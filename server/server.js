@@ -278,17 +278,17 @@ app.get('/api/bootstrap', (_, res) => {
     state: scenario.initialState,
     opening: {
       narrative:
-        "Chicago wakes under a low gray sky and a restless wind from the lake. Inside the Administration Building, messengers move at a near-run, telegraph slips change hands without ceremony, and Daniel Burnham stands over a desk scattered with shipping papers. He does not look up at once. When he finally does, there is strain in his face beneath the command. 'Something is wrong with the electrical consignments,' he says. 'And I do not mean delay. I mean interference.'",
+        "Chicago, May 1893. The White City rises from the lakefront mud, its plaster palaces gleaming in the morning haze — ten thousand workers still swarming Jackson Park in the final days before the Exposition opens. But beneath the spectacle, something is wrong. A tension moves through the corridors of the Administration Building that has nothing to do with last-minute preparations.\n\nYou are assistant to Daniel Burnham, Director of Works. When he needs eyes he can trust, he sends for you.\n\nThis morning, a shipping manifest crossed your desk: electrical equipment, diverted from its declared route. The signature authorizing the change does not match any name on Burnham's staff.\n\nBurnham's office door stands open. He is at his desk, jaw set, a telegraph slip folded in his hand. He looks up.",
       npcMoments: [
         {
           npc: 'daniel_burnham',
-          text: "'I have no time for panic, and less for gossip. Bring me facts.'"
+          text: "'Shut the door. Tell me what you found in those papers.'"
         }
       ],
       choices: [
-        'Examine the shipping memorandum on Burnham\'s desk',
-        'Ask Burnham who had access to the consignments',
-        'Go at once to the freight yards'
+        'Show Burnham the mismatched signature on the manifest',
+        'Ask Burnham what he already suspects',
+        'Request permission to go directly to the freight yards'
       ]
     }
   });
