@@ -39,6 +39,15 @@ function getLocationById(id) {
   return locations.find((loc) => loc.id === id) || null;
 }
 
+function slimLocation(loc) {
+  if (!loc) return null;
+  return { id: loc.id, name: loc.name, description: loc.description, clues: loc.possibleClues };
+}
+
+function slimNpc(npc) {
+  return { id: npc.id, name: npc.name, voice: npc.voice, goal: npc.privateGoal, knowledge: npc.knowledge };
+}
+
 function getRelevantNpcs(state, location) {
   const ids = new Set();
   if (location?.linkedNPCs) {
@@ -48,7 +57,7 @@ function getRelevantNpcs(state, location) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 2)
     .forEach(([id]) => ids.add(id));
-  return npcs.filter((npc) => ids.has(npc.id));
+  return npcs.filter((npc) => ids.has(npc.id)).map(slimNpc);
 }
 
 function composeTurnPrompt(state, playerInput) {
@@ -56,10 +65,9 @@ function composeTurnPrompt(state, playerInput) {
   const relevantNpcs = getRelevantNpcs(state, location);
 
   return turnTemplate
-    .replace('{{STATE_JSON}}', JSON.stringify(state, null, 2))
-    .replace('{{SCENARIO_JSON}}', JSON.stringify(scenario, null, 2))
-    .replace('{{LOCATION_JSON}}', JSON.stringify(location, null, 2))
-    .replace('{{NPC_JSON}}', JSON.stringify(relevantNpcs, null, 2))
+    .replace('{{STATE_JSON}}', JSON.stringify(state))
+    .replace('{{LOCATION_JSON}}', JSON.stringify(slimLocation(location)))
+    .replace('{{NPC_JSON}}', JSON.stringify(relevantNpcs))
     .replace('{{PLAYER_INPUT}}', playerInput);
 }
 
@@ -191,13 +199,20 @@ app.post('/api/turn', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'prompt-caching-2024-07-31'
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1200,
+        max_tokens: 900,
         temperature: 0.8,
-        system: systemPrompt,
+        system: [
+          {
+            type: 'text',
+            text: systemPrompt,
+            cache_control: { type: 'ephemeral' }
+          }
+        ],
         messages: [
           {
             role: 'user',

@@ -94,36 +94,6 @@ Important fields include:
 - remaining time
 - whether the sabotage plan is known
 
-## Output contract
-Return JSON only. Do not include markdown fences.
-Use this schema:
-{
-  "narrative": "A concise but vivid scene response.",
-  "timeAdvance": 3,
-  "location": "location_id",
-  "stateChanges": {
-    "threat": 0,
-    "act": 1,
-    "burnhamTrust": 0,
-    "suspicion": {
-      "npc_id": 1
-    }
-  },
-  "newClues": ["clue text"],
-  "npcMoments": [
-    {"npc": "npc_id", "text": "dialogue or observed action"}
-  ],
-  "choices": [
-    "Optional suggested action 1",
-    "Optional suggested action 2",
-    "Optional suggested action 3"
-  ],
-  "endState": {
-    "isEnding": false,
-    "result": "ongoing"
-  }
-}
-
 ## Writing style
 - vivid but economical
 - 1 to 4 short paragraphs worth of prose, stored in the `narrative` field
@@ -133,3 +103,49 @@ Use this schema:
 
 ## What success looks like
 By the end of the session, the player should feel they participated in a living historical drama with meaningful choices, credible characters, and a controlled narrative arc.
+
+## Scenario reference
+
+Acts and timing:
+- Act 1 (Setup): minutes 0–8 — establish stakes, first irregularity, first clue, one visible suspect
+- Act 2 (Pressure): minutes 9–21 — conflicting testimony, political pressure, timed-sabotage evidence, false lead
+- Act 3 (Climax): minutes 22–30 — sabotage plan clear, player intervenes, resolution
+
+Pressure events (inject when player is stuck):
+- A telegraph arrives with contradictory instructions
+- A key witness disappears
+- A guard reports movement near restricted electrical equipment
+- A newspaper man gets wind of a scandal
+
+Win: sabotage identified and neutralized, Burnham warned in time.
+Fail: time expires before action, wrong accusation destroys support, sabotage succeeds.
+Partial: immediate threat stopped but conspirators escape; fair opens but scandal reaches press.
+
+## Output contract
+Return JSON only. No markdown fences. Fields:
+
+```
+{
+  "narrative": "1–4 paragraphs of vivid prose.",
+  "timeAdvance": 3,
+  "location": "location_id",
+  "stateChanges": {
+    "threat": 0,
+    "act": 1,
+    "burnhamTrust": 0,
+    "suspicion": { "npc_id": 1 },
+    "flags": {},
+    "knownSabotageMethod": false,
+    "namedConspirators": []
+  },
+  "newClues": [],
+  "npcMoments": [{ "npc": "npc_id", "text": "dialogue or action" }],
+  "choices": ["action 1", "action 2", "action 3"],
+  "endState": { "isEnding": true, "result": "success|failure|partial" }
+}
+```
+
+- `stateChanges`: omit any sub-field that did not change this turn.
+- `newClues`: omit or use `[]` if none.
+- `npcMoments`: omit or use `[]` if no NPC speaks.
+- `endState`: **omit entirely** unless the story is ending this turn.
