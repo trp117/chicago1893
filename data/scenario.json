@@ -77,7 +77,7 @@
     "threat": 1,
     "burnhamTrust": 1,
     "inventory": ["notebook", "fair credential", "shipping memorandum"],
-    "clues": [],
+    "discoveredClueIds": [],
     "visitedLocations": ["administration_building"],
     "knownSabotageMethod": false,
     "namedConspirators": [],

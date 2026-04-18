@@ -264,11 +264,231 @@ button {
 
 ul {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 0;
+  list-style: none;
 }
 
 li {
   margin-bottom: 8px;
+}
+
+.clue-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: normal;
+}
+
+.clue-empty {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+.clue-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--panel-soft);
+}
+
+.clue-title {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 3px;
+  color: var(--fg);
+}
+
+.clue-desc {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.clue-category {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-bottom: 4px;
+}
+
+.clue-category--documentary { background: #1a2a1a; color: #7ec87e; }
+.clue-category--physical    { background: #2a1a1a; color: #e07070; }
+.clue-category--testimony   { background: #1a1a2a; color: #7090d8; }
+.clue-category--observation { background: #2a2215; color: #c8a860; }
+
+.hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.notes-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.notes-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(8, 6, 4, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 20px;
+}
+
+.notes-overlay.hidden {
+  display: none;
+}
+
+.notes-panel {
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notes-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.notes-panel-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.notes-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-weight: normal;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.notes-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.notes-content {
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  flex: 1;
+}
+
+.notes-section {
+  margin-bottom: 20px;
+}
+
+.notes-section:last-child {
+  margin-bottom: 0;
+}
+
+.notes-section h3 {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.notes-section ul {
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.notes-section li {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.suspicion-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.suspicion--low    { background: #1a2010; color: #90c070; }
+.suspicion--medium { background: #2a2010; color: #d8a850; }
+.suspicion--high   { background: #2a1010; color: #e07060; }
+
+.notes-loading,
+.notes-empty {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.notes-error {
+  color: #e07060;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .notes-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .notes-panel {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 12px 12px 0 0;
+  }
 }
 
 .begin-overlay {

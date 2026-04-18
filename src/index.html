@@ -42,7 +42,7 @@
         </div>
 
         <div class="panel">
-          <h2>Clues</h2>
+          <h2>Clues <span id="clue-count" class="clue-count"></span></h2>
           <ul id="clues"></ul>
         </div>
       </aside>
@@ -60,7 +60,10 @@
         <header class="hero">
           <div class="hero-title-row">
             <h1>Chicago, 1893</h1>
-            <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
+            <div class="hero-controls">
+              <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
+              <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
+            </div>
           </div>
           <p>Shadows gather beneath the White City.</p>
         </header>
@@ -91,6 +94,16 @@
           <button type="submit">Send</button>
         </form>
       </main>
+    </div>
+
+    <div id="notes-overlay" class="notes-overlay hidden" role="dialog" aria-modal="true" aria-label="Case notes">
+      <div class="notes-panel">
+        <div class="notes-panel-header">
+          <h2>Case Notes</h2>
+          <button type="button" id="notes-close" class="notes-close" aria-label="Close notes">&times;</button>
+        </div>
+        <div id="notes-content" class="notes-content"></div>
+      </div>
     </div>
 
     <script type="module" src="/app.js"></script>

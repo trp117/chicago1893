@@ -89,10 +89,17 @@ Important fields include:
 - elapsed minutes
 - threat level
 - suspicion by NPC
-- clues discovered
+- `discoveredClueIds`: the IDs of clues the player has found — reference these in narrative, never repeat their content as if new
 - act number
 - remaining time
 - whether the sabotage plan is known
+
+## Clue system rules
+- Clues are structured objects with IDs. You receive the full discovered clue objects and the available (undiscovered) clues at the current location.
+- When the player's action logically uncovers a clue, return its ID in `newClues`. Only use IDs from the available clues list you receive — never invent IDs.
+- Do not hint at or reveal the content of clues the player has not discovered, unless their action directly warrants it.
+- Reference discovered clues naturally in prose and dialogue to reward the player's progress.
+- When `readyForClimax` is true, steer toward Act III resolution.
 
 ## Writing style
 - vivid but economical
@@ -138,7 +145,7 @@ Return JSON only. No markdown fences. Fields:
     "knownSabotageMethod": false,
     "namedConspirators": []
   },
-  "newClues": [],
+  "newClues": ["clue_id_from_catalog"],
   "npcMoments": [{ "npc": "npc_id", "text": "dialogue or action" }],
   "choices": ["action 1", "action 2", "action 3"],
   "endState": { "isEnding": true, "result": "success|failure|partial" }
@@ -146,6 +153,6 @@ Return JSON only. No markdown fences. Fields:
 ```
 
 - `stateChanges`: omit any sub-field that did not change this turn.
-- `newClues`: omit or use `[]` if none.
+- `newClues`: array of clue IDs from the available clues list provided in the turn prompt. Omit or use `[]` if none discovered this turn.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
 - `endState`: **omit entirely** unless the story is ending this turn.

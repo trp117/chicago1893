@@ -31,17 +31,45 @@ function readJson(filePath) {
 
 const systemPrompt = readText('prompts/system_prompt.md');
 const turnTemplate = readText('prompts/turn_prompt_template.md');
+const notesSystemPrompt = readText('prompts/notes_system_prompt.md');
+const notesTemplate = readText('prompts/notes_prompt_template.md');
 const scenario = readJson('data/scenario.json');
 const locations = readJson('data/locations.json');
 const npcs = readJson('data/npcs.json');
+const cluesCatalog = readJson('data/clues.json');
 
 function getLocationById(id) {
   return locations.find((loc) => loc.id === id) || null;
 }
 
+function getClueById(id) {
+  return cluesCatalog.find((c) => c.id === id) || null;
+}
+
 function slimLocation(loc) {
   if (!loc) return null;
-  return { id: loc.id, name: loc.name, description: loc.description, clues: loc.possibleClues };
+  return { id: loc.id, name: loc.name, description: loc.description, atmosphericClues: loc.possibleClues };
+}
+
+function slimClue(clue) {
+  return { id: clue.id, title: clue.title, description: clue.description, category: clue.category, implicates: clue.implicates, unlocks: clue.unlocks };
+}
+
+function getAvailableCluesAtLocation(locationId, discoveredClueIds) {
+  return cluesCatalog
+    .filter((c) => c.source === locationId && !discoveredClueIds.includes(c.id))
+    .map((c) => ({ id: c.id, title: c.title, category: c.category }));
+}
+
+function checkEndingReadiness(state) {
+  const ids = state.discoveredClueIds || [];
+  const hasMethod = state.knownSabotageMethod;
+  const hasKeyEvidence = ids.includes('tampered_wiring_diagrams') || ids.includes('opening_night_note');
+  const hasConspirators = (state.namedConspirators || []).length >= 2;
+  return {
+    keyEvidenceFound: hasKeyEvidence,
+    readyForClimax: hasMethod || (hasKeyEvidence && hasConspirators)
+  };
 }
 
 function slimNpc(npc) {
@@ -63,11 +91,17 @@ function getRelevantNpcs(state, location) {
 function composeTurnPrompt(state, playerInput) {
   const location = getLocationById(state.location);
   const relevantNpcs = getRelevantNpcs(state, location);
+  const discoveredClues = (state.discoveredClueIds || []).map(getClueById).filter(Boolean).map(slimClue);
+  const availableClues = getAvailableCluesAtLocation(state.location, state.discoveredClueIds || []);
+  const endingSignals = checkEndingReadiness(state);
 
   return turnTemplate
     .replace('{{STATE_JSON}}', JSON.stringify(state))
     .replace('{{LOCATION_JSON}}', JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}', JSON.stringify(relevantNpcs))
+    .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
+    .replace('{{AVAILABLE_CLUES_JSON}}', JSON.stringify(availableClues))
+    .replace('{{ENDING_SIGNALS_JSON}}', JSON.stringify(endingSignals))
     .replace('{{PLAYER_INPUT}}', playerInput);
 }
 
@@ -110,8 +144,18 @@ function mergeState(currentState, modelOutput) {
   }
 
   if (Array.isArray(modelOutput.newClues)) {
-    for (const clue of modelOutput.newClues) {
-      if (!next.clues.includes(clue)) next.clues.push(clue);
+    for (const clueId of modelOutput.newClues) {
+      if (typeof clueId !== 'string') continue;
+      if (!(next.discoveredClueIds || []).includes(clueId)) {
+        next.discoveredClueIds = next.discoveredClueIds || [];
+        next.discoveredClueIds.push(clueId);
+        const clue = getClueById(clueId);
+        if (clue) {
+          for (const npcId of (clue.implicates || [])) {
+            next.suspicion[npcId] = (next.suspicion[npcId] || 0) + 1;
+          }
+        }
+      }
     }
   }
 
@@ -130,9 +174,107 @@ function mergeState(currentState, modelOutput) {
   return next;
 }
 
+function buildMockNotes(state, discoveredClues, suspicionContext) {
+  const clues = discoveredClues.map((c) => ({
+    title: c.title,
+    significance: c.description
+  }));
+
+  const suspicions = suspicionContext.map(({ name, score }) => ({
+    name,
+    level: score >= 3 ? 'high' : score >= 2 ? 'medium' : 'low',
+    reasoning: score >= 3
+      ? 'Several pieces of evidence now point in their direction.'
+      : 'Something in their behavior has not sat right with me.'
+  }));
+
+  const impressions = suspicionContext.slice(0, 3).map(({ name, score }) => ({
+    name,
+    impression: score > 1
+      ? 'Evasive when pressed. I should return to them with harder questions.'
+      : 'Hard to read so far. Either uninvolved or very careful.'
+  }));
+
+  const openQuestions = [
+    !state.knownSabotageMethod && 'I still do not know exactly how the sabotage is meant to work.',
+    (state.namedConspirators || []).length < 2 && 'There are people behind this I have not yet identified.',
+    discoveredClues.length < 3 && 'I have not found all the physical evidence — there is more out there.'
+  ].filter(Boolean);
+
+  const visited = state.visitedLocations || [];
+  const nextLeads = [
+    !visited.includes('freight_yards') && 'The freight yards may hold physical evidence of the diverted crates.',
+    !visited.includes('machinery_hall') && 'Machinery Hall should be examined for tampering.',
+    !visited.includes('midway_plaisance') && 'The Midway is full of loose talk — worth a visit.',
+    discoveredClues.length === 0 && 'Start with the documents Burnham has on his desk.'
+  ].filter(Boolean).slice(0, 3);
+
+  return { clues, suspicions, characterImpressions: impressions, openQuestions, nextLeads };
+}
+
+app.post('/api/notes', async (req, res) => {
+  try {
+    const { state } = req.body;
+    if (!state) return res.status(400).json({ error: 'Missing state.' });
+
+    const discoveredClues = (state.discoveredClueIds || []).map(getClueById).filter(Boolean).map(slimClue);
+    const suspicionContext = Object.entries(state.suspicion || {})
+      .filter(([, v]) => v > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, score]) => {
+        const npc = npcs.find((n) => n.id === id);
+        return { id, name: npc?.name || id, score };
+      });
+
+    if (!API_KEY) {
+      return res.json({ notes: buildMockNotes(state, discoveredClues, suspicionContext) });
+    }
+
+    const prompt = notesTemplate
+      .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
+      .replace('{{SUSPICION_JSON}}', JSON.stringify(suspicionContext))
+      .replace('{{NAMED_CONSPIRATORS}}', JSON.stringify(state.namedConspirators || []))
+      .replace('{{VISITED_LOCATIONS}}', JSON.stringify(state.visitedLocations || []))
+      .replace('{{ACT}}', String(state.act || 1))
+      .replace('{{ELAPSED}}', String(state.elapsedMinutes || 0));
+
+    const response = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 700,
+        temperature: 0.7,
+        system: notesSystemPrompt,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data?.content?.[0]?.text;
+    if (!text) return res.status(500).json({ error: 'No response from AI.' });
+
+    let notes;
+    try {
+      notes = JSON.parse(text);
+    } catch {
+      return res.status(500).json({ error: 'Invalid notes format returned.' });
+    }
+
+    return res.json({ notes });
+  } catch (error) {
+    return res.status(500).json({ error: error.message || 'Server error.' });
+  }
+});
+
 app.get('/api/bootstrap', (_, res) => {
   res.json({
     scenario,
+    cluesCatalog,
     state: scenario.initialState,
     opening: {
       narrative:
@@ -169,9 +311,7 @@ app.post('/api/turn', async (req, res) => {
           threat: 1,
           burnhamTrust: 1
         },
-        newClues: [
-          'A shipping document contains duplicated initials in different handwriting.'
-        ],
+        newClues: ['forged_initials_memo'],
         npcMoments: [
           {
             npc: 'daniel_burnham',
