@@ -344,6 +344,32 @@ li {
   gap: 8px;
 }
 
+.driving-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: normal;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.driving-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.driving-btn.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #1a150c;
+}
+
 .autotest-btn {
   height: 36px;
   padding: 0 14px;

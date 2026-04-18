@@ -327,10 +327,12 @@ inputEl.addEventListener('keydown', (e) => {
 
 // Voice input
 const micBtn = document.getElementById('mic-btn');
+const drivingBtn = document.getElementById('driving-btn');
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
   micBtn.remove();
+  drivingBtn.remove();
 } else {
   const recognition = new SpeechRecognition();
   recognition.continuous = true;
@@ -340,6 +342,70 @@ if (!SpeechRecognition) {
   let listening = false;
   let confirmedText = '';  // base text + all finalized speech chunks
   let restartScheduled = false;
+
+  let drivingMode = false;
+  let drivingTimer = null;
+
+  const VOICE_COMMANDS = {
+    'send': () => {
+      if (confirmedText.trim()) {
+        const text = confirmedText.trim();
+        confirmedText = '';
+        inputEl.value = '';
+        submitTurn(text);
+      }
+    },
+    'stop reading': () => {
+      ttsEnabled = false;
+      ttsStop();
+      updateTtsBarUI();
+      updateTtsToggleUI();
+    },
+    'start reading': () => {
+      ttsEnabled = true;
+      if (audioUnlocked && lastRenderedSpeakText) ttsSpeakRaw(lastRenderedSpeakText);
+      updateTtsBarUI();
+      updateTtsToggleUI();
+    },
+    'notes': () => openNotes(),
+  };
+
+  function checkVoiceCommand(chunk) {
+    const normalized = chunk.trim().toLowerCase().replace(/[.,!?]+$/, '');
+    const handler = VOICE_COMMANDS[normalized];
+    if (handler) { handler(); return true; }
+    return false;
+  }
+
+  function resetDrivingTimer() {
+    clearTimeout(drivingTimer);
+    if (!confirmedText.trim()) return;
+    drivingTimer = setTimeout(() => {
+      const text = confirmedText.trim();
+      if (text && drivingMode) {
+        confirmedText = '';
+        inputEl.value = '';
+        submitTurn(text);
+      }
+    }, 2500);
+  }
+
+  function setDrivingMode(on) {
+    drivingMode = on;
+    drivingBtn.classList.toggle('active', on);
+    drivingBtn.setAttribute('aria-label', on ? 'Disable driving mode' : 'Enable driving mode');
+    drivingBtn.title = on ? 'Driving mode: on' : 'Driving mode';
+    if (on) {
+      if (!listening) {
+        confirmedText = inputEl.value.trimEnd();
+        setListening(true);
+        startRecognition();
+      }
+    } else {
+      clearTimeout(drivingTimer);
+      if (listening) stopListening(false);
+    }
+  }
 
   function setListening(on) {
     listening = on;
@@ -353,6 +419,7 @@ if (!SpeechRecognition) {
   }
 
   function stopListening(autoSubmit = false) {
+    clearTimeout(drivingTimer);
     setListening(false);
     restartScheduled = false;
     recognition.stop();
@@ -369,14 +436,19 @@ if (!SpeechRecognition) {
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const chunk = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
-        const sep = confirmedText && !confirmedText.endsWith(' ') ? ' ' : '';
-        confirmedText += sep + chunk;
+        if (drivingMode && checkVoiceCommand(chunk)) {
+          // voice command handled — skip appending to text
+        } else {
+          const sep = confirmedText && !confirmedText.endsWith(' ') ? ' ' : '';
+          confirmedText += sep + chunk;
+        }
       } else {
         interim += chunk;
       }
     }
     const sep = confirmedText && interim && !confirmedText.endsWith(' ') ? ' ' : '';
     inputEl.value = confirmedText + (interim ? sep + interim : '');
+    if (drivingMode) resetDrivingTimer();
   };
 
   // Auto-restart on unexpected end (browser cuts off after silence on mobile/some desktop)
@@ -409,8 +481,10 @@ if (!SpeechRecognition) {
 
   // Stop mic when the form is submitted
   formEl.addEventListener('submit', () => {
-    if (listening) stopListening();
+    if (listening && !drivingMode) stopListening();
   }, { capture: true });
+
+  drivingBtn.addEventListener('click', () => setDrivingMode(!drivingMode));
 }
 
 // ── Case Notes ───────────────────────────────────────────────────────────────
