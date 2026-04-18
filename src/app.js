@@ -21,6 +21,7 @@ let hasSpokenIntro = false;
 let lastSpokenMessageId = 0;
 let currentMessageId = 0;
 let introText = null;
+let lastRenderedSpeakText = '';
 
 const SVG_SPEAKER_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
   <path d="M2 6h2l4-4v12l-4-4H2z"/>
@@ -121,7 +122,11 @@ if (!ttsSupported) {
   // True Start/Stop toggle: changes ttsEnabled AND stops current speech when disabling
   ttsStopBtn.addEventListener('click', () => {
     ttsEnabled = !ttsEnabled;
-    if (!ttsEnabled) ttsStop();
+    if (!ttsEnabled) {
+      ttsStop();
+    } else if (audioUnlocked && lastRenderedSpeakText) {
+      ttsSpeakRaw(lastRenderedSpeakText);
+    }
     updateTtsBarUI();
     updateTtsToggleUI();
   });
@@ -199,6 +204,7 @@ function renderOutput(output, meta = {}) {
 
   const messageId = ++currentMessageId;
   const speakText = speakParts.join(' ');
+  lastRenderedSpeakText = speakText;
 
   if (!hasSpokenIntro) {
     introText = speakText;
