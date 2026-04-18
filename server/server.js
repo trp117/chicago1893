@@ -127,8 +127,8 @@ function mergeState(currentState, modelOutput) {
   if (typeof delta.act === 'number') {
     next.act = delta.act;
   } else {
-    if (next.elapsedMinutes >= 22) next.act = 3;
-    else if (next.elapsedMinutes >= 9) next.act = 2;
+    if (next.elapsedMinutes >= 8) next.act = 3;
+    else if (next.elapsedMinutes >= 4) next.act = 2;
     else next.act = 1;
   }
 

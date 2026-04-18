@@ -11,6 +11,6 @@ Locations visited:
 {{VISITED_LOCATIONS}}
 
 Current act: {{ACT}} of 3
-Elapsed time: {{ELAPSED}} of 30 minutes
+Elapsed time: {{ELAPSED}} of 10 minutes
 
 Write my case notes based only on the above. Be honest about what I do not yet know.

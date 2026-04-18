@@ -2,7 +2,7 @@
   "id": "chicago_1893_burnham_conspiracy_v1",
   "title": "Chicago, 1893: Shadows of the White City",
   "premise": "The player, assistant to Daniel Burnham, must uncover and stop a conspiracy to sabotage the World's Columbian Exposition before opening day.",
-  "sessionTargetMinutes": 30,
+  "sessionTargetMinutes": 10,
   "historicalRealism": "high",
   "tone": ["historical thriller", "mystery"],
   "freedomLevel": "guided",
@@ -13,7 +13,7 @@
     {
       "act": 1,
       "name": "Setup",
-      "minutes": [0, 8],
+      "minutes": [0, 3],
       "beats": [
         "Burnham introduces stakes",
         "First irregularity appears",
@@ -24,20 +24,19 @@
     {
       "act": 2,
       "name": "Pressure",
-      "minutes": [9, 21],
+      "minutes": [4, 7],
       "beats": [
-        "Conflicting testimony",
-        "Political pressure increases",
-        "Evidence points toward a timed sabotage",
-        "False lead or betrayal complicates investigation"
+        "Evidence of deliberate interference confirmed",
+        "A second suspect or complication emerges",
+        "Sabotage method or target becomes clearer"
       ]
     },
     {
       "act": 3,
       "name": "Climax",
-      "minutes": [22, 30],
+      "minutes": [8, 10],
       "beats": [
-        "Sabotage plan becomes clear",
+        "Sabotage plan is clear",
         "Player chooses how to intervene",
         "Resolution before opening"
       ]
@@ -46,7 +45,7 @@
   "coreSystems": {
     "threatScale": {"min": 0, "max": 10},
     "burnhamTrustScale": {"min": -3, "max": 5},
-    "timePerTurnDefault": 3,
+    "timePerTurnDefault": 2,
     "pressureEvents": [
       "A telegraph arrives with contradictory instructions",
       "A key witness disappears",
@@ -71,7 +70,7 @@
   ],
   "initialState": {
     "elapsedMinutes": 0,
-    "remainingMinutes": 30,
+    "remainingMinutes": 10,
     "act": 1,
     "location": "administration_building",
     "threat": 1,
@@ -91,7 +90,6 @@
       "daniel_burnham": 0,
       "emile_mercier": 1,
       "patrick_hanrahan": 0,
-      "clara_hale": 0,
       "captain_odonnell": 0
     }
   }

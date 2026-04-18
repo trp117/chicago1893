@@ -199,37 +199,51 @@ async function loadGame() {
   renderOutput(data.opening);
 }
 
+let submitting = false;
+
 async function submitTurn(playerInput) {
-  if (!playerInput?.trim()) return;
+  if (!playerInput?.trim() || submitting) return;
+  submitting = true;
   addEntry('player', 'You', `<p>${playerInput}</p>`);
   inputEl.value = '';
+  try {
+    const response = await fetch('/api/turn', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ state: gameState, playerInput })
+    });
 
-  const response = await fetch('/api/turn', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ state: gameState, playerInput })
-  });
+    const data = await response.json();
+    if (data.error) {
+      addEntry('engine', 'Error', `<p>${data.error}</p>`);
+      return;
+    }
 
-  const data = await response.json();
-  if (data.error) {
-    addEntry('engine', 'Error', `<p>${data.error}</p>`);
-    return;
-  }
+    gameState = data.nextState;
+    renderSidebar();
+    renderOutput(data.output, { mockMode: data.mockMode });
 
-  gameState = data.nextState;
-  renderSidebar();
-  renderOutput(data.output, { mockMode: data.mockMode });
-
-  if (data.output?.endState?.isEnding) {
-    formEl.querySelector('button').disabled = true;
-    inputEl.disabled = true;
-    renderChoices([]);
+    if (data.output?.endState?.isEnding) {
+      formEl.querySelector('button').disabled = true;
+      inputEl.disabled = true;
+      renderChoices([]);
+    }
+  } finally {
+    submitting = false;
   }
 }
 
 formEl.addEventListener('submit', async (event) => {
   event.preventDefault();
   await submitTurn(inputEl.value);
+});
+
+// Enter submits, Shift+Enter inserts newline
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    formEl.requestSubmit();
+  }
 });
 
 // Voice input
@@ -259,11 +273,16 @@ if (!SpeechRecognition) {
     try { recognition.start(); } catch { /* already running */ }
   }
 
-  function stopListening() {
+  function stopListening(autoSubmit = false) {
     setListening(false);
     restartScheduled = false;
     recognition.stop();
     inputEl.value = confirmedText;
+    if (autoSubmit && confirmedText.trim()) {
+      const text = confirmedText.trim();
+      confirmedText = '';
+      submitTurn(text);
+    }
   }
 
   recognition.onresult = (event) => {
@@ -301,7 +320,7 @@ if (!SpeechRecognition) {
 
   micBtn.addEventListener('click', () => {
     if (listening) {
-      stopListening();
+      stopListening(true);
     } else {
       confirmedText = inputEl.value.trimEnd();
       setListening(true);
