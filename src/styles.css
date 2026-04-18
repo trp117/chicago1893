@@ -97,18 +97,27 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #7a2a20;
+  border: 1px solid #3a5c3a;
   background: transparent;
-  color: #e07060;
+  color: #7ec87e;
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.8rem;
   font-weight: normal;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .tts-stop-btn:hover {
+  background: #101a10;
+}
+
+.tts-stop-btn.active {
+  border-color: #7a2a20;
+  color: #e07060;
+}
+
+.tts-stop-btn.active:hover {
   background: #2a1010;
 }
 
@@ -196,9 +205,16 @@ body {
 
 .input-row {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr auto;
   gap: 12px;
   padding: 0 28px 28px;
+}
+
+.input-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100px;
 }
 
 .input-textarea-wrap {

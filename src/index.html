@@ -61,7 +61,6 @@
           <div class="hero-title-row">
             <h1>Chicago, 1893</h1>
             <div class="hero-controls">
-              <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
               <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
             </div>
           </div>
@@ -70,10 +69,10 @@
 
         <section id="story" class="story-feed"></section>
 
-        <div id="tts-bar" class="tts-bar" hidden>
+        <div id="tts-bar" class="tts-bar">
           <button type="button" id="tts-stop" class="tts-stop-btn">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><rect width="10" height="10" rx="2"/></svg>
-            Stop reading
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>
+            Start reading
           </button>
         </div>
 
@@ -91,7 +90,10 @@
               </svg>
             </button>
           </div>
-          <button type="submit">Send</button>
+          <div class="input-actions">
+            <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
+            <button type="submit">Send</button>
+          </div>
         </form>
       </main>
     </div>

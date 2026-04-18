@@ -53,8 +53,21 @@ function updateTtsToggleUI() {
   ttsToggleBtn.title = ttsEnabled ? 'Read aloud: on' : 'Read aloud: off';
 }
 
-function setTtsSpeaking(on) {
-  ttsBarEl.hidden = !on;
+const SVG_STOP_ICON = `<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><rect width="10" height="10" rx="2"/></svg>`;
+const SVG_PLAY_ICON = `<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>`;
+
+function updateTtsBarUI() {
+  if (ttsEnabled) {
+    ttsStopBtn.innerHTML = `${SVG_STOP_ICON} Stop reading`;
+    ttsStopBtn.classList.add('active');
+  } else {
+    ttsStopBtn.innerHTML = `${SVG_PLAY_ICON} Start reading`;
+    ttsStopBtn.classList.remove('active');
+  }
+}
+
+function setTtsSpeaking(_on) {
+  // bar is always visible; state communicated via updateTtsBarUI
 }
 
 function ttsSpeakRaw(text) {
@@ -79,14 +92,17 @@ const beginBtn = document.getElementById('begin-btn');
 
 if (!ttsSupported) {
   ttsToggleBtn.remove();
+  ttsBarEl.hidden = true;
   beginOverlay.classList.add('hidden');
 } else {
   updateTtsToggleUI();
+  updateTtsBarUI();
 
   beginBtn.addEventListener('click', () => {
     audioUnlocked = true;
     ttsEnabled = true;
     updateTtsToggleUI();
+    updateTtsBarUI();
     beginOverlay.classList.add('hidden');
     if (introText && !hasSpokenIntro) {
       hasSpokenIntro = true;
@@ -99,9 +115,16 @@ if (!ttsSupported) {
     ttsEnabled = !ttsEnabled;
     if (!ttsEnabled) ttsStop();
     updateTtsToggleUI();
+    updateTtsBarUI();
   });
 
-  ttsStopBtn.addEventListener('click', ttsStop);
+  // True Start/Stop toggle: changes ttsEnabled AND stops current speech when disabling
+  ttsStopBtn.addEventListener('click', () => {
+    ttsEnabled = !ttsEnabled;
+    if (!ttsEnabled) ttsStop();
+    updateTtsBarUI();
+    updateTtsToggleUI();
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
