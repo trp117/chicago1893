@@ -1,0 +1,399 @@
+{
+  "scenario_id": "chicago_1893_dimming_v1",
+  "title": "The Dimming of the White City",
+  "premise": "Two days before the World's Columbian Exposition opens, a covert act of sabotage threatens to destroy the AC electrical demonstration in the Electricity Building — the showpiece meant to prove Westinghouse's alternating current can power a city. The player, assistant to Daniel Burnham, must identify the saboteur and their corporate backer before the demonstration fails in front of the world.",
+  "tone": "historical thriller",
+  "difficulty": "medium",
+
+  "setting": {
+    "location": "Chicago, Illinois",
+    "year": 1893,
+    "event": "World's Columbian Exposition",
+    "historical_context": "The War of Currents is at its peak. Westinghouse won the contract to light the Fair with AC power over Edison's DC bid. A deliberate failure at the Fair's opening would discredit AC power, damage Westinghouse, and reopen the city power grid contract — worth millions.",
+    "atmosphere": "Lake wind, white plaster facades, construction dust, electric arc lights being tested after dark, the smell of mud and ambition"
+  },
+
+  "player": {
+    "role": "Assistant to Daniel Burnham, Director of Works",
+    "starting_knowledge": "A routine inspection flagged an anomaly in the Electricity Building wiring. Burnham believes it is an accident. You are not so sure.",
+    "capabilities": ["investigate", "question NPCs", "examine objects", "travel between locations", "present evidence to Burnham or security", "accuse suspects"]
+  },
+
+  "session": {
+    "target_minutes": 10,
+    "time_per_turn_default": 2,
+    "acts": [
+      {
+        "act": 1,
+        "name": "The Anomaly",
+        "minutes": [0, 3],
+        "objective": "Identify that the wiring fault is deliberate and surface the first suspect",
+        "required_beats": [
+          "Burnham introduces the wiring anomaly as potentially serious",
+          "Player visits the Electricity Building and finds altered_wiring_spec",
+          "Thomas Crowe identified as a person of interest"
+        ]
+      },
+      {
+        "act": 2,
+        "name": "The Trail",
+        "minutes": [4, 7],
+        "objective": "Follow the evidence to the corporate backer behind Crowe",
+        "required_beats": [
+          "Crowe's personnel file surfaces as an apparent motive (false lead)",
+          "Hotel Sherman ledger connects Crowe to Aldrich",
+          "Freight depot evidence confirms physical tampering"
+        ]
+      },
+      {
+        "act": 3,
+        "name": "The Demonstration",
+        "minutes": [8, 10],
+        "objective": "Confront the conspirators or neutralize the sabotage before the demonstration",
+        "required_beats": [
+          "Player must choose: confront Aldrich, detain Crowe, or replace the relay",
+          "Burnham must be convinced with evidence to authorize security action",
+          "Resolution before the electrical demonstration begins"
+        ]
+      }
+    ],
+    "pressure_events": [
+      "A technician reports the relay assembly has been accessed again overnight",
+      "A telegraph from Westinghouse headquarters asks Burnham to confirm the demonstration is secure",
+      "Crowe is seen near the freight depot asking about his access pass",
+      "A journalist approaches Burnham with rumors of sabotage"
+    ]
+  },
+
+  "locations": [
+    {
+      "id": "administration_building",
+      "name": "Administration Building",
+      "description": "Burnham's command post. Telegraphs, shipping manifests, stressed clerks, and the weight of a city's ambition in one room.",
+      "mood": "urgent, institutional, brittle",
+      "linked_npcs": ["daniel_burnham"],
+      "clues_available": ["crowe_personnel_file"],
+      "act_relevance": [1, 2]
+    },
+    {
+      "id": "electricity_building",
+      "name": "Electricity Building",
+      "description": "The crown jewel of the Fair's technical exhibits. Arc lights, dynamos, relay panels, and the hum of something that could change the world — or fail spectacularly.",
+      "mood": "impressive, technical, quietly dangerous",
+      "linked_npcs": ["thomas_crowe", "nora_aldrich"],
+      "clues_available": ["altered_wiring_spec", "aldrich_telegram"],
+      "act_relevance": [1, 3]
+    },
+    {
+      "id": "freight_depot",
+      "name": "Fair Freight Depot",
+      "description": "Crates, rail sidings, laborers, and the unglamorous machinery beneath the Fair's polished face. Records here are kept loosely.",
+      "mood": "industrial, secretive, overlooked",
+      "linked_npcs": ["thomas_crowe", "captain_doyle"],
+      "clues_available": ["tampered_relay_switch", "foreman_eyewitness"],
+      "act_relevance": [2, 3]
+    },
+    {
+      "id": "hotel_sherman",
+      "name": "Hotel Sherman",
+      "description": "A respectable hotel two blocks from the grounds. Business is conducted here that cannot be conducted at the Fair. The bar is quiet in the afternoon.",
+      "mood": "civilized, discreet, conspiratorial",
+      "linked_npcs": ["nora_aldrich"],
+      "clues_available": ["hotel_ledger_entry"],
+      "act_relevance": [2]
+    }
+  ],
+
+  "npcs": [
+    {
+      "id": "daniel_burnham",
+      "name": "Daniel Burnham",
+      "role": "Director of Works; the player's superior",
+      "public_face": "Commanding, exhausted, committed to the Fair succeeding at any cost",
+      "private_goal": "Open the Fair without scandal or public failure",
+      "fear": "Political embarrassment and press humiliation",
+      "knowledge": [
+        "An anomaly was flagged in the Electricity Building wiring",
+        "Thomas Crowe was dismissed from the Fair two weeks ago for unreliable conduct",
+        "Westinghouse is watching the Fair demonstration closely"
+      ],
+      "trust_logic": "Responds to evidence, not intuition. Trust rises with hard facts; falls with accusation unsupported by proof.",
+      "voice": "Precise, controlled, impatient but not unkind",
+      "behavior_under_pressure": "Deflects early, authorizes action only when confronted with physical evidence"
+    },
+    {
+      "id": "thomas_crowe",
+      "name": "Thomas Crowe",
+      "role": "Disgraced electrician; the operative",
+      "public_face": "Nervous, eager to seem helpful, volunteering unnecessary details",
+      "private_goal": "Complete the sabotage, collect payment, and disappear before opening day",
+      "fear": "Being identified before he can leave Chicago",
+      "knowledge": [
+        "Exactly which relay switch was tampered and how",
+        "Nora Aldrich hired him through an intermediary at the Hotel Sherman",
+        "He does not know the full corporate motive — only that he was well paid"
+      ],
+      "trust_logic": "Cooperative when not directly accused; becomes evasive and hostile when cornered with specifics",
+      "voice": "Deferential, slightly too helpful, quick to redirect",
+      "behavior_under_pressure": "Denies everything, then attempts to flee if presented with physical evidence"
+    },
+    {
+      "id": "nora_aldrich",
+      "name": "Nora Aldrich",
+      "role": "Edison company representative; the hidden sponsor",
+      "public_face": "Composed, businesslike, professionally attending the Fair on behalf of an exhibitor",
+      "private_goal": "Ensure the AC demonstration fails visibly, discrediting Westinghouse and reopening the Chicago grid contract for Edison interests",
+      "fear": "Exposure and the corporate scandal that would follow",
+      "knowledge": [
+        "The full sabotage plan and timeline",
+        "Crowe's identity and method",
+        "The financial incentive: the Chicago power grid contract is worth millions"
+      ],
+      "trust_logic": "Engages smoothly, deflects with charm, becomes hostile only when confronted with documentary evidence connecting her to Crowe",
+      "voice": "Measured, intelligent, slightly condescending toward the Fair's organizers",
+      "behavior_under_pressure": "Denies involvement, pivots to legal language, will attempt to leave Chicago if she believes she has been identified"
+    },
+    {
+      "id": "captain_doyle",
+      "name": "Captain Doyle",
+      "role": "Chief of Fair security",
+      "public_face": "Blunt, skeptical, disciplined, protective of his authority",
+      "private_goal": "Maintain order and prevent any incident that reflects poorly on his department",
+      "fear": "False alarms and looking incompetent in front of Burnham",
+      "knowledge": [
+        "Crowe's access pass was used twice after his dismissal — someone is letting him in",
+        "A crate of replacement relay components went missing from the freight depot",
+        "He has not filed a report because he lacks certainty"
+      ],
+      "trust_logic": "Responds to timelines, names, and physical evidence. Rejects vague suspicion. Once convinced, acts decisively.",
+      "voice": "Direct, clipped, unsentimental",
+      "behavior_under_pressure": "Pushes back on claims without evidence; becomes an effective ally when given specific facts"
+    }
+  ],
+
+  "conspiracy": {
+    "mastermind": "nora_aldrich",
+    "operative": "thomas_crowe",
+    "motive": "Nora Aldrich represents Edison corporate interests. Westinghouse won the Fair's lighting contract over Edison's bid. A public AC failure at the Fair — before the world press — would discredit alternating current and reopen the Chicago city power grid contract, worth millions in Edison's favor.",
+    "method": "Crowe, using a forged access pass, tampered with the primary relay switch assembly in the Electricity Building's distribution panel. The sabotaged relay is designed to fail under full load during the demonstration, causing a cascade failure that blacks out the building mid-ceremony.",
+    "timeline": {
+      "three_days_before": "Aldrich meets Crowe at Hotel Sherman, delivers payment and instructions",
+      "two_days_before": "Crowe uses a forged pass to access the freight depot and substitutes a sabotaged relay switch in the incoming shipment",
+      "one_day_before": "Crowe enters the Electricity Building during overnight maintenance and installs the tampered relay",
+      "opening_night": "The AC demonstration activates under full press attendance; the relay fails at peak load"
+    },
+    "backup_plan": "If Crowe is detained, Aldrich has a second operative who can introduce a secondary fault the morning of the demonstration"
+  },
+
+  "clues": [
+    {
+      "id": "altered_wiring_spec",
+      "title": "Altered Wiring Specification",
+      "description": "The official wiring specification for the relay distribution panel has been subtly redrawn — a tolerance mark changed to one that would cause overload failure at full demonstration load.",
+      "type": "physical",
+      "strength": "strong",
+      "where_found": "electricity_building",
+      "implicates": ["thomas_crowe"],
+      "veracity": "true",
+      "how_discovered": "Close inspection of the relay panel documentation; Burnham's engineering staff would not have caught it without being specifically directed there",
+      "unlocks": ["freight_depot access becomes urgent", "dialogue: Crowe's expertise becomes relevant"]
+    },
+    {
+      "id": "crowe_personnel_file",
+      "title": "Crowe's Dismissal Record",
+      "description": "Thomas Crowe was dismissed from Fair employment two weeks ago for 'unreliable conduct and missing shifts.' The file is thin. The stated reason looks like a cover for something not fully documented.",
+      "type": "documentary",
+      "strength": "weak",
+      "where_found": "administration_building",
+      "implicates": ["thomas_crowe"],
+      "veracity": "partial",
+      "how_discovered": "Records search at the Administration Building; Burnham's clerk can retrieve it",
+      "unlocks": ["Crowe confirmed as person of interest; but motive appears personal, not corporate — this is the false lead path"],
+      "false_lead_note": "Players who pursue 'revenge from a fired worker' angle will miss the corporate sponsor entirely and waste time"
+    },
+    {
+      "id": "hotel_ledger_entry",
+      "title": "Hotel Sherman Register: Aldrich + Guest",
+      "description": "The hotel register shows Nora Aldrich dined privately with an unnamed guest three nights ago. The waiter remembers the guest was male, nervous, and spoke of 'electrical work.'",
+      "type": "documentary",
+      "strength": "medium",
+      "where_found": "hotel_sherman",
+      "implicates": ["nora_aldrich", "thomas_crowe"],
+      "veracity": "true",
+      "how_discovered": "Asking at the Hotel Sherman after connecting Aldrich to the Fair through her exhibitor credentials",
+      "unlocks": ["Aldrich becomes a named suspect", "dialogue: Crowe confrontation becomes available"]
+    },
+    {
+      "id": "tampered_relay_switch",
+      "title": "Sabotaged Relay Switch",
+      "description": "A relay switch in the freight depot's outgoing inspection area has been swapped — the authentic unit sits hidden behind a crate, and the installed unit is internally rewired to fail under load.",
+      "type": "physical",
+      "strength": "conclusive",
+      "where_found": "freight_depot",
+      "implicates": ["thomas_crowe", "nora_aldrich"],
+      "veracity": "true",
+      "how_discovered": "Physical inspection of outgoing electrical components at the freight depot; requires knowing to look",
+      "unlocks": ["Physical proof of sabotage; sufficient for Doyle to authorize detainment", "Burnham can no longer dismiss the threat"]
+    },
+    {
+      "id": "aldrich_telegram",
+      "title": "Aldrich's Received Telegram",
+      "description": "A telegram in Aldrich's Fair office, partially visible, references 'the relay confirmation' and 'the grid contract reopens if the demonstration fails.' Signed only with initials.",
+      "type": "documentary",
+      "strength": "strong",
+      "where_found": "electricity_building",
+      "implicates": ["nora_aldrich"],
+      "veracity": "true",
+      "how_discovered": "Searching Aldrich's temporary office in the Electricity Building exhibitor space; requires access or Burnham's authorization",
+      "unlocks": ["Corporate motive confirmed", "Full conspiracy chain: Edison interests → Aldrich → Crowe → sabotaged relay"]
+    },
+    {
+      "id": "foreman_eyewitness",
+      "title": "Depot Foreman's Account",
+      "description": "The freight depot foreman saw a man matching Crowe's description accessing the relay shipment crates two nights ago — after hours, with a pass that 'looked right but felt wrong.'",
+      "type": "testimony",
+      "strength": "medium",
+      "where_found": "freight_depot",
+      "implicates": ["thomas_crowe"],
+      "veracity": "true",
+      "how_discovered": "Speaking directly with freight depot workers; the foreman is willing to talk if the player identifies themselves as acting under Burnham's authority",
+      "unlocks": ["Places Crowe at the scene of the tampered relay; corroborates physical evidence"]
+    }
+  ],
+
+  "clue_relationships": [
+    {
+      "chain": ["altered_wiring_spec", "tampered_relay_switch"],
+      "reveals": "The sabotage is deliberate and technically sophisticated — not vandalism. Someone with electrical knowledge planned this.",
+      "sufficient_for": "Burnham to take the threat seriously and authorize security action"
+    },
+    {
+      "chain": ["tampered_relay_switch", "foreman_eyewitness"],
+      "reveals": "Crowe is the operative. Physical evidence plus eyewitness places him at the scene.",
+      "sufficient_for": "Captain Doyle to detain Crowe"
+    },
+    {
+      "chain": ["hotel_ledger_entry", "aldrich_telegram"],
+      "reveals": "Aldrich is the corporate sponsor. She met Crowe, financed the operation, and stands to benefit from the failure.",
+      "sufficient_for": "Full conspiracy exposed; success ending unlocked"
+    },
+    {
+      "chain": ["crowe_personnel_file"],
+      "reveals": "False lead — suggests personal revenge motive, draws player away from the corporate angle",
+      "sufficient_for": "Nothing on its own; wastes turns if pursued exclusively"
+    },
+    {
+      "chain": ["altered_wiring_spec", "hotel_ledger_entry", "aldrich_telegram"],
+      "reveals": "Complete conspiracy chain from method to operator to sponsor",
+      "sufficient_for": "Optimal success ending"
+    }
+  ],
+
+  "false_leads": [
+    {
+      "id": "crowe_revenge_theory",
+      "description": "The personnel file makes it easy to assume Crowe is acting out of personal grievance after being fired — a disgruntled worker, not a paid operative.",
+      "source_clue": "crowe_personnel_file",
+      "how_it_misleads": "The player may spend turns investigating Crowe's personal history and missing the corporate chain entirely, arriving at Act 3 without identifying Aldrich.",
+      "consequence": "Player stops the sabotage but misses the sponsor — partial success at best; Aldrich walks free"
+    }
+  ],
+
+  "acts": [
+    {
+      "act": 1,
+      "name": "The Anomaly",
+      "minutes": [0, 3],
+      "beats": [
+        "Burnham alerts player to the wiring anomaly — he suspects an accident",
+        "Player inspects the Electricity Building; finds altered_wiring_spec",
+        "Crowe's name surfaces through the Administration Building or Burnham's staff"
+      ],
+      "act_goal": "Establish that the fault is deliberate and identify the first suspect"
+    },
+    {
+      "act": 2,
+      "name": "The Trail",
+      "minutes": [4, 7],
+      "beats": [
+        "Player pulls crowe_personnel_file — false lead opportunity opens",
+        "Following the trail to Hotel Sherman yields hotel_ledger_entry; Aldrich enters the picture",
+        "Freight depot investigation yields tampered_relay_switch and foreman_eyewitness",
+        "Player must decide whether to pursue Crowe, Aldrich, or both"
+      ],
+      "act_goal": "Connect Crowe to Aldrich; establish the corporate motive"
+    },
+    {
+      "act": 3,
+      "name": "The Demonstration",
+      "minutes": [8, 10],
+      "beats": [
+        "The demonstration is one hour away; time pressure becomes acute",
+        "Player chooses intervention: confront Aldrich with aldrich_telegram, have Doyle detain Crowe with physical evidence, or replace the relay directly",
+        "Burnham must be convinced with at least two pieces of evidence to authorize action",
+        "Resolution before the lights switch on"
+      ],
+      "act_goal": "Stop the sabotage; expose the conspiracy"
+    }
+  ],
+
+  "ending_conditions": {
+    "success": {
+      "requirements": ["tampered_relay_switch identified and replaced OR Crowe detained", "aldrich_telegram or hotel_ledger_entry presented to Burnham", "Burnham authorizes security action in time"],
+      "narrative_outcome": "The demonstration proceeds. The lights rise without incident over the Court of Honor. Aldrich is quietly detained. Crowe is held. Burnham thanks the player with characteristic brevity.",
+      "burnham_response": "You did not bring me a theory. You brought me the thing itself."
+    },
+    "partial": {
+      "requirements": ["Sabotage physically stopped (relay replaced or Crowe detained)", "Aldrich not identified or escapes before confrontation"],
+      "narrative_outcome": "The demonstration succeeds, but the corporate sponsor walks free. The grid contract question remains open. A journalist begins asking questions.",
+      "burnham_response": "The Fair opens. That is what matters tonight. The rest — we will find."
+    },
+    "failure": {
+      "variants": [
+        {
+          "label": "Wrong accusation",
+          "requirements": ["Player formally accuses Crowe of personal revenge without corporate link", "Aldrich removes the backup relay fault the morning of the demonstration"],
+          "narrative_outcome": "Crowe is detained, but Aldrich's backup activates. The lights fail at peak load. The press is there for all of it."
+        },
+        {
+          "label": "Time expired",
+          "requirements": ["Player has not neutralized the relay or detained Crowe by minute 10"],
+          "narrative_outcome": "The cascade failure blacks out the Electricity Building during the demonstration. No fire. But the humiliation is total. The Westinghouse contract is in doubt."
+        }
+      ],
+      "burnham_response": "We will not speak of what might have been done."
+    }
+  },
+
+  "opening_scene": {
+    "narrative": "The lake wind comes off the water cold and purposeful, the kind that makes a man pull his coat and move faster. Inside the Administration Building, Burnham is already at his desk when you arrive — papers spread, a telegraph in his hand, the familiar tension behind his eyes that means something has gone wrong before anyone is ready. 'An anomaly,' he says. 'In the Electricity Building relay panel. My engineer flagged it this morning.' He sets down the telegraph. 'I am told it may be nothing. I am not satisfied with may be.'",
+    "npc_moments": [
+      {
+        "npc": "daniel_burnham",
+        "text": "'I have forty-eight hours before the world is watching. If this is sabotage, I need to know it now — not after the lights go out.'"
+      }
+    ],
+    "initial_choices": [
+      "Go directly to the Electricity Building to inspect the relay panel",
+      "Ask Burnham who had access to the Electricity Building in the past week",
+      "Check the Administration Building records for any unusual personnel activity"
+    ]
+  },
+
+  "notes_seed": {
+    "initial_suspicions": [],
+    "initial_impressions": [
+      {
+        "npc": "Daniel Burnham",
+        "impression": "He is not treating this as routine. That means something."
+      }
+    ],
+    "initial_open_questions": [
+      "Is the wiring anomaly an accident or deliberate interference?",
+      "Who had access to the Electricity Building relay panel?"
+    ],
+    "initial_leads": [
+      "The Electricity Building relay panel — the anomaly needs to be seen firsthand"
+    ]
+  }
+}
