@@ -13,7 +13,13 @@ const ttsStopBtn = document.getElementById('tts-stop');
 
 const synth = window.speechSynthesis;
 const ttsSupported = !!synth;
-let ttsEnabled = localStorage.getItem('ttsEnabled') === 'true';
+
+let ttsEnabled = false;
+let audioUnlocked = false;
+let hasSpokenIntro = false;
+let lastSpokenMessageId = 0;
+let currentMessageId = 0;
+let introText = null;
 
 const SVG_SPEAKER_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
   <path d="M2 6h2l4-4v12l-4-4H2z"/>
@@ -27,6 +33,18 @@ const SVG_SPEAKER_ON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="cu
   <path d="M12 4a5.5 5.5 0 0 1 0 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
 </svg>`;
 
+function cleanForSpeech(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/#+\s*/g, '')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/[_~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function updateTtsToggleUI() {
   ttsToggleBtn.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
   ttsToggleBtn.classList.toggle('active', ttsEnabled);
@@ -38,10 +56,10 @@ function setTtsSpeaking(on) {
   ttsBarEl.hidden = !on;
 }
 
-function ttsSpeak(text) {
-  if (!ttsSupported || !ttsEnabled) return;
+function ttsSpeakRaw(text) {
+  if (!ttsSupported) return;
   synth.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
+  const utt = new SpeechSynthesisUtterance(cleanForSpeech(text));
   utt.rate = 0.95;
   utt.onend = () => setTtsSpeaking(false);
   utt.onerror = () => setTtsSpeaking(false);
@@ -55,14 +73,29 @@ function ttsStop() {
   setTtsSpeaking(false);
 }
 
+const beginOverlay = document.getElementById('begin-overlay');
+const beginBtn = document.getElementById('begin-btn');
+
 if (!ttsSupported) {
   ttsToggleBtn.remove();
+  beginOverlay.hidden = true;
 } else {
   updateTtsToggleUI();
 
+  beginBtn.addEventListener('click', () => {
+    audioUnlocked = true;
+    ttsEnabled = true;
+    updateTtsToggleUI();
+    beginOverlay.hidden = true;
+    if (introText && !hasSpokenIntro) {
+      hasSpokenIntro = true;
+      lastSpokenMessageId = currentMessageId;
+      ttsSpeakRaw(introText);
+    }
+  });
+
   ttsToggleBtn.addEventListener('click', () => {
     ttsEnabled = !ttsEnabled;
-    localStorage.setItem('ttsEnabled', ttsEnabled);
     if (!ttsEnabled) ttsStop();
     updateTtsToggleUI();
   });
@@ -129,7 +162,20 @@ function renderOutput(output, meta = {}) {
   }
   addEntry('engine', 'Story', html);
   renderChoices(output.choices || []);
-  ttsSpeak(speakParts.join(' '));
+
+  const messageId = ++currentMessageId;
+  const speakText = speakParts.join(' ');
+
+  if (!hasSpokenIntro) {
+    introText = speakText;
+  } else if (ttsEnabled && audioUnlocked) {
+    setTimeout(() => {
+      if (lastSpokenMessageId < messageId) {
+        lastSpokenMessageId = messageId;
+        ttsSpeakRaw(speakText);
+      }
+    }, 300);
+  }
 }
 
 async function loadGame() {
