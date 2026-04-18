@@ -42,6 +42,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .hero h1 {
   margin: 0;
   font-size: 2rem;
@@ -52,7 +59,67 @@ body {
   color: var(--muted);
 }
 
+.tts-toggle {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-weight: normal;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
 
+.tts-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tts-toggle.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(208, 176, 106, 0.1);
+}
+
+.tts-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 28px 6px;
+}
+
+.tts-stop-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #3a5c3a;
+  background: transparent;
+  color: #7ec87e;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.tts-stop-btn:hover {
+  background: #101a10;
+}
+
+.tts-stop-btn.active {
+  border-color: #7a2a20;
+  color: #e07060;
+}
+
+.tts-stop-btn.active:hover {
+  background: #2a1010;
+}
 
 .panel {
   background: var(--panel);
@@ -137,34 +204,41 @@ body {
 }
 
 .input-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  padding: 10px 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 0 28px 28px;
 }
 
-.input-row textarea {
-  flex: 1;
-  min-width: 0;
-  resize: none;
-  overflow-y: hidden;
-  min-height: 44px;
-  max-height: 160px;
+.input-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.input-textarea-wrap {
+  position: relative;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);
-  padding: 11px 14px;
+  padding: 14px;
+  padding-right: 52px;
   font: inherit;
-  font-size: 0.95rem;
-  line-height: 1.4;
 }
 
-/* shared base for icon buttons in the control row */
-.ctrl-btn {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+.mic-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--panel-soft);
@@ -174,16 +248,15 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
-  font-weight: normal;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-weight: normal;
 }
 
-.ctrl-btn:hover {
+.mic-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-/* mic active state */
 .mic-btn.listening {
   border-color: #c0392b;
   background: #2a1010;
@@ -194,38 +267,6 @@ body {
 @keyframes mic-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.45); }
   50%       { box-shadow: 0 0 0 7px rgba(231, 76, 60, 0); }
-}
-
-/* notes button: inherits ctrl-btn size but uses a document icon */
-.notes-btn {
-  font-size: 0;
-}
-
-/* tts toggle active state */
-.tts-toggle.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: rgba(208, 176, 106, 0.1);
-}
-
-.send-btn {
-  flex-shrink: 0;
-  height: 44px;
-  min-width: 64px;
-  padding: 0 18px;
-  border-radius: 22px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: #1a150c;
-  font-family: Georgia, serif;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.send-btn:hover {
-  opacity: 0.88;
 }
 
 button {
@@ -303,6 +344,24 @@ li {
   gap: 8px;
 }
 
+.notes-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.notes-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 .notes-overlay {
   position: fixed;
