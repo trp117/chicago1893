@@ -6,9 +6,7 @@ const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
 const formEl = document.getElementById('input-form');
 const inputEl = document.getElementById('player-input');
-const ttsBarEl = document.getElementById('tts-bar');
 const ttsToggleBtn = document.getElementById('tts-toggle');
-const ttsStopBtn = document.getElementById('tts-stop');
 
 // ── TTS ──────────────────────────────────────────────────────────────────────
 
@@ -53,38 +51,18 @@ function updateTtsToggleUI() {
   ttsToggleBtn.title = ttsEnabled ? 'Read aloud: on' : 'Read aloud: off';
 }
 
-const SVG_STOP_ICON = `<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><rect width="10" height="10" rx="2"/></svg>`;
-const SVG_PLAY_ICON = `<svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>`;
-
-function updateTtsBarUI() {
-  if (ttsEnabled) {
-    ttsStopBtn.innerHTML = `${SVG_STOP_ICON} Stop reading`;
-    ttsStopBtn.classList.add('active');
-  } else {
-    ttsStopBtn.innerHTML = `${SVG_PLAY_ICON} Start reading`;
-    ttsStopBtn.classList.remove('active');
-  }
-}
-
-function setTtsSpeaking(_on) {
-  // bar is always visible; state communicated via updateTtsBarUI
-}
 
 function ttsSpeakRaw(text) {
   if (!ttsSupported) return;
   synth.cancel();
   const utt = new SpeechSynthesisUtterance(cleanForSpeech(text));
   utt.rate = 0.95;
-  utt.onend = () => setTtsSpeaking(false);
-  utt.onerror = () => setTtsSpeaking(false);
   synth.speak(utt);
-  setTtsSpeaking(true);
 }
 
 function ttsStop() {
   if (!ttsSupported) return;
   synth.cancel();
-  setTtsSpeaking(false);
 }
 
 const beginOverlay = document.getElementById('begin-overlay');
@@ -92,17 +70,14 @@ const beginBtn = document.getElementById('begin-btn');
 
 if (!ttsSupported) {
   ttsToggleBtn.remove();
-  ttsBarEl.hidden = true;
   beginOverlay.classList.add('hidden');
 } else {
   updateTtsToggleUI();
-  updateTtsBarUI();
 
   beginBtn.addEventListener('click', () => {
     audioUnlocked = true;
     ttsEnabled = true;
     updateTtsToggleUI();
-    updateTtsBarUI();
     beginOverlay.classList.add('hidden');
     if (introText && !hasSpokenIntro) {
       hasSpokenIntro = true;
@@ -114,15 +89,6 @@ if (!ttsSupported) {
   ttsToggleBtn.addEventListener('click', () => {
     ttsEnabled = !ttsEnabled;
     if (!ttsEnabled) ttsStop();
-    updateTtsToggleUI();
-    updateTtsBarUI();
-  });
-
-  // True Start/Stop toggle: changes ttsEnabled AND stops current speech when disabling
-  ttsStopBtn.addEventListener('click', () => {
-    ttsEnabled = !ttsEnabled;
-    if (!ttsEnabled) ttsStop();
-    updateTtsBarUI();
     updateTtsToggleUI();
   });
 }
@@ -278,6 +244,7 @@ async function submitTurn(playerInput) {
   submitting = true;
   addEntry('player', 'You', `<p>${playerInput}</p>`);
   inputEl.value = '';
+  inputEl.style.height = 'auto';
   try {
     const response = await fetch('/api/turn', {
       method: 'POST',
@@ -317,6 +284,12 @@ inputEl.addEventListener('keydown', (e) => {
     e.preventDefault();
     formEl.requestSubmit();
   }
+});
+
+// Auto-resize textarea as content grows
+inputEl.addEventListener('input', () => {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 160) + 'px';
 });
 
 // Voice input
