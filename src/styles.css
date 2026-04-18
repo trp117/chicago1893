@@ -42,6 +42,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .hero h1 {
   margin: 0;
   font-size: 2rem;
@@ -50,6 +57,59 @@ body {
 .hero p {
   margin: 8px 0 0;
   color: var(--muted);
+}
+
+.tts-toggle {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-weight: normal;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.tts-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tts-toggle.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(208, 176, 106, 0.1);
+}
+
+.tts-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 28px 6px;
+}
+
+.tts-stop-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #7a2a20;
+  background: transparent;
+  color: #e07060;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tts-stop-btn:hover {
+  background: #2a1010;
 }
 
 .panel {

@@ -5,6 +5,72 @@ const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
 const formEl = document.getElementById('input-form');
 const inputEl = document.getElementById('player-input');
+const ttsBarEl = document.getElementById('tts-bar');
+const ttsToggleBtn = document.getElementById('tts-toggle');
+const ttsStopBtn = document.getElementById('tts-stop');
+
+// ── TTS ──────────────────────────────────────────────────────────────────────
+
+const synth = window.speechSynthesis;
+const ttsSupported = !!synth;
+let ttsEnabled = localStorage.getItem('ttsEnabled') === 'true';
+
+const SVG_SPEAKER_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+  <path d="M2 6h2l4-4v12l-4-4H2z"/>
+  <line x1="11" y1="5.5" x2="15" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="15" y1="5.5" x2="11" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`;
+
+const SVG_SPEAKER_ON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+  <path d="M2 6h2l4-4v12l-4-4H2z"/>
+  <path d="M10 6.5a2.5 2.5 0 0 1 0 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M12 4a5.5 5.5 0 0 1 0 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+function updateTtsToggleUI() {
+  ttsToggleBtn.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+  ttsToggleBtn.classList.toggle('active', ttsEnabled);
+  ttsToggleBtn.setAttribute('aria-label', ttsEnabled ? 'Disable read-aloud' : 'Enable read-aloud');
+  ttsToggleBtn.title = ttsEnabled ? 'Read aloud: on' : 'Read aloud: off';
+}
+
+function setTtsSpeaking(on) {
+  ttsBarEl.hidden = !on;
+}
+
+function ttsSpeak(text) {
+  if (!ttsSupported || !ttsEnabled) return;
+  synth.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.95;
+  utt.onend = () => setTtsSpeaking(false);
+  utt.onerror = () => setTtsSpeaking(false);
+  synth.speak(utt);
+  setTtsSpeaking(true);
+}
+
+function ttsStop() {
+  if (!ttsSupported) return;
+  synth.cancel();
+  setTtsSpeaking(false);
+}
+
+if (!ttsSupported) {
+  ttsToggleBtn.remove();
+} else {
+  updateTtsToggleUI();
+
+  ttsToggleBtn.addEventListener('click', () => {
+    ttsEnabled = !ttsEnabled;
+    localStorage.setItem('ttsEnabled', ttsEnabled);
+    if (!ttsEnabled) ttsStop();
+    updateTtsToggleUI();
+  });
+
+  ttsStopBtn.addEventListener('click', ttsStop);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function addEntry(kind, title, html) {
   const div = document.createElement('div');
@@ -50,9 +116,12 @@ function renderChoices(choices = []) {
 
 function renderOutput(output, meta = {}) {
   let html = `<p>${output.narrative}</p>`;
+  const speakParts = [output.narrative];
+
   if (Array.isArray(output.npcMoments)) {
     for (const npcMoment of output.npcMoments) {
       html += `<div class="npc-line"><strong>${prettifyId(npcMoment.npc)}:</strong> ${npcMoment.text}</div>`;
+      speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
     }
   }
   if (meta.mockMode) {
@@ -60,6 +129,7 @@ function renderOutput(output, meta = {}) {
   }
   addEntry('engine', 'Story', html);
   renderChoices(output.choices || []);
+  ttsSpeak(speakParts.join(' '));
 }
 
 async function loadGame() {

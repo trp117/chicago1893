@@ -49,11 +49,21 @@
 
       <main class="main-column">
         <header class="hero">
-          <h1>Chicago, 1893</h1>
+          <div class="hero-title-row">
+            <h1>Chicago, 1893</h1>
+            <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
+          </div>
           <p>Shadows gather beneath the White City.</p>
         </header>
 
         <section id="story" class="story-feed"></section>
+
+        <div id="tts-bar" class="tts-bar" hidden>
+          <button type="button" id="tts-stop" class="tts-stop-btn">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><rect width="10" height="10" rx="2"/></svg>
+            Stop reading
+          </button>
+        </div>
 
         <section id="choices" class="choices"></section>
 
