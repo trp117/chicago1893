@@ -340,8 +340,11 @@ if (!SpeechRecognition) {
   recognition.lang = 'en-US';
 
   let listening = false;
-  let confirmedText = '';  // base text + all finalized speech chunks
+  let confirmedText = '';
   let restartScheduled = false;
+  // After a restart, Chrome often re-delivers the last finalized result. This flag
+  // triggers a one-shot duplicate check on the first final chunk of the new session.
+  let postRestartDedup = false;
 
   let drivingMode = false;
   let drivingTimer = null;
@@ -377,6 +380,18 @@ if (!SpeechRecognition) {
     return false;
   }
 
+  function appendFinalChunk(chunk) {
+    const trimmed = chunk.trim();
+    if (!trimmed) return;
+    if (postRestartDedup) {
+      postRestartDedup = false;
+      // Skip if this chunk was already committed before the restart
+      if (confirmedText.trimEnd().toLowerCase().endsWith(trimmed.toLowerCase())) return;
+    }
+    const sep = confirmedText && !confirmedText.endsWith(' ') ? ' ' : '';
+    confirmedText += sep + chunk;
+  }
+
   function resetDrivingTimer() {
     clearTimeout(drivingTimer);
     if (!confirmedText.trim()) return;
@@ -388,6 +403,31 @@ if (!SpeechRecognition) {
         submitTurn(text);
       }
     }, 2500);
+  }
+
+  function setListening(on) {
+    listening = on;
+    micBtn.classList.toggle('listening', on);
+    micBtn.setAttribute('aria-label', on ? 'Stop listening' : 'Start voice input');
+    micBtn.title = on ? 'Listening… (click to stop)' : 'Voice input';
+  }
+
+  function startRecognition() {
+    try { recognition.start(); } catch { /* already running */ }
+  }
+
+  function stopListening(autoSubmit = false) {
+    clearTimeout(drivingTimer);
+    setListening(false);
+    restartScheduled = false;
+    postRestartDedup = false;
+    recognition.stop();
+    inputEl.value = confirmedText;
+    if (autoSubmit && confirmedText.trim()) {
+      const text = confirmedText.trim();
+      confirmedText = '';
+      submitTurn(text);
+    }
   }
 
   function setDrivingMode(on) {
@@ -407,57 +447,37 @@ if (!SpeechRecognition) {
     }
   }
 
-  function setListening(on) {
-    listening = on;
-    micBtn.classList.toggle('listening', on);
-    micBtn.setAttribute('aria-label', on ? 'Stop listening' : 'Start voice input');
-    micBtn.title = on ? 'Listening… (click to stop)' : 'Voice input';
-  }
-
-  function startRecognition() {
-    try { recognition.start(); } catch { /* already running */ }
-  }
-
-  function stopListening(autoSubmit = false) {
-    clearTimeout(drivingTimer);
-    setListening(false);
-    restartScheduled = false;
-    recognition.stop();
-    inputEl.value = confirmedText;
-    if (autoSubmit && confirmedText.trim()) {
-      const text = confirmedText.trim();
-      confirmedText = '';
-      submitTurn(text);
-    }
-  }
-
   recognition.onresult = (event) => {
     let interim = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const chunk = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
         if (drivingMode && checkVoiceCommand(chunk)) {
-          // voice command handled — skip appending to text
+          postRestartDedup = false; // command consumed the chunk
         } else {
-          const sep = confirmedText && !confirmedText.endsWith(' ') ? ' ' : '';
-          confirmedText += sep + chunk;
+          appendFinalChunk(chunk);
         }
       } else {
         interim += chunk;
       }
     }
+    // Show confirmed text + live interim in textarea so user can see and edit
     const sep = confirmedText && interim && !confirmedText.endsWith(' ') ? ' ' : '';
     inputEl.value = confirmedText + (interim ? sep + interim : '');
     if (drivingMode) resetDrivingTimer();
   };
 
-  // Auto-restart on unexpected end (browser cuts off after silence on mobile/some desktop)
+  // Auto-restart keeps recognition alive through browser silence timeouts.
+  // Set postRestartDedup so the first final result of the new session is checked for re-delivery.
   recognition.onend = () => {
     if (listening && !restartScheduled) {
       restartScheduled = true;
       setTimeout(() => {
         restartScheduled = false;
-        if (listening) startRecognition();
+        if (listening) {
+          postRestartDedup = true;
+          startRecognition();
+        }
       }, 150);
     }
   };
@@ -467,19 +487,20 @@ if (!SpeechRecognition) {
     console.warn('Speech recognition error:', event.error);
     setListening(false);
     restartScheduled = false;
+    postRestartDedup = false;
   };
 
   micBtn.addEventListener('click', () => {
     if (listening) {
-      stopListening(true);
+      stopListening(true); // tapping mic while listening stops and submits
     } else {
-      confirmedText = inputEl.value.trimEnd();
+      confirmedText = inputEl.value.trimEnd(); // preserve any text the user typed
       setListening(true);
       startRecognition();
     }
   });
 
-  // Stop mic when the form is submitted
+  // In standard mode, form submit stops the mic (driving mode keeps it running)
   formEl.addEventListener('submit', () => {
     if (listening && !drivingMode) stopListening();
   }, { capture: true });
