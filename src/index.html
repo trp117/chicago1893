@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chicago 1893 — Interactive Story V1</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="panel">
+          <h2>Case File</h2>
+          <div id="objective"></div>
+        </div>
+
+        <div class="panel stat-grid">
+          <div>
+            <span class="label">Location</span>
+            <div id="location"></div>
+          </div>
+          <div>
+            <span class="label">Act</span>
+            <div id="act"></div>
+          </div>
+          <div>
+            <span class="label">Elapsed</span>
+            <div id="elapsed"></div>
+          </div>
+          <div>
+            <span class="label">Remaining</span>
+            <div id="remaining"></div>
+          </div>
+          <div>
+            <span class="label">Threat</span>
+            <div id="threat"></div>
+          </div>
+          <div>
+            <span class="label">Burnham Trust</span>
+            <div id="trust"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Clues</h2>
+          <ul id="clues"></ul>
+        </div>
+      </aside>
+
+      <main class="main-column">
+        <header class="hero">
+          <h1>Chicago, 1893</h1>
+          <p>Shadows gather beneath the White City.</p>
+        </header>
+
+        <section id="story" class="story-feed"></section>
+
+        <section id="choices" class="choices"></section>
+
+        <form id="input-form" class="input-row">
+          <textarea id="player-input" placeholder="Type what you do or say..." rows="3"></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

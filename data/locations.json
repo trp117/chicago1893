@@ -1,0 +1,74 @@
+[
+  {
+    "id": "administration_building",
+    "name": "Administration Building",
+    "description": "Burnham's nerve center: papers, telegraphs, mud on boots, tempers under restraint, and the strain of a city trying to stage a modern wonder.",
+    "mood": "urgent, managerial, brittle",
+    "linkedNPCs": ["daniel_burnham"],
+    "possibleClues": [
+      "Shipping memorandum with altered crate numbers",
+      "A telegraph marked urgent but unsigned",
+      "A list of delayed electrical parts"
+    ]
+  },
+  {
+    "id": "court_of_honor",
+    "name": "Court of Honor",
+    "description": "Brilliant white facades, open vistas, workers moving through grandeur still half-finished, beauty stretched over exhaustion.",
+    "mood": "majestic, exposed, performative",
+    "linkedNPCs": ["clara_hale", "captain_odonnell"],
+    "possibleClues": [
+      "A misplaced credential",
+      "A worker's rumor about after-hours visitors",
+      "Fresh wheel marks where none should be"
+    ]
+  },
+  {
+    "id": "midway_plaisance",
+    "name": "Midway Plaisance",
+    "description": "Noise, spectacle, concessionaires, foreign exhibits, and loose tongues among men who assume no one is listening closely.",
+    "mood": "crowded, colorful, distracting",
+    "linkedNPCs": ["emile_mercier", "clara_hale"],
+    "possibleClues": [
+      "A conversation in French cut short at your approach",
+      "A receipt tied to a private carriage",
+      "A rumor of a meeting at a hotel off the grounds"
+    ]
+  },
+  {
+    "id": "machinery_hall",
+    "name": "Machinery Hall",
+    "description": "Steel, heat, engines, belts, and the nervous confidence of modern industry on display.",
+    "mood": "mechanical, dangerous, impressive",
+    "linkedNPCs": ["captain_odonnell", "emile_mercier"],
+    "possibleClues": [
+      "Tampered wiring diagrams",
+      "A missing toolbox",
+      "A maintenance log entry in the wrong hand"
+    ]
+  },
+  {
+    "id": "freight_yards",
+    "name": "Freight Yards and Service Access",
+    "description": "Crates, mud, rail sidings, laborers, and the real arteries beneath the fair's polished face.",
+    "mood": "industrial, secretive, practical",
+    "linkedNPCs": ["patrick_hanrahan", "captain_odonnell"],
+    "possibleClues": [
+      "Crates redirected under forged papers",
+      "A bribed watchman",
+      "A wagon ledger with missing hours"
+    ]
+  },
+  {
+    "id": "auditorium_hotel",
+    "name": "Auditorium Hotel Lounge",
+    "description": "Cigars, polished wood, politics, foreign visitors, and private conversations disguised as idle society chatter.",
+    "mood": "civilized, strategic, conspiratorial",
+    "linkedNPCs": ["clara_hale", "emile_mercier", "patrick_hanrahan"],
+    "possibleClues": [
+      "A meeting arranged under another name",
+      "A newspaper draft hinting at scandal",
+      "A handwritten note mentioning opening night lighting"
+    ]
+  }
+]

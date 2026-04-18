@@ -1,0 +1,92 @@
+[
+  {
+    "id": "daniel_burnham",
+    "name": "Daniel Burnham",
+    "role": "Director of Works and the player's superior",
+    "publicFace": "Controlled, visionary, exhausted, commanding",
+    "privateGoal": "Open the fair without scandal, delay, or humiliation",
+    "fear": "Public failure and political embarrassment",
+    "knowledge": [
+      "Construction delays are worse than the public knows",
+      "Several supply deliveries have been irregular",
+      "City politicians are looking for a reason to blame management"
+    ],
+    "voice": "brief, precise, impatient but not unkind",
+    "trustLogic": "Trust rises when the player brings evidence instead of rumor. It falls if the player acts theatrically or makes unsupported accusations.",
+    "secrets": [
+      "He has quietly suppressed at least one smaller incident to protect public confidence"
+    ]
+  },
+  {
+    "id": "emile_mercier",
+    "name": "Émile Mercier",
+    "role": "French electrical consultant attached to an overseas exhibit",
+    "publicFace": "Elegant, clever, amused, cosmopolitan",
+    "privateGoal": "Protect French prestige and conceal his meetings with intermediaries",
+    "fear": "Exposure, diplomatic embarrassment, loss of patronage",
+    "knowledge": [
+      "A plan exists to disable a key lighting demonstration",
+      "Certain crates were redirected under false authority",
+      "He knows at least one American collaborator"
+    ],
+    "voice": "smooth, indirect, occasionally condescending",
+    "trustLogic": "He engages when flattered or cornered by specifics. He lies if the player shows uncertainty.",
+    "secrets": [
+      "He did not design the entire plot, but he enabled access and false paperwork"
+    ]
+  },
+  {
+    "id": "patrick_hanrahan",
+    "name": "Patrick Hanrahan",
+    "role": "Ward-connected local fixer and procurement intermediary",
+    "publicFace": "Jovial, connected, evasive",
+    "privateGoal": "Profit from contracts while staying clear of the blast radius",
+    "fear": "Being made the public scapegoat",
+    "knowledge": [
+      "He arranged unofficial labor and after-hours deliveries",
+      "He knows which watchmen can be bribed",
+      "He suspects foreign involvement but cares more about money"
+    ],
+    "voice": "earthy, persuasive, half-confessional",
+    "trustLogic": "He opens up to practical deals, not moral appeals.",
+    "secrets": [
+      "He does not know the full sabotage target, only the logistics behind access"
+    ]
+  },
+  {
+    "id": "clara_hale",
+    "name": "Clara Hale",
+    "role": "Journalist with unofficial access to fair gossip and city politics",
+    "publicFace": "Bright, observant, sharper than she first appears",
+    "privateGoal": "Land a major story without being frozen out by fair officials",
+    "fear": "Being fed a false story and losing credibility",
+    "knowledge": [
+      "A rumor links Paris interests to embarrassment schemes against Chicago",
+      "A missing worker may have seen restricted activity after dark",
+      "Political allies of the fair want scandals buried"
+    ],
+    "voice": "quick, incisive, lightly teasing",
+    "trustLogic": "She rewards candor and punishs manipulation. If involved, she becomes a force multiplier but also a risk.",
+    "secrets": [
+      "She has one source inside a hotel frequented by foreign delegates"
+    ]
+  },
+  {
+    "id": "captain_odonnell",
+    "name": "Captain O'Donnell",
+    "role": "Fair security officer",
+    "publicFace": "Blunt, skeptical, disciplined",
+    "privateGoal": "Keep order and avoid panic",
+    "fear": "False alarms that damage his authority",
+    "knowledge": [
+      "There have been unexplained movements in restricted service areas",
+      "At least one badge may be forged",
+      "He has concerns about inconsistent watch schedules"
+    ],
+    "voice": "direct, clipped, unsentimental",
+    "trustLogic": "He responds to timelines, names, and physical evidence. He rejects vague intuition.",
+    "secrets": [
+      "He has quietly reassigned one unreliable guard without reporting why"
+    ]
+  }
+]
