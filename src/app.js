@@ -78,7 +78,7 @@ const beginBtn = document.getElementById('begin-btn');
 
 if (!ttsSupported) {
   ttsToggleBtn.remove();
-  beginOverlay.hidden = true;
+  beginOverlay.classList.add('hidden');
 } else {
   updateTtsToggleUI();
 
@@ -86,7 +86,7 @@ if (!ttsSupported) {
     audioUnlocked = true;
     ttsEnabled = true;
     updateTtsToggleUI();
-    beginOverlay.hidden = true;
+    beginOverlay.classList.add('hidden');
     if (introText && !hasSpokenIntro) {
       hasSpokenIntro = true;
       lastSpokenMessageId = currentMessageId;

@@ -283,6 +283,10 @@ li {
   padding: 24px;
 }
 
+.begin-overlay.hidden {
+  display: none;
+}
+
 .begin-overlay-inner {
   display: flex;
   flex-direction: column;
