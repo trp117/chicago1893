@@ -490,6 +490,107 @@ notesCloseBtn.addEventListener('click', closeNotes);
 notesOverlay.addEventListener('click', (e) => { if (e.target === notesOverlay) closeNotes(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNotes(); });
 
+// ── Auto Test ────────────────────────────────────────────────────────────────
+
+const AUTO_TEST_SCRIPT = [
+  "Examine the shipping manifest on Burnham's desk",
+  "Ask Burnham who authorized the rerouting and whether he trusts his own procurement staff",
+  "Go to the freight yards to find the diverted crates",
+  "Question the watchman about the after-hours delivery",
+  "Head to Machinery Hall and inspect the wiring diagrams for tampering",
+  "Return to Burnham and accuse Émile Mercier and Patrick Hanrahan as the conspirators",
+];
+
+const autotestBtnEl = document.getElementById('autotest-btn');
+const autotestBarEl = document.getElementById('autotest-bar');
+const autotestStopBtnEl = document.getElementById('autotest-stop-btn');
+
+let autoTestRunning = false;
+let autoTestStepIndex = 0;
+let autoTestTimer = null;
+const autoTestLog = { steps: [], startedAt: null, endedAt: null, stopReason: null };
+
+function setAutoTestUI(running) {
+  autotestBtnEl.disabled = running;
+  autotestBarEl.hidden = !running;
+  inputEl.disabled = running;
+  formEl.querySelector('button[type="submit"]').disabled = running;
+}
+
+function stopAutoTest(reason = 'stopped') {
+  autoTestRunning = false;
+  clearTimeout(autoTestTimer);
+  autoTestLog.endedAt = Date.now();
+  autoTestLog.stopReason = reason;
+  setAutoTestUI(false);
+
+  const blob = new Blob([JSON.stringify(autoTestLog, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `autotest-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function runAutoTestStep() {
+  if (!autoTestRunning) return;
+
+  let input;
+  if (autoTestStepIndex < AUTO_TEST_SCRIPT.length) {
+    input = AUTO_TEST_SCRIPT[autoTestStepIndex];
+  } else {
+    const firstChoice = choicesEl.querySelector('.choice-btn');
+    if (firstChoice) {
+      input = firstChoice.textContent.trim();
+    } else {
+      stopAutoTest('no-more-steps');
+      return;
+    }
+  }
+
+  autoTestStepIndex++;
+
+  const step = {
+    step: autoTestStepIndex,
+    input,
+    timestamp: Date.now(),
+    cluesBefore: [...(gameState?.discoveredClueIds || [])],
+  };
+  autoTestLog.steps.push(step);
+
+  await submitTurn(input);
+
+  step.cluesAfter = [...(gameState?.discoveredClueIds || [])];
+  step.newClues = step.cluesAfter.filter(id => !step.cluesBefore.includes(id));
+
+  const entries = storyEl.querySelectorAll('.entry.engine');
+  const lastEntry = entries[entries.length - 1];
+  step.narrative = lastEntry?.querySelector('div:last-child')?.textContent?.trim() || '';
+
+  if (storyEl.querySelector('.ending-card')) {
+    step.isEnding = true;
+    step.endingSummary = storyEl.querySelector('.ending-card')?.textContent?.trim() || '';
+    stopAutoTest('ending-reached');
+    return;
+  }
+
+  if (autoTestRunning) {
+    autoTestTimer = setTimeout(runAutoTestStep, 3000);
+  }
+}
+
+function startAutoTest() {
+  autoTestStepIndex = 0;
+  Object.assign(autoTestLog, { steps: [], startedAt: Date.now(), endedAt: null, stopReason: null });
+  autoTestRunning = true;
+  setAutoTestUI(true);
+  autoTestTimer = setTimeout(runAutoTestStep, 3000);
+}
+
+autotestBtnEl.addEventListener('click', startAutoTest);
+autotestStopBtnEl.addEventListener('click', () => stopAutoTest('user-stopped'));
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 loadGame();

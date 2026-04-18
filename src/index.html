@@ -76,6 +76,11 @@
           </button>
         </div>
 
+        <div id="autotest-bar" class="autotest-bar" hidden>
+          <span class="autotest-label">Auto Test running…</span>
+          <button type="button" id="autotest-stop-btn" class="autotest-stop-btn">Stop</button>
+        </div>
+
         <section id="choices" class="choices"></section>
 
         <form id="input-form" class="input-row">
@@ -92,6 +97,7 @@
           </div>
           <div class="input-actions">
             <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
+            <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
             <button type="submit">Send</button>
           </div>
         </form>

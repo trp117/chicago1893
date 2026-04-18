@@ -344,6 +344,64 @@ li {
   gap: 8px;
 }
 
+.autotest-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.82rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.autotest-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.autotest-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.autotest-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 4px 28px 6px;
+  background: rgba(208, 176, 106, 0.06);
+  border-top: 1px solid rgba(208, 176, 106, 0.15);
+}
+
+.autotest-label {
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.autotest-stop-btn {
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #7a2a20;
+  background: transparent;
+  color: #e07060;
+  font-family: Georgia, serif;
+  font-size: 0.75rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.autotest-stop-btn:hover {
+  background: #2a1010;
+}
+
 .notes-btn {
   height: 36px;
   padding: 0 14px;
