@@ -199,6 +199,55 @@ async function loadGame() {
   renderOutput(data.opening);
 }
 
+function renderEnding(endState) {
+  const result = endState.result || 'failure';
+  const perf = endState.performance || {};
+
+  const resultLabel = { success: 'SUCCESS', partial: 'PARTIAL SUCCESS', failure: 'FAILURE' }[result] || result.toUpperCase();
+
+  const sections = [];
+
+  if (endState.scene) {
+    sections.push(`<div class="ending-scene">${endState.scene.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}</div>`);
+  }
+
+  if (endState.conspiracySummary) {
+    sections.push(`<section class="ending-section"><h3>The Conspiracy</h3><p>${endState.conspiracySummary}</p></section>`);
+  }
+
+  if (endState.whatPlayerDiscovered) {
+    sections.push(`<section class="ending-section"><h3>What You Uncovered</h3><p>${endState.whatPlayerDiscovered}</p></section>`);
+  }
+
+  if (endState.outcome) {
+    sections.push(`<section class="ending-section"><h3>Outcome</h3><p>${endState.outcome}</p></section>`);
+  }
+
+  if (endState.playerContribution) {
+    sections.push(`<section class="ending-section"><h3>Your Role</h3><p>${endState.playerContribution}</p></section>`);
+  }
+
+  if (endState.burnhamResponse) {
+    sections.push(`<section class="ending-section ending-burnham"><blockquote>\u201c${endState.burnhamResponse}\u201d</blockquote><cite>\u2014 Daniel Burnham</cite></section>`);
+  }
+
+  if (perf.cluesDiscovered !== undefined) {
+    const correct = endState.correctSuspectIdentified;
+    sections.push(`<div class="ending-stats">
+      <div class="ending-stat"><span class="ending-stat-label">Clues Found</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
+      <div class="ending-stat"><span class="ending-stat-label">Suspect Identified</span><span class="ending-stat-value">${correct ? 'Yes' : 'No'}</span></div>
+      <div class="ending-stat"><span class="ending-stat-label">Time Remaining</span><span class="ending-stat-value">${perf.timeRemaining} min</span></div>
+      <div class="ending-stat"><span class="ending-stat-label">Outcome</span><span class="ending-stat-value ending-result--${result}">${resultLabel}</span></div>
+    </div>`);
+  }
+
+  const card = document.createElement('div');
+  card.className = `ending-card ending-card--${result}`;
+  card.innerHTML = `<div class="ending-header"><span class="ending-result ending-result--${result}">${resultLabel}</span></div>${sections.join('')}`;
+  storyEl.appendChild(card);
+  storyEl.scrollTop = storyEl.scrollHeight;
+}
+
 let submitting = false;
 
 async function submitTurn(playerInput) {
@@ -227,6 +276,7 @@ async function submitTurn(playerInput) {
       formEl.querySelector('button').disabled = true;
       inputEl.disabled = true;
       renderChoices([]);
+      renderEnding(data.output.endState);
     }
   } finally {
     submitting = false;

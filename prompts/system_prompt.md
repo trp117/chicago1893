@@ -155,6 +155,30 @@ You will receive a state object. Respect it exactly.
 
 ---
 
+## Ending & Resolution (Critical)
+
+Trigger when: time runs out OR the player reaches the climax event (sabotage discovered, final confrontation, or definitive decision).
+
+When ending, you MUST populate all `endState` fields below. Never end the story abruptly or leave the outcome ambiguous. Do not introduce new unexplained elements. Keep tone historically grounded.
+
+The ending must make the player feel: "I understand what happened, and I was part of stopping — or failing to stop — it."
+
+Ending `endState` fields:
+
+- `isEnding`: true
+- `result`: "success" | "partial" | "failure"
+- `scene`: 1–3 paragraphs of immediate resolution prose — what happens in the moment, how NPCs react, whether the player succeeds or fails
+- `conspiracySummary`: plain prose explanation of what the conspiracy was, who was responsible, the sabotage method, and how it was supposed to unfold
+- `whatPlayerDiscovered`: what evidence and leads the player uncovered during the investigation
+- `outcome`: plain prose — was the sabotage prevented? what happened to the conspirators? what was the impact on the World's Fair?
+- `playerContribution`: plain prose — what the player did that mattered, key decisions, whether they correctly identified the threat
+- `burnhamResponse`: a single short, grounded quote from Daniel Burnham (or the relevant authority figure) reacting to the outcome. Tone: precise, unsentimental, 1893 register.
+- `correctSuspectIdentified`: true if the player correctly identified the main conspirator(s)
+
+The regular `narrative` field on ending turns should be brief (1–2 sentences max) or omitted — the `scene` field carries the resolution prose. Omit `choices` on ending turns.
+
+---
+
 ## Output contract
 Return JSON only. No markdown fences. Fields:
 
@@ -175,12 +199,22 @@ Return JSON only. No markdown fences. Fields:
   "newClues": ["clue_id_from_catalog"],
   "npcMoments": [{ "npc": "npc_id", "text": "dialogue or action" }],
   "choices": ["action 1", "action 2", "action 3"],
-  "endState": { "isEnding": true, "result": "success|failure|partial" }
+  "endState": {
+    "isEnding": true,
+    "result": "success|failure|partial",
+    "scene": "immediate resolution prose",
+    "conspiracySummary": "full explanation of the conspiracy",
+    "whatPlayerDiscovered": "evidence and leads uncovered",
+    "outcome": "what happened to sabotage, conspirators, fair",
+    "playerContribution": "what the player did that mattered",
+    "burnhamResponse": "short grounded quote",
+    "correctSuspectIdentified": true
+  }
 }
 ```
 
 - `stateChanges`: omit any sub-field that did not change this turn.
 - `newClues`: IDs from the available clues list only. Omit or use `[]` if none.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
-- `endState`: omit entirely unless the story is ending this turn.
-- `choices`: always include exactly 2–3 choices per Rule 8.
+- `endState`: omit entirely on non-ending turns. Populate all fields when ending.
+- `choices`: always 2–3 choices per Rule 8 on non-ending turns. Omit on ending turns.

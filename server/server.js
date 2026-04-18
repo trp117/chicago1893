@@ -377,6 +377,16 @@ app.post('/api/turn', async (req, res) => {
     }
 
     const nextState = mergeState(state, output);
+
+    if (output.endState?.isEnding) {
+      output.endState.performance = {
+        cluesDiscovered: nextState.discoveredClueIds?.length || 0,
+        totalClues: cluesCatalog.length,
+        timeRemaining: nextState.remainingMinutes,
+        result: output.endState.result || 'failure'
+      };
+    }
+
     return res.json({ output, nextState, mockMode: false });
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Server error' });
