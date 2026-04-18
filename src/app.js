@@ -104,4 +104,55 @@ formEl.addEventListener('submit', async (event) => {
   await submitTurn(inputEl.value);
 });
 
+// Voice input
+const micBtn = document.getElementById('mic-btn');
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+  micBtn.remove();
+} else {
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  let listening = false;
+
+  function setListening(on) {
+    listening = on;
+    micBtn.classList.toggle('listening', on);
+    micBtn.setAttribute('aria-label', on ? 'Stop listening' : 'Start voice input');
+    micBtn.title = on ? 'Listening… (click to stop)' : 'Voice input';
+  }
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const current = inputEl.value.trimEnd();
+    inputEl.value = current ? current + ' ' + transcript : transcript;
+    inputEl.focus();
+  };
+
+  recognition.onend = () => setListening(false);
+
+  recognition.onerror = (event) => {
+    if (event.error !== 'aborted' && event.error !== 'no-speech') {
+      console.warn('Speech recognition error:', event.error);
+    }
+    setListening(false);
+  };
+
+  micBtn.addEventListener('click', () => {
+    if (listening) {
+      recognition.stop();
+    } else {
+      try {
+        recognition.start();
+        setListening(true);
+      } catch {
+        setListening(false);
+      }
+    }
+  });
+}
+
 loadGame();

@@ -141,6 +141,10 @@ body {
   padding: 0 28px 28px;
 }
 
+.input-textarea-wrap {
+  position: relative;
+}
+
 textarea {
   width: 100%;
   resize: vertical;
@@ -149,7 +153,44 @@ textarea {
   background: var(--panel);
   color: var(--text);
   padding: 14px;
+  padding-right: 52px;
   font: inherit;
+}
+
+.mic-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-weight: normal;
+}
+
+.mic-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mic-btn.listening {
+  border-color: #c0392b;
+  background: #2a1010;
+  color: #e74c3c;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.45); }
+  50%       { box-shadow: 0 0 0 7px rgba(231, 76, 60, 0); }
 }
 
 button {
