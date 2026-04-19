@@ -91,6 +91,13 @@
       "emile_mercier": 1,
       "patrick_hanrahan": 0,
       "captain_odonnell": 0
+    },
+    "npcTrust": {
+      "daniel_burnham": 20,
+      "emile_mercier": 0,
+      "patrick_hanrahan": 0,
+      "clara_hale": 10,
+      "captain_odonnell": 10
     }
   }
 }

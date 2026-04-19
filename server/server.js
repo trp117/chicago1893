@@ -143,6 +143,14 @@ function mergeState(currentState, modelOutput) {
     }
   }
 
+  if (delta.npcTrust && typeof delta.npcTrust === 'object') {
+    next.npcTrust = next.npcTrust || {};
+    for (const [npcId, amount] of Object.entries(delta.npcTrust)) {
+      const current = next.npcTrust[npcId] || 0;
+      next.npcTrust[npcId] = Math.max(-100, Math.min(100, current + Number(amount || 0)));
+    }
+  }
+
   if (Array.isArray(modelOutput.newClues)) {
     for (const clueId of modelOutput.newClues) {
       if (typeof clueId !== 'string') continue;

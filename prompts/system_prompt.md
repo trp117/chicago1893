@@ -140,7 +140,8 @@ You will receive a state object. Respect it exactly.
 - `elapsedMinutes`: time elapsed — use to calibrate act and urgency
 - `threat`: current threat level (0–10)
 - `burnhamTrust`: Burnham's trust in the player (-3 to 5)
-- `suspicion`: per-NPC suspicion scores
+- `suspicion`: per-NPC suspicion scores (how suspicious the player is of each NPC)
+- `npcTrust`: per-NPC trust scores (-100 to +100) — how much each NPC trusts the player. Adjust via `stateChanges.npcTrust`. Higher trust = NPC more open and forthcoming. Lower trust = evasive or hostile. Reflect current trust level in NPC dialogue and behavior.
 - `discoveredClueIds`: clues already found — reference naturally, never repeat as if new
 - `act`: current act — escalate accordingly
 - `knownSabotageMethod`: if true, the player knows the method; steer toward intervention
@@ -206,6 +207,7 @@ Return JSON only. No markdown fences. Fields:
     "act": 1,
     "burnhamTrust": 0,
     "suspicion": { "npc_id": 1 },
+    "npcTrust": { "npc_id": 5 },
     "flags": {},
     "knownSabotageMethod": false,
     "namedConspirators": []
