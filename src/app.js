@@ -1,6 +1,4 @@
 let gameState = null;
-let scenario = null;
-let cluesCatalog = [];
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
@@ -143,67 +141,50 @@ function addEntry(kind, title, html) {
 }
 
 function renderSidebar() {
-  document.getElementById('objective').textContent = scenario.goal;
-  document.getElementById('location').textContent = prettifyId(gameState.location);
-  document.getElementById('act').textContent = `Act ${gameState.act}`;
-  document.getElementById('elapsed').textContent = `${gameState.elapsedMinutes} min`;
-  document.getElementById('remaining').textContent = `${gameState.remainingMinutes} min`;
-  document.getElementById('threat').textContent = String(gameState.threat);
-  document.getElementById('trust').textContent = String(gameState.burnhamTrust);
+  document.getElementById('objective').textContent = gameState.scenario?.player_role || '';
 
+  const statusEl = document.getElementById('case-status');
+  const status = gameState.scenario?.case_status || 'active';
+  statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  statusEl.className = `case-status case-status--${status}`;
+
+  const npcsEl = document.getElementById('npcs');
+  npcsEl.innerHTML = '';
+  for (const npc of (gameState.npcs || [])) {
+    const li = document.createElement('li');
+    li.className = 'npc-card';
+    const trustClass = npc.trust >= 30 ? 'high' : npc.trust >= 0 ? 'neutral' : 'low';
+    const suspClass = npc.suspicion >= 60 ? 'high' : npc.suspicion >= 30 ? 'medium' : 'low';
+    li.innerHTML = `<strong class="npc-name">${npc.name}</strong><span class="npc-role">${npc.role}</span><div class="npc-stats"><span class="npc-trust npc-trust--${trustClass}">Trust ${npc.trust > 0 ? '+' : ''}${npc.trust}</span><span class="npc-suspicion npc-suspicion--${suspClass}">Susp ${npc.suspicion}</span></div>`;
+    npcsEl.appendChild(li);
+  }
+
+  const visibleClues = (gameState.clues || []).filter(c => c.status !== 'hidden');
+  const clueCountEl = document.getElementById('clue-count');
+  if (clueCountEl) clueCountEl.textContent = visibleClues.length ? `(${visibleClues.length})` : '';
   const cluesEl = document.getElementById('clues');
   cluesEl.innerHTML = '';
-  const discoveredIds = gameState.discoveredClueIds || [];
-  const clueCountEl = document.getElementById('clue-count');
-  if (clueCountEl) clueCountEl.textContent = discoveredIds.length ? `(${discoveredIds.length})` : '';
-  if (discoveredIds.length === 0) {
+  if (visibleClues.length === 0) {
     cluesEl.innerHTML = '<li class="clue-empty">No clues discovered yet.</li>';
   } else {
-    for (const id of discoveredIds) {
-      const clue = cluesCatalog.find((c) => c.id === id);
-      if (!clue) continue;
+    for (const clue of visibleClues) {
       const li = document.createElement('li');
       li.className = 'clue-card';
-      li.innerHTML = `<span class="clue-category clue-category--${clue.category}">${clue.category}</span><strong class="clue-title">${clue.title}</strong><p class="clue-desc">${clue.description}</p>`;
+      li.innerHTML = `<span class="clue-category clue-category--${clue.status}">${clue.status}</span><strong class="clue-title">${clue.title}</strong><p class="clue-desc">${clue.description}</p>`;
       cluesEl.appendChild(li);
     }
   }
 }
 
-function prettifyId(id) {
-  return id.replaceAll('_', ' ').replace(/\b\w/g, (m) => m.toUpperCase());
-}
-
-function renderChoices(choices = []) {
-  choicesEl.innerHTML = '';
-  for (const choice of choices) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.type = 'button';
-    btn.textContent = choice;
-    btn.addEventListener('click', () => submitTurn(choice));
-    choicesEl.appendChild(btn);
-  }
-}
-
-function renderOutput(output, meta = {}) {
+function renderOutput(output) {
   let html = `<p>${output.narrative}</p>`;
-  const speakParts = [output.narrative];
-
-  if (Array.isArray(output.npcMoments)) {
-    for (const npcMoment of output.npcMoments) {
-      html += `<div class="npc-line"><strong>${prettifyId(npcMoment.npc)}:</strong> ${npcMoment.text}</div>`;
-      speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
-    }
-  }
-  if (meta.mockMode) {
+  if (output.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
   addEntry('engine', 'Story', html);
-  renderChoices(output.choices || []);
 
   const messageId = ++currentMessageId;
-  const speakText = speakParts.join(' ');
+  const speakText = output.narrative;
   lastRenderedSpeakText = speakText;
 
   if (!hasSpokenIntro) {
@@ -221,60 +202,9 @@ function renderOutput(output, meta = {}) {
 async function loadGame() {
   const response = await fetch('/api/bootstrap');
   const data = await response.json();
-  scenario = data.scenario;
-  cluesCatalog = data.cluesCatalog || [];
-  gameState = data.state;
+  gameState = data.initial_state;
   renderSidebar();
-  renderOutput(data.opening);
-}
-
-function renderEnding(endState) {
-  const result = endState.result || 'failure';
-  const perf = endState.performance || {};
-
-  const resultLabel = { success: 'SUCCESS', partial: 'PARTIAL SUCCESS', failure: 'FAILURE' }[result] || result.toUpperCase();
-
-  const sections = [];
-
-  if (endState.scene) {
-    sections.push(`<div class="ending-scene">${endState.scene.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}</div>`);
-  }
-
-  if (endState.conspiracySummary) {
-    sections.push(`<section class="ending-section"><h3>The Conspiracy</h3><p>${endState.conspiracySummary}</p></section>`);
-  }
-
-  if (endState.whatPlayerDiscovered) {
-    sections.push(`<section class="ending-section"><h3>What You Uncovered</h3><p>${endState.whatPlayerDiscovered}</p></section>`);
-  }
-
-  if (endState.outcome) {
-    sections.push(`<section class="ending-section"><h3>Outcome</h3><p>${endState.outcome}</p></section>`);
-  }
-
-  if (endState.playerContribution) {
-    sections.push(`<section class="ending-section"><h3>Your Role</h3><p>${endState.playerContribution}</p></section>`);
-  }
-
-  if (endState.burnhamResponse) {
-    sections.push(`<section class="ending-section ending-burnham"><blockquote>\u201c${endState.burnhamResponse}\u201d</blockquote><cite>\u2014 Daniel Burnham</cite></section>`);
-  }
-
-  if (perf.cluesDiscovered !== undefined) {
-    const correct = endState.correctSuspectIdentified;
-    sections.push(`<div class="ending-stats">
-      <div class="ending-stat"><span class="ending-stat-label">Clues Found</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Suspect Identified</span><span class="ending-stat-value">${correct ? 'Yes' : 'No'}</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Time Remaining</span><span class="ending-stat-value">${perf.timeRemaining} min</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Outcome</span><span class="ending-stat-value ending-result--${result}">${resultLabel}</span></div>
-    </div>`);
-  }
-
-  const card = document.createElement('div');
-  card.className = `ending-card ending-card--${result}`;
-  card.innerHTML = `<div class="ending-header"><span class="ending-result ending-result--${result}">${resultLabel}</span></div>${sections.join('')}`;
-  storyEl.appendChild(card);
-  storyEl.scrollTop = storyEl.scrollHeight;
+  renderOutput({ narrative: data.opening.narrative });
 }
 
 let submitting = false;
@@ -297,15 +227,13 @@ async function submitTurn(playerInput) {
       return;
     }
 
-    gameState = data.nextState;
+    gameState = data.updated_state;
     renderSidebar();
-    renderOutput(data.output, { mockMode: data.mockMode });
+    renderOutput({ narrative: data.narrative, mockMode: data.mockMode });
 
-    if (data.output?.endState?.isEnding) {
-      formEl.querySelector('button').disabled = true;
+    if (data.updated_state?.scenario?.case_status === 'solved') {
+      formEl.querySelector('button[type="submit"]').disabled = true;
       inputEl.disabled = true;
-      renderChoices([]);
-      renderEnding(data.output.endState);
     }
   } finally {
     submitting = false;
@@ -654,41 +582,30 @@ function stopAutoTest(reason = 'stopped') {
 async function runAutoTestStep() {
   if (!autoTestRunning) return;
 
-  let input;
-  if (autoTestStepIndex < AUTO_TEST_SCRIPT.length) {
-    input = AUTO_TEST_SCRIPT[autoTestStepIndex];
-  } else {
-    const firstChoice = choicesEl.querySelector('.choice-btn');
-    if (firstChoice) {
-      input = firstChoice.textContent.trim();
-    } else {
-      stopAutoTest('no-more-steps');
-      return;
-    }
+  if (autoTestStepIndex >= AUTO_TEST_SCRIPT.length) {
+    stopAutoTest('no-more-steps');
+    return;
   }
 
+  const input = AUTO_TEST_SCRIPT[autoTestStepIndex];
   autoTestStepIndex++;
 
-  const step = {
-    step: autoTestStepIndex,
-    input,
-    timestamp: Date.now(),
-    cluesBefore: [...(gameState?.discoveredClueIds || [])],
-  };
+  const cluesBefore = (gameState?.clues || []).filter(c => c.status !== 'hidden').map(c => c.id);
+  const step = { step: autoTestStepIndex, input, timestamp: Date.now(), cluesBefore };
   autoTestLog.steps.push(step);
 
   await submitTurn(input);
 
-  step.cluesAfter = [...(gameState?.discoveredClueIds || [])];
-  step.newClues = step.cluesAfter.filter(id => !step.cluesBefore.includes(id));
+  const cluesAfter = (gameState?.clues || []).filter(c => c.status !== 'hidden').map(c => c.id);
+  step.cluesAfter = cluesAfter;
+  step.newClues = cluesAfter.filter(id => !cluesBefore.includes(id));
 
   const entries = storyEl.querySelectorAll('.entry.engine');
   const lastEntry = entries[entries.length - 1];
   step.narrative = lastEntry?.querySelector('div:last-child')?.textContent?.trim() || '';
 
-  if (storyEl.querySelector('.ending-card')) {
+  if (gameState?.scenario?.case_status === 'solved') {
     step.isEnding = true;
-    step.endingSummary = storyEl.querySelector('.ending-card')?.textContent?.trim() || '';
     stopAutoTest('ending-reached');
     return;
   }

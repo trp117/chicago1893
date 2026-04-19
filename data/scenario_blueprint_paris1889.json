@@ -1,0 +1,346 @@
+{
+  "story": {
+    "premise": "Three days before the inaugural lighting ceremony of the Eiffel Tower, the player — an assistant to Gustave Eiffel — discovers signs of deliberate sabotage to the tower's electrical system. A coalition of nationalist politicians and foreign industrial rivals intends to humiliate France by extinguishing the lights of the Exposition Universelle on its most visible night.",
+    "setting": {
+      "location": "Paris, France",
+      "year": 1889,
+      "venue": "Exposition Universelle — Champ de Mars and the Eiffel Tower",
+      "period_details": [
+        "Gas and arc lighting in transition to electric",
+        "Third Republic political instability, Boulangist movement at peak",
+        "Franco-Prussian War memory still raw — anti-German sentiment strong",
+        "Telegraph, pneumatic post, horse-drawn carriages, early telephony",
+        "International press covering the Exposition daily"
+      ]
+    },
+    "tone": ["historical thriller", "political intrigue", "mystery"],
+    "real_world_inspiration": "The 1889 Exposition Universelle and the opening of the Eiffel Tower, loosely adapted with fictional conspirators. The Boulangist political movement's anti-establishment nationalism provides authentic backdrop. The tower's actual electrical illumination debut is the fulcrum."
+  },
+
+  "conspiracy": {
+    "true_perpetrators": ["franz_wenzel", "boulanger_intermediary"],
+    "financier": "boulanger_faction",
+    "motivation": "A coalition of French Boulangist nationalists — who consider the tower a vulgar industrial monument unworthy of France — and an Austrian engineering consortium that lost the Exposition contract to Eiffel. The nationalists want public humiliation of the Republican government; the Austrians want to demonstrate that Eiffel's design is unreliable.",
+    "sabotage_plan": "Replace the primary electrical relay assembly on the second platform with a visually identical but internally sabotaged unit. Under full load during the lighting ceremony, the relay fails, triggering a cascade that blacks out the tower and risks an electrical fire visible to the entire Exposition crowd and international press.",
+    "timeline": {
+      "T_minus_3_days": "Wenzel obtains maintenance access via a forged work order",
+      "T_minus_2_days": "Sabotaged relay is installed in the early morning hours",
+      "T_minus_1_day": "Player's investigation begins after an engineer notices anomalies",
+      "opening_night": "Ceremony begins at 21:00 — sabotage triggers at first full illumination load"
+    },
+    "fail_safe": "If Wenzel is caught early, the intermediary carries a backup plan to bribe a maintenance worker to introduce a secondary fault the night of the ceremony."
+  },
+
+  "npcs": [
+    {
+      "id": "gustave_eiffel",
+      "name": "Gustave Eiffel",
+      "role": "Chief engineer and director of the tower project; the player's superior",
+      "public_face": "Confident, visionary, under enormous pressure to deliver a flawless opening",
+      "hidden_agenda": "Has quietly suppressed a prior electrical fault report to avoid bad press before the Exposition opens; fears the press more than the sabotage",
+      "knowledge": [
+        "An unusual maintenance request was filed two days ago",
+        "A German-speaking engineer was cleared for access by a forged credential",
+        "The relay assembly was recently 'inspected' without his authorization"
+      ],
+      "behavior_under_pressure": "Deflects, rationalizes, and delays action unless presented with irrefutable physical evidence; responds to calm precision, not alarm"
+    },
+    {
+      "id": "franz_wenzel",
+      "name": "Franz Wenzel",
+      "role": "Austrian electrical engineer attached to a competing pavilion exhibit",
+      "public_face": "Collegial, technically impressive, mildly condescending about French engineering",
+      "hidden_agenda": "Was hired by the Austrian consortium to execute the relay substitution; motivated by professional rivalry and a substantial payment",
+      "knowledge": [
+        "Exactly which relay unit was swapped and where it is stored",
+        "The identity of the intermediary who hired him",
+        "The precise failure mode of the sabotaged relay"
+      ],
+      "behavior_under_pressure": "Deflects with technical jargon and counter-questions; becomes hostile if shown documentary evidence; will attempt to flee if cornered with physical proof"
+    },
+    {
+      "id": "colette_moreau",
+      "name": "Colette Moreau",
+      "role": "Journalist for Le Figaro with unofficial access to fair staff areas",
+      "public_face": "Charming, curious, professionally relentless",
+      "hidden_agenda": "Wants the story — will help the player if she believes the tip is real, but will publish if the player tries to bury it",
+      "knowledge": [
+        "Heard a rumor of foreign money circulating among fair workers",
+        "Knows a hotel concierge who overheard a suspicious meeting",
+        "Has a list of after-hours access logs she obtained informally"
+      ],
+      "behavior_under_pressure": "Becomes an ally if treated honestly; becomes a threat if manipulated; her publication of a partial story can destabilize the investigation"
+    },
+    {
+      "id": "marcel_dupont",
+      "name": "Marcel Dupont",
+      "role": "Tower maintenance foreman",
+      "public_face": "Gruff, loyal, overworked",
+      "hidden_agenda": "Has been accepting cash payments to allow after-hours access to a wine smuggling operation using the tower's freight lift — unrelated to the sabotage",
+      "knowledge": [
+        "Someone used the maintenance freight access two nights ago",
+        "He did not witness who it was — he was paid to be elsewhere",
+        "He knows a relay inspection was logged without his sign-off"
+      ],
+      "behavior_under_pressure": "Panics and looks guilty because of the smuggling; will confess the smuggling if cornered, which clears him but wastes the player's time — a deliberate false lead"
+    },
+    {
+      "id": "sophie_lacroix",
+      "name": "Sophie Lacroix",
+      "role": "Socialite with press credentials and access to restricted levels through a romantic connection to a fair official",
+      "public_face": "Fashionable, socially maneuvering, apparently trivial",
+      "hidden_agenda": "Was on the restricted second platform after hours for a private meeting with her lover — she saw Wenzel but assumed he was legitimate maintenance",
+      "knowledge": [
+        "Saw a man matching Wenzel's description near the relay room after midnight",
+        "He carried a large leather case and spoke to no one",
+        "She has not reported it because she does not want her presence there known"
+      ],
+      "behavior_under_pressure": "Evasive about her own presence; will give testimony if the player can assure her discretion; can be the key eyewitness"
+    },
+    {
+      "id": "boulanger_intermediary",
+      "name": "Victor Mühlberg",
+      "role": "Private agent acting for the Boulangist political network; no official Exposition role",
+      "public_face": "Presents as a Swiss art dealer attending the Exposition",
+      "hidden_agenda": "Coordinated financing and access for the sabotage; handled contact between the French political backers and Wenzel",
+      "knowledge": [
+        "The names of the political backers",
+        "The complete sabotage plan including the backup fault option",
+        "Wenzel's current location at all times"
+      ],
+      "behavior_under_pressure": "Calm, denies everything, will attempt to disappear from Paris if he believes he has been identified; has a forged Swiss passport prepared"
+    }
+  ],
+
+  "clues": [
+    {
+      "id": "relay_replacement_order",
+      "description": "A maintenance work order for 'relay assembly inspection' on the second platform, signed by an engineer name that matches no authorized staff list.",
+      "type": "documentary",
+      "where_found": "maintenance_office",
+      "implicates": ["franz_wenzel"],
+      "veracity": "true",
+      "notes": "The forged signature is a near-match for a real engineer who was on leave — intentional cover"
+    },
+    {
+      "id": "wenzel_hotel_receipt",
+      "description": "A hotel receipt showing Franz Wenzel dined privately with an unnamed guest on the night before the forged work order was filed.",
+      "type": "documentary",
+      "where_found": "hotel_de_ville_lounge",
+      "implicates": ["franz_wenzel", "boulanger_intermediary"],
+      "veracity": "true",
+      "notes": "The guest signed as 'M. Meunier' — a name Mühlberg used as an alias"
+    },
+    {
+      "id": "dupont_payment_record",
+      "description": "A ledger entry showing Marcel Dupont received cash payments for three consecutive nights of 'access facilitation.'",
+      "type": "documentary",
+      "where_found": "freight_office",
+      "implicates": ["marcel_dupont"],
+      "veracity": "misleading",
+      "notes": "Payments are for wine smuggling access, not the sabotage — a false lead that consumes investigation time"
+    },
+    {
+      "id": "boulanger_letter_draft",
+      "description": "A draft letter, unsigned, calling the tower 'a monument to Republican vanity that deserves to be humbled before the eyes of Europe.'",
+      "type": "documentary",
+      "where_found": "political_club_salon",
+      "implicates": ["boulanger_intermediary"],
+      "veracity": "partial",
+      "notes": "Proves political motivation and Mühlberg's network but not direct operational involvement"
+    },
+    {
+      "id": "sabotaged_relay_unit",
+      "description": "A relay assembly in a locked storage room that appears standard externally but has been internally rewired to fail under full load.",
+      "type": "physical",
+      "where_found": "tower_second_platform_storage",
+      "implicates": ["franz_wenzel"],
+      "veracity": "true",
+      "notes": "The rewiring technique is consistent with Austrian electrical engineering practice of the period"
+    },
+    {
+      "id": "wenzel_blueprint_annotations",
+      "description": "Eiffel Tower electrical schematics found in Wenzel's workshop with handwritten annotations in German identifying load thresholds and failure points.",
+      "type": "physical",
+      "where_found": "wenzel_workshop_pavilion",
+      "implicates": ["franz_wenzel"],
+      "veracity": "true",
+      "notes": "The annotations pre-date his official start date at the Exposition — he studied the system before arriving"
+    },
+    {
+      "id": "lacroix_access_log",
+      "description": "A restricted-level access log showing Sophie Lacroix signed in twice after midnight in the past week.",
+      "type": "documentary",
+      "where_found": "tower_security_post",
+      "implicates": ["sophie_lacroix"],
+      "veracity": "partial",
+      "notes": "Her access was for personal reasons, not sabotage — but she witnessed Wenzel and can provide eyewitness testimony"
+    },
+    {
+      "id": "german_cipher_note",
+      "description": "A folded note in partial cipher found in Wenzel's coat pocket, referencing 'la lumière' and a date corresponding to opening night.",
+      "type": "documentary",
+      "where_found": "wenzel_person",
+      "implicates": ["franz_wenzel", "boulanger_intermediary"],
+      "veracity": "true",
+      "notes": "The cipher is simple and period-consistent; the date and phrase confirm the target and timing"
+    },
+    {
+      "id": "eiffel_suppressed_report",
+      "description": "An internal report from ten days prior flagging anomalies in the relay assembly — marked 'hold for review' and never acted on.",
+      "type": "documentary",
+      "where_found": "eiffel_private_files",
+      "implicates": ["gustave_eiffel"],
+      "veracity": "partial",
+      "notes": "Not evidence of conspiracy — Eiffel suppressed it for press reasons — but reveals institutional vulnerability and unlocks Eiffel's cooperation"
+    },
+    {
+      "id": "muhlberg_alias_confirmation",
+      "description": "A hotel concierge identifies 'M. Meunier' from the receipt as a man who paid in gold coin and asked specifically about engineering staff dining schedules.",
+      "type": "testimony",
+      "where_found": "hotel_de_ville_lounge",
+      "implicates": ["boulanger_intermediary"],
+      "veracity": "true",
+      "notes": "Combined with the hotel receipt, confirms Mühlberg's operational role and his method of contact with Wenzel"
+    },
+    {
+      "id": "lacroix_eyewitness",
+      "description": "Sophie Lacroix, once persuaded to speak, confirms she saw a man matching Wenzel's description carrying a large case near the relay room at approximately 01:30.",
+      "type": "testimony",
+      "where_found": "lacroix_private_meeting",
+      "implicates": ["franz_wenzel"],
+      "veracity": "true",
+      "notes": "Requires the player to first discover the access log and then gain her trust through discretion — a two-step unlock"
+    }
+  ],
+
+  "clue_relationships": [
+    {
+      "chain": ["relay_replacement_order", "wenzel_blueprint_annotations"],
+      "reveals": "Wenzel planned the sabotage before arriving and forged his own authorization to execute it"
+    },
+    {
+      "chain": ["sabotaged_relay_unit", "wenzel_blueprint_annotations"],
+      "reveals": "Confirms both the method and Wenzel's technical authorship — sufficient for Eiffel to order the relay replaced and Wenzel detained"
+    },
+    {
+      "chain": ["wenzel_hotel_receipt", "muhlberg_alias_confirmation"],
+      "reveals": "Mühlberg (alias Meunier) is the operational coordinator between the political network and Wenzel"
+    },
+    {
+      "chain": ["boulanger_letter_draft", "muhlberg_alias_confirmation"],
+      "reveals": "Full political sponsorship chain — from Boulangist faction through Mühlberg to Wenzel"
+    },
+    {
+      "chain": ["lacroix_access_log", "lacroix_eyewitness"],
+      "reveals": "Sophie Lacroix is an eyewitness who can place Wenzel at the scene — requires two-step trust unlock"
+    },
+    {
+      "chain": ["dupont_payment_record"],
+      "reveals": "False lead — pursuing Dupont reveals wine smuggling, wastes time, and redirects suspicion away from Wenzel"
+    },
+    {
+      "chain": ["eiffel_suppressed_report"],
+      "reveals": "Unlocks Eiffel's full cooperation once the player confronts him with it — he stops deflecting and authorizes full access"
+    },
+    {
+      "chain": ["german_cipher_note", "muhlberg_alias_confirmation"],
+      "reveals": "Confirms the ceremony is the target, the timing, and the coordination between Wenzel and the financing network"
+    }
+  ],
+
+  "acts": [
+    {
+      "act": 1,
+      "name": "The Anomaly",
+      "minutes": "0–8",
+      "beats": [
+        "Eiffel briefs the player on the anomalous relay inspection report",
+        "Player discovers the forged work order in the maintenance office",
+        "First suspect emerges: Dupont's payment record surfaces as an apparent lead",
+        "The player learns of the relay assembly on the second platform"
+      ],
+      "goal": "Establish that deliberate interference has occurred and surface at least one lead"
+    },
+    {
+      "act": 2,
+      "name": "Pressure and Misdirection",
+      "minutes": "9–21",
+      "beats": [
+        "Pursuing Dupont reveals the smuggling — a red herring that costs time",
+        "Wenzel surfaces as a credible suspect via the hotel receipt or blueprint annotations",
+        "Colette Moreau becomes involved — asset or risk depending on player's candor",
+        "Sophie Lacroix is identified as a potential witness but is evasive",
+        "Eiffel attempts to delay action to protect press perception",
+        "Mühlberg attempts to leave Paris if he senses investigation closing in"
+      ],
+      "goal": "Identify Wenzel as the saboteur and establish the political connection"
+    },
+    {
+      "act": 3,
+      "name": "The Ceremony",
+      "minutes": "22–30",
+      "beats": [
+        "Crowd assembles; ceremony is one hour away",
+        "Player must choose how to intervene: confront Wenzel, replace the relay, alert security, or involve Eiffel",
+        "Mühlberg's escape attempt or backup plan activates if not addressed",
+        "Resolution before the lights are switched on"
+      ],
+      "goal": "Stop the sabotage before the ceremony; expose or contain the conspiracy"
+    }
+  ],
+
+  "endings": {
+    "success": {
+      "conditions": [
+        "Sabotaged relay is identified and replaced before the ceremony",
+        "Wenzel is detained by fair security with physical evidence presented",
+        "Eiffel is warned and authorizes intervention in time"
+      ],
+      "outcome": "The tower is illuminated without incident. Eiffel quietly thanks the player. The political network is not publicly exposed but is known to authorities."
+    },
+    "partial_success": [
+      {
+        "label": "Sabotage stopped, conspiracy hidden",
+        "conditions": [
+          "Relay is replaced and ceremony succeeds",
+          "Mühlberg escapes before he can be identified",
+          "Political backing remains unknown"
+        ],
+        "outcome": "The fair opens safely but the conspiracy's backers face no consequence. Colette Moreau suspects a story was buried."
+      },
+      {
+        "label": "Conspiracy exposed, ceremony disrupted",
+        "conditions": [
+          "Player goes public with Colette Moreau before replacing the relay",
+          "Ceremony is delayed or cancelled as a precaution"
+        ],
+        "outcome": "The sabotage is prevented but the scandal dominates opening coverage. Eiffel is furious. The Boulangist network is politically embarrassed."
+      }
+    ],
+    "failure": [
+      {
+        "label": "Ceremony fails",
+        "conditions": [
+          "Player does not locate and replace the relay before opening",
+          "Relay fails on activation — tower goes dark before international press"
+        ],
+        "outcome": "A cascade failure blacks out the tower. No fire, but the humiliation is complete. The Republican government faces a political crisis."
+      },
+      {
+        "label": "Time expired",
+        "conditions": [
+          "Player is still pursuing Dupont or other false leads when the ceremony begins"
+        ],
+        "outcome": "No intervention reaches Eiffel in time. The sabotage succeeds."
+      }
+    ],
+    "false_accusation": {
+      "conditions": [
+        "Player formally accuses Marcel Dupont of the sabotage",
+        "Dupont is detained but Wenzel remains free"
+      ],
+      "outcome": "Dupont confesses to smuggling but not sabotage. The real sabotage proceeds unimpeded. Eiffel loses trust in the player and withholds further access."
+    }
+  }
+}

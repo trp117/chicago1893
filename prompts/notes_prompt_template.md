@@ -1,16 +1,10 @@
 Discovered clues:
 {{DISCOVERED_CLUES_JSON}}
 
-NPC suspicion levels (higher score = more suspicious):
-{{SUSPICION_JSON}}
+NPC states (name, role, trust, suspicion):
+{{NPC_JSON}}
 
-Named conspirators so far:
-{{NAMED_CONSPIRATORS}}
-
-Locations visited:
-{{VISITED_LOCATIONS}}
-
-Current act: {{ACT}} of 3
-Elapsed time: {{ELAPSED}} of 10 minutes
+Player conclusions so far:
+{{PLAYER_CONCLUSIONS_JSON}}
 
 Write my case notes based only on the above. Be honest about what I do not yet know.

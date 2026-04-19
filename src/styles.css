@@ -333,10 +333,71 @@ li {
   margin-bottom: 4px;
 }
 
-.clue-category--documentary { background: #1a2a1a; color: #7ec87e; }
-.clue-category--physical    { background: #2a1a1a; color: #e07070; }
-.clue-category--testimony   { background: #1a1a2a; color: #7090d8; }
-.clue-category--observation { background: #2a2215; color: #c8a860; }
+.clue-category--documentary  { background: #1a2a1a; color: #7ec87e; }
+.clue-category--physical     { background: #2a1a1a; color: #e07070; }
+.clue-category--testimony    { background: #1a1a2a; color: #7090d8; }
+.clue-category--observation  { background: #2a2215; color: #c8a860; }
+.clue-category--discovered   { background: #1a2215; color: #9ed87e; }
+.clue-category--confirmed    { background: #152215; color: #5ec85e; }
+.clue-category--disputed     { background: #2a1515; color: #d87070; }
+
+.case-status-row {
+  margin-top: 10px;
+}
+
+.case-status {
+  font-size: 0.82rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.case-status--active { color: var(--accent); }
+.case-status--solved { color: #7ec87e; }
+
+.npc-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--panel-soft);
+  list-style: none;
+}
+
+.npc-name {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+}
+
+.npc-role {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.npc-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.npc-trust, .npc-suspicion {
+  font-size: 0.68rem;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.npc-trust--high    { background: #152215; color: #7ec87e; }
+.npc-trust--neutral { background: #1f1f1a; color: #c8b870; }
+.npc-trust--low     { background: #2a1515; color: #d87070; }
+
+.npc-suspicion--low    { background: #1a1a1a; color: var(--muted); }
+.npc-suspicion--medium { background: #2a1f10; color: #d8a860; }
+.npc-suspicion--high   { background: #2a1515; color: #d87070; }
 
 .hero-controls {
   display: flex;
