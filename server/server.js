@@ -59,6 +59,11 @@ app.post('/api/turn', async (req, res) => {
 
       return res.json({
         narrative: "Burnham narrows his eyes as you speak. Around you, clerks continue their work with the strained efficiency of men who know that every lost minute may become a public embarrassment. Your question touches a nerve: several consignments were rerouted under irregular authority, and one initials mark appears twice in different hands.\n\n\"Find out whether this is incompetence or design,\" Burnham says quietly. \"I confess I no longer assume the better of the two.\"",
+        choices: [
+          'Inspect the altered memorandum more closely',
+          'Head to the freight yards to trace the rerouted delivery',
+          'Ask Burnham who had access to the shipping papers'
+        ],
         updated_state: mockState,
         mockMode: true
       });
@@ -96,6 +101,7 @@ app.post('/api/turn', async (req, res) => {
 
     return res.json({
       narrative: output.narrative,
+      choices: output.choices || [],
       updated_state: output.updated_state,
       mockMode: false
     });

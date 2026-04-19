@@ -60,10 +60,11 @@ You must process both.
 
 OUTPUT RULES
 
-You must always return valid JSON with exactly two top-level fields:
+You must always return valid JSON with exactly three top-level fields:
 
 1. "narrative"
 2. "updated_state"
+3. "choices"
 
 Return only valid JSON.
 Do not include markdown.
@@ -74,6 +75,7 @@ OUTPUT FORMAT
 
 {
   "narrative": "string",
+  "choices": ["string", "string", "string"],
   "updated_state": {
     "session_id": "string",
     "scenario": {
@@ -155,6 +157,20 @@ PLAYER CONCLUSION RULES
   - player.identified_motive
 - Only change scenario.case_status to "solved" when the case has clearly reached a conclusion.
 - Otherwise keep case_status as "active".
+
+CHOICES RULES
+
+- Always return exactly 3 choices.
+- Each choice should be a short, clear player action.
+- Choices should feel natural for the current moment in the story.
+- Choices should vary across:
+  - questioning a person
+  - investigating a place
+  - reviewing evidence
+  - escalating suspicion
+- Do not make choices too long.
+- Do not reveal hidden information in the choices.
+- The player may still type or speak any custom action; choices are optional helpers only.
 
 DECISION STANDARD
 

@@ -176,6 +176,18 @@ function renderSidebar() {
   }
 }
 
+function renderChoices(choices = []) {
+  choicesEl.innerHTML = '';
+  for (const choice of choices) {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.type = 'button';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => submitTurn(choice));
+    choicesEl.appendChild(btn);
+  }
+}
+
 function renderOutput(output) {
   let html = `<p>${output.narrative}</p>`;
   if (output.mockMode) {
@@ -230,10 +242,12 @@ async function submitTurn(playerInput) {
     gameState = data.updated_state;
     renderSidebar();
     renderOutput({ narrative: data.narrative, mockMode: data.mockMode });
+    renderChoices(data.choices || []);
 
     if (data.updated_state?.scenario?.case_status === 'solved') {
       formEl.querySelector('button[type="submit"]').disabled = true;
       inputEl.disabled = true;
+      renderChoices([]);
     }
   } finally {
     submitting = false;
