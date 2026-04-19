@@ -334,28 +334,41 @@ if (!SpeechRecognition) {
   micBtn.remove();
   drivingBtn.remove();
 } else {
+  // Mobile browsers re-deliver finalized results on restart and mishandle continuous mode,
+  // causing word doubling. Use push-to-talk (single-shot) on mobile instead.
+  const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+
   const recognition = new SpeechRecognition();
-  recognition.continuous = true;
+  recognition.continuous = !isMobile;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
 
   let listening = false;
-  let confirmedText = '';
+  let finalTranscript = '';
   let restartScheduled = false;
   // After a restart, Chrome often re-delivers the last finalized result. This flag
   // triggers a one-shot duplicate check on the first final chunk of the new session.
   let postRestartDedup = false;
+  // Prevents the same text being submitted twice if onend fires after a manual stop+submit.
+  let submissionLock = false;
 
   let drivingMode = false;
   let drivingTimer = null;
 
+  function safeSend(text) {
+    if (submissionLock) return;
+    submissionLock = true;
+    Promise.resolve(submitTurn(text)).finally(() => { submissionLock = false; });
+  }
+
   const VOICE_COMMANDS = {
     'send': () => {
-      if (confirmedText.trim()) {
-        const text = confirmedText.trim();
-        confirmedText = '';
+      if (finalTranscript.trim()) {
+        const text = finalTranscript.trim();
+        finalTranscript = '';
         inputEl.value = '';
-        submitTurn(text);
+        safeSend(text);
       }
     },
     'stop reading': () => {
@@ -386,21 +399,21 @@ if (!SpeechRecognition) {
     if (postRestartDedup) {
       postRestartDedup = false;
       // Skip if this chunk was already committed before the restart
-      if (confirmedText.trimEnd().toLowerCase().endsWith(trimmed.toLowerCase())) return;
+      if (finalTranscript.trimEnd().toLowerCase().endsWith(trimmed.toLowerCase())) return;
     }
-    const sep = confirmedText && !confirmedText.endsWith(' ') ? ' ' : '';
-    confirmedText += sep + chunk;
+    const sep = finalTranscript && !finalTranscript.endsWith(' ') ? ' ' : '';
+    finalTranscript += sep + trimmed;
   }
 
   function resetDrivingTimer() {
     clearTimeout(drivingTimer);
-    if (!confirmedText.trim()) return;
+    if (!finalTranscript.trim()) return;
     drivingTimer = setTimeout(() => {
-      const text = confirmedText.trim();
+      const text = finalTranscript.trim();
       if (text && drivingMode) {
-        confirmedText = '';
+        finalTranscript = '';
         inputEl.value = '';
-        submitTurn(text);
+        safeSend(text);
       }
     }, 2500);
   }
@@ -422,11 +435,11 @@ if (!SpeechRecognition) {
     restartScheduled = false;
     postRestartDedup = false;
     recognition.stop();
-    inputEl.value = confirmedText;
-    if (autoSubmit && confirmedText.trim()) {
-      const text = confirmedText.trim();
-      confirmedText = '';
-      submitTurn(text);
+    inputEl.value = finalTranscript;
+    if (autoSubmit && finalTranscript.trim()) {
+      const text = finalTranscript.trim();
+      finalTranscript = '';
+      safeSend(text);
     }
   }
 
@@ -437,7 +450,7 @@ if (!SpeechRecognition) {
     drivingBtn.title = on ? 'Driving mode: on' : 'Driving mode';
     if (on) {
       if (!listening) {
-        confirmedText = inputEl.value.trimEnd();
+        finalTranscript = inputEl.value.trimEnd();
         setListening(true);
         startRecognition();
       }
@@ -448,7 +461,7 @@ if (!SpeechRecognition) {
   }
 
   recognition.onresult = (event) => {
-    let interim = '';
+    let interimTranscript = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const chunk = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
@@ -458,18 +471,27 @@ if (!SpeechRecognition) {
           appendFinalChunk(chunk);
         }
       } else {
-        interim += chunk;
+        interimTranscript += chunk;
       }
     }
-    // Show confirmed text + live interim in textarea so user can see and edit
-    const sep = confirmedText && interim && !confirmedText.endsWith(' ') ? ' ' : '';
-    inputEl.value = confirmedText + (interim ? sep + interim : '');
+    // Show finalized text + live interim so user can see and edit before sending
+    const sep = finalTranscript && interimTranscript && !finalTranscript.endsWith(' ') ? ' ' : '';
+    inputEl.value = finalTranscript + (interimTranscript ? sep + interimTranscript : '');
     if (drivingMode) resetDrivingTimer();
   };
 
-  // Auto-restart keeps recognition alive through browser silence timeouts.
-  // Set postRestartDedup so the first final result of the new session is checked for re-delivery.
   recognition.onend = () => {
+    if (isMobile) {
+      // Push-to-talk: don't auto-restart. Let the browser's natural silence detection
+      // end the session; put the transcript in the input for the user to review and send.
+      if (listening) {
+        setListening(false);
+        inputEl.value = finalTranscript;
+      }
+      return;
+    }
+    // Desktop: auto-restart keeps recognition alive through browser silence timeouts.
+    // Set postRestartDedup so the first final result of the new session is checked for re-delivery.
     if (listening && !restartScheduled) {
       restartScheduled = true;
       setTimeout(() => {
@@ -492,9 +514,10 @@ if (!SpeechRecognition) {
 
   micBtn.addEventListener('click', () => {
     if (listening) {
-      stopListening(true); // tapping mic while listening stops and submits
+      // Desktop: stop and auto-submit. Mobile: stop only — user reviews and taps Send.
+      stopListening(!isMobile);
     } else {
-      confirmedText = inputEl.value.trimEnd(); // preserve any text the user typed
+      finalTranscript = inputEl.value.trimEnd(); // preserve any text the user typed
       setListening(true);
       startRecognition();
     }
