@@ -149,7 +149,13 @@ You will receive a state object. Respect it exactly.
 ## Clue system rules
 - Clues are structured objects with IDs. You receive discovered clue objects and available (undiscovered) clues at the current location.
 - Only return a clue ID in `newClues` if the player's action logically uncovers it and it appears in the available clues list.
+- Do not invent new clue IDs.
 - Do not hint at undiscovered clues unless the player's action directly warrants it.
+- Usually reveal no more than 1 new clue per turn unless the player action clearly justifies more.
+- A clue should feel earned through investigation, questioning, or close observation.
+- Clues should build understanding of the sabotage, the people involved, or the method being used.
+- Do not use clues to reveal the full solution too early.
+- If the player makes a guess without evidence, do not treat it as a discovered clue.
 - When `readyForClimax` is true, steer immediately toward Act III resolution.
 
 ---

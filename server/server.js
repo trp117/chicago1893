@@ -38,6 +38,35 @@ const locations = readJson('data/locations.json');
 const npcs = readJson('data/npcs.json');
 const cluesCatalog = readJson('data/clues.json');
 
+function extractJson(raw) {
+  if (typeof raw !== 'string') {
+    throw new Error('Model response is not text.');
+  }
+
+  const trimmed = raw.trim();
+
+  if (!trimmed) {
+    throw new Error('Model response text is empty.');
+  }
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {}
+
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (fenced?.[1]) {
+    return JSON.parse(fenced[1].trim());
+  }
+
+  const firstBrace = trimmed.indexOf('{');
+  const lastBrace = trimmed.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
+  }
+
+  throw new Error('No valid JSON object found in model response.');
+}
+
 function getLocationById(id) {
   return locations.find((loc) => loc.id === id) || null;
 }
@@ -48,11 +77,23 @@ function getClueById(id) {
 
 function slimLocation(loc) {
   if (!loc) return null;
-  return { id: loc.id, name: loc.name, description: loc.description, atmosphericClues: loc.possibleClues };
+  return {
+    id: loc.id,
+    name: loc.name,
+    description: loc.description,
+    atmosphericClues: loc.possibleClues
+  };
 }
 
 function slimClue(clue) {
-  return { id: clue.id, title: clue.title, description: clue.description, category: clue.category, implicates: clue.implicates, unlocks: clue.unlocks };
+  return {
+    id: clue.id,
+    title: clue.title,
+    description: clue.description,
+    category: clue.category,
+    implicates: clue.implicates,
+    unlocks: clue.unlocks
+  };
 }
 
 function getAvailableCluesAtLocation(locationId, discoveredClueIds) {
@@ -64,8 +105,11 @@ function getAvailableCluesAtLocation(locationId, discoveredClueIds) {
 function checkEndingReadiness(state) {
   const ids = state.discoveredClueIds || [];
   const hasMethod = state.knownSabotageMethod;
-  const hasKeyEvidence = ids.includes('tampered_wiring_diagrams') || ids.includes('opening_night_note');
+  const hasKeyEvidence =
+    ids.includes('tampered_wiring_diagrams') ||
+    ids.includes('opening_night_note');
   const hasConspirators = (state.namedConspirators || []).length >= 2;
+
   return {
     keyEvidenceFound: hasKeyEvidence,
     readyForClimax: hasMethod || (hasKeyEvidence && hasConspirators)
@@ -73,26 +117,41 @@ function checkEndingReadiness(state) {
 }
 
 function slimNpc(npc) {
-  return { id: npc.id, name: npc.name, voice: npc.voice, goal: npc.privateGoal, knowledge: npc.knowledge };
+  return {
+    id: npc.id,
+    name: npc.name,
+    voice: npc.voice,
+    goal: npc.privateGoal,
+    knowledge: npc.knowledge
+  };
 }
 
 function getRelevantNpcs(state, location) {
   const ids = new Set();
+
   if (location?.linkedNPCs) {
     location.linkedNPCs.forEach((id) => ids.add(id));
   }
+
   Object.entries(state.suspicion || {})
     .sort((a, b) => b[1] - a[1])
     .slice(0, 2)
     .forEach(([id]) => ids.add(id));
+
   return npcs.filter((npc) => ids.has(npc.id)).map(slimNpc);
 }
 
 function composeTurnPrompt(state, playerInput) {
   const location = getLocationById(state.location);
   const relevantNpcs = getRelevantNpcs(state, location);
-  const discoveredClues = (state.discoveredClueIds || []).map(getClueById).filter(Boolean).map(slimClue);
-  const availableClues = getAvailableCluesAtLocation(state.location, state.discoveredClueIds || []);
+  const discoveredClues = (state.discoveredClueIds || [])
+    .map(getClueById)
+    .filter(Boolean)
+    .map(slimClue);
+  const availableClues = getAvailableCluesAtLocation(
+    state.location,
+    state.discoveredClueIds || []
+  );
   const endingSignals = checkEndingReadiness(state);
 
   return turnTemplate
@@ -109,9 +168,14 @@ function mergeState(currentState, modelOutput) {
   const next = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
 
-  const advance = Number(modelOutput.timeAdvance || scenario.coreSystems.timePerTurnDefault || 3);
+  const advance = Number(
+    modelOutput.timeAdvance || scenario.coreSystems.timePerTurnDefault || 3
+  );
   next.elapsedMinutes += advance;
-  next.remainingMinutes = Math.max(0, scenario.sessionTargetMinutes - next.elapsedMinutes);
+  next.remainingMinutes = Math.max(
+    0,
+    scenario.sessionTargetMinutes - next.elapsedMinutes
+  );
 
   if (typeof modelOutput.location === 'string' && modelOutput.location) {
     next.location = modelOutput.location;
@@ -133,7 +197,10 @@ function mergeState(currentState, modelOutput) {
   }
 
   if (typeof delta.burnhamTrust === 'number') {
-    next.burnhamTrust = Math.max(-3, Math.min(5, next.burnhamTrust + delta.burnhamTrust));
+    next.burnhamTrust = Math.max(
+      -3,
+      Math.min(5, next.burnhamTrust + delta.burnhamTrust)
+    );
   }
 
   if (delta.suspicion && typeof delta.suspicion === 'object') {
@@ -146,12 +213,14 @@ function mergeState(currentState, modelOutput) {
   if (Array.isArray(modelOutput.newClues)) {
     for (const clueId of modelOutput.newClues) {
       if (typeof clueId !== 'string') continue;
+
       if (!(next.discoveredClueIds || []).includes(clueId)) {
         next.discoveredClueIds = next.discoveredClueIds || [];
         next.discoveredClueIds.push(clueId);
+
         const clue = getClueById(clueId);
         if (clue) {
-          for (const npcId of (clue.implicates || [])) {
+          for (const npcId of clue.implicates || []) {
             next.suspicion[npcId] = (next.suspicion[npcId] || 0) + 1;
           }
         }
@@ -168,7 +237,9 @@ function mergeState(currentState, modelOutput) {
   }
 
   if (Array.isArray(delta.namedConspirators)) {
-    next.namedConspirators = Array.from(new Set([...next.namedConspirators, ...delta.namedConspirators]));
+    next.namedConspirators = Array.from(
+      new Set([...next.namedConspirators, ...delta.namedConspirators])
+    );
   }
 
   return next;
@@ -183,41 +254,64 @@ function buildMockNotes(state, discoveredClues, suspicionContext) {
   const suspicions = suspicionContext.map(({ name, score }) => ({
     name,
     level: score >= 3 ? 'high' : score >= 2 ? 'medium' : 'low',
-    reasoning: score >= 3
-      ? 'Several pieces of evidence now point in their direction.'
-      : 'Something in their behavior has not sat right with me.'
+    reasoning:
+      score >= 3
+        ? 'Several pieces of evidence now point in their direction.'
+        : 'Something in their behavior has not sat right with me.'
   }));
 
   const impressions = suspicionContext.slice(0, 3).map(({ name, score }) => ({
     name,
-    impression: score > 1
-      ? 'Evasive when pressed. I should return to them with harder questions.'
-      : 'Hard to read so far. Either uninvolved or very careful.'
+    impression:
+      score > 1
+        ? 'Evasive when pressed. I should return to them with harder questions.'
+        : 'Hard to read so far. Either uninvolved or very careful.'
   }));
 
   const openQuestions = [
-    !state.knownSabotageMethod && 'I still do not know exactly how the sabotage is meant to work.',
-    (state.namedConspirators || []).length < 2 && 'There are people behind this I have not yet identified.',
-    discoveredClues.length < 3 && 'I have not found all the physical evidence — there is more out there.'
+    !state.knownSabotageMethod &&
+      'I still do not know exactly how the sabotage is meant to work.',
+    (state.namedConspirators || []).length < 2 &&
+      'There are people behind this I have not yet identified.',
+    discoveredClues.length < 3 &&
+      'I have not found all the physical evidence — there is more out there.'
   ].filter(Boolean);
 
   const visited = state.visitedLocations || [];
   const nextLeads = [
-    !visited.includes('freight_yards') && 'The freight yards may hold physical evidence of the diverted crates.',
-    !visited.includes('machinery_hall') && 'Machinery Hall should be examined for tampering.',
-    !visited.includes('midway_plaisance') && 'The Midway is full of loose talk — worth a visit.',
-    discoveredClues.length === 0 && 'Start with the documents Burnham has on his desk.'
-  ].filter(Boolean).slice(0, 3);
+    !visited.includes('freight_yards') &&
+      'The freight yards may hold physical evidence of the diverted crates.',
+    !visited.includes('machinery_hall') &&
+      'Machinery Hall should be examined for tampering.',
+    !visited.includes('midway_plaisance') &&
+      'The Midway is full of loose talk — worth a visit.',
+    discoveredClues.length === 0 &&
+      'Start with the documents Burnham has on his desk.'
+  ]
+    .filter(Boolean)
+    .slice(0, 3);
 
-  return { clues, suspicions, characterImpressions: impressions, openQuestions, nextLeads };
+  return {
+    clues,
+    suspicions,
+    characterImpressions: impressions,
+    openQuestions,
+    nextLeads
+  };
 }
 
 app.post('/api/notes', async (req, res) => {
   try {
     const { state } = req.body;
-    if (!state) return res.status(400).json({ error: 'Missing state.' });
+    if (!state) {
+      return res.status(400).json({ error: 'Missing state.' });
+    }
 
-    const discoveredClues = (state.discoveredClueIds || []).map(getClueById).filter(Boolean).map(slimClue);
+    const discoveredClues = (state.discoveredClueIds || [])
+      .map(getClueById)
+      .filter(Boolean)
+      .map(slimClue);
+
     const suspicionContext = Object.entries(state.suspicion || {})
       .filter(([, v]) => v > 0)
       .sort((a, b) => b[1] - a[1])
@@ -227,14 +321,22 @@ app.post('/api/notes', async (req, res) => {
       });
 
     if (!API_KEY) {
-      return res.json({ notes: buildMockNotes(state, discoveredClues, suspicionContext) });
+      return res.json({
+        notes: buildMockNotes(state, discoveredClues, suspicionContext)
+      });
     }
 
     const prompt = notesTemplate
       .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
       .replace('{{SUSPICION_JSON}}', JSON.stringify(suspicionContext))
-      .replace('{{NAMED_CONSPIRATORS}}', JSON.stringify(state.namedConspirators || []))
-      .replace('{{VISITED_LOCATIONS}}', JSON.stringify(state.visitedLocations || []))
+      .replace(
+        '{{NAMED_CONSPIRATORS}}',
+        JSON.stringify(state.namedConspirators || [])
+      )
+      .replace(
+        '{{VISITED_LOCATIONS}}',
+        JSON.stringify(state.visitedLocations || [])
+      )
       .replace('{{ACT}}', String(state.act || 1))
       .replace('{{ELAPSED}}', String(state.elapsedMinutes || 0));
 
@@ -256,13 +358,20 @@ app.post('/api/notes', async (req, res) => {
 
     const data = await response.json();
     const text = data?.content?.[0]?.text;
-    if (!text) return res.status(500).json({ error: 'No response from AI.' });
+
+    if (!text) {
+      return res.status(500).json({ error: 'No response from AI.' });
+    }
 
     let notes;
     try {
-      notes = JSON.parse(text);
-    } catch {
-      return res.status(500).json({ error: 'Invalid notes format returned.' });
+      notes = extractJson(text);
+    } catch (parseError) {
+      console.error('INVALID NOTES JSON RAW TEXT:', text);
+      return res.status(500).json({
+        error: 'Invalid notes format returned.',
+        rawText: text
+      });
     }
 
     return res.json({ notes });
@@ -297,6 +406,7 @@ app.get('/api/bootstrap', (_, res) => {
 app.post('/api/turn', async (req, res) => {
   try {
     const { state, playerInput } = req.body;
+
     if (!state || !playerInput) {
       return res.status(400).json({ error: 'Missing state or playerInput.' });
     }
@@ -315,7 +425,8 @@ app.post('/api/turn', async (req, res) => {
         npcMoments: [
           {
             npc: 'daniel_burnham',
-            text: "'Find out whether this is incompetence or design. I confess I no longer assume the better of the two.'"
+            text:
+              "'Find out whether this is incompetence or design. I confess I no longer assume the better of the two.'"
           }
         ],
         choices: [
@@ -329,7 +440,11 @@ app.post('/api/turn', async (req, res) => {
         }
       };
 
-      return res.json({ output: fallback, nextState: mergeState(state, fallback), mockMode: true });
+      return res.json({
+        output: fallback,
+        nextState: mergeState(state, fallback),
+        mockMode: true
+      });
     }
 
     const prompt = composeTurnPrompt(state, playerInput);
@@ -366,14 +481,21 @@ app.post('/api/turn', async (req, res) => {
     const text = data?.content?.[0]?.text;
 
     if (!text) {
-      return res.status(500).json({ error: 'No text returned from Anthropic.', raw: data });
+      return res.status(500).json({
+        error: 'No text returned from Anthropic.',
+        raw: data
+      });
     }
 
     let output;
     try {
-      output = JSON.parse(text);
+      output = extractJson(text);
     } catch (parseError) {
-      return res.status(500).json({ error: 'Model returned invalid JSON.', rawText: text });
+      console.error('INVALID TURN JSON RAW TEXT:', text);
+      return res.status(500).json({
+        error: 'Model returned invalid JSON.',
+        rawText: text
+      });
     }
 
     const nextState = mergeState(state, output);
