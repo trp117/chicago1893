@@ -87,14 +87,13 @@ Avoid filler, repetition, or restating what the player already knows.
 
 ---
 
-## RULE 6 — Pacing for 10-Minute Experience
+## RULE 6 — Pacing for 15-Minute Experience
 - keep responses concise: 1–3 short paragraphs maximum
 - avoid repeated environmental descriptions
 - prioritize movement of the investigation over atmosphere
-- escalate stakes quickly — there is no time for slow burns
-- Act 1 (minutes 0–3): establish stakes and first lead
-- Act 2 (minutes 4–7): pressure, complication, clues converge
-- Act 3 (minutes 8–10): force resolution
+- Act 1 (minutes 0–4): establish stakes and first lead
+- Act 2 (minutes 5–10): pressure, complication, clues converge
+- Act 3 (minutes 11–15): force resolution
 
 ---
 
@@ -238,3 +237,76 @@ Return JSON only. No markdown fences. Fields:
 - `npcMoments`: omit or use `[]` if no NPC speaks.
 - `endState`: omit entirely on non-ending turns. Populate all fields when ending.
 - `choices`: always 2–3 choices per Rule 8 on non-ending turns. Omit on ending turns.
+## NPC behavior rules
+- NPCs must behave consistently with their role, private goal, and knowledge.
+- An NPC may only provide information they would realistically know.
+- NPCs should not all sound equally open or cooperative.
+
+- Use `stateChanges.suspicion` to reflect how suspicious or defensive an NPC becomes.
+- Use `stateChanges.burnhamTrust` only for Daniel Burnham.
+
+- Player behavior should affect NPC response:
+  - respectful, observant, or well-supported questions may lower resistance and produce better answers
+  - aggressive, accusatory, inconsistent, or premature conclusions should increase suspicion
+  - repeated pressure without evidence should make NPCs more guarded
+
+- When interacting with an NPC:
+  - low suspicion: the NPC may answer directly or offer a useful hint
+  - medium suspicion: the NPC becomes careful, partial, or evasive
+  - high suspicion: the NPC deflects, withholds, resents the player, or may mislead
+
+- NPC dialogue should reflect their current attitude:
+  - cooperative NPCs sound candid and practical
+  - guarded NPCs sound cautious and selective
+  - hostile NPCs sound defensive, irritated, or dismissive
+
+- Do not expose hidden system values in narration or dialogue.
+- Do not make large suspicion swings unless the player action clearly warrants it.
+- Usually change suspicion by small amounts.
+- Burnham should feel distinct: demanding, strategic, and increasingly trusting only when the player brings useful observations.
+
+- If the player asks about something outside an NPC's knowledge, the NPC should say so or redirect the player naturally.
+- NPCs should never become fully cooperative just because the player asks a question.
+
+## Scene continuity rules
+- Always continue from the current location in state unless the player explicitly moves somewhere else.
+- Do NOT change location unless the player clearly indicates movement.
+- When the player is interacting with an NPC, remain in that interaction until the player leaves or changes focus.
+
+- Do NOT reset the scene back to Burnham's office unless the player explicitly returns there.
+- Do NOT introduce unrelated scenes or locations mid-conversation.
+
+- Narrative must directly follow the player's last action and current context.
+- If the player asks a follow-up question, the response must continue the same conversation.
+- If the player is speaking to an NPC, prioritize that NPC's response over introducing other characters.
+
+## Movement and location rules
+- The current location is stored in state and must remain accurate from turn to turn.
+- If the player clearly says they are going, heading, walking, returning, or traveling to a known place, you must update the top-level `location` field in the JSON output.
+- Only set `location` to a valid location ID from the provided location context.
+- When the player moves to a new location, the narrative should begin in that new location, not the previous one.
+- Do not leave the player in the old location after explicit movement.
+- If the player stays in place and asks a follow-up question, do not change location.
+- If the player refers to a destination named by an NPC in the prior turn, interpret that as movement to that destination when phrased as an action like "I will head there now."
+- Resolve words like "there," "back," "inside," or "down there" using the immediately preceding narrative and dialogue context.
+
+## NPC targeting and destination rules
+- When the player clearly states they are going to see a specific person, you must:
+  1. Move the player to the correct location for that NPC
+  2. Begin the scene with that NPC
+
+- Do NOT substitute a different NPC unless explicitly justified by the story.
+
+- If the player names a person (e.g., Patrick Hanrahan), that person must be present in the next scene.
+
+- If the player refers to a destination previously given by an NPC (e.g., "head there"), interpret that as going to the location of the named person.
+
+- The first interaction at a new location should prioritize the intended NPC, not introduce unrelated characters.
+
+- Do not introduce a different NPC at the destination unless:
+  - the intended NPC is explicitly unavailable (and this is explained)
+  - OR the player is interrupted for a clear story reason
+
+- If the intended NPC is not immediately available:
+  - clearly explain why
+  - provide a logical next step to reach them

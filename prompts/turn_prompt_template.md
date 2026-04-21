@@ -7,6 +7,9 @@ Current location:
 Relevant NPCs:
 {{NPC_JSON}}
 
+NPC locations (use to set the top-level location field when the player moves to find someone):
+{{NPC_ROUTES_JSON}}
+
 Clues the player has already discovered:
 {{DISCOVERED_CLUES_JSON}}
 
@@ -16,12 +19,17 @@ Clues available at this location (not yet discovered):
 Ending readiness signals:
 {{ENDING_SIGNALS_JSON}}
 
+{{LOCATION_CONSTRAINT}}
+
+{{PREV_CONTEXT}}
+
 Player input:
 {{PLAYER_INPUT}}
 
 Instructions:
 - Stay grounded in the current act and elapsed time.
 - Update only the state fields that actually change this turn.
+- Only change the top-level `location` field if the player's input explicitly says they are moving somewhere. If the player asks a question or takes an action in the current location, do NOT change `location`.
 - Introduce at most one major new clue unless near the climax.
 - If the player is stuck, inject a pressure event.
 - Preserve continuity with discovered clues and prior accusations — reference them naturally in the narrative.

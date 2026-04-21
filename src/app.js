@@ -1,6 +1,8 @@
 let gameState = null;
 let scenario = null;
 let cluesCatalog = [];
+let conversationHistory = []; // [{role:'user',content:...},{role:'assistant',content:...}]
+const MAX_HISTORY_TURNS = 4;
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
@@ -224,6 +226,7 @@ async function loadGame() {
   scenario = data.scenario;
   cluesCatalog = data.cluesCatalog || [];
   gameState = data.state;
+  conversationHistory = [];
   renderSidebar();
   renderOutput(data.opening);
 }
@@ -279,6 +282,14 @@ function renderEnding(endState) {
 
 let submitting = false;
 
+function buildAssistantHistoryContent(output) {
+  let text = output.narrative || '';
+  for (const m of output.npcMoments || []) {
+    text += `\n${prettifyId(m.npc)}: ${m.text}`;
+  }
+  return text.trim();
+}
+
 async function submitTurn(playerInput) {
   if (!playerInput?.trim() || submitting) return;
   submitting = true;
@@ -288,7 +299,7 @@ async function submitTurn(playerInput) {
     const response = await fetch('/api/turn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: gameState, playerInput })
+      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory })
     });
 
     const data = await response.json();
@@ -298,6 +309,16 @@ async function submitTurn(playerInput) {
     }
 
     gameState = data.nextState;
+
+    // Append this exchange to history, keep last MAX_HISTORY_TURNS turns
+    conversationHistory.push(
+      { role: 'user', content: playerInput },
+      { role: 'assistant', content: buildAssistantHistoryContent(data.output) }
+    );
+    if (conversationHistory.length > MAX_HISTORY_TURNS * 2) {
+      conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS * 2);
+    }
+
     renderSidebar();
     renderOutput(data.output, { mockMode: data.mockMode });
 

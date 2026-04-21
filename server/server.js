@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 3001;
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
+const MAX_HISTORY_MESSAGES = 8; // 4 turns × 2 (user + assistant)
 
 function readText(filePath) {
   return fs.readFileSync(path.join(rootDir, filePath), 'utf8');
@@ -126,6 +127,10 @@ function slimNpc(npc) {
   };
 }
 
+function getNpcLocations(npcId) {
+  return locations.filter((l) => l.linkedNPCs?.includes(npcId)).map((l) => l.id);
+}
+
 function getRelevantNpcs(state, location) {
   const ids = new Set();
 
@@ -133,12 +138,58 @@ function getRelevantNpcs(state, location) {
     location.linkedNPCs.forEach((id) => ids.add(id));
   }
 
+  // Only pull high-suspicion NPCs if they can plausibly be at the current location
+  // (i.e. they are linked to the current location OR they appear in multiple locations)
+  const currentLocId = location?.id;
   Object.entries(state.suspicion || {})
+    .filter(([, score]) => score > 0)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 2)
-    .forEach(([id]) => ids.add(id));
+    .forEach(([id]) => {
+      const npcLocs = getNpcLocations(id);
+      if (npcLocs.includes(currentLocId) || npcLocs.length > 1) {
+        ids.add(id);
+      }
+    });
 
   return npcs.filter((npc) => ids.has(npc.id)).map(slimNpc);
+}
+
+const PRONOUN_RE = /\b(him|her|them|there)\b/i;
+
+function buildReferenceContext(input, state) {
+  if (!PRONOUN_RE.test(input)) return null;
+  const parts = [];
+  if (/\b(him|her|them)\b/i.test(input) && state.targetNpc) {
+    const npc = npcs.find((n) => n.id === state.targetNpc);
+    const npcLocs = getNpcLocations(state.targetNpc);
+    // Only resolve if the player isn't already at that NPC's location —
+    // if they are, "him/her" must refer to someone mentioned in the narrative, not the NPC they're with.
+    if (npc && !npcLocs.includes(state.location)) {
+      parts.push(`"him"/"her" = ${npc.name}`);
+    }
+  }
+  if (/\bthere\b/i.test(input) && state.location) {
+    const loc = getLocationById(state.location);
+    if (loc) parts.push(`"there" = ${loc.name}`);
+  }
+  return parts.length ? `[Reference context: ${parts.join(', ')}]` : null;
+}
+
+function buildNpcRoutes() {
+  return npcs.map((npc) => {
+    const locs = locations
+      .filter((l) => l.linkedNPCs?.includes(npc.id))
+      .map((l) => l.id);
+    return { npc: npc.id, name: npc.name, locations: locs };
+  });
+}
+
+function buildLocationConstraint(locationId) {
+  if (locationId === 'administration_building') {
+    return `Current location (authoritative): ${locationId}\nThe player is in Burnham's office. Burnham is present and available.`;
+  }
+  return `Current location (authoritative): ${locationId}\n⚠️ The player is at ${locationId}, NOT at administration_building. Do NOT place the player in Burnham's office. Do NOT introduce Daniel Burnham unless the player explicitly travels to administration_building.`;
 }
 
 function composeTurnPrompt(state, playerInput) {
@@ -153,18 +204,36 @@ function composeTurnPrompt(state, playerInput) {
     state.discoveredClueIds || []
   );
   const endingSignals = checkEndingReadiness(state);
+  const npcRoutes = buildNpcRoutes();
+
+  const refContext = buildReferenceContext(playerInput, state);
+  const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
 
   return turnTemplate
     .replace('{{STATE_JSON}}', JSON.stringify(state))
     .replace('{{LOCATION_JSON}}', JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}', JSON.stringify(relevantNpcs))
+    .replace('{{NPC_ROUTES_JSON}}', JSON.stringify(npcRoutes))
     .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
     .replace('{{AVAILABLE_CLUES_JSON}}', JSON.stringify(availableClues))
     .replace('{{ENDING_SIGNALS_JSON}}', JSON.stringify(endingSignals))
-    .replace('{{PLAYER_INPUT}}', playerInput);
+    .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location))
+    .replace('{{PREV_CONTEXT}}', '')
+    .replace('{{PLAYER_INPUT}}', resolvedInput);
 }
 
-function mergeState(currentState, modelOutput) {
+const MOVEMENT_RE = /\b(go|head|return|walk|travel|back|leave|move)\b/i;
+const BURNHAM_RE = /\b(burnham|administration|office)\b/i;
+
+function isValidLocationMove(newLoc, currentLoc, playerInput) {
+  if (newLoc === currentLoc) return true;
+  if (newLoc === 'administration_building' && currentLoc !== 'administration_building') {
+    return MOVEMENT_RE.test(playerInput) && BURNHAM_RE.test(playerInput);
+  }
+  return true;
+}
+
+function mergeState(currentState, modelOutput, playerInput = '') {
   const next = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
 
@@ -178,9 +247,11 @@ function mergeState(currentState, modelOutput) {
   );
 
   if (typeof modelOutput.location === 'string' && modelOutput.location) {
-    next.location = modelOutput.location;
-    if (!next.visitedLocations.includes(modelOutput.location)) {
-      next.visitedLocations.push(modelOutput.location);
+    if (isValidLocationMove(modelOutput.location, currentState.location, playerInput)) {
+      next.location = modelOutput.location;
+      if (!next.visitedLocations.includes(modelOutput.location)) {
+        next.visitedLocations.push(modelOutput.location);
+      }
     }
   }
 
@@ -191,8 +262,8 @@ function mergeState(currentState, modelOutput) {
   if (typeof delta.act === 'number') {
     next.act = delta.act;
   } else {
-    if (next.elapsedMinutes >= 8) next.act = 3;
-    else if (next.elapsedMinutes >= 4) next.act = 2;
+    if (next.elapsedMinutes >= 11) next.act = 3;
+    else if (next.elapsedMinutes >= 5) next.act = 2;
     else next.act = 1;
   }
 
@@ -208,6 +279,11 @@ function mergeState(currentState, modelOutput) {
       const current = next.suspicion[npcId] || 0;
       next.suspicion[npcId] = current + Number(amount || 0);
     }
+  }
+
+  if (Array.isArray(modelOutput.npcMoments) && modelOutput.npcMoments.length > 0) {
+    const last = modelOutput.npcMoments[modelOutput.npcMoments.length - 1];
+    if (last?.npc) next.targetNpc = last.npc;
   }
 
   if (Array.isArray(modelOutput.newClues)) {
@@ -405,7 +481,7 @@ app.get('/api/bootstrap', (_, res) => {
 
 app.post('/api/turn', async (req, res) => {
   try {
-    const { state, playerInput } = req.body;
+    const { state, playerInput, history = [] } = req.body;
 
     if (!state || !playerInput) {
       return res.status(400).json({ error: 'Missing state or playerInput.' });
@@ -442,12 +518,21 @@ app.post('/api/turn', async (req, res) => {
 
       return res.json({
         output: fallback,
-        nextState: mergeState(state, fallback),
+        nextState: mergeState(state, fallback, playerInput),
         mockMode: true
       });
     }
 
-    const prompt = composeTurnPrompt(state, playerInput);
+    console.log('[TURN] location_in:', state.location, '| input:', playerInput.slice(0, 60));
+
+    let prompt;
+    try {
+      prompt = composeTurnPrompt(state, playerInput);
+      console.log('[DEBUG] composeTurnPrompt completed, prompt length:', prompt?.length);
+    } catch (promptError) {
+      console.error('[ERROR] composeTurnPrompt failed:', promptError.message, promptError.stack);
+      return res.status(500).json({ error: 'Failed to build prompt: ' + promptError.message });
+    }
 
     const response = await fetch(ANTHROPIC_URL, {
       method: 'POST',
@@ -469,10 +554,8 @@ app.post('/api/turn', async (req, res) => {
           }
         ],
         messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
+          ...history.slice(-MAX_HISTORY_MESSAGES),
+          { role: 'user', content: prompt }
         ]
       })
     });
@@ -498,7 +581,16 @@ app.post('/api/turn', async (req, res) => {
       });
     }
 
-    const nextState = mergeState(state, output);
+    console.log('[TURN] location_out:', output.location, '| npcMoments:', JSON.stringify(output.npcMoments?.map(m => m.npc)));
+
+    let nextState;
+    try {
+      nextState = mergeState(state, output, playerInput);
+      console.log('[TURN] location_final:', nextState.location);
+    } catch (mergeError) {
+      console.error('[ERROR] mergeState failed:', mergeError.message, mergeError.stack);
+      return res.status(500).json({ error: 'Failed to merge state: ' + mergeError.message });
+    }
 
     if (output.endState?.isEnding) {
       output.endState.performance = {
@@ -511,6 +603,7 @@ app.post('/api/turn', async (req, res) => {
 
     return res.json({ output, nextState, mockMode: false });
   } catch (error) {
+    console.error('[ERROR] /api/turn failed:', error.message, error.stack);
     return res.status(500).json({ error: error.message || 'Server error' });
   }
 });
