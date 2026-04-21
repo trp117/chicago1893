@@ -70,38 +70,47 @@
 
         <section id="story" class="story-feed"></section>
 
-        <div id="tts-bar" class="tts-bar">
-          <button type="button" id="tts-stop" class="tts-stop-btn">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>
-            Start reading
-          </button>
-        </div>
+        <div class="bottom-bar">
+          <div class="timer-strip">
+            <span id="bottom-act"></span>
+            <span class="timer-sep">·</span>
+            <span id="bottom-remaining"></span>
+            <span> remaining</span>
+          </div>
 
-        <div id="autotest-bar" class="autotest-bar" hidden>
-          <span class="autotest-label">Auto Test running…</span>
-          <button type="button" id="autotest-stop-btn" class="autotest-stop-btn">Stop</button>
-        </div>
-
-        <section id="choices" class="choices"></section>
-
-        <form id="input-form" class="input-row">
-          <div class="input-textarea-wrap">
-            <textarea id="player-input" placeholder="Type what you do or say..." rows="3"></textarea>
-            <button type="button" id="mic-btn" class="mic-btn" aria-label="Start voice input" title="Voice input">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <rect x="5" y="1" width="6" height="9" rx="3"/>
-                <path d="M2.5 8a5.5 5.5 0 0 0 11 0" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-                <line x1="8" y1="13.5" x2="8" y2="15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                <line x1="5.5" y1="15.5" x2="10.5" y2="15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
+          <div id="tts-bar" class="tts-bar">
+            <button type="button" id="tts-stop" class="tts-stop-btn">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>
+              Start reading
             </button>
           </div>
-          <div class="input-actions">
-            <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
-            <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
-            <button type="submit">Send</button>
+
+          <div id="autotest-bar" class="autotest-bar" hidden>
+            <span class="autotest-label">Auto Test running…</span>
+            <button type="button" id="autotest-stop-btn" class="autotest-stop-btn">Stop</button>
           </div>
-        </form>
+
+          <section id="choices" class="choices"></section>
+
+          <form id="input-form" class="input-row">
+            <div class="input-textarea-wrap">
+              <textarea id="player-input" placeholder="Type what you do or say..." rows="2"></textarea>
+              <button type="button" id="mic-btn" class="mic-btn" aria-label="Start voice input" title="Voice input">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <rect x="5" y="1" width="6" height="9" rx="3"/>
+                  <path d="M2.5 8a5.5 5.5 0 0 0 11 0" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  <line x1="8" y1="13.5" x2="8" y2="15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                  <line x1="5.5" y1="15.5" x2="10.5" y2="15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="input-actions">
+              <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
+              <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
+              <button type="submit">Send</button>
+            </div>
+          </form>
+        </div>
       </main>
     </div>
 

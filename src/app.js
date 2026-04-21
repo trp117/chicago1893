@@ -153,6 +153,9 @@ function renderSidebar() {
   document.getElementById('threat').textContent = String(gameState.threat);
   document.getElementById('trust').textContent = String(gameState.burnhamTrust);
 
+  document.getElementById('bottom-act').textContent = `Act ${gameState.act}`;
+  document.getElementById('bottom-remaining').textContent = `${gameState.remainingMinutes} min`;
+
   const cluesEl = document.getElementById('clues');
   cluesEl.innerHTML = '';
   const discoveredIds = gameState.discoveredClueIds || [];

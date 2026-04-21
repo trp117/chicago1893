@@ -310,3 +310,31 @@ Return JSON only. No markdown fences. Fields:
 - If the intended NPC is not immediately available:
   - clearly explain why
   - provide a logical next step to reach them
+
+  ## Case resolution rules
+- The story must move toward a conclusion when either:
+  - the player explicitly attempts to solve the case
+  - or `readyForClimax` is true
+
+- At the conclusion, the player must identify:
+  - the culprit
+  - the method or motive
+  - the key supporting evidence (implicitly through their reasoning)
+
+- Do NOT automatically reveal the full solution without giving the player a chance to act.
+
+- When the player makes a conclusion attempt:
+  - evaluate whether it is correct, partially correct, or incorrect
+  - base this on discovered clues and known facts
+
+- The ending should include:
+  - a clear explanation of what actually happened
+  - whether the player was correct
+  - what they missed (if anything)
+
+- The tone should reflect performance:
+  - strong performance → confident resolution
+  - weak performance → uncertainty or consequences
+
+- Do not expose internal scoring numbers yet.
+- Do not break immersion with system language.
