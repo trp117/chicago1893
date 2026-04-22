@@ -140,14 +140,6 @@ if (!ttsSupported) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function addEntry(kind, title, html) {
-  const div = document.createElement('div');
-  div.className = `entry ${kind}`;
-  div.innerHTML = `<div class="meta">${title}</div><div>${html}</div>`;
-  storyEl.appendChild(div);
-  storyEl.scrollTop = storyEl.scrollHeight;
-}
-
 function renderSidebar() {
   document.getElementById('objective').textContent = scenario.goal;
   document.getElementById('location').textContent = prettifyId(gameState.location);
@@ -158,7 +150,12 @@ function renderSidebar() {
   document.getElementById('trust').textContent = String(gameState.burnhamTrust);
 
   document.getElementById('bottom-act').textContent = `Act ${gameState.act}`;
-  document.getElementById('bottom-remaining').textContent = `${gameState.remainingMinutes} min`;
+  const mins = gameState.remainingMinutes;
+  const countdownEl = document.getElementById('countdown');
+  if (countdownEl) {
+    countdownEl.textContent = `${String(mins).padStart(2, '0')}:00`;
+    countdownEl.classList.toggle('countdown--urgent', mins <= 5);
+  }
 
   const cluesEl = document.getElementById('clues');
   cluesEl.innerHTML = '';
@@ -208,7 +205,8 @@ function renderOutput(output, meta = {}) {
   if (meta.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
-  addEntry('engine', 'Story', html);
+  storyEl.innerHTML = `<div class="scene-card">${html}</div>`;
+  storyEl.scrollTop = 0;
   renderChoices(output.choices || []);
 
   const messageId = ++currentMessageId;
@@ -284,7 +282,7 @@ function renderEnding(endState) {
   card.className = `ending-card ending-card--${result}`;
   card.innerHTML = `<div class="ending-header"><span class="ending-result ending-result--${result}">${resultLabel}</span></div>${sections.join('')}`;
   storyEl.appendChild(card);
-  storyEl.scrollTop = storyEl.scrollHeight;
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 let submitting = false;
@@ -300,7 +298,7 @@ function buildAssistantHistoryContent(output) {
 async function submitTurn(playerInput) {
   if (!playerInput?.trim() || submitting) return;
   submitting = true;
-  addEntry('player', 'You', `<p>${playerInput}</p>`);
+  storyEl.innerHTML = '<div class="scene-thinking">&#8230;</div>';
   inputEl.value = '';
   try {
     const response = await fetch('/api/turn', {
@@ -311,7 +309,7 @@ async function submitTurn(playerInput) {
 
     const data = await response.json();
     if (data.error) {
-      addEntry('engine', 'Error', `<p>${data.error}</p>`);
+      storyEl.innerHTML = `<div class="scene-card scene-error"><p>${data.error}</p></div>`;
       return;
     }
 
@@ -710,9 +708,7 @@ async function runAutoTestStep() {
   step.cluesAfter = [...(gameState?.discoveredClueIds || [])];
   step.newClues = step.cluesAfter.filter(id => !step.cluesBefore.includes(id));
 
-  const entries = storyEl.querySelectorAll('.entry.engine');
-  const lastEntry = entries[entries.length - 1];
-  step.narrative = lastEntry?.querySelector('div:last-child')?.textContent?.trim() || '';
+  step.narrative = storyEl.querySelector('.scene-card')?.textContent?.trim() || '';
 
   if (storyEl.querySelector('.ending-card')) {
     step.isEnding = true;

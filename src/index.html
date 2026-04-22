@@ -62,6 +62,7 @@
             <h1>Chicago, 1893</h1>
             <div class="hero-controls">
               <button type="button" id="driving-btn" class="driving-btn" aria-label="Enable driving mode" title="Driving mode">Drive</button>
+              <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
               <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
             </div>
           </div>
@@ -72,10 +73,8 @@
 
         <div class="bottom-bar">
           <div class="timer-strip">
-            <span id="bottom-act"></span>
-            <span class="timer-sep">·</span>
-            <span id="bottom-remaining"></span>
-            <span> remaining</span>
+            <span id="bottom-act" class="timer-act"></span>
+            <span id="countdown" class="countdown">--:--</span>
           </div>
 
           <div id="tts-bar" class="tts-bar">
@@ -105,7 +104,6 @@
               </button>
             </div>
             <div class="input-actions">
-              <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
               <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
               <button type="submit">Send</button>
             </div>
