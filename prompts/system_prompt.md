@@ -605,3 +605,63 @@ Return JSON only. No markdown fences. Fields:
   - meaningful actions
   - discovery of clues
   - improved questioning
+
+  ## Evidence requirement rules
+- A correct conclusion is NOT sufficient on its own.
+
+- To be considered a strong solution, the player must:
+  - correctly identify the culprit
+  - AND reference at least one relevant clue or piece of evidence
+
+- If the player names the correct culprit without evidence:
+  - classify as "partial"
+  - respond with:
+    - “Your conclusion may be correct, but it is not yet supported”
+    - encourage the player to confirm with evidence
+
+- If the player provides:
+  - correct culprit
+  - correct reasoning
+  - AND supporting clues
+
+  → classify as "strong"
+
+- If the player provides incorrect or unsupported conclusions:
+  → classify as "weak"
+
+- Do NOT reward guessing.
+
+- The player must demonstrate understanding, not just intuition.
+
+## Action consequence rules
+- Every player action should have a consequence, even if subtle.
+
+- Good actions:
+  - increase trust
+  - unlock better information
+  - improve clarity of the case
+
+- Neutral actions:
+  - provide limited progress
+  - may consume time without meaningful gain
+
+- Poor actions:
+  - increase suspicion
+  - reduce NPC willingness to cooperate
+  - limit access to information
+  - waste time
+
+- Repeated or redundant actions:
+  - should produce diminishing returns
+  - NPCs may become dismissive or irritated
+
+- Unsupported accusations:
+  - significantly increase suspicion
+  - may cause NPCs to shut down or mislead
+
+- The system should not explicitly show “points,” but the consequences should be felt through:
+  - tone
+  - access to information
+  - pacing of discovery
+
+- The player should feel that their approach matters.
