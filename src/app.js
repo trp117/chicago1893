@@ -17,8 +17,13 @@ const ttsStopBtn = document.getElementById('tts-stop');
 const synth = window.speechSynthesis;
 const ttsSupported = !!synth;
 
-let ttsEnabled = false;
+let ttsEnabled = localStorage.getItem('readAloudOn') === 'true';
 let audioUnlocked = false;
+
+function setTtsEnabled(val) {
+  ttsEnabled = val;
+  localStorage.setItem('readAloudOn', String(val));
+}
 let hasSpokenIntro = false;
 let lastSpokenMessageId = 0;
 let currentMessageId = 0;
@@ -103,19 +108,18 @@ if (!ttsSupported) {
 
   beginBtn.addEventListener('click', () => {
     audioUnlocked = true;
-    ttsEnabled = true;
     updateTtsToggleUI();
     updateTtsBarUI();
     beginOverlay.classList.add('hidden');
-    if (introText && !hasSpokenIntro) {
-      hasSpokenIntro = true;
+    hasSpokenIntro = true;
+    if (ttsEnabled && introText) {
       lastSpokenMessageId = currentMessageId;
       ttsSpeakRaw(introText);
     }
   });
 
   ttsToggleBtn.addEventListener('click', () => {
-    ttsEnabled = !ttsEnabled;
+    setTtsEnabled(!ttsEnabled);
     if (!ttsEnabled) ttsStop();
     updateTtsToggleUI();
     updateTtsBarUI();
@@ -123,7 +127,7 @@ if (!ttsSupported) {
 
   // True Start/Stop toggle: changes ttsEnabled AND stops current speech when disabling
   ttsStopBtn.addEventListener('click', () => {
-    ttsEnabled = !ttsEnabled;
+    setTtsEnabled(!ttsEnabled);
     if (!ttsEnabled) {
       ttsStop();
     } else if (audioUnlocked && lastRenderedSpeakText) {
@@ -396,13 +400,13 @@ if (!SpeechRecognition) {
       }
     },
     'stop reading': () => {
-      ttsEnabled = false;
+      setTtsEnabled(false);
       ttsStop();
       updateTtsBarUI();
       updateTtsToggleUI();
     },
     'start reading': () => {
-      ttsEnabled = true;
+      setTtsEnabled(true);
       if (audioUnlocked && lastRenderedSpeakText) ttsSpeakRaw(lastRenderedSpeakText);
       updateTtsBarUI();
       updateTtsToggleUI();
