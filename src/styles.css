@@ -97,8 +97,14 @@ body {
 
 .tts-bar {
   display: flex;
+}
+
+.tools-row {
+  display: flex;
+  align-items: center;
   justify-content: flex-end;
-  padding: 0 28px 6px;
+  gap: 8px;
+  padding: 2px 28px 6px;
 }
 
 .tts-stop-btn {
@@ -303,6 +309,10 @@ body {
   min-width: 100px;
 }
 
+.input-actions button[type="submit"] {
+  flex: 1;
+}
+
 .input-textarea-wrap {
   position: relative;
 }
@@ -480,14 +490,14 @@ li {
   cursor: not-allowed;
 }
 
+.autotest-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(208, 176, 106, 0.12);
+}
+
 .autotest-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 4px 28px 6px;
-  background: rgba(208, 176, 106, 0.06);
-  border-top: 1px solid rgba(208, 176, 106, 0.15);
+  display: none;
 }
 
 .autotest-label {
@@ -893,33 +903,58 @@ li {
     font-size: 1.2rem;
   }
 
-  /* ── Choices — compact but tap-friendly ── */
-  .choices {
-    flex-direction: column;
-    padding: 6px 14px 4px;
-    gap: 6px;
+  /* ── Tools row: compact pill controls ── */
+  .tools-row {
+    padding: 4px 14px;
+    justify-content: flex-start;
   }
 
-  .choice-btn {
-    width: 100%;
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    line-height: 1.3;
-    border-radius: 10px;
-  }
-
-  /* ── Hide secondary controls ── */
-  .tts-bar {
-    display: none;
+  .tts-stop-btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
   }
 
   .autotest-btn {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 0.75rem;
+  }
+
+  /* ── Story: hide scrollbar on mobile ── */
+  .story-feed {
+    scrollbar-width: none;
+  }
+
+  .story-feed::-webkit-scrollbar {
     display: none;
   }
 
-  .autotest-bar {
-    padding: 4px 14px;
+  /* ── Choices — horizontal swipe carousel ── */
+  .choices {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 14px 8px;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .choices::-webkit-scrollbar {
+    display: none;
+  }
+
+  .choice-btn {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+    width: auto;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    line-height: 1.3;
+    border-radius: 10px;
+    white-space: normal;
   }
 
   /* ── Input area ── */

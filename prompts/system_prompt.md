@@ -665,3 +665,28 @@ Return JSON only. No markdown fences. Fields:
   - pacing of discovery
 
 - The player should feel that their approach matters.
+
+## Time extension rules
+- The player should be allowed to extend the investigation when time runs low or is exhausted.
+
+- When time is nearly depleted:
+  - offer the player a choice:
+    - continue investigating (with consequences)
+    - make a final conclusion
+
+- If the player chooses to extend:
+  - increase urgency in the narrative
+  - reduce NPC willingness to provide new information
+  - limit discovery of new high-value clues
+  - slightly increase suspicion or resistance
+
+- Extensions should feel like:
+  - pushing beyond safe limits
+  - operating under pressure
+
+- Limit the number of extensions:
+  - maximum of 1–2 per session
+
+- Do NOT reset the investigation or remove existing progress.
+
+- The goal is to allow continued play without removing tension.

@@ -655,8 +655,8 @@ let autoTestTimer = null;
 const autoTestLog = { steps: [], startedAt: null, endedAt: null, stopReason: null };
 
 function setAutoTestUI(running) {
-  autotestBtnEl.disabled = running;
-  autotestBarEl.hidden = !running;
+  autotestBtnEl.classList.toggle('active', running);
+  autotestBarEl.hidden = true;
   inputEl.disabled = running;
   formEl.querySelector('button[type="submit"]').disabled = running;
 }
@@ -730,8 +730,10 @@ function startAutoTest() {
   autoTestTimer = setTimeout(runAutoTestStep, 3000);
 }
 
-autotestBtnEl.addEventListener('click', startAutoTest);
-autotestStopBtnEl.addEventListener('click', () => stopAutoTest('user-stopped'));
+autotestBtnEl.addEventListener('click', () => {
+  if (autoTestRunning) stopAutoTest('user-stopped');
+  else startAutoTest();
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 

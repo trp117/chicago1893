@@ -77,16 +77,19 @@
             <span id="countdown" class="countdown">--:--</span>
           </div>
 
-          <div id="tts-bar" class="tts-bar">
-            <button type="button" id="tts-stop" class="tts-stop-btn">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>
-              Start reading
-            </button>
-          </div>
-
           <div id="autotest-bar" class="autotest-bar" hidden>
             <span class="autotest-label">Auto Test running…</span>
             <button type="button" id="autotest-stop-btn" class="autotest-stop-btn">Stop</button>
+          </div>
+
+          <div class="tools-row">
+            <div id="tts-bar" class="tts-bar">
+              <button type="button" id="tts-stop" class="tts-stop-btn">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><polygon points="0,0 10,5 0,10"/></svg>
+                Start reading
+              </button>
+            </div>
+            <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
           </div>
 
           <section id="choices" class="choices"></section>
@@ -104,7 +107,6 @@
               </button>
             </div>
             <div class="input-actions">
-              <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
               <button type="submit">Send</button>
             </div>
           </form>

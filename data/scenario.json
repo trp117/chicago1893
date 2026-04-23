@@ -2,7 +2,7 @@
   "id": "chicago_1893_burnham_conspiracy_v1",
   "title": "Chicago, 1893: Shadows of the White City",
   "premise": "The player, assistant to Daniel Burnham, must uncover and stop a conspiracy to sabotage the World's Columbian Exposition before opening day.",
-  "sessionTargetMinutes": 15,
+  "sessionTargetMinutes": 20,
   "historicalRealism": "high",
   "tone": ["historical thriller", "mystery"],
   "freedomLevel": "guided",
@@ -34,7 +34,7 @@
     {
       "act": 3,
       "name": "Climax",
-      "minutes": [11, 15],
+      "minutes": [11, 20],
       "beats": [
         "Sabotage plan is clear",
         "Player chooses how to intervene",
@@ -70,7 +70,7 @@
   ],
   "initialState": {
     "elapsedMinutes": 0,
-    "remainingMinutes": 15,
+    "remainingMinutes": 20,
     "act": 1,
     "location": "administration_building",
     "threat": 1,
