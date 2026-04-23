@@ -4,6 +4,7 @@ let cluesCatalog = [];
 let conversationHistory = []; // [{role:'user',content:...},{role:'assistant',content:...}]
 const MAX_HISTORY_TURNS = 4;
 let recentScenes = []; // rolling window: last 2 scene HTML strings
+let bootstrapData = null;
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
@@ -236,14 +237,54 @@ function renderOutput(output, meta = {}) {
 
 async function loadGame() {
   const response = await fetch('/api/bootstrap');
-  const data = await response.json();
-  scenario = data.scenario;
-  cluesCatalog = data.cluesCatalog || [];
-  gameState = data.state;
+  bootstrapData = await response.json();
+  scenario = bootstrapData.scenario;
+  cluesCatalog = bootstrapData.cluesCatalog || [];
+  showRoleSelection();
+}
+
+function showRoleSelection() {
+  const roleOverlay = document.getElementById('role-overlay');
+  const roleCardsEl = document.getElementById('role-cards');
+  const roleBeginBtn = document.getElementById('role-begin-btn');
+
+  let selectedRoleId = null;
+
+  for (const role of scenario.playerRoleOptions || []) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'role-card';
+    card.innerHTML = `<span class="role-card-name">${role.name}</span><span class="role-card-desc">${role.description}</span>`;
+    card.addEventListener('click', () => {
+      selectedRoleId = role.id;
+      roleBeginBtn.disabled = false;
+      roleCardsEl.querySelectorAll('.role-card').forEach((c) => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+    roleCardsEl.appendChild(card);
+  }
+
+  roleBeginBtn.addEventListener('click', () => {
+    if (!selectedRoleId) return;
+    roleOverlay.classList.add('hidden');
+    startGame(selectedRoleId);
+  });
+}
+
+function startGame(roleId) {
+  const role = (scenario.playerRoleOptions || []).find((r) => r.id === roleId);
+  gameState = structuredClone(scenario.initialState);
+  if (role) {
+    gameState.playerRole = role.id;
+    gameState.playerRoleName = role.name;
+    gameState.location = role.startLocation;
+    gameState.visitedLocations = [role.startLocation];
+    gameState.startingKnowledge = role.startingKnowledge;
+  }
   conversationHistory = [];
   recentScenes = [];
   renderSidebar();
-  renderOutput(data.opening);
+  renderOutput(bootstrapData.opening);
 }
 
 function renderEnding(endState) {
