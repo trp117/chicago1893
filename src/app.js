@@ -284,7 +284,7 @@ function startGame(roleId) {
   conversationHistory = [];
   recentScenes = [];
   renderSidebar();
-  renderOutput(bootstrapData.opening);
+  renderOutput(bootstrapData.roleOpenings?.[roleId] ?? bootstrapData.opening);
 }
 
 function renderEnding(endState) {

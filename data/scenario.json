@@ -30,6 +30,37 @@
       "startingKnowledge": ["observed after-hours delivery", "knows unofficial routes through the fairgrounds"]
     }
   ],
+  "roleOpenings": {
+    "burnhams_assistant": {
+      "narrative": "Chicago, May 1893. The White City rises from the lakefront mud, its plaster palaces gleaming in the morning haze — ten thousand workers still swarming Jackson Park in the final days before the Exposition opens. But beneath the spectacle, something is wrong. A tension moves through the corridors of the Administration Building that has nothing to do with last-minute preparations.\n\nYou are assistant to Daniel Burnham, Director of Works. When he needs eyes he can trust, he sends for you.\n\nThis morning, a shipping manifest crossed your desk: electrical equipment, diverted from its declared route. The signature authorizing the change does not match any name on Burnham's staff.\n\nBurnham's office door stands open. He is at his desk, jaw set, a telegraph slip folded in his hand. He looks up.",
+      "npcMoments": [
+        { "npc": "daniel_burnham", "text": "'Shut the door. Tell me what you found in those papers.'" }
+      ],
+      "choices": [
+        "Show Burnham the mismatched signature on the manifest",
+        "Ask Burnham what he already suspects",
+        "Request permission to go directly to the freight yards"
+      ]
+    },
+    "daniel_burnham": {
+      "narrative": "Chicago, May 1893. You built this city from swamp and ambition — ten thousand men answering to your hand, four hundred buildings risen from bare ground in two years. The White City is yours. And now, three days from opening, someone is trying to take it from you.\n\nA telegraph arrived before dawn: a consignment of electrical equipment rerouted without your authorization. Someone signed a transfer order in your name. The forgery is competent. That tells you something.\n\nYou are Daniel Burnham, Director of Works. Your desk faces the door. Your assistant stands before you with a second document — the shipping manifest. You unfold it.",
+      "npcMoments": [],
+      "choices": [
+        "Study the forged signature on the transfer order",
+        "Send for the head of fair security immediately",
+        "Go to the freight yards yourself, unannounced"
+      ]
+    },
+    "watchman_murphy": {
+      "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",
+      "npcMoments": [],
+      "choices": [
+        "Examine the ground where the crates were unloaded",
+        "Check the south gate log to see if the delivery was recorded",
+        "Go to the Administration Building and report what you saw"
+      ]
+    }
+  },
   "openingSituation": "A discrepancy in shipping manifests and an unnerving conversation overheard near the Administration Building suggest that someone is tampering with critical fair infrastructure.",
   "goal": "Identify the conspirators, confirm the method of sabotage, and stop it before public disaster or humiliation strikes the fair.",
   "acts": [
