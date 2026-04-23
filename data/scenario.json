@@ -13,21 +13,27 @@
       "name": "Burnham's Assistant",
       "description": "A trusted aide with access to Burnham's office and the Administration Building. You move in official circles and can question staff without raising suspicion.",
       "startLocation": "administration_building",
-      "startingKnowledge": ["shipping manifest discrepancy", "access to Burnham's inner office"]
+      "startingKnowledge": ["shipping manifest discrepancy", "access to Burnham's inner office"],
+      "accessLevel": "staff",
+      "perspective": "The player is Burnham's assistant. Burnham is the player's superior and may speak to the player directly, give orders, and act as a boss. Write the player as an aide acting on Burnham's authority."
     },
     {
       "id": "daniel_burnham",
       "name": "Daniel Burnham",
       "description": "Director of Works. You built this city from mud and ambition. You have command authority over the fair — but your reputation rides on every decision you make here.",
       "startLocation": "administration_building",
-      "startingKnowledge": ["telegraph warning received", "full authority over fair staff", "political pressure from exposition committee"]
+      "startingKnowledge": ["telegraph warning received", "full authority over fair staff", "political pressure from exposition committee"],
+      "accessLevel": "director",
+      "perspective": "The player IS Daniel Burnham. Never write 'Burnham says to you' or treat Burnham as an NPC speaking to the player. Narrate from Burnham's point of view. NPCs address the player as 'Mr. Burnham' or 'sir'. Burnham commands — he does not receive orders."
     },
     {
       "id": "watchman_murphy",
       "name": "Watchman Murphy",
       "description": "A night watchman who patrols the freight yards and service corridors. You've seen things the officials haven't noticed. You know this fair from the ground up.",
       "startLocation": "freight_yards",
-      "startingKnowledge": ["observed after-hours delivery", "knows unofficial routes through the fairgrounds"]
+      "startingKnowledge": ["observed after-hours delivery", "knows unofficial routes through the fairgrounds"],
+      "accessLevel": "worker",
+      "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers."
     }
   ],
   "roleOpenings": {

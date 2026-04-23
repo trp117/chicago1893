@@ -185,9 +185,28 @@ function buildNpcRoutes() {
   });
 }
 
-function buildLocationConstraint(locationId) {
+function buildPlayerRoleSection(state) {
+  const roleId = state.playerRoleId || state.playerRole || 'burnhams_assistant';
+  const roleName = state.playerRoleName || "Burnham's Assistant";
+  const perspective = state.playerPerspective || "The player is assistant to Daniel Burnham.";
+  const accessLevel = state.playerAccessLevel || 'staff';
+  const knowledge = (state.playerStartingKnowledge || state.startingKnowledge || []).join('; ');
+  return `Role: ${roleName} (id: ${roleId}) | Access: ${accessLevel}
+Perspective: ${perspective}
+Starting knowledge: ${knowledge || 'none'}
+HARD RULE: The player is ${roleName}. Never address the player as a different character. Never have ${roleName} appear as an NPC speaking to the player.`;
+}
+
+function buildLocationConstraint(locationId, state = {}) {
+  const roleId = state.playerRoleId || state.playerRole || 'burnhams_assistant';
   if (locationId === 'administration_building') {
+    if (roleId === 'daniel_burnham') {
+      return `Current location (authoritative): ${locationId}\nThe player is Daniel Burnham, in his own office. He is the authority here. Do NOT write Burnham as an NPC addressing the player — the player IS Burnham.`;
+    }
     return `Current location (authoritative): ${locationId}\nThe player is in Burnham's office. Burnham is present and available.`;
+  }
+  if (roleId === 'daniel_burnham') {
+    return `Current location (authoritative): ${locationId}\nThe player (Daniel Burnham) is at ${locationId}. Write from Burnham's perspective throughout. Do NOT revert to Burnham's office.`;
   }
   return `Current location (authoritative): ${locationId}\n⚠️ The player is at ${locationId}, NOT at administration_building. Do NOT place the player in Burnham's office. Do NOT introduce Daniel Burnham unless the player explicitly travels to administration_building.`;
 }
@@ -210,6 +229,7 @@ function composeTurnPrompt(state, playerInput) {
   const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
 
   return turnTemplate
+    .replace('{{PLAYER_ROLE_SECTION}}', buildPlayerRoleSection(state))
     .replace('{{STATE_JSON}}', JSON.stringify(state))
     .replace('{{LOCATION_JSON}}', JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}', JSON.stringify(relevantNpcs))
@@ -217,7 +237,7 @@ function composeTurnPrompt(state, playerInput) {
     .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
     .replace('{{AVAILABLE_CLUES_JSON}}', JSON.stringify(availableClues))
     .replace('{{ENDING_SIGNALS_JSON}}', JSON.stringify(endingSignals))
-    .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location))
+    .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location, state))
     .replace('{{PREV_CONTEXT}}', '')
     .replace('{{PLAYER_INPUT}}', resolvedInput);
 }

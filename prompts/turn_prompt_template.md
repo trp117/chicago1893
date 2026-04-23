@@ -1,3 +1,6 @@
+PLAYER ROLE (maintain this perspective for the entire turn — do not override):
+{{PLAYER_ROLE_SECTION}}
+
 Current game state:
 {{STATE_JSON}}
 

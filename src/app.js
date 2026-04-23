@@ -275,11 +275,13 @@ function startGame(roleId) {
   const role = (scenario.playerRoleOptions || []).find((r) => r.id === roleId);
   gameState = structuredClone(scenario.initialState);
   if (role) {
-    gameState.playerRole = role.id;
+    gameState.playerRoleId = role.id;
     gameState.playerRoleName = role.name;
+    gameState.playerAccessLevel = role.accessLevel;
+    gameState.playerPerspective = role.perspective;
+    gameState.playerStartingKnowledge = role.startingKnowledge;
     gameState.location = role.startLocation;
     gameState.visitedLocations = [role.startLocation];
-    gameState.startingKnowledge = role.startingKnowledge;
   }
   conversationHistory = [];
   recentScenes = [];
