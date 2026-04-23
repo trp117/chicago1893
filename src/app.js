@@ -3,6 +3,7 @@ let scenario = null;
 let cluesCatalog = [];
 let conversationHistory = []; // [{role:'user',content:...},{role:'assistant',content:...}]
 const MAX_HISTORY_TURNS = 4;
+let recentScenes = []; // rolling window: last 2 scene HTML strings
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
@@ -205,7 +206,15 @@ function renderOutput(output, meta = {}) {
   if (meta.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
-  storyEl.innerHTML = `<div class="scene-card">${html}</div>`;
+
+  recentScenes.push(html);
+  if (recentScenes.length > 2) recentScenes = recentScenes.slice(-2);
+
+  storyEl.innerHTML = recentScenes.map((sceneHtml, i) => {
+    const isCurrent = i === recentScenes.length - 1;
+    const cls = isCurrent ? 'scene-card scene-card--current' : 'scene-card scene-card--previous';
+    return `<div class="${cls}">${sceneHtml}</div>`;
+  }).join('');
   storyEl.scrollTop = 0;
   renderChoices(output.choices || []);
 
@@ -232,6 +241,7 @@ async function loadGame() {
   cluesCatalog = data.cluesCatalog || [];
   gameState = data.state;
   conversationHistory = [];
+  recentScenes = [];
   renderSidebar();
   renderOutput(data.opening);
 }
@@ -708,7 +718,8 @@ async function runAutoTestStep() {
   step.cluesAfter = [...(gameState?.discoveredClueIds || [])];
   step.newClues = step.cluesAfter.filter(id => !step.cluesBefore.includes(id));
 
-  step.narrative = storyEl.querySelector('.scene-card')?.textContent?.trim() || '';
+  const sceneCards = storyEl.querySelectorAll('.scene-card');
+  step.narrative = sceneCards[sceneCards.length - 1]?.textContent?.trim() || '';
 
   if (storyEl.querySelector('.ending-card')) {
     step.isEnding = true;
