@@ -1,9 +1,12 @@
 let gameState = null;
 let scenario = null;
 let cluesCatalog = [];
+let locationsList = [];
 let conversationHistory = []; // [{role:'user',content:...},{role:'assistant',content:...}]
 const MAX_HISTORY_TURNS = 4;
-let recentScenes = []; // rolling window: last 2 scene HTML strings
+let locationFeed = [];   // all turns for the current location: [{playerInput, html}]
+let feedLocationId = null;
+let pendingEntryEl = null; // DOM node holding player input + dots, awaiting AI response
 let bootstrapData = null;
 
 const storyEl = document.getElementById('story');
@@ -178,28 +181,59 @@ function renderChoices(choices = []) {
   }
 }
 
+function markupNarrative(text) {
+  const lines = (text || '').split('\n').map(line => {
+    if (!line.trim()) return null;
+    if (/\*[^*]+\*/.test(line)) return `<span class="line">${line.replace(/\*([^*]+)\*/g, '<em>$1</em>')}</span>`;
+    if (/^\w[^:]{0,30}:\s*["']/.test(line)) return `<span class="line dialogue">${line}</span>`;
+    return `<span class="line"><em>${line}</em></span>`;
+  });
+  return lines.filter(Boolean).join('');
+}
+
 function renderOutput(output, meta = {}) {
-  let html = `<p>${output.narrative}</p>`;
+  const narrativeHtml = markupNarrative(output.narrative);
+  let html = `<p>${narrativeHtml}</p>`;
   const speakParts = [output.narrative];
 
   if (Array.isArray(output.npcMoments)) {
-  for (const npcMoment of output.npcMoments) {
-    speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
+    for (const npcMoment of output.npcMoments) {
+      speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
+    }
   }
-}
   if (meta.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
 
-  recentScenes.push(html);
-  if (recentScenes.length > 2) recentScenes = recentScenes.slice(-2);
+  // Reset feed when location changes
+  const currentLocation = gameState?.location;
+  if (currentLocation && currentLocation !== feedLocationId) {
+    locationFeed = [];
+    feedLocationId = currentLocation;
+    storyEl.innerHTML = '';
+    pendingEntryEl = null;
+  }
 
-  storyEl.innerHTML = recentScenes.map((sceneHtml, i) => {
-    const isCurrent = i === recentScenes.length - 1;
-    const cls = isCurrent ? 'scene-card scene-card--current' : 'scene-card scene-card--previous';
-    return `<div class="${cls}">${sceneHtml}</div>`;
-  }).join('');
-  storyEl.scrollTop = 0;
+  locationFeed.push({ playerInput: meta.playerInput || null, html });
+
+  const sceneEl = document.createElement('div');
+  sceneEl.className = 'scene-card';
+  sceneEl.innerHTML = html;
+
+  if (pendingEntryEl) {
+    // Response arrived — swap dots for the scene card in the existing entry
+    pendingEntryEl.querySelector('.thinking-dots')?.remove();
+    pendingEntryEl.appendChild(sceneEl);
+    pendingEntryEl = null;
+  } else {
+    // Opening scene (no pending entry) — build a full entry
+    const entryEl = document.createElement('div');
+    entryEl.className = 'feed-entry';
+    entryEl.appendChild(sceneEl);
+    storyEl.appendChild(entryEl);
+  }
+
+  storyEl.scrollTop = storyEl.scrollHeight;
   renderChoices(output.choices || []);
 
   const messageId = ++currentMessageId;
@@ -223,6 +257,7 @@ async function loadGame() {
   bootstrapData = await response.json();
   scenario = bootstrapData.scenario;
   cluesCatalog = bootstrapData.cluesCatalog || [];
+  locationsList = bootstrapData.locations || [];
   showRoleSelection();
 }
 
@@ -267,6 +302,13 @@ function showRoleSelection() {
   });
 }
 
+function updateLocationDisplay(locationId) {
+  const el = document.getElementById('location-display');
+  if (!el) return;
+  const loc = locationsList.find(l => l.id === locationId);
+  el.textContent = loc ? loc.name : '';
+}
+
 function startGame(roleId, narrativeStyle) {
   const role = (scenario.playerRoleOptions || []).find((r) => r.id === roleId);
   gameState = structuredClone(scenario.initialState);
@@ -281,8 +323,11 @@ function startGame(roleId, narrativeStyle) {
     gameState.visitedLocations = [role.startLocation];
   }
   conversationHistory = [];
-  recentScenes = [];
+  locationFeed = [];
+  feedLocationId = null;
+  pendingEntryEl = null;
   renderSidebar();
+  updateLocationDisplay(gameState.location);
   renderOutput(bootstrapData.roleOpenings?.[roleId] ?? bootstrapData.opening);
 }
 
@@ -393,8 +438,23 @@ function buildAssistantHistoryContent(output) {
 async function submitTurn(playerInput) {
   if (!playerInput?.trim() || submitting) return;
   submitting = true;
-  storyEl.innerHTML = '<div class="scene-thinking">&#8230;</div>';
   inputEl.value = '';
+
+  // Immediately show player input + pulsing dots
+  const entryEl = document.createElement('div');
+  entryEl.className = 'feed-entry';
+  const playerEl = document.createElement('div');
+  playerEl.className = 'player-turn';
+  playerEl.textContent = playerInput;
+  entryEl.appendChild(playerEl);
+  const dotsEl = document.createElement('div');
+  dotsEl.className = 'thinking-dots';
+  dotsEl.innerHTML = '<span></span><span></span><span></span>';
+  entryEl.appendChild(dotsEl);
+  storyEl.appendChild(entryEl);
+  storyEl.scrollTop = storyEl.scrollHeight;
+  pendingEntryEl = entryEl;
+
   try {
     const response = await fetch('/api/turn', {
       method: 'POST',
@@ -404,11 +464,17 @@ async function submitTurn(playerInput) {
 
     const data = await response.json();
     if (data.error) {
-      storyEl.innerHTML = `<div class="scene-card scene-error"><p>${data.error}</p></div>`;
+      dotsEl.remove();
+      const errEl = document.createElement('div');
+      errEl.className = 'scene-card scene-error';
+      errEl.innerHTML = `<p>${data.error}</p>`;
+      entryEl.appendChild(errEl);
+      pendingEntryEl = null;
       return;
     }
 
     gameState = data.nextState;
+    updateLocationDisplay(gameState.location);
 
     // Append this exchange to history, keep last MAX_HISTORY_TURNS turns
     conversationHistory.push(
@@ -420,7 +486,7 @@ async function submitTurn(playerInput) {
     }
 
     renderSidebar();
-    renderOutput(data.output, { mockMode: data.mockMode });
+    renderOutput(data.output, { mockMode: data.mockMode, playerInput });
 
     if (data.output?.endState?.isEnding) {
       formEl.querySelector('button').disabled = true;

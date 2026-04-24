@@ -481,6 +481,7 @@ app.get('/api/bootstrap', (_, res) => {
   res.json({
     scenario,
     cluesCatalog,
+    locations,
     state: scenario.initialState,
     roleOpenings: scenario.roleOpenings || {},
     opening: {
@@ -556,40 +557,33 @@ app.post('/api/turn', async (req, res) => {
       return res.status(500).json({ error: 'Failed to build prompt: ' + promptError.message });
     }
 
-    const response = await fetch(ANTHROPIC_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'prompt-caching-2024-07-31'
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 900,
-        temperature: 0.8,
-        system: [
-          {
-            type: 'text',
-            text: systemPrompt,
-            cache_control: { type: 'ephemeral' }
-          }
-        ],
-        messages: [
-          ...history.slice(-MAX_HISTORY_MESSAGES),
-          { role: 'user', content: prompt }
-        ]
-      })
-    });
+    const callModel = (messages) =>
+      fetch(ANTHROPIC_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'prompt-caching-2024-07-31'
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          max_tokens: 900,
+          temperature: 0.8,
+          system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+          messages
+        })
+      });
 
-    const data = await response.json();
-    const text = data?.content?.[0]?.text;
+    const hasSpeech = (narrative) => narrative && /[""][^""]{4}|:\s*["']/.test(narrative);
+
+    const baseMessages = [...history.slice(-MAX_HISTORY_MESSAGES), { role: 'user', content: prompt }];
+    let response = await callModel(baseMessages);
+    let data = await response.json();
+    let text = data?.content?.[0]?.text;
 
     if (!text) {
-      return res.status(500).json({
-        error: 'No text returned from Anthropic.',
-        raw: data
-      });
+      return res.status(500).json({ error: 'No text returned from Anthropic.', raw: data });
     }
 
     let output;
@@ -597,10 +591,32 @@ app.post('/api/turn', async (req, res) => {
       output = extractJson(text);
     } catch (parseError) {
       console.error('INVALID TURN JSON RAW TEXT:', text);
-      return res.status(500).json({
-        error: 'Model returned invalid JSON.',
-        rawText: text
-      });
+      return res.status(500).json({ error: 'Model returned invalid JSON.', rawText: text });
+    }
+
+    // Retry once if NPC is present but narrative contains no spoken dialogue
+    const npcPresent = Array.isArray(output.npcMoments) && output.npcMoments.length > 0;
+    if (npcPresent && !hasSpeech(output.narrative)) {
+      const npcName = output.npcMoments[0]?.npc?.replace(/_/g, ' ') || 'the NPC';
+      console.log('[RETRY] Silent NPC response detected — retrying with dialogue correction');
+      const retryMessages = [
+        ...baseMessages,
+        { role: 'assistant', content: text },
+        {
+          role: 'user',
+          content: `Your response contained no spoken dialogue from ${npcName}. Rewrite the narrative so that ${npcName} delivers at least one spoken line — e.g. ${npcName}: "..." — before presenting choices. Return only valid JSON.`
+        }
+      ];
+      const retryResponse = await callModel(retryMessages);
+      const retryData = await retryResponse.json();
+      const retryText = retryData?.content?.[0]?.text;
+      if (retryText) {
+        try {
+          output = extractJson(retryText);
+        } catch (_) {
+          // retry parse failed — keep original output
+        }
+      }
     }
 
     console.log('[TURN] location_out:', output.location, '| npcMoments:', JSON.stringify(output.npcMoments?.map(m => m.npc)));
