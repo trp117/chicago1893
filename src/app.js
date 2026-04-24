@@ -340,6 +340,51 @@ function renderEnding(endState) {
 
 let submitting = false;
 
+function showTimeDecision() {
+  renderChoices([]);
+
+  const panel = document.createElement('div');
+  panel.className = 'time-decision';
+
+  const label = document.createElement('p');
+  label.className = 'time-decision-label';
+  label.textContent = 'Time has run out. The exposition opens at dawn.';
+  panel.appendChild(label);
+
+  const extendBtn = document.createElement('button');
+  extendBtn.type = 'button';
+  extendBtn.className = 'choice-btn';
+  extendBtn.textContent = 'Push on — extend the investigation (+5 minutes, harder conditions)';
+  extendBtn.addEventListener('click', () => {
+    gameState.remainingMinutes = 5;
+    gameState.extensionUsed = true;
+    gameState.timeExpired = false;
+    choicesEl.innerHTML = '';
+    inputEl.disabled = false;
+    formEl.querySelector('button[type="submit"]').disabled = false;
+    renderSidebar();
+  });
+
+  const concludeBtn = document.createElement('button');
+  concludeBtn.type = 'button';
+  concludeBtn.className = 'choice-btn';
+  concludeBtn.textContent = 'Make your final accusation — name the suspect and state your case';
+  concludeBtn.addEventListener('click', () => {
+    choicesEl.innerHTML = '';
+    inputEl.disabled = false;
+    formEl.querySelector('button[type="submit"]').disabled = false;
+    inputEl.placeholder = 'Name your suspect and state your case…';
+    inputEl.focus();
+  });
+
+  panel.appendChild(extendBtn);
+  panel.appendChild(concludeBtn);
+  choicesEl.appendChild(panel);
+
+  inputEl.disabled = true;
+  formEl.querySelector('button[type="submit"]').disabled = true;
+}
+
 function buildAssistantHistoryContent(output) {
   let text = output.narrative || '';
   for (const m of output.npcMoments || []) {
@@ -385,6 +430,9 @@ async function submitTurn(playerInput) {
       inputEl.disabled = true;
       renderChoices([]);
       renderEnding(data.output.endState);
+    } else if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed) {
+      gameState.timeExpired = true;
+      showTimeDecision();
     }
   } finally {
     submitting = false;

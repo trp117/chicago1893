@@ -260,11 +260,11 @@ function mergeState(currentState, modelOutput, playerInput = '') {
   const advance = Number(
     modelOutput.timeAdvance || scenario.coreSystems.timePerTurnDefault || 3
   );
+  const sessionTarget = currentState.extensionUsed
+    ? scenario.sessionTargetMinutes + 5
+    : scenario.sessionTargetMinutes;
   next.elapsedMinutes += advance;
-  next.remainingMinutes = Math.max(
-    0,
-    scenario.sessionTargetMinutes - next.elapsedMinutes
-  );
+  next.remainingMinutes = Math.max(0, sessionTarget - next.elapsedMinutes);
 
   if (typeof modelOutput.location === 'string' && modelOutput.location) {
     if (isValidLocationMove(modelOutput.location, currentState.location, playerInput)) {
