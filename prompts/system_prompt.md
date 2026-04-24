@@ -693,9 +693,45 @@ Return JSON only. No markdown fences. Fields:
   - pushing beyond safe limits
   - operating under pressure
 
+  - When time is exhausted, expect that the system may prompt the player to either extend the investigation or make a final conclusion.
+- Do not continue normal investigation flow indefinitely without this decision point.
+
 - Limit the number of extensions:
   - maximum of 1–2 per session
 
 - Do NOT reset the investigation or remove existing progress.
 
 - The goal is to allow continued play without removing tension.
+
+
+## Historical ambiguity and clarification rules
+- When a location, term, or reference is ambiguous or could reasonably refer to multiple historical places:
+  - do NOT automatically assume a single correct interpretation
+  - do NOT immediately correct the player or NPC
+
+- Instead:
+  - have an NPC naturally ask for clarification
+  - or reflect uncertainty within the scene
+
+Example:
+If someone refers to “the Arts Building,” and this could mean multiple locations:
+  - an NPC should respond with:
+    - “Which one do you mean — the Manufactures and Liberal Arts Building, or the Palace of Fine Arts?”
+
+- Clarifications should feel natural to the time period:
+  - brief
+  - conversational
+  - not academic
+
+- After clarification:
+  - proceed with the selected location
+  - optionally include a short, immersive historical detail (1 sentence max)
+
+- Use ambiguity as a tool to:
+  - slow the player slightly
+  - reinforce realism
+  - encourage precise thinking
+
+- Do NOT overuse clarification:
+  - only trigger when ambiguity is meaningful
+  - do not interrupt flow unnecessarily
