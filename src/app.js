@@ -97,28 +97,12 @@ function ttsStop() {
   setTtsSpeaking(false);
 }
 
-const beginOverlay = document.getElementById('begin-overlay');
-const beginBtn = document.getElementById('begin-btn');
-
 if (!ttsSupported) {
   ttsToggleBtn.remove();
   ttsBarEl.hidden = true;
-  beginOverlay.classList.add('hidden');
 } else {
   updateTtsToggleUI();
   updateTtsBarUI();
-
-  beginBtn.addEventListener('click', () => {
-    audioUnlocked = true;
-    updateTtsToggleUI();
-    updateTtsBarUI();
-    beginOverlay.classList.add('hidden');
-    hasSpokenIntro = true;
-    if (ttsEnabled && introText) {
-      lastSpokenMessageId = currentMessageId;
-      ttsSpeakRaw(introText);
-    }
-  });
 
   ttsToggleBtn.addEventListener('click', () => {
     setTtsEnabled(!ttsEnabled);
@@ -199,11 +183,10 @@ function renderOutput(output, meta = {}) {
   const speakParts = [output.narrative];
 
   if (Array.isArray(output.npcMoments)) {
-    for (const npcMoment of output.npcMoments) {
-      html += `<div class="npc-line"><strong>${prettifyId(npcMoment.npc)}:</strong> ${npcMoment.text}</div>`;
-      speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
-    }
+  for (const npcMoment of output.npcMoments) {
+    speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
   }
+}
   if (meta.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
@@ -249,6 +232,7 @@ function showRoleSelection() {
   const roleBeginBtn = document.getElementById('role-begin-btn');
 
   let selectedRoleId = null;
+  let selectedStyle = 'focused';
 
   for (const role of scenario.playerRoleOptions || []) {
     const card = document.createElement('button');
@@ -264,16 +248,29 @@ function showRoleSelection() {
     roleCardsEl.appendChild(card);
   }
 
+  roleOverlay.querySelectorAll('.style-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      selectedStyle = btn.dataset.style;
+      roleOverlay.querySelectorAll('.style-btn').forEach((b) => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
   roleBeginBtn.addEventListener('click', () => {
     if (!selectedRoleId) return;
+    audioUnlocked = true;
+    hasSpokenIntro = true;
+    updateTtsToggleUI();
+    updateTtsBarUI();
     roleOverlay.classList.add('hidden');
-    startGame(selectedRoleId);
+    startGame(selectedRoleId, selectedStyle);
   });
 }
 
-function startGame(roleId) {
+function startGame(roleId, narrativeStyle) {
   const role = (scenario.playerRoleOptions || []).find((r) => r.id === roleId);
   gameState = structuredClone(scenario.initialState);
+  gameState.narrativeStyle = narrativeStyle || 'focused';
   if (role) {
     gameState.playerRoleId = role.id;
     gameState.playerRoleName = role.name;

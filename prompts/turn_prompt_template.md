@@ -26,6 +26,8 @@ Ending readiness signals:
 
 {{PREV_CONTEXT}}
 
+Narrative style for this session: {{NARRATIVE_STYLE}}
+
 Player input:
 {{PLAYER_INPUT}}
 

@@ -239,6 +239,7 @@ function composeTurnPrompt(state, playerInput) {
     .replace('{{ENDING_SIGNALS_JSON}}', JSON.stringify(endingSignals))
     .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location, state))
     .replace('{{PREV_CONTEXT}}', '')
+    .replace('{{NARRATIVE_STYLE}}', state.narrativeStyle || 'focused')
     .replace('{{PLAYER_INPUT}}', resolvedInput);
 }
 

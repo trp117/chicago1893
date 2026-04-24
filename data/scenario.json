@@ -129,6 +129,7 @@
     "Burnham is saved political embarrassment, but the player sacrifices an ally"
   ],
   "initialState": {
+    "narrativeStyle": "focused",
     "elapsedMinutes": 0,
     "remainingMinutes": 20,
     "act": 1,

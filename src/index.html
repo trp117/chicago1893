@@ -48,14 +48,7 @@
       </aside>
 
       <main class="main-column">
-        <div id="begin-overlay" class="begin-overlay">
-          <div class="begin-overlay-inner">
-            <h2>Chicago, 1893</h2>
-            <p>Shadows gather beneath the White City.</p>
-            <button type="button" id="begin-btn" class="begin-btn">Begin Experience</button>
-            <span class="begin-note">Enables narration &amp; unlocks audio</span>
-          </div>
-        </div>
+
 
         <header class="hero">
           <div class="hero-title-row">
@@ -114,12 +107,35 @@
       </main>
     </div>
 
-    <div id="role-overlay" class="role-overlay" role="dialog" aria-modal="true" aria-label="Choose your role">
+    <div id="role-overlay" class="role-overlay" role="dialog" aria-modal="true" aria-label="Begin investigation">
       <div class="role-overlay-inner">
         <h2>Chicago, 1893</h2>
-        <p class="role-intro">Shadows gather beneath the White City. Choose your role to begin.</p>
+        <p class="role-intro">Shadows gather beneath the White City.</p>
+
+        <div class="role-setup-text">
+          <p>The World's Fair is days from opening. Beneath the gleaming White City, something is wrong.</p>
+          <p>A shipment has been diverted. The authorization is forged. Someone inside the operation is moving equipment after hours.</p>
+        </div>
+
+        <div class="role-objective">
+          <p class="role-objective-label">Your Objective</p>
+          <p>Uncover who is altering the manifests, determine their motive, and stop the operation before the Exposition opens.</p>
+          <p class="role-objective-note">Every decision reveals clues — or closes doors.</p>
+        </div>
+
+        <p class="role-instruction">Select your role to begin the investigation.</p>
         <div class="role-cards" id="role-cards"></div>
-        <button type="button" id="role-begin-btn" class="begin-btn" disabled>Begin Investigation</button>
+
+        <div class="style-selector">
+          <p class="style-label">Narrative Style</p>
+          <div class="style-btns">
+            <button type="button" class="style-btn selected" data-style="focused">Focused</button>
+            <button type="button" class="style-btn" data-style="cinematic">Cinematic</button>
+          </div>
+          <p class="style-hint">Focused = faster&nbsp;|&nbsp;Cinematic = more descriptive</p>
+        </div>
+
+        <button type="button" id="role-begin-btn" class="begin-btn" disabled>Start Investigation</button>
       </div>
     </div>
 
