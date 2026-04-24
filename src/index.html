@@ -52,14 +52,13 @@
 
         <header class="hero">
           <div class="hero-title-row">
-            <h1>Chicago, 1893</h1>
+            <h1 id="header-title">Chicago, 1893</h1>
             <div class="hero-controls">
               <button type="button" id="driving-btn" class="driving-btn" aria-label="Enable driving mode" title="Driving mode">Drive</button>
               <button type="button" id="notes-btn" class="notes-btn" aria-label="Review case notes" title="Review case notes">Notes</button>
               <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
             </div>
           </div>
-          <p id="location-display" class="header-location"></p>
         </header>
 
         <section id="story" class="story-feed"></section>
@@ -85,7 +84,11 @@
             <button type="button" id="autotest-btn" class="autotest-btn" title="Run automated test script">Auto Test</button>
           </div>
 
-          <section id="choices" class="choices"></section>
+          <div class="choices-wrap">
+            <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
+            <section id="choices" class="choices"></section>
+            <button type="button" class="choices-arrow choices-arrow--right" aria-hidden="true" tabindex="-1">&#8250;</button>
+          </div>
 
           <form id="input-form" class="input-row">
             <div class="input-textarea-wrap">

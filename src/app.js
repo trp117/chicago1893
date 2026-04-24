@@ -7,10 +7,13 @@ const MAX_HISTORY_TURNS = 4;
 let locationFeed = [];   // all turns for the current location: [{playerInput, html}]
 let feedLocationId = null;
 let pendingEntryEl = null; // DOM node holding player input + dots, awaiting AI response
+let locationShowing = false; // false = header shows "Chicago, 1893"; true = shows location name
 let bootstrapData = null;
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
+const arrowLeft = document.querySelector('.choices-arrow--left');
+const arrowRight = document.querySelector('.choices-arrow--right');
 const formEl = document.getElementById('input-form');
 const inputEl = document.getElementById('player-input');
 const ttsBarEl = document.getElementById('tts-bar');
@@ -169,6 +172,13 @@ function prettifyId(id) {
   return id.replaceAll('_', ' ').replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
+function syncArrows() {
+  if (!arrowLeft || !arrowRight) return;
+  const { scrollLeft, scrollWidth, clientWidth } = choicesEl;
+  arrowLeft.classList.toggle('visible', scrollLeft > 4);
+  arrowRight.classList.toggle('visible', scrollLeft + clientWidth < scrollWidth - 4);
+}
+
 function renderChoices(choices = []) {
   choicesEl.innerHTML = '';
   for (const choice of choices) {
@@ -179,7 +189,13 @@ function renderChoices(choices = []) {
     btn.addEventListener('click', () => submitTurn(choice));
     choicesEl.appendChild(btn);
   }
+  choicesEl.scrollLeft = 0;
+  requestAnimationFrame(syncArrows);
 }
+
+choicesEl.addEventListener('scroll', syncArrows, { passive: true });
+if (arrowLeft)  arrowLeft.addEventListener('click',  () => { choicesEl.scrollBy({ left: -choicesEl.clientWidth * 0.85, behavior: 'smooth' }); });
+if (arrowRight) arrowRight.addEventListener('click', () => { choicesEl.scrollBy({ left:  choicesEl.clientWidth * 0.85, behavior: 'smooth' }); });
 
 function markupNarrative(text) {
   const lines = (text || '').split('\n').map(line => {
@@ -303,10 +319,11 @@ function showRoleSelection() {
 }
 
 function updateLocationDisplay(locationId) {
-  const el = document.getElementById('location-display');
-  if (!el) return;
+  if (!locationShowing) return;
+  const h1 = document.getElementById('header-title');
+  if (!h1) return;
   const loc = locationsList.find(l => l.id === locationId);
-  el.textContent = loc ? loc.name : '';
+  h1.textContent = loc ? loc.name : locationId;
 }
 
 function startGame(roleId, narrativeStyle) {
@@ -326,6 +343,9 @@ function startGame(roleId, narrativeStyle) {
   locationFeed = [];
   feedLocationId = null;
   pendingEntryEl = null;
+  locationShowing = false;
+  const h1 = document.getElementById('header-title');
+  if (h1) h1.textContent = 'Chicago, 1893';
   renderSidebar();
   updateLocationDisplay(gameState.location);
   renderOutput(bootstrapData.roleOpenings?.[roleId] ?? bootstrapData.opening);
@@ -474,6 +494,7 @@ async function submitTurn(playerInput) {
     }
 
     gameState = data.nextState;
+    locationShowing = true;
     updateLocationDisplay(gameState.location);
 
     // Append this exchange to history, keep last MAX_HISTORY_TURNS turns

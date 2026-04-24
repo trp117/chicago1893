@@ -67,13 +67,8 @@ body {
   color: var(--muted);
 }
 
-.header-location {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 4px 0 0;
-  min-height: 1em;
+.hero h1 {
+  transition: opacity 0.3s;
 }
 
 .tts-toggle {
@@ -337,9 +332,36 @@ body {
   color: #f6e9c8;
 }
 
+.choices-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.choices-arrow {
+  display: none;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  user-select: none;
+}
+
+.choices-arrow.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .choices {
   display: flex;
   flex-wrap: wrap;
+  flex: 1;
   gap: 8px;
   padding: 10px 28px 8px;
 }
@@ -947,14 +969,6 @@ li {
     font-size: 1.3rem;
   }
 
-  .hero p {
-    display: none;
-  }
-
-  .header-location {
-    display: block;
-    font-size: 0.65rem;
-  }
 
   /* Hide secondary hero controls on mobile */
   .driving-btn {
@@ -1002,13 +1016,22 @@ li {
   }
 
   /* ── Choices — horizontal swipe carousel ── */
+  .choices-wrap {
+    align-items: stretch;
+  }
+
+  .choices-arrow {
+    display: flex;
+    align-items: center;
+  }
+
   .choices {
     flex-direction: row;
     flex-wrap: nowrap;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 6px 14px 8px;
+    padding: 6px 4px 8px;
     gap: 8px;
     scrollbar-width: none;
   }
