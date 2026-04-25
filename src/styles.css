@@ -1338,6 +1338,13 @@ li {
     display: block;
   }
 
+  /* When a role is selected, hide context blocks to make room for description */
+  .role-overlay-inner:has(.role-card.selected) .role-setup-text,
+  .role-overlay-inner:has(.role-card.selected) .role-objective,
+  .role-overlay-inner:has(.role-card.selected) .role-instruction {
+    display: none;
+  }
+
   .style-selector {
     margin-top: 4px;
   }
