@@ -9,6 +9,7 @@ let feedLocationId = null;
 let pendingEntryEl = null; // DOM node holding player input + dots, awaiting AI response
 let locationShowing = false; // false = header shows "Chicago, 1893"; true = shows location name
 let bootstrapData = null;
+let lastChoices = []; // preserved so choices can be restored after time extension
 
 const storyEl = document.getElementById('story');
 const choicesEl = document.getElementById('choices');
@@ -132,6 +133,26 @@ if (!ttsSupported) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function updateChaseUI() {
+  const isChasing = !!gameState?.chaseState?.active;
+  const turnsLeft = gameState?.chaseState?.turnsRemaining ?? 0;
+  document.body.classList.toggle('chase-active', isChasing);
+  const bottomActEl = document.getElementById('bottom-act');
+  if (bottomActEl) {
+    bottomActEl.textContent = isChasing
+      ? `CHASE — ${turnsLeft} turn${turnsLeft !== 1 ? 's' : ''} left`
+      : `Act ${gameState?.act || 1}`;
+  }
+  const countdownEl = document.getElementById('countdown');
+  if (countdownEl) {
+    countdownEl.classList.toggle('countdown--urgent', isChasing || (gameState?.remainingMinutes ?? 0) <= 5);
+  }
+  const inputEl2 = document.getElementById('player-input');
+  if (inputEl2 && !inputEl2.disabled) {
+    inputEl2.placeholder = isChasing ? 'What do you do?' : 'What do you do next?';
+  }
+}
+
 function renderSidebar() {
   document.getElementById('objective').textContent = scenario.goal;
   document.getElementById('location').textContent = prettifyId(gameState.location);
@@ -180,6 +201,7 @@ function syncArrows() {
 }
 
 function renderChoices(choices = []) {
+  if (choices.length > 0) lastChoices = choices;
   choicesEl.innerHTML = '';
   for (const choice of choices) {
     const btn = document.createElement('button');
@@ -339,6 +361,13 @@ function startGame(roleId, narrativeStyle) {
     gameState.location = role.startLocation;
     gameState.visitedLocations = [role.startLocation];
   }
+  // Pre-mark NPCs in the opening scene as introduced so the first turn
+  // doesn't re-introduce characters already described in the role opening.
+  const startLoc = locationsList.find((l) => l.id === gameState.location);
+  gameState.introducedNpcs = (startLoc?.linkedNPCs || []).filter(
+    (id) => id !== gameState.playerRoleId
+  );
+
   conversationHistory = [];
   locationFeed = [];
   feedLocationId = null;
@@ -423,10 +452,22 @@ function showTimeDecision() {
     gameState.timeExpired = false;
     gameState.flags = gameState.flags || {};
     gameState.flags.overtime = true;
-    choicesEl.innerHTML = '';
+
+    // Inject a brief overtime narrative beat into the feed
+    const overtimeEl = document.createElement('div');
+    overtimeEl.className = 'feed-entry';
+    const sceneEl = document.createElement('div');
+    sceneEl.className = 'scene-card';
+    sceneEl.innerHTML = `<p><span class="line"><em>*Five minutes. The exposition opens at dawn — there is no more room for error.*</em></span></p>`;
+    overtimeEl.appendChild(sceneEl);
+    storyEl.appendChild(overtimeEl);
+    storyEl.scrollTop = storyEl.scrollHeight;
+
+    renderSidebar();
+    updateChaseUI();
     inputEl.disabled = false;
     formEl.querySelector('button[type="submit"]').disabled = false;
-    renderSidebar();
+    renderChoices(lastChoices); // restore the choices from before time ran out
   });
 
   const concludeBtn = document.createElement('button');
@@ -515,6 +556,7 @@ async function submitTurn(playerInput) {
     }
 
     renderSidebar();
+    updateChaseUI();
     renderOutput(data.output, { mockMode: data.mockMode, playerInput });
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {

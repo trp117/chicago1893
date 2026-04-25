@@ -1,6 +1,9 @@
 Discovered clues:
 {{DISCOVERED_CLUES_JSON}}
 
+Characters met so far (use publicFace to write a brief first-person impression for each):
+{{INTRODUCED_NPCS_JSON}}
+
 NPC suspicion levels (higher score = more suspicious):
 {{SUSPICION_JSON}}
 

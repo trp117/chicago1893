@@ -155,6 +155,10 @@
       "emile_mercier": 1,
       "patrick_hanrahan": 0,
       "captain_odonnell": 0
-    }
+    },
+    "introducedNpcs": [],
+    "escapedNpcs": [],
+    "chaseState": null,
+    "physicalConflicts": []
   }
 }

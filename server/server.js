@@ -110,10 +110,16 @@ function checkEndingReadiness(state) {
     ids.includes('tampered_wiring_diagrams') ||
     ids.includes('opening_night_note');
   const hasConspirators = (state.namedConspirators || []).length >= 2;
+  const escapedNpcs = state.escapedNpcs || [];
+  const mercierEscaped = escapedNpcs.includes('emile_mercier');
+  const hasConsequentialInfo = hasMethod || hasKeyEvidence;
 
   return {
     keyEvidenceFound: hasKeyEvidence,
-    readyForClimax: hasMethod || (hasKeyEvidence && hasConspirators)
+    readyForClimax: hasMethod || (hasKeyEvidence && hasConspirators),
+    mercierEscaped,
+    partialVictoryPossible: mercierEscaped && hasConsequentialInfo,
+    failureRisk: mercierEscaped && !hasConsequentialInfo && ids.length < 2
   };
 }
 
@@ -123,7 +129,8 @@ function slimNpc(npc) {
     name: npc.name,
     voice: npc.voice,
     goal: npc.privateGoal,
-    knowledge: npc.knowledge
+    knowledge: npc.knowledge,
+    aggressionProfile: npc.aggressionProfile || null
   };
 }
 
@@ -185,6 +192,46 @@ function buildNpcRoutes() {
   });
 }
 
+function buildNpcIntroInstruction(state, location, playerInput = '') {
+  const introduced = state.introducedNpcs || [];
+  const playerRoleId = state.playerRoleId || 'burnhams_assistant';
+
+  // Check current location for un-introduced NPCs
+  const linkedNpcs = location?.linkedNPCs || [];
+  let newNpcs = linkedNpcs
+    .filter((id) => !introduced.includes(id) && id !== playerRoleId)
+    .map((id) => npcs.find((n) => n.id === id))
+    .filter(Boolean);
+
+  // On movement turns, also check if the player is heading toward an un-introduced NPC
+  if (newNpcs.length === 0 && MOVEMENT_RE.test(playerInput)) {
+    const inputLower = playerInput.toLowerCase();
+    for (const npc of npcs) {
+      if (introduced.includes(npc.id) || npc.id === playerRoleId) continue;
+      const lastName = npc.name.split(' ').pop().toLowerCase();
+      const firstName = npc.name.split(' ')[0].toLowerCase();
+      if (inputLower.includes(lastName) || inputLower.includes(firstName)) {
+        const npcLocs = getNpcLocations(npc.id);
+        if (npcLocs.length > 0) newNpcs.push(npc);
+      }
+    }
+  }
+
+  if (newNpcs.length === 0) return '';
+
+  const names = newNpcs.map((n) => n.name).join(' and ');
+  return `First encounter this session: ${names}. Apply the first encounter introduction rule from the system prompt.`;
+}
+
+function buildChaseInstruction(state) {
+  if (!state.chaseState?.active) return '';
+  const { npcId, turnsRemaining } = state.chaseState;
+  const npc = npcs.find((n) => n.id === npcId);
+  const name = npc?.name || npcId;
+  const chaseStyle = npc?.aggressionProfile?.chaseStyle || 'panicked and unpredictable';
+  return `⚠️ CHASE IN PROGRESS — ${name} is fleeing. ${turnsRemaining} turn(s) remaining before escape is guaranteed regardless of player action. Chase style: ${chaseStyle}. This turn: present exactly 2 pursuit choices specific to the current location. Narrative must be short and kinetic — no dialogue, no reflection. Signal resolution via chaseResolved when the chase ends.`;
+}
+
 function buildPlayerRoleSection(state) {
   const roleId = state.playerRoleId || state.playerRole || 'burnhams_assistant';
   const roleName = state.playerRoleName || "Burnham's Assistant";
@@ -243,6 +290,10 @@ function composeTurnPrompt(state, playerInput) {
     .replace('{{ENDING_SIGNALS_JSON}}', JSON.stringify(endingSignals))
     .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location, state))
     .replace('{{PREV_CONTEXT}}', '')
+    .replace('{{NPC_INTRO_INSTRUCTION}}', [
+      buildNpcIntroInstruction(state, location, playerInput),
+      buildChaseInstruction(state)
+    ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}', state.narrativeStyle || 'focused')
     .replace('{{PLAYER_INPUT}}', resolvedInput + finalAccusationNote);
 }
@@ -309,6 +360,74 @@ function mergeState(currentState, modelOutput, playerInput = '') {
   if (Array.isArray(modelOutput.npcMoments) && modelOutput.npcMoments.length > 0) {
     const last = modelOutput.npcMoments[modelOutput.npcMoments.length - 1];
     if (last?.npc) next.targetNpc = last.npc;
+
+    next.introducedNpcs = next.introducedNpcs || [];
+    for (const moment of modelOutput.npcMoments) {
+      if (moment?.npc && !next.introducedNpcs.includes(moment.npc)) {
+        next.introducedNpcs.push(moment.npc);
+      }
+    }
+  }
+
+  // ── Chase and physical conflict state ──────────────────────────────────────
+
+  if (modelOutput.chaseResolved?.npcId) {
+    // Chase ended this turn — process outcome before anything else
+    const { npcId, result, clueGained } = modelOutput.chaseResolved;
+    next.chaseState = null;
+    if (result !== 'capture') {
+      next.escapedNpcs = [...(next.escapedNpcs || []), npcId];
+      next.threat = Math.min(10, next.threat + 2);
+    } else {
+      next.threat = Math.min(10, next.threat + 1);
+      next.burnhamTrust = Math.max(-3, next.burnhamTrust - 1);
+    }
+    if (clueGained && typeof clueGained === 'string') {
+      const clue = getClueById(clueGained);
+      if (clue && !(next.discoveredClueIds || []).includes(clueGained)) {
+        next.discoveredClueIds = next.discoveredClueIds || [];
+        next.discoveredClueIds.push(clueGained);
+        for (const nid of clue.implicates || []) {
+          next.suspicion[nid] = (next.suspicion[nid] || 0) + 1;
+        }
+      }
+    }
+    next.physicalConflicts = [...(next.physicalConflicts || []), { npcId, result, turn: next.elapsedMinutes }];
+  } else if (modelOutput.chaseInitiated?.npcId) {
+    // New chase started this turn
+    next.chaseState = { active: true, npcId: modelOutput.chaseInitiated.npcId, turnsRemaining: 3 };
+  } else if (next.chaseState?.active) {
+    // Chase ongoing — decrement turns
+    const turnsLeft = next.chaseState.turnsRemaining - 1;
+    if (turnsLeft <= 0) {
+      // Hard cap: force escape
+      const npcId = next.chaseState.npcId;
+      next.chaseState = null;
+      next.escapedNpcs = [...(next.escapedNpcs || []), npcId];
+      next.threat = Math.min(10, next.threat + 2);
+      next.physicalConflicts = [...(next.physicalConflicts || []), { npcId, result: 'escape_timeout', turn: next.elapsedMinutes }];
+    } else {
+      next.chaseState = { ...next.chaseState, turnsRemaining: turnsLeft };
+    }
+  }
+
+  // NPC fled without a chase sequence
+  if (typeof modelOutput.npcFled === 'string' && modelOutput.npcFled) {
+    next.escapedNpcs = next.escapedNpcs || [];
+    if (!next.escapedNpcs.includes(modelOutput.npcFled)) {
+      next.escapedNpcs = [...next.escapedNpcs, modelOutput.npcFled];
+      next.threat = Math.min(10, next.threat + 1);
+    }
+  }
+
+  // Physical conflict tracking
+  if (modelOutput.physicalConflict?.npcId) {
+    next.physicalConflicts = [...(next.physicalConflicts || []), { ...modelOutput.physicalConflict, turn: next.elapsedMinutes }];
+    if (modelOutput.physicalConflict.type === 'npc_struck_first') {
+      const npcId = modelOutput.physicalConflict.npcId;
+      next.suspicion[npcId] = (next.suspicion[npcId] || 0) + 2;
+      next.burnhamTrust = Math.max(-3, next.burnhamTrust - 1);
+    }
   }
 
   if (Array.isArray(modelOutput.newClues)) {
@@ -361,13 +480,13 @@ function buildMockNotes(state, discoveredClues, suspicionContext) {
         : 'Something in their behavior has not sat right with me.'
   }));
 
-  const impressions = suspicionContext.slice(0, 3).map(({ name, score }) => ({
-    name,
-    impression:
-      score > 1
-        ? 'Evasive when pressed. I should return to them with harder questions.'
-        : 'Hard to read so far. Either uninvolved or very careful.'
-  }));
+  const impressions = (state.introducedNpcs || [])
+    .map((id) => {
+      const npc = npcs.find((n) => n.id === id);
+      if (!npc) return null;
+      return { name: npc.name, impression: npc.publicFace };
+    })
+    .filter(Boolean);
 
   const openQuestions = [
     !state.knownSabotageMethod &&
@@ -427,8 +546,16 @@ app.post('/api/notes', async (req, res) => {
       });
     }
 
+    const introducedNpcsContext = (state.introducedNpcs || [])
+      .map((id) => {
+        const npc = npcs.find((n) => n.id === id);
+        return npc ? { name: npc.name, role: npc.role, publicFace: npc.publicFace } : null;
+      })
+      .filter(Boolean);
+
     const prompt = notesTemplate
       .replace('{{DISCOVERED_CLUES_JSON}}', JSON.stringify(discoveredClues))
+      .replace('{{INTRODUCED_NPCS_JSON}}', JSON.stringify(introducedNpcsContext))
       .replace('{{SUSPICION_JSON}}', JSON.stringify(suspicionContext))
       .replace(
         '{{NAMED_CONSPIRATORS}}',

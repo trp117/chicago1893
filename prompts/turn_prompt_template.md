@@ -33,6 +33,8 @@ Player input:
 
 ⚠️ DIALOGUE CHECK (applies before generating): If any NPC appears in this scene, their spoken words MUST appear in the narrative as quoted dialogue — e.g. Burnham: "Get to the point." Body language alone (*he looks up*, *his jaw tightens*) is not acceptable. At minimum one spoken line is required.
 
+{{NPC_INTRO_INSTRUCTION}}
+
 Instructions:
 - Stay grounded in the current act and elapsed time.
 - Update only the state fields that actually change this turn.
