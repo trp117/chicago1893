@@ -75,10 +75,10 @@ const SVG_PLAY_ICON = `<svg width="10" height="10" viewBox="0 0 10 10" fill="cur
 
 function updateTtsBarUI() {
   if (ttsEnabled) {
-    ttsStopBtn.innerHTML = `${SVG_STOP_ICON} Stop reading`;
+    ttsStopBtn.innerHTML = `${SVG_STOP_ICON} Mute narration`;
     ttsStopBtn.classList.add('active');
   } else {
-    ttsStopBtn.innerHTML = `${SVG_PLAY_ICON} Start reading`;
+    ttsStopBtn.innerHTML = `${SVG_PLAY_ICON} Unmute narration`;
     ttsStopBtn.classList.remove('active');
   }
 }
@@ -305,7 +305,7 @@ function renderOutput(output, meta = {}) {
   const messageId = ++currentMessageId;
   lastRenderedSpeakText = output.narrative;
 
-  if (ttsEnabled && audioUnlocked) {
+  if (!meta.skipTts && ttsEnabled && audioUnlocked) {
     setTimeout(() => {
       if (lastSpokenMessageId < messageId) {
         lastSpokenMessageId = messageId;
@@ -376,7 +376,7 @@ function updateLocationDisplay(locationId) {
   h1.textContent = loc ? loc.name : locationId;
 }
 
-function startGame(roleId, narrativeStyle) {
+async function startGame(roleId, narrativeStyle) {
   const role = (scenario.playerRoleOptions || []).find((r) => r.id === roleId);
   gameState = structuredClone(scenario.initialState);
   gameState.narrativeStyle = narrativeStyle || 'focused';
@@ -405,7 +405,58 @@ function startGame(roleId, narrativeStyle) {
   if (h1) h1.textContent = 'Chicago, 1893';
   renderSidebar();
   updateLocationDisplay(gameState.location);
-  renderOutput(bootstrapData.roleOpenings?.[roleId] ?? bootstrapData.opening);
+
+  const openingData = bootstrapData.roleOpenings?.[roleId] ?? bootstrapData.opening;
+
+  if (ttsEnabled && audioUnlocked) {
+    // Show loading dots while pre-fetching opening audio
+    const loadingEl = document.createElement('div');
+    loadingEl.className = 'feed-entry';
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'thinking-dots';
+    dotsEl.innerHTML = '<span></span><span></span><span></span>';
+    loadingEl.appendChild(dotsEl);
+    storyEl.appendChild(loadingEl);
+    storyEl.scrollTop = storyEl.scrollHeight;
+
+    // Pre-fetch audio
+    let audioBlobUrl = null;
+    try {
+      const resp = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: openingData.narrative })
+      });
+      if (resp.ok) {
+        const blob = await resp.blob();
+        audioBlobUrl = URL.createObjectURL(blob);
+      }
+    } catch {}
+
+    // Dots gone — render scene and play audio simultaneously
+    loadingEl.remove();
+    renderOutput(openingData, { skipTts: true });
+
+    if (audioBlobUrl && audioEl) {
+      const url = audioBlobUrl;
+      audioEl.src = url;
+      audioEl.playbackRate = 1.15;
+      audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
+      audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(openingData.narrative); };
+      currentAudio = audioEl;
+      try {
+        await audioEl.play();
+        setTtsSpeaking(true);
+      } catch (err) {
+        console.warn('[TTS] opening play() failed:', err?.message);
+        ttsSpeakFallback(openingData.narrative);
+      }
+    } else {
+      ttsSpeakFallback(openingData.narrative);
+    }
+  } else {
+    renderOutput(openingData);
+  }
 }
 
 function renderEnding(endState) {
