@@ -1006,6 +1006,7 @@ li {
     font-size: 0.75rem;
   }
 
+
   /* ── Story: hide scrollbar on mobile ── */
   .story-feed {
     scrollbar-width: none;
@@ -1268,5 +1269,9 @@ li {
   .role-overlay {
     align-items: flex-start;
     padding: 20px 16px;
+  }
+
+  .autotest-btn {
+    display: none;
   }
 }

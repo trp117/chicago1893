@@ -40,6 +40,12 @@ function prepareForTts(text) {
     .replace(/\[(.+?)\]\(.+?\)/g, '$1')
     .replace(/`(.+?)`/g, '$1')
     .replace(/[_~]/g, '')
+    // NPC dialogue: "Name: "speech"" → "Name says/asks/exclaims, speech"
+    .replace(/^([A-Z][^:\n]{0,25}):\s*["""'](.+?)["""']\s*$/gm, (_, name, speech) => {
+      const trimmed = speech.trim();
+      const verb = trimmed.endsWith('!') ? 'exclaims' : trimmed.endsWith('?') ? 'asks' : 'says';
+      return `${name} ${verb}, ${trimmed}`;
+    })
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -826,7 +832,8 @@ app.post('/api/tts', async (req, res) => {
         body: JSON.stringify({
           text: cleaned,
           model_id: 'eleven_turbo_v2_5',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+          speed: 1.15
         })
       }
     );
