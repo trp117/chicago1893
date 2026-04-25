@@ -24,19 +24,18 @@ const ttsStopBtn = document.getElementById('tts-stop');
 // ── TTS ──────────────────────────────────────────────────────────────────────
 
 const synth = window.speechSynthesis;
-const ttsSupported = !!synth;
+const ttsSupported = true; // Audio element always available; Web Speech API is fallback only
 
 let ttsEnabled = localStorage.getItem('readAloudOn') === 'true';
 let audioUnlocked = false;
+let currentAudio = null;
 
 function setTtsEnabled(val) {
   ttsEnabled = val;
   localStorage.setItem('readAloudOn', String(val));
 }
-let hasSpokenIntro = false;
 let lastSpokenMessageId = 0;
 let currentMessageId = 0;
-let introText = null;
 let lastRenderedSpeakText = '';
 
 const SVG_SPEAKER_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -87,8 +86,8 @@ function setTtsSpeaking(_on) {
   // bar is always visible; state communicated via updateTtsBarUI
 }
 
-function ttsSpeakRaw(text) {
-  if (!ttsSupported) return;
+function ttsSpeakFallback(text) {
+  if (!synth) return;
   synth.cancel();
   const utt = new SpeechSynthesisUtterance(cleanForSpeech(text));
   utt.rate = 0.95;
@@ -98,9 +97,34 @@ function ttsSpeakRaw(text) {
   setTtsSpeaking(true);
 }
 
+async function ttsSpeak(text) {
+  if (!ttsEnabled) return;
+  ttsStop();
+  try {
+    const response = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!response.ok) {
+      ttsSpeakFallback(text);
+      return;
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
+    currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(text); };
+    await currentAudio.play();
+    setTtsSpeaking(true);
+  } catch {
+    ttsSpeakFallback(text);
+  }
+}
+
 function ttsStop() {
-  if (!ttsSupported) return;
-  synth.cancel();
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  if (synth) synth.cancel();
   setTtsSpeaking(false);
 }
 
@@ -124,7 +148,7 @@ if (!ttsSupported) {
     if (!ttsEnabled) {
       ttsStop();
     } else if (audioUnlocked && lastRenderedSpeakText) {
-      ttsSpeakRaw(lastRenderedSpeakText);
+      ttsSpeak(lastRenderedSpeakText);
     }
     updateTtsBarUI();
     updateTtsToggleUI();
@@ -153,23 +177,7 @@ function updateChaseUI() {
   }
 }
 
-function renderSidebar() {
-  document.getElementById('objective').textContent = scenario.goal;
-  document.getElementById('location').textContent = prettifyId(gameState.location);
-  document.getElementById('act').textContent = `Act ${gameState.act}`;
-  document.getElementById('elapsed').textContent = `${gameState.elapsedMinutes} min`;
-  document.getElementById('remaining').textContent = `${gameState.remainingMinutes} min`;
-  document.getElementById('threat').textContent = String(gameState.threat);
-  document.getElementById('trust').textContent = String(gameState.burnhamTrust);
-
-  document.getElementById('bottom-act').textContent = `Act ${gameState.act}`;
-  const mins = gameState.remainingMinutes;
-  const countdownEl = document.getElementById('countdown');
-  if (countdownEl) {
-    countdownEl.textContent = `${String(mins).padStart(2, '0')}:00`;
-    countdownEl.classList.toggle('countdown--urgent', mins <= 5);
-  }
-
+function renderSidebarClues() {
   const cluesEl = document.getElementById('clues');
   cluesEl.innerHTML = '';
   const discoveredIds = gameState.discoveredClueIds || [];
@@ -187,6 +195,26 @@ function renderSidebar() {
       cluesEl.appendChild(li);
     }
   }
+}
+
+function renderSidebar({ includeClues = true } = {}) {
+  document.getElementById('objective').textContent = scenario.goal;
+  document.getElementById('location').textContent = prettifyId(gameState.location);
+  document.getElementById('act').textContent = `Act ${gameState.act}`;
+  document.getElementById('elapsed').textContent = `${gameState.elapsedMinutes} min`;
+  document.getElementById('remaining').textContent = `${gameState.remainingMinutes} min`;
+  document.getElementById('threat').textContent = String(gameState.threat);
+  document.getElementById('trust').textContent = String(gameState.burnhamTrust);
+
+  document.getElementById('bottom-act').textContent = `Act ${gameState.act}`;
+  const mins = gameState.remainingMinutes;
+  const countdownEl = document.getElementById('countdown');
+  if (countdownEl) {
+    countdownEl.textContent = `${String(mins).padStart(2, '0')}:00`;
+    countdownEl.classList.toggle('countdown--urgent', mins <= 5);
+  }
+
+  if (includeClues) renderSidebarClues();
 }
 
 function prettifyId(id) {
@@ -232,13 +260,7 @@ function markupNarrative(text) {
 function renderOutput(output, meta = {}) {
   const narrativeHtml = markupNarrative(output.narrative);
   let html = `<p>${narrativeHtml}</p>`;
-  const speakParts = [output.narrative];
 
-  if (Array.isArray(output.npcMoments)) {
-    for (const npcMoment of output.npcMoments) {
-      speakParts.push(`${prettifyId(npcMoment.npc)} says: ${npcMoment.text}`);
-    }
-  }
   if (meta.mockMode) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
@@ -275,16 +297,13 @@ function renderOutput(output, meta = {}) {
   renderChoices(output.choices || []);
 
   const messageId = ++currentMessageId;
-  const speakText = speakParts.join(' ');
-  lastRenderedSpeakText = speakText;
+  lastRenderedSpeakText = output.narrative;
 
-  if (!hasSpokenIntro) {
-    introText = speakText;
-  } else if (ttsEnabled && audioUnlocked) {
+  if (ttsEnabled && audioUnlocked) {
     setTimeout(() => {
       if (lastSpokenMessageId < messageId) {
         lastSpokenMessageId = messageId;
-        ttsSpeakRaw(speakText);
+        ttsSpeak(output.narrative);
       }
     }, 300);
   }
@@ -332,7 +351,6 @@ function showRoleSelection() {
   roleBeginBtn.addEventListener('click', () => {
     if (!selectedRoleId) return;
     audioUnlocked = true;
-    hasSpokenIntro = true;
     updateTtsToggleUI();
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
@@ -555,9 +573,10 @@ async function submitTurn(playerInput) {
       conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS * 2);
     }
 
-    renderSidebar();
+    renderSidebar({ includeClues: false });
     updateChaseUI();
     renderOutput(data.output, { mockMode: data.mockMode, playerInput });
+    renderSidebarClues(); // update clues after narrative so reveal lands first
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
       gameState.timeExpired = true;
@@ -640,7 +659,7 @@ if (!SpeechRecognition) {
     },
     'start reading': () => {
       setTtsEnabled(true);
-      if (audioUnlocked && lastRenderedSpeakText) ttsSpeakRaw(lastRenderedSpeakText);
+      if (audioUnlocked && lastRenderedSpeakText) ttsSpeak(lastRenderedSpeakText);
       updateTtsBarUI();
       updateTtsToggleUI();
     },

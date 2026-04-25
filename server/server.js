@@ -21,6 +21,8 @@ const API_KEY = process.env.ANTHROPIC_API_KEY;
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
 const MAX_HISTORY_MESSAGES = 8; // 4 turns × 2 (user + assistant)
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'onwK4e9ZLuTAKqWW03F9';
 
 function readText(filePath) {
   return fs.readFileSync(path.join(rootDir, filePath), 'utf8');
@@ -28,6 +30,18 @@ function readText(filePath) {
 
 function readJson(filePath) {
   return JSON.parse(readText(filePath));
+}
+
+function prepareForTts(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/#+\s*/g, '')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/[_~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 const systemPrompt = readText('prompts/system_prompt.md');
@@ -787,6 +801,49 @@ app.post('/api/turn', async (req, res) => {
   } catch (error) {
     console.error('[ERROR] /api/turn failed:', error.message, error.stack);
     return res.status(500).json({ error: error.message || 'Server error' });
+  }
+});
+
+app.post('/api/tts', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) return res.status(400).json({ error: 'Missing text.' });
+
+    if (!ELEVENLABS_API_KEY) {
+      return res.status(503).json({ error: 'TTS not configured.' });
+    }
+
+    const cleaned = prepareForTts(text);
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': ELEVENLABS_API_KEY
+        },
+        body: JSON.stringify({
+          text: cleaned,
+          model_id: 'eleven_turbo_v2_5',
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('[TTS] ElevenLabs error:', response.status, errText);
+      return res.status(502).json({ error: 'TTS upstream error.' });
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    res.set('Content-Type', 'audio/mpeg');
+    res.set('Cache-Control', 'no-store');
+    res.send(Buffer.from(audioBuffer));
+  } catch (error) {
+    console.error('[TTS] Error:', error.message);
+    res.status(500).json({ error: error.message || 'TTS error.' });
   }
 });
 

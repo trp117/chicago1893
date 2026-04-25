@@ -1,70 +1,53 @@
-I want to add very small instructional text to the existing intro/start screen to improve clarity. These should be minimal UI changes only — do NOT redesign or restructure the page.
+The time extension feature is not working correctly.
+
+Current behavior:
+- The countdown reaches 0:00
+- The game continues normally
+- No extension decision appears
+- No overtime consequences are applied
 
 Goal:
-- Help users understand what to do
-- Keep the screen clean and uncluttered
-- Preserve current layout, styling, and logic
+Create a proper time-extension/overtime system.
 
-Do NOT:
-- Change layout structure
-- Add new sections or containers
-- Modify backend or game logic
-- Change role cards or their functionality
-- Increase vertical spacing significantly
+Expected behavior:
+When gameState.remainingMinutes <= 0 and the player has not already used an extension:
+1. Pause normal gameplay
+2. Show a clear decision panel:
+   - Continue investigating (+5 minutes, harder conditions)
+   - Make final accusation
+3. Do not send another normal AI turn until the player chooses one option
 
----
+If player chooses Continue Investigating:
+- Set remainingMinutes to 5
+- Set extensionUsed = true
+- Set timeExpired = false
+- Resume normal play
+- Add an overtime/pressure flag if available, such as:
+  stateChanges.flags.overtime = true
+  or gameState.flags.overtime = true
+- Future turns should feel more urgent and less forgiving
 
-### 1. Add instruction above role selection
+If player chooses Make Final Accusation:
+- Re-enable the input
+- Change placeholder to:
+  “Name your suspect and state your case…”
+- The next user input should be treated as a solve attempt / final conclusion
 
-Add this single line directly ABOVE the role cards:
+Important requirements:
+- Only allow one extension for now
+- Do not reset the investigation
+- Do not erase clues
+- Do not restart the game
+- Do not change unrelated game logic
+- Keep the implementation minimal and safe
 
-"Select your role to begin the investigation."
+Likely files:
+- src/app.js
+- server/server.js only if time logic is server-side
+- data/scenario.json only if initial state needs extensionUsed/timeExpired/flags initialized
 
-Requirements:
-- Use subtle styling (secondary text color)
-- Smaller than headers
-- Keep spacing tight (minimal margin)
-
----
-
-### 2. Add clarification under Narrative Style
-
-Under the "NARRATIVE STYLE" label or buttons, add:
-
-"Focused = faster | Cinematic = more descriptive"
-
-Requirements:
-- Small font
-- Subtle/secondary styling
-- Keep inline and compact (no wrapping if possible)
-
----
-
-### 3. Optional (only if it fits cleanly)
-
-If spacing allows WITHOUT pushing content down significantly, add a small line above the Start button:
-
-"When ready, begin."
-
-If it creates clutter or pushes the button down too much, SKIP this step.
-
----
-
-### Technical notes
-
-- Likely files:
-  - src/index.html
-  - src/app.js (if rendered dynamically)
-  - src/styles.css (for subtle text styling)
-
-- Prefer reusing existing typography classes if available
-- Do NOT create large new CSS blocks — keep changes minimal
-
----
-
-### Output format
-
-Return:
-1. Files changed
-2. Exact code snippets (minimal diffs preferred)
-3. Any new CSS classes (if added)
+Please return:
+1. Exact files changed
+2. Explanation of why the previous logic failed
+3. Updated code snippets
+4. How to test it quickly by forcing remainingMinutes to 0
