@@ -38,6 +38,8 @@ function setTtsEnabled(val) {
 let lastSpokenMessageId = 0;
 let currentMessageId = 0;
 let lastRenderedSpeakText = '';
+let pendingTeleprompterEl = null;
+let teleprompterRafId = null;
 
 const SVG_SPEAKER_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
   <path d="M2 6h2l4-4v12l-4-4H2z"/>
@@ -122,6 +124,7 @@ async function ttsSpeak(text) {
     currentAudio = audioEl;
     await audioEl.play();
     setTtsSpeaking(true);
+    if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
   } catch (err) {
     console.warn('[TTS] play() failed, falling back:', err?.message);
     ttsSpeakFallback(text);
@@ -129,9 +132,30 @@ async function ttsSpeak(text) {
 }
 
 function ttsStop() {
+  cancelAnimationFrame(teleprompterRafId);
+  teleprompterRafId = null;
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
   if (synth) synth.cancel();
   setTtsSpeaking(false);
+}
+
+function startTeleprompter(sceneEl) {
+  if (!sceneEl || !audioEl || !audioEl.duration || !isFinite(audioEl.duration)) return;
+  cancelAnimationFrame(teleprompterRafId);
+
+  const startScroll = storyEl.scrollTop;
+  const feedRect = storyEl.getBoundingClientRect();
+  const entryEl = sceneEl.closest('.feed-entry') || sceneEl;
+  const entryRect = entryEl.getBoundingClientRect();
+  const scrollDistance = Math.max(0, entryRect.bottom - feedRect.bottom + 16);
+  const duration = audioEl.duration;
+
+  function tick() {
+    if (!audioEl || audioEl.paused || audioEl.ended) { teleprompterRafId = null; return; }
+    storyEl.scrollTop = startScroll + (audioEl.currentTime / duration) * scrollDistance;
+    teleprompterRafId = requestAnimationFrame(tick);
+  }
+  teleprompterRafId = requestAnimationFrame(tick);
 }
 
 if (!ttsSupported) {
@@ -299,7 +323,15 @@ function renderOutput(output, meta = {}) {
     storyEl.appendChild(entryEl);
   }
 
-  storyEl.scrollTop = storyEl.scrollHeight;
+  // Scroll to show top of new scene card, then teleprompter takes over
+  pendingTeleprompterEl = sceneEl;
+  requestAnimationFrame(() => {
+    const newScrollTop = sceneEl.getBoundingClientRect().top
+      - storyEl.getBoundingClientRect().top
+      + storyEl.scrollTop - 8;
+    storyEl.scrollTop = Math.max(0, newScrollTop);
+  });
+
   renderChoices(output.choices || []);
 
   const messageId = ++currentMessageId;
@@ -327,7 +359,13 @@ async function loadGame() {
 function showRoleSelection() {
   const roleOverlay = document.getElementById('role-overlay');
   const roleCardsEl = document.getElementById('role-cards');
-  const roleBeginBtn = document.getElementById('role-begin-btn');
+
+  // Clear cards and clone begin button to remove stale event listeners on re-use
+  roleCardsEl.innerHTML = '';
+  const oldBeginBtn = document.getElementById('role-begin-btn');
+  const roleBeginBtn = oldBeginBtn.cloneNode(true);
+  oldBeginBtn.replaceWith(roleBeginBtn);
+  roleBeginBtn.disabled = true;
 
   let selectedRoleId = null;
   let selectedStyle = 'focused';
@@ -366,6 +404,27 @@ function showRoleSelection() {
     roleOverlay.classList.add('hidden');
     startGame(selectedRoleId, selectedStyle);
   });
+}
+
+function restartGame() {
+  ttsStop();
+  gameState = null;
+  audioUnlocked = false;
+  audioEl = null;
+  conversationHistory = [];
+  locationFeed = [];
+  feedLocationId = null;
+  pendingEntryEl = null;
+  pendingTeleprompterEl = null;
+  lastChoices = [];
+  submitting = false;
+  storyEl.innerHTML = '';
+  renderChoices([]);
+  locationShowing = false;
+  const h1 = document.getElementById('header-title');
+  if (h1) h1.textContent = 'Chicago, 1893';
+  document.getElementById('role-overlay').classList.remove('hidden');
+  showRoleSelection();
 }
 
 function updateLocationDisplay(locationId) {
@@ -447,6 +506,7 @@ async function startGame(roleId, narrativeStyle) {
       try {
         await audioEl.play();
         setTtsSpeaking(true);
+        if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
       } catch (err) {
         console.warn('[TTS] opening play() failed:', err?.message);
         ttsSpeakFallback(openingData.narrative);
@@ -504,6 +564,14 @@ function renderEnding(endState) {
   const card = document.createElement('div');
   card.className = `ending-card ending-card--${result}`;
   card.innerHTML = `<div class="ending-header"><span class="ending-result ending-result--${result}">${resultLabel}</span></div>${sections.join('')}`;
+
+  const playAgainBtn = document.createElement('button');
+  playAgainBtn.type = 'button';
+  playAgainBtn.className = 'play-again-btn';
+  playAgainBtn.textContent = 'New Game';
+  playAgainBtn.addEventListener('click', restartGame);
+  card.appendChild(playAgainBtn);
+
   storyEl.appendChild(card);
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -944,6 +1012,7 @@ function renderNotes(notes) {
     : '<p class="notes-empty">Nothing to report yet. Keep investigating.</p>';
 }
 
+document.getElementById('new-game-btn').addEventListener('click', restartGame);
 notesBtn.addEventListener('click', openNotes);
 notesCloseBtn.addEventListener('click', closeNotes);
 notesOverlay.addEventListener('click', (e) => { if (e.target === notesOverlay) closeNotes(); });

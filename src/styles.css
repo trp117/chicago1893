@@ -608,6 +608,24 @@ li {
   background: #2a1010;
 }
 
+.new-game-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.new-game-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .notes-btn {
   height: 36px;
   padding: 0 14px;
@@ -882,6 +900,25 @@ li {
   font-size: 0.88rem;
   font-weight: bold;
   color: var(--text);
+}
+
+.play-again-btn {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 16px 20px 20px;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.play-again-btn:hover {
+  background: rgba(208, 176, 106, 0.12);
 }
 
 .begin-overlay {
