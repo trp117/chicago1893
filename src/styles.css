@@ -26,8 +26,8 @@ body {
 .app-shell {
   display: grid;
   grid-template-columns: 320px 1fr;
+  height: 100vh; /* fallback for older browsers */
   height: 100dvh;
-  height: 100vh; /* fallback */
   overflow: hidden;
 }
 
@@ -646,7 +646,7 @@ li {
 .notes-panel {
   width: 100%;
   max-width: 420px;
-  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
