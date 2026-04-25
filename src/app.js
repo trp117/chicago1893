@@ -28,6 +28,7 @@ const ttsSupported = true; // Audio element always available; Web Speech API is 
 
 let ttsEnabled = localStorage.getItem('readAloudOn') === 'true';
 let audioUnlocked = false;
+let audioEl = null;   // single reusable Audio element, unlocked on first user gesture
 let currentAudio = null;
 
 function setTtsEnabled(val) {
@@ -100,6 +101,7 @@ function ttsSpeakFallback(text) {
 async function ttsSpeak(text) {
   if (!ttsEnabled) return;
   ttsStop();
+  if (!audioEl) { ttsSpeakFallback(text); return; }
   try {
     const response = await fetch('/api/tts', {
       method: 'POST',
@@ -112,10 +114,11 @@ async function ttsSpeak(text) {
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
-    currentAudio = new Audio(url);
-    currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
-    currentAudio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(text); };
-    await currentAudio.play();
+    audioEl.src = url;
+    audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
+    audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(text); };
+    currentAudio = audioEl;
+    await audioEl.play();
     setTtsSpeaking(true);
   } catch {
     ttsSpeakFallback(text);
@@ -351,6 +354,10 @@ function showRoleSelection() {
   roleBeginBtn.addEventListener('click', () => {
     if (!selectedRoleId) return;
     audioUnlocked = true;
+    // Unlock audio for mobile (iOS requires play() inside a user gesture)
+    audioEl = new Audio();
+    audioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQAAAAA=';
+    audioEl.play().catch(() => {});
     updateTtsToggleUI();
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
