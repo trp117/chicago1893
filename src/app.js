@@ -421,6 +421,8 @@ function showTimeDecision() {
     gameState.remainingMinutes = 5;
     gameState.extensionUsed = true;
     gameState.timeExpired = false;
+    gameState.flags = gameState.flags || {};
+    gameState.flags.overtime = true;
     choicesEl.innerHTML = '';
     inputEl.disabled = false;
     formEl.querySelector('button[type="submit"]').disabled = false;
@@ -432,6 +434,7 @@ function showTimeDecision() {
   concludeBtn.className = 'choice-btn';
   concludeBtn.textContent = 'Make your final accusation — name the suspect and state your case';
   concludeBtn.addEventListener('click', () => {
+    gameState.finalAccusation = true;
     choicesEl.innerHTML = '';
     inputEl.disabled = false;
     formEl.querySelector('button[type="submit"]').disabled = false;
@@ -457,6 +460,11 @@ function buildAssistantHistoryContent(output) {
 
 async function submitTurn(playerInput) {
   if (!playerInput?.trim() || submitting) return;
+  if (gameState?.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
+    gameState.timeExpired = true;
+    showTimeDecision();
+    return;
+  }
   submitting = true;
   inputEl.value = '';
 
@@ -509,14 +517,14 @@ async function submitTurn(playerInput) {
     renderSidebar();
     renderOutput(data.output, { mockMode: data.mockMode, playerInput });
 
-    if (data.output?.endState?.isEnding) {
+    if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
+      gameState.timeExpired = true;
+      showTimeDecision();
+    } else if (data.output?.endState?.isEnding) {
       formEl.querySelector('button').disabled = true;
       inputEl.disabled = true;
       renderChoices([]);
       renderEnding(data.output.endState);
-    } else if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed) {
-      gameState.timeExpired = true;
-      showTimeDecision();
     }
   } finally {
     submitting = false;
@@ -922,5 +930,7 @@ autotestBtnEl.addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+window.__setTime = (n) => { if (gameState) { gameState.remainingMinutes = n; gameState.elapsedMinutes = 20 - n; } };
 
 loadGame();

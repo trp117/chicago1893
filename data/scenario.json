@@ -139,6 +139,8 @@
     "inventory": ["notebook", "fair credential", "shipping memorandum"],
     "discoveredClueIds": [],
     "visitedLocations": ["administration_building"],
+    "extensionUsed": false,
+    "timeExpired": false,
     "knownSabotageMethod": false,
     "namedConspirators": [],
     "targetNpc": null,

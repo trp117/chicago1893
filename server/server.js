@@ -228,6 +228,10 @@ function composeTurnPrompt(state, playerInput) {
   const refContext = buildReferenceContext(playerInput, state);
   const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
 
+  const finalAccusationNote = state.finalAccusation
+    ? '\n\n⚠️ FINAL ACCUSATION: The player has chosen to end the investigation and make their final accusation. This is their last move. You MUST return endState with isEnding: true. Evaluate as strong/partial/weak based on discovered clues, but the case ends here regardless. Do not redirect them to gather more evidence.'
+    : '';
+
   return turnTemplate
     .replace('{{PLAYER_ROLE_SECTION}}', buildPlayerRoleSection(state))
     .replace('{{STATE_JSON}}', JSON.stringify(state))
@@ -240,7 +244,7 @@ function composeTurnPrompt(state, playerInput) {
     .replace('{{LOCATION_CONSTRAINT}}', buildLocationConstraint(state.location, state))
     .replace('{{PREV_CONTEXT}}', '')
     .replace('{{NARRATIVE_STYLE}}', state.narrativeStyle || 'focused')
-    .replace('{{PLAYER_INPUT}}', resolvedInput);
+    .replace('{{PLAYER_INPUT}}', resolvedInput + finalAccusationNote);
 }
 
 const MOVEMENT_RE = /\b(go|head|return|walk|travel|back|leave|move)\b/i;
@@ -624,10 +628,25 @@ app.post('/api/turn', async (req, res) => {
     let nextState;
     try {
       nextState = mergeState(state, output, playerInput);
+      if (state.finalAccusation) nextState.remainingMinutes = 0;
       console.log('[TURN] location_final:', nextState.location);
     } catch (mergeError) {
       console.error('[ERROR] mergeState failed:', mergeError.message, mergeError.stack);
       return res.status(500).json({ error: 'Failed to merge state: ' + mergeError.message });
+    }
+
+    if (state.finalAccusation && !output.endState?.isEnding) {
+      output.endState = {
+        isEnding: true,
+        result: 'failure',
+        scene: 'Time has run out. Without a clear accusation, the investigation ends here.',
+        conspiracySummary: 'The conspiracy was never fully exposed.',
+        whatPlayerDiscovered: `${nextState.discoveredClueIds?.length || 0} clue(s) were found, but no conclusion was reached.`,
+        outcome: 'The fair opened under a cloud of unresolved suspicion.',
+        playerContribution: 'The investigation was abandoned before a suspect could be named.',
+        burnhamResponse: '"I needed a name. You gave me nothing."',
+        correctSuspectIdentified: false
+      };
     }
 
     if (output.endState?.isEnding) {
