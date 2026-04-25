@@ -1306,14 +1306,43 @@ li {
 @media (max-width: 600px) {
   .role-overlay {
     align-items: flex-start;
-    padding: 20px 16px;
+    padding: 16px 16px;
   }
 
-  .autotest-btn {
+  .role-overlay-inner {
+    gap: 10px;
+  }
+
+  .role-overlay-inner h2 {
+    font-size: 1.3rem;
+  }
+
+  .role-intro {
     display: none;
   }
 
+  .role-cards {
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .role-card {
+    padding: 10px 14px;
+  }
+
   .role-card-desc {
+    display: none;
+  }
+
+  .role-card.selected .role-card-desc {
+    display: block;
+  }
+
+  .style-selector {
+    margin-top: 4px;
+  }
+
+  .autotest-btn {
     display: none;
   }
 }
