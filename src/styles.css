@@ -902,6 +902,25 @@ li {
   color: var(--text);
 }
 
+.overlay-drive-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.overlay-drive-btn:hover,
+.overlay-drive-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .play-again-btn {
   display: block;
   width: calc(100% - 40px);

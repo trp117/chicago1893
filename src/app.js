@@ -835,6 +835,7 @@ if (!SpeechRecognition) {
   }
 
   function startRecognition() {
+    recognition.continuous = drivingMode || !isMobile;
     try { recognition.start(); } catch { /* already running */ }
   }
 
@@ -890,17 +891,15 @@ if (!SpeechRecognition) {
   };
 
   recognition.onend = () => {
-    if (isMobile) {
-      // Push-to-talk: don't auto-restart. Let the browser's natural silence detection
-      // end the session; put the transcript in the input for the user to review and send.
+    if (isMobile && !drivingMode) {
+      // Push-to-talk on mobile: don't auto-restart.
       if (listening) {
         setListening(false);
         inputEl.value = finalTranscript;
       }
       return;
     }
-    // Desktop: auto-restart keeps recognition alive through browser silence timeouts.
-    // Set postRestartDedup so the first final result of the new session is checked for re-delivery.
+    // Desktop or driving mode: auto-restart keeps recognition alive through silence timeouts.
     if (listening && !restartScheduled) {
       restartScheduled = true;
       setTimeout(() => {
@@ -923,8 +922,7 @@ if (!SpeechRecognition) {
 
   micBtn.addEventListener('click', () => {
     if (listening) {
-      // Desktop: stop and auto-submit. Mobile: stop only — user reviews and taps Send.
-      stopListening(!isMobile);
+      stopListening(drivingMode || !isMobile);
     } else {
       finalTranscript = inputEl.value.trimEnd(); // preserve any text the user typed
       setListening(true);
@@ -938,6 +936,17 @@ if (!SpeechRecognition) {
   }, { capture: true });
 
   drivingBtn.addEventListener('click', () => setDrivingMode(!drivingMode));
+
+  // Overlay drive button on role selection screen — sets flag without starting mic yet
+  const overlayDriveBtn = document.getElementById('overlay-drive-btn');
+  if (overlayDriveBtn) {
+    overlayDriveBtn.addEventListener('click', () => {
+      drivingMode = !drivingMode;
+      drivingBtn.classList.toggle('active', drivingMode);
+      overlayDriveBtn.classList.toggle('active', drivingMode);
+      overlayDriveBtn.textContent = drivingMode ? '🚗 Drive: On' : '🚗 Drive';
+    });
+  }
 }
 
 // ── Case Notes ───────────────────────────────────────────────────────────────
