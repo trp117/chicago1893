@@ -1312,4 +1312,8 @@ li {
   .autotest-btn {
     display: none;
   }
+
+  .role-card-desc {
+    display: none;
+  }
 }

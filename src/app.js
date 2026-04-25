@@ -26,7 +26,7 @@ const ttsStopBtn = document.getElementById('tts-stop');
 const synth = window.speechSynthesis;
 const ttsSupported = true; // Audio element always available; Web Speech API is fallback only
 
-let ttsEnabled = localStorage.getItem('readAloudOn') === 'true';
+let ttsEnabled = localStorage.getItem('readAloudOn') !== 'false';
 let audioUnlocked = false;
 let audioEl = null;   // single reusable Audio element, unlocked on first user gesture
 let currentAudio = null;
