@@ -109,18 +109,21 @@ async function ttsSpeak(text) {
       body: JSON.stringify({ text })
     });
     if (!response.ok) {
+      console.warn('[TTS] server error', response.status, '— falling back to Web Speech');
       ttsSpeakFallback(text);
       return;
     }
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     audioEl.src = url;
+    audioEl.playbackRate = 1.15;
     audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
-    audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(text); };
+    audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; console.warn('[TTS] audio error, falling back'); ttsSpeakFallback(text); };
     currentAudio = audioEl;
     await audioEl.play();
     setTtsSpeaking(true);
-  } catch {
+  } catch (err) {
+    console.warn('[TTS] play() failed, falling back:', err?.message);
     ttsSpeakFallback(text);
   }
 }
