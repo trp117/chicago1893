@@ -523,7 +523,7 @@ function renderEnding(endState) {
   const result = endState.result || 'failure';
   const perf = endState.performance || {};
 
-  const resultLabel = { success: 'SUCCESS', partial: 'PARTIAL SUCCESS', failure: 'FAILURE' }[result] || result.toUpperCase();
+  const resultLabel = { success: 'CASE CLOSED', partial: 'INCOMPLETE', failure: 'CASE UNSOLVED' }[result] || result.toUpperCase();
 
   const sections = [];
 
@@ -532,7 +532,7 @@ function renderEnding(endState) {
   }
 
   if (endState.conspiracySummary) {
-    sections.push(`<section class="ending-section"><h3>The Conspiracy</h3><p>${endState.conspiracySummary}</p></section>`);
+    sections.push(`<section class="ending-section"><h3>The Hidden Plot</h3><p>${endState.conspiracySummary}</p></section>`);
   }
 
   if (endState.whatPlayerDiscovered) {
@@ -540,11 +540,11 @@ function renderEnding(endState) {
   }
 
   if (endState.outcome) {
-    sections.push(`<section class="ending-section"><h3>Outcome</h3><p>${endState.outcome}</p></section>`);
+    sections.push(`<section class="ending-section"><h3>The Aftermath</h3><p>${endState.outcome}</p></section>`);
   }
 
   if (endState.playerContribution) {
-    sections.push(`<section class="ending-section"><h3>Your Role</h3><p>${endState.playerContribution}</p></section>`);
+    sections.push(`<section class="ending-section"><h3>Your Part in It</h3><p>${endState.playerContribution}</p></section>`);
   }
 
   if (endState.burnhamResponse) {

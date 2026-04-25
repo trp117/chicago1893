@@ -1265,16 +1265,18 @@ When ending, you MUST populate all `endState` fields below. Never end the story 
 
 The ending must make the player feel: "I understand what happened, and I was part of stopping — or failing to stop — it."
 
+**The ending is the climax of a thriller novel.** Write it that way. The `scene` field is the most important piece of writing in the entire game — it must land with weight, tension, and consequence. This is not a summary; it is a scene. Make the reader feel it.
+
 Ending `endState` fields:
 
 - `isEnding`: true
 - `result`: "success" | "partial" | "failure"
-- `scene`: 1–3 paragraphs of immediate resolution prose — what happens in the moment, how NPCs react, whether the player succeeds or fails
-- `conspiracySummary`: plain prose explanation of what the conspiracy was, who was responsible, the sabotage method, and how it was supposed to unfold
-- `whatPlayerDiscovered`: what evidence and leads the player uncovered during the investigation
-- `outcome`: plain prose — was the sabotage prevented? what happened to the conspirators? what was the impact on the World's Fair?
-- `playerContribution`: plain prose — what the player did that mattered, key decisions, whether they correctly identified the threat
-- `burnhamResponse`: a single short, grounded quote from Daniel Burnham (or the relevant authority figure) reacting to the outcome. Tone: precise, unsentimental, 1893 register.
+- `scene`: 2–4 paragraphs of immediate, cinematic resolution prose. Write this like the final scene of a thriller — sensory detail, the stakes arriving in real time, the moment of reckoning. Show NPCs reacting, show the physical world responding, show what was won or lost. DO NOT summarize events — dramatize them. If it's a success: the relief and the cost. If it's a failure: the dread of what's coming. If partial: the bitter-sweet of stopping the immediate threat while knowing it wasn't clean.
+- `conspiracySummary`: a vivid, propulsive account of the hidden plot — who was behind it, what they planned, how close they came. Write as if revealing a secret that was buried. Not a dry report — a revelation.
+- `whatPlayerDiscovered`: the specific evidence and leads the player uncovered, framed as hard-won intelligence — clues that mattered, interrogations that broke open the case, the moment the picture clicked into focus.
+- `outcome`: what the conspiracy's resolution means — was the sabotage stopped cold, or did it leave a mark? What happened to the conspirators? What does the opening of the World's Fair look like now?
+- `playerContribution`: the player's specific role in the outcome — what they did that actually mattered, which decisions were pivotal, whether they identified the threat in time or came up short. Personal and direct — address them.
+- `burnhamResponse`: a single quote from Daniel Burnham (or relevant authority) reacting to the outcome. Tone: the authority of a man who built the White City — direct, weighted, 1893 register. Let it land.
 - `correctSuspectIdentified`: true if the player correctly identified the main conspirator(s)
 
 The regular `narrative` field on ending turns should be brief (1–2 sentences max) or omitted — the `scene` field carries the resolution prose. Omit `choices` on ending turns.
