@@ -106,9 +106,7 @@ function getAvailableCluesAtLocation(locationId, discoveredClueIds) {
 function checkEndingReadiness(state) {
   const ids = state.discoveredClueIds || [];
   const hasMethod = state.knownSabotageMethod;
-  const hasKeyEvidence =
-    ids.includes('tampered_wiring_diagrams') ||
-    ids.includes('opening_night_note');
+  const hasKeyEvidence = (scenario.keyEvidenceClues || []).some((id) => ids.includes(id));
   const hasConspirators = (state.namedConspirators || []).length >= 2;
   const escapedNpcs = state.escapedNpcs || [];
   const mercierEscaped = escapedNpcs.includes('emile_mercier');

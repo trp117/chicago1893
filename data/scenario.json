@@ -128,6 +128,8 @@
     "The fair opens safely, but scandal reaches the newspapers",
     "Burnham is saved political embarrassment, but the player sacrifices an ally"
   ],
+  "keyEvidenceClues": ["tampered_wiring_diagrams", "opening_night_note"],
+
   "initialState": {
     "narrativeStyle": "focused",
     "elapsedMinutes": 0,
