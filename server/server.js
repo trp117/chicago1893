@@ -706,6 +706,7 @@ app.post('/api/turn', async (req, res) => {
       return res.status(500).json({ error: 'Failed to build prompt: ' + promptError.message });
     }
 
+    const isEndingTurn = !!(state.finalAccusation || state.remainingMinutes <= 0);
     const callModel = (messages) =>
       fetch(ANTHROPIC_URL, {
         method: 'POST',
@@ -717,7 +718,7 @@ app.post('/api/turn', async (req, res) => {
         },
         body: JSON.stringify({
           model: MODEL,
-          max_tokens: 900,
+          max_tokens: isEndingTurn ? 2000 : 900,
           temperature: 0.8,
           system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
           messages
