@@ -316,6 +316,16 @@ function composeTurnPrompt(state, playerInput) {
     .replace('{{PLAYER_INPUT}}', resolvedInput + finalAccusationNote);
 }
 
+// Detects a turn that ends on an unanswered NPC-to-NPC question.
+// Pattern: last non-empty narrative line is an NPC speaking a question
+// AND two or more distinct NPCs are listed in npcMoments.
+function endsOnNpcQuestion(narrative, npcMoments) {
+  if (!narrative || !Array.isArray(npcMoments) || npcMoments.length < 2) return false;
+  const lines = narrative.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  const last = lines[lines.length - 1];
+  return /^[A-Z][A-Za-z'\-\s]{1,30}:\s*["""'].+\?["""']\s*$/.test(last);
+}
+
 const MOVEMENT_RE = /\b(go|head|return|walk|travel|back|leave|move)\b/i;
 const BURNHAM_RE = /\b(burnham|administration|office)\b/i;
 
@@ -449,8 +459,19 @@ function mergeState(currentState, modelOutput, playerInput = '') {
   }
 
   if (Array.isArray(modelOutput.newClues)) {
+    // Only accept clues that are actually available at the current location.
+    // The AI prompt instructs this, but validate here as the authoritative gate.
+    const validIds = new Set(
+      getAvailableCluesAtLocation(next.location, []).map(c => c.id)
+    );
+
     for (const clueId of modelOutput.newClues) {
       if (typeof clueId !== 'string') continue;
+
+      if (!validIds.has(clueId)) {
+        console.warn(`[CLUE] Rejected "${clueId}" — not available at ${next.location}`);
+        continue;
+      }
 
       if (!(next.discoveredClueIds || []).includes(clueId)) {
         next.discoveredClueIds = next.discoveredClueIds || [];
@@ -707,9 +728,16 @@ app.post('/api/turn', async (req, res) => {
     }
 
     const isEndingTurn = !!(state.finalAccusation || state.remainingMinutes <= 0);
-    const callModel = (messages) =>
-      fetch(ANTHROPIC_URL, {
+    const endingSignals = checkEndingReadiness(state);
+    const mightEndSpontaneously = endingSignals.readyForClimax || (state.namedConspirators || []).length >= 1;
+    const isLateGame = (state.remainingMinutes <= 7 && state.remainingMinutes > 0) || state.elapsedMinutes >= 11;
+    const maxTokens = isEndingTurn ? 2000 : mightEndSpontaneously ? 1800 : isLateGame ? 1400 : 900;
+
+    const callModel = (messages, tokenOverride) => {
+      const signal = AbortSignal.timeout(55000);
+      return fetch(ANTHROPIC_URL, {
         method: 'POST',
+        signal,
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': API_KEY,
@@ -718,12 +746,13 @@ app.post('/api/turn', async (req, res) => {
         },
         body: JSON.stringify({
           model: MODEL,
-          max_tokens: isEndingTurn ? 2000 : 900,
+          max_tokens: tokenOverride || maxTokens,
           temperature: 0.8,
           system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
           messages
         })
       });
+    };
 
     const hasSpeech = (narrative) => narrative && /[""][^""]{4}|:\s*["']/.test(narrative);
 
@@ -740,8 +769,24 @@ app.post('/api/turn', async (req, res) => {
     try {
       output = extractJson(text);
     } catch (parseError) {
-      console.error('INVALID TURN JSON RAW TEXT:', text);
-      return res.status(500).json({ error: 'Model returned invalid JSON.', rawText: text });
+      const stopReason = data?.stop_reason || 'unknown';
+      // If the model was generating an ending but ran out of tokens, retry at full budget
+      const truncatedEnding = stopReason === 'max_tokens' && /"isEnding"\s*:\s*true/.test(text);
+      if (truncatedEnding && maxTokens < 2000) {
+        console.log(`[RETRY] Truncated endState (stop_reason=max_tokens, budget=${maxTokens}) — retrying at 2000`);
+        try {
+          const retryResp = await callModel(baseMessages, 2000);
+          const retryData = await retryResp.json();
+          const retryText = retryData?.content?.[0]?.text;
+          if (retryText) output = extractJson(retryText);
+        } catch (retryErr) {
+          console.error('[RETRY] endState retry failed:', retryErr.message);
+        }
+      }
+      if (!output) {
+        console.error(`INVALID TURN JSON stop_reason=${stopReason} max_tokens=${maxTokens} text_length=${text.length}\n`, text);
+        return res.status(500).json({ error: `Model returned invalid JSON (stop_reason: ${stopReason}).`, rawText: text });
+      }
     }
 
     // Retry once if NPC is present but narrative contains no spoken dialogue
@@ -755,6 +800,30 @@ app.post('/api/turn', async (req, res) => {
         {
           role: 'user',
           content: `Your response contained no spoken dialogue from ${npcName}. Rewrite the narrative so that ${npcName} delivers at least one spoken line — e.g. ${npcName}: "..." — before presenting choices. Return only valid JSON.`
+        }
+      ];
+      const retryResponse = await callModel(retryMessages);
+      const retryData = await retryResponse.json();
+      const retryText = retryData?.content?.[0]?.text;
+      if (retryText) {
+        try {
+          output = extractJson(retryText);
+          text = retryText;
+        } catch (_) {
+          // retry parse failed — keep original output
+        }
+      }
+    }
+
+    // Retry if the turn ended on an unanswered NPC-to-NPC question
+    if (endsOnNpcQuestion(output.narrative, output.npcMoments)) {
+      console.log('[RETRY] NPC-to-NPC unanswered question detected — retrying');
+      const retryMessages = [
+        ...baseMessages,
+        { role: 'assistant', content: text },
+        {
+          role: 'user',
+          content: `The turn ended with one NPC asking another NPC a question, leaving it unanswered. Continue the narrative immediately: the questioned NPC must reply in the same turn, then give the player choices to act on what they witnessed. Do not repeat the question. Return only valid JSON.`
         }
       ];
       const retryResponse = await callModel(retryMessages);
@@ -806,8 +875,9 @@ app.post('/api/turn', async (req, res) => {
 
     return res.json({ output, nextState, mockMode: false });
   } catch (error) {
-    console.error('[ERROR] /api/turn failed:', error.message, error.stack);
-    return res.status(500).json({ error: error.message || 'Server error' });
+    const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
+    console.error('[ERROR] /api/turn failed:', isTimeout ? 'Anthropic API timeout' : error.message, error.stack);
+    return res.status(500).json({ error: isTimeout ? 'AI request timed out — please try again.' : (error.message || 'Server error') });
   }
 });
 

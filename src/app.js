@@ -295,13 +295,20 @@ function renderOutput(output, meta = {}) {
     html += `<div class="npc-line"><em>Running in mock mode until an Anthropic API key is added.</em></div>`;
   }
 
-  // Reset feed when location changes
+  // Reset feed when the player's first action at the new location renders.
+  // On the transition turn itself (the turn where location changes), keep the old
+  // feed so any farewell dialogue appears in the previous location's context.
+  // The clear fires on the next input once the player is actually there.
   const currentLocation = gameState?.location;
-  if (currentLocation && currentLocation !== feedLocationId) {
+  const isTransitionTurn = meta.prevLocation != null && meta.prevLocation !== currentLocation;
+
+  if (!isTransitionTurn && currentLocation && currentLocation !== feedLocationId) {
     locationFeed = [];
     feedLocationId = currentLocation;
     storyEl.innerHTML = '';
     pendingEntryEl = null;
+    locationShowing = true;
+    updateLocationDisplay(currentLocation);
   }
 
   locationFeed.push({ playerInput: meta.playerInput || null, html });
@@ -689,9 +696,8 @@ async function submitTurn(playerInput) {
       return;
     }
 
+    const prevLocation = gameState?.location;
     gameState = data.nextState;
-    locationShowing = true;
-    updateLocationDisplay(gameState.location);
 
     // Append this exchange to history, keep last MAX_HISTORY_TURNS turns
     conversationHistory.push(
@@ -704,7 +710,7 @@ async function submitTurn(playerInput) {
 
     renderSidebar({ includeClues: false });
     updateChaseUI();
-    renderOutput(data.output, { mockMode: data.mockMode, playerInput });
+    renderOutput(data.output, { mockMode: data.mockMode, playerInput, prevLocation });
     renderSidebarClues(); // update clues after narrative so reveal lands first
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
