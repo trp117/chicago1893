@@ -119,7 +119,7 @@ async function ttsSpeak(text) {
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     audioEl.src = url;
-    audioEl.playbackRate = 1.15;
+    audioEl.playbackRate = 1.0;
     audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
     audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; console.warn('[TTS] audio error, falling back'); ttsSpeakFallback(text); };
     currentAudio = audioEl;
@@ -509,7 +509,7 @@ async function startGame(roleId, narrativeStyle) {
     if (audioBlobUrl && audioEl) {
       const url = audioBlobUrl;
       audioEl.src = url;
-      audioEl.playbackRate = 1.15;
+      audioEl.playbackRate = 1.0;
       audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; setTtsSpeaking(false); };
       audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(openingData.narrative); };
       currentAudio = audioEl;

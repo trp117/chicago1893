@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Readable } from 'node:stream';
 import { Langfuse } from 'langfuse';
 
 dotenv.config();
@@ -32,8 +33,10 @@ const API_KEY = process.env.ANTHROPIC_API_KEY;
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
 const MAX_HISTORY_MESSAGES = 8; // 4 turns × 2 (user + assistant)
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'onwK4e9ZLuTAKqWW03F9';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_TTS_VOICE = process.env.OPENAI_TTS_VOICE || 'onyx';
+const OPENAI_TTS_SPEED = parseFloat(process.env.OPENAI_TTS_SPEED || '0.9');
+const OPENAI_TTS_MODEL = 'tts-1';
 
 function readText(filePath) {
   return fs.readFileSync(path.join(rootDir, filePath), 'utf8');
@@ -919,38 +922,43 @@ app.post('/api/tts', async (req, res) => {
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
 
-    if (!ELEVENLABS_API_KEY) {
+    if (!OPENAI_API_KEY) {
       return res.status(503).json({ error: 'TTS not configured.' });
     }
 
     const cleaned = prepareForTts(text);
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': ELEVENLABS_API_KEY
-        },
-        body: JSON.stringify({
-          text: cleaned,
-          model_id: 'eleven_flash_v2_5',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-        })
-      }
-    );
+    const charCount = cleaned.length;
+    // tts-1 is $0.015 per 1000 characters
+    const estimatedCostUsd = (charCount / 1000) * 0.015;
+
+    const ttsTrace = langfuse?.trace({ name: 'tts', input: { chars: charCount, voice: OPENAI_TTS_VOICE, model: OPENAI_TTS_MODEL } });
+    const ttsGen = ttsTrace?.generation({ name: 'tts-request', model: OPENAI_TTS_MODEL, modelParameters: { voice: OPENAI_TTS_VOICE }, input: cleaned, usage: { totalCost: estimatedCostUsd } });
+
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: OPENAI_TTS_MODEL,
+        input: cleaned,
+        voice: OPENAI_TTS_VOICE,
+        speed: OPENAI_TTS_SPEED
+      })
+    });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('[TTS] ElevenLabs error:', response.status, errText);
+      console.error('[TTS] OpenAI error:', response.status, errText);
+      ttsGen?.end({ output: 'error', level: 'ERROR', statusMessage: `${response.status}: ${errText}` });
       return res.status(502).json({ error: 'TTS upstream error.' });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    ttsGen?.end({ output: `${charCount} chars streamed`, metadata: { estimatedCostUsd } });
     res.set('Content-Type', 'audio/mpeg');
     res.set('Cache-Control', 'no-store');
-    res.send(Buffer.from(audioBuffer));
+    Readable.fromWeb(response.body).pipe(res);
   } catch (error) {
     console.error('[TTS] Error:', error.message);
     res.status(500).json({ error: error.message || 'TTS error.' });
