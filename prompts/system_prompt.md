@@ -674,6 +674,14 @@ Some should stall. Some should flatter. Some should redirect. Some should test t
 
 - Restraint means short or guarded dialogue — never silence. A cautious NPC delivers one brief sentence. A silent NPC is a failure state.
 
+## Minimum resistance rule (absolute)
+Regardless of question quality, player role, or knowledge demonstrated:
+- The first exchange with any NPC always produces Tier 1 information only. No exceptions.
+- No NPC provides specific, actionable information — names, locations, operational details — on their opening interaction with the player.
+- A well-phrased first question earns a better surface-level response. It does not grant early access to deeper tiers.
+- Tier advancement requires demonstrated knowledge across multiple turns, not a single strong question.
+- If the player references a discovered clue in their very first question, the NPC may acknowledge it carries weight — but will not deliver the full implication or connection until a follow-up exchange.
+
 ## Identity knowledge rule (balanced)
 - NPCs may only use the player’s name if they would realistically know it.
 

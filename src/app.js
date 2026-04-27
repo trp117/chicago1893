@@ -2,6 +2,7 @@ let gameState = null;
 let scenario = null;
 let cluesCatalog = [];
 let locationsList = [];
+let sessionId = null;
 let conversationHistory = []; // [{role:'user',content:...},{role:'assistant',content:...}]
 const MAX_HISTORY_TURNS = 4;
 let locationFeed = [];   // all turns for the current location: [{playerInput, html}]
@@ -418,6 +419,7 @@ function restartGame() {
   gameState = null;
   audioUnlocked = false;
   audioEl = null;
+  sessionId = crypto.randomUUID();
   conversationHistory = [];
   locationFeed = [];
   feedLocationId = null;
@@ -462,6 +464,7 @@ async function startGame(roleId, narrativeStyle) {
     (id) => id !== gameState.playerRoleId
   );
 
+  sessionId = crypto.randomUUID();
   conversationHistory = [];
   locationFeed = [];
   feedLocationId = null;
@@ -682,7 +685,7 @@ async function submitTurn(playerInput) {
     const response = await fetch('/api/turn', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory })
+      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId })
     });
 
     const data = await response.json();
@@ -977,7 +980,7 @@ async function fetchNotes() {
     const response = await fetch('/api/notes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: gameState })
+      body: JSON.stringify({ state: gameState, sessionId })
     });
     const data = await response.json();
     if (data.error) {

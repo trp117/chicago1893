@@ -4,8 +4,19 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Langfuse } from 'langfuse';
 
 dotenv.config();
+
+const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC_KEY)
+  ? new Langfuse({
+      secretKey: process.env.LANGFUSE_SECRET_KEY,
+      publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+      baseUrl: process.env.LANGFUSE_BASE_URL  // SDK env var is LANGFUSE_BASEURL; honour the user's LANGFUSE_BASE_URL instead
+    })
+  : null;
+
+['SIGTERM', 'SIGINT'].forEach(sig => process.on(sig, () => langfuse?.shutdownAsync().finally(() => process.exit(0))));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -214,10 +225,13 @@ function buildNpcIntroInstruction(state, location, playerInput = '') {
   const introduced = state.introducedNpcs || [];
   const playerRoleId = state.playerRoleId || 'burnhams_assistant';
 
-  // Check current location for un-introduced NPCs
+  // Check current location for un-introduced NPCs.
+  // If the player is mid-conversation with a specific NPC, suppress intros for other
+  // location-linked NPCs — they should only fire when that NPC becomes the active target.
   const linkedNpcs = location?.linkedNPCs || [];
   let newNpcs = linkedNpcs
     .filter((id) => !introduced.includes(id) && id !== playerRoleId)
+    .filter((id) => !state.targetNpc || id === state.targetNpc)
     .map((id) => npcs.find((n) => n.id === id))
     .filter(Boolean);
 
@@ -561,7 +575,7 @@ function buildMockNotes(state, discoveredClues, suspicionContext) {
 
 app.post('/api/notes', async (req, res) => {
   try {
-    const { state } = req.body;
+    const { state, sessionId } = req.body;
     if (!state) {
       return res.status(400).json({ error: 'Missing state.' });
     }
@@ -607,6 +621,9 @@ app.post('/api/notes', async (req, res) => {
       .replace('{{ACT}}', String(state.act || 1))
       .replace('{{ELAPSED}}', String(state.elapsedMinutes || 0));
 
+    const noteTrace = langfuse?.trace({ name: 'notes', sessionId, input: { clues: discoveredClues.length, suspicions: suspicionContext.length } });
+    const noteGen = noteTrace?.generation({ name: 'notes', model: MODEL, modelParameters: { max_tokens: 700, temperature: 0.7 }, input: [{ role: 'system', content: notesSystemPrompt }, { role: 'user', content: prompt }] });
+
     const response = await fetch(ANTHROPIC_URL, {
       method: 'POST',
       headers: {
@@ -625,6 +642,7 @@ app.post('/api/notes', async (req, res) => {
 
     const data = await response.json();
     const text = data?.content?.[0]?.text;
+    noteGen?.end({ output: text, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens } });
 
     if (!text) {
       return res.status(500).json({ error: 'No response from AI.' });
@@ -674,7 +692,7 @@ app.get('/api/bootstrap', (_, res) => {
 
 app.post('/api/turn', async (req, res) => {
   try {
-    const { state, playerInput, history = [] } = req.body;
+    const { state, playerInput, history = [], sessionId } = req.body;
 
     if (!state || !playerInput) {
       return res.status(400).json({ error: 'Missing state or playerInput.' });
@@ -718,6 +736,14 @@ app.post('/api/turn', async (req, res) => {
 
     console.log('[TURN] location_in:', state.location, '| input:', playerInput.slice(0, 60));
 
+    const turnTrace = langfuse?.trace({ name: 'turn', sessionId, input: { playerInput, location: state.location, act: state.act, elapsedMinutes: state.elapsedMinutes } });
+    const traceTags = [];
+    const scoreTrace = (value, comment) => {
+      if (!turnTrace) return;
+      if (traceTags.length) turnTrace.update({ tags: traceTags });
+      turnTrace.score({ name: 'quality', value, dataType: 'BOOLEAN', comment });
+    };
+
     let prompt;
     try {
       prompt = composeTurnPrompt(state, playerInput);
@@ -733,9 +759,11 @@ app.post('/api/turn', async (req, res) => {
     const isLateGame = (state.remainingMinutes <= 7 && state.remainingMinutes > 0) || state.elapsedMinutes >= 11;
     const maxTokens = isEndingTurn ? 2000 : mightEndSpontaneously ? 1800 : isLateGame ? 1400 : 900;
 
-    const callModel = (messages, tokenOverride) => {
+    const callModel = async (messages, tokenOverride, callName = 'call') => {
+      const toks = tokenOverride || maxTokens;
+      const gen = turnTrace?.generation({ name: callName, model: MODEL, modelParameters: { max_tokens: toks, temperature: 0.8 }, input: [{ role: 'system', content: systemPrompt }, ...messages] });
       const signal = AbortSignal.timeout(55000);
-      return fetch(ANTHROPIC_URL, {
+      const resp = await fetch(ANTHROPIC_URL, {
         method: 'POST',
         signal,
         headers: {
@@ -746,22 +774,25 @@ app.post('/api/turn', async (req, res) => {
         },
         body: JSON.stringify({
           model: MODEL,
-          max_tokens: tokenOverride || maxTokens,
+          max_tokens: toks,
           temperature: 0.8,
           system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
           messages
         })
       });
+      const data = await resp.json();
+      const text = data?.content?.[0]?.text;
+      gen?.end({ output: text, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens }, metadata: { stop_reason: data?.stop_reason } });
+      return { data, text };
     };
 
     const hasSpeech = (narrative) => narrative && /[""][^""]{4}|:\s*["']/.test(narrative);
 
     const baseMessages = [...history.slice(-MAX_HISTORY_MESSAGES), { role: 'user', content: prompt }];
-    let response = await callModel(baseMessages);
-    let data = await response.json();
-    let text = data?.content?.[0]?.text;
+    let { data, text } = await callModel(baseMessages, null, 'initial');
 
     if (!text) {
+      scoreTrace(0, 'no-text-returned');
       return res.status(500).json({ error: 'No text returned from Anthropic.', raw: data });
     }
 
@@ -773,18 +804,19 @@ app.post('/api/turn', async (req, res) => {
       // If the model was generating an ending but ran out of tokens, retry at full budget
       const truncatedEnding = stopReason === 'max_tokens' && /"isEnding"\s*:\s*true/.test(text);
       if (truncatedEnding && maxTokens < 2000) {
+        traceTags.push('has-retry', 'truncated-ending');
         console.log(`[RETRY] Truncated endState (stop_reason=max_tokens, budget=${maxTokens}) — retrying at 2000`);
         try {
-          const retryResp = await callModel(baseMessages, 2000);
-          const retryData = await retryResp.json();
-          const retryText = retryData?.content?.[0]?.text;
+          const { text: retryText } = await callModel(baseMessages, 2000, 'retry-truncated-ending');
           if (retryText) output = extractJson(retryText);
         } catch (retryErr) {
           console.error('[RETRY] endState retry failed:', retryErr.message);
         }
       }
       if (!output) {
+        traceTags.push('json-error');
         console.error(`INVALID TURN JSON stop_reason=${stopReason} max_tokens=${maxTokens} text_length=${text.length}\n`, text);
+        scoreTrace(0, `invalid-json: stop_reason=${stopReason}`);
         return res.status(500).json({ error: `Model returned invalid JSON (stop_reason: ${stopReason}).`, rawText: text });
       }
     }
@@ -792,6 +824,7 @@ app.post('/api/turn', async (req, res) => {
     // Retry once if NPC is present but narrative contains no spoken dialogue
     const npcPresent = Array.isArray(output.npcMoments) && output.npcMoments.length > 0;
     if (npcPresent && !hasSpeech(output.narrative)) {
+      traceTags.push('has-retry', 'silent-npc');
       const npcName = output.npcMoments[0]?.npc?.replace(/_/g, ' ') || 'the NPC';
       console.log('[RETRY] Silent NPC response detected — retrying with dialogue correction');
       const retryMessages = [
@@ -802,9 +835,7 @@ app.post('/api/turn', async (req, res) => {
           content: `Your response contained no spoken dialogue from ${npcName}. Rewrite the narrative so that ${npcName} delivers at least one spoken line — e.g. ${npcName}: "..." — before presenting choices. Return only valid JSON.`
         }
       ];
-      const retryResponse = await callModel(retryMessages);
-      const retryData = await retryResponse.json();
-      const retryText = retryData?.content?.[0]?.text;
+      const { text: retryText } = await callModel(retryMessages, null, 'retry-silent-npc');
       if (retryText) {
         try {
           output = extractJson(retryText);
@@ -817,6 +848,7 @@ app.post('/api/turn', async (req, res) => {
 
     // Retry if the turn ended on an unanswered NPC-to-NPC question
     if (endsOnNpcQuestion(output.narrative, output.npcMoments)) {
+      traceTags.push('has-retry', 'npc-question');
       console.log('[RETRY] NPC-to-NPC unanswered question detected — retrying');
       const retryMessages = [
         ...baseMessages,
@@ -826,9 +858,7 @@ app.post('/api/turn', async (req, res) => {
           content: `The turn ended with one NPC asking another NPC a question, leaving it unanswered. Continue the narrative immediately: the questioned NPC must reply in the same turn, then give the player choices to act on what they witnessed. Do not repeat the question. Return only valid JSON.`
         }
       ];
-      const retryResponse = await callModel(retryMessages);
-      const retryData = await retryResponse.json();
-      const retryText = retryData?.content?.[0]?.text;
+      const { text: retryText } = await callModel(retryMessages, null, 'retry-npc-question');
       if (retryText) {
         try {
           output = extractJson(retryText);
@@ -872,6 +902,9 @@ app.post('/api/turn', async (req, res) => {
         result: output.endState.result || 'failure'
       };
     }
+
+    turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
+    scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 
     return res.json({ output, nextState, mockMode: false });
   } catch (error) {

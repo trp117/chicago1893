@@ -48,7 +48,7 @@
         "condition": "If cornered in a private space with suspicion above 3 and player has been aggressive across multiple turns",
         "action": "Shoves the player hard and bolts for the nearest exit. Calculated, not panicked."
       },
-      "fleeCondition": "Cornered with no social escape available and evidence clearly mounting against him.",
+      "fleeCondition": "Suspicion score reaches 3 AND the player references specific evidence against him in their input, OR suspicion reaches 4 regardless of player action. Mercier calculates his exposure early — flight is a deliberate move before being cornered, not a last resort.",
       "fleeStyle": "Calculated — heads for exits, uses crowd or staff as cover. May have transport arranged.",
       "chaseStyle": "Fast and deliberate. Knows the hotel layout. May double back through a service corridor or push through staff areas.",
       "breakingPoint": "Will not name co-conspirators or admit the full plan under any circumstances. Too much at stake beyond this fair.",
@@ -79,7 +79,7 @@
         "condition": "Only if the player physically grabs or strikes him first — Hanrahan shoves back instinctively.",
         "action": "A hard shove and a shout for the nearest worker. Not a fighter — creates a scene to draw witnesses."
       },
-      "fleeCondition": "If the player produces direct evidence against him and threatens arrest or Burnham's authority.",
+      "fleeCondition": "If the player produces direct evidence AND threatens arrest or Burnham's authority — OR if the player physically blocks his exit, grabs him, or takes any action that cuts off his escape route. Physical blocking is sufficient on its own; Hanrahan does not need to be caught with evidence to run.",
       "fleeStyle": "Heavy and slow. Heads toward groups of dock workers where he has authority and protection.",
       "chaseStyle": "Calls for help from the crew. Uses his bulk to block and deflect rather than outrun. Counts on allies slowing the player.",
       "breakingPoint": "Will give up operational details — what was moved, where, when — to avoid being the fall guy. Will not name Mercier voluntarily.",
