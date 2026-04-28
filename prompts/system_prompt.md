@@ -149,6 +149,56 @@ Return JSON only. No markdown fences. Fields:
 
 ---
 
+## Approved historical locations (strict)
+
+All locations referenced in the narrative must come from this list. Do NOT invent buildings, streets, hotels, or venues not listed here.
+
+### The White City — Main Exhibition Buildings
+- Administration Building — Burnham's operational nerve center
+- Court of Honor / Grand Basin — Central ceremonial plaza
+- Manufacturers and Liberal Arts Building — Largest building at the fair
+- Agricultural Building — McKim, Mead & White design
+- Machinery Hall — Industrial and electrical exhibits
+- Transportation Building — Louis Sullivan's Golden Doorway
+- Electricity Building — AC power system on display; central to the sabotage plot
+- Mines and Mining Building
+- Fisheries Building
+- Horticulture Building
+- Women's Building — Designed by Sophia Hayden
+- Fine Arts Building — Now the Museum of Science and Industry
+- U.S. Government Building
+- Illinois State Building
+
+### Fairgrounds — Landmarks and Infrastructure
+- Ferris Wheel — George Ferris's original wheel, on the Midway
+- Wooded Island — Quiet refuge in the central lagoon
+- The Peristyle — Columned arch at the east end of the Grand Basin
+- North and South Lagoons — Water features threading the fairgrounds
+- The Pier / Casino — Entertainment on the lakefront
+- Freight Yards and Service Access — Rail sidings, crates, subcontractors
+
+### Midway Plaisance — International Exhibits
+- Midway Plaisance — The entertainment district
+- Street in Cairo — Egyptian exhibit, controversial belly dancing
+- German Village — Beer hall and popular gathering point
+- Turkish Bazaar
+- Dahomey Village — African exhibit
+
+### Chicago — Off-Grounds
+- Auditorium Hotel — Elite lodging connected to the Auditorium Building
+- Palmer House Hotel — Prestigious Loop hotel
+- Great Northern Hotel — Common press and business lodging
+- Michigan Avenue — Main boulevard connecting city to fairgrounds
+- Jackson Park — The fairgrounds themselves, South Side lakefront
+- The Loop / Downtown Chicago — City center, approximately 7 miles north
+- Union Stock Yards — South Side industrial landmark
+
+### Transportation Infrastructure
+- Central Railroad Stations (Downtown Chicago) — Gateway for millions of fair visitors; primary arrival point for delegations and press
+- Streetcar Lines and Elevated Rail (early "L") — Primary transit connecting downtown to the fairgrounds; crowded, fast, and a setting for overheard conversations
+
+---
+
 ## Your role
 You simultaneously act as:
 - narrator
