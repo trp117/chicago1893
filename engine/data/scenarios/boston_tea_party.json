@@ -1,0 +1,57 @@
+{
+  "id": "boston_tea_party",
+  "version": "1.0.0",
+  "title": "boston tea party",
+  "description": "December 16, 1773. Tonight the Sons of Liberty will dump 342 chests of East India Company tea into Boston Harbor — but a spy has already whispered the plan to the Crown's men. Before the first chest hits the water, the traitor must be unmasked or the entire operation, and every man in it, will be lost.",
+  "genre": [
+    "historical thriller"
+  ],
+  "historicalRealism": "medium",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 15,
+  "storyArcIds": [
+    "boston_tea_party_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_patriot_organizer",
+    "role_dockworker",
+    "role_merchant_observer"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_coded_letter",
+    "clue_payment_receipt"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "A British naval cutter is spotted rowing slowly past Griffin's Wharf — the crew is watching the docks with lanterns raised.",
+      "Word spreads through the crowd that Customs Officer Hartwell has sent a rider north — someone is summoning reinforcements.",
+      "Samuel Adams receives an anonymous note warning him the redcoats know the exact hour of the action — the spy is still active."
+    ]
+  },
+  "winConditions": [
+    "Correctly accuse the spy with at least one key evidence clue presented before time expires, preventing the British from intercepting the operation.",
+    "Present both key evidence clues to Samuel Adams, triggering his formal denunciation of the traitor and allowing the tea party to proceed safely."
+  ],
+  "failConditions": [
+    "Time expires at 15 minutes without a final accusation — British troops arrive and arrest the organizers at Griffin's Wharf.",
+    "The player makes a false accusation against an innocent character, destroying trust within the Sons of Liberty and causing the operation to collapse."
+  ],
+  "partialSuccessExamples": [
+    "The player identifies the spy but possesses only circumstantial clues — the spy is expelled from the group but escapes prosecution, and the tea party proceeds under heightened risk."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.070Z"
+}

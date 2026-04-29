@@ -1,0 +1,34 @@
+{
+  "id": "captain_john_rotch",
+  "scenarioIds": [
+    "boston_tea_party_version_2"
+  ],
+  "name": "Captain John Rotch",
+  "role": "Owner of the Dartmouth, the tea ship at Griffin's Wharf",
+  "publicFace": "A harried, exhausted merchant caught between the Patriots who threaten him if he unloads the tea and the customs men who threaten him if he does not — he wants only to be left alone.",
+  "privateGoal": "He wants the standoff resolved without his ship being destroyed and without him being held personally liable by either side.",
+  "fear": "That he will be ruined financially regardless of how tonight ends — he has already petitioned Governor Hutchinson for a pass to sail the tea back to England and been refused.",
+  "knowledge": [
+    "He saw a man matching Greenleaf's description speaking with a customs officer near the Customs Dock earlier this afternoon.",
+    "He knows that a document was passed between two men near his ship's gangplank — he did not read it but noticed it was folded in a distinctive way, sealed with red wax.",
+    "He is aware that customs men have been placed on alert tonight, which he finds suspicious given that the information about the boarding plan was supposed to be secret."
+  ],
+  "voice": "Exhausted and plaintive, with the cadence of a man who has been awake for three days — he sighs between sentences and frequently trails off as though he has given up on finishing his own thoughts.",
+  "trustLogic": "He opens up to anyone who seems sympathetic to his impossible position and does not demand he take a side. He shuts down if he believes the conversation will get him in trouble with either the Patriots or the Crown.",
+  "secrets": [
+    "He kept the red-wax-sealed document he found on his gangplank — he did not know what to do with it and stuffed it into a cargo crate on the dock.",
+    "He has already decided that if the mob boards his ship tonight, he will not resist — he simply cannot afford to."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He throws his hands up and insists he is just a merchant, not a politician, not a spy, not a hero.",
+    "heavyPressure": "He becomes agitated and starts pacing, saying repeatedly that he wants no part of any of this.",
+    "breakingPoint": "He will not formally testify against anyone — he is too afraid of retaliation from both sides.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "He sits down heavily and tells the player everything he knows — he is too tired to pretend anymore.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.437Z"
+}

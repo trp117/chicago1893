@@ -1,0 +1,57 @@
+{
+  "id": "boston_tea_party_version_2",
+  "version": "1.0.0",
+  "title": "boston tea party version 2",
+  "description": "Boston, December 16, 1773. The Sons of Liberty stand hours away from their boldest act of defiance — the destruction of 342 chests of East India Company tea aboard the Dartmouth. But a spy has whispered the plan to the customs men, and if the traitor is not unmasked before the ships are boarded, the ringleaders will hang before dawn. You must move through the fog-choked streets of Boston, question allies and suspects alike, and expose the informer before the operation — and the cause of liberty — is crushed forever.",
+  "genre": [
+    "historical thriller"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 15,
+  "storyArcIds": [
+    "boston_tea_party_version_2_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_patriot_organizer",
+    "role_dockworker",
+    "role_tavern_spy"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_coded_letter",
+    "clue_customs_receipt"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "A customs officer is spotted near Griffin's Wharf — the threat scale rises by 2 and all NPC suspicion thresholds tighten.",
+      "A rider arrives at the Green Dragon Tavern with word that Governor Hutchinson has refused to let the ships leave — panic spreads and one random NPC becomes evasive until reassured.",
+      "Church bells begin to toll from the Old South Meeting House — the final rally has begun, and the boarding party will move in 5 minutes regardless of the investigation's outcome."
+    ]
+  },
+  "winConditions": [
+    "Correctly accuse the spy before time expires, presenting at least one key evidence clue to support the accusation.",
+    "Present both key evidence clues and confront the spy directly, triggering a full confession that protects all ringleaders."
+  ],
+  "failConditions": [
+    "Time expires without a final accusation — the customs men are tipped off and the boarding party is arrested on the dock.",
+    "The player makes a false accusation against an innocent character — the real spy escapes and alerts the authorities in time to stop the operation."
+  ],
+  "partialSuccessExamples": [
+    "The player correctly names the spy but possesses only one key evidence clue — the spy is expelled from the Sons of Liberty but escapes prosecution, and the tea party proceeds under a cloud of uncertainty."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.434Z"
+}

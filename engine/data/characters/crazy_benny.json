@@ -1,0 +1,23 @@
+{
+  "name": "Crazy Benny",
+  "role": "Hobo",
+  "publicFace": "near do well, down on luck",
+  "voice": "1893 slange",
+  "fear": "petty theft, do anything for drinking money",
+  "privateGoal": "Getting spare change for alcohol",
+  "trustLogic": "money shuts them up or opens them up.",
+  "knowledge": [],
+  "secrets": [],
+  "aggressionProfile": {
+    "mildPressure": "",
+    "heavyPressure": "",
+    "breakingPoint": "",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": ""
+  },
+  "id": "crazy_benny",
+  "updatedAt": "2026-04-28T17:56:43.293Z",
+  "createdAt": "2026-04-28T17:56:43.293Z"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "griffins_wharf",
+  "scenarioId": "boston_tea_party_version_2",
+  "name": "Griffin's Wharf",
+  "description": "The three tea ships — Dartmouth, Eleanor, and Beaver — sit black and heavy in the harbor, their rigging creaking in the December wind while lanterns bob on the water and the silhouettes of watchmen move along the dock. The air smells of salt, tar, and something electric — the whole wharf feels like a fuse waiting to be lit.",
+  "mood": "cold, ominous, charged, watchful",
+  "linkedCharacterIds": [
+    "captain_john_rotch",
+    "agent_silas_dawes"
+  ],
+  "atmosphericDetails": [
+    "The Dartmouth's hull looms over the dock like a wall, her name barely legible in the dim lantern light.",
+    "A customs officer paces the far end of the wharf, his breath steaming in the cold air, his eyes scanning the street.",
+    "The distant roar of the crowd at Old South Meeting House carries across the water — thousands of voices, indistinct but unmistakable in their anger."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.440Z"
+}

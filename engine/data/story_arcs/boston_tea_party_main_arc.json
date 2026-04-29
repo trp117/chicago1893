@@ -1,0 +1,52 @@
+{
+  "id": "boston_tea_party_main_arc",
+  "scenarioId": "boston_tea_party",
+  "name": "The Traitor at Griffin's Wharf",
+  "premise": "On the night the Sons of Liberty plan their most daring act of defiance, a mole inside their inner circle has sold their secrets to the Royal Governor. The player must move through the fog-wrapped streets and crowded meeting halls of colonial Boston to expose the traitor before British forces close the trap.",
+  "goal": "Identify and expose the spy within the Sons of Liberty before the British intercept the tea party operation at Griffin's Wharf.",
+  "openingSituation": "Samuel Adams has just received word that Customs Officer Hartwell knew the meeting time before it was publicly announced — someone in the room talked. The Sons of Liberty have one hour before the ships must be boarded.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "Whispers on the Waterfront",
+      "minuteRange": [
+        0,
+        5
+      ],
+      "beats": [
+        "The player arrives at their starting location and learns that a British informant has compromised tonight's plan — the exact hour of action was leaked.",
+        "Initial interviews with NPCs reveal surface-level alibis and competing suspicions; Paul Revere points a finger at the nervous newcomer Elias Croft.",
+        "The player discovers the first environmental clue — a torn page or overheard conversation — that begins to complicate the obvious suspect."
+      ]
+    },
+    {
+      "actNumber": 2,
+      "name": "Ink and Coin",
+      "minuteRange": [
+        5,
+        11
+      ],
+      "beats": [
+        "Deeper investigation at the Green Dragon Tavern and the counting house reveals financial irregularities tied to one of the inner circle.",
+        "The coded letter is discovered, written in a cipher used only by those with access to Crown correspondence — narrowing the suspect pool dramatically.",
+        "Dr. Joseph Warren grows agitated when questioned about his recent meetings, providing misdirection; meanwhile the payment receipt surfaces at an unexpected location.",
+        "The pressure events escalate — British activity on the harbor becomes visible, and the player feels the clock tightening."
+      ]
+    },
+    {
+      "actNumber": 3,
+      "name": "The Harbor Reckons",
+      "minuteRange": [
+        11,
+        15
+      ],
+      "beats": [
+        "All evidence threads converge — the player must confront the true culprit, Thomas Dillworth, with the coded letter and payment receipt.",
+        "Dillworth attempts to flee toward the Custom House or deflect blame onto Dr. Warren; the player must act decisively.",
+        "Final accusation scene: Samuel Adams presides as the player presents their case — success sends the tea party forward, failure brings the redcoats down on Griffin's Wharf."
+      ]
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.071Z"
+}

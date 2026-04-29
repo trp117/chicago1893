@@ -1,0 +1,18 @@
+{
+  "id": "old_south_meeting_house",
+  "scenarioId": "boston_tea_party",
+  "name": "Old South Meeting House",
+  "description": "The great meeting hall blazes with tallow candles and the heat of five thousand bodies packed into its wooden pews — the air smells of wool, tallow smoke, and barely contained fury. Samuel Adams stands at the front, his voice cutting through the din like a bell, while men press close to hear every word.",
+  "mood": "tense, electric, crowded, conspiratorial",
+  "linkedCharacterIds": [
+    "samuel_adams",
+    "thomas_dillworth"
+  ],
+  "atmosphericDetails": [
+    "Candle wax has dripped in long yellow rivers down the gallery rails, hardening into formations that look like frozen waterfalls.",
+    "Two men near the back door are speaking in urgent whispers, their heads so close together their hat brims touch.",
+    "A broadsheet nailed to the pillar reads 'NO TAXATION WITHOUT REPRESENTATION' in letters large enough to read across the room."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.076Z"
+}

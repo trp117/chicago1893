@@ -1,0 +1,34 @@
+{
+  "id": "emile_mercier",
+  "scenarioIds": ["chicago_1893_v1"],
+  "name": "Émile Mercier",
+  "role": "French electrical consultant attached to an overseas exhibit",
+  "publicFace": "Elegant, clever, amused, cosmopolitan",
+  "privateGoal": "Protect French prestige and conceal his meetings with intermediaries",
+  "fear": "Exposure, diplomatic embarrassment, loss of patronage",
+  "knowledge": [
+    "A plan exists to disable a key lighting demonstration",
+    "Certain crates were redirected under false authority",
+    "He knows at least one American collaborator"
+  ],
+  "voice": "smooth, indirect, occasionally condescending",
+  "trustLogic": "He engages when flattered or cornered by specifics. He lies if the player shows uncertainty.",
+  "secrets": [
+    "He did not design the entire plot, but he enabled access and false paperwork"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Condescending and evasive. Implies diplomatic immunity, redirects with charm.",
+    "heavyPressure": "Threatens to report the confrontation to fair management and the French delegation. Denies everything coldly.",
+    "strikeFirst": {
+      "condition": "If cornered in a private space with suspicion above 3 and player has been aggressive across multiple turns",
+      "action": "Shoves the player hard and bolts for the nearest exit. Calculated, not panicked."
+    },
+    "fleeCondition": "Suspicion score reaches 3 AND the player references specific evidence against him in their input, OR suspicion reaches 4 regardless of player action. Mercier calculates his exposure early — flight is a deliberate move before being cornered, not a last resort.",
+    "fleeStyle": "Calculated — heads for exits, uses crowd or staff as cover. May have transport arranged.",
+    "chaseStyle": "Fast and deliberate. Knows the hotel layout. May double back through a service corridor or push through staff areas.",
+    "breakingPoint": "Will not name co-conspirators or admit the full plan under any circumstances. Too much at stake beyond this fair.",
+    "capturedBehavior": "Denies everything. Demands the French consul. Remains cold and controlled even when cornered."
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

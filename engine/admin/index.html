@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chicago 1893 — Story Admin</title>
+<style>
+:root {
+  --navy:       #1e2a4a;
+  --navy-hover: #2a3a62;
+  --navy-active:#3b5080;
+  --accent:     #4f8ef7;
+  --accent-dk:  #3a7de8;
+  --success:    #22c55e;
+  --danger:     #ef4444;
+  --warn:       #f59e0b;
+  --bg:         #f1f5f9;
+  --card:       #ffffff;
+  --text:       #1e293b;
+  --text-soft:  #64748b;
+  --border:     #e2e8f0;
+  --sidebar-w:  240px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w); background: var(--navy); color: #c8d4ed;
+  display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
+}
+#sidebar-brand { padding: 20px 16px 12px; border-bottom: 1px solid #2e3f66; }
+#sidebar-brand h1 { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: .5px; line-height: 1.3; }
+#sidebar-brand p  { font-size: 11px; color: #8899bb; margin-top: 2px; }
+.nav-section { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6070a0; padding: 16px 16px 4px; }
+.nav-link {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  font-size: 13px; color: #c8d4ed; cursor: pointer; border-left: 3px solid transparent;
+  transition: background .15s, color .15s;
+}
+.nav-link:hover   { background: var(--navy-hover); color: #fff; }
+.nav-link.active  { background: var(--navy-active); color: #fff; border-left-color: var(--accent); }
+.nav-link .badge  { margin-left: auto; background: #2e3f66; border-radius: 10px; font-size: 10px; padding: 1px 6px; color: #8899bb; }
+
+/* ── Main content ────────────────────────────────────────────── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+#topbar-title { font-size: 18px; font-weight: 600; }
+#topbar-actions { display: flex; gap: 8px; }
+#content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background .15s, opacity .15s; }
+.btn-primary   { background: var(--accent); color: #fff; }
+.btn-primary:hover   { background: var(--accent-dk); }
+.btn-secondary { background: var(--border); color: var(--text); }
+.btn-secondary:hover { background: #d0d8e4; }
+.btn-danger    { background: var(--danger); color: #fff; }
+.btn-danger:hover    { opacity: .85; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Cards / List ────────────────────────────────────────────── */
+.entity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.entity-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.entity-card-name { font-size: 15px; font-weight: 600; }
+.entity-card-sub  { font-size: 12px; color: var(--text-soft); line-height: 1.4; }
+.entity-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #eef2ff; color: #4f46e5; }
+.tag.category { background: #fef3c7; color: #92400e; }
+.tag.key-evidence { background: #fce7f3; color: #9d174d; }
+.tag.scenario { background: #f0fdf4; color: #166534; font-family: monospace; }
+.entity-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+/* ── Dashboard ───────────────────────────────────────────────── */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.stat-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px #4f8ef720; }
+.stat-card-num  { font-size: 32px; font-weight: 700; color: var(--accent); }
+.stat-card-label { font-size: 13px; color: var(--text-soft); margin-top: 4px; }
+.scenario-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.scenario-play-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.scenario-play-card-info { flex: 1; min-width: 0; }
+.scenario-play-card-title { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scenario-play-card-meta { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+.scenario-play-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── Forms ───────────────────────────────────────────────────── */
+.form-wrap { max-width: 720px; }
+.form-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+.form-section h3 { font-size: 14px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.field-group { margin-bottom: 18px; }
+.field-group:last-child { margin-bottom: 0; }
+.field-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+.field-group .required { color: var(--danger); }
+.help-text { font-size: 12px; color: var(--text-soft); margin-top: 4px; line-height: 1.4; }
+input[type=text], input[type=email], input[type=number], select, textarea {
+  width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; color: var(--text); background: #fff; font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px #4f8ef720; }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+.checkbox-row label { font-size: 13px; font-weight: 400; margin: 0; cursor: pointer; }
+.checkboxes-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; padding: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; }
+.form-actions { display: flex; gap: 10px; padding: 16px 0 8px; }
+
+/* ── Dynamic list ────────────────────────────────────────────── */
+.dynamic-list { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.list-item-row { display: flex; align-items: center; gap: 0; border-bottom: 1px solid var(--border); }
+.list-item-row:last-child { border-bottom: none; }
+.list-item-row input { border: none; border-radius: 0; box-shadow: none; flex: 1; }
+.list-item-row input:focus { box-shadow: none; border-color: transparent; background: #f0f6ff; }
+.list-item-row .remove-btn { padding: 8px 12px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; transition: color .15s; flex-shrink: 0; }
+.list-item-row .remove-btn:hover { color: var(--danger); }
+.add-item-btn { width: 100%; padding: 8px; background: #f8fafc; border: none; color: var(--text-soft); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: background .15s, color .15s; }
+.add-item-btn:hover { background: #eef2ff; color: var(--accent); }
+
+/* ── Acts editor ─────────────────────────────────────────────── */
+.act-block { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.act-header { background: #f8fafc; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-soft); border-bottom: 1px solid var(--border); }
+.act-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.act-row { display: flex; gap: 10px; }
+.act-row .field-group { flex: 1; margin: 0; }
+.act-row .field-group label { font-size: 12px; }
+.act-row input { padding: 6px 10px; font-size: 13px; }
+.minute-range { display: flex; align-items: center; gap: 6px; }
+.minute-range input { width: 70px; }
+.minute-range span { color: var(--text-soft); font-size: 13px; }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+#toasts { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+.toast { padding: 12px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.15); animation: slideIn .2s ease; max-width: 320px; }
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.info    { background: var(--accent); }
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ── Modal ───────────────────────────────────────────────────── */
+#modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; z-index: 500; }
+#modal-overlay.hidden { display: none; }
+#modal-box { background: var(--card); border-radius: 12px; padding: 28px; max-width: 420px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,.2); }
+#modal-box h3 { font-size: 16px; margin-bottom: 10px; }
+#modal-box p  { font-size: 13px; color: var(--text-soft); margin-bottom: 20px; line-height: 1.5; }
+#modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ── Misc ────────────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-soft); }
+.empty-state p { font-size: 15px; margin-bottom: 16px; }
+.id-display { font-family: monospace; font-size: 11px; color: var(--text-soft); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.preview-section-label { font-size: 13px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div id="sidebar-brand">
+    <h1>Chicago 1893</h1>
+    <p>Story Admin</p>
+  </div>
+  <div class="nav-section">Create</div>
+  <div class="nav-link" data-view="generate">✨ Generate Story</div>
+  <div class="nav-section">Story</div>
+  <div class="nav-link" data-entity="story-arcs">📜 Story Arcs <span class="badge" id="badge-story-arcs">–</span></div>
+  <div class="nav-link" data-entity="player-roles">🎭 Player Roles <span class="badge" id="badge-player-roles">–</span></div>
+  <div class="nav-section">Characters</div>
+  <div class="nav-link" data-entity="characters">👤 Characters <span class="badge" id="badge-characters">–</span></div>
+  <div class="nav-section">World</div>
+  <div class="nav-link" data-entity="locations">📍 Locations <span class="badge" id="badge-locations">–</span></div>
+  <div class="nav-link" data-entity="clues">🔍 Clues <span class="badge" id="badge-clues">–</span></div>
+  <div class="nav-section">Players</div>
+  <div class="nav-link" data-entity="players">👥 Players <span class="badge" id="badge-players">–</span></div>
+  <div class="nav-link" data-entity="sessions">🎮 Sessions <span class="badge" id="badge-sessions">–</span></div>
+</nav>
+
+<div id="main">
+  <div id="topbar">
+    <span id="topbar-title">Dashboard</span>
+    <div id="topbar-actions"></div>
+  </div>
+  <div id="content"><p>Loading…</p></div>
+</div>
+
+<div id="toasts"></div>
+
+<div id="modal-overlay" class="hidden">
+  <div id="modal-box">
+    <h3 id="modal-title">Confirm Delete</h3>
+    <p id="modal-body">Are you sure?</p>
+    <div id="modal-actions">
+      <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+      <button class="btn btn-danger"    id="modal-confirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const API = '/admin/api';
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const state = {
+  view: 'dashboard',      // dashboard | list | form
+  entity: null,           // current entity type key
+  editId: null,           // null = new, string = editing
+  related: {},            // { characters: [...], locations: [...] }
+  scenarioFilter: '',     // '' = all, else scenarioId string
+  scenarios: [],          // all known scenarios
+};
+
+// ═══════════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════════
+async function apiFetch(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Server error');
+  return data;
+}
+const apiGet    = path       => apiFetch('GET',    path);
+const apiPost   = (path, b)  => apiFetch('POST',   path, b);
+const apiPut    = (path, b)  => apiFetch('PUT',    path, b);
+const apiDelete = path       => apiFetch('DELETE', path);
+
+// ═══════════════════════════════════════════════════════════════
+// ENTITY CONFIG  (label, name field, list card renderer, form sections)
+// ═══════════════════════════════════════════════════════════════
+const ENTITIES = {
+  'characters': {
+    label: 'Character', plural: 'Characters', nameField: 'name',
+    canAdd: true, canDelete: true,
+    cardSub: c => c.role || '',
+    cardTags: c => (c.scenarioIds || []).map(s => ({ label: s, cls: 'scenario' })),
+    sections: [
+      { title: 'Identity', fields: [
+        { key: 'name',       label: 'Name',           type: 'text',     required: true, help: 'Full name as it appears in the story.' },
+        { key: 'role',       label: 'Role',           type: 'text',     required: true, help: 'Their official function. e.g. "French electrical consultant"' },
+        { key: 'publicFace', label: 'Public Appearance', type: 'text', help: 'How they come across to strangers. e.g. "Elegant, clever, amused"' },
+        { key: 'voice',      label: 'Speaking Style', type: 'text',     help: 'Tone and manner. e.g. "smooth, indirect, occasionally condescending"' },
+        { key: 'fear',       label: 'Greatest Fear',  type: 'text',     help: 'What they most want to avoid being exposed for.' },
+      ]},
+      { title: 'Goals & Knowledge', fields: [
+        { key: 'privateGoal', label: 'Hidden Goal', type: 'textarea', help: 'What they are really after, beneath their public face.' },
+        { key: 'trustLogic',  label: 'Trust Logic', type: 'textarea', help: 'What opens them up or shuts them down. The AI uses this to shape their responses.' },
+        { key: 'knowledge',   label: 'Things They Know', type: 'list', help: 'Facts this character is aware of and may reveal.' },
+        { key: 'secrets',     label: 'Things They Hide', type: 'list', help: 'Information they will actively conceal.' },
+      ]},
+      { title: 'Behavior Under Pressure', fields: [
+        { key: 'aggressionProfile.mildPressure',  label: 'Mild Pressure Response',  type: 'textarea', help: 'How they react when questioned but not cornered.' },
+        { key: 'aggressionProfile.heavyPressure', label: 'Heavy Pressure Response', type: 'textarea', help: 'How they react when directly accused or threatened.' },
+        { key: 'aggressionProfile.breakingPoint', label: 'Breaking Point',          type: 'textarea', help: 'What they will absolutely never admit, no matter what.' },
+        { key: 'aggressionProfile.fleeCondition', label: 'Flee Condition',          type: 'textarea', help: 'The condition that triggers flight. Leave blank if they never flee.' },
+        { key: 'aggressionProfile.fleeStyle',     label: 'Flee Style',              type: 'textarea', help: 'How they escape. e.g. "Calculated — heads for exits, uses crowd as cover"' },
+        { key: 'aggressionProfile.chaseStyle',    label: 'Chase Style',             type: 'textarea', help: 'How they behave when being chased. Leave blank if they never flee.' },
+        { key: 'aggressionProfile.capturedBehavior', label: 'If Captured',          type: 'textarea', help: 'What they do if caught. Leave blank for non-conspirators.' },
+      ]},
+    ],
+  },
+
+  'locations': {
+    label: 'Location', plural: 'Locations', nameField: 'name',
+    canAdd: true, canDelete: true,
+    cardSub: l => l.mood || '',
+    cardTags: l => [
+      ...(l.scenarioId ? [{ label: l.scenarioId, cls: 'scenario' }] : []),
+      ...(l.linkedCharacterIds || []).map(id => ({ label: id.replace(/_/g,' ') })),
+    ],
+    sections: [
+      { title: 'Description', fields: [
+        { key: 'name',        label: 'Location Name', type: 'text',     required: true },
+        { key: 'description', label: 'Description',   type: 'textarea', help: 'Vivid description — what the player sees, hears, and feels here.' },
+        { key: 'mood',        label: 'Mood / Atmosphere', type: 'text', help: 'Short mood tags. e.g. "urgent, managerial, brittle"' },
+      ]},
+      { title: 'Connections', fields: [
+        { key: 'linkedCharacterIds', label: 'Characters Present Here', type: 'checkboxes', source: 'characters', help: 'Which characters can be found at this location.' },
+        { key: 'atmosphericDetails', label: 'Atmospheric Details',     type: 'list',       help: 'Evocative details the player might notice — flavor, not actual clues.' },
+      ]},
+    ],
+  },
+
+  'clues': {
+    label: 'Clue', plural: 'Clues', nameField: 'title',
+    canAdd: true, canDelete: true,
+    cardSub: c => c.description ? c.description.slice(0, 80) + '…' : '',
+    cardTags: c => [
+      ...(c.scenarioId ? [{ label: c.scenarioId, cls: 'scenario' }] : []),
+      { label: c.category, cls: 'category' },
+      ...(c.isKeyEvidence ? [{ label: 'Key Evidence', cls: 'key-evidence' }] : []),
+    ],
+    sections: [
+      { title: 'Evidence', fields: [
+        { key: 'title',       label: 'Clue Title',   type: 'text',     required: true, help: 'Short name. e.g. "Forged Initials on Shipping Memo"' },
+        { key: 'description', label: 'Description',  type: 'textarea', help: 'What the player discovers. Written from the player\'s perspective.' },
+        { key: 'category',    label: 'Category',     type: 'select',   options: ['documentary','observation','physical','testimony'] },
+        { key: 'isKeyEvidence', label: 'This is Key Evidence', type: 'checkbox', help: 'Check if finding this clue is required to solve the mystery.' },
+      ]},
+      { title: 'Connections', fields: [
+        { key: 'discoveryLocationId',   label: 'Found At',    type: 'select',     source: 'locations', help: 'Where the player must be to discover this clue.' },
+        { key: 'implicatesCharacterIds', label: 'Implicates', type: 'checkboxes', source: 'characters', help: 'Which characters this clue points toward.' },
+        { key: 'unlocks', label: 'Unlocks', type: 'list', help: 'What discovering this clue unlocks. e.g. "location:freight_yards" or "dialogue:mercier_pressure"' },
+      ]},
+    ],
+  },
+
+  'story-arcs': {
+    label: 'Story Arc', plural: 'Story Arcs', nameField: 'name',
+    canAdd: true, canDelete: true,
+    cardSub: a => a.goal ? a.goal.slice(0, 90) + '…' : '',
+    cardTags: a => a.scenarioId ? [{ label: a.scenarioId, cls: 'scenario' }] : [],
+    sections: [
+      { title: 'Overview', fields: [
+        { key: 'name',            label: 'Arc Name',         type: 'text',     required: true },
+        { key: 'premise',         label: 'Premise',          type: 'textarea', help: 'The core situation the player steps into.' },
+        { key: 'goal',            label: 'Player Goal',      type: 'textarea', help: 'What the player needs to accomplish to win.' },
+        { key: 'openingSituation',label: 'Opening Situation',type: 'textarea', help: 'The immediate problem at the start.' },
+      ]},
+      { title: 'Acts', type: 'acts' },
+    ],
+  },
+
+  'player-roles': {
+    label: 'Player Role', plural: 'Player Roles', nameField: 'name',
+    canAdd: true, canDelete: true,
+    cardSub: r => r.description ? r.description.slice(0, 80) + '…' : '',
+    cardTags: r => [
+      ...(r.scenarioId ? [{ label: r.scenarioId, cls: 'scenario' }] : []),
+      ...(r.accessLevel ? [{ label: r.accessLevel }] : []),
+    ],
+    sections: [
+      { title: 'Role Details', fields: [
+        { key: 'name',        label: 'Role Name',    type: 'text',     required: true },
+        { key: 'description', label: 'Description',  type: 'textarea', help: 'Shown to the player when they choose this role.' },
+        { key: 'accessLevel', label: 'Access Level', type: 'select',   options: ['worker','staff','director'] },
+        { key: 'startLocationId', label: 'Starting Location', type: 'select', source: 'locations' },
+      ]},
+      { title: 'AI Perspective', fields: [
+        { key: 'perspective',    label: 'Perspective Instructions', type: 'textarea', help: 'Tells the AI how to write for this role. e.g. "The player is Burnham\'s assistant. Burnham may speak to the player as a superior."' },
+        { key: 'startingKnowledge', label: 'Starting Knowledge', type: 'list', help: 'What the player already knows at the start.' },
+      ]},
+      { title: 'Opening Scene', fields: [
+        { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
+        { key: 'opening.choices',   label: 'Opening Choices',   type: 'list',     help: 'The three initial actions offered to the player (aim for exactly 3).' },
+      ]},
+    ],
+  },
+
+  'players': {
+    label: 'Player', plural: 'Players', nameField: 'username',
+    canAdd: true, canDelete: true,
+    cardSub: p => p.email || '',
+    cardTags: () => [],
+    sections: [
+      { title: 'Account', fields: [
+        { key: 'username', label: 'Username', type: 'text', required: true },
+        { key: 'email',    label: 'Email',    type: 'text' },
+      ]},
+    ],
+  },
+
+  'sessions': {
+    label: 'Session', plural: 'Sessions', nameField: 'id',
+    canAdd: false, canDelete: true, readOnly: true,
+    cardSub: s => `Player: ${s.playerId || '–'} · ${s.status || '–'}`,
+    cardTags: s => s.status ? [{ label: s.status }] : [],
+    sections: [],
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS — nested object get/set by dotted key path
+// ═══════════════════════════════════════════════════════════════
+function getDeep(obj, path) {
+  return path.split('.').reduce((o, k) => o?.[k], obj);
+}
+function setDeep(obj, path, value) {
+  const keys = path.split('.');
+  const last = keys.pop();
+  const target = keys.reduce((o, k) => { if (!o[k] || typeof o[k] !== 'object') o[k] = {}; return o[k]; }, obj);
+  target[last] = value;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORM BUILDER
+// ═══════════════════════════════════════════════════════════════
+function buildDynamicList(key, values = []) {
+  const esc = s => s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const rows = values.map((v, i) => `
+    <div class="list-item-row">
+      <input type="text" data-list="${key}" data-index="${i}" value="${esc(v)}">
+      <button type="button" class="remove-btn" data-list="${key}" data-index="${i}" title="Remove">×</button>
+    </div>`).join('');
+  return `<div class="dynamic-list" data-list-wrap="${key}">
+    <div class="list-items">${rows}</div>
+    <button type="button" class="add-item-btn" data-list-add="${key}">＋ Add item</button>
+  </div>`;
+}
+
+function buildCheckboxGroup(key, relatedItems, selectedIds = [], labelField = 'name') {
+  const boxes = relatedItems.map(item => {
+    const checked = selectedIds.includes(item.id) ? 'checked' : '';
+    const label   = item[labelField] || item.title || item.id;
+    return `<label class="checkbox-row">
+      <input type="checkbox" name="${key}" value="${item.id}" ${checked}>
+      ${label}
+    </label>`;
+  }).join('');
+  return `<div class="checkboxes-group">${boxes || '<em style="font-size:12px;color:#94a3b8">No items available</em>'}</div>`;
+}
+
+function buildSelectField(key, options, selected, placeholder = 'Choose…') {
+  const opts = options.map(opt => {
+    const value = typeof opt === 'string' ? opt : opt.id;
+    const label = typeof opt === 'string' ? opt : (opt.name || opt.title || opt.id);
+    const sel   = value === selected ? 'selected' : '';
+    return `<option value="${value}" ${sel}>${label}</option>`;
+  }).join('');
+  return `<select name="${key}" id="field-${key}"><option value="">${placeholder}</option>${opts}</select>`;
+}
+
+function buildActsEditor(arc) {
+  const acts = arc?.acts || [
+    { actNumber: 1, name: 'Setup',    minuteRange: [0,  4],  beats: [] },
+    { actNumber: 2, name: 'Pressure', minuteRange: [5,  10], beats: [] },
+    { actNumber: 3, name: 'Climax',   minuteRange: [11, 20], beats: [] },
+  ];
+  return acts.map((act, i) => `
+    <div class="act-block" data-act="${i}">
+      <div class="act-header">Act ${act.actNumber}</div>
+      <div class="act-body">
+        <div class="act-row">
+          <div class="field-group">
+            <label>Act Name</label>
+            <input type="text" name="act-name-${i}" value="${act.name || ''}">
+          </div>
+          <div class="field-group">
+            <label>Minutes</label>
+            <div class="minute-range">
+              <input type="number" name="act-from-${i}" value="${act.minuteRange?.[0] ?? 0}" min="0" max="60">
+              <span>to</span>
+              <input type="number" name="act-to-${i}" value="${act.minuteRange?.[1] ?? 5}" min="0" max="60">
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Story Beats</label>
+          <p class="help-text">Key narrative moments that should happen in this act.</p>
+          ${buildDynamicList(`act-beats-${i}`, act.beats || [])}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function buildField(field, item, related) {
+  const value = getDeep(item, field.key) ?? '';
+  const id    = `field-${field.key.replace(/\./g, '-')}`;
+
+  if (field.type === 'text' || field.type === 'email' || field.type === 'number') {
+    return `<input type="${field.type}" name="${field.key}" id="${id}" value="${String(value).replace(/"/g,'&quot;')}" ${field.required ? 'required' : ''} placeholder="${field.placeholder || ''}">`;
+  }
+  if (field.type === 'textarea') {
+    return `<textarea name="${field.key}" id="${id}">${value}</textarea>`;
+  }
+  if (field.type === 'checkbox') {
+    return `<label class="checkbox-row"><input type="checkbox" name="${field.key}" id="${id}" ${value ? 'checked' : ''}> ${field.checkboxLabel || 'Yes'}</label>`;
+  }
+  if (field.type === 'select') {
+    if (field.source && related[field.source]) {
+      return buildSelectField(field.key, related[field.source], value);
+    }
+    return buildSelectField(field.key, field.options || [], value);
+  }
+  if (field.type === 'checkboxes') {
+    const items = related[field.source] || [];
+    return buildCheckboxGroup(field.key, items, Array.isArray(value) ? value : []);
+  }
+  if (field.type === 'list') {
+    return buildDynamicList(field.key, Array.isArray(value) ? value : []);
+  }
+  return `<input type="text" name="${field.key}" id="${id}" value="${String(value).replace(/"/g,'&quot;')}">`;
+}
+
+function buildFormHTML(cfg, item, related) {
+  const isNew = !item;
+  item = item || {};
+  const idLine = item.id ? `<p class="help-text" style="margin-bottom:8px">ID: <span class="id-display">${item.id}</span></p>` : '';
+
+  const sections = cfg.sections.map(section => {
+    if (section.type === 'acts') {
+      return `<div class="form-section">
+        <h3>Acts</h3>
+        ${buildActsEditor(item)}
+      </div>`;
+    }
+    const fields = (section.fields || []).map(field => `
+      <div class="field-group">
+        <label for="field-${field.key.replace(/\./g,'-')}">${field.label}${field.required ? ' <span class="required">*</span>' : ''}</label>
+        ${buildField(field, item, related)}
+        ${field.help ? `<p class="help-text">${field.help}</p>` : ''}
+      </div>`).join('');
+    return `<div class="form-section"><h3>${section.title}</h3>${idLine}${fields}</div>`;
+  }).join('');
+
+  return `<form id="entity-form" class="form-wrap">
+    ${sections}
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Save</button>
+      <button type="button" class="btn btn-secondary" id="form-cancel">Cancel</button>
+    </div>
+  </form>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FORM DATA EXTRACTION
+// ═══════════════════════════════════════════════════════════════
+function extractFormData(cfg, formEl, existingItem) {
+  const data = existingItem ? { ...existingItem } : {};
+
+  // Standard fields from schema
+  for (const section of cfg.sections) {
+    if (section.type === 'acts') continue;
+    for (const field of (section.fields || [])) {
+      if (field.type === 'checkbox') {
+        setDeep(data, field.key, formEl.querySelector(`[name="${field.key}"]`)?.checked ?? false);
+      } else if (field.type === 'checkboxes') {
+        const checked = [...formEl.querySelectorAll(`[name="${field.key}"]:checked`)].map(el => el.value);
+        setDeep(data, field.key, checked);
+      } else if (field.type === 'list') {
+        const items = [...formEl.querySelectorAll(`[data-list="${field.key}"]`)]
+          .map(el => el.value.trim()).filter(Boolean);
+        setDeep(data, field.key, items);
+      } else {
+        const el = formEl.querySelector(`[name="${field.key}"]`);
+        if (el) setDeep(data, field.key, el.value.trim());
+      }
+    }
+  }
+
+  // Acts editor
+  const actBlocks = formEl.querySelectorAll('[data-act]');
+  if (actBlocks.length) {
+    data.acts = [...actBlocks].map((_, i) => ({
+      actNumber:  i + 1,
+      name:       formEl.querySelector(`[name="act-name-${i}"]`)?.value.trim() || '',
+      minuteRange:[
+        Number(formEl.querySelector(`[name="act-from-${i}"]`)?.value || 0),
+        Number(formEl.querySelector(`[name="act-to-${i}"]`)?.value   || 0),
+      ],
+      beats: [...formEl.querySelectorAll(`[data-list="act-beats-${i}"]`)]
+        .map(el => el.value.trim()).filter(Boolean),
+    }));
+  }
+
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DYNAMIC LIST EVENT DELEGATION
+// ═══════════════════════════════════════════════════════════════
+function bindDynamicLists(container) {
+  container.addEventListener('click', e => {
+    // Add item
+    const addBtn = e.target.closest('[data-list-add]');
+    if (addBtn) {
+      const key   = addBtn.dataset.listAdd;
+      const wrap  = container.querySelector(`[data-list-wrap="${key}"] .list-items`);
+      const idx   = wrap.children.length;
+      const row   = document.createElement('div');
+      row.className = 'list-item-row';
+      row.innerHTML = `<input type="text" data-list="${key}" data-index="${idx}" placeholder="Type here…">
+                       <button type="button" class="remove-btn" data-list="${key}" data-index="${idx}" title="Remove">×</button>`;
+      wrap.appendChild(row);
+      row.querySelector('input').focus();
+      return;
+    }
+    // Remove item
+    const removeBtn = e.target.closest('.remove-btn[data-list]');
+    if (removeBtn) {
+      removeBtn.closest('.list-item-row').remove();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — Dashboard
+// ═══════════════════════════════════════════════════════════════
+async function renderDashboard() {
+  setTopbar('Story Admin', []);
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  const [dash, scenarios] = await Promise.all([
+    apiGet('/dashboard'),
+    apiGet('/scenarios').catch(err => { console.error('[dashboard] /scenarios failed:', err); return []; }),
+  ]);
+  const counts = { 'story-arcs': dash.storyArcs, 'player-roles': dash.playerRoles,
+    characters: dash.characters, locations: dash.locations, clues: dash.clues,
+    players: dash.players, sessions: dash.sessions };
+  for (const [entity, count] of Object.entries(counts)) {
+    const badge = document.getElementById(`badge-${entity}`);
+    if (badge) badge.textContent = count;
+  }
+  const statCards = Object.entries(counts).map(([entity, count]) => `
+    <div class="stat-card" data-entity="${entity}">
+      <div class="stat-card-num">${count}</div>
+      <div class="stat-card-label">${ENTITIES[entity]?.plural || entity}</div>
+    </div>`).join('');
+
+  const scenarioSection = scenarios.length ? `
+    <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
+    <div class="scenario-cards">${scenarios.map(s => `
+      <div class="scenario-play-card">
+        <div class="scenario-play-card-info">
+          <div class="scenario-play-card-title">${s.title || s.id}</div>
+          <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+        </div>
+        <div class="scenario-play-card-actions">
+          <a class="btn btn-primary btn-sm" href="/game?scenarioId=${encodeURIComponent(s.id)}" target="_blank">▶ Play</a>
+        </div>
+      </div>`).join('')}
+    </div>` : '';
+
+  document.getElementById('content').innerHTML = `
+    ${scenarioSection}
+    <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Content Library</h3>
+    <div class="dashboard-grid">${statCards}</div>
+    <p style="color:var(--text-soft);font-size:13px">Click any card to manage that entity type.</p>`;
+  document.querySelectorAll('.stat-card[data-entity]').forEach(el => {
+    el.addEventListener('click', () => navigate(el.dataset.entity));
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — List view
+// ═══════════════════════════════════════════════════════════════
+async function renderList(entityType) {
+  const cfg = ENTITIES[entityType];
+  setTopbar(cfg.plural, cfg.canAdd ? [{ label: `＋ New ${cfg.label}`, cls: 'btn-primary', action: () => renderForm(entityType, null) }] : []);
+  setNavActive(entityType);
+  document.getElementById('content').innerHTML = '<p>Loading…</p>';
+
+  // Load scenarios for filter (once)
+  if (!state.scenarios.length) {
+    try { state.scenarios = await apiGet('/scenarios'); } catch {}
+  }
+
+  const qs = state.scenarioFilter ? `?scenarioId=${encodeURIComponent(state.scenarioFilter)}` : '';
+  let items = await apiGet(`/${entityType}${qs}`);
+
+  // Client-side filter for entities that use scenarioIds[] (characters)
+  if (state.scenarioFilter && entityType === 'characters') {
+    items = items.filter(c => (c.scenarioIds || []).includes(state.scenarioFilter));
+  }
+
+  updateBadge(entityType, items.length);
+
+  const filterBar = state.scenarios.length > 1 ? `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;color:var(--text-soft)">SCENARIO</span>
+      <select id="scenario-filter" style="width:auto;padding:5px 10px;font-size:13px">
+        <option value="">All scenarios</option>
+        ${state.scenarios.map(s => `<option value="${s.id}" ${state.scenarioFilter === s.id ? 'selected' : ''}>${s.title || s.id}</option>`).join('')}
+      </select>
+    </div>` : '';
+
+  if (!items.length) {
+    document.getElementById('content').innerHTML = `
+      ${filterBar}
+      <div class="empty-state">
+        <p>No ${cfg.plural.toLowerCase()}${state.scenarioFilter ? ' for this scenario' : ''} yet.</p>
+        ${cfg.canAdd ? `<button class="btn btn-primary" id="add-first">＋ Add your first ${cfg.label}</button>` : ''}
+      </div>`;
+    document.getElementById('scenario-filter')?.addEventListener('change', e => {
+      state.scenarioFilter = e.target.value;
+      renderList(entityType);
+    });
+    document.getElementById('add-first')?.addEventListener('click', () => renderForm(entityType, null));
+    return;
+  }
+
+  const cards = items.map(item => {
+    const name = item[cfg.nameField] || item.id;
+    const sub  = cfg.cardSub(item);
+    const tags = cfg.cardTags(item).map(t => `<span class="tag ${t.cls || ''}">${t.label}</span>`).join('');
+    const editBtn   = !cfg.readOnly ? `<button class="btn btn-secondary btn-sm" data-edit="${item.id}">Edit</button>` : '';
+    const deleteBtn = cfg.canDelete ? `<button class="btn btn-danger btn-sm" data-delete="${item.id}" data-name="${name}">Delete</button>` : '';
+    return `<div class="entity-card">
+      <div class="entity-card-name">${name}</div>
+      ${sub ? `<div class="entity-card-sub">${sub}</div>` : ''}
+      ${tags ? `<div class="entity-card-tags">${tags}</div>` : ''}
+      <div class="entity-card-actions">${editBtn}${deleteBtn}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    ${filterBar}
+    <div class="entity-grid">${cards}</div>`;
+
+  document.getElementById('scenario-filter')?.addEventListener('change', e => {
+    state.scenarioFilter = e.target.value;
+    renderList(entityType);
+  });
+
+  document.getElementById('content').addEventListener('click', async e => {
+    const editBtn   = e.target.closest('[data-edit]');
+    const deleteBtn = e.target.closest('[data-delete]');
+    if (editBtn)   renderForm(entityType, editBtn.dataset.edit);
+    if (deleteBtn) confirmDelete(entityType, deleteBtn.dataset.delete, deleteBtn.dataset.name);
+  }, { once: true });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — Form view
+// ═══════════════════════════════════════════════════════════════
+async function renderForm(entityType, editId) {
+  const cfg   = ENTITIES[entityType];
+  const isNew = !editId;
+  setTopbar(`${isNew ? 'New' : 'Edit'} ${cfg.label}`, []);
+  setNavActive(entityType);
+  document.getElementById('content').innerHTML = '<p>Loading…</p>';
+
+  // Load item and related data
+  const [item, characters, locations] = await Promise.all([
+    editId ? apiGet(`/${entityType}/${editId}`) : Promise.resolve(null),
+    apiGet('/characters'),
+    apiGet('/locations'),
+  ]);
+
+  state.related = { characters, locations };
+
+  const html = buildFormHTML(cfg, item, state.related);
+  document.getElementById('content').innerHTML = html;
+
+  const form = document.getElementById('entity-form');
+  bindDynamicLists(form);
+
+  document.getElementById('form-cancel').addEventListener('click', () => renderList(entityType));
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const saveBtn = form.querySelector('[type=submit]');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+    try {
+      const body = extractFormData(cfg, form, item);
+      if (isNew) {
+        await apiPost(`/${entityType}`, body);
+        toast(`${cfg.label} created.`, 'success');
+      } else {
+        await apiPut(`/${entityType}/${editId}`, body);
+        toast(`${cfg.label} saved.`, 'success');
+      }
+      renderList(entityType);
+    } catch (err) {
+      toast(err.message, 'error');
+      saveBtn.disabled = false;
+      saveBtn.textContent = '💾 Save';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DELETE CONFIRMATION
+// ═══════════════════════════════════════════════════════════════
+function confirmDelete(entityType, id, name) {
+  const cfg = ENTITIES[entityType];
+  document.getElementById('modal-title').textContent = `Delete ${cfg.label}`;
+  document.getElementById('modal-body').textContent  = `Are you sure you want to delete "${name}"? This cannot be undone.`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+
+  const onConfirm = async () => {
+    cleanup();
+    try {
+      await apiDelete(`/${entityType}/${id}`);
+      toast(`${cfg.label} deleted.`, 'success');
+      renderList(entityType);
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+  };
+  const cleanup = () => {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    document.getElementById('modal-confirm').removeEventListener('click', onConfirm);
+    document.getElementById('modal-cancel').removeEventListener('click', cleanup);
+  };
+  document.getElementById('modal-confirm').addEventListener('click', onConfirm);
+  document.getElementById('modal-cancel').addEventListener('click', cleanup);
+}
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.add('hidden');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION + TOPBAR HELPERS
+// ═══════════════════════════════════════════════════════════════
+function navigate(entityType) {
+  if (entityType) renderList(entityType);
+  else renderDashboard();
+}
+
+function setTopbar(title, actions) {
+  document.getElementById('topbar-title').textContent = title;
+  document.getElementById('topbar-actions').innerHTML = actions.map(a =>
+    `<button class="btn ${a.cls}" id="topbar-btn">${a.label}</button>`
+  ).join('');
+  actions.forEach((a, i) => {
+    document.querySelectorAll('#topbar-btn')[i]?.addEventListener('click', a.action);
+  });
+}
+
+function setNavActive(entityType) {
+  document.querySelectorAll('.nav-link').forEach(el => {
+    el.classList.toggle('active', el.dataset.entity === entityType);
+  });
+}
+
+function updateBadge(entityType, count) {
+  const badge = document.getElementById(`badge-${entityType}`);
+  if (badge) badge.textContent = count;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+function toast(message, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STORY GENERATOR
+// ═══════════════════════════════════════════════════════════════
+function renderGenerator() {
+  setTopbar('Generate New Story', []);
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.querySelector('.nav-link[data-view="generate"]')?.classList.add('active');
+
+  document.getElementById('content').innerHTML = `
+    <div class="form-wrap">
+      <div class="form-section">
+        <h3>Story Parameters</h3>
+        <div class="field-group">
+          <label for="gen-title">Story Title <span class="required">*</span></label>
+          <input type="text" id="gen-title" placeholder="e.g. The Boston Tea Party: A Night of Secrets">
+        </div>
+        <div class="two-col">
+          <div class="field-group">
+            <label for="gen-playtime">Play Time</label>
+            <select id="gen-playtime">
+              <option value="10">10 minutes</option>
+              <option value="15" selected>15 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60">60 minutes</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="gen-tone">Tone</label>
+            <select id="gen-tone">
+              <option value="historical thriller">Historical Thriller</option>
+              <option value="mystery">Mystery</option>
+              <option value="adventure">Adventure</option>
+              <option value="noir">Noir</option>
+              <option value="drama">Drama</option>
+              <option value="sci-fi thriller">Sci-Fi Thriller</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="gen-realism">Historical Realism</label>
+          <select id="gen-realism">
+            <option value="high">High — use real historical figures and facts</option>
+            <option value="medium" selected>Medium — blend real history with invention</option>
+            <option value="low">Low — inspired by history but fully fictional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Source Material</h3>
+        <div class="field-group">
+          <label for="gen-concept">Story Concept or Source Text <span class="required">*</span></label>
+          <textarea id="gen-concept" style="min-height:220px" placeholder="Paste your source material here. This can be:
+
+• A one-sentence concept
+  e.g. 'Boston Tea Party, 1773 — a colonial spy uncovers who tipped off the British'
+
+• A detailed brief with characters, locations, and events you want included
+
+• A Wikipedia article or historical summary
+
+• Key chapters from a public domain book
+
+Best results: 500–3,000 words of focused material.
+Up to ~10,000 words is supported, but more is not always better."></textarea>
+          <p class="help-text" id="gen-word-count">0 words</p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="gen-submit">✨ Generate Story</button>
+      </div>
+    </div>`;
+
+  document.getElementById('gen-concept').addEventListener('input', e => {
+    const words = e.target.value.trim() ? e.target.value.trim().split(/\s+/).length : 0;
+    const el = document.getElementById('gen-word-count');
+    el.textContent = `${words.toLocaleString()} words`;
+    el.style.color = words > 10000 ? 'var(--warn)' : 'var(--text-soft)';
+  });
+
+  document.getElementById('gen-submit').addEventListener('click', handleGenerate);
+}
+
+async function handleGenerate() {
+  const title             = document.getElementById('gen-title').value.trim();
+  const concept           = document.getElementById('gen-concept').value.trim();
+  const playTimeMinutes   = Number(document.getElementById('gen-playtime').value);
+  const tone              = document.getElementById('gen-tone').value;
+  const historicalRealism = document.getElementById('gen-realism').value;
+
+  if (!title)   { toast('Please enter a story title.', 'error');   return; }
+  if (!concept) { toast('Please enter a concept or source material.', 'error'); return; }
+
+  setTopbar('Generating…', []);
+  document.getElementById('content').innerHTML = `
+    <div style="text-align:center;padding:80px 20px;max-width:480px;margin:0 auto">
+      <div style="font-size:52px;margin-bottom:20px">✨</div>
+      <p style="font-size:17px;font-weight:600;margin-bottom:10px">Claude is writing your story…</p>
+      <p style="font-size:13px;color:var(--text-soft);line-height:1.6">
+        Creating characters, locations, clues, and a full story arc.<br>
+        This usually takes <strong>30–90 seconds</strong>.
+      </p>
+    </div>`;
+
+  try {
+    const generated = await apiPost('/generate', { title, concept, playTimeMinutes, tone, historicalRealism });
+    renderPreview(generated, { playTimeMinutes });
+  } catch (err) {
+    const errMsg = err.message || 'Unknown error';
+    setTopbar('Generation Failed', []);
+    document.getElementById('content').innerHTML = `
+      <div style="max-width:560px;margin:40px auto">
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:24px;margin-bottom:20px">
+          <p style="font-size:15px;font-weight:600;color:#991b1b;margin-bottom:10px">Generation failed</p>
+          <p style="font-size:13px;color:#7f1d1d;line-height:1.6;white-space:pre-wrap">${errMsg}</p>
+        </div>
+        <p style="font-size:13px;color:var(--text-soft);margin-bottom:20px">
+          Your concept and settings have been preserved. Click <strong>Try Again</strong> to go back to the form with everything filled in.
+        </p>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="gen-retry">Try Again</button>
+          <button class="btn btn-secondary" id="gen-back">Start Over</button>
+        </div>
+      </div>`;
+    document.getElementById('gen-retry').addEventListener('click', () => {
+      renderGenerator();
+      document.getElementById('gen-title').value   = title;
+      document.getElementById('gen-concept').value = concept;
+      document.getElementById('gen-playtime').value = String(playTimeMinutes);
+      document.getElementById('gen-tone').value     = tone;
+      document.getElementById('gen-realism').value  = historicalRealism;
+      const words = concept.trim().split(/\s+/).length;
+      const wc = document.getElementById('gen-word-count');
+      if (wc) wc.textContent = `${words.toLocaleString()} words`;
+    });
+    document.getElementById('gen-back').addEventListener('click', () => renderGenerator());
+  }
+}
+
+function renderPreview(data, params) {
+  const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
+
+  setTopbar(`Preview: ${scenario.title}`, [
+    { label: '💾 Save All', cls: 'btn-primary',   action: () => handleSaveGenerated(data) },
+    { label: '↩ Start Over', cls: 'btn-secondary', action: () => renderGenerator() },
+  ]);
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.querySelector('.nav-link[data-view="generate"]')?.classList.add('active');
+
+  const keyClueIds = new Set(scenario.keyEvidenceClueIds || []);
+
+  const characterCards = characters.map(c => `
+    <div class="entity-card">
+      <div class="entity-card-name">${c.name}</div>
+      <div class="entity-card-sub">${c.role || ''}</div>
+      <div class="entity-card-tags"><span class="tag">${c.publicFace || ''}</span></div>
+    </div>`).join('');
+
+  const locationCards = locations.map(l => `
+    <div class="entity-card">
+      <div class="entity-card-name">${l.name}</div>
+      <div class="entity-card-sub">${l.mood || ''}</div>
+      <div class="entity-card-tags">${(l.linkedCharacterIds || []).map(id => `<span class="tag">${id.replace(/_/g,' ')}</span>`).join('')}</div>
+    </div>`).join('');
+
+  const clueCards = clues.map(c => `
+    <div class="entity-card">
+      <div class="entity-card-name">${c.title}</div>
+      <div class="entity-card-sub">${(c.description || '').slice(0, 90)}${c.description?.length > 90 ? '…' : ''}</div>
+      <div class="entity-card-tags">
+        <span class="tag category">${c.category || ''}</span>
+        ${keyClueIds.has(c.id) ? '<span class="tag key-evidence">Key Evidence</span>' : ''}
+      </div>
+    </div>`).join('');
+
+  const roleCards = playerRoles.map(r => `
+    <div class="entity-card">
+      <div class="entity-card-name">${r.name}</div>
+      <div class="entity-card-sub">${(r.description || '').slice(0, 90)}${r.description?.length > 90 ? '…' : ''}</div>
+      <div class="entity-card-tags"><span class="tag">${r.accessLevel || ''}</span></div>
+    </div>`).join('');
+
+  const arcHtml = storyArc ? `
+    <div class="form-section" style="margin-bottom:24px">
+      <h3>Story Arc — ${storyArc.name}</h3>
+      <p style="font-size:13px;margin-bottom:8px"><strong>Goal:</strong> ${storyArc.goal || ''}</p>
+      <p style="font-size:13px;color:var(--text-soft)">${storyArc.premise || ''}</p>
+    </div>` : '';
+
+  document.getElementById('content').innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px">
+      <h2 style="margin-bottom:6px">${scenario.title}</h2>
+      <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px">${scenario.description || ''}</p>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px">
+        <span>⏱ ${params.playTimeMinutes} min</span>
+        <span>🎭 ${characters.length} characters</span>
+        <span>📍 ${locations.length} locations</span>
+        <span>🔍 ${clues.length} clues</span>
+        <span>🎮 ${playerRoles.length} player roles</span>
+      </div>
+    </div>
+
+    ${arcHtml}
+
+    <div class="preview-section-label">Characters</div>
+    <div class="entity-grid" style="margin-bottom:24px">${characterCards || '<p style="color:var(--text-soft);font-size:13px">None generated.</p>'}</div>
+
+    <div class="preview-section-label">Locations</div>
+    <div class="entity-grid" style="margin-bottom:24px">${locationCards || '<p style="color:var(--text-soft);font-size:13px">None generated.</p>'}</div>
+
+    <div class="preview-section-label">Clues</div>
+    <div class="entity-grid" style="margin-bottom:24px">${clueCards || '<p style="color:var(--text-soft);font-size:13px">None generated.</p>'}</div>
+
+    <div class="preview-section-label">Player Roles</div>
+    <div class="entity-grid" style="margin-bottom:24px">${roleCards || '<p style="color:var(--text-soft);font-size:13px">None generated.</p>'}</div>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin-bottom:24px">
+      <p style="font-size:13px;color:#166534;line-height:1.6">
+        ✅ Review everything above. When you're happy, click <strong>Save All</strong> to write all entities to your admin.
+        You can edit any details using the regular admin editors afterward.
+      </p>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="preview-save">💾 Save All</button>
+      <button class="btn btn-secondary" id="preview-restart">↩ Start Over</button>
+    </div>`;
+
+  document.getElementById('preview-save').addEventListener('click',    () => handleSaveGenerated(data));
+  document.getElementById('preview-restart').addEventListener('click', () => renderGenerator());
+}
+
+async function handleSaveGenerated(data) {
+  const btn = document.getElementById('preview-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  try {
+    await apiPost('/generate/save', data);
+    toast(`"${data.scenario.title}" saved — ${data.characters.length} characters, ${data.locations.length} locations, ${data.clues.length} clues.`, 'success');
+    await renderDashboard();
+  } catch (err) {
+    toast(`Save failed: ${err.message}`, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Save All'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR NAVIGATION EVENTS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.nav-link[data-entity]').forEach(link => {
+  link.addEventListener('click', () => navigate(link.dataset.entity));
+});
+document.querySelector('.nav-link[data-view="generate"]')
+  ?.addEventListener('click', () => renderGenerator());
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderDashboard();
+</script>
+</body>
+</html>

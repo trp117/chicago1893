@@ -1,0 +1,13 @@
+{
+  "id": "tampered_wiring_diagrams",
+  "scenarioId": "chicago_1893_v1",
+  "title": "Altered Wiring Diagrams",
+  "description": "The official schematics for the central lighting demonstration have been subtly altered — a change that would cause a cascade failure on activation.",
+  "category": "physical",
+  "discoveryLocationId": "machinery_hall",
+  "implicatesCharacterIds": ["emile_mercier"],
+  "unlocks": ["dialogue:burnham_warning"],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

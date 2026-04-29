@@ -1,0 +1,33 @@
+{
+  "id": "elias_croft",
+  "scenarioIds": [
+    "boston_tea_party"
+  ],
+  "name": "Elias Croft",
+  "role": "Dock laborer and recent recruit to the Sons of Liberty",
+  "publicFace": "A rough-handed, nervous young man who speaks too quickly and laughs at the wrong moments — he looks guilty even when he isn't.",
+  "privateGoal": "Prove himself to the Sons of Liberty and earn enough trust to be included in the boarding party tonight.",
+  "fear": "Being blamed for the leak simply because he is new and unknown — he knows how easily suspicion falls on the lowest man.",
+  "knowledge": [
+    "He overheard Thomas Dillworth arguing in hushed tones with a man in a dark coat near Rowe's Wharf two nights ago — the stranger handed Dillworth something small.",
+    "He knows which crates on the Dartmouth are rigged to open quickly — he helped load them — and the information was never written down, only spoken aloud."
+  ],
+  "voice": "Fast, earnest, slightly breathless — he over-explains and circles back to repeat himself when nervous; his loyalty is genuine but his manner invites suspicion.",
+  "trustLogic": "He opens up immediately to anyone who treats him with basic respect and does not lead with accusations; he shuts down completely if he feels he is being set up as a scapegoat.",
+  "secrets": [
+    "He cannot read or write, which means he could not have authored the coded letter — a fact that exonerates him if the player thinks to ask.",
+    "He stole a small coin from the collection at Old South Meeting House last month and is terrified that sin will be used against him."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Stumbles over his words and repeats his alibi: 'I was on the dock all evening, ask any man there, I never left, not once.'",
+    "heavyPressure": "Becomes tearful and angry simultaneously: 'You want a name to give Adams, is that it? Well I won't give you mine for something I didn't do!'",
+    "breakingPoint": "He will never reveal the stolen coin — he believes it is irrelevant but fears it will be used to destroy his character.",
+    "fleeCondition": "If formally accused in front of Samuel Adams without the player having any real evidence against him.",
+    "fleeStyle": "Runs toward the waterfront and tries to hide among the crowd gathering at Griffin's Wharf.",
+    "chaseStyle": "Fast on his feet and knows every alley near the docks; will hide rather than fight.",
+    "capturedBehavior": "Breaks down and tells everything he knows about Dillworth and the stranger at Rowe's Wharf.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.074Z"
+}

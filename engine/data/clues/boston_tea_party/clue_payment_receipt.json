@@ -1,0 +1,15 @@
+{
+  "id": "clue_payment_receipt",
+  "scenarioId": "boston_tea_party",
+  "title": "The Payment Receipt",
+  "description": "Tucked inside the unwrapped bolt of dark wool in Dillworth's counting house, you discover a small slip of paper — a receipt in the formal hand of a Crown clerk, acknowledging delivery of twenty pounds sterling to 'T.D.' for 'services rendered in the matter of harbor commerce, 14 December 1773.' The initials match Thomas Dillworth. The date is two days before tonight.",
+  "category": "documentary",
+  "discoveryLocationId": "dillworth_counting_house",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.081Z"
+}

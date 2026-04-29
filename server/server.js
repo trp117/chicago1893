@@ -44,19 +44,23 @@ function readJson(filePath) {
   return JSON.parse(readText(filePath));
 }
 
+const SPEECH_VERBS = ['says', 'states', 'explains', 'claims', 'adds', 'continues', 'replies', 'notes', 'murmurs', 'answers'];
+
 function prepareForTts(text) {
-  return text
+  return (text || '')
     .replace(/\*\*(.+?)\*\*/g, '$1')
     .replace(/\*(.+?)\*/g, '$1')
     .replace(/#+\s*/g, '')
     .replace(/\[(.+?)\]\(.+?\)/g, '$1')
     .replace(/`(.+?)`/g, '$1')
     .replace(/[_~]/g, '')
-    // NPC dialogue: "Name: "speech"" → "Name says/asks/exclaims, speech"
-    .replace(/^([A-Z][^:\n]{0,25}):\s*["""'](.+?)["""']\s*$/gm, (_, name, speech) => {
-      const trimmed = speech.trim();
-      const verb = trimmed.endsWith('!') ? 'exclaims' : trimmed.endsWith('?') ? 'asks' : 'says';
-      return `${name} ${verb}, ${trimmed}`;
+    // Name: "speech" → Name says, speech  (verb chosen by terminal punctuation)
+    .replace(/^([A-Z][^:\n]{0,30}):\s*[""'](.+?)[""']\s*$/gm, (_, name, speech) => {
+      const t = speech.trim();
+      const verb = t.endsWith('!') ? 'exclaims'
+                 : t.endsWith('?') ? 'asks'
+                 : SPEECH_VERBS[Math.floor(Math.random() * SPEECH_VERBS.length)];
+      return `${name} ${verb}, ${t}`;
     })
     .replace(/\s+/g, ' ')
     .trim();

@@ -1,0 +1,15 @@
+{
+  "id": "clue_croft_testimony",
+  "scenarioId": "boston_tea_party",
+  "title": "Croft's Rowe's Wharf Observation",
+  "description": "Elias Croft, visibly relieved to be treated as a witness rather than a suspect, tells you what he saw two nights ago at Rowe's Wharf: Dillworth meeting a man in a dark coat who handed him something small and flat — the size of a folded banknote or a receipt. Croft adds, almost as an afterthought, that he cannot read or write, which means he could not have authored any coded correspondence even if he wanted to.",
+  "category": "testimony",
+  "discoveryLocationId": "griffins_wharf",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.083Z"
+}

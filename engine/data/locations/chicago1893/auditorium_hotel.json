@@ -1,0 +1,15 @@
+{
+  "id": "auditorium_hotel",
+  "scenarioId": "chicago_1893_v1",
+  "name": "Auditorium Hotel Lounge",
+  "description": "Cigars, polished wood, politics, foreign visitors, and private conversations disguised as idle society chatter.",
+  "mood": "civilized, strategic, conspiratorial",
+  "linkedCharacterIds": ["clara_hale", "emile_mercier", "patrick_hanrahan"],
+  "atmosphericDetails": [
+    "A meeting arranged under another name",
+    "A newspaper draft hinting at scandal",
+    "A handwritten note mentioning opening night lighting"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

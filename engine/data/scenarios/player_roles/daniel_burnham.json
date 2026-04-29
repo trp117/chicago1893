@@ -1,0 +1,39 @@
+{
+  "id": "daniel_burnham",
+  "scenarioId": "chicago_1893_v1",
+  "name": "Daniel Burnham",
+  "description": "Director of Works. You built this city from mud and ambition. You have command authority over the fair — but your reputation rides on every decision you make here.",
+  "startLocationId": "administration_building",
+  "startingKnowledge": [
+    "telegraph warning received",
+    "full authority over fair staff",
+    "political pressure from exposition committee"
+  ],
+  "accessLevel": "director",
+  "perspective": "The player IS Daniel Burnham. Never write 'Burnham says to you' or treat Burnham as an NPC speaking to the player. Narrate from Burnham's point of view. NPCs address the player as 'Mr. Burnham' or 'sir'. Burnham commands — he does not receive orders.",
+  "opening": {
+    "narrative": "Chicago, May 1893. You built this city from swamp and ambition — ten thousand men answering to your hand, four hundred buildings risen from bare ground in two years. The White City is yours. And now, three days from opening, someone is trying to take it from you.\n\nA telegraph arrived before dawn: a consignment of electrical equipment rerouted without your authorization. Someone signed a transfer order in your name. The forgery is competent. That tells you something.\n\nYou are Daniel Burnham, Director of Works. Your desk faces the door. Your assistant stands before you with a second document — the shipping manifest. You unfold it.",
+    "npcMoments": [],
+    "choices": [
+      "Study the forged signature on the transfer order",
+      "Send for the head of fair security immediately",
+      "Go to the freight yards yourself, unannounced"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": ["telegraph warning", "transfer order", "fair credential"],
+    "flags": {
+      "heardFrenchConversation": false,
+      "manifestDiscrepancyFound": true,
+      "securityAlertIssued": false,
+      "journalistInvolved": false
+    },
+    "suspicion": {
+      "emile_mercier": 1,
+      "patrick_hanrahan": 0,
+      "captain_odonnell": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

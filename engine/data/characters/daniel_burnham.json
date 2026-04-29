@@ -1,0 +1,28 @@
+{
+  "id": "daniel_burnham",
+  "scenarioIds": ["chicago_1893_v1"],
+  "name": "Daniel Burnham",
+  "role": "Director of Works and the player's superior",
+  "publicFace": "Controlled, visionary, exhausted, commanding",
+  "privateGoal": "Open the fair without scandal, delay, or humiliation",
+  "fear": "Public failure and political embarrassment",
+  "knowledge": [
+    "Construction delays are worse than the public knows",
+    "Several supply deliveries have been irregular",
+    "City politicians are looking for a reason to blame management"
+  ],
+  "voice": "brief, precise, impatient but not unkind",
+  "trustLogic": "Trust rises when the player brings evidence instead of rumor. It falls if the player acts theatrically or makes unsupported accusations.",
+  "secrets": [
+    "He has quietly suppressed at least one smaller incident to protect public confidence"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Becomes formal and cold. Demands evidence, not theatrics. Trust drops.",
+    "heavyPressure": "Shuts the conversation down entirely. Removes the player from the task. Significant trust loss.",
+    "strikeFirst": null,
+    "fleeCondition": null,
+    "breakingPoint": "Will not tolerate theatrics or unsupported accusations. Authority is his only weapon and he uses it absolutely."
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

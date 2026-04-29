@@ -1,0 +1,34 @@
+{
+  "id": "patrick_hanrahan",
+  "scenarioIds": ["chicago_1893_v1"],
+  "name": "Patrick Hanrahan",
+  "role": "Ward-connected local fixer and procurement intermediary",
+  "publicFace": "Jovial, connected, evasive",
+  "privateGoal": "Profit from contracts while staying well clear of the wreckage if things go wrong",
+  "fear": "Being made the public scapegoat",
+  "knowledge": [
+    "He arranged unofficial labor and after-hours deliveries",
+    "He knows which watchmen can be bribed",
+    "He suspects foreign involvement but cares more about money"
+  ],
+  "voice": "earthy, persuasive, half-confessional",
+  "trustLogic": "He opens up to practical deals, not moral appeals.",
+  "secrets": [
+    "He does not know the full sabotage target, only the logistics behind access"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Deflects with humor and partial truths. Redirects suspicion toward someone else.",
+    "heavyPressure": "Threatens to make noise. Calls loudly for dock workers or supervisors nearby. Uses his ward connections as a threat.",
+    "strikeFirst": {
+      "condition": "Only if the player physically grabs or strikes him first — Hanrahan shoves back instinctively.",
+      "action": "A hard shove and a shout for the nearest worker. Not a fighter — creates a scene to draw witnesses."
+    },
+    "fleeCondition": "If the player produces direct evidence AND threatens arrest or Burnham's authority — OR if the player physically blocks his exit, grabs him, or takes any action that cuts off his escape route. Physical blocking is sufficient on its own; Hanrahan does not need to be caught with evidence to run.",
+    "fleeStyle": "Heavy and slow. Heads toward groups of dock workers where he has authority and protection.",
+    "chaseStyle": "Calls for help from the crew. Uses his bulk to block and deflect rather than outrun. Counts on allies slowing the player.",
+    "breakingPoint": "Will give up operational details — what was moved, where, when — to avoid being the fall guy. Will not name Mercier voluntarily.",
+    "capturedBehavior": "Negotiates immediately. Offers a deal. Blames the French contact for the plan and positions himself as a naive middleman."
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

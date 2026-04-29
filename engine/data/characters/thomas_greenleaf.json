@@ -1,0 +1,34 @@
+{
+  "id": "thomas_greenleaf",
+  "scenarioIds": [
+    "boston_tea_party_version_2"
+  ],
+  "name": "Thomas Greenleaf",
+  "role": "Sons of Liberty treasurer and merchant clerk",
+  "publicFace": "A mild-mannered, bookish man who handles the group's accounts with quiet efficiency — trusted by nearly everyone for his discretion and loyalty to the cause.",
+  "privateGoal": "Greenleaf has been secretly paid by the East India Company's Boston agent to pass intelligence about Patriot operations; he hopes to collect his fee and quietly leave Boston before anyone suspects him.",
+  "fear": "That the coded letter he passed to the customs agent will be found and traced back to him — it bears a cipher only he uses in his account ledgers.",
+  "knowledge": [
+    "He knows the exact time and method the boarding party plans to use to board the Dartmouth.",
+    "He knows the name of his customs contact, Agent Silas Dawes, and the location of their last meeting at the Counting House.",
+    "He is aware that Samuel Adams suspects a leak but believes the suspicion currently falls on Reverend Willard."
+  ],
+  "voice": "Soft-spoken and precise, favoring careful qualifications — 'I believe,' 'as I understand it,' 'one ought to be careful.' He never raises his voice and smiles just a moment too late.",
+  "trustLogic": "He opens up when he believes the player is focused on Reverend Willard as a suspect — he will even volunteer mildly incriminating details about the reverend to redirect attention. He shuts down immediately if the player mentions the Counting House or the name Dawes.",
+  "secrets": [
+    "He received thirty pounds sterling from the East India Company's agent in exchange for the boarding plan.",
+    "The coded letter discovered at the Counting House was written in his hand, using a cipher from his personal ledger."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He grows very still, adjusts his spectacles, and deflects with bureaucratic detail — asking the player to clarify exactly what they mean, buying time to compose himself.",
+    "heavyPressure": "He becomes indignant, invoking his years of service to the Sons of Liberty and suggesting the player has been manipulated by enemies of the cause.",
+    "breakingPoint": "He will never voluntarily admit he wrote the coded letter — he insists it is a forgery even when confronted with it directly.",
+    "fleeCondition": "If the player presents both the coded letter and the customs receipt simultaneously, Greenleaf bolts for the door.",
+    "fleeStyle": "He moves with surprising speed for a bookish man, ducking into the alley behind the Green Dragon and heading toward the waterfront.",
+    "chaseStyle": "He shouts that he is being robbed to draw attention from bystanders, hoping the commotion slows pursuit.",
+    "capturedBehavior": "When cornered, he collapses into tearful confession, begging for mercy and claiming he was coerced by threats to his family — a partial truth designed to win sympathy.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.435Z"
+}

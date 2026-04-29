@@ -1,0 +1,17 @@
+{
+  "id": "warren_surgery",
+  "scenarioId": "boston_tea_party",
+  "name": "Dr. Warren's Surgery",
+  "description": "A clean, spare room above a apothecary on Hanover Street, smelling of camphor and dried herbs — Dr. Warren uses it as both a medical practice and a private meeting room for Sons of Liberty intelligence work. Tonight the surgery is locked, but a light burns in the upstairs window and the sound of papers being sorted carries into the street.",
+  "mood": "analytical, private, tense, intelligent",
+  "linkedCharacterIds": [
+    "dr_joseph_warren"
+  ],
+  "atmosphericDetails": [
+    "A row of small labeled jars lines the windowsill — between the medicinal herbs, one jar contains tightly rolled slips of paper rather than dried leaves.",
+    "A half-decoded document is spread on the writing desk, weighted at the corners by medical instruments.",
+    "The lock on the surgery door is a newer, heavier model than anything else on the street — someone invested in security here."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.079Z"
+}

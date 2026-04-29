@@ -1,0 +1,20 @@
+{
+  "id": "court_of_honor",
+  "scenarioId": "chicago_1893_v1",
+  "name": "Court of Honor",
+  "description": "Brilliant white facades, open vistas, workers moving through grandeur still half-finished, beauty stretched over exhaustion.",
+  "mood": "majestic, exposed, performative",
+  "linkedCharacterIds": [
+    "captain_odonnell",
+    "clara_hale",
+    "crazy_benny",
+    "patrick_hanrahan"
+  ],
+  "atmosphericDetails": [
+    "A misplaced credential",
+    "A worker's rumor about after-hours visitors",
+    "Fresh wheel marks where none should be"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T19:20:55.810Z"
+}

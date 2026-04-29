@@ -1,0 +1,15 @@
+{
+  "id": "clue_custom_house_activity",
+  "scenarioId": "boston_tea_party",
+  "title": "Unusual Activity at the Custom House",
+  "description": "Observing the Custom House from across King Street, you note three things that do not fit an ordinary evening: a dispatch rider's horse arrived lathered within the last hour, a man in a dark coat is gesturing over a map inside, and the wax seal impression in the mud near the door matches the same seal pressed into the oilcloth wrapping of the letter in Dillworth's counting house. Someone has been here recently — and recently means tonight.",
+  "category": "observation",
+  "discoveryLocationId": "custom_house",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.084Z"
+}

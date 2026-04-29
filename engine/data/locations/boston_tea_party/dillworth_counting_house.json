@@ -1,0 +1,17 @@
+{
+  "id": "dillworth_counting_house",
+  "scenarioId": "boston_tea_party",
+  "name": "Dillworth's Counting House",
+  "description": "A narrow two-story building on King Street, its ground floor crammed with ledgers, bolts of cloth, and the smell of ink and cedar — the kind of orderly commercial space that projects respectability so hard it almost convinces you. Tonight it is dark and locked, but the latch on the rear window has not fully caught.",
+  "mood": "cold, suspicious, orderly, hiding something",
+  "linkedCharacterIds": [
+    "thomas_dillworth"
+  ],
+  "atmosphericDetails": [
+    "A ledger on the main desk is open to a page where several entries have been scratched out with such force the quill tore the paper.",
+    "A bolt of dark wool in the corner has been partially unwrapped and rewrapped clumsily — the folds do not match the others on the shelf.",
+    "The smell of sealing wax is fresh and sharp, as if a letter was sealed here within the last few hours."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.077Z"
+}
