@@ -105,6 +105,11 @@ li { margin-bottom: 8px; }
 .new-game-btn:hover { border-color: var(--accent); color: var(--accent); }
 .notes-btn { height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: Georgia, serif; font-size: 0.82rem; font-weight: normal; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
 .notes-btn:hover { border-color: var(--accent); color: var(--accent); }
+.act-transition { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 0 20px; opacity: 0; animation: act-fade-in 1.2s ease forwards; }
+.act-transition-rule { width: 120px; border: none; border-top: 1px solid var(--border); margin: 0; }
+.act-transition-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; }
+.act-transition-line { font-size: 0.88rem; color: var(--muted); font-style: italic; text-align: center; }
+@keyframes act-fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .notes-overlay { position: fixed; inset: 0; z-index: 150; background: rgba(8,6,4,0.7); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: flex-end; padding: 20px; }
 .notes-overlay.hidden { display: none; }
 .notes-panel { width: 100%; max-width: 420px; max-height: calc(100dvh - 40px); background: var(--panel); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
@@ -702,6 +707,26 @@ function updateLocationDisplay(locationId) {
   if (sub) sub.textContent = scenario?.setting || '';
 }
 
+// ── Act transition ────────────────────────────────────────────────────────────
+
+const ACT_BEATS = {
+  2: 'The investigation deepens.',
+  3: 'Time is running short.',
+};
+
+function renderActTransition(from, to) {
+  const el = document.createElement('div');
+  el.className = 'act-transition';
+  el.innerHTML = `
+    <hr class="act-transition-rule">
+    <span class="act-transition-label">Act ${to}</span>
+    <span class="act-transition-line">${ACT_BEATS[to] || ''}</span>
+    <hr class="act-transition-rule">
+  `;
+  storyEl.appendChild(el);
+  storyEl.scrollTop = storyEl.scrollHeight;
+}
+
 // ── Ending ────────────────────────────────────────────────────────────────────
 
 function renderEnding(endState) {
@@ -866,7 +891,12 @@ async function submitTurn(playerInput) {
     }
 
     const prevLocation = gameState?.location;
+    const prevAct = gameState?.act || 1;
     gameState = data.nextState;
+
+    if (data.output?.actTransition) {
+      renderActTransition(data.output.actTransition.from, data.output.actTransition.to);
+    }
 
     conversationHistory.push(
       { role: 'user',      content: playerInput },
@@ -1070,6 +1100,7 @@ async function startGame(roleId, narrativeStyle) {
   const role = (scenario.playerRoleOptions || []).find(r => r.id === roleId);
   if (!role) return;
 
+  // Temporary local state so the sidebar is visible while /start is in flight
   gameState = buildClientInitialState(scenario, role);
   gameState.narrativeStyle = narrativeStyle || 'focused';
 
@@ -1087,50 +1118,69 @@ async function startGame(roleId, narrativeStyle) {
   renderSidebar();
   updateLocationDisplay(gameState.location);
 
-  const openingData = role.opening;
-  if (!openingData?.narrative) {
-    // No opening — render a generic prompt
-    renderOutput({ narrative: `The investigation begins. You are ${role.name}.`, choices: [] });
+  // Show loading indicator while the engine generates the opening
+  const loadingEl = document.createElement('div');
+  loadingEl.className = 'feed-entry';
+  const dotsEl = document.createElement('div');
+  dotsEl.className = 'thinking-dots';
+  dotsEl.innerHTML = '<span></span><span></span><span></span>';
+  loadingEl.appendChild(dotsEl);
+  storyEl.appendChild(loadingEl);
+  storyEl.scrollTop = storyEl.scrollHeight;
+
+  let openingOutput, openingNextState;
+  try {
+    const startResp = await fetch(`${API_BASE}/start`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenarioId: scenario.id, roleId, narrativeStyle: gameState.narrativeStyle })
+    });
+    if (!startResp.ok) throw new Error(`/start returned ${startResp.status}`);
+    const startData = await startResp.json();
+    openingOutput    = startData.output;
+    openingNextState = startData.nextState;
+  } catch (err) {
+    loadingEl.remove();
+    console.error('[START]', err);
+    // Graceful fallback: render static opening if the engine call fails
+    const fallback = role.opening?.narrative
+      ? role.opening
+      : { narrative: `The investigation begins. You are ${role.name}.`, choices: [] };
+    renderOutput(fallback);
     return;
   }
 
-  if (ttsEnabled && audioUnlocked) {
-    const loadingEl = document.createElement('div');
-    loadingEl.className = 'feed-entry';
-    const dotsEl = document.createElement('div');
-    dotsEl.className = 'thinking-dots';
-    dotsEl.innerHTML = '<span></span><span></span><span></span>';
-    loadingEl.appendChild(dotsEl);
-    storyEl.appendChild(loadingEl);
-    storyEl.scrollTop = storyEl.scrollHeight;
+  // Promote server state as authoritative
+  gameState = { ...openingNextState, narrativeStyle: gameState.narrativeStyle };
 
+  if (ttsEnabled && audioUnlocked) {
     let audioBlobUrl = null;
     try {
       const ttsResp = await fetch(`${API_BASE}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: openingData.narrative })
+        body: JSON.stringify({ text: openingOutput.narrative })
       });
       if (ttsResp.ok) audioBlobUrl = URL.createObjectURL(await ttsResp.blob());
     } catch {}
 
     loadingEl.remove();
-    renderOutput(openingData, { skipTts: true });
+    renderOutput(openingOutput, { skipTts: true });
 
     if (audioBlobUrl && audioEl) {
       audioEl.src = audioBlobUrl;
       audioEl.playbackRate = 1.0;
       audioEl.onended = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; };
-      audioEl.onerror = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; ttsSpeakFallback(openingData.narrative); };
+      audioEl.onerror = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; ttsSpeakFallback(openingOutput.narrative); };
       currentAudio = audioEl;
       try {
         await audioEl.play();
         if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
-      } catch { ttsSpeakFallback(openingData.narrative); }
+      } catch { ttsSpeakFallback(openingOutput.narrative); }
     } else {
-      ttsSpeakFallback(openingData.narrative);
+      ttsSpeakFallback(openingOutput.narrative);
     }
   } else {
-    renderOutput(openingData);
+    loadingEl.remove();
+    renderOutput(openingOutput);
   }
 }
 
