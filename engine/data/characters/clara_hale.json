@@ -1,0 +1,29 @@
+{
+  "id": "clara_hale",
+  "scenarioIds": ["chicago_1893_v1"],
+  "name": "Clara Hale",
+  "role": "Journalist with unofficial access to fair gossip and city politics",
+  "publicFace": "Bright, observant, sharper than she first appears",
+  "privateGoal": "Land a major story without being frozen out by fair officials",
+  "fear": "Being fed a false story and losing credibility",
+  "knowledge": [
+    "A rumor links Paris interests to embarrassment schemes against Chicago",
+    "A missing worker may have seen restricted activity after dark",
+    "Political allies of the fair want scandals buried"
+  ],
+  "voice": "quick, incisive, lightly teasing",
+  "trustLogic": "She rewards candor and punishes manipulation. If involved, she becomes a force multiplier but also a risk.",
+  "secrets": [
+    "She has one source inside a hotel frequented by foreign delegates"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Goes cold and professional. Reminds the player of her access and what she could print.",
+    "heavyPressure": "Threatens to publish what she already knows — which may be more than the player assumes. Withdraws access entirely.",
+    "strikeFirst": null,
+    "fleeCondition": null,
+    "breakingPoint": "Cannot be intimidated physically. Information is her only weapon and her only shield.",
+    "capturedBehavior": "N/A — not a conspirator. Treating her as one makes her a permanent enemy with a printing press."
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

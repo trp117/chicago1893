@@ -2,18 +2,78 @@
   "id": "chicago_1893_burnham_conspiracy_v1",
   "title": "Chicago, 1893: Shadows of the White City",
   "premise": "The player, assistant to Daniel Burnham, must uncover and stop a conspiracy to sabotage the World's Columbian Exposition before opening day.",
-  "sessionTargetMinutes": 10,
+  "sessionTargetMinutes": 20,
   "historicalRealism": "high",
   "tone": ["historical thriller", "mystery"],
   "freedomLevel": "guided",
   "playerRole": "Assistant to Daniel Burnham",
+  "playerRoleOptions": [
+    {
+      "id": "burnhams_assistant",
+      "name": "Burnham's Assistant",
+      "description": "A trusted aide with access to Burnham's office and the Administration Building. You move in official circles and can question staff without raising suspicion.",
+      "startLocation": "administration_building",
+      "startingKnowledge": ["shipping manifest discrepancy", "access to Burnham's inner office"],
+      "accessLevel": "staff",
+      "perspective": "The player is Burnham's assistant. Burnham is the player's superior and may speak to the player directly, give orders, and act as a boss. Write the player as an aide acting on Burnham's authority."
+    },
+    {
+      "id": "daniel_burnham",
+      "name": "Daniel Burnham",
+      "description": "Director of Works. You built this city from mud and ambition. You have command authority over the fair — but your reputation rides on every decision you make here.",
+      "startLocation": "administration_building",
+      "startingKnowledge": ["telegraph warning received", "full authority over fair staff", "political pressure from exposition committee"],
+      "accessLevel": "director",
+      "perspective": "The player IS Daniel Burnham. Never write 'Burnham says to you' or treat Burnham as an NPC speaking to the player. Narrate from Burnham's point of view. NPCs address the player as 'Mr. Burnham' or 'sir'. Burnham commands — he does not receive orders."
+    },
+    {
+      "id": "watchman_murphy",
+      "name": "Watchman Murphy",
+      "description": "A night watchman who patrols the freight yards and service corridors. You've seen things the officials haven't noticed. You know this fair from the ground up.",
+      "startLocation": "freight_yards",
+      "startingKnowledge": ["observed after-hours delivery", "knows unofficial routes through the fairgrounds"],
+      "accessLevel": "worker",
+      "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers."
+    }
+  ],
+  "roleOpenings": {
+    "burnhams_assistant": {
+      "narrative": "Chicago, May 1893. The White City rises from the lakefront mud, its plaster palaces gleaming in the morning haze — ten thousand workers still swarming Jackson Park in the final days before the Exposition opens. But beneath the spectacle, something is wrong. A tension moves through the corridors of the Administration Building that has nothing to do with last-minute preparations.\n\nYou are assistant to Daniel Burnham, Director of Works. When he needs eyes he can trust, he sends for you.\n\nThis morning, a shipping manifest crossed your desk: electrical equipment, diverted from its declared route. The signature authorizing the change does not match any name on Burnham's staff.\n\nBurnham's office door stands open. He is at his desk, jaw set, a telegraph slip folded in his hand. He looks up.",
+      "npcMoments": [
+        { "npc": "daniel_burnham", "text": "'Shut the door. Tell me what you found in those papers.'" }
+      ],
+      "choices": [
+        "Show Burnham the mismatched signature on the manifest",
+        "Ask Burnham what he already suspects",
+        "Request permission to go directly to the freight yards"
+      ]
+    },
+    "daniel_burnham": {
+      "narrative": "Chicago, May 1893. You built this city from swamp and ambition — ten thousand men answering to your hand, four hundred buildings risen from bare ground in two years. The White City is yours. And now, three days from opening, someone is trying to take it from you.\n\nA telegraph arrived before dawn: a consignment of electrical equipment rerouted without your authorization. Someone signed a transfer order in your name. The forgery is competent. That tells you something.\n\nYou are Daniel Burnham, Director of Works. Your desk faces the door. Your assistant stands before you with a second document — the shipping manifest. You unfold it.",
+      "npcMoments": [],
+      "choices": [
+        "Study the forged signature on the transfer order",
+        "Send for the head of fair security immediately",
+        "Go to the freight yards yourself, unannounced"
+      ]
+    },
+    "watchman_murphy": {
+      "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",
+      "npcMoments": [],
+      "choices": [
+        "Examine the ground where the crates were unloaded",
+        "Check the south gate log to see if the delivery was recorded",
+        "Go to the Administration Building and report what you saw"
+      ]
+    }
+  },
   "openingSituation": "A discrepancy in shipping manifests and an unnerving conversation overheard near the Administration Building suggest that someone is tampering with critical fair infrastructure.",
   "goal": "Identify the conspirators, confirm the method of sabotage, and stop it before public disaster or humiliation strikes the fair.",
   "acts": [
     {
       "act": 1,
       "name": "Setup",
-      "minutes": [0, 3],
+      "minutes": [0, 4],
       "beats": [
         "Burnham introduces stakes",
         "First irregularity appears",
@@ -24,7 +84,7 @@
     {
       "act": 2,
       "name": "Pressure",
-      "minutes": [4, 7],
+      "minutes": [5, 10],
       "beats": [
         "Evidence of deliberate interference confirmed",
         "A second suspect or complication emerges",
@@ -34,7 +94,7 @@
     {
       "act": 3,
       "name": "Climax",
-      "minutes": [8, 10],
+      "minutes": [11, 20],
       "beats": [
         "Sabotage plan is clear",
         "Player chooses how to intervene",
@@ -68,76 +128,39 @@
     "The fair opens safely, but scandal reaches the newspapers",
     "Burnham is saved political embarrassment, but the player sacrifices an ally"
   ],
+  "keyEvidenceClues": ["tampered_wiring_diagrams", "opening_night_note"],
+
   "initialState": {
-    "session_id": "chicago_1893_session_001",
-    "scenario": {
-      "setting": "Chicago World's Columbian Exposition, May 1893",
-      "player_role": "Assistant to Daniel Burnham, Director of Works",
-      "culprit": "Émile Mercier and Patrick Hanrahan",
-      "motive": "Sabotage the Westinghouse AC electrical demonstration to embarrass Chicago and benefit rival foreign interests",
-      "case_status": "active"
+    "narrativeStyle": "focused",
+    "elapsedMinutes": 0,
+    "remainingMinutes": 20,
+    "act": 1,
+    "location": "administration_building",
+    "threat": 1,
+    "burnhamTrust": 1,
+    "inventory": ["notebook", "fair credential", "shipping memorandum"],
+    "discoveredClueIds": [],
+    "visitedLocations": ["administration_building"],
+    "extensionUsed": false,
+    "timeExpired": false,
+    "knownSabotageMethod": false,
+    "namedConspirators": [],
+    "targetNpc": null,
+    "flags": {
+      "heardFrenchConversation": false,
+      "manifestDiscrepancyFound": true,
+      "securityAlertIssued": false,
+      "journalistInvolved": false
     },
-    "clues": [
-      {
-        "id": "forged_initials_memo",
-        "title": "Forged Initials on Shipping Memo",
-        "description": "A shipping authorization bears the same initials twice — in two distinct hands. Someone falsified access.",
-        "source": "administration_building",
-        "status": "hidden",
-        "reliability": 75
-      },
-      {
-        "id": "overheard_french",
-        "title": "Overheard French Exchange",
-        "description": "Near the Midway, a brief exchange in French cuts off at your approach. The words 'la démonstration' and 'demain soir' were unmistakable.",
-        "source": "midway_plaisance",
-        "status": "hidden",
-        "reliability": 60
-      },
-      {
-        "id": "redirected_crates",
-        "title": "Rerouted Electrical Crates",
-        "description": "Three crates of electrical switching equipment were diverted from Machinery Hall to an unlisted service depot under irregular paperwork.",
-        "source": "freight_yards",
-        "status": "hidden",
-        "reliability": 85
-      },
-      {
-        "id": "bribed_watchman",
-        "title": "Bribed Night Watchman",
-        "description": "A freight yard watchman admits to accepting payment for looking away during after-hours deliveries, paid in cash by a well-dressed intermediary.",
-        "source": "freight_yards",
-        "status": "hidden",
-        "reliability": 70
-      },
-      {
-        "id": "tampered_wiring_diagrams",
-        "title": "Altered Wiring Diagrams",
-        "description": "The official schematics for the central lighting demonstration have been subtly altered — a change that would cause a cascade failure on activation.",
-        "source": "machinery_hall",
-        "status": "hidden",
-        "reliability": 95
-      },
-      {
-        "id": "opening_night_note",
-        "title": "Note: Opening Night Lighting",
-        "description": "A handwritten note refers to the lighting demonstration as the moment of action — confirming a specific, timed sabotage target.",
-        "source": "auditorium_hotel",
-        "status": "hidden",
-        "reliability": 90
-      }
-    ],
-    "npcs": [
-      { "name": "Daniel Burnham", "role": "Director of Works, player's superior", "trust": 20, "suspicion": 0 },
-      { "name": "Émile Mercier", "role": "French electrical consultant", "trust": 0, "suspicion": 10 },
-      { "name": "Patrick Hanrahan", "role": "Ward-connected local fixer", "trust": 0, "suspicion": 0 },
-      { "name": "Clara Hale", "role": "Journalist with unofficial fair access", "trust": 10, "suspicion": 0 },
-      { "name": "Captain O'Donnell", "role": "Fair security officer", "trust": 10, "suspicion": 0 }
-    ],
-    "player": {
-      "notes": [],
-      "identified_culprit": null,
-      "identified_motive": null
-    }
+    "suspicion": {
+      "daniel_burnham": 0,
+      "emile_mercier": 1,
+      "patrick_hanrahan": 0,
+      "captain_odonnell": 0
+    },
+    "introducedNpcs": [],
+    "escapedNpcs": [],
+    "chaseState": null,
+    "physicalConflicts": []
   }
 }

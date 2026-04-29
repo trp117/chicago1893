@@ -1,0 +1,33 @@
+{
+  "id": "paul_revere",
+  "scenarioIds": [
+    "boston_tea_party"
+  ],
+  "name": "Paul Revere",
+  "role": "Silversmith, express rider, and trusted operative of the Sons of Liberty",
+  "publicFace": "Energetic, practical, and direct — a craftsman's bluntness wrapped in patriot zeal; people trust him because he does what he says.",
+  "privateGoal": "Get tonight's action done cleanly and get home before dawn — he has a family and a shop to think about.",
+  "fear": "Being implicated by association if the spy is someone he recruited or vouched for.",
+  "knowledge": [
+    "He personally recruited Elias Croft three months ago after meeting him at a Masonic lodge gathering, and he is now anxious about that decision.",
+    "He knows which dock workers were given the signal phrase for tonight and can account for most of them — but not all."
+  ],
+  "voice": "Clipped, active, impatient with abstractions — he speaks in short declarative sentences and gestures with his hands as if shaping metal.",
+  "trustLogic": "He responds well to direct, no-nonsense questions and to players who show they have already done legwork; he dislikes theorizing and will dismiss players who come to him empty-handed.",
+  "secrets": [
+    "He saw Thomas Dillworth speaking privately with a well-dressed stranger near the Custom House three days ago but dismissed it as a business matter.",
+    "He has a small cache of disguises — Mohawk dress — hidden at the cooperage on Hutchinson Street, and he is worried someone else knows where they are."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Crosses his arms and answers curtly — 'Ask what you mean to ask, friend. We haven't the night for dancing.'",
+    "heavyPressure": "Leans in close and drops his voice: 'You'd better have something solid behind those words or you'll answer for them yourself.'",
+    "breakingPoint": "He will never admit he had doubts about Croft before tonight — admitting that would mean he endangered everyone.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Stays calm, assesses the situation for an exit, and keeps talking to buy time.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.073Z"
+}

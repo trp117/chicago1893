@@ -15,7 +15,14 @@
     "trustLogic": "Trust rises when the player brings evidence instead of rumor. It falls if the player acts theatrically or makes unsupported accusations.",
     "secrets": [
       "He has quietly suppressed at least one smaller incident to protect public confidence"
-    ]
+    ],
+    "aggressionProfile": {
+      "mildPressure": "Becomes formal and cold. Demands evidence, not theatrics. Trust drops.",
+      "heavyPressure": "Shuts the conversation down entirely. Removes the player from the task. Significant trust loss.",
+      "strikeFirst": null,
+      "fleeCondition": null,
+      "breakingPoint": "Will not tolerate theatrics or unsupported accusations. Authority is his only weapon and he uses it absolutely."
+    }
   },
   {
     "id": "emile_mercier",
@@ -33,7 +40,20 @@
     "trustLogic": "He engages when flattered or cornered by specifics. He lies if the player shows uncertainty.",
     "secrets": [
       "He did not design the entire plot, but he enabled access and false paperwork"
-    ]
+    ],
+    "aggressionProfile": {
+      "mildPressure": "Condescending and evasive. Implies diplomatic immunity, redirects with charm.",
+      "heavyPressure": "Threatens to report the confrontation to fair management and the French delegation. Denies everything coldly.",
+      "strikeFirst": {
+        "condition": "If cornered in a private space with suspicion above 3 and player has been aggressive across multiple turns",
+        "action": "Shoves the player hard and bolts for the nearest exit. Calculated, not panicked."
+      },
+      "fleeCondition": "Suspicion score reaches 3 AND the player references specific evidence against him in their input, OR suspicion reaches 4 regardless of player action. Mercier calculates his exposure early — flight is a deliberate move before being cornered, not a last resort.",
+      "fleeStyle": "Calculated — heads for exits, uses crowd or staff as cover. May have transport arranged.",
+      "chaseStyle": "Fast and deliberate. Knows the hotel layout. May double back through a service corridor or push through staff areas.",
+      "breakingPoint": "Will not name co-conspirators or admit the full plan under any circumstances. Too much at stake beyond this fair.",
+      "capturedBehavior": "Denies everything. Demands the French consul. Remains cold and controlled even when cornered."
+    }
   },
   {
     "id": "patrick_hanrahan",
@@ -51,7 +71,20 @@
     "trustLogic": "He opens up to practical deals, not moral appeals.",
     "secrets": [
       "He does not know the full sabotage target, only the logistics behind access"
-    ]
+    ],
+    "aggressionProfile": {
+      "mildPressure": "Deflects with humor and partial truths. Redirects suspicion toward someone else.",
+      "heavyPressure": "Threatens to make noise. Calls loudly for dock workers or supervisors nearby. Uses his ward connections as a threat.",
+      "strikeFirst": {
+        "condition": "Only if the player physically grabs or strikes him first — Hanrahan shoves back instinctively.",
+        "action": "A hard shove and a shout for the nearest worker. Not a fighter — creates a scene to draw witnesses."
+      },
+      "fleeCondition": "If the player produces direct evidence AND threatens arrest or Burnham's authority — OR if the player physically blocks his exit, grabs him, or takes any action that cuts off his escape route. Physical blocking is sufficient on its own; Hanrahan does not need to be caught with evidence to run.",
+      "fleeStyle": "Heavy and slow. Heads toward groups of dock workers where he has authority and protection.",
+      "chaseStyle": "Calls for help from the crew. Uses his bulk to block and deflect rather than outrun. Counts on allies slowing the player.",
+      "breakingPoint": "Will give up operational details — what was moved, where, when — to avoid being the fall guy. Will not name Mercier voluntarily.",
+      "capturedBehavior": "Negotiates immediately. Offers a deal. Blames the French contact for the plan and positions himself as a naive middleman."
+    }
   },
   {
     "id": "clara_hale",
@@ -66,10 +99,18 @@
       "Political allies of the fair want scandals buried"
     ],
     "voice": "quick, incisive, lightly teasing",
-    "trustLogic": "She rewards candor and punishs manipulation. If involved, she becomes a force multiplier but also a risk.",
+    "trustLogic": "She rewards candor and punishes manipulation. If involved, she becomes a force multiplier but also a risk.",
     "secrets": [
       "She has one source inside a hotel frequented by foreign delegates"
-    ]
+    ],
+    "aggressionProfile": {
+      "mildPressure": "Goes cold and professional. Reminds the player of her access and what she could print.",
+      "heavyPressure": "Threatens to publish what she already knows — which may be more than the player assumes. Withdraws access entirely.",
+      "strikeFirst": null,
+      "fleeCondition": null,
+      "breakingPoint": "Cannot be intimidated physically. Information is her only weapon and her only shield.",
+      "capturedBehavior": "N/A — not a conspirator. Treating her as one makes her a permanent enemy with a printing press."
+    }
   },
   {
     "id": "captain_odonnell",
@@ -87,6 +128,17 @@
     "trustLogic": "He responds to timelines, names, and physical evidence. He rejects vague intuition.",
     "secrets": [
       "He has quietly reassigned one unreliable guard without reporting why"
-    ]
+    ],
+    "aggressionProfile": {
+      "mildPressure": "Becomes formal and procedural. Demands identification, authorization, and specifics.",
+      "heavyPressure": "Detains the player. Escalates to Burnham. May physically remove the player from the location.",
+      "strikeFirst": {
+        "condition": "If the player is physically aggressive toward him or someone under his protection.",
+        "action": "Restrains the player with practiced authority. Does not flee — escalates instead. May summon guards."
+      },
+      "fleeCondition": null,
+      "breakingPoint": "Responds to evidence, chain of command, and clear timelines. Cannot be bullied — only reasoned with or outranked.",
+      "capturedBehavior": "N/A — not a conspirator."
+    }
   }
 ]

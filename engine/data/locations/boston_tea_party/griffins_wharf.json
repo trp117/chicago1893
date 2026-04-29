@@ -1,0 +1,18 @@
+{
+  "id": "griffins_wharf",
+  "scenarioId": "boston_tea_party",
+  "name": "Griffin's Wharf",
+  "description": "The three tea ships — Dartmouth, Eleanor, and Beaver — sit dark and heavy in the black water, their rigging creaking in the December wind off the harbor. Dozens of men in rough coats and Mohawk disguises are beginning to gather in the shadows of the warehouses, their breath misting, their axes and rope in hand, waiting for the signal.",
+  "mood": "cold, urgent, dramatic, historic",
+  "linkedCharacterIds": [
+    "elias_croft",
+    "paul_revere"
+  ],
+  "atmosphericDetails": [
+    "The harbor water is so cold it has a faint skin of ice along the pilings — each wave breaks it with a soft crackling sound.",
+    "A lantern signal blinks twice from the far end of the wharf, then goes dark — someone is watching for British patrol boats.",
+    "The smell of tea is already in the air, sweet and foreign, seeping through the wooden hulls of the ships."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.078Z"
+}

@@ -1,0 +1,39 @@
+{
+  "id": "watchman_murphy",
+  "scenarioId": "chicago_1893_v1",
+  "name": "Watchman Murphy",
+  "description": "A night watchman who patrols the freight yards and service corridors. You've seen things the officials haven't noticed. You know this fair from the ground up.",
+  "startLocationId": "freight_yards",
+  "startingKnowledge": [
+    "observed after-hours delivery",
+    "knows unofficial routes through the fairgrounds"
+  ],
+  "accessLevel": "worker",
+  "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers.",
+  "opening": {
+    "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",
+    "npcMoments": [],
+    "choices": [
+      "Examine the ground where the crates were unloaded",
+      "Check the south gate log to see if the delivery was recorded",
+      "Go to the Administration Building and report what you saw"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": ["watch log", "lamp", "fair badge"],
+    "flags": {
+      "heardFrenchConversation": false,
+      "manifestDiscrepancyFound": false,
+      "securityAlertIssued": false,
+      "journalistInvolved": false
+    },
+    "suspicion": {
+      "daniel_burnham": 0,
+      "emile_mercier": 0,
+      "patrick_hanrahan": 1,
+      "captain_odonnell": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

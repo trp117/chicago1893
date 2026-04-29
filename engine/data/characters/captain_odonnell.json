@@ -1,0 +1,36 @@
+{
+  "id": "captain_odonnell",
+  "scenarioIds": [
+    "chicago_1893_v1"
+  ],
+  "name": "Captain O'Donnell, Jr.",
+  "role": "Fair security officer",
+  "publicFace": "Blunt, skeptical, disciplined",
+  "privateGoal": "Keep order and avoid panic",
+  "fear": "False alarms that damage his authority",
+  "knowledge": [
+    "There have been unexplained movements in restricted service areas",
+    "At least one badge may be forged",
+    "He has concerns about inconsistent watch schedules"
+  ],
+  "voice": "direct, clipped, unsentimental",
+  "trustLogic": "He responds to timelines, names, and physical evidence. He rejects vague intuition.",
+  "secrets": [
+    "He has quietly reassigned one unreliable guard without reporting why"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Becomes formal and procedural. Demands identification, authorization, and specifics.",
+    "heavyPressure": "Detains the player. Escalates to Burnham. May physically remove the player from the location.",
+    "strikeFirst": {
+      "condition": "If the player is physically aggressive toward him or someone under his protection.",
+      "action": "Restrains the player with practiced authority. Does not flee — escalates instead. May summon guards."
+    },
+    "fleeCondition": "",
+    "breakingPoint": "Responds to evidence, chain of command, and clear timelines. Cannot be bullied — only reasoned with or outranked.",
+    "capturedBehavior": "N/A — not a conspirator.",
+    "fleeStyle": "",
+    "chaseStyle": ""
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T17:54:36.119Z"
+}

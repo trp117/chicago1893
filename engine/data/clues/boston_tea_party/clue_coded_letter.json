@@ -1,0 +1,17 @@
+{
+  "id": "clue_coded_letter",
+  "scenarioId": "boston_tea_party",
+  "title": "The Coded Letter",
+  "description": "Beneath a loose floorboard in Dillworth's counting house, wrapped in oilcloth, you find a folded letter sealed with plain wax. The body of the letter is written in cipher — columns of letters that mean nothing at a glance — but the salutation is clear: 'To H., Custom House, with the compliments of your faithful servant.' The handwriting is precise, educated, and matches the scratched-out entries in the ledger on the desk above.",
+  "category": "documentary",
+  "discoveryLocationId": "dillworth_counting_house",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ],
+  "unlocks": [
+    "clue_cipher_key"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.080Z"
+}

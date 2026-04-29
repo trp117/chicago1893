@@ -1,8 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pkill -f \"node server/server.js\")",
-      "Bash(node /d/chicago1893_v1/chicago1893_v1/server/server.js)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

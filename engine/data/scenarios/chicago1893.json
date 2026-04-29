@@ -1,0 +1,43 @@
+{
+  "id": "chicago_1893_v1",
+  "version": "1.0.0",
+  "title": "Chicago, 1893: Shadows of the White City",
+  "description": "A 20-minute historical thriller set during the World's Columbian Exposition. A conspiracy threatens to sabotage the fair's opening night lighting demonstration.",
+  "genre": ["historical thriller", "mystery"],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 20,
+  "storyArcIds": ["chicago1893_main_arc"],
+  "playerRoleIds": ["burnhams_assistant", "daniel_burnham", "watchman_murphy"],
+  "keyEvidenceClueIds": ["tampered_wiring_diagrams", "opening_night_note"],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat":       { "min": 0,  "max": 10, "default": 1 },
+      "burnhamTrust": { "min": -3, "max": 5,  "default": 1 }
+    },
+    "pressureEvents": [
+      "A telegraph arrives with contradictory instructions",
+      "A key witness disappears",
+      "A guard reports movement near restricted electrical equipment",
+      "A newspaper man gets wind of a scandal"
+    ]
+  },
+  "winConditions": [
+    "The true sabotage method is identified",
+    "The player prevents or neutralizes the sabotage",
+    "Burnham or fair security accepts the player's warning in time"
+  ],
+  "failConditions": [
+    "Time expires before action is taken",
+    "The player accuses the wrong person and loses critical support",
+    "The sabotage succeeds sufficiently to damage the fair's opening or reputation"
+  ],
+  "partialSuccessExamples": [
+    "The immediate sabotage is stopped, but the conspirators escape",
+    "The fair opens safely, but scandal reaches the newspapers",
+    "Burnham is saved political embarrassment, but the player sacrifices an ally"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

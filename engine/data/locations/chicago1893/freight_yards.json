@@ -1,0 +1,15 @@
+{
+  "id": "freight_yards",
+  "scenarioId": "chicago_1893_v1",
+  "name": "Freight Yards and Service Access",
+  "description": "Crates, mud, rail sidings, laborers, and the real arteries beneath the fair's polished face.",
+  "mood": "industrial, secretive, practical",
+  "linkedCharacterIds": ["patrick_hanrahan", "captain_odonnell"],
+  "atmosphericDetails": [
+    "Crates redirected under forged papers",
+    "A bribed watchman",
+    "A wagon ledger with missing hours"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z"
+}

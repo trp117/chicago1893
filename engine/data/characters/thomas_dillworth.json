@@ -1,0 +1,33 @@
+{
+  "id": "thomas_dillworth",
+  "scenarioIds": [
+    "boston_tea_party"
+  ],
+  "name": "Thomas Dillworth",
+  "role": "Merchant and peripheral member of the Sons of Liberty inner circle",
+  "publicFace": "A prosperous, well-spoken merchant who frames his patriotism in economic terms — he opposes the tea tax because it harms his business, which makes him seem reasonable and relatable.",
+  "privateGoal": "Collect his final payment from Customs Officer Hartwell and disappear to Halifax before anyone connects the dots.",
+  "fear": "The coded letter he wrote to Hartwell — if it is found and deciphered, he is finished.",
+  "knowledge": [
+    "He knows the exact timing and boarding plan for tonight's action — he provided it to Hartwell two days ago.",
+    "He knows that Hartwell has already dispatched a message to Admiral Montagu's flagship, but the response has not yet arrived."
+  ],
+  "voice": "Smooth, measured, slightly over-helpful — he volunteers just enough information to seem cooperative while steering attention elsewhere; his sentences trail into reassuring generalities.",
+  "trustLogic": "He is most forthcoming when he believes the player suspects someone else — he will subtly reinforce suspicion toward Elias Croft or Dr. Warren. He becomes evasive the moment specific dates or documents are mentioned.",
+  "secrets": [
+    "He received twenty pounds sterling from Hartwell hidden inside a bolt of cloth delivered to his counting house on King Street.",
+    "He wrote a coded letter to Hartwell using a cipher taught to him during a private meeting at the Custom House — the letter is hidden beneath a loose board in his counting house."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Smiles warmly and redirects: 'A fair question — though I wonder if we shouldn't be looking more closely at those who joined us most recently.'",
+    "heavyPressure": "Becomes stiff and formal, invoking his contributions to the cause: 'I have given money and time and risk to this movement. I will not stand here and be slandered.'",
+    "breakingPoint": "He will never voluntarily admit the coded letter exists — he will claim any such document is a forgery or misunderstanding.",
+    "fleeCondition": "If the player presents the coded letter or the payment receipt directly to him in conversation.",
+    "fleeStyle": "Bolts toward the Custom House, weaving through the crowd on King Street, heading for Hartwell's protection.",
+    "chaseStyle": "Knocks over barrels and shoves bystanders to slow pursuit; knows the back alleys between King Street and the waterfront.",
+    "capturedBehavior": "Collapses into bargaining — offers to name other Crown informants in exchange for safe passage out of Boston.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-28T20:02:23.074Z"
+}
