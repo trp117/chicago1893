@@ -10,6 +10,11 @@
     "Thomas Greenleaf handles the Sons of Liberty's accounts and is one of only five men who knew the full operational plan."
   ],
   "accessLevel": "director",
+  "briefing": {
+    "who": "You are a trusted lieutenant of Samuel Adams with access to the Sons of Liberty's inner circle — and tonight, that access makes you a target.",
+    "mission": "Identify the spy who has leaked tonight's operation before the boarding party reaches Griffin's Wharf.",
+    "stakes": "Fifteen minutes until Adams gives the signal. Name the wrong man and you fracture the movement. Name no one and the trap closes."
+  },
   "perspective": "Write from the perspective of a senior Patriot operative — someone with authority, connections, and access to the inner circle of the Sons of Liberty. This player can press NPCs harder than others, invoke Samuel Adams's name, and access restricted areas like the Counting House without suspicion. However, their high profile means the spy is more likely to be on guard around them. Tone should be urgent and conspiratorial, with the weight of consequence in every exchange.",
   "opening": {
     "narrative": "Boston, December 16, 1773. The night air bites with a cold that feels like an omen — you have been in this city long enough to know the difference between a winter chill and the particular stillness that precedes catastrophe. For months, the Sons of Liberty have planned this night with painstaking care: 342 chests of East India Company tea, three ships, one harbor, and a message to Parliament that cannot be ignored. The cause of colonial liberty may hinge on what happens in the next few hours. But someone has talked. Samuel Adams pressed a note into your hand an hour ago — three words in an unfamiliar hand: 'One of yours.' You are standing in the Green Dragon Tavern, the fire low and the room thick with men who do not yet know the operation may already be compromised. Greenleaf is at the bar, his back to you, turning a coin over and over in his fingers. Margaret Cole is watching you from across the room with the expression of a woman who has already figured out more than she has said.",

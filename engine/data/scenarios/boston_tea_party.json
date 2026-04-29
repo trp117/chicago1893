@@ -2,6 +2,7 @@
   "id": "boston_tea_party",
   "version": "1.0.0",
   "title": "boston tea party",
+  "setting": "Boston, 1773",
   "description": "December 16, 1773. Tonight the Sons of Liberty will dump 342 chests of East India Company tea into Boston Harbor — but a spy has already whispered the plan to the Crown's men. Before the first chest hits the water, the traitor must be unmasked or the entire operation, and every man in it, will be lost.",
   "genre": [
     "historical thriller"

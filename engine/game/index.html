@@ -26,6 +26,8 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .overlay-back-link { align-self: flex-start; margin-bottom: 0; }
 .hero-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .hero h1 { margin: 0; font-size: 2rem; transition: opacity 0.3s; }
+.header-title-stack { display: flex; flex-direction: column; gap: 2px; }
+.header-subtitle { margin: 0; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; font-style: italic; font-family: system-ui, sans-serif; }
 .hero-controls { display: flex; align-items: center; gap: 8px; }
 .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
 .panel h2 { margin-top: 0; font-size: 1rem; color: var(--accent); }
@@ -177,6 +179,14 @@ li { margin-bottom: 8px; }
 .overlay-drive-btn:hover, .overlay-drive-btn.active { border-color: var(--accent); color: var(--accent); }
 .error-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 16px; text-align: center; padding: 24px; }
 .error-page h1 { color: var(--accent); margin: 0; }
+.briefing-overlay { position: fixed; inset: 0; z-index: 220; background: rgba(8,6,4,0.98); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.briefing-overlay.hidden { display: none; }
+.briefing-inner { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 480px; }
+.briefing-role-name { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
+.briefing-lines { display: flex; flex-direction: column; gap: 20px; }
+.briefing-line { display: flex; flex-direction: column; gap: 5px; }
+.briefing-line-label { font-size: 0.68rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
+.briefing-line p { margin: 0; font-size: 1.05rem; color: var(--text); line-height: 1.65; }
 .error-page p { color: var(--muted); margin: 0; }
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
@@ -235,7 +245,7 @@ li { margin-bottom: 8px; }
       <div><span id="trust-label" class="label">Trust</span><div id="trust"></div></div>
     </div>
     <div class="panel">
-      <h2>Clues <span id="clue-count" class="clue-count"></span></h2>
+      <h2>What You Know <span id="clue-count" class="clue-count"></span></h2>
       <ul id="clues"></ul>
     </div>
   </aside>
@@ -244,7 +254,10 @@ li { margin-bottom: 8px; }
     <header class="hero">
       <a href="/" class="back-link">&#8592; Stories</a>
       <div class="hero-title-row">
-        <h1 id="header-title">Investigation</h1>
+        <div class="header-title-stack">
+          <h1 id="header-title">Investigation</h1>
+          <p id="header-subtitle" class="header-subtitle"></p>
+        </div>
         <div class="hero-controls">
           <button type="button" id="new-game-btn" class="new-game-btn">New Game</button>
           <button type="button" id="driving-btn" class="driving-btn" aria-label="Enable driving mode" title="Driving mode">Drive</button>
@@ -304,7 +317,7 @@ li { margin-bottom: 8px; }
     <div class="role-objective" id="overlay-objective" style="display:none">
       <p class="role-objective-label">Your Objective</p>
       <p id="overlay-goal"></p>
-      <p class="role-objective-note">Every decision reveals clues — or closes doors.</p>
+      <p class="role-objective-note">Every decision adds to what you know — or closes doors.</p>
     </div>
     <p class="role-instruction">Select your role to begin.</p>
     <div class="role-cards" id="role-cards"></div>
@@ -318,6 +331,27 @@ li { margin-bottom: 8px; }
     </div>
     <button type="button" id="role-begin-btn" class="begin-btn" disabled>Start Investigation</button>
     <button type="button" id="overlay-drive-btn" class="overlay-drive-btn">&#128663; Drive</button>
+  </div>
+</div>
+
+<div id="briefing-overlay" class="briefing-overlay hidden" role="dialog" aria-modal="true" aria-label="Mission briefing">
+  <div class="briefing-inner">
+    <div class="briefing-role-name" id="briefing-role-name"></div>
+    <div class="briefing-lines">
+      <div class="briefing-line" id="briefing-line-who">
+        <span class="briefing-line-label">Who you are</span>
+        <p id="briefing-who"></p>
+      </div>
+      <div class="briefing-line" id="briefing-line-mission">
+        <span class="briefing-line-label">Your mission</span>
+        <p id="briefing-mission"></p>
+      </div>
+      <div class="briefing-line" id="briefing-line-stakes">
+        <span class="briefing-line-label">What's at stake</span>
+        <p id="briefing-stakes"></p>
+      </div>
+    </div>
+    <button type="button" id="briefing-begin-btn" class="begin-btn">Enter the Story</button>
   </div>
 </div>
 
@@ -519,7 +553,7 @@ function renderSidebarClues() {
   const countEl = document.getElementById('clue-count');
   if (countEl) countEl.textContent = ids.length ? `(${ids.length})` : '';
   if (!ids.length) {
-    cluesEl.innerHTML = '<li class="clue-empty">No clues discovered yet.</li>';
+    cluesEl.innerHTML = '<li class="clue-empty">Nothing uncovered yet.</li>';
     return;
   }
   for (const id of ids) {
@@ -534,7 +568,8 @@ function renderSidebarClues() {
 
 function renderSidebar({ includeClues = true } = {}) {
   document.getElementById('objective').textContent = scenario.goal || '';
-  document.getElementById('location').textContent  = prettifyId(gameState.location);
+  const _loc = locationsList.find(l => l.id === gameState.location);
+  document.getElementById('location').textContent  = _loc ? _loc.name : prettifyId(gameState.location);
   document.getElementById('act').textContent       = `Act ${gameState.act}`;
   document.getElementById('elapsed').textContent   = `${gameState.elapsedMinutes} min`;
   document.getElementById('remaining').textContent = `${gameState.remainingMinutes} min`;
@@ -608,13 +643,14 @@ function renderOutput(output, meta = {}) {
   const currentLocation  = gameState?.location;
   const isTransitionTurn = meta.prevLocation != null && meta.prevLocation !== currentLocation;
 
-  if (!isTransitionTurn && currentLocation && currentLocation !== feedLocationId) {
-    locationFeed = [];
+  if (currentLocation && currentLocation !== feedLocationId) {
     feedLocationId = currentLocation;
-    storyEl.innerHTML = '';
-    pendingEntryEl = null;
-    locationShowing = true;
     updateLocationDisplay(currentLocation);
+    if (!isTransitionTurn) {
+      locationFeed = [];
+      storyEl.innerHTML = '';
+      pendingEntryEl = null;
+    }
   }
 
   locationFeed.push({ playerInput: meta.playerInput || null, html });
@@ -658,11 +694,12 @@ function renderOutput(output, meta = {}) {
 }
 
 function updateLocationDisplay(locationId) {
-  if (!locationShowing) return;
-  const h1 = document.getElementById('header-title');
+  const h1  = document.getElementById('header-title');
+  const sub = document.getElementById('header-subtitle');
   if (!h1) return;
   const loc = locationsList.find(l => l.id === locationId);
-  h1.textContent = loc ? loc.name : prettifyId(locationId);
+  h1.textContent  = loc ? loc.name : prettifyId(locationId);
+  if (sub) sub.textContent = scenario?.setting || '';
 }
 
 // ── Ending ────────────────────────────────────────────────────────────────────
@@ -695,7 +732,7 @@ function renderEnding(endState) {
   if (perf.cluesDiscovered !== undefined) {
     const correct = endState.correctSuspectIdentified;
     sections.push(`<div class="ending-stats">
-      <div class="ending-stat"><span class="ending-stat-label">Clues Found</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
+      <div class="ending-stat"><span class="ending-stat-label">What You Knew</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Suspect Identified</span><span class="ending-stat-value">${correct ? 'Yes' : 'No'}</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Time Remaining</span><span class="ending-stat-value">${perf.timeRemaining} min</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Outcome</span><span class="ending-stat-value ending-result--${result}">${resultLabel}</span></div>
@@ -960,7 +997,35 @@ function showRoleSelection() {
     updateTtsToggleUI();
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
-    startGame(selectedRoleId, selectedStyle);
+    const role = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
+    showBriefing(role, selectedStyle);
+  });
+}
+
+// ── Mission briefing ──────────────────────────────────────────────────────────
+
+function showBriefing(role, style) {
+  const overlay = document.getElementById('briefing-overlay');
+  const briefing = role.briefing || {};
+
+  document.getElementById('briefing-role-name').textContent = role.name;
+  document.getElementById('briefing-who').textContent     = briefing.who     || role.description || '';
+  document.getElementById('briefing-mission').textContent = briefing.mission || '';
+  document.getElementById('briefing-stakes').textContent  = briefing.stakes  || '';
+
+  ['who', 'mission', 'stakes'].forEach(key => {
+    const line = document.getElementById(`briefing-line-${key}`);
+    if (line) line.style.display = document.getElementById(`briefing-${key}`)?.textContent.trim() ? '' : 'none';
+  });
+
+  overlay.classList.remove('hidden');
+
+  const oldBtn = document.getElementById('briefing-begin-btn');
+  const newBtn = oldBtn.cloneNode(true);
+  oldBtn.replaceWith(newBtn);
+  newBtn.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    startGame(role.id, style);
   });
 }
 
@@ -1129,7 +1194,7 @@ async function fetchNotes() {
 function renderNotes(notes) {
   const sections = [];
   if (notes.clues?.length) {
-    sections.push(`<section class="notes-section"><h3>Clues Found</h3><ul>${notes.clues.map(c => `<li><strong>${c.title}</strong> — ${c.significance}</li>`).join('')}</ul></section>`);
+    sections.push(`<section class="notes-section"><h3>What You Know</h3><ul>${notes.clues.map(c => `<li><strong>${c.title}</strong> — ${c.significance}</li>`).join('')}</ul></section>`);
   }
   if (notes.suspicions?.length) {
     sections.push(`<section class="notes-section"><h3>Suspicions</h3><ul>${notes.suspicions.map(s =>

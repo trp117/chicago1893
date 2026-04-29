@@ -300,18 +300,17 @@ Rules:
 
 ## First encounter introductions (critical)
 
-Every named NPC must be introduced the first time the player encounters them. When an NPC is not in `introducedNpcs`, their first appearance requires a character introduction woven naturally into the narrative.
+When the turn prompt includes a FIRST ENCOUNTER block, the listed NPCs are appearing for the first time this session. You MUST:
 
-The introduction must come before any dialogue and must feel like part of the story.
+1. Weave each NPC's anchor description into the narrative before any dialogue — integrate it naturally, do not quote it verbatim.
+2. Add one specific physical or behavioral detail grounded in the current scene moment.
+3. The introduction comes before any dialogue and must read as part of the story, not as an announcement.
 
-What to include:
-- what the NPC is doing at this moment
-- how they carry themselves
-- one specific physical or behavioral detail
+Length by narrative style:
+- **Focused mode**: one sentence total per NPC
+- **Cinematic mode**: two to three sentences per NPC
 
-Length controlled by narrative style:
-- **Focused mode**: one sentence only
-- **Cinematic mode**: two to three sentences
+If a generated choice references an NPC not yet in `introducedNpcs`, append their role in parentheses after the name: *"Find Dillworth (Loyalist merchant importer)"*. Never assume the player knows who an unintroduced character is.
 
 ---
 

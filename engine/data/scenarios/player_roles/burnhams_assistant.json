@@ -9,6 +9,11 @@
     "access to Burnham's inner office"
   ],
   "accessLevel": "staff",
+  "briefing": {
+    "who": "You are Daniel Burnham's trusted aide, authorized to move through the Administration Building and question fair staff without raising suspicion.",
+    "mission": "Trace a diverted shipment of electrical equipment back to whoever forged the transfer order before the Exposition opens in three days.",
+    "stakes": "If the sabotage succeeds on opening day, the failure belongs to Burnham — and to you."
+  },
   "perspective": "The player is Burnham's assistant. Burnham is the player's superior and may speak to the player directly, give orders, and act as a boss. Write the player as an aide acting on Burnham's authority.",
   "opening": {
     "narrative": "Chicago, May 1893. The White City rises from the lakefront mud, its plaster palaces gleaming in the morning haze — ten thousand workers still swarming Jackson Park in the final days before the Exposition opens. But beneath the spectacle, something is wrong. A tension moves through the corridors of the Administration Building that has nothing to do with last-minute preparations.\n\nYou are assistant to Daniel Burnham, Director of Works. When he needs eyes he can trust, he sends for you.\n\nThis morning, a shipping manifest crossed your desk: electrical equipment, diverted from its declared route. The signature authorizing the change does not match any name on Burnham's staff.\n\nBurnham's office door stands open. He is at his desk, jaw set, a telegraph slip folded in his hand. He looks up.",

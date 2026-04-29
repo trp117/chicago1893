@@ -10,6 +10,11 @@
     "political pressure from exposition committee"
   ],
   "accessLevel": "director",
+  "briefing": {
+    "who": "You are Daniel Burnham, Director of Works — you built the White City from swamp and ambition, and it opens in three days.",
+    "mission": "Find whoever forged your signature on a transfer order and diverted electrical equipment before it can be used to sabotage the opening.",
+    "stakes": "If it fails on opening day, in front of the world, the failure is yours. No one else can be blamed."
+  },
   "perspective": "The player IS Daniel Burnham. Never write 'Burnham says to you' or treat Burnham as an NPC speaking to the player. Narrate from Burnham's point of view. NPCs address the player as 'Mr. Burnham' or 'sir'. Burnham commands — he does not receive orders.",
   "opening": {
     "narrative": "Chicago, May 1893. You built this city from swamp and ambition — ten thousand men answering to your hand, four hundred buildings risen from bare ground in two years. The White City is yours. And now, three days from opening, someone is trying to take it from you.\n\nA telegraph arrived before dawn: a consignment of electrical equipment rerouted without your authorization. Someone signed a transfer order in your name. The forgery is competent. That tells you something.\n\nYou are Daniel Burnham, Director of Works. Your desk faces the door. Your assistant stands before you with a second document — the shipping manifest. You unfold it.",

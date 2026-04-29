@@ -13,6 +13,7 @@
     "He knows that the intelligence he received was written in a distinctive cipher, which he found unusual for a simple merchant.",
     "He is aware that one of the Patriots is currently investigating the leak — he has been watching the player's movements."
   ],
+  "introAnchor": "a Crown customs officer posted to Griffin's Wharf with the quiet authority of a man who believes the trap is already set",
   "voice": "Clipped, formal, and faintly contemptuous — he speaks to colonists the way a schoolmaster speaks to slow students, with exaggerated patience masking deep disdain.",
   "trustLogic": "He does not trust Patriots under any circumstances. He will speak to the player only if they approach with an air of authority or claim to have information useful to the Crown. He is most forthcoming when he believes he has the upper hand.",
   "secrets": [

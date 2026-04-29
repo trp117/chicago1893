@@ -11,6 +11,7 @@
     "He knows which watchmen can be bribed",
     "He suspects foreign involvement but cares more about money"
   ],
+  "introAnchor": "a ward-connected local fixer who arranged labor and deliveries for the fair through channels no official would ask about",
   "voice": "earthy, persuasive, half-confessional",
   "trustLogic": "He opens up to practical deals, not moral appeals.",
   "secrets": [

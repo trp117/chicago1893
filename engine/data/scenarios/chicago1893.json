@@ -2,6 +2,7 @@
   "id": "chicago_1893_v1",
   "version": "1.0.0",
   "title": "Chicago, 1893: Shadows of the White City",
+  "setting": "Chicago, 1893",
   "description": "A 20-minute historical thriller set during the World's Columbian Exposition. A conspiracy threatens to sabotage the fair's opening night lighting demonstration.",
   "genre": ["historical thriller", "mystery"],
   "historicalRealism": "high",

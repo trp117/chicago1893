@@ -15,6 +15,7 @@ import { PlayerRepository }     from '../repositories/PlayerRepository.js';
 import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
+import { SchemaValidator }      from '../services/SchemaValidator.js';
 
 dotenv.config();
 
@@ -60,6 +61,8 @@ function killPort(port) {
   try { execSync(`lsof -ti :${port} | xargs kill -9`, { stdio: 'ignore' }); } catch {}
   try { execSync(`powershell -NoProfile -Command "Get-Process -Id (Get-NetTCPConnection -LocalPort ${port} -State Listen).OwningProcess | Stop-Process -Force"`, { stdio: 'ignore' }); } catch {}
 }
+
+new SchemaValidator(repos).report();
 
 function startServer() {
   const server = app.listen(PORT, () => {

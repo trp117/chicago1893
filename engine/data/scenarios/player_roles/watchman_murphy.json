@@ -9,6 +9,11 @@
     "knows unofficial routes through the fairgrounds"
   ],
   "accessLevel": "worker",
+  "briefing": {
+    "who": "You are Watchman Murphy, night patrol at the freight yards — no rank, no authority, but you know every shadow in this fair and you saw something last night that doesn't sit right.",
+    "mission": "Find out what was in those unmarked crates and who authorized the after-hours delivery before whatever was inside them is used.",
+    "stakes": "You have no badge. Go to the wrong person and you will be dismissed. Go to no one and you may be the only one who could have stopped it."
+  },
   "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers.",
   "opening": {
     "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",

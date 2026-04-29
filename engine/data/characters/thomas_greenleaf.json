@@ -13,6 +13,7 @@
     "He knows the name of his customs contact, Agent Silas Dawes, and the location of their last meeting at the Counting House.",
     "He is aware that Samuel Adams suspects a leak but believes the suspicion currently falls on Reverend Willard."
   ],
+  "introAnchor": "the Sons of Liberty treasurer, a mild-mannered bookish man trusted by nearly everyone for his discretion — which is exactly what makes him dangerous",
   "voice": "Soft-spoken and precise, favoring careful qualifications — 'I believe,' 'as I understand it,' 'one ought to be careful.' He never raises his voice and smiles just a moment too late.",
   "trustLogic": "He opens up when he believes the player is focused on Reverend Willard as a suspect — he will even volunteer mildly incriminating details about the reverend to redirect attention. He shuts down immediately if the player mentions the Counting House or the name Dawes.",
   "secrets": [

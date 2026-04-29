@@ -215,7 +215,7 @@ function renderSidebarClues() {
   const clueCountEl = document.getElementById('clue-count');
   if (clueCountEl) clueCountEl.textContent = discoveredIds.length ? `(${discoveredIds.length})` : '';
   if (discoveredIds.length === 0) {
-    cluesEl.innerHTML = '<li class="clue-empty">No clues discovered yet.</li>';
+    cluesEl.innerHTML = '<li class="clue-empty">Nothing uncovered yet.</li>';
   } else {
     for (const id of discoveredIds) {
       const clue = cluesCatalog.find((c) => c.id === id);
@@ -564,7 +564,7 @@ function renderEnding(endState) {
   if (perf.cluesDiscovered !== undefined) {
     const correct = endState.correctSuspectIdentified;
     sections.push(`<div class="ending-stats">
-      <div class="ending-stat"><span class="ending-stat-label">Clues Found</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
+      <div class="ending-stat"><span class="ending-stat-label">What You Knew</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Suspect Identified</span><span class="ending-stat-value">${correct ? 'Yes' : 'No'}</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Time Remaining</span><span class="ending-stat-value">${perf.timeRemaining} min</span></div>
       <div class="ending-stat"><span class="ending-stat-label">Outcome</span><span class="ending-stat-value ending-result--${result}">${resultLabel}</span></div>
@@ -998,7 +998,7 @@ function renderNotes(notes) {
 
   if (notes.clues?.length) {
     const items = notes.clues.map((c) => `<li><strong>${c.title}</strong> — ${c.significance}</li>`).join('');
-    sections.push(`<section class="notes-section"><h3>Clues Found</h3><ul>${items}</ul></section>`);
+    sections.push(`<section class="notes-section"><h3>What You Know</h3><ul>${items}</ul></section>`);
   }
 
   if (notes.suspicions?.length) {

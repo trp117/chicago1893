@@ -12,6 +12,7 @@
     "He knows the exact timing and boarding plan for tonight's action — he provided it to Hartwell two days ago.",
     "He knows that Hartwell has already dispatched a message to Admiral Montagu's flagship, but the response has not yet arrived."
   ],
+  "introAnchor": "a prosperous merchant and peripheral Sons of Liberty member whose patriotism is framed entirely in the language of commerce",
   "voice": "Smooth, measured, slightly over-helpful — he volunteers just enough information to seem cooperative while steering attention elsewhere; his sentences trail into reassuring generalities.",
   "trustLogic": "He is most forthcoming when he believes the player suspects someone else — he will subtly reinforce suspicion toward Elias Croft or Dr. Warren. He becomes evasive the moment specific dates or documents are mentioned.",
   "secrets": [

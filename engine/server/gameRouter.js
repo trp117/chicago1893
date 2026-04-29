@@ -134,7 +134,8 @@ function slimCharacter(char) {
     voice:            char.voice,
     goal:             char.privateGoal,
     knowledge:        char.knowledge,
-    aggressionProfile: char.aggressionProfile || null
+    aggressionProfile: char.aggressionProfile || null,
+    introAnchor:      char.introAnchor || null
   };
 }
 
@@ -245,8 +246,13 @@ function buildNpcIntroInstruction(state, location, characters, playerInput = '')
   }
 
   if (newChars.length === 0) return '';
-  const names = newChars.map(c => c.name).join(' and ');
-  return `First encounter this session: ${names}. Apply the first encounter introduction rule from the system prompt.`;
+
+  const introLines = newChars.map(c => {
+    const anchor = c.introAnchor || c.publicFace || c.role || '';
+    return `- ${c.name} (id: ${c.id}): "${anchor}"`;
+  }).join('\n');
+
+  return `⚠️ FIRST ENCOUNTER — the following NPCs appear for the first time this session. Before any dialogue, weave their anchor description naturally into the narrative (do not quote it verbatim — integrate it into the prose):\n${introLines}\n\nIf any generated choice references an NPC not yet in the state's introducedNpcs list, append their role in parentheses after the name.`;
 }
 
 function buildChaseInstruction(state, characters) {
@@ -527,7 +533,8 @@ export function createGameRouter(repos, config = {}) {
         perspective:  r.perspective || '',
         startingKnowledge: r.startingKnowledge || [],
         opening:      r.opening || null,
-        roleInitialState: r.roleInitialState || {}
+        roleInitialState: r.roleInitialState || {},
+        briefing:     r.briefing || null
       }));
 
       res.json({
