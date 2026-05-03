@@ -1,0 +1,57 @@
+{
+  "id": "dorothy_gill_role",
+  "scenarioId": "midnight_errand_boston",
+  "name": "Dorothy Gill — The Watcher",
+  "description": "You are the printer's sister, the one who keeps the accounts and sees everything and says nothing — until tonight, when everything you have been waiting for is finally happening at once. You have a bag packed behind the ink barrels. You have been ready for this for a year.",
+  "startLocationId": "gill_print_shop_front",
+  "startingKnowledge": [
+    "The recognition phrase — overheard through a wall eighteen months ago: 'The tide sets east tonight.'",
+    "The type drawer in the back room has been used as a dead-drop at least twice; you have seen it and said nothing to Benjamin.",
+    "Owen Pryce is not what he appears — you have watched him for weeks and you are certain."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write in close second person, emphasizing the quality of attention that comes from years of watching without being watched in return. Dorothy sees the room before she enters it. She is not passive — she has been making decisions for a long time; she has simply been making them quietly.",
+  "briefing": "You are Dorothy Gill, sister to Benjamin, keeper of the household accounts, and the person in this building who has known for the longest time that tonight was coming. Your brother is at the top of the stairs and does not know that a woman is at the back door and that his son is holding something that will define the next twenty years of this family's life. You know that Owen Pryce has been feeding information to someone outside the shop — you have watched him for six weeks and you are not guessing. You want to protect Nathaniel without destroying Benjamin, and you have not yet found a way to do both, which is why the bag behind the ink barrels has been packed for three weeks and not moved. You are standing in the front room and the candle in your hand has burned down to the last inch and you can hear everything through the thin wall between the rooms.",
+  "character_hooks": [
+    "I passed a message for the Sons of Liberty myself, two years ago, and told no one — not Benjamin, not Nathaniel — and tonight I am wondering whether that silence was cowardice or wisdom.",
+    "I know that Benjamin has been approached by a Loyalist merchant about buying the shop, and I know that he has not said no, and I have not told Nathaniel because I did not know what it would do to him.",
+    "I have a letter in my pocket from a man in Concord who asked me, six months ago, to watch this shop and report anything unusual — I have never sent a reply, but I have never thrown the letter away either."
+  ],
+  "suggested_secret": "Dorothy knows the identity of the second courier in the Sons of Liberty network — a name that Thomas Wren himself does not know she possesses — because she is the one who recruited them.",
+  "opening": {
+    "narrative": "You came downstairs for a glass of water and stopped at the bottom step when you heard the back door. You have been standing in the front room for four minutes now, candle in hand, listening. The woman's voice is low and quick — you cannot make out words, only the shape of urgency. Nathaniel has not spoken yet, or not loudly enough to hear, which means he is listening, which means he has not panicked, which is something. Benjamin is at the top of the stairs — you can tell by the creak — and he has not come down yet, which means he heard something but is not certain what. You have perhaps two minutes before one of the men in this building does something that cannot be undone, and the question is whether you are going to stand here holding a candle or whether you are going to act.",
+    "npcMoments": [
+      {
+        "characterId": "benjamin_gill",
+        "moment": "Your brother's shadow moves at the top of the stairs. He is cautious — he will listen before he acts — but he is not patient, and four minutes is already longer than he usually waits."
+      },
+      {
+        "characterId": "nathaniel_gill",
+        "moment": "Through the wall you hear Nathaniel shift his weight — the particular sound of someone who has made a decision and is about to move on it."
+      }
+    ],
+    "choices": [
+      "Go upstairs and distract Benjamin — give Nathaniel whatever time he needs to get out the back.",
+      "Go into the back room and make yourself known — take control of whatever is happening before it happens without you.",
+      "Blow out your candle and stay exactly where you are, listening, until you know enough to act with certainty."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "dorothys_packed_bag"
+    ],
+    "flags": {
+      "owen_suspected": true,
+      "recognition_phrase_known": true,
+      "bag_packed": true,
+      "benjamin_unaware": true
+    },
+    "suspicion": {
+      "owen_pryce": 4,
+      "captain_aldrich": 1,
+      "silas_murch": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.188Z"
+}

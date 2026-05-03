@@ -37,6 +37,8 @@ Player input:
 
 ⚠️ BREAKING POINT CHECK: For each NPC with suspicion 2 or higher, locate their breakingPoint. It is a hard ceiling — what this NPC will never reveal regardless of pressure. No NPC dialogue may cross it.
 
+⚠️ NPC_UPDATES REQUIRED: For every NPC who appears in this scene, include their id in npc_updates with trust_delta, aggression_mode, and last_interaction. This is mandatory — do not omit npc_updates if any NPC is present.
+
 {{NPC_INTRO_INSTRUCTION}}
 
 Instructions:

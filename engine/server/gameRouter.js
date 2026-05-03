@@ -1,14 +1,27 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
+import { randomUUID } from 'crypto';
 
 import {
-  buildSystemPrompt,
+  buildSystemPrompt as buildSystemPromptLegacy,
   composeTurnPrompt,
   checkEndingReadiness,
   prepareForTts,
   getClueById,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState } from '../services/StateManager.js';
+import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
+import * as appData from '../data.js';
+
+// ID of the primary scenario backed by the flat data/ files
+const PRIMARY_SCENARIO_ID = appData.getScenario().id;
+
+function selectSystemPrompt(scenarioId, sessionId, scenario, locations) {
+  if (scenarioId === PRIMARY_SCENARIO_ID) {
+    return buildSystemPromptFromData(sessionId);
+  }
+  return buildSystemPromptLegacy(scenario, locations);
+}
 
 const ANTHROPIC_URL    = 'https://api.anthropic.com/v1/messages';
 const MODEL            = 'claude-sonnet-4-6';
@@ -48,6 +61,23 @@ function extractJson(raw) {
   const first = trimmed.indexOf('{'), last = trimmed.lastIndexOf('}');
   if (first !== -1 && last > first) return JSON.parse(trimmed.slice(first, last + 1));
   throw new Error('No valid JSON found in model response.');
+}
+
+// ── NPC state updater ─────────────────────────────────────────────────────────
+
+function applyNpcUpdates(npcStates, npcUpdates) {
+  if (!npcUpdates || !npcStates) return npcStates;
+  const updated = { ...npcStates };
+  for (const [id, u] of Object.entries(npcUpdates)) {
+    if (!updated[id]) continue;
+    const s = { ...updated[id] };
+    if (u.trust_delta != null)          s.trust_level = Math.max(0, Math.min(10, (s.trust_level ?? 5) + u.trust_delta));
+    if (Array.isArray(u.knows_add) && u.knows_add.length) s.knows = [...(s.knows || []), ...u.knows_add];
+    if (u.aggression_mode != null)      s.aggression_mode = u.aggression_mode;
+    if (u.last_interaction != null)     s.last_interaction = u.last_interaction;
+    updated[id] = s;
+  }
+  return updated;
 }
 
 // ── Retry signal detectors ─────────────────────────────────────────────────────
@@ -100,7 +130,9 @@ export function createGameRouter(repos, config = {}) {
         startingKnowledge: r.startingKnowledge || [],
         opening:          r.opening || null,
         roleInitialState: r.roleInitialState || {},
-        briefing:         r.briefing || null
+        briefing:         r.briefing || null,
+        character_hooks:  r.character_hooks || [],
+        suggested_secret: r.suggested_secret || null,
       }));
 
       res.json({
@@ -117,7 +149,10 @@ export function createGameRouter(repos, config = {}) {
   // ── Start (engine-generated opening) ──────────────────────────────────────
   r.post('/start', async (req, res) => {
     try {
-      const { scenarioId, roleId, narrativeStyle } = req.body;
+      const {
+        scenarioId, roleId, narrativeStyle, sessionId: clientSessionId,
+        character_context, player_addition, active_hook, ttsEnabled,
+      } = req.body;
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
@@ -132,7 +167,17 @@ export function createGameRouter(repos, config = {}) {
       initialState.narrativeStyle  = narrativeStyle || 'focused';
       initialState.introducedNpcs  = [];
 
-      const systemPrompt = buildSystemPrompt(scenario, locations);
+      // Attach briefing context from the briefing screen
+      if (character_context)   initialState.character_context = character_context;
+      if (player_addition)     initialState.player_addition   = player_addition;
+      if (active_hook)         initialState.active_hook       = active_hook;
+      if (ttsEnabled !== undefined) initialState.ttsEnabled   = ttsEnabled;
+
+      // Persist session so promptBuilder can read it; saveSession seeds npc_states on first save
+      const sessionId = clientSessionId || randomUUID();
+      const seededInitial = appData.saveSession(sessionId, initialState);
+
+      const systemPrompt = selectSystemPrompt(scenarioId, sessionId, scenario, locations);
 
       const openingChoicesText = (role.opening?.choices || [])
         .map(c => `- ${c.text || c}`)
@@ -182,9 +227,13 @@ export function createGameRouter(repos, config = {}) {
       }
 
       output.timeAdvance = 0;  // guard: opening never advances the clock
-      const nextState = mergeState(initialState, output, scenario, clues, '');
+      const nextState = mergeState(seededInitial, output, scenario, clues, '');
+      if (output.npc_updates && nextState.npc_states) {
+        nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
+      }
+      appData.saveSession(sessionId, nextState);
 
-      return res.json({ output, nextState });
+      return res.json({ output, nextState, sessionId });
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
       console.error(`[START ERROR] ${isTimeout ? 'timeout' : error.message}`);
@@ -205,7 +254,10 @@ export function createGameRouter(repos, config = {}) {
       const gameData = getScenarioData(repos, state.scenarioId);
       const { scenario, characters, locations, clues } = gameData;
 
-      const systemPrompt = buildSystemPrompt(scenario, locations);
+      // Save current state so promptBuilder can read session context
+      if (sessionId) appData.saveSession(sessionId, state);
+
+      const systemPrompt = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
       const prompt       = composeTurnPrompt(state, playerInput, gameData);
 
       const isEndingTurn  = !!(state.finalAccusation || state.remainingMinutes <= 0);
@@ -312,14 +364,18 @@ export function createGameRouter(repos, config = {}) {
       }
 
       if (state.finalAccusation && !output.endState?.isEnding) {
+        // Fallback endings pulled from scenario data — no hardcoded story content
+        const failCond = (scenario.failConditions || [])[0] || 'The investigation ends inconclusively.';
+        const cluesFound = nextState.discoveredClueIds?.length || 0;
+        const totalClues = clues.length;
         output.endState = {
           isEnding: true, result: 'failure',
-          scene: 'Time has run out. The investigation ends without a clear accusation.',
-          conspiracySummary: 'The conspiracy was never fully exposed.',
-          whatPlayerDiscovered: `${nextState.discoveredClueIds?.length || 0} clue(s) found, but no conclusion reached.`,
-          outcome: 'The case remains open.',
-          playerContribution: 'The investigation was abandoned before a suspect could be named.',
-          authorityResponse: 'I needed a name. You gave me nothing.',
+          scene: `Time has run out. ${failCond}`,
+          conspiracySummary: (scenario.partialSuccessExamples || [])[0] || 'The conspiracy was not fully exposed.',
+          whatPlayerDiscovered: `${cluesFound} of ${totalClues} clue(s) found. No conclusion was reached in time.`,
+          outcome: (scenario.failConditions || [])[0] || 'The case remains unresolved.',
+          playerContribution: 'The investigation could not be completed in the time available.',
+          authorityResponse: scenario.coreSystems?.failureAuthorityQuote || 'We ran out of time.',
           correctSuspectIdentified: false
         };
       }
@@ -332,6 +388,11 @@ export function createGameRouter(repos, config = {}) {
           result:          output.endState.result || 'failure'
         };
       }
+
+      if (output.npc_updates && nextState.npc_states) {
+        nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
+      }
+      if (sessionId) appData.saveSession(sessionId, nextState);
 
       console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} newClues=${JSON.stringify(output.newClues)} isEnding=${output.endState?.isEnding ?? false}`);
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
@@ -390,34 +451,58 @@ export function createGameRouter(repos, config = {}) {
 
   // ── TTS ────────────────────────────────────────────────────────────────────
   r.post('/tts', async (req, res) => {
-    const { text } = req.body;
+    const { text, sensory_opening, confirmation, trust_level } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
     if (!elevenLabsApiKey) return res.status(503).json({ error: 'TTS not configured.' });
 
-    const cleaned          = prepareForTts(text);
-    const charCount        = cleaned.length;
-    const estimatedCostUsd = (charCount / 1000) * 0.15;
-    console.log(`[TTS] chars=${charCount} est=$${estimatedCostUsd.toFixed(4)}`);
+    const voiceId = elevenLabsVoiceId || 'onwK4e9ZLuTAKqWW03F9';
 
-    const ttsTrace = langfuse?.trace({ name: 'tts', input: { chars: charCount, voiceId: elevenLabsVoiceId, model: 'eleven_flash_v2_5' } });
-    const ttsGen   = ttsTrace?.generation({ name: 'tts-request', model: 'eleven_flash_v2_5', modelParameters: { stability: 0.5, similarity_boost: 0.75 }, input: cleaned, usage: { totalCost: estimatedCostUsd } });
+    function trustVoiceSettings(tl) {
+      if (tl == null)  return { stability: 0.5,  similarity_boost: 0.75, style: 0.50 };
+      if (tl <= 3)     return { stability: 0.25, similarity_boost: 0.75, style: 0.80 };
+      if (tl <= 6)     return { stability: 0.55, similarity_boost: 0.75, style: 0.50 };
+      return             { stability: 0.75, similarity_boost: 0.75, style: 0.30 };
+    }
 
-    try {
-      const { Readable } = await import('node:stream');
-      const voiceId  = elevenLabsVoiceId || 'onwK4e9ZLuTAKqWW03F9';
-      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    async function elevenLabsCall(rawText, speed = null, applyTrust = false) {
+      const cleaned       = prepareForTts(rawText);
+      const voiceSettings = applyTrust ? trustVoiceSettings(trust_level) : { stability: 0.5, similarity_boost: 0.75 };
+      if (speed != null) voiceSettings.speed = speed;
+      const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: { 'Accept': 'audio/mpeg', 'Content-Type': 'application/json', 'xi-api-key': elevenLabsApiKey },
-        body: JSON.stringify({ text: cleaned, model_id: 'eleven_flash_v2_5', voice_settings: { stability: 0.5, similarity_boost: 0.75 } })
+        body: JSON.stringify({ text: cleaned, model_id: 'eleven_flash_v2_5', voice_settings: voiceSettings })
       });
-      if (!response.ok) {
-        ttsGen?.end({ metadata: { status: response.status } });
-        return res.status(502).json({ error: 'TTS upstream error.' });
-      }
-      ttsGen?.end({ metadata: { status: 200 } });
+      if (!resp.ok) throw new Error(`ElevenLabs ${resp.status}`);
+      return { resp, charCount: cleaned.length };
+    }
+
+    // Build ordered segment list: confirmation (0.85) → sensory (0.88) → main (trust-mapped)
+    const segments = [];
+    if (confirmation)   segments.push({ raw: confirmation,   speed: 0.85, trust: false });
+    if (sensory_opening) segments.push({ raw: sensory_opening, speed: 0.88, trust: false });
+    segments.push({ raw: text, speed: null, trust: true });
+
+    const totalChars = segments.reduce((n, s) => n + prepareForTts(s.raw).length, 0);
+    console.log(`[TTS] chars=${totalChars} segments=${segments.length} confirmation=${!!confirmation} sensory=${!!sensory_opening} est=$${((totalChars / 1000) * 0.15).toFixed(4)}`);
+
+    const ttsTrace = langfuse?.trace({ name: 'tts', input: { chars: totalChars, segments: segments.length, voiceId, model: 'eleven_flash_v2_5' } });
+
+    try {
       res.set('Content-Type', 'audio/mpeg');
       res.set('Cache-Control', 'no-store');
-      Readable.fromWeb(response.body).pipe(res);
+
+      if (segments.length === 1) {
+        const { Readable } = await import('node:stream');
+        const { resp } = await elevenLabsCall(text, null, true);
+        ttsTrace?.update({ output: { segments: 1 } });
+        Readable.fromWeb(resp.body).pipe(res);
+      } else {
+        const results = await Promise.all(segments.map(s => elevenLabsCall(s.raw, s.speed, s.trust)));
+        ttsTrace?.update({ output: { segments: segments.length } });
+        const buffers = await Promise.all(results.map(r => r.resp.arrayBuffer()));
+        res.send(Buffer.concat(buffers.map(b => Buffer.from(b))));
+      }
     } catch (err) {
       console.error(`[TTS ERROR] ${err.message}`);
       res.status(500).json({ error: err.message });

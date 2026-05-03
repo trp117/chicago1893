@@ -74,6 +74,7 @@ Return JSON only. No markdown fences. Fields:
 
 ```
 {
+  "sensory_opening": "2–4 sentences of pure sensory detail: smell, sound, light, physical sensation. No character, no plot, no dialogue. Location-specific and period-accurate.",
   "narrative": "1–3 paragraphs of vivid prose.",
   "timeAdvance": 2,
   "location": "location_id",
@@ -87,6 +88,14 @@ Return JSON only. No markdown fences. Fields:
   },
   "newClues": ["clue_id_from_catalog"],
   "npcMoments": [{ "npc": "character_id", "text": "spoken dialogue only — no italics, no stage directions" }],
+  "npc_updates": {
+    "character_id": {
+      "trust_delta": 1,
+      "knows_add": ["one-line description of something new this NPC learned about the player"],
+      "aggression_mode": "neutral",
+      "last_interaction": "one sentence summary of this scene from this NPC's perspective"
+    }
+  },
   "chaseInitiated": { "npcId": "character_id" },
   "chaseResolved": { "npcId": "character_id", "result": "capture|escape|partial", "clueGained": "clue_id_or_null" },
   "npcFled": "character_id",
@@ -106,9 +115,11 @@ Return JSON only. No markdown fences. Fields:
 }
 ```
 
+- `sensory_opening`: REQUIRED on every turn. 2–4 sentences. Senses only — no characters, no plot, no dialogue.
 - `stateChanges`: omit any sub-field that did not change this turn.
 - `newClues`: IDs from the available clues list only. Omit or use `[]` if none.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
+- `npc_updates`: REQUIRED on every turn where an NPC appears. For each NPC who appeared, return their id as a key. `trust_delta` is an integer (+1, -1, +2, etc.) reflecting whether the player's action built or damaged trust. `knows_add` is an array of strings for new things the NPC learned about the player this turn (omit or use [] if nothing new). `aggression_mode` is "neutral", "mild", or "heavy" based on current tension. `last_interaction` is a one-sentence summary of this scene from this NPC's perspective — used in future turns.
 - `chaseInitiated`: include only when an NPC begins fleeing this turn. Omit otherwise.
 - `chaseResolved`: include only when a chase ends this turn. Omit otherwise.
 - `npcFled`: include only when an NPC flees without triggering a chase. Omit otherwise.

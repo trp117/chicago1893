@@ -1,0 +1,18 @@
+{
+  "id": "aldrich_notebook_glimpse",
+  "scenarioId": "midnight_errand_boston",
+  "title": "Aldrich's Notebook Entry",
+  "description": "At the Ann Street checkpoint, as Captain Aldrich turns to speak to one of his soldiers, you catch a glimpse of the open page of his notebook. Among the names and times, you can make out 'Gill — dispatch — tonight' and below it, in different ink, 'O.P. confirmed.' The initials are enough.",
+  "category": "observation",
+  "discoveryLocationId": "ann_street_checkpoint",
+  "implicatesCharacterIds": [
+    "captain_aldrich",
+    "owen_pryce"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.183Z",
+  "locationId": "",
+  "isRedHerring": false
+}

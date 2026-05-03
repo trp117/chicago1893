@@ -1,0 +1,17 @@
+{
+  "id": "dorothys_packed_bag",
+  "scenarioId": "midnight_errand_boston",
+  "title": "Dorothy's Hidden Bag",
+  "description": "Behind the ink barrels in the back room, tucked out of sight, is a small canvas bag packed with a change of clothes, a few coins, and a folded note in Dorothy's handwriting. The note says only: 'Go north. Find the Reverend Hartwell in Woburn. He will know what to do.' She packed this before tonight. She has been waiting.",
+  "category": "physical",
+  "discoveryLocationId": "gill_print_shop_back",
+  "implicatesCharacterIds": [
+    "dorothy_gill"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.185Z",
+  "locationId": "",
+  "isRedHerring": false
+}

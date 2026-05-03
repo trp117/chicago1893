@@ -1,6 +1,7 @@
 {
-  "id": "chicago_1893_burnham_conspiracy_v1",
+  "id": "chicago_1893_v1",
   "title": "Chicago, 1893: Shadows of the White City",
+  "world_language": "Characters do not say sabotage plainly in company. They say: the trouble, the irregularity, the situation with the deliveries. The Exposition is always the Fair. Burnham is always Mr. Burnham, never Daniel. Foreign visitors are guests of the exposition, never suspects. Nothing is said plainly that could be reported.",
   "premise": "The player, assistant to Daniel Burnham, must uncover and stop a conspiracy to sabotage the World's Columbian Exposition before opening day.",
   "sessionTargetMinutes": 20,
   "historicalRealism": "high",

@@ -1,0 +1,19 @@
+{
+  "id": "murch_chandlery",
+  "scenarioId": "midnight_errand_boston",
+  "name": "Murch's Chandlery",
+  "description": "A low-ceilinged shop that smells overwhelmingly of tallow and beeswax, its shelves crowded with candles of every size. Silas Murch keeps a stool behind the counter and a small fire going regardless of the hour.",
+  "mood": "greasy, transactional, oddly warm",
+  "linkedCharacterIds": [
+    "silas_murch"
+  ],
+  "atmosphericDetails": [
+    "Dozens of candles in various states of completion hang from ceiling hooks on strings, swaying slightly.",
+    "The fire in the corner is banked low but hot — the room is stuffy despite the cold outside.",
+    "A ledger on the counter is open but turned face-down when anyone enters."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.178Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

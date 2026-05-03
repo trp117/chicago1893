@@ -1,0 +1,35 @@
+{
+  "id": "dorothy_gill",
+  "scenarioIds": [
+    "midnight_errand_boston"
+  ],
+  "name": "Dorothy Gill",
+  "role": "Benjamin Gill's sister, lives above the print shop, quietly sympathetic to the Cause",
+  "publicFace": "A spare, watchful woman who manages the household accounts and says little at table.",
+  "privateGoal": "To protect her nephew Nathaniel without openly defying her brother — she has been waiting for a night like this.",
+  "fear": "That Benjamin will make a choice tonight that she cannot forgive or undo.",
+  "knowledge": [
+    "She has seen the type drawer used as a dead-drop before and said nothing to Benjamin.",
+    "She knows the recognition phrase — she heard it once through a wall and kept it.",
+    "She suspects Owen Pryce is not what he appears and has been watching him for weeks."
+  ],
+  "voice": "Dry, precise, occasionally kind in a way that catches you off guard — she wastes nothing, including words.",
+  "trustLogic": "She responds to directness and to evidence that the player is not being reckless. She will not help someone she believes is throwing themselves away for theater rather than purpose.",
+  "secrets": [
+    "She has already packed a small bag for Nathaniel and hidden it behind the ink barrels — she has been expecting this night.",
+    "She once passed a message for the Sons of Liberty herself, two years ago, and told no one."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "She asks one clarifying question and waits for the answer with absolute stillness.",
+    "heavyPressure": "She says: 'Then we don't have time for this conversation' and moves to act.",
+    "breakingPoint": "She will not tell Benjamin what she knows, even if directly asked — that bridge is already decided.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "She identifies herself as the master printer's sister and asks to send word to him. She uses the delay to think.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.174Z",
+  "description": ""
+}

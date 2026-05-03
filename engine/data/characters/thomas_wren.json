@@ -1,0 +1,35 @@
+{
+  "id": "thomas_wren",
+  "scenarioIds": [
+    "midnight_errand_boston"
+  ],
+  "name": "Thomas Wren",
+  "role": "Innkeeper of the Green Dragon Tavern, Sons of Liberty coordinator",
+  "publicFace": "A prosperous, cheerful tavern keeper who is good at remembering faces and forgetting conversations.",
+  "privateGoal": "To receive the dispatch and route map, verify them, and dispatch riders to Lexington and Concord before midnight.",
+  "fear": "That the network has been compromised and tonight's delivery is a trap.",
+  "knowledge": [
+    "He is expecting a delivery tonight but not necessarily from the player — he will need the recognition phrase.",
+    "He knows the riders are ready and waiting in the stable behind the tavern.",
+    "He has heard that a checkpoint has been set up on Ann Street and has already sent one person back."
+  ],
+  "voice": "Warm, loud in the public room, very quiet in the back — two entirely different men separated by a door.",
+  "trustLogic": "He opens up immediately to the recognition phrase. Without it, he is a pleasant wall. He will also respond to Hannah Cross's name, spoken quietly, as a secondary credential.",
+  "secrets": [
+    "He has a second copy of the route map hidden in the tavern — he will not reveal this unless the first is lost.",
+    "He knows who the second courier is and will activate them if the primary delivery fails."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He smiles and offers a drink and talks about nothing.",
+    "heavyPressure": "He calls for his tapman by name — a signal — and the back door of the tavern opens.",
+    "breakingPoint": "He will never confirm that riders are waiting. That is the piece that cannot be known.",
+    "fleeCondition": "If soldiers enter the tavern in force.",
+    "fleeStyle": "He goes through the kitchen and into the stable yard — he has done this before.",
+    "chaseStyle": "He does not run. He walks into a crowd and becomes unremarkable.",
+    "capturedBehavior": "He gives his name, his trade, and invites the officer to inspect his license. He is very calm.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.172Z",
+  "description": ""
+}

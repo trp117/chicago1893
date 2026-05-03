@@ -1,0 +1,56 @@
+{
+  "id": "nathaniel_gill_role",
+  "scenarioId": "midnight_errand_boston",
+  "name": "Nathaniel Gill — The Apprentice",
+  "description": "You are the printer's son, nineteen years old, standing at the exact moment when circling something finally becomes choosing it. The dispatch is in your hands. Your father is upstairs.",
+  "startLocationId": "gill_print_shop_back",
+  "startingKnowledge": [
+    "The back door of the shop has a broken latch that makes no sound when opened.",
+    "Owen Pryce stayed late tonight — unusual, and he did not say why.",
+    "Your father knows Captain Aldrich by name and has spoken well of him."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write in close second person, emphasizing the physical sensation of divided loyalty — the weight of the packet, the sound of footsteps above, the cold air from the alley. Nathaniel is young and feels everything acutely.",
+  "briefing": "You are Nathaniel Gill, nineteen years old, printer's apprentice in your father's shop in Boston's North End. Your father Benjamin is awake upstairs and does not know that Hannah Cross is standing at the back door, and the fact of that gap between what he knows and what you are about to do is already a kind of lie. You know that Owen Pryce, the journeyman, stayed in the shop tonight after hours and slipped out without explanation — something he has never done before. You want to carry the dispatch yourself, have wanted to do something like this for months, and tonight the wanting has a name and a weight and a wax seal. The candle on the compositing table is guttering, and the cold from the open door is raising the hairs on your forearm.",
+  "character_hooks": [
+    "I owe Owen Pryce a debt — he covered for me when I broke the press last winter — and I have been wondering all evening whether he will use it tonight.",
+    "I found a pamphlet in my father's old trunk six months ago that proved he was not always so cautious, and I have never known what to do with that knowledge.",
+    "I told a girl on Fish Street that I was going to do something worth remembering before the year was out, and I have thought about that promise every day since."
+  ],
+  "suggested_secret": "Nathaniel has already read the dispatch — he broke the seal and resealed it with a candle stub, and he knows exactly what the Regulars are planning tonight.",
+  "opening": {
+    "narrative": "The bell of Christ Church struck nine not ten minutes ago, and the echo of it is still somewhere in your chest. Hannah Cross is standing just inside the back door of the shop, her shawl pulled tight, holding an oilskin packet that she has placed in your hands without ceremony or explanation beyond the name Thomas Wren and the time before ten. Above you, your father's footstep crosses the bedroom floor — once, twice — and then stops. The candle on the compositing table is the only light, and it makes everything outside its small circle invisible. You are holding something that will change what tonight means, and the broken latch of the back door is swinging gently in the April air, and you have not yet decided anything, which is itself a kind of decision.",
+    "npcMoments": [
+      {
+        "characterId": "hannah_cross",
+        "moment": "Hannah watches your face and not the door. She has already decided what she thinks of you; she is waiting to find out if she is right."
+      },
+      {
+        "characterId": "benjamin_gill",
+        "moment": "A floorboard above creaks — the seventh step, which means he is at the top of the stairs and not yet coming down, but he is considering it."
+      }
+    ],
+    "choices": [
+      "Send Hannah away and go upstairs to your father — tell him nothing, or tell him everything.",
+      "Take the dispatch and slip out the back door into the alley before your father comes down.",
+      "Search the back room first — something about Owen staying late tonight is wrong and you want to know what before you move."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "dispatch_letter"
+    ],
+    "flags": {
+      "father_knows": false,
+      "owen_suspected": false,
+      "recognition_phrase_known": false
+    },
+    "suspicion": {
+      "captain_aldrich": 0,
+      "owen_pryce": 1,
+      "silas_murch": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.187Z"
+}

@@ -112,19 +112,19 @@ export function buildSystemPrompt(scenario, locations) {
     .map(l => `- ${l.id}: ${l.name} — ${(l.description || '').slice(0, 100)}`)
     .join('\n');
 
-  const winConds  = (scenario.winConditions  || ['Identify the culprit and present key evidence.']).join('\n- ');
-  const failConds = (scenario.failConditions || ['Time expires before action.', 'Wrong accusation.']).join('\n- ');
-  const partial   = (scenario.partialSuccessExamples || ['Immediate threat stopped but conspirators escape.']).join('\n- ');
-  const pressure  = (scenario.systems?.pressureEvents || ['A witness disappears.', 'A key document goes missing.']).join('\n- ');
+  const winConds  = (scenario.winConditions        || []).join('\n- ');
+  const failConds = (scenario.failConditions       || []).join('\n- ');
+  const partial   = (scenario.partialSuccessExamples || []).join('\n- ');
+  const pressure  = (scenario.systems?.pressureEvents || []).join('\n- ');
 
   const context = [
     `## Scenario: ${scenario.title}`,
     '',
-    scenario.description || '',
+    scenario.description || scenario.premise || '',
     '',
-    `**Genre:** ${(scenario.genre || ['mystery']).join(', ')}`,
-    `**Historical Realism:** ${scenario.historicalRealism || 'medium'}`,
-    `**Session Target:** ${scenario.sessionTargetMinutes || 15} minutes`,
+    `**Genre:** ${(scenario.genre || scenario.tone || []).join(', ')}`,
+    `**Historical Realism:** ${scenario.historicalRealism || ''}`,
+    `**Session Target:** ${scenario.sessionTargetMinutes || ''} minutes`,
     '',
     '## Approved Locations (use only these IDs and names in your narrative)',
     locList,

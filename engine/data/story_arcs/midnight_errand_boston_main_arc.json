@@ -1,0 +1,73 @@
+{
+  "id": "midnight_errand_boston_main_arc",
+  "scenarioId": "midnight_errand_boston",
+  "name": "The Errand That Cannot Be Undone",
+  "premise": "A woman appears at the back door of Gill's Print Shop with a sealed dispatch and a route map that could change the course of a colonial uprising. The apprentice has less than an hour to move through a city laced with Loyalist informers and Redcoat patrols.",
+  "goal": "Deliver the dispatch and the troop route map to the Sons of Liberty contact at the Green Dragon Tavern before ten o'clock, without exposing the network or destroying the Gill family.",
+  "openingSituation": "It is nine o'clock on the night of April 18th, 1775. Hannah Cross has knocked at the back door of Gill's Print Shop holding a oilskin packet. Benjamin Gill is awake upstairs. The streets outside are unusually quiet — the kind of quiet that means soldiers.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Knock at the Back Door",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        "Hannah Cross arrives at the print shop's back door with the sealed dispatch and whispered urgency.",
+        "The player learns the dispatch must reach Thomas Wren at the Green Dragon Tavern before ten o'clock.",
+        "Benjamin Gill's footsteps are heard upstairs — the player must decide whether to hide Hannah or send her away.",
+        "First exploration of the print shop reveals the troop route map hidden inside a type drawer, left by an earlier contact."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Streets Between",
+      "minuteRange": [
+        8,
+        18
+      ],
+      "beats": [
+        "The player ventures into the North End streets and encounters the Redcoat checkpoint on Ann Street, manned by Captain Aldrich.",
+        "At the chandler's shop, Silas Murch offers a back-alley route — for a price or a favor.",
+        "The player discovers that Owen Pryce, a journeyman printer, has been watching the shop and may be feeding information to Loyalist contacts.",
+        "Hannah Cross, if she left the shop, can be found near the rope-walk and will reveal what she knows about the network — but she is frightened and may bolt."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Green Dragon's Shadow",
+      "minuteRange": [
+        18,
+        26
+      ],
+      "beats": [
+        "The player reaches Union Street and the Green Dragon Tavern, where Thomas Wren is waiting in the back room.",
+        "Captain Aldrich has followed or sent word ahead — the tavern is being watched from the street.",
+        "Benjamin Gill may appear if he was not managed earlier, confronting his son or the network directly.",
+        "Owen Pryce's loyalty is tested: he either helps create a diversion or attempts to expose the delivery."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "Before the Bell Strikes Ten",
+      "minuteRange": [
+        26,
+        30
+      ],
+      "beats": [
+        "The dispatch and route map must be placed in Thomas Wren's hands — or the plan fails.",
+        "Final reckoning with Benjamin Gill: confrontation, confession, or a lie that holds.",
+        "The climax resolves: riders depart, or they don't. The player learns what their choice has cost and what it has made possible.",
+        "A closing image — the lantern in the Old North Church, or its absence — signals whether history bends tonight."
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.168Z",
+  "opening": ""
+}

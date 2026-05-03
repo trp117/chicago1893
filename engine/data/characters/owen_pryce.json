@@ -1,0 +1,35 @@
+{
+  "id": "owen_pryce",
+  "scenarioIds": [
+    "midnight_errand_boston"
+  ],
+  "name": "Owen Pryce",
+  "role": "Journeyman printer at Gill's shop, Loyalist informer",
+  "publicFace": "A reliable workman, slightly dull, not political — the kind of man nobody thinks about twice.",
+  "privateGoal": "To collect enough information to satisfy Captain Aldrich and secure a land grant in Nova Scotia, where he plans to start over.",
+  "fear": "That the Patriots will discover he is the informer before he can get out of Boston.",
+  "knowledge": [
+    "He saw Hannah Cross approach the back door of the shop earlier this evening and noted the time.",
+    "He knows the troop route map was left in the shop's type drawer three days ago — he does not know by whom.",
+    "He has told Captain Aldrich that a dispatch is moving tonight but does not yet know who is carrying it."
+  ],
+  "voice": "Agreeable, slightly slow, full of 'ayes' and 'well enough' — he performs ordinariness like a trade.",
+  "trustLogic": "He appears to open up under friendliness and shared complaint about the uncertainty of the times. In reality, he is assessing what the player knows. Genuine warmth or a direct appeal to his conscience can crack him — he is not a true believer, just a frightened man.",
+  "secrets": [
+    "He has not yet sent his final report to Aldrich tonight — he is still deciding how much to reveal.",
+    "He was once a Patriot sympathizer himself and still feels the pull — he despises himself for what he is doing."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He laughs it off and changes the subject, mentioning the weather or the price of paper.",
+    "heavyPressure": "He goes pale and says he doesn't know what the player is talking about, then looks for a way to leave the room.",
+    "breakingPoint": "He will never admit to Captain Aldrich's name — that is the thread that unravels everything.",
+    "fleeCondition": "If the player produces the troop route map and confronts him directly, or if Hannah Cross names him.",
+    "fleeStyle": "He grabs his coat and moves fast toward the waterfront, where he has a boat arranged.",
+    "chaseStyle": "He is not a fighter — he begs, bargains, and throws obstacles behind him.",
+    "capturedBehavior": "He confesses almost immediately, then tries to negotiate: information for safe passage out of the city.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.172Z",
+  "description": ""
+}

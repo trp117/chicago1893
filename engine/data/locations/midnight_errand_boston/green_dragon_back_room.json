@@ -1,0 +1,19 @@
+{
+  "id": "green_dragon_back_room",
+  "scenarioId": "midnight_errand_boston",
+  "name": "The Green Dragon Tavern — Back Room",
+  "description": "A small room with a table, two chairs, and a shuttered window that opens onto the stable yard. Thomas Wren uses it for accounts — and for other things. Tonight a candle burns on the table and the second chair is empty.",
+  "mood": "urgent, private, final",
+  "linkedCharacterIds": [
+    "thomas_wren"
+  ],
+  "atmosphericDetails": [
+    "A map of the roads north of Boston is spread on the table, weighted at the corners with coins.",
+    "From the stable yard beyond the shuttered window, you can hear horses moving — they have been saddled.",
+    "The candle on the table has burned down two inches — someone has been waiting here for a while."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.180Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

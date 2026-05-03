@@ -1,0 +1,20 @@
+{
+  "id": "green_dragon_tavern",
+  "scenarioId": "midnight_errand_boston",
+  "name": "The Green Dragon Tavern — Public Room",
+  "description": "The public room of the Green Dragon is half-full despite the hour, loud with ordinary conversation that seems just slightly too ordinary. Thomas Wren moves behind the bar with the practiced ease of a man who never stops watching the door.",
+  "mood": "loud, watchful, layered",
+  "linkedCharacterIds": [
+    "thomas_wren",
+    "captain_aldrich"
+  ],
+  "atmosphericDetails": [
+    "The sign above the bar — a green dragon on a black field — is smoke-darkened and old.",
+    "Three men at a corner table are playing cards with the focused silence of men who are not thinking about cards.",
+    "The back room door is closed; a line of light shows under it."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.179Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

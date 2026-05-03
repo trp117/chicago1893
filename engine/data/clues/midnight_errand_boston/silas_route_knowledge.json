@@ -1,0 +1,17 @@
+{
+  "id": "silas_route_knowledge",
+  "scenarioId": "midnight_errand_boston",
+  "title": "Silas Knows the Back Way",
+  "description": "Silas Murch, after sufficient persuasion, draws a route on the back of a candle wrapper with a tallow-stained finger: through the chandlery yard, along the back of the rope-walk, and out onto Union Street two blocks from the Green Dragon. He says he has moved things this way before and the soldiers don't know it yet. He names his price.",
+  "category": "testimony",
+  "discoveryLocationId": "murch_chandlery",
+  "implicatesCharacterIds": [
+    "silas_murch"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.184Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,35 @@
+{
+  "id": "silas_murch",
+  "scenarioIds": [
+    "midnight_errand_boston"
+  ],
+  "name": "Silas Murch",
+  "role": "Chandler and black-market route broker, nominally neutral",
+  "publicFace": "A stout, greasy-fingered candle-maker who sells information and shortcuts to anyone with coin.",
+  "privateGoal": "To profit from tonight's chaos without committing to either side — he will sell the same back-alley route to a Patriot and a Redcoat if the timing works.",
+  "fear": "Being left in the city when the fighting starts with no friends on either side.",
+  "knowledge": [
+    "He knows a back-alley route from the North End to Union Street that avoids the Ann Street checkpoint entirely.",
+    "He has seen unusual troop movement toward the Common tonight and is already calculating what it means for his prices.",
+    "He knows Owen Pryce by face and has seen him near the garrison — he will sell this observation for the right price."
+  ],
+  "voice": "Oily, cheerful, always angling — he phrases everything as a favor he is doing you.",
+  "trustLogic": "He responds to coin, trade goods, or information he can resell. He is immune to appeals to patriotism or loyalty but will respond to fear — specifically, fear of what happens to collaborators after a war.",
+  "secrets": [
+    "He has already been paid by Captain Aldrich to report any unusual movement through his alley tonight — he has not yet decided whether to honor this.",
+    "He has a cache of Patriot pamphlets hidden under his tallow vats that would hang him with the Loyalists."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He names a price for everything and waits.",
+    "heavyPressure": "He laughs and says he doesn't know anything worth knowing, then names a higher price.",
+    "breakingPoint": "He will not give Aldrich's name for free — that is his most valuable asset tonight.",
+    "fleeCondition": "If violence breaks out within sight of his shop.",
+    "fleeStyle": "He locks the shop door and disappears into the back — he has a bolt-hole under the floorboards.",
+    "chaseStyle": "He sits down and pretends to have a bad leg.",
+    "capturedBehavior": "He immediately offers to tell everything he knows about the other side — whichever side that is.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.173Z",
+  "description": ""
+}

@@ -1,0 +1,68 @@
+{
+  "id": "midnight_errand_boston",
+  "version": "1.0.0",
+  "title": "Midnight Errand: Boston, 1775",
+  "description": "On the eve of the Regulars' march, a printer's apprentice must decide whether to carry a secret dispatch through a city on the edge of war. Every choice tonight will echo for years — but the clock strikes ten in less than an hour.",
+  "genre": [
+    "historical",
+    "thriller",
+    "moral_drama"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 30,
+  "storyArcIds": [
+    "midnight_errand_boston_main_arc"
+  ],
+  "playerRoleIds": [
+    "nathaniel_gill_role",
+    "margaret_vane_role",
+    "ezra_cole_role"
+  ],
+  "keyEvidenceClueIds": [
+    "dispatch_letter",
+    "troop_route_map"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "A Redcoat patrol is heard passing the end of Milk Street — boots on cobblestone, lantern light under the door.",
+      "Benjamin Gill's candle appears in the upstairs window; he is awake and moving toward the stairs.",
+      "A church bell tolls the half-hour — nine-thirty — and the woman at the back door whispers that the window is closing."
+    ]
+  },
+  "winConditions": [
+    "The dispatch is delivered to the Green Dragon Tavern before ten o'clock without Benjamin Gill alerting the authorities.",
+    "The troop route is confirmed and passed to the Sons of Liberty network, enabling the warning riders to depart.",
+    "The player navigates the night without any NPC being arrested by Loyalist informers."
+  ],
+  "failConditions": [
+    "The dispatch is seized by Captain Aldrich or handed over by Benjamin Gill.",
+    "Ten o'clock passes without delivery and the troop route is lost.",
+    "The player is arrested or detained at the checkpoint on Ann Street.",
+    "Benjamin Gill discovers the conspiracy and sends word to the garrison before the player can act."
+  ],
+  "partialSuccessExamples": [
+    "The dispatch is delivered but Benjamin Gill suspects his son — the family business is ruined though the Cause is served.",
+    "The troop route reaches the riders but one NPC is arrested; history is made at a personal cost.",
+    "The player delivers the letter but cannot confirm the route map, leaving the warning incomplete."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.167Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": []
+}

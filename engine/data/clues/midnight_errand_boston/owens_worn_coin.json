@@ -1,0 +1,18 @@
+{
+  "id": "owens_worn_coin",
+  "scenarioId": "midnight_errand_boston",
+  "title": "Owen's King's Coin",
+  "description": "On the compositing table where Owen Pryce works, a coin sits half-hidden under a rag. It is a British shilling, newer than most in circulation, and on its edge someone has scratched a small mark — the kind of mark used to identify payment from a specific source. Owen does not know you have seen it.",
+  "category": "physical",
+  "discoveryLocationId": "gill_print_shop_back",
+  "implicatesCharacterIds": [
+    "owen_pryce",
+    "captain_aldrich"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.182Z",
+  "locationId": "",
+  "isRedHerring": false
+}

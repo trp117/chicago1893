@@ -1,0 +1,56 @@
+{
+  "id": "margaret_vane_role",
+  "scenarioId": "midnight_errand_boston",
+  "name": "Margaret Vane — The Courier",
+  "description": "You are Hannah Cross under a different name tonight — a woman who has been carrying messages through this city for two years and has learned that the most dangerous moment is always the handoff. You have placed the dispatch in the apprentice's hands. Now you must decide whether to trust him.",
+  "startLocationId": "gill_print_shop_back",
+  "startingKnowledge": [
+    "The recognition phrase that will open Thomas Wren's back room: 'The tide sets east tonight.'",
+    "The Ann Street checkpoint went up two hours ago — someone told the soldiers something.",
+    "The boy's father is a cautious man who once believed, and cautious men who once believed are unpredictable."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write in close second person, emphasizing the trained watchfulness of someone who has learned to read rooms and people as survival skills. Margaret notices everything and trusts almost nothing — but she is not cold. She is precise.",
+  "briefing": "You are Margaret Vane, a seamstress by trade and a courier by necessity, standing in the back room of a print shop where you have just placed a dispatch in the hands of a nineteen-year-old boy. You know that Owen Pryce, the journeyman who works here, came to your door three days ago asking questions that only an informer would think to ask, and you said nothing, and you have been wondering since whether that was enough. You want to see this through yourself rather than trust the handoff, but your face is known at the Ann Street checkpoint and the boy's is not, which is the only reason you are standing here instead of walking. The cold from the open door is at your back and the boy is still holding the packet and looking at you, and you have perhaps thirty seconds before the man upstairs comes down the stairs.",
+  "character_hooks": [
+    "I have carried six dispatches through this city in two years and never been stopped; tonight feels different and I cannot say why, which frightens me more than any checkpoint.",
+    "I know who the second courier is — the one Thomas Wren will activate if the primary delivery fails — and I have not told anyone, including Thomas, that I know.",
+    "The man upstairs, Benjamin Gill, printed something for us three years ago and does not know I know that; it is the card I will play if I have to."
+  ],
+  "suggested_secret": "Margaret is not working solely for the Sons of Liberty — she is also passing information to a French contact in the harbor, and tonight's dispatch will be copied before it reaches Thomas Wren.",
+  "opening": {
+    "narrative": "You have been in this city long enough to know that the quality of silence on a street tells you more than any informer. Tonight Ann Street went quiet at half past eight, which is an hour too early, and that is why you came to the back door of Gill's Print Shop instead of going straight to the Green Dragon as planned. The boy — Nathaniel — is holding the packet now, which is the right outcome, but his face is doing too many things at once and that is not reassuring. You can hear a man moving upstairs, which was not part of what you were told about tonight. You have perhaps made a mistake, and the question now is what kind of mistake and whether it is recoverable.",
+    "npcMoments": [
+      {
+        "characterId": "nathaniel_gill",
+        "moment": "The boy has not moved since you put the packet in his hands. He is thinking. Thinking is better than panicking, but it takes time you do not have."
+      },
+      {
+        "characterId": "owen_pryce",
+        "moment": "You notice, through the gap in the shuttered front window, a shape on the street that was not there when you arrived. It may be nothing. It is probably not nothing."
+      }
+    ],
+    "choices": [
+      "Give the boy the recognition phrase and leave immediately — your face at the shop is already a risk.",
+      "Stay and assess whether he can actually be trusted to make the delivery alone.",
+      "Take the dispatch back and find another route to the Green Dragon yourself, checkpoint or not."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "hannahs_recognition_phrase"
+    ],
+    "flags": {
+      "dispatch_handed_off": true,
+      "owen_suspected": true,
+      "checkpoint_known": true
+    },
+    "suspicion": {
+      "captain_aldrich": 2,
+      "owen_pryce": 3,
+      "benjamin_gill": 1
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T02:05:31.188Z"
+}

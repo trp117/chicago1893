@@ -44,6 +44,7 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .scene-card .line { display: block; margin-bottom: 6px; }
 .scene-card .line:last-child { margin-bottom: 0; }
 .scene-card .line.dialogue { margin-top: 0.9em; }
+.sensory-opening { font-style: italic; opacity: 0.85; margin-bottom: 16px; line-height: 1.7; }
 .thinking-dots { display: flex; gap: 5px; padding: 10px 0 4px; }
 .thinking-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: dot-pulse 1.2s ease-in-out infinite; }
 .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -67,11 +68,13 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .choices { display: flex; flex-wrap: wrap; flex: 1; gap: 8px; padding: 10px 28px 8px; }
 .choice-btn { border: 1px solid var(--border); background: #282318; color: var(--text); border-radius: 999px; padding: 10px 14px; cursor: pointer; }
 .choice-btn:hover { border-color: var(--accent); }
-.input-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 8px 28px 16px; }
+.input-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 28px 8px; }
 .input-actions { display: flex; flex-direction: column; gap: 8px; min-width: 100px; }
 .input-actions button[type="submit"] { flex: 1; }
 .input-textarea-wrap { position: relative; }
 textarea { width: 100%; resize: vertical; border-radius: 14px; border: 1px solid var(--border); background: var(--panel); color: var(--text); padding: 14px; padding-right: 52px; font: inherit; }
+#player-input { font-size: 1rem; border-color: rgba(208,176,106,0.35); }
+#player-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px rgba(208,176,106,0.12); }
 .mic-btn { position: absolute; bottom: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--panel-soft); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: border-color 0.15s, color 0.15s, background 0.15s; font-weight: normal; }
 .mic-btn:hover { border-color: var(--accent); color: var(--accent); }
 .mic-btn.listening { border-color: #c0392b; background: #2a1010; color: #e74c3c; animation: mic-pulse 1.2s ease-in-out infinite; }
@@ -192,6 +195,14 @@ li { margin-bottom: 8px; }
 .briefing-line { display: flex; flex-direction: column; gap: 5px; }
 .briefing-line-label { font-size: 0.68rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
 .briefing-line p { margin: 0; font-size: 1.05rem; color: var(--text); line-height: 1.65; }
+.briefing-text { margin: 0; font-size: 1.05rem; color: var(--text); line-height: 1.8; }
+.briefing-input-wrap { width: 100%; }
+.briefing-input-label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
+.briefing-input-optional { opacity: 0.7; }
+.briefing-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: Georgia, serif; padding: 10px 12px; font-size: 0.88rem; resize: none; }
+.briefing-input:focus { outline: none; border-color: var(--accent); box-shadow: none; }
+.briefing-header { display: flex; align-items: center; justify-content: space-between; }
+.briefing-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
 .error-page p { color: var(--muted); margin: 0; }
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
@@ -287,15 +298,9 @@ li { margin-bottom: 8px; }
           </button>
         </div>
       </div>
-      <p id="choices-label" class="choices-label">Suggested actions</p>
-      <div class="choices-wrap">
-        <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
-        <section id="choices" class="choices"></section>
-        <button type="button" class="choices-arrow choices-arrow--right" aria-hidden="true" tabindex="-1">&#8250;</button>
-      </div>
       <form id="input-form" class="input-row">
         <div class="input-textarea-wrap">
-          <textarea id="player-input" placeholder="Describe your action…" rows="2"></textarea>
+          <textarea id="player-input" placeholder="What do you say or do?" rows="2"></textarea>
           <button type="button" id="mic-btn" class="mic-btn" aria-label="Start voice input" title="Voice input">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <rect x="5" y="1" width="6" height="9" rx="3"/>
@@ -306,9 +311,15 @@ li { margin-bottom: 8px; }
           </button>
         </div>
         <div class="input-actions">
-          <button type="submit">Act</button>
+          <button type="submit">Send</button>
         </div>
       </form>
+      <p id="choices-label" class="choices-label">or choose:</p>
+      <div class="choices-wrap">
+        <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
+        <section id="choices" class="choices"></section>
+        <button type="button" class="choices-arrow choices-arrow--right" aria-hidden="true" tabindex="-1">&#8250;</button>
+      </div>
     </div>
   </main>
 </div>
@@ -339,24 +350,22 @@ li { margin-bottom: 8px; }
   </div>
 </div>
 
-<div id="briefing-overlay" class="briefing-overlay hidden" role="dialog" aria-modal="true" aria-label="Mission briefing">
+<div id="briefing-overlay" class="briefing-overlay hidden" role="dialog" aria-modal="true" aria-label="Character briefing">
   <div class="briefing-inner">
-    <div class="briefing-role-name" id="briefing-role-name"></div>
-    <div class="briefing-lines">
-      <div class="briefing-line" id="briefing-line-who">
-        <span class="briefing-line-label">Who you are</span>
-        <p id="briefing-who"></p>
-      </div>
-      <div class="briefing-line" id="briefing-line-mission">
-        <span class="briefing-line-label">Your mission</span>
-        <p id="briefing-mission"></p>
-      </div>
-      <div class="briefing-line" id="briefing-line-stakes">
-        <span class="briefing-line-label">What's at stake</span>
-        <p id="briefing-stakes"></p>
-      </div>
+    <div class="briefing-header">
+      <a href="/" class="back-link overlay-back-link">&#8592; Stories</a>
+      <button type="button" id="briefing-tts-btn" class="tts-toggle" aria-label="Disable read-aloud" title="Read aloud: on"></button>
     </div>
-    <button type="button" id="briefing-begin-btn" class="begin-btn">Enter the Story</button>
+    <div class="briefing-role-name" id="briefing-role-name"></div>
+    <p class="briefing-text" id="briefing-text"></p>
+    <div class="briefing-input-wrap">
+      <label class="briefing-input-label" for="briefing-addition">Anything else you are carrying into tonight? <span class="briefing-input-optional">(optional)</span></label>
+      <textarea id="briefing-addition" class="briefing-input" rows="2" placeholder="One line. Or skip it."></textarea>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" id="briefing-begin-btn" class="begin-btn">Begin</button>
+      <button type="button" id="briefing-skip-btn" class="overlay-drive-btn">Skip</button>
+    </div>
   </div>
 </div>
 
@@ -419,6 +428,7 @@ let currentAudio = null;
 let lastSpokenMessageId = 0;
 let currentMessageId = 0;
 let lastRenderedSpeakText = '';
+let lastRenderedSensoryOpening = null;
 let pendingTeleprompterEl = null;
 let teleprompterRafId = null;
 
@@ -462,26 +472,30 @@ function ttsSpeakFallback(text) {
   synth.speak(utt);
 }
 
-async function ttsSpeak(text) {
+async function ttsSpeak(text, sensoryOpening, confirmation = null, trustLevel = null) {
   if (!ttsEnabled) return;
   ttsStop();
-  if (!audioEl) { ttsSpeakFallback(text); return; }
+  if (!audioEl) { console.warn('[TTS] audioEl not initialized — audio not yet unlocked, skipping.'); return; }
   try {
+    const body = { text };
+    if (sensoryOpening)    body.sensory_opening = sensoryOpening;
+    if (confirmation)      body.confirmation    = confirmation;
+    if (trustLevel != null) body.trust_level    = trustLevel;
     const resp = await fetch(`${API_BASE}/tts`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
+      body: JSON.stringify(body)
     });
-    if (!resp.ok) { ttsSpeakFallback(text); return; }
+    if (!resp.ok) { console.warn(`[TTS] ElevenLabs returned ${resp.status} — falling back to browser TTS.`); ttsSpeakFallback(text); return; }
     const blob = await resp.blob();
     const url  = URL.createObjectURL(blob);
     audioEl.src = url;
     audioEl.playbackRate = 1.0;
     audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; };
-    audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; ttsSpeakFallback(text); };
+    audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; console.warn('[TTS] audio element error — falling back to browser TTS.'); ttsSpeakFallback(text); };
     currentAudio = audioEl;
     await audioEl.play();
     if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
-  } catch { ttsSpeakFallback(text); }
+  } catch (e) { console.warn('[TTS] exception — falling back to browser TTS.', e); ttsSpeakFallback(text); }
 }
 
 function ttsStop() {
@@ -523,7 +537,7 @@ ttsStopBtn.addEventListener('click', () => {
   if (!ttsEnabled) {
     ttsStop();
   } else if (audioUnlocked && lastRenderedSpeakText) {
-    ttsSpeak(lastRenderedSpeakText);
+    ttsSpeak(lastRenderedSpeakText, lastRenderedSensoryOpening);
   }
   updateTtsBarUI();
   updateTtsToggleUI();
@@ -544,8 +558,7 @@ function updateChaseUI() {
   const countdownEl = document.getElementById('countdown');
   if (countdownEl) countdownEl.classList.toggle('countdown--urgent', isChasing || (gameState?.remainingMinutes ?? 0) <= 5);
   if (inputEl && !inputEl.disabled) {
-    const hasChoices = choicesEl && choicesEl.children.length > 0;
-    inputEl.placeholder = isChasing ? 'What do you do?' : hasChoices ? 'Or type something different…' : 'Describe your action…';
+    inputEl.placeholder = isChasing ? 'What do you do?' : 'What do you say or do?';
   }
 }
 
@@ -612,7 +625,7 @@ function renderChoices(choices = []) {
     btn.className = 'choice-btn';
     btn.type = 'button';
     btn.textContent = choice;
-    btn.addEventListener('click', () => submitTurn(choice));
+    btn.addEventListener('click', () => submitTurn(choice, { isChoice: true }));
     choicesEl.appendChild(btn);
   }
   choicesEl.scrollLeft = 0;
@@ -620,10 +633,6 @@ function renderChoices(choices = []) {
 
   const labelEl = document.getElementById('choices-label');
   if (labelEl) labelEl.classList.toggle('visible', choices.length > 0);
-  if (inputEl && !inputEl.disabled) {
-    const isChasing = gameState?.isChasing;
-    inputEl.placeholder = isChasing ? 'What do you do?' : choices.length > 0 ? 'Or type something different…' : 'Describe your action…';
-  }
 }
 
 choicesEl.addEventListener('scroll', syncArrows, { passive: true });
@@ -642,8 +651,11 @@ function markupNarrative(text) {
 }
 
 function renderOutput(output, meta = {}) {
+  const sensoryHtml   = output.sensory_opening
+    ? `<p class="sensory-opening">${output.sensory_opening}</p>`
+    : '';
   const narrativeHtml = markupNarrative(output.narrative);
-  const html = `<p>${narrativeHtml}</p>`;
+  const html = `${sensoryHtml}<p>${narrativeHtml}</p>`;
 
   const currentLocation  = gameState?.location;
   const isTransitionTurn = meta.prevLocation != null && meta.prevLocation !== currentLocation;
@@ -685,14 +697,30 @@ function renderOutput(output, meta = {}) {
 
   renderChoices(output.choices || []);
 
+  // Auto-focus input on mobile after each scene finishes loading
+  if ('ontouchstart' in window && inputEl && !inputEl.disabled) {
+    setTimeout(() => inputEl.focus(), 600);
+  }
+
   const messageId = ++currentMessageId;
-  lastRenderedSpeakText = output.narrative;
+  lastRenderedSpeakText      = output.narrative;
+  lastRenderedSensoryOpening = output.sensory_opening || null;
 
   if (!meta.skipTts && ttsEnabled && audioUnlocked) {
+    // Build narrator confirmation: "You [player_action]." — freeform input only, not choices
+    const pa = meta.player_action?.trim();
+    const confirmation = pa
+      ? `You ${pa}${pa.endsWith('.') || pa.endsWith('!') || pa.endsWith('?') ? '' : '.'}`
+      : null;
+    // Determine primary NPC trust level for voice shaping
+    const primaryNpcId = output.npcMoments?.[0]?.npc || null;
+    const trustLevel = (primaryNpcId && gameState?.npc_states?.[primaryNpcId]?.trust_level != null)
+      ? gameState.npc_states[primaryNpcId].trust_level
+      : null;
     setTimeout(() => {
       if (lastSpokenMessageId < messageId) {
         lastSpokenMessageId = messageId;
-        ttsSpeak(output.narrative);
+        ttsSpeak(output.narrative, output.sensory_opening, confirmation, trustLevel);
       }
     }, 300);
   }
@@ -843,12 +871,13 @@ function showTimeDecision() {
 let submitting = false;
 
 function buildAssistantHistoryContent(output) {
-  let text = output.narrative || '';
+  let text = output.sensory_opening ? `${output.sensory_opening}\n\n` : '';
+  text += output.narrative || '';
   for (const m of output.npcMoments || []) text += `\n${prettifyId(m.npc)}: ${m.text}`;
   return text.trim();
 }
 
-async function submitTurn(playerInput) {
+async function submitTurn(playerInput, { isChoice = false } = {}) {
   if (!playerInput?.trim() || submitting) return;
   if (gameState?.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
     gameState.timeExpired = true;
@@ -876,7 +905,7 @@ async function submitTurn(playerInput) {
     const resp = await fetch(`${API_BASE}/turn`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId })
+      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(isChoice ? {} : { player_action: playerInput }) })
     });
     const data = await resp.json();
 
@@ -908,7 +937,7 @@ async function submitTurn(playerInput) {
 
     renderSidebar({ includeClues: false });
     updateChaseUI();
-    renderOutput(data.output, { playerInput, prevLocation });
+    renderOutput(data.output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
     renderSidebarClues();
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
@@ -1032,31 +1061,79 @@ function showRoleSelection() {
   });
 }
 
-// ── Mission briefing ──────────────────────────────────────────────────────────
+// ── Briefing screen ───────────────────────────────────────────────────────────
 
 function showBriefing(role, style) {
-  const overlay = document.getElementById('briefing-overlay');
-  const briefing = role.briefing || {};
+  const overlay     = document.getElementById('briefing-overlay');
+  const additionEl  = document.getElementById('briefing-addition');
+
+  // Pick a random character hook to append as the final sentence
+  const hooks      = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
+  const hookIndex  = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
+  const activeHook = hookIndex >= 0 ? hooks[hookIndex] : null;
+
+  // Full briefing = the 5-sentence string + hook appended
+  const baseBriefing = typeof role.briefing === 'string' && role.briefing.trim()
+    ? role.briefing.trim()
+    : (role.description || '');
+  const fullBriefing = activeHook ? `${baseBriefing} ${activeHook}` : baseBriefing;
 
   document.getElementById('briefing-role-name').textContent = role.name;
-  document.getElementById('briefing-who').textContent     = briefing.who     || role.description || '';
-  document.getElementById('briefing-mission').textContent = briefing.mission || '';
-  document.getElementById('briefing-stakes').textContent  = briefing.stakes  || '';
+  document.getElementById('briefing-text').textContent      = fullBriefing;
 
-  ['who', 'mission', 'stakes'].forEach(key => {
-    const line = document.getElementById(`briefing-line-${key}`);
-    if (line) line.style.display = document.getElementById(`briefing-${key}`)?.textContent.trim() ? '' : 'none';
-  });
-
+  if (additionEl) additionEl.value = '';
   overlay.classList.remove('hidden');
 
-  const oldBtn = document.getElementById('briefing-begin-btn');
-  const newBtn = oldBtn.cloneNode(true);
-  oldBtn.replaceWith(newBtn);
-  newBtn.addEventListener('click', () => {
-    overlay.classList.add('hidden');
-    startGame(role.id, style);
+  // ── Briefing TTS toggle ───────────────────────────────────────────────────
+  // Clone to remove any prior event listeners from a previous briefing call
+  const oldTtsBtn = document.getElementById('briefing-tts-btn');
+  const ttsBtn    = oldTtsBtn.cloneNode(false);
+  oldTtsBtn.replaceWith(ttsBtn);
+
+  function syncBriefingTtsBtn() {
+    ttsBtn.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+    ttsBtn.classList.toggle('active', ttsEnabled);
+    ttsBtn.setAttribute('aria-label', ttsEnabled ? 'Disable read-aloud' : 'Enable read-aloud');
+    ttsBtn.title = ttsEnabled ? 'Read aloud: on' : 'Read aloud: off';
+  }
+  syncBriefingTtsBtn();
+
+  ttsBtn.addEventListener('click', () => {
+    setTtsEnabled(!ttsEnabled);
+    if (!ttsEnabled) {
+      ttsStop();
+    } else if (audioUnlocked && fullBriefing) {
+      ttsSpeak(fullBriefing);
+    }
+    syncBriefingTtsBtn();
+    updateTtsToggleUI();
+    updateTtsBarUI();
   });
+
+  // Read briefing aloud on open
+  if (ttsEnabled && audioUnlocked && fullBriefing) {
+    ttsSpeak(fullBriefing);
+  }
+
+  function beginWith(playerAddition) {
+    ttsStop();
+    overlay.classList.add('hidden');
+    startGame(role.id, style, {
+      character_context: fullBriefing,
+      player_addition:   playerAddition,
+      active_hook:       activeHook,
+    });
+  }
+
+  const oldBegin = document.getElementById('briefing-begin-btn');
+  const newBegin = oldBegin.cloneNode(true);
+  oldBegin.replaceWith(newBegin);
+  newBegin.addEventListener('click', () => beginWith(additionEl?.value?.trim() || ''));
+
+  const oldSkip = document.getElementById('briefing-skip-btn');
+  const newSkip = oldSkip.cloneNode(true);
+  oldSkip.replaceWith(newSkip);
+  newSkip.addEventListener('click', () => beginWith(''));
 }
 
 // ── Client-side initial state builder ────────────────────────────────────────
@@ -1096,7 +1173,7 @@ function buildClientInitialState(scenario, role) {
 
 // ── Start game ────────────────────────────────────────────────────────────────
 
-async function startGame(roleId, narrativeStyle) {
+async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   const role = (scenario.playerRoleOptions || []).find(r => r.id === roleId);
   if (!role) return;
 
@@ -1132,7 +1209,15 @@ async function startGame(roleId, narrativeStyle) {
   try {
     const startResp = await fetch(`${API_BASE}/start`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scenarioId: scenario.id, roleId, narrativeStyle: gameState.narrativeStyle })
+      body: JSON.stringify({
+        scenarioId:        scenario.id,
+        roleId,
+        narrativeStyle:    gameState.narrativeStyle,
+        character_context: briefingContext.character_context || null,
+        player_addition:   briefingContext.player_addition   || null,
+        active_hook:       briefingContext.active_hook       || null,
+        ttsEnabled,
+      })
     });
     if (!startResp.ok) throw new Error(`/start returned ${startResp.status}`);
     const startData = await startResp.json();
@@ -1155,9 +1240,12 @@ async function startGame(roleId, narrativeStyle) {
   if (ttsEnabled && audioUnlocked) {
     let audioBlobUrl = null;
     try {
+      const ttsBody = openingOutput.sensory_opening
+        ? { text: openingOutput.narrative, sensory_opening: openingOutput.sensory_opening }
+        : { text: openingOutput.narrative };
       const ttsResp = await fetch(`${API_BASE}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: openingOutput.narrative })
+        body: JSON.stringify(ttsBody)
       });
       if (ttsResp.ok) audioBlobUrl = URL.createObjectURL(await ttsResp.blob());
     } catch {}
@@ -1169,14 +1257,14 @@ async function startGame(roleId, narrativeStyle) {
       audioEl.src = audioBlobUrl;
       audioEl.playbackRate = 1.0;
       audioEl.onended = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; };
-      audioEl.onerror = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; ttsSpeakFallback(openingOutput.narrative); };
+      audioEl.onerror = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; console.warn('[TTS] opening: audio element error — falling back to browser TTS.'); ttsSpeakFallback(openingOutput.narrative); };
       currentAudio = audioEl;
       try {
         await audioEl.play();
         if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
-      } catch { ttsSpeakFallback(openingOutput.narrative); }
+      } catch (e) { console.warn('[TTS] opening: playback exception — falling back to browser TTS.', e); ttsSpeakFallback(openingOutput.narrative); }
     } else {
-      ttsSpeakFallback(openingOutput.narrative);
+      console.warn('[TTS] opening: ElevenLabs unavailable — no audio for opening scene.');
     }
   } else {
     loadingEl.remove();

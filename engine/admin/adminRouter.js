@@ -46,97 +46,88 @@ function maxTokens(minutes) {
   return 20000;
 }
 
-function buildGenerationPrompt({ title, concept, playTimeMinutes, tone, historicalRealism }) {
-  const s   = scalingGuide(playTimeMinutes);
-  const sid = slugify(title);
-  const aid = `${sid}_main_arc`;
+function buildGenerationPrompt({ description, playTimeMinutes }) {
+  const s = scalingGuide(playTimeMinutes);
 
   return `You are a professional story designer for an AI-powered interactive mystery game engine.
-Generate a complete, playable story package from the parameters and source material below.
+Read the creator's description and generate a complete, immediately playable story package.
 
-GAME ENGINE OVERVIEW:
-Players explore locations, question NPCs, and discover clues to solve a mystery before time expires.
-Key mechanics:
-- Players travel between locations to find clues and encounter NPCs
-- Each NPC has a suspicion score that rises as incriminating clues are found
-- Clues are location-specific — a player must visit the correct location to discover each one
-- NPCs reveal more as their suspicion rises and the player presents evidence
-- The game ends when the player makes a final accusation, time expires, or a climax is triggered
+GAME ENGINE:
+Players explore locations, question NPCs, discover clues, and solve a mystery before time runs out.
+- Players travel between locations; clues are location-specific
+- NPCs have suspicion scores that rise as evidence is presented
+- The game ends on final accusation, time expiry, or triggered climax
 
-STORY PARAMETERS:
-- Title: ${title}
-- Scenario ID (use exactly): ${sid}
-- Story Arc ID (use exactly): ${aid}
-- Play Time: ${playTimeMinutes} minutes
-- Tone: ${tone}
-- Historical Realism: ${historicalRealism}
-- Time per turn: ${s.tpt} minutes
+CREATOR'S DESCRIPTION:
+${description}
 
-SCALING REQUIREMENTS FOR ${playTimeMinutes} MINUTES:
-- Acts: exactly ${s.acts} acts covering 0–${playTimeMinutes} minutes
-- Characters: ${s.chars} (include at least 1–2 culprits, 1 authority figure, 1 neutral/ally)
-- Locations: ${s.locs} (spread characters across locations, 2–3 per location)
-- Clues: ${s.clues} (exactly 2 must have isKeyEvidence: true)
-- Player Roles: ${s.roles} (different access levels and starting locations)
+PLAY TIME: ${playTimeMinutes} minutes
+TIME PER TURN: ${s.tpt} minutes
 
-SOURCE MATERIAL:
-${concept}
+REQUIRED SCALE:
+- Acts: exactly ${s.acts}
+- NPCs: ${s.chars} — at least 1–2 culprits, 1 authority figure, 1 neutral/ally
+- Locations: ${s.locs} — 2–3 NPCs per location
+- Clues: ${s.clues} — exactly 2 with isKeyEvidence: true
+- Player Roles: ${s.roles}
 
-OUTPUT RULES — READ CAREFULLY:
-1. Return ONLY a valid JSON object — no markdown, no code fences, no explanation text
-2. All entity IDs must be lowercase slugs (letters, numbers, underscores only)
-3. Use the exact scenario ID "${sid}" and story arc ID "${aid}" throughout
-4. All cross-references MUST be internally consistent:
-   - location.linkedCharacterIds → must match actual character IDs you create
-   - clue.discoveryLocationId → must match an actual location ID you create
-   - clue.implicatesCharacterIds → must match actual character IDs you create
-   - scenario.keyEvidenceClueIds → must match clue IDs where isKeyEvidence: true
-   - scenario.playerRoleIds → must match actual player role IDs you create
-   - playerRole.startLocationId → must match an actual location ID you create
-5. Exactly 2 clues must have isKeyEvidence: true — these unlock the ending
-6. Distribute clues across at least 3 different locations
-7. The culprit should not be obvious at the start — build misdirection
-8. Every NPC needs a distinct voice and a reason to be evasive or helpful
-9. Opening narratives should be vivid and immersive — 2–4 sentences minimum
+OUTPUT RULES:
+1. Return ONLY valid JSON — no markdown, no code fences, no prose
+2. Invent a concise story title. Derive scenario_id as its snake_case slug
+3. Story arc ID must be: {scenario_id}_main_arc
+4. All IDs: lowercase, letters/numbers/underscores only
+5. All cross-references must be consistent (linkedCharacterIds, discoveryLocationId, etc.)
+6. Exactly 2 clues must have isKeyEvidence: true
+7. Every playerRole MUST include briefing, character_hooks, and suggested_secret (rules below)
+
+PLAYER BRIEFING RULES (required on every playerRole):
+- briefing: exactly 5 sentences, second person (You are...)
+  S1: who they are (name, trade, station in this world)
+  S2: one relationship with another character that has tension right now
+  S3: one thing they know they were not meant to know
+  S4: one want they have not yet acted on
+  S5: one sensory/physical detail placing them in this world right now
+  Must make the player feel already late for something. No backstory, no history lesson.
+- character_hooks: array of exactly 3 first-person sentences — alternative starting conditions (different debt, different rumour, different relationship). One is picked randomly each session.
+- suggested_secret: one sentence. Something nobody in the story knows about this player character.
 
 REQUIRED JSON STRUCTURE:
-
 {
   "scenario": {
-    "id": "${sid}",
+    "id": "your_scenario_slug",
     "version": "1.0.0",
-    "title": "${title}",
-    "description": "2–3 sentence description of the scenario",
-    "genre": ["${tone}"],
-    "historicalRealism": "${historicalRealism}",
+    "title": "Your Story Title",
+    "description": "2–3 sentence description",
+    "genre": ["genre_word"],
+    "historicalRealism": "high | medium | low",
     "freedomLevel": "guided",
     "sessionTargetMinutes": ${playTimeMinutes},
-    "storyArcIds": ["${aid}"],
-    "playerRoleIds": ["role_id_1", "role_id_2"],
-    "keyEvidenceClueIds": ["clue_id_for_key_evidence_1", "clue_id_for_key_evidence_2"],
+    "storyArcIds": ["your_scenario_slug_main_arc"],
+    "playerRoleIds": ["role_id_1"],
+    "keyEvidenceClueIds": ["key_clue_1", "key_clue_2"],
     "systems": {
       "timePerTurnDefault": ${s.tpt},
       "scales": {
-        "threat":      { "min": 0,  "max": 10, "default": 1 },
-        "authorityTrust": { "min": -3, "max": 5,  "default": 1 }
+        "threat":         { "min": 0, "max": 10, "default": 1 },
+        "authorityTrust": { "min": -3, "max": 5, "default": 1 }
       },
-      "pressureEvents": ["pressure event 1", "pressure event 2", "pressure event 3"]
+      "pressureEvents": ["event 1", "event 2", "event 3"]
     },
-    "winConditions": ["win condition 1", "win condition 2"],
-    "failConditions": ["fail condition 1", "fail condition 2"],
-    "partialSuccessExamples": ["partial success example"],
+    "winConditions": ["win condition"],
+    "failConditions": ["fail condition"],
+    "partialSuccessExamples": ["partial example"],
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2025-01-01T00:00:00Z"
   },
   "storyArc": {
-    "id": "${aid}",
-    "scenarioId": "${sid}",
+    "id": "your_scenario_slug_main_arc",
+    "scenarioId": "your_scenario_slug",
     "name": "Arc name",
-    "premise": "The central dramatic situation",
+    "premise": "Central dramatic situation in 1–2 sentences",
     "goal": "What the player must accomplish",
-    "openingSituation": "The immediate problem at the very start",
+    "openingSituation": "The immediate problem at game start",
     "acts": [
-      { "actNumber": 1, "name": "Act name", "minuteRange": [0, ${Math.round(playTimeMinutes / s.acts)}], "beats": ["beat 1", "beat 2", "beat 3"] }
+      { "actNumber": 1, "name": "Act name", "minuteRange": [0, ${Math.round(playTimeMinutes / s.acts)}], "beats": ["beat 1", "beat 2"] }
     ],
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2025-01-01T00:00:00Z"
@@ -144,24 +135,24 @@ REQUIRED JSON STRUCTURE:
   "characters": [
     {
       "id": "character_slug",
-      "scenarioIds": ["${sid}"],
+      "scenarioIds": ["your_scenario_slug"],
       "name": "Full Name",
-      "role": "Their official role or occupation",
+      "role": "Official role or occupation",
       "publicFace": "How they appear to strangers",
       "privateGoal": "What they really want",
-      "fear": "Their greatest vulnerability or what they most want to hide",
-      "knowledge": ["specific thing they know 1", "specific thing they know 2"],
-      "voice": "Speaking style description",
-      "trustLogic": "What makes them open up or shut down",
+      "fear": "Their greatest vulnerability",
+      "knowledge": ["fact they know 1", "fact they know 2"],
+      "voice": "Speaking style in one phrase",
+      "trustLogic": "What opens them up or shuts them down",
       "secrets": ["secret 1", "secret 2"],
       "aggressionProfile": {
-        "mildPressure": "How they react when lightly questioned",
-        "heavyPressure": "How they react when directly accused or threatened",
-        "breakingPoint": "What they will never admit under any circumstances",
-        "fleeCondition": "Exact condition that triggers flight — empty string if they never flee",
-        "fleeStyle": "How they escape — empty string if they never flee",
-        "chaseStyle": "Behavior when chased — empty string if they never flee",
-        "capturedBehavior": "What they do if caught or cornered",
+        "mildPressure": "Reaction when questioned lightly",
+        "heavyPressure": "Reaction when directly accused",
+        "breakingPoint": "What they will never admit",
+        "fleeCondition": "Trigger for flight — empty string if never",
+        "fleeStyle": "How they escape — empty string if never",
+        "chaseStyle": "Behavior when chased — empty string if never",
+        "capturedBehavior": "Behavior if cornered",
         "strikeFirst": null
       },
       "createdAt": "2025-01-01T00:00:00Z",
@@ -171,12 +162,12 @@ REQUIRED JSON STRUCTURE:
   "locations": [
     {
       "id": "location_slug",
-      "scenarioId": "${sid}",
+      "scenarioId": "your_scenario_slug",
       "name": "Location Name",
-      "description": "Vivid, atmospheric 1–2 sentence description of what the player sees and feels",
+      "description": "Vivid 1–2 sentence description with sensory detail",
       "mood": "comma-separated mood tags",
-      "linkedCharacterIds": ["character_id_1", "character_id_2"],
-      "atmosphericDetails": ["evocative detail 1", "evocative detail 2", "evocative detail 3"],
+      "linkedCharacterIds": ["character_id"],
+      "atmosphericDetails": ["sensory detail 1", "sensory detail 2", "sensory detail 3"],
       "createdAt": "2025-01-01T00:00:00Z",
       "updatedAt": "2025-01-01T00:00:00Z"
     }
@@ -184,10 +175,10 @@ REQUIRED JSON STRUCTURE:
   "clues": [
     {
       "id": "clue_slug",
-      "scenarioId": "${sid}",
+      "scenarioId": "your_scenario_slug",
       "title": "Short Clue Name",
-      "description": "What the player discovers — written from the player's perspective",
-      "category": "documentary OR observation OR physical OR testimony",
+      "description": "What the player discovers, from player perspective",
+      "category": "documentary | observation | physical | testimony",
       "discoveryLocationId": "location_slug",
       "implicatesCharacterIds": ["character_slug"],
       "unlocks": [],
@@ -199,22 +190,25 @@ REQUIRED JSON STRUCTURE:
   "playerRoles": [
     {
       "id": "role_slug",
-      "scenarioId": "${sid}",
+      "scenarioId": "your_scenario_slug",
       "name": "Role Name",
-      "description": "1–2 sentence description shown to the player when choosing this role",
+      "description": "1–2 sentences shown when choosing this role",
       "startLocationId": "location_slug",
-      "startingKnowledge": ["something they already know at the start"],
-      "accessLevel": "worker OR staff OR director",
-      "perspective": "Instructions for the narrative AI: how to write from this role's point of view, authority level, and relationship to other characters",
+      "startingKnowledge": ["something they know at start"],
+      "accessLevel": "worker | staff | director",
+      "perspective": "How the AI should write for this role's point of view",
+      "briefing": "You are [name]. [Tension sentence]. [Forbidden knowledge]. [Unfulfilled want]. [Sensory anchor right now].",
+      "character_hooks": ["First-person hook one.", "First-person hook two.", "First-person hook three."],
+      "suggested_secret": "One sentence nobody in the story knows.",
       "opening": {
-        "narrative": "Opening in two parts. Part 1 — context (2–3 sentences): establish the time period, place, and historical situation in second person — draw the player into the world before the action starts, making clear what is at stake and why this moment matters. Part 2 — scene entry (2–3 sentences): zoom into the immediate situation, where the player is right now, what surrounds them, and the first hook or tension that opens the investigation. Do NOT start mid-action.",
+        "narrative": "4–6 sentence opening establishing time, place, and immediate tension. Do not start mid-action.",
         "npcMoments": [],
-        "choices": ["first action choice", "second action choice", "third action choice"]
+        "choices": ["first action", "second action", "third action"]
       },
       "roleInitialState": {
-        "inventory": ["starting item 1", "starting item 2"],
+        "inventory": ["starting item"],
         "flags": {},
-        "suspicion": { "culprit_character_id": 1 }
+        "suspicion": {}
       },
       "createdAt": "2025-01-01T00:00:00Z",
       "updatedAt": "2025-01-01T00:00:00Z"
@@ -399,16 +393,15 @@ export function createAdminRouter(repos, config = {}) {
     if (!anthropicApiKey) {
       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured on the engine server.' });
     }
-    const { title, concept, playTimeMinutes = 15, tone = 'mystery', historicalRealism = 'medium' } = req.body;
-    if (!title)   return badRequest(res, '"title" is required.');
-    if (!concept) return badRequest(res, '"concept" is required.');
+    const { description, playTimeMinutes = 15 } = req.body;
+    if (!description) return badRequest(res, '"description" is required.');
 
-    const prompt = buildGenerationPrompt({ title, concept, playTimeMinutes: Number(playTimeMinutes), tone, historicalRealism });
+    const prompt = buildGenerationPrompt({ description, playTimeMinutes: Number(playTimeMinutes) });
     const toks   = maxTokens(Number(playTimeMinutes));
 
-    console.log(`[GENERATE] "${title}" playTime=${playTimeMinutes}min tokenBudget=${toks}`);
+    console.log(`[GENERATE] playTime=${playTimeMinutes}min tokenBudget=${toks}`);
 
-    const genTrace = langfuse?.trace({ name: 'story-generate', input: { title, concept, playTimeMinutes, tone, historicalRealism, tokenBudget: toks } });
+    const genTrace = langfuse?.trace({ name: 'story-generate', input: { playTimeMinutes, tokenBudget: toks } });
     const genSpan  = genTrace?.generation({ name: 'generate', model: 'claude-sonnet-4-6', modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
 
     let text;
@@ -460,6 +453,88 @@ export function createAdminRouter(repos, config = {}) {
       const tail = text.slice(-200);
       genTrace?.update({ tags: ['invalid-json'] });
       return res.status(500).json({ error: `Claude returned invalid JSON (response may be truncated).\n\nLast 200 chars:\n${tail}` });
+    }
+  });
+
+  r.post('/generate/player-briefings', async (req, res) => {
+    if (!anthropicApiKey) {
+      return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    }
+    const { playerRoles = [], scenario = {}, characters = [] } = req.body;
+    if (!playerRoles.length) return badRequest(res, 'playerRoles array is required.');
+
+    const characterList = characters.map(c => `- ${c.name} (${c.role || 'unknown role'}): ${c.publicFace || ''}`).join('\n') || '(none listed)';
+    const rolesBlock = playerRoles.map((role, i) => `
+ROLE ${i + 1}: "${role.name}" (id: ${role.id})
+Description: ${role.description || 'none'}
+Access Level: ${role.accessLevel || 'staff'}
+Starting Knowledge: ${(role.startingKnowledge || []).join(', ') || 'none'}
+Perspective notes: ${role.perspective || 'none'}`).join('\n');
+
+    const prompt = `You are writing player character briefings for an immersive AI mystery game.
+
+SCENARIO: ${scenario.title || 'unknown'}
+PREMISE: ${scenario.description || ''}
+TONE: ${(scenario.genre || []).join(', ')}
+
+CHARACTERS IN THIS STORY:
+${characterList}
+
+For each player role below, generate three fields:
+
+1. "briefing" — Exactly 5 sentences. Second person (You are...).
+   Sentence 1: Who the player is in this world (name, trade, station).
+   Sentence 2: One relationship with another character that has tension RIGHT NOW.
+   Sentence 3: One thing the player knows that they were not meant to know.
+   Sentence 4: One want that has not been acted on yet.
+   Sentence 5: One sensory or physical detail that grounds them in the world.
+   No backstory. No history lesson. The briefing must make the player feel they are already late for something.
+
+2. "character_hooks" — Array of exactly 3 strings. Alternative personal details that vary between sessions — different things overheard, different debts, different relationships. Same character, different starting condition. Each hook is one sentence in first person.
+
+3. "suggested_secret" — One sentence. Something nobody in the story knows about this player character.
+
+PLAYER ROLES:
+${rolesBlock}
+
+Return ONLY valid JSON in this exact structure:
+{
+  "briefings": [
+    {
+      "id": "role_id",
+      "briefing": "Five sentence second-person briefing text here.",
+      "character_hooks": ["First-person hook one.", "First-person hook two.", "First-person hook three."],
+      "suggested_secret": "One sentence nobody in the story knows."
+    }
+  ]
+}`;
+
+    console.log(`[BRIEFINGS] Generating for ${playerRoles.length} role(s) in "${scenario.title || 'unknown'}"`);
+
+    let text;
+    try {
+      const signal   = AbortSignal.timeout(120_000);
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST', signal,
+        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.8, messages: [{ role: 'user', content: prompt }] })
+      });
+      const data = await response.json();
+      if (!response.ok) return res.status(500).json({ error: `Anthropic API error (${response.status}): ${data?.error?.message || JSON.stringify(data?.error)}` });
+      text = data?.content?.[0]?.text;
+      if (!text) return res.status(500).json({ error: 'No response from Claude.' });
+    } catch (err) {
+      const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+      return res.status(500).json({ error: isTimeout ? 'Briefing generation timed out.' : err.message });
+    }
+
+    try {
+      const parsed = extractJson(text);
+      if (!Array.isArray(parsed.briefings)) return res.status(500).json({ error: 'Response missing briefings array.', rawText: text.slice(0, 400) });
+      console.log(`[BRIEFINGS] Generated ${parsed.briefings.length} briefing(s)`);
+      return res.json(parsed);
+    } catch (err) {
+      return res.status(500).json({ error: 'Claude returned invalid JSON for briefings.', rawText: text.slice(0, 400) });
     }
   });
 
