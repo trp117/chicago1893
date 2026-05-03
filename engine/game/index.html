@@ -209,7 +209,7 @@ li { margin-bottom: 8px; }
 .intro-overlay { position: fixed; inset: 0; z-index: 215; background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; overflow: hidden; }
 .intro-overlay.hidden { display: none; }
 .intro-inner { display: flex; flex-direction: column; width: 100%; max-width: 680px; height: 100dvh; }
-.intro-header { flex-shrink: 0; padding: 28px 32px 20px; border-bottom: 1px solid rgba(58,52,41,0.5); }
+.intro-header { flex-shrink: 0; padding: 28px 32px 20px; border-bottom: 1px solid rgba(58,52,41,0.5); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .intro-header-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; margin: 0; }
 .intro-sections { flex: 1; overflow-y: auto; padding: 40px 32px 24px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .intro-sections::-webkit-scrollbar { width: 4px; }
@@ -413,6 +413,7 @@ li { margin-bottom: 8px; }
   <div class="intro-inner">
     <div class="intro-header">
       <p id="intro-title" class="intro-header-title"></p>
+      <button type="button" id="intro-tts-btn" class="tts-toggle" aria-label="Mute narration" title="Mute narration"></button>
     </div>
     <div id="intro-sections" class="intro-sections"></div>
     <div class="intro-footer">
@@ -1146,17 +1147,77 @@ function showIntroduction(scenario, role, style) {
 
   titleEl.textContent = scenario.title || '';
   sectionsEl.innerHTML = '';
+  const texts = [];
   for (const section of (scenario.introduction?.sections || [])) {
     if (!section.text?.trim()) continue;
     const p = document.createElement('p');
     p.className = 'intro-section';
     p.textContent = section.text;
     sectionsEl.appendChild(p);
+    texts.push(section.text);
   }
   sectionsEl.scrollTop = 0;
   overlay.classList.remove('hidden');
 
+  // ── TTS ───────────────────────────────────────────────────────────────────────
+  const oldTtsBtn = document.getElementById('intro-tts-btn');
+  const ttsBtnEl  = oldTtsBtn.cloneNode(false);
+  oldTtsBtn.replaceWith(ttsBtnEl);
+
+  function syncIntroTtsBtn() {
+    ttsBtnEl.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+    ttsBtnEl.classList.toggle('active', ttsEnabled);
+    const label = ttsEnabled ? 'Mute narration' : 'Unmute narration';
+    ttsBtnEl.title = label;
+    ttsBtnEl.setAttribute('aria-label', label);
+  }
+  syncIntroTtsBtn();
+
+  function startIntroTeleprompter() {
+    cancelAnimationFrame(teleprompterRafId);
+    if (!audioEl || !audioEl.duration || !isFinite(audioEl.duration)) return;
+    const scrollDist = sectionsEl.scrollHeight - sectionsEl.clientHeight;
+    if (scrollDist <= 0) return;
+    const dur = audioEl.duration;
+    function tick() {
+      if (!audioEl || audioEl.paused || audioEl.ended) { teleprompterRafId = null; return; }
+      sectionsEl.scrollTop = (audioEl.currentTime / dur) * scrollDist;
+      teleprompterRafId = requestAnimationFrame(tick);
+    }
+    teleprompterRafId = requestAnimationFrame(tick);
+  }
+
+  function speakIntro() {
+    if (!texts.length || !audioUnlocked) return;
+    ttsSpeak(texts.join('\n\n')).then(() => {
+      if (currentAudio) {
+        // Duration available immediately for blob URLs; guard with loadedmetadata just in case
+        if (audioEl.duration && isFinite(audioEl.duration)) {
+          startIntroTeleprompter();
+        } else {
+          audioEl.addEventListener('loadedmetadata', startIntroTeleprompter, { once: true });
+        }
+      }
+    });
+  }
+
+  if (ttsEnabled && audioUnlocked) speakIntro();
+
+  ttsBtnEl.addEventListener('click', () => {
+    setTtsEnabled(!ttsEnabled);
+    if (!ttsEnabled) {
+      ttsStop();
+    } else {
+      speakIntro();
+    }
+    syncIntroTtsBtn();
+    updateTtsToggleUI();
+    updateTtsBarUI();
+  });
+
+  // ── Navigation ────────────────────────────────────────────────────────────────
   function proceed() {
+    ttsStop();
     overlay.classList.add('hidden');
     showBriefing(role, style);
   }
