@@ -11,5 +11,7 @@
   "unlocks": [],
   "isKeyEvidence": false,
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-28T20:02:23.083Z"
+  "updatedAt": "2026-05-03T21:41:04.775Z",
+  "locationId": "",
+  "isRedHerring": false
 }

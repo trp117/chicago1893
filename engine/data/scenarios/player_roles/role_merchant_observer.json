@@ -10,11 +10,7 @@
     "You were present when Dillworth volunteered detailed information about the ships' manifests at a meeting last week — information he should not have had."
   ],
   "accessLevel": "staff",
-  "briefing": {
-    "who": "You are a Boston merchant brought in by Samuel Adams to watch the inner circle from the outside — your access to both the Patriot and commercial worlds is exactly what tonight requires.",
-    "mission": "Identify the spy who has been passing operational intelligence to the Crown before tonight's action is compromised.",
-    "stakes": "Your suspicions already point to one man. But suspicion without proof will destroy an innocent — or let the guilty walk free."
-  },
+  "briefing": "[object Object]",
   "perspective": "Write from the perspective of an educated merchant who moves between the patriot and commercial worlds with equal ease. This player has natural credibility with Dillworth and can approach him without triggering immediate suspicion. They also have enough social standing to gain access to Warren and Adams, though they are not part of the inner circle. The narrative should emphasize the player's commercial instincts — following the money, reading contracts, noticing financial irregularities. This player is the most natural candidate to investigate Dillworth's counting house without arousing suspicion.",
   "opening": {
     "narrative": "The Green Dragon Tavern is quieter than you have ever seen it — the regulars are all at the meeting house, and the fire in the hearth is burning low, casting the room in amber and shadow. Paul Revere is standing near the hearth with a mug he has not touched, his eyes moving between the door and the window with the rhythm of a man expecting bad news. He spots you and waves you over: 'Adams asked me to keep you close tonight. He thinks the spy is someone with money and connections — your kind of person.' The words sting a little, but he is not wrong.",
@@ -39,5 +35,11 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-28T20:13:52.598Z"
+  "updatedAt": "2026-05-03T21:41:04.779Z",
+  "character_hooks": [
+    "",
+    "",
+    ""
+  ],
+  "suggested_secret": ""
 }

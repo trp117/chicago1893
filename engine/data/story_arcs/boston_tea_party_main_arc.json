@@ -17,7 +17,8 @@
         "The player arrives at their starting location and learns that a British informant has compromised tonight's plan — the exact hour of action was leaked.",
         "Initial interviews with NPCs reveal surface-level alibis and competing suspicions; Paul Revere points a finger at the nervous newcomer Elias Croft.",
         "The player discovers the first environmental clue — a torn page or overheard conversation — that begins to complicate the obvious suspect."
-      ]
+      ],
+      "title": ""
     },
     {
       "actNumber": 2,
@@ -31,7 +32,8 @@
         "The coded letter is discovered, written in a cipher used only by those with access to Crown correspondence — narrowing the suspect pool dramatically.",
         "Dr. Joseph Warren grows agitated when questioned about his recent meetings, providing misdirection; meanwhile the payment receipt surfaces at an unexpected location.",
         "The pressure events escalate — British activity on the harbor becomes visible, and the player feels the clock tightening."
-      ]
+      ],
+      "title": ""
     },
     {
       "actNumber": 3,
@@ -44,9 +46,11 @@
         "All evidence threads converge — the player must confront the true culprit, Thomas Dillworth, with the coded letter and payment receipt.",
         "Dillworth attempts to flee toward the Custom House or deflect blame onto Dr. Warren; the player must act decisively.",
         "Final accusation scene: Samuel Adams presides as the player presents their case — success sends the tea party forward, failure brings the redcoats down on Griffin's Wharf."
-      ]
+      ],
+      "title": ""
     }
   ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-28T20:02:23.071Z"
+  "updatedAt": "2026-05-03T21:41:04.766Z",
+  "opening": ""
 }

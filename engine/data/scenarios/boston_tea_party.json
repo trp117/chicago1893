@@ -54,5 +54,31 @@
     "The player identifies the spy but possesses only circumstantial clues — the spy is expelled from the group but escapes prosecution, and the tea party proceeds under heightened risk."
   ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-28T20:02:23.070Z"
+  "updatedAt": "2026-05-03T21:41:04.766Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": [],
+  "introduction": {
+    "enabled": false,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": ""
+      },
+      {
+        "type": "stakes",
+        "text": ""
+      },
+      {
+        "type": "scene",
+        "text": ""
+      },
+      {
+        "type": "entry",
+        "text": ""
+      }
+    ]
+  }
 }
