@@ -658,6 +658,7 @@ async function renderDashboard() {
           </div>
           <div class="scenario-play-card-actions">
             <button class="btn btn-secondary btn-sm sop-toggle-btn" data-scenario-id="${s.id}">⚙ Scene Opening</button>
+            <button class="btn btn-secondary btn-sm scenario-edit-btn" data-scenario-id="${s.id}">✏ Edit</button>
             <a class="btn btn-primary btn-sm" href="/game?scenarioId=${encodeURIComponent(s.id)}" target="_blank">▶ Play</a>
           </div>
         </div>
@@ -768,6 +769,24 @@ async function renderDashboard() {
       } catch (e) { toast('Save failed: ' + e.message, 'error'); }
     });
   });
+
+  document.querySelectorAll('.scenario-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => renderScenarioEditor(btn.dataset.scenarioId));
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER — Scenario editor (loads existing story into preview/edit view)
+// ═══════════════════════════════════════════════════════════════
+async function renderScenarioEditor(scenarioId) {
+  setTopbar('Loading…', []);
+  try {
+    const data = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/full`);
+    renderPreview(data, true);
+  } catch (err) {
+    toast(`Could not load scenario: ${err.message}`, 'error');
+    renderDashboard();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

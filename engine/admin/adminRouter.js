@@ -304,6 +304,17 @@ export function createAdminRouter(repos, config = {}) {
 
   // ── Locations ────────────────────────────────────────────────────────────────
   r.get('/scenarios',      (_, res) => res.json(repos.scenarios.findAll()));
+  r.get('/scenarios/:id/full', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const arcId    = scenario.storyArcIds?.[0];
+    const storyArc = arcId ? repos.storyArcs.findById(arcId) : null;
+    const characters  = repos.characters.findAll().filter(c => c.scenarioIds?.includes(scenario.id));
+    const locations   = repos.locations.findByScenario(scenario.id);
+    const clues       = repos.clues.findByScenario(scenario.id);
+    const playerRoles = repos.scenarios.findPlayerRoles(scenario.id);
+    res.json({ scenario, storyArc: storyArc || null, characters, locations, clues, playerRoles });
+  });
   r.get('/locations',      (req, res) => res.json(
     req.query.scenarioId ? repos.locations.findByScenario(req.query.scenarioId) : repos.locations.findAll()
   ));
