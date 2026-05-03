@@ -451,7 +451,7 @@ export function createGameRouter(repos, config = {}) {
 
   // ── TTS ────────────────────────────────────────────────────────────────────
   r.post('/tts', async (req, res) => {
-    const { text, sensory_opening, confirmation, trust_level } = req.body;
+    const { text, sensory_opening, confirmation, trust_level, narrative_speed } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
     if (!elevenLabsApiKey) return res.status(503).json({ error: 'TTS not configured.' });
 
@@ -481,7 +481,7 @@ export function createGameRouter(repos, config = {}) {
     const segments = [];
     if (confirmation)   segments.push({ raw: confirmation,   speed: 0.85, trust: false });
     if (sensory_opening) segments.push({ raw: sensory_opening, speed: 0.88, trust: false });
-    segments.push({ raw: text, speed: null, trust: true });
+    segments.push({ raw: text, speed: narrative_speed ?? null, trust: true });
 
     const totalChars = segments.reduce((n, s) => n + prepareForTts(s.raw).length, 0);
     console.log(`[TTS] chars=${totalChars} segments=${segments.length} confirmation=${!!confirmation} sensory=${!!sensory_opening} est=$${((totalChars / 1000) * 0.15).toFixed(4)}`);

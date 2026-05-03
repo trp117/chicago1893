@@ -255,6 +255,34 @@ export function createAdminRouter(repos, config = {}) {
     return repos.characters.delete(req.params.id) ? res.json({ ok: true }) : notFound(res);
   });
 
+  // ── Scenario sensory_opening settings ────────────────────────────────────────
+  const SENSORY_DEFAULTS = {
+    enabled: true, style: 'cinematic_period',
+    elements: ['architecture', 'period_light', 'body_senses', 'exterior_context'],
+    target_sentences: 4, tts_pacing_hint: 'slow',
+  };
+
+  r.get('/scenarios/:id/sensory-opening', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    res.json({
+      ...SENSORY_DEFAULTS,
+      ...(scenario.sensory_opening || {}),
+      tts_narration_speed: scenario.tts_narration_speed ?? 1.0,
+    });
+  });
+
+  r.patch('/scenarios/:id/sensory-opening', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const { tts_narration_speed, ...sopFields } = req.body;
+    const merged = { ...SENSORY_DEFAULTS, ...(scenario.sensory_opening || {}), ...sopFields };
+    const updated = { ...scenario, sensory_opening: merged };
+    if (tts_narration_speed !== undefined) updated.tts_narration_speed = Number(tts_narration_speed);
+    repos.scenarios.save(updated);
+    res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0 });
+  });
+
   // ── Locations ────────────────────────────────────────────────────────────────
   r.get('/scenarios',      (_, res) => res.json(repos.scenarios.findAll()));
   r.get('/locations',      (req, res) => res.json(

@@ -60,13 +60,14 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .countdown--urgent { color: #e07060; animation: countdown-pulse 1.5s ease-in-out infinite; }
 @keyframes countdown-pulse { 0%,100% { opacity:1; } 50% { opacity:0.55; } }
 .npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }
-.choices-label { padding: 6px 28px 0; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); display: none; }
+.input-section-label { margin: 0; padding: 8px 28px 0; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; }
+.choices-label { padding: 6px 28px 0; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; display: none; }
 .choices-label.visible { display: block; }
 .choices-wrap { display: flex; align-items: center; }
 .choices-arrow { display: none; flex-shrink: 0; background: none; border: none; color: var(--muted); font-size: 1.6rem; line-height: 1; padding: 0 6px; cursor: pointer; opacity: 0; transition: opacity 0.2s; pointer-events: none; user-select: none; }
 .choices-arrow.visible { opacity: 1; pointer-events: auto; }
 .choices { display: flex; flex-wrap: wrap; flex: 1; gap: 8px; padding: 10px 28px 8px; }
-.choice-btn { border: 1px solid var(--border); background: #282318; color: var(--text); border-radius: 999px; padding: 10px 14px; cursor: pointer; }
+.choice-btn { border: 1px solid var(--border); background: #282318; color: var(--text); border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 0.82rem; line-height: 1.35; text-align: left; white-space: normal; }
 .choice-btn:hover { border-color: var(--accent); }
 .input-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 12px 28px 8px; }
 .input-actions { display: flex; flex-direction: column; gap: 8px; min-width: 100px; }
@@ -187,15 +188,15 @@ li { margin-bottom: 8px; }
 .overlay-drive-btn:hover, .overlay-drive-btn.active { border-color: var(--accent); color: var(--accent); }
 .error-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 16px; text-align: center; padding: 24px; }
 .error-page h1 { color: var(--accent); margin: 0; }
-.briefing-overlay { position: fixed; inset: 0; z-index: 220; background: rgba(8,6,4,0.98); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.briefing-overlay { position: fixed; inset: 0; z-index: 220; background: rgba(8,6,4,0.98); backdrop-filter: blur(8px); display: flex; align-items: flex-start; justify-content: center; padding: 20px 16px; }
 .briefing-overlay.hidden { display: none; }
-.briefing-inner { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 480px; }
-.briefing-role-name { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
+.briefing-inner { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 480px; height: calc(100dvh - 40px); overflow: hidden; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; }
+.briefing-role-name { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
 .briefing-lines { display: flex; flex-direction: column; gap: 20px; }
 .briefing-line { display: flex; flex-direction: column; gap: 5px; }
 .briefing-line-label { font-size: 0.68rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
-.briefing-line p { margin: 0; font-size: 1.05rem; color: var(--text); line-height: 1.65; }
-.briefing-text { margin: 0; font-size: 1.05rem; color: var(--text); line-height: 1.8; }
+.briefing-line p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; }
+.briefing-text { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .briefing-input-wrap { width: 100%; }
 .briefing-input-label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
 .briefing-input-optional { opacity: 0.7; }
@@ -241,6 +242,13 @@ li { margin-bottom: 8px; }
   .role-overlay-inner:has(.role-card.selected) .role-objective,
   .role-overlay-inner:has(.role-card.selected) .role-instruction { display: none; }
   .style-selector { margin-top: 4px; }
+  .briefing-overlay { padding: 12px; }
+  .briefing-inner { height: calc(100dvh - 24px); }
+  .input-section-label { padding: 6px 14px 0; }
+  .choices-label { padding: 4px 14px 0; }
+  .choices { flex-direction: column; flex-wrap: nowrap; overflow-x: visible; padding: 6px 14px 8px; }
+  .choices-arrow { display: none !important; }
+  .choice-btn { flex: none; width: 100%; border-radius: 8px; }
 }
   </style>
 </head>
@@ -298,6 +306,7 @@ li { margin-bottom: 8px; }
           </button>
         </div>
       </div>
+      <p class="input-section-label">Your move</p>
       <form id="input-form" class="input-row">
         <div class="input-textarea-wrap">
           <textarea id="player-input" placeholder="What do you say or do?" rows="2"></textarea>
@@ -311,7 +320,7 @@ li { margin-bottom: 8px; }
           </button>
         </div>
         <div class="input-actions">
-          <button type="submit">Send</button>
+          <button type="submit">Submit</button>
         </div>
       </form>
       <p id="choices-label" class="choices-label">or choose:</p>
@@ -404,9 +413,10 @@ let locationFeed    = [];
 let feedLocationId  = null;
 let pendingEntryEl  = null;
 let locationShowing = false;
-let bootstrapData   = null;
-let lastChoices     = [];
-let trustLabel      = 'Trust';
+let bootstrapData        = null;
+let ttsNarrationSpeed    = 1.0;
+let lastChoices          = [];
+let trustLabel           = 'Trust';
 
 const storyEl    = document.getElementById('story');
 const choicesEl  = document.getElementById('choices');
@@ -478,9 +488,10 @@ async function ttsSpeak(text, sensoryOpening, confirmation = null, trustLevel = 
   if (!audioEl) { console.warn('[TTS] audioEl not initialized — audio not yet unlocked, skipping.'); return; }
   try {
     const body = { text };
-    if (sensoryOpening)    body.sensory_opening = sensoryOpening;
-    if (confirmation)      body.confirmation    = confirmation;
-    if (trustLevel != null) body.trust_level    = trustLevel;
+    if (sensoryOpening)         body.sensory_opening   = sensoryOpening;
+    if (confirmation)           body.confirmation      = confirmation;
+    if (trustLevel != null)     body.trust_level       = trustLevel;
+    if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
     const resp = await fetch(`${API_BASE}/tts`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -969,10 +980,11 @@ async function loadGame() {
       const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
       throw new Error(err.error || `HTTP ${resp.status}`);
     }
-    bootstrapData = await resp.json();
-    scenario      = bootstrapData.scenario;
-    cluesCatalog  = bootstrapData.cluesCatalog || [];
-    locationsList = bootstrapData.locations    || [];
+    bootstrapData      = await resp.json();
+    scenario           = bootstrapData.scenario;
+    ttsNarrationSpeed  = scenario.tts_narration_speed ?? 1.0;
+    cluesCatalog       = bootstrapData.cluesCatalog || [];
+    locationsList      = bootstrapData.locations    || [];
 
     // Set trust label from scenario scales if available
     const tLabel = scenario.systems?.scales?.authorityTrust?.label;

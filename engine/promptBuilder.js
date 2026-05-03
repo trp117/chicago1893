@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as data from './data.js';
+import { buildSensoryOpeningRule } from './services/PromptComposer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,16 +15,6 @@ const _rawTemplate = fs.readFileSync(
 const _templateParts = _rawTemplate.split('{{SCENARIO_CONTEXT}}');
 const _preamble      = _templateParts[0].replace(/\n*---\s*$/, '').trim();
 const _rulesBody     = _templateParts[1].replace(/^\s*---\n*/, '').trim();
-const SENSORY_OPENING_RULE = `SENSORY OPENING RULE:
-Every scene must begin with a sensory_opening of 2-4 sentences.
-Describe only: what the player smells, sounds they hear, what the
-light is doing, what they feel physically (temperature, ground
-underfoot, weight of clothing). No character. No plot. No dialogue.
-The body first. Always.
-
-The sensory_opening must be specific to the current location.
-Draw from the location's description, atmosphere, and time of day.
-Never use generic atmosphere. Specific, period-accurate, physical.`;
 
 const PLAYER_ACTION_RULE = `PLAYER ACTION RULES:
 When player_action is present:
@@ -80,8 +71,6 @@ When aggression_mode is mild: follow mildPressure from aggressionProfile.
 When aggression_mode is heavy: follow heavyPressure from aggressionProfile.
 Return updated aggression_mode in npc_updates based on player actions.`;
 
-const BEHAVIORAL_RULES = `${_preamble}\n\n${_rulesBody}\n\n${SENSORY_OPENING_RULE}\n\n${PLAYER_ACTION_RULE}\n\n${NPC_TRUST_RULE}\n\n${CHARACTER_BEHAVIOR_RULE}`;
-
 export function buildSystemPrompt(sessionId) {
   const session  = sessionId ? data.getSession(sessionId) : null;
   const scenario = data.getScenario();
@@ -93,6 +82,9 @@ export function buildSystemPrompt(sessionId) {
   const sections = [];
 
   // ── BEHAVIORAL RULES ──────────────────────────────────────────────────────
+  const sensoryRule    = buildSensoryOpeningRule(scenario.sensory_opening);
+  const rulesWithSensory = _rulesBody.replace('{{SENSORY_OPENING_RULE}}', sensoryRule);
+  const BEHAVIORAL_RULES = `${_preamble}\n\n${rulesWithSensory}\n\n${PLAYER_ACTION_RULE}\n\n${NPC_TRUST_RULE}\n\n${CHARACTER_BEHAVIOR_RULE}`;
   sections.push(`## BEHAVIORAL RULES\n\n${BEHAVIORAL_RULES}`);
 
   // ── SCENARIO CONTEXT ──────────────────────────────────────────────────────

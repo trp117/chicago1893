@@ -168,6 +168,23 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .saved-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 10px; border-radius: 999px; font-weight: 500; }
 .saved-pill.ok  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
 .saved-pill.warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+/* ── Scene Opening Style panel ──────────────────────────────── */
+.sop-panel { background: #f8fafc; border-top: 1px solid var(--border); padding: 16px; display: none; }
+.sop-panel.open { display: block; }
+.sop-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-soft); margin-bottom: 14px; }
+.sop-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.sop-field { display: flex; flex-direction: column; gap: 5px; }
+.sop-field label { font-size: 12px; font-weight: 600; color: var(--text); }
+.sop-field select { padding: 6px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--text); min-width: 160px; }
+.sop-checkboxes { display: flex; flex-direction: column; gap: 5px; }
+.sop-checkbox-row { display: flex; align-items: center; gap: 7px; font-size: 12px; cursor: pointer; }
+.sop-checkbox-row input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--accent); }
+.sop-toggle-row { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.sop-toggle-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+.sop-save-row { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+.sop-status { font-size: 12px; color: var(--success); display: none; }
+.sop-status.show { display: inline; }
 </style>
 </head>
 <body>
@@ -177,6 +194,7 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
     <h1>Chicago 1893</h1>
     <p>Story Admin</p>
   </div>
+  <div class="nav-link" data-view="dashboard">🏠 Playable Scenarios</div>
   <div class="nav-section">Create</div>
   <div class="nav-link" data-view="generate">✨ Generate Story</div>
   <div class="nav-section">Story</div>
@@ -611,6 +629,7 @@ function bindDynamicLists(container) {
 async function renderDashboard() {
   setTopbar('Story Admin', []);
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.querySelector('.nav-link[data-view="dashboard"]')?.classList.add('active');
   const [dash, scenarios] = await Promise.all([
     apiGet('/dashboard'),
     apiGet('/scenarios').catch(err => { console.error('[dashboard] /scenarios failed:', err); return []; }),
@@ -631,13 +650,67 @@ async function renderDashboard() {
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
     <div class="scenario-cards">${scenarios.map(s => `
-      <div class="scenario-play-card">
-        <div class="scenario-play-card-info">
-          <div class="scenario-play-card-title">${s.title || s.id}</div>
-          <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+      <div class="scenario-play-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
+          <div class="scenario-play-card-info">
+            <div class="scenario-play-card-title">${s.title || s.id}</div>
+            <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+          </div>
+          <div class="scenario-play-card-actions">
+            <button class="btn btn-secondary btn-sm sop-toggle-btn" data-scenario-id="${s.id}">⚙ Scene Opening</button>
+            <a class="btn btn-primary btn-sm" href="/game?scenarioId=${encodeURIComponent(s.id)}" target="_blank">▶ Play</a>
+          </div>
         </div>
-        <div class="scenario-play-card-actions">
-          <a class="btn btn-primary btn-sm" href="/game?scenarioId=${encodeURIComponent(s.id)}" target="_blank">▶ Play</a>
+        <div class="sop-panel" id="sop-${s.id}">
+          <div class="sop-panel-title">Scene Opening Style</div>
+          <div class="sop-toggle-row">
+            <input type="checkbox" id="sop-enabled-${s.id}" data-field="enabled">
+            <label for="sop-enabled-${s.id}">Immersive sensory opening</label>
+          </div>
+          <div class="sop-row">
+            <div class="sop-field">
+              <label>Style</label>
+              <select id="sop-style-${s.id}" data-field="style">
+                <option value="cinematic_period">Cinematic Period</option>
+                <option value="sparse_tense">Sparse &amp; Tense</option>
+                <option value="action_first">Action First</option>
+              </select>
+            </div>
+            <div class="sop-field">
+              <label>Opening length</label>
+              <select id="sop-sentences-${s.id}" data-field="target_sentences">
+                <option value="2">2 sentences</option>
+                <option value="3">3 sentences</option>
+                <option value="4">3–4 sentences</option>
+                <option value="5">5+ sentences</option>
+              </select>
+            </div>
+            <div class="sop-field">
+              <label>Elements to include</label>
+              <div class="sop-checkboxes">
+                <label class="sop-checkbox-row"><input type="checkbox" data-element="architecture"> Architecture &amp; space</label>
+                <label class="sop-checkbox-row"><input type="checkbox" data-element="period_light"> Period lighting</label>
+                <label class="sop-checkbox-row"><input type="checkbox" data-element="body_senses"> Body &amp; senses</label>
+                <label class="sop-checkbox-row"><input type="checkbox" data-element="exterior_context"> Exterior / city context</label>
+              </div>
+            </div>
+          </div>
+          <div class="sop-row" style="margin-top:12px">
+            <div class="sop-field">
+              <label>Narration speed</label>
+              <select id="sop-speed-${s.id}" data-field="tts_narration_speed">
+                <option value="0.75">0.75 — slow &amp; deliberate</option>
+                <option value="0.9">0.9 — measured</option>
+                <option value="1.0">1.0 — normal</option>
+                <option value="1.1">1.1 — brisk</option>
+                <option value="1.2">1.2 — urgent</option>
+              </select>
+            </div>
+          </div>
+          <div class="sop-save-row">
+            <button class="btn btn-primary btn-sm sop-save-btn" data-scenario-id="${s.id}">Save</button>
+            <span class="sop-status" id="sop-status-${s.id}">Saved</span>
+          </div>
         </div>
       </div>`).join('')}
     </div>` : '';
@@ -647,8 +720,53 @@ async function renderDashboard() {
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Content Library</h3>
     <div class="dashboard-grid">${statCards}</div>
     <p style="color:var(--text-soft);font-size:13px">Click any card to manage that entity type.</p>`;
+
   document.querySelectorAll('.stat-card[data-entity]').forEach(el => {
     el.addEventListener('click', () => navigate(el.dataset.entity));
+  });
+
+  // Wire scene-opening panels
+  document.querySelectorAll('.sop-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sid   = btn.dataset.scenarioId;
+      const panel = document.getElementById(`sop-${sid}`);
+      const isOpen = panel.classList.toggle('open');
+      if (isOpen && !panel.dataset.loaded) {
+        panel.dataset.loaded = '1';
+        try {
+          const cfg = await apiGet(`/scenarios/${encodeURIComponent(sid)}/sensory-opening`);
+          document.getElementById(`sop-enabled-${sid}`).checked    = cfg.enabled !== false;
+          document.getElementById(`sop-style-${sid}`).value        = cfg.style || 'cinematic_period';
+          document.getElementById(`sop-sentences-${sid}`).value    = String(cfg.target_sentences || 4);
+          document.getElementById(`sop-speed-${sid}`).value        = String(cfg.tts_narration_speed ?? 1.0);
+          panel.querySelectorAll('[data-element]').forEach(cb => {
+            cb.checked = (cfg.elements || []).includes(cb.dataset.element);
+          });
+        } catch (e) { toast('Failed to load settings: ' + e.message, 'error'); }
+      }
+    });
+  });
+
+  document.querySelectorAll('.sop-save-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sid    = btn.dataset.scenarioId;
+      const panel  = document.getElementById(`sop-${sid}`);
+      const elements = [...panel.querySelectorAll('[data-element]:checked')].map(cb => cb.dataset.element);
+      const payload = {
+        enabled:             document.getElementById(`sop-enabled-${sid}`).checked,
+        style:               document.getElementById(`sop-style-${sid}`).value,
+        target_sentences:    Number(document.getElementById(`sop-sentences-${sid}`).value),
+        elements,
+        tts_pacing_hint:     document.getElementById(`sop-enabled-${sid}`).checked ? 'slow' : 'normal',
+        tts_narration_speed: Number(document.getElementById(`sop-speed-${sid}`).value),
+      };
+      try {
+        await apiFetch('PATCH', `/scenarios/${encodeURIComponent(sid)}/sensory-opening`, payload);
+        const status = document.getElementById(`sop-status-${sid}`);
+        status.classList.add('show');
+        setTimeout(() => status.classList.remove('show'), 2000);
+      } catch (e) { toast('Save failed: ' + e.message, 'error'); }
+    });
   });
 }
 
@@ -1196,6 +1314,8 @@ function renderPreview(data, autoSaved = false) {
 document.querySelectorAll('.nav-link[data-entity]').forEach(link => {
   link.addEventListener('click', () => navigate(link.dataset.entity));
 });
+document.querySelector('.nav-link[data-view="dashboard"]')
+  ?.addEventListener('click', () => renderDashboard());
 document.querySelector('.nav-link[data-view="generate"]')
   ?.addEventListener('click', () => renderGenerator());
 

@@ -9,6 +9,62 @@ const systemPromptTemplate = fs.readFileSync(path.join(promptsDir, 'game_system_
 const turnTemplate         = fs.readFileSync(path.join(promptsDir, 'game_turn_template.md'), 'utf8');
 
 const MOVEMENT_RE  = /\b(go|head|return|walk|travel|back|leave|move)\b/i;
+
+// ── Sensory opening config ─────────────────────────────────────────────────────
+
+const SENSORY_ELEMENT_DESCRIPTIONS = {
+  architecture:     '**ARCHITECTURE & SPACE** — The room or exterior structure: ceiling height, materials (plaster, timber, brick, stone, iron, glass), the size and feel of the space, what is worn or broken or well-kept. The player must be able to close their eyes and see the walls.',
+  period_light:     '**PERIOD LIGHT** — The quality and source of light specific to the era: candles, gaslight, electric arc bulbs, firelight, moonlight. Light defines what is visible and what lies in shadow.',
+  body_senses:      '**BODY & SENSES** — What the character physically feels: temperature, textures underfoot, the smell of the space, the sounds the building makes.',
+  exterior_context: "**EXTERIOR CONTEXT** (when near a window, door, or outside) — What the city looks like at this hour, grounded in the scenario's setting and period.",
+};
+
+const SENSORY_STYLE_NOTES = {
+  cinematic_period: 'Write with the specificity of a production designer. Concrete nouns, no vague adjectives. The reader must feel they are standing there in that era.',
+  sparse_tense:     'Write with minimal precision — choose the one or two details that carry maximum atmospheric weight. No decoration.',
+  action_first:     'Open briefly — one or two sensory beats only — then let the narrative launch immediately.',
+};
+
+const SENSORY_ELEMENT_NAMES = {
+  architecture:     'architecture and materials of the space',
+  period_light:     'period light source and quality',
+  body_senses:      'physical sensation, smell, and sound',
+  exterior_context: 'exterior context (if near door, window, or outside)',
+};
+
+const SENSORY_DEFAULTS = {
+  enabled:          true,
+  style:            'cinematic_period',
+  elements:         ['architecture', 'period_light', 'body_senses', 'exterior_context'],
+  target_sentences: 4,
+  tts_pacing_hint:  'slow',
+};
+
+export function buildSensoryOpeningRule(_cfg = {}) {
+  return [
+    '## SENSORY OPENING RULE',
+    '',
+    'Do not open each response with a dedicated sensory description block. Instead, weave physical, environmental, and period detail continuously throughout the narrative — embedded in action, in what the character notices, in how other characters appear, in what the body registers while moving through the space.',
+    '',
+    'The model is literary fiction, not stage directions:',
+    '- NOT: "The room smells of tallow and old paper." [standalone block]',
+    '- YES: "You set the candle down on the counter beside his spectacles and the smell of tallow mingles with the cold sizing from the press."',
+    '',
+    'Sensory detail must:',
+    '- Emerge from what the character is doing or looking at in that moment',
+    '- Reveal character interiority — what she notices tells us who she is',
+    '- Advance or complicate the scene — the creak below is both atmosphere and information',
+    '- Never stop the narrative to describe — describe while the narrative moves',
+    '',
+    '`sensory_opening` is optional. Populate it ONLY when the player enters a new location or the scene context shifts significantly — and even then, 1–2 sentences before action begins. When continuing within the same scene or responding to a chosen action, omit `sensory_opening` entirely. All environmental texture belongs inside `narrative`.',
+    '',
+    '---',
+  ].join('\n');
+}
+
+export function buildSensoryOpeningCheck(_cfg = {}) {
+  return '⚠️ SENSORY OPENING CHECK: Do NOT open with a standalone sensory block unless the player just entered a new location (1–2 sentences max). Weave all environmental and period detail into `narrative` through action and attention. Omit `sensory_opening` when continuing within the same scene.';
+}
 const PRONOUN_RE   = /\b(him|her|them|there)\b/i;
 const SPEECH_VERBS = ['says', 'states', 'explains', 'claims', 'adds', 'continues', 'replies', 'notes', 'murmurs', 'answers'];
 
@@ -142,7 +198,9 @@ export function buildSystemPrompt(scenario, locations) {
     `- ${pressure}`,
   ].join('\n');
 
-  return systemPromptTemplate.replace('{{SCENARIO_CONTEXT}}', context);
+  return systemPromptTemplate
+    .replace('{{SCENARIO_CONTEXT}}', context)
+    .replace('{{SENSORY_OPENING_RULE}}', buildSensoryOpeningRule(scenario.sensory_opening));
 }
 
 // ── Turn prompt builders ───────────────────────────────────────────────────────
@@ -267,5 +325,6 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
       buildChaseInstruction(state, characters)
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
+    .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
     .replace('{{PLAYER_INPUT}}',           resolvedInput + finalAccusationNote);
 }

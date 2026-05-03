@@ -74,7 +74,7 @@ Return JSON only. No markdown fences. Fields:
 
 ```
 {
-  "sensory_opening": "2–4 sentences of pure sensory detail: smell, sound, light, physical sensation. No character, no plot, no dialogue. Location-specific and period-accurate.",
+  "sensory_opening": "Optional. Only when the player enters a new location or the scene context shifts significantly — 1–2 sentences max. Omit when continuing within the same scene or responding to a chosen action.",
   "narrative": "1–3 paragraphs of vivid prose.",
   "timeAdvance": 2,
   "location": "location_id",
@@ -115,7 +115,7 @@ Return JSON only. No markdown fences. Fields:
 }
 ```
 
-- `sensory_opening`: REQUIRED on every turn. 2–4 sentences. Senses only — no characters, no plot, no dialogue.
+- `sensory_opening`: Optional. Populate only when the player enters a new location or the scene context shifts significantly. 1–2 sentences max, no characters, no plot. Omit entirely when continuing within the same scene or responding to a chosen action — carry all environmental texture inside `narrative` instead.
 - `stateChanges`: omit any sub-field that did not change this turn.
 - `newClues`: IDs from the available clues list only. Omit or use `[]` if none.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
@@ -140,6 +140,8 @@ You will receive a state object. Respect it exactly.
 - `act`: current act — escalate accordingly
 
 ---
+
+{{SENSORY_OPENING_RULE}}
 
 ## RULE 0 — Player Identity (Critical, always applies)
 The player's role is passed explicitly in each turn prompt. Honor it exactly for the entire session.

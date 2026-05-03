@@ -6,6 +6,13 @@
   "sessionTargetMinutes": 20,
   "historicalRealism": "high",
   "tone": ["historical thriller", "mystery"],
+  "sensory_opening": {
+    "enabled": true,
+    "style": "cinematic_period",
+    "elements": ["architecture", "period_light", "body_senses", "exterior_context"],
+    "target_sentences": 4,
+    "tts_pacing_hint": "slow"
+  },
   "freedomLevel": "guided",
   "playerRole": "Assistant to Daniel Burnham",
   "playerRoleOptions": [
