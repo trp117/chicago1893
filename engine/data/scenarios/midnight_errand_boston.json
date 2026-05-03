@@ -59,6 +59,28 @@
     "The troop route reaches the riders but one NPC is arrested; history is made at a personal cost.",
     "The player delivers the letter but cannot confirm the route map, leaving the warning incomplete."
   ],
+  "introduction": {
+    "enabled": true,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": "The year is 1775 and Boston is a city of sixteen thousand souls living under military occupation. Since General Thomas Gage landed with his Regulars the previous spring, the town has been two cities at once: the one that goes about its business — the chandlers and cobblers, the printers and porters, the women carrying market baskets down Queen Street — and the one that meets in back rooms and speaks in careful half-sentences about what is being planned. Two years have passed since the night men with painted faces dumped three hundred and forty-two chests of East India tea into the harbor. Parliament's answer was the Coercive Acts, which closed the port, dissolved the provincial assembly, and quartered troops in private homes. What had been colonial grievance became something else. The word for it is not yet settled. Some say rebellion. Some say liberty. Most say nothing in public."
+      },
+      {
+        "type": "stakes",
+        "text": "Tonight a dispatch is moving through the city — or trying to. It describes in careful hand the route Colonel Francis Smith's column will take when Gage orders the march to Concord: the roads, the bridges, the timing. If this information reaches the warning riders before the clock at Old South strikes ten, Paul Revere and William Dawes will be in the saddle within the hour, riding north and west through the sleeping countryside, and the militia at Lexington will have time to decide whether to stand. If the dispatch is seized, or simply does not move, seven hundred Regulars will arrive at Concord in silence. What is buried in the field there — cannon, muskets, powder, the stores of a provincial army — will be taken or destroyed. What the men who put them there believed about their own cause will face its first and harshest test unanswered."
+      },
+      {
+        "type": "scene",
+        "text": "Spring has come cold to Boston. The air off the harbor carries salt and the first green of the marshes beyond the Back Bay, and the cobblestones of Milk Street are still wet from an afternoon rain that has since cleared to a sky pricked through with stars. It is half past nine. The garrison curfew falls at ten, and already the streets are nearly empty — a Redcoat patrol, two men with a lantern, moves in the middle distance toward King Street without urgency. Benjamin Gill's print shop sits dark at the corner, the smell of ink and linseed oil pressing through its door frame, the hand press inside silent for the first time since morning. The broadsheets that rolled off that press today are in the taverns and coffeehouses now, their careful language walking the line Benjamin Gill has always walked — close enough to the Patriot cause to keep his customers, far enough from it to keep his neck."
+      },
+      {
+        "type": "entry",
+        "text": "You are standing at that door. There is a candle in your hand, the kind carried by a person with legitimate business and nowhere to hide it, and there is a dispatch folded inside your coat that was not meant for you to read but that you have read. The boots on the cobblestones to the north are growing louder — a patrol on its round, or something else, you cannot yet tell. You do not know whether Benjamin Gill is asleep in the rooms above or sitting awake by a window. You do not know whether the woman who gave you the dispatch three hours ago is still free. What you know is this: the Old South clock has not yet struck ten. The choice in front of you is not abstract. It has a door, and a handle, and the weight of everything that depends on what happens in the next twenty minutes pressing against the back of your hand."
+      }
+    ]
+  },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-03T02:05:31.167Z",
   "premise": "",

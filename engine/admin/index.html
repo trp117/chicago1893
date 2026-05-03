@@ -1127,9 +1127,64 @@ function collectEdits(containerEl, data) {
 
 // ── Section renderers ─────────────────────────────────────────────────────────
 
+function previewIntroduction(btn) {
+  const form = btn.closest('#preview-form') || btn.closest('.form-section') || document.body;
+  const texts = [0, 1, 2, 3].map(i => {
+    const el = form.querySelector(`[data-path="scenario.introduction.sections.${i}.text"]`);
+    return el ? el.value.trim() : '';
+  });
+  const titleEl = form.querySelector('[data-path="scenario.title"]');
+  const titleText = titleEl ? titleEl.value.trim() : 'Introduction';
+
+  let modal = document.getElementById('intro-preview-modal');
+  if (modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = 'intro-preview-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:1000;background:#0a0a0a;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;font-family:Georgia,serif;';
+
+  const delays = [0.1, 0.6, 1.1, 1.6];
+  const sectionsHtml = texts
+    .filter(t => t)
+    .map((t, i) => `<p style="font-size:1.05rem;line-height:1.85;color:#e8e0d0;margin:0 0 28px;opacity:0;animation:intro-fade 0.7s ease ${delays[i]}s forwards">${esc(t).replace(/\n/g,'<br>')}</p>`)
+    .join('') || '<p style="color:#c1b9a6;font-style:italic;margin:0">No introduction text yet.</p>';
+
+  modal.innerHTML = `
+    <style>@keyframes intro-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
+    <div style="display:flex;flex-direction:column;width:100%;max-width:680px;height:100dvh;">
+      <div style="flex-shrink:0;padding:28px 32px 20px;border-bottom:1px solid rgba(58,52,41,0.5);display:flex;align-items:center;justify-content:space-between;">
+        <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#c1b9a6;font-family:system-ui,sans-serif;margin:0">${esc(titleText)}</p>
+        <button onclick="document.getElementById('intro-preview-modal').remove()" style="background:none;border:1px solid #3a3429;color:#c1b9a6;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1.1rem;line-height:1;padding:0;font-family:system-ui">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:40px 32px 24px;">${sectionsHtml}</div>
+      <div style="flex-shrink:0;border-top:1px solid #3a3429;background:#0a0a0a;padding:20px 32px;display:flex;align-items:center;gap:20px;">
+        <button onclick="document.getElementById('intro-preview-modal').remove()" style="padding:13px 36px;font-size:1rem;border-radius:14px;border:1px solid #d0b06a;background:#d0b06a;color:#1a150c;font-weight:bold;cursor:pointer;font-family:Georgia,serif">Begin</button>
+        <button onclick="document.getElementById('intro-preview-modal').remove()" style="font-size:0.8rem;color:#c1b9a6;cursor:pointer;background:none;border:none;font-family:Georgia,serif;padding:0">Close preview</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
 function renderScenarioSection(data) {
   const s = data.scenario || {};
+  const intro = s.introduction || {};
+  const sections = Array.isArray(intro.sections) ? intro.sections : [];
+  const sec = (i) => sections[i] || {};
   const toneVal = Array.isArray(s.tone) ? s.tone.join(', ') : (s.tone || '');
+
+  const introBody = `
+    ${edField('Enable', `<select data-path="scenario.introduction.enabled"><option value="true"${intro.enabled ? ' selected' : ''}>Yes</option><option value="false"${!intro.enabled ? ' selected' : ''}>No</option></select>`)}
+    ${edField('Skippable', `<select data-path="scenario.introduction.skippable"><option value="true"${intro.skippable !== false ? ' selected' : ''}>Yes</option><option value="false"${intro.skippable === false ? ' selected' : ''}>No</option></select>`)}
+    <input type="hidden" data-path="scenario.introduction.sections.0.type" value="world">
+    <input type="hidden" data-path="scenario.introduction.sections.1.type" value="stakes">
+    <input type="hidden" data-path="scenario.introduction.sections.2.type" value="scene">
+    <input type="hidden" data-path="scenario.introduction.sections.3.type" value="entry">
+    ${edField('World', edTextarea('scenario.introduction.sections.0.text', sec(0).text, 5), 'Historical context — what is happening, what forces are in motion')}
+    ${edField('Stakes', edTextarea('scenario.introduction.sections.1.text', sec(1).text, 5), 'What is at stake — politically, personally, why tonight matters')}
+    ${edField('Scene', edTextarea('scenario.introduction.sections.2.text', sec(2).text, 5), 'The immediate world — the city, the hour, the tension in the air')}
+    ${edField('Entry', edTextarea('scenario.introduction.sections.3.text', sec(3).text, 5), 'Final paragraph — lands the player at the threshold of the scene')}
+    <div class="field-group"><button type="button" onclick="previewIntroduction(this)" style="padding:7px 18px;font-size:0.85rem;border-radius:8px;border:1px solid #555;background:transparent;color:#c1b9a6;cursor:pointer">Preview introduction</button></div>
+  `;
+
   return edSection('Scenario', `
     ${edField('Title',             edInput('scenario.title',             s.title))}
     ${edField('Scenario ID',       edInput('scenario.id',               s.id),              'snake_case slug — used in URLs')}
@@ -1138,6 +1193,7 @@ function renderScenarioSection(data) {
     ${edField('Opening Situation', edTextarea('scenario.openingSituation', s.openingSituation, 2))}
     ${edField('Tone',              edInput('scenario.tone',             toneVal, 'data-type="csv"'), 'Comma-separated')}
     ${edField('Historical Realism', edInput('scenario.historicalRealism', s.historicalRealism))}
+    ${edDetails('Introduction', intro.enabled ? 'enabled' : 'off', introBody, !!intro.enabled)}
   `);
 }
 

@@ -79,6 +79,15 @@ OUTPUT RULES:
 5. All cross-references must be consistent (linkedCharacterIds, discoveryLocationId, etc.)
 6. Exactly 2 clues must have isKeyEvidence: true
 7. Every playerRole MUST include briefing, character_hooks, and suggested_secret (rules below)
+8. The scenario MUST include an introduction object (rules below)
+
+INTRODUCTION RULES (required on scenario):
+Write a 4-section pre-game reading experience in the style of a serious narrative historian — specific, cinematic, grounded in concrete detail. No genre clichés.
+- world: The broader context — time, place, the forces in motion. What kind of world this is right now. Specific names, numbers, facts where possible.
+- stakes: What hangs on tonight — politically, personally, for the people in this story. Why this moment and not another. What failure costs.
+- scene: The immediate environment — this street, this hour, this weather, this smell. Paint the world the player is about to step into.
+- entry: The final paragraph. Bring the player to the exact threshold where the interactive story begins. The last sentence should land them at the door, the moment, the decision. Second person ("You are...").
+Each section: 3–5 sentences. No section headers in the text. No meta-commentary.
 
 PLAYER BRIEFING RULES (required on every playerRole):
 - briefing: exactly 5 sentences, second person (You are...)
@@ -116,6 +125,16 @@ REQUIRED JSON STRUCTURE:
     "winConditions": ["win condition"],
     "failConditions": ["fail condition"],
     "partialSuccessExamples": ["partial example"],
+    "introduction": {
+      "enabled": true,
+      "skippable": true,
+      "sections": [
+        { "type": "world",  "text": "World context paragraph." },
+        { "type": "stakes", "text": "Stakes paragraph." },
+        { "type": "scene",  "text": "Immediate scene paragraph." },
+        { "type": "entry",  "text": "Entry paragraph — second person, lands at the threshold." }
+      ]
+    },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2025-01-01T00:00:00Z"
   },

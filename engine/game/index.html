@@ -205,6 +205,27 @@ li { margin-bottom: 8px; }
 .briefing-header { display: flex; align-items: center; justify-content: space-between; }
 .briefing-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
 .error-page p { color: var(--muted); margin: 0; }
+/* ── Introduction overlay ────────────────────────────────────────────────── */
+.intro-overlay { position: fixed; inset: 0; z-index: 215; background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; overflow: hidden; }
+.intro-overlay.hidden { display: none; }
+.intro-inner { display: flex; flex-direction: column; width: 100%; max-width: 680px; height: 100dvh; }
+.intro-header { flex-shrink: 0; padding: 28px 32px 20px; border-bottom: 1px solid rgba(58,52,41,0.5); }
+.intro-header-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; margin: 0; }
+.intro-sections { flex: 1; overflow-y: auto; padding: 40px 32px 24px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.intro-sections::-webkit-scrollbar { width: 4px; }
+.intro-sections::-webkit-scrollbar-track { background: transparent; }
+.intro-sections::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.intro-section { font-size: 1.05rem; line-height: 1.85; color: #e8e0d0; margin: 0 0 28px; opacity: 0; animation: intro-fade 0.7s ease forwards; }
+.intro-section:nth-child(1) { animation-delay: 0.1s; }
+.intro-section:nth-child(2) { animation-delay: 0.6s; }
+.intro-section:nth-child(3) { animation-delay: 1.1s; }
+.intro-section:nth-child(4) { animation-delay: 1.6s; }
+@keyframes intro-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.intro-footer { flex-shrink: 0; border-top: 1px solid var(--border); background: #0a0a0a; padding: 20px 32px; display: flex; align-items: center; gap: 20px; }
+.intro-begin-btn { padding: 13px 36px; font-size: 1rem; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #1a150c; font-weight: bold; cursor: pointer; letter-spacing: 0.04em; transition: background 0.15s, border-color 0.15s; }
+.intro-begin-btn:hover { background: #e0c070; border-color: #e0c070; }
+.intro-skip-btn { font-size: 0.8rem; color: var(--muted); cursor: pointer; background: none; border: none; padding: 0; font-family: Georgia, serif; letter-spacing: 0.02em; transition: color 0.15s; }
+.intro-skip-btn:hover { color: var(--text); }
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
   .sidebar { display: none; }
@@ -226,6 +247,16 @@ li { margin-bottom: 8px; }
   .input-row { padding: 6px 14px 10px; gap: 8px; }
   .input-actions { flex-direction: column; min-width: unset; gap: 0; }
   .input-actions button[type="submit"] { height: 100%; min-height: 44px; padding: 0 18px; }
+  /* Collapsible choices on mobile */
+  .choices-wrap.mobile-collapsed .choices { display: none !important; }
+  .choices-wrap.mobile-collapsed .choices-arrow { display: none !important; }
+  #choices-label.visible { cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  #choices-label.visible::after { content: attr(data-arrow); font-size: 0.65rem; opacity: 0.7; }
+  /* Intro overlay mobile */
+  .intro-header { padding: 18px 18px 14px; }
+  .intro-sections { padding: 28px 18px 16px; }
+  .intro-section { font-size: 1rem; line-height: 1.75; }
+  .intro-footer { padding: 16px 18px; }
 }
 @media (max-width: 600px) {
   .notes-overlay { padding: 0; align-items: flex-end; }
@@ -378,6 +409,19 @@ li { margin-bottom: 8px; }
   </div>
 </div>
 
+<div id="intro-overlay" class="intro-overlay hidden" role="dialog" aria-modal="true" aria-label="Story introduction">
+  <div class="intro-inner">
+    <div class="intro-header">
+      <p id="intro-title" class="intro-header-title"></p>
+    </div>
+    <div id="intro-sections" class="intro-sections"></div>
+    <div class="intro-footer">
+      <button type="button" id="intro-begin-btn" class="intro-begin-btn">Begin</button>
+      <button type="button" id="intro-skip-btn" class="intro-skip-btn">Skip introduction</button>
+    </div>
+  </div>
+</div>
+
 <div id="notes-overlay" class="notes-overlay hidden" role="dialog" aria-modal="true" aria-label="Case notes">
   <div class="notes-panel">
     <div class="notes-panel-header">
@@ -427,6 +471,8 @@ const inputEl    = document.getElementById('player-input');
 const ttsBarEl   = document.getElementById('tts-bar');
 const ttsToggleBtn = document.getElementById('tts-toggle');
 const ttsStopBtn   = document.getElementById('tts-stop');
+
+const isMobileDevice = () => 'ontouchstart' in window || window.innerWidth <= 768;
 
 // ── TTS ───────────────────────────────────────────────────────────────────────
 
@@ -643,12 +689,30 @@ function renderChoices(choices = []) {
   requestAnimationFrame(syncArrows);
 
   const labelEl = document.getElementById('choices-label');
-  if (labelEl) labelEl.classList.toggle('visible', choices.length > 0);
+  if (labelEl) {
+    labelEl.classList.toggle('visible', choices.length > 0);
+    if (choices.length > 0 && isMobileDevice()) {
+      document.querySelector('.choices-wrap')?.classList.add('mobile-collapsed');
+      labelEl.dataset.arrow = ' ▾';
+    } else {
+      labelEl.dataset.arrow = '';
+    }
+  }
 }
 
 choicesEl.addEventListener('scroll', syncArrows, { passive: true });
 if (arrowLeft)  arrowLeft.addEventListener('click',  () => choicesEl.scrollBy({ left: -choicesEl.clientWidth * 0.85, behavior: 'smooth' }));
 if (arrowRight) arrowRight.addEventListener('click', () => choicesEl.scrollBy({ left:  choicesEl.clientWidth * 0.85, behavior: 'smooth' }));
+
+// Tap choices label on mobile to expand/collapse
+document.getElementById('choices-label')?.addEventListener('click', () => {
+  if (!isMobileDevice()) return;
+  const wrap = document.querySelector('.choices-wrap');
+  const label = document.getElementById('choices-label');
+  if (!wrap) return;
+  const nowCollapsed = wrap.classList.toggle('mobile-collapsed');
+  if (label) label.dataset.arrow = nowCollapsed ? ' ▾' : ' ▲';
+});
 
 // ── Narrative rendering ───────────────────────────────────────────────────────
 
@@ -707,11 +771,6 @@ function renderOutput(output, meta = {}) {
   });
 
   renderChoices(output.choices || []);
-
-  // Auto-focus input on mobile after each scene finishes loading
-  if ('ontouchstart' in window && inputEl && !inputEl.disabled) {
-    setTimeout(() => inputEl.focus(), 600);
-  }
 
   const messageId = ++currentMessageId;
   lastRenderedSpeakText      = output.narrative;
@@ -1068,9 +1127,49 @@ function showRoleSelection() {
     updateTtsToggleUI();
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
-    const role = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
-    showBriefing(role, selectedStyle);
+    const role  = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
+    const intro = scenario.introduction;
+    if (intro?.enabled && (intro.sections || []).some(s => s.text?.trim())) {
+      showIntroduction(scenario, role, selectedStyle);
+    } else {
+      showBriefing(role, selectedStyle);
+    }
   });
+}
+
+// ── Introduction screen ───────────────────────────────────────────────────────
+
+function showIntroduction(scenario, role, style) {
+  const overlay    = document.getElementById('intro-overlay');
+  const titleEl    = document.getElementById('intro-title');
+  const sectionsEl = document.getElementById('intro-sections');
+
+  titleEl.textContent = scenario.title || '';
+  sectionsEl.innerHTML = '';
+  for (const section of (scenario.introduction?.sections || [])) {
+    if (!section.text?.trim()) continue;
+    const p = document.createElement('p');
+    p.className = 'intro-section';
+    p.textContent = section.text;
+    sectionsEl.appendChild(p);
+  }
+  sectionsEl.scrollTop = 0;
+  overlay.classList.remove('hidden');
+
+  function proceed() {
+    overlay.classList.add('hidden');
+    showBriefing(role, style);
+  }
+
+  const oldBegin = document.getElementById('intro-begin-btn');
+  const newBegin = oldBegin.cloneNode(true);
+  oldBegin.replaceWith(newBegin);
+  newBegin.addEventListener('click', proceed);
+
+  const oldSkip = document.getElementById('intro-skip-btn');
+  const newSkip = oldSkip.cloneNode(true);
+  oldSkip.replaceWith(newSkip);
+  newSkip.addEventListener('click', proceed);
 }
 
 // ── Briefing screen ───────────────────────────────────────────────────────────
