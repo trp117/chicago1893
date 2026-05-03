@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -36,6 +37,7 @@ const repos = {
 };
 
 const app = express();
+app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -48,12 +50,17 @@ const gameConfig = {
 app.use('/admin/api', createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
 app.use('/game/api',  createGameRouter(repos, gameConfig));
 
-app.get('/',     (_, res) => res.sendFile(path.join(gameDir, 'landing.html')));
-app.get('/game', (_, res) => res.sendFile(path.join(gameDir, 'index.html')));
+// Keep-warm ping — Railway and uptime monitors hit this to prevent cold starts
+app.get('/ping', (_, res) => res.json({ ok: true, ts: Date.now() }));
 
-app.use('/admin', express.static(adminDir));
-app.get('/admin', (_, res) => res.sendFile(path.join(adminDir, 'index.html')));
-app.get('/admin/*', (_, res) => res.sendFile(path.join(adminDir, 'index.html')));
+const HTML_HEADERS = { headers: { 'Cache-Control': 'public, max-age=300, must-revalidate' } };
+
+app.get('/',     (_, res) => res.sendFile(path.join(gameDir,  'landing.html'), HTML_HEADERS));
+app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   HTML_HEADERS));
+
+app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
+app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
+app.get('/admin/*', (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
 
 const PORT = process.env.PORT || process.env.ENGINE_PORT || 3002;
 

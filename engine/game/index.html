@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Investigation</title>
+  <link rel="dns-prefetch" href="https://api.anthropic.com">
+  <link rel="dns-prefetch" href="https://api.elevenlabs.io">
+  <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <style>
 :root {
   --bg: #111111;
@@ -462,6 +465,9 @@ let bootstrapData        = null;
 let ttsNarrationSpeed    = 1.0;
 let lastChoices          = [];
 let trustLabel           = 'Trust';
+
+// Pre-warmed /start request fired as soon as role is selected, resolved in startGame()
+let warmStart = null; // { promise, roleId, style, characterContext, activeHook }
 
 const storyEl    = document.getElementById('story');
 const choicesEl  = document.getElementById('choices');
@@ -1129,18 +1135,47 @@ function showRoleSelection() {
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
     const role  = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
+
+    // Compute briefing context once so pre-warm and showBriefing use the same values
+    const hooks      = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
+    const hookIndex  = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
+    const activeHook = hookIndex >= 0 ? hooks[hookIndex] : null;
+    const baseBriefing = typeof role.briefing === 'string' && role.briefing.trim()
+      ? role.briefing.trim() : (role.description || '');
+    const characterContext = activeHook ? `${baseBriefing} ${activeHook}` : baseBriefing;
+
+    // Fire /start immediately — intro + briefing screens give Claude time to respond
+    warmStart = {
+      roleId: selectedRoleId,
+      style: selectedStyle,
+      activeHook,
+      characterContext,
+      promise: fetch(`${API_BASE}/start`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenarioId:        scenario.id,
+          roleId:            selectedRoleId,
+          narrativeStyle:    selectedStyle,
+          character_context: characterContext,
+          player_addition:   null,
+          active_hook:       activeHook,
+          ttsEnabled,
+        }),
+      }),
+    };
+
     const intro = scenario.introduction;
     if (intro?.enabled && (intro.sections || []).some(s => s.text?.trim())) {
-      showIntroduction(scenario, role, selectedStyle);
+      showIntroduction(scenario, role, selectedStyle, activeHook, characterContext);
     } else {
-      showBriefing(role, selectedStyle);
+      showBriefing(role, selectedStyle, activeHook, characterContext);
     }
   });
 }
 
 // ── Introduction screen ───────────────────────────────────────────────────────
 
-function showIntroduction(scenario, role, style) {
+function showIntroduction(scenario, role, style, activeHook, characterContext) {
   const overlay    = document.getElementById('intro-overlay');
   const titleEl    = document.getElementById('intro-title');
   const sectionsEl = document.getElementById('intro-sections');
@@ -1219,7 +1254,7 @@ function showIntroduction(scenario, role, style) {
   function proceed() {
     ttsStop();
     overlay.classList.add('hidden');
-    showBriefing(role, style);
+    showBriefing(role, style, activeHook, characterContext);
   }
 
   const oldBegin = document.getElementById('intro-begin-btn');
@@ -1235,20 +1270,21 @@ function showIntroduction(scenario, role, style) {
 
 // ── Briefing screen ───────────────────────────────────────────────────────────
 
-function showBriefing(role, style) {
-  const overlay     = document.getElementById('briefing-overlay');
-  const additionEl  = document.getElementById('briefing-addition');
+function showBriefing(role, style, activeHook, fullBriefing) {
+  const overlay    = document.getElementById('briefing-overlay');
+  const additionEl = document.getElementById('briefing-addition');
 
-  // Pick a random character hook to append as the final sentence
-  const hooks      = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
-  const hookIndex  = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
-  const activeHook = hookIndex >= 0 ? hooks[hookIndex] : null;
-
-  // Full briefing = the 5-sentence string + hook appended
-  const baseBriefing = typeof role.briefing === 'string' && role.briefing.trim()
-    ? role.briefing.trim()
-    : (role.description || '');
-  const fullBriefing = activeHook ? `${baseBriefing} ${activeHook}` : baseBriefing;
+  // Use precomputed values from role selection (same hook used for pre-warm); compute if absent
+  if (activeHook === undefined) {
+    const hooks = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
+    const idx   = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
+    activeHook  = idx >= 0 ? hooks[idx] : null;
+  }
+  if (!fullBriefing) {
+    const base = typeof role.briefing === 'string' && role.briefing.trim()
+      ? role.briefing.trim() : (role.description || '');
+    fullBriefing = activeHook ? `${base} ${activeHook}` : base;
+  }
 
   document.getElementById('briefing-role-name').textContent = role.name;
   document.getElementById('briefing-text').textContent      = fullBriefing;
@@ -1379,23 +1415,32 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
 
   let openingOutput, openingNextState;
   try {
-    const startResp = await fetch(`${API_BASE}/start`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        scenarioId:        scenario.id,
-        roleId,
-        narrativeStyle:    gameState.narrativeStyle,
-        character_context: briefingContext.character_context || null,
-        player_addition:   briefingContext.player_addition   || null,
-        active_hook:       briefingContext.active_hook       || null,
-        ttsEnabled,
-      })
-    });
+    // Use pre-warmed response if it matches this request and no player_addition was added
+    const canUseWarm = warmStart
+      && warmStart.roleId  === roleId
+      && warmStart.style   === gameState.narrativeStyle
+      && !briefingContext.player_addition;
+    const startResp = canUseWarm
+      ? await warmStart.promise
+      : await fetch(`${API_BASE}/start`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenarioId:        scenario.id,
+            roleId,
+            narrativeStyle:    gameState.narrativeStyle,
+            character_context: briefingContext.character_context || null,
+            player_addition:   briefingContext.player_addition   || null,
+            active_hook:       briefingContext.active_hook       || null,
+            ttsEnabled,
+          }),
+        });
+    warmStart = null;
     if (!startResp.ok) throw new Error(`/start returned ${startResp.status}`);
     const startData = await startResp.json();
     openingOutput    = startData.output;
     openingNextState = startData.nextState;
   } catch (err) {
+    warmStart = null;
     loadingEl.remove();
     console.error('[START]', err);
     // Graceful fallback: render static opening if the engine call fails
