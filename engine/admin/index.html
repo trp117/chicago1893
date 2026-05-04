@@ -1148,10 +1148,15 @@ function collectEdits(containerEl, data) {
 
 function previewIntroduction(btn) {
   const form = btn.closest('#preview-form') || btn.closest('.form-section') || document.body;
-  const texts = [0, 1, 2, 3].map(i => {
+  const sharedTexts = [0, 1, 2].map(i => {
     const el = form.querySelector(`[data-path="scenario.introduction.sections.${i}.text"]`);
     return el ? el.value.trim() : '';
   });
+  const entryEls = Array.from(form.querySelectorAll('[data-path^="scenario.introduction.sections.3.character_entries."]'));
+  const entries = entryEls.map(el => {
+    const label = el.closest('.field-group')?.querySelector('label')?.textContent?.trim() || '';
+    return { label, text: el.value.trim() };
+  }).filter(e => e.text);
   const titleEl = form.querySelector('[data-path="scenario.title"]');
   const titleText = titleEl ? titleEl.value.trim() : 'Introduction';
 
@@ -1161,11 +1166,16 @@ function previewIntroduction(btn) {
   modal.id = 'intro-preview-modal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:1000;background:#0a0a0a;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;font-family:Georgia,serif;';
 
-  const delays = [0.1, 0.6, 1.1, 1.6];
-  const sectionsHtml = texts
-    .filter(t => t)
-    .map((t, i) => `<p style="font-size:1.05rem;line-height:1.85;color:#e8e0d0;margin:0 0 28px;opacity:0;animation:intro-fade 0.7s ease ${delays[i]}s forwards">${esc(t).replace(/\n/g,'<br>')}</p>`)
-    .join('') || '<p style="color:#c1b9a6;font-style:italic;margin:0">No introduction text yet.</p>';
+  let delay = 0.1;
+  const sharedHtml = sharedTexts.filter(t => t).map(t => {
+    const d = delay; delay += 0.5;
+    return `<p style="font-size:1.05rem;line-height:1.85;color:#e8e0d0;margin:0 0 28px;opacity:0;animation:intro-fade 0.7s ease ${d}s forwards">${esc(t).replace(/\n/g,'<br>')}</p>`;
+  }).join('');
+  const entriesHtml = entries.map(e => {
+    const d = delay; delay += 0.55;
+    return `<p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#c1b9a6;font-family:system-ui,sans-serif;margin:28px 0 8px;opacity:0;animation:intro-fade 0.7s ease ${d}s forwards">${esc(e.label)}</p><p style="font-size:1.05rem;line-height:1.85;color:#e8e0d0;margin:0 0 28px;opacity:0;animation:intro-fade 0.7s ease ${d + 0.05}s forwards">${esc(e.text).replace(/\n/g,'<br>')}</p>`;
+  }).join('');
+  const sectionsHtml = sharedHtml + entriesHtml || '<p style="color:#c1b9a6;font-style:italic;margin:0">No introduction text yet.</p>';
 
   modal.innerHTML = `
     <style>@keyframes intro-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
@@ -1189,6 +1199,11 @@ function renderScenarioSection(data) {
   const sections = Array.isArray(intro.sections) ? intro.sections : [];
   const sec = (i) => sections[i] || {};
   const toneVal = Array.isArray(s.tone) ? s.tone.join(', ') : (s.tone || '');
+  const roles = data.playerRoles || [];
+  const characterEntries = sec(3).character_entries || {};
+  const entryFields = roles.length
+    ? roles.map(r => edField(r.name, edTextarea(`scenario.introduction.sections.3.character_entries.${r.id}`, characterEntries[r.id] || '', 5), 'Entry paragraph — places this character at the threshold of the scene')).join('')
+    : `<div class="field-group"><p class="help-text" style="font-style:italic">No character roles defined yet — add roles in the Player Roles section first.</p></div>`;
 
   const introBody = `
     ${edField('Enable', `<select data-path="scenario.introduction.enabled"><option value="true"${intro.enabled ? ' selected' : ''}>Yes</option><option value="false"${!intro.enabled ? ' selected' : ''}>No</option></select>`)}
@@ -1200,7 +1215,7 @@ function renderScenarioSection(data) {
     ${edField('World', edTextarea('scenario.introduction.sections.0.text', sec(0).text, 5), 'Historical context — what is happening, what forces are in motion')}
     ${edField('Stakes', edTextarea('scenario.introduction.sections.1.text', sec(1).text, 5), 'What is at stake — politically, personally, why tonight matters')}
     ${edField('Scene', edTextarea('scenario.introduction.sections.2.text', sec(2).text, 5), 'The immediate world — the city, the hour, the tension in the air')}
-    ${edField('Entry', edTextarea('scenario.introduction.sections.3.text', sec(3).text, 5), 'Final paragraph — lands the player at the threshold of the scene')}
+    ${entryFields}
     <div class="field-group"><button type="button" onclick="previewIntroduction(this)" style="padding:7px 18px;font-size:0.85rem;border-radius:8px;border:1px solid #555;background:transparent;color:#c1b9a6;cursor:pointer">Preview introduction</button></div>
   `;
 

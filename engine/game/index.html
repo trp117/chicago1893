@@ -1169,18 +1169,13 @@ function showRoleSelection() {
       }),
     };
 
-    const intro = scenario.introduction;
-    if (intro?.enabled && (intro.sections || []).some(s => s.text?.trim())) {
-      showIntroduction(scenario, role, selectedStyle, activeHook, characterContext);
-    } else {
-      showBriefing(role, selectedStyle, activeHook, characterContext);
-    }
+    showBriefing(role, selectedStyle, activeHook, characterContext);
   });
 }
 
 // ── Introduction screen ───────────────────────────────────────────────────────
 
-function showIntroduction(scenario, role, style, activeHook, characterContext) {
+function showIntroduction(scenario, role, style, activeHook, characterContext, playerAddition) {
   const overlay    = document.getElementById('intro-overlay');
   const titleEl    = document.getElementById('intro-title');
   const sectionsEl = document.getElementById('intro-sections');
@@ -1190,12 +1185,18 @@ function showIntroduction(scenario, role, style, activeHook, characterContext) {
   const texts = [];
   const paragraphs = [];
   for (const section of (scenario.introduction?.sections || [])) {
-    if (!section.text?.trim()) continue;
+    let text;
+    if (section.character_entries) {
+      text = section.character_entries[role?.id] || Object.values(section.character_entries)[0] || '';
+    } else {
+      text = section.text || '';
+    }
+    if (!text.trim()) continue;
     const p = document.createElement('p');
     p.className = 'intro-section';
-    p.textContent = section.text;
+    p.textContent = text;
     paragraphs.push(p);
-    texts.push(section.text);
+    texts.push(text);
   }
 
   function revealText() {
@@ -1290,7 +1291,11 @@ function showIntroduction(scenario, role, style, activeHook, characterContext) {
   function proceed() {
     ttsStop();
     overlay.classList.add('hidden');
-    showBriefing(role, style, activeHook, characterContext);
+    startGame(role.id, style, {
+      character_context: characterContext,
+      player_addition:   playerAddition || '',
+      active_hook:       activeHook,
+    });
   }
 
   const oldBegin = document.getElementById('intro-begin-btn');
@@ -1362,11 +1367,19 @@ function showBriefing(role, style, activeHook, fullBriefing) {
   function beginWith(playerAddition) {
     ttsStop();
     overlay.classList.add('hidden');
-    startGame(role.id, style, {
-      character_context: fullBriefing,
-      player_addition:   playerAddition,
-      active_hook:       activeHook,
-    });
+    const intro = scenario?.introduction;
+    const hasIntro = intro?.enabled && (intro.sections || []).some(
+      s => s.text?.trim() || Object.values(s.character_entries || {}).some(v => v?.trim())
+    );
+    if (hasIntro) {
+      showIntroduction(scenario, role, style, activeHook, fullBriefing, playerAddition);
+    } else {
+      startGame(role.id, style, {
+        character_context: fullBriefing,
+        player_addition:   playerAddition,
+        active_hook:       activeHook,
+      });
+    }
   }
 
   const oldBegin = document.getElementById('briefing-begin-btn');
