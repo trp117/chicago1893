@@ -160,6 +160,10 @@ export function buildSystemPrompt(sessionId) {
       `Perspective: ${session.playerPerspective || ''}`,
       `Starting Knowledge: ${(session.playerStartingKnowledge || []).join('; ') || 'none'}`,
     ];
+    if (session.playerRealName && session.playerCoverName) {
+      const firstName = session.playerRealName.split(' ')[0];
+      ctxLines.push('', `CRITICAL IDENTITY NOTE: The player character is ${session.playerRealName}, operating under the cover name ${session.playerCoverName}. These are the same person. ${session.playerRealName} must NEVER appear as a separate NPC, bystander, or named character in any scene. If you are about to write "${firstName}" or "${session.playerRealName}" as someone other than the player, stop — that is the player. Other characters may refer to her as ${session.playerCoverName} or by no name at all depending on what they know. There is one woman. She is the player.`);
+    }
     if (session.character_context) {
       ctxLines.push('', 'Character Briefing (player read this before the game started):', session.character_context);
     }

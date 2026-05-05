@@ -227,10 +227,24 @@ function buildPlayerRoleSection(state) {
   const perspective = state.playerPerspective || 'The player is an investigator.';
   const accessLevel = state.playerAccessLevel || 'staff';
   const knowledge   = (state.playerStartingKnowledge || []).join('; ');
-  return `Role: ${roleName} (id: ${roleId}) | Access: ${accessLevel}
-Perspective: ${perspective}
-Starting knowledge: ${knowledge || 'none'}
-HARD RULE: The player is ${roleName}. Never address them as a different character. Never have ${roleName} appear as an NPC speaking to the player.`;
+
+  const lines = [
+    `Role: ${roleName} (id: ${roleId}) | Access: ${accessLevel}`,
+    `Perspective: ${perspective}`,
+    `Starting knowledge: ${knowledge || 'none'}`,
+    `HARD RULE: The player is ${roleName}. Never address them as a different character. Never have ${roleName} appear as an NPC speaking to the player.`,
+  ];
+
+  if (state.playerRealName && state.playerCoverName) {
+    lines.push(`IDENTITY CONFLICT PREVENTION: "${state.playerRealName}" and "${state.playerCoverName}" are the same person — the player. Never render "${state.playerRealName}" as an NPC, bystander, or any character separate from the player.`);
+  }
+
+  if (Array.isArray(state.playerAliases) && state.playerAliases.length > 0) {
+    const nameList = state.playerAliases.map(a => `"${a.name}" (${a.context})`).join(', ');
+    lines.push(`ALIAS PROTECTION: This character is known by multiple names: ${nameList}. None of these names may appear as a separate NPC or character in any scene.`);
+  }
+
+  return lines.join('\n');
 }
 
 function buildLocationConstraint(locationId) {

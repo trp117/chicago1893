@@ -2,7 +2,22 @@
   "id": "margaret_vane_role",
   "scenarioId": "midnight_errand_boston",
   "name": "Margaret Vane — The Courier",
-  "description": "You are Hannah Cross under a different name tonight — a woman who has been carrying messages through this city for two years and has learned that the most dangerous moment is always the handoff. You have placed the dispatch in the apprentice's hands. Now you must decide whether to trust him.",
+  "real_name": "Hannah Cross",
+  "cover_name": "Margaret Vane",
+  "alias_note": "Hannah Cross and Margaret Vane are the same person. Hannah Cross is her real name. Margaret Vane is her cover identity in use tonight. These must never be rendered as two separate characters in the same scene.",
+  "aliases": [
+    {
+      "name": "Hannah Cross",
+      "context": "real identity",
+      "known_to": ["player"]
+    },
+    {
+      "name": "Margaret Vane",
+      "context": "cover identity",
+      "known_to": ["nathaniel_gill", "general_public"]
+    }
+  ],
+  "description": "You are Hannah Cross, operating tonight under the name Margaret Vane — a woman who has been carrying messages through this city for two years and has learned that the most dangerous moment is always the handoff. You have placed the dispatch in the apprentice's hands. Now you must decide whether to trust him.",
   "startLocationId": "gill_print_shop_back",
   "startingKnowledge": [
     "The recognition phrase that will open Thomas Wren's back room: 'The tide sets east tonight.'",
