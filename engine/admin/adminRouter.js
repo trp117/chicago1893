@@ -1,5 +1,11 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
+import { readdir, readFile, unlink, stat } from 'fs/promises';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const _dir = dirname(fileURLToPath(import.meta.url));
+const TRANSCRIPTS_DIR = join(_dir, '../data/transcripts');
 
 const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC_KEY)
   ? new Langfuse({
@@ -241,7 +247,12 @@ export function createAdminRouter(repos, config = {}) {
   const r = Router();
 
   // ── Dashboard ────────────────────────────────────────────────────────────────
-  r.get('/dashboard', (_, res) => {
+  r.get('/dashboard', async (_, res) => {
+    let transcripts = 0;
+    try {
+      const files = await readdir(TRANSCRIPTS_DIR);
+      transcripts = files.filter(f => f.endsWith('.md')).length;
+    } catch {}
     res.json({
       characters:  repos.characters.findAll().length,
       locations:   repos.locations.findByScenario().length,
@@ -250,6 +261,7 @@ export function createAdminRouter(repos, config = {}) {
       playerRoles: repos.scenarios.findPlayerRoles().length,
       players:     repos.players.findAll().length,
       sessions:    repos.sessions.findAll().length,
+      transcripts,
     });
   });
 
@@ -593,6 +605,54 @@ Return ONLY valid JSON in this exact structure:
       return res.json(parsed);
     } catch (err) {
       return res.status(500).json({ error: 'Claude returned invalid JSON for briefings.', rawText: text.slice(0, 400) });
+    }
+  });
+
+  // ── Transcripts ──────────────────────────────────────────────────────────────
+  r.get('/transcripts', async (_, res) => {
+    try {
+      let files;
+      try { files = await readdir(TRANSCRIPTS_DIR); } catch { files = []; }
+      const mdFiles = files.filter(f => f.endsWith('.md'));
+      const items = await Promise.all(mdFiles.map(async f => {
+        const id = f.slice(0, -3);
+        const filePath = join(TRANSCRIPTS_DIR, f);
+        const [content, stats] = await Promise.all([readFile(filePath, 'utf8'), stat(filePath)]);
+        const scenario  = content.match(/^scenario: (.+)$/m)?.[1]?.trim() || '—';
+        const character = content.match(/^character: (.+)$/m)?.[1]?.trim() || '—';
+        const started   = content.match(/^started: (.+)$/m)?.[1]?.trim() || null;
+        const turns     = (content.match(/^\*\*Player:\*\*/gm) || []).length;
+        const endMatch  = content.match(/^## Ending — (.+)$/m);
+        const result    = endMatch ? endMatch[1].toLowerCase() : 'in-progress';
+        return { id, scenario, character, started, turns, result, size: stats.size, mtime: stats.mtime };
+      }));
+      items.sort((a, b) => new Date(b.mtime) - new Date(a.mtime));
+      res.json(items);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  r.get('/transcripts/:id/download', async (req, res) => {
+    const safe = req.params.id.replace(/[^a-zA-Z0-9-]/g, '');
+    const filePath = join(TRANSCRIPTS_DIR, `${safe}.md`);
+    try {
+      const content = await readFile(filePath, 'utf8');
+      res.set('Content-Type', 'text/markdown; charset=utf-8');
+      res.set('Content-Disposition', `attachment; filename="transcript-${safe}.md"`);
+      res.send(content);
+    } catch {
+      res.status(404).json({ error: 'Transcript not found.' });
+    }
+  });
+
+  r.delete('/transcripts/:id', async (req, res) => {
+    const safe = req.params.id.replace(/[^a-zA-Z0-9-]/g, '');
+    try {
+      await unlink(join(TRANSCRIPTS_DIR, `${safe}.md`));
+      res.json({ ok: true });
+    } catch {
+      res.status(404).json({ error: 'Transcript not found.' });
     }
   });
 

@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
 import { randomUUID } from 'crypto';
+import { appendFile, mkdir } from 'fs/promises';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 import {
   buildSystemPrompt as buildSystemPromptLegacy,
@@ -22,6 +25,10 @@ function selectSystemPrompt(scenarioId, sessionId, scenario, locations) {
   }
   return buildSystemPromptLegacy(scenario, locations);
 }
+
+const _dir = dirname(fileURLToPath(import.meta.url));
+const TRANSCRIPTS_DIR = join(_dir, '../data/transcripts');
+mkdir(TRANSCRIPTS_DIR, { recursive: true }).catch(() => {});
 
 const ANTHROPIC_URL    = 'https://api.anthropic.com/v1/messages';
 const MODEL            = 'claude-sonnet-4-6';
@@ -236,6 +243,32 @@ export function createGameRouter(repos, config = {}) {
       }
       appData.saveSession(sessionId, nextState);
 
+      // Transcript — fire-and-forget
+      appendFile(
+        join(TRANSCRIPTS_DIR, `${sessionId}.md`),
+        [
+          `---`,
+          `scenario: ${scenarioId}`,
+          `character: ${role.name}`,
+          `session: ${sessionId}`,
+          `started: ${new Date().toISOString()}`,
+          `---`,
+          ``,
+          `# ${scenario.title || scenarioId}`,
+          ``,
+          `**Role:** ${role.name}`,
+          ``,
+          `---`,
+          ``,
+          `## Introduction`,
+          ``,
+          output.narrative || '',
+          ``,
+          `---`,
+          ``,
+        ].join('\n')
+      ).catch(e => console.error('[TRANSCRIPT]', e.message));
+
       return res.json({ output, nextState, sessionId });
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
@@ -396,6 +429,32 @@ export function createGameRouter(repos, config = {}) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
       if (sessionId) appData.saveSession(sessionId, nextState);
+
+      // Transcript — fire-and-forget
+      if (sessionId) {
+        const locName = locations.find(l => l.id === (output.location || state.location))?.name || (output.location || state.location);
+        const chunk = [
+          `**Player:** ${playerInput}`,
+          ``,
+          `> Act ${nextState.act || 1} · ${locName} · ${nextState.remainingMinutes} min remaining`,
+          ``,
+          output.narrative || '',
+          ``,
+        ];
+        if (output.endState?.isEnding) {
+          const p = output.endState.performance || {};
+          chunk.push(`## Ending — ${(output.endState.result || 'unknown').toUpperCase()}`);
+          chunk.push(``);
+          chunk.push(`**Result:** ${output.endState.result || '—'}`);
+          chunk.push(`**Clues found:** ${p.cluesDiscovered ?? '?'} of ${p.totalClues ?? '?'}`);
+          chunk.push(`**Time remaining:** ${p.timeRemaining ?? '?'} min`);
+          chunk.push(``);
+        }
+        chunk.push(`---`);
+        chunk.push(``);
+        appendFile(join(TRANSCRIPTS_DIR, `${sessionId}.md`), chunk.join('\n'))
+          .catch(e => console.error('[TRANSCRIPT]', e.message));
+      }
 
       console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} newClues=${JSON.stringify(output.newClues)} isEnding=${output.endState?.isEnding ?? false}`);
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });

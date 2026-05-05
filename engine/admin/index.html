@@ -208,6 +208,8 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
   <div class="nav-section">Players</div>
   <div class="nav-link" data-entity="players">👥 Players <span class="badge" id="badge-players">–</span></div>
   <div class="nav-link" data-entity="sessions">🎮 Sessions <span class="badge" id="badge-sessions">–</span></div>
+  <div class="nav-section">Testing</div>
+  <div class="nav-link" data-view="transcripts">📄 Transcripts <span class="badge" id="badge-transcripts">–</span></div>
 </nav>
 
 <div id="main">
@@ -641,11 +643,19 @@ async function renderDashboard() {
     const badge = document.getElementById(`badge-${entity}`);
     if (badge) badge.textContent = count;
   }
+  const transcriptCount = dash.transcripts || 0;
+  const transcriptBadge = document.getElementById('badge-transcripts');
+  if (transcriptBadge) transcriptBadge.textContent = transcriptCount;
+
   const statCards = Object.entries(counts).map(([entity, count]) => `
     <div class="stat-card" data-entity="${entity}">
       <div class="stat-card-num">${count}</div>
       <div class="stat-card-label">${ENTITIES[entity]?.plural || entity}</div>
-    </div>`).join('');
+    </div>`).join('') + `
+    <div class="stat-card" data-view="transcripts">
+      <div class="stat-card-num">${transcriptCount}</div>
+      <div class="stat-card-label">Transcripts</div>
+    </div>`;
 
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
@@ -725,6 +735,8 @@ async function renderDashboard() {
   document.querySelectorAll('.stat-card[data-entity]').forEach(el => {
     el.addEventListener('click', () => navigate(el.dataset.entity));
   });
+  document.querySelector('.stat-card[data-view="transcripts"]')
+    ?.addEventListener('click', () => renderTranscripts());
 
   // Wire scene-opening panels
   document.querySelectorAll('.sop-toggle-btn').forEach(btn => {
@@ -1399,6 +1411,105 @@ function renderPreview(data, autoSaved = false) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// TRANSCRIPTS
+// ═══════════════════════════════════════════════════════════════
+async function renderTranscripts() {
+  setTopbar('Transcripts', []);
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.querySelector('.nav-link[data-view="transcripts"]')?.classList.add('active');
+  document.getElementById('content').innerHTML = '<p>Loading…</p>';
+
+  let items = [];
+  try { items = await apiGet('/transcripts'); } catch (err) {
+    document.getElementById('content').innerHTML = `<div class="empty-state"><p>Could not load transcripts: ${err.message}</p></div>`;
+    return;
+  }
+
+  const badge = document.getElementById('badge-transcripts');
+  if (badge) badge.textContent = items.length;
+
+  if (!items.length) {
+    document.getElementById('content').innerHTML = `
+      <div class="empty-state">
+        <p>No transcripts yet.</p>
+        <p style="font-size:13px">Transcripts are recorded automatically when you play a session from start to finish.</p>
+      </div>`;
+    return;
+  }
+
+  const resultBadge = r => {
+    if (r === 'in-progress') return `<span class="tag" style="background:#fef3c7;color:#92400e">In progress</span>`;
+    if (r.includes('success')) return `<span class="tag" style="background:#f0fdf4;color:#166534">Success</span>`;
+    return `<span class="tag" style="background:#fef2f2;color:#991b1b">${r}</span>`;
+  };
+
+  const rows = items.map(t => {
+    const dateStr = t.started ? new Date(t.started).toLocaleString() : '—';
+    const kb = t.size ? `${(t.size / 1024).toFixed(1)} KB` : '—';
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--text-soft)">${t.id.slice(0, 8)}…</td>
+      <td>${esc(t.scenario)}</td>
+      <td>${esc(t.character)}</td>
+      <td>${dateStr}</td>
+      <td style="text-align:center">${t.turns}</td>
+      <td>${resultBadge(t.result)}</td>
+      <td style="text-align:right;white-space:nowrap;color:var(--text-soft);font-size:12px">${kb}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <a class="btn btn-secondary btn-sm" href="${API}/transcripts/${t.id}/download" download="transcript-${t.id}.md" style="text-decoration:none;margin-right:6px">Download</a>
+        <button class="btn btn-danger btn-sm" data-delete-transcript="${t.id}">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f8fafc;border-bottom:1px solid var(--border)">
+            <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Session</th>
+            <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Scenario</th>
+            <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Character</th>
+            <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Started</th>
+            <th style="padding:10px 14px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Turns</th>
+            <th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Result</th>
+            <th style="padding:10px 14px;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Size</th>
+            <th style="padding:10px 14px"></th>
+          </tr>
+        </thead>
+        <tbody id="transcript-tbody">
+          ${rows}
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('transcript-tbody').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-delete-transcript]');
+    if (!btn) return;
+    const id   = btn.dataset.deleteTranscript;
+    const name = `transcript-${id.slice(0, 8)}…`;
+    document.getElementById('modal-title').textContent = 'Delete Transcript';
+    document.getElementById('modal-body').textContent  = `Delete ${name}? This cannot be undone.`;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+
+    const onConfirm = async () => {
+      cleanup();
+      try {
+        await apiDelete(`/transcripts/${id}`);
+        toast('Transcript deleted.', 'success');
+        renderTranscripts();
+      } catch (err) { toast(err.message, 'error'); }
+    };
+    const cleanup = () => {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('modal-confirm').removeEventListener('click', onConfirm);
+      document.getElementById('modal-cancel').removeEventListener('click', cleanup);
+    };
+    document.getElementById('modal-confirm').addEventListener('click', onConfirm);
+    document.getElementById('modal-cancel').addEventListener('click', cleanup);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SIDEBAR NAVIGATION EVENTS
 // ═══════════════════════════════════════════════════════════════
 document.querySelectorAll('.nav-link[data-entity]').forEach(link => {
@@ -1408,6 +1519,8 @@ document.querySelector('.nav-link[data-view="dashboard"]')
   ?.addEventListener('click', () => renderDashboard());
 document.querySelector('.nav-link[data-view="generate"]')
   ?.addEventListener('click', () => renderGenerator());
+document.querySelector('.nav-link[data-view="transcripts"]')
+  ?.addEventListener('click', () => renderTranscripts());
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
