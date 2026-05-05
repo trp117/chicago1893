@@ -101,14 +101,17 @@ export function createGameRouter(repos, config = {}) {
 
   // ── Public scenario listing ────────────────────────────────────────────────
   r.get('/scenarios', (_, res) => {
-    const all = repos.scenarios.findAll().map(s => ({
-      id:                   s.id,
-      title:                s.title,
-      description:          s.description,
-      genre:                s.genre || [],
-      sessionTargetMinutes: s.sessionTargetMinutes,
-      historicalRealism:    s.historicalRealism,
-    }));
+    const all = repos.scenarios.findAll()
+      .filter(s => !s.hidden)
+      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
+      .map(s => ({
+        id:                   s.id,
+        title:                s.title,
+        description:          s.description,
+        genre:                s.genre || [],
+        sessionTargetMinutes: s.sessionTargetMinutes,
+        historicalRealism:    s.historicalRealism,
+      }));
     res.json(all);
   });
 

@@ -1,5 +1,7 @@
 {
   "id": "midnight_errand_boston",
+  "order": 2,
+  "hidden": false,
   "version": "1.0.0",
   "title": "Midnight Errand: Boston, 1775",
   "description": "On the eve of the Regulars' march, a printer's apprentice must decide whether to carry a secret dispatch through a city on the edge of war. Every choice tonight will echo for years — but the clock strikes ten in less than an hour.",
