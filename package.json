@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "start": "node engine/server/server.js",
-    "engine": "node engine/server/server.js"
+    "engine": "node engine/server/server.js",
+    "review": "node engine/agents/transcriptReviewer.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.1",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

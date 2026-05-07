@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 
 const _dir = dirname(fileURLToPath(import.meta.url));
 const TRANSCRIPTS_DIR = join(_dir, '../data/transcripts');
+const REVIEWS_DIR     = join(_dir, '../../data/reviews');
 
 const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC_KEY)
   ? new Langfuse({
@@ -653,6 +654,18 @@ Return ONLY valid JSON in this exact structure:
       res.json({ ok: true });
     } catch {
       res.status(404).json({ error: 'Transcript not found.' });
+    }
+  });
+
+  // ── Reviews (read-only) ───────────────────────────────────────────────────────
+  r.get('/reviews/:scenarioId', async (req, res) => {
+    const safe = req.params.scenarioId.replace(/[^a-zA-Z0-9_-]/g, '');
+    const filePath = join(REVIEWS_DIR, `${safe}_review.md`);
+    try {
+      const content = await readFile(filePath, 'utf8');
+      res.json({ scenarioId: safe, content });
+    } catch {
+      res.json({ scenarioId: safe, content: null });
     }
   });
 
