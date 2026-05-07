@@ -952,7 +952,8 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     });
 
     // Consume SSE stream
-    let streamEl = null;
+    let streamEl     = null;
+    let streamBuffer = '';
     let output = null, nextState = null;
     const sseReader  = resp.body.getReader();
     const sseDecoder = new TextDecoder();
@@ -975,7 +976,8 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
             streamEl.className = 'scene-card';
             entryEl.appendChild(streamEl);
           }
-          streamEl.textContent += evt.text;
+          streamBuffer += evt.text;
+          streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
           storyEl.scrollTop = storyEl.scrollHeight;
         } else if (evt.type === 'done') {
           output    = evt.output;
