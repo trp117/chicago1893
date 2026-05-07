@@ -136,30 +136,24 @@ li { margin-bottom: 8px; }
 .suspicion--high   { background: #2a1010; color: #e07060; }
 .notes-loading, .notes-empty { color: var(--muted); font-style: italic; font-size: 0.85rem; margin: 0; }
 .notes-error { color: #e07060; font-size: 0.85rem; margin: 0; }
-.ending-card { margin: 24px 0 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--panel); }
-.ending-card--success { border-color: #3a5c3a; }
-.ending-card--partial  { border-color: #5c4a20; }
-.ending-card--failure  { border-color: #5c2a2a; }
-.ending-header { padding: 14px 20px 12px; border-bottom: 1px solid var(--border); }
-.ending-result { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 4px; padding: 3px 8px; }
-.ending-result--success { background: #1a3a1a; color: #7ec87e; }
-.ending-result--partial  { background: #3a2a08; color: #d8a850; }
-.ending-result--failure  { background: #3a1010; color: #e07060; }
-.ending-scene { padding: 16px 20px; font-style: italic; color: var(--text); line-height: 1.65; border-bottom: 1px solid var(--border); }
-.ending-scene p { margin: 0 0 10px; }
-.ending-scene p:last-child { margin-bottom: 0; }
-.ending-section { padding: 14px 20px; border-bottom: 1px solid var(--border); }
-.ending-section:last-child { border-bottom: none; }
-.ending-section h3 { margin: 0 0 6px; font-size: 0.7rem; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); opacity: 0.75; }
-.ending-section p { margin: 0; font-size: 0.88rem; color: var(--text); line-height: 1.6; }
-.ending-authority { background: rgba(208,176,106,0.04); }
-.ending-authority blockquote { margin: 0; font-style: italic; font-size: 0.92rem; color: var(--accent); line-height: 1.55; }
-.ending-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-top: 1px solid var(--border); }
-.ending-stat { background: var(--panel-soft); padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
-.ending-stat-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-.ending-stat-value { font-size: 0.88rem; font-weight: bold; color: var(--text); }
-.play-again-btn { display: block; width: calc(100% - 40px); margin: 16px 20px 20px; padding: 12px; border: 1px solid var(--accent); border-radius: 6px; background: transparent; color: var(--accent); font-family: Georgia, serif; font-size: 0.9rem; cursor: pointer; transition: background 0.15s, color 0.15s; }
-.play-again-btn:hover { background: rgba(208,176,106,0.12); }
+.closing-overlay { position: fixed; inset: 0; z-index: 220; background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; padding: 64px 24px 80px; overflow-y: auto; }
+.closing-overlay.hidden { display: none; }
+.closing-inner { width: 100%; max-width: 640px; font-family: Georgia, serif; color: #d4cfc8; line-height: 1.8; }
+.closing-prose { font-size: 1.05rem; font-style: italic; opacity: 0; transition: opacity 1.2s ease; margin-bottom: 2.4em; }
+.closing-prose.visible { opacity: 1; }
+.closing-aftermath { font-size: 1rem; opacity: 0; transition: opacity 1.2s ease; margin-bottom: 2.8em; }
+.closing-aftermath.visible { opacity: 1; }
+.closing-line { font-size: 1.2rem; color: #d0b06a; text-align: center; opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; }
+.closing-line.visible { opacity: 1; }
+.closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
+.closing-return.visible { opacity: 1; }
+.closing-return:hover { color: #d0b06a; }
+.closing-dots { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 0; letter-spacing: 0.6em; }
+.closing-dots span { font-size: 1.2rem; color: #d0b06a; opacity: 0; animation: closing-dot-breathe 2.4s ease-in-out infinite; }
+.closing-dots span:nth-child(2) { animation-delay: 0.8s; }
+.closing-dots span:nth-child(3) { animation-delay: 1.6s; }
+.closing-dots.hidden { display: none; }
+@keyframes closing-dot-breathe { 0%,100% { opacity:0; } 50% { opacity:1; } }
 .role-overlay { position: fixed; inset: 0; z-index: 210; background: rgba(8,6,4,0.97); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
 .role-overlay.hidden { display: none; }
 .role-overlay-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 480px; }
@@ -438,6 +432,18 @@ li { margin-bottom: 8px; }
       <button type="button" id="notes-close" class="notes-close" aria-label="Close notes">&times;</button>
     </div>
     <div id="notes-content" class="notes-content"></div>
+  </div>
+</div>
+
+<div id="closing-overlay" class="closing-overlay hidden" role="region" aria-label="Story closing">
+  <div id="closing-dots" class="closing-dots" aria-hidden="true">
+    <span>·</span><span>·</span><span>·</span>
+  </div>
+  <div class="closing-inner">
+    <div id="closing-prose" class="closing-prose"></div>
+    <div id="closing-aftermath" class="closing-aftermath"></div>
+    <div id="closing-line" class="closing-line">You were there.</div>
+    <a id="closing-return" href="/" class="closing-return">&#8592; Return to Stories</a>
   </div>
 </div>
 
@@ -837,56 +843,49 @@ function renderActTransition(from, to) {
   storyEl.scrollTop = storyEl.scrollHeight;
 }
 
-// ── Ending ────────────────────────────────────────────────────────────────────
+// ── Closing screen ────────────────────────────────────────────────────────────
 
-function renderEnding(endState) {
-  const result = endState.result || 'failure';
-  const perf   = endState.performance || {};
-  const resultLabel = { success:'CASE CLOSED', partial:'INCOMPLETE', failure:'CASE UNSOLVED' }[result] || result.toUpperCase();
-  const sections = [];
+function showClosingScreen(endState, sessionId) {
+  const overlay     = document.getElementById('closing-overlay');
+  const dotsEl      = document.getElementById('closing-dots');
+  const proseEl     = document.getElementById('closing-prose');
+  const aftermathEl = document.getElementById('closing-aftermath');
+  const lineEl      = document.getElementById('closing-line');
+  const returnEl    = document.getElementById('closing-return');
 
-  if (endState.scene) {
-    sections.push(`<div class="ending-scene">${endState.scene.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}</div>`);
-  }
-  if (endState.conspiracySummary) {
-    sections.push(`<section class="ending-section"><h3>The Hidden Plot</h3><p>${endState.conspiracySummary}</p></section>`);
-  }
-  if (endState.whatPlayerDiscovered) {
-    sections.push(`<section class="ending-section"><h3>What You Uncovered</h3><p>${endState.whatPlayerDiscovered}</p></section>`);
-  }
-  if (endState.outcome) {
-    sections.push(`<section class="ending-section"><h3>The Aftermath</h3><p>${endState.outcome}</p></section>`);
-  }
-  if (endState.playerContribution) {
-    sections.push(`<section class="ending-section"><h3>Your Part in It</h3><p>${endState.playerContribution}</p></section>`);
-  }
-  const authorityResp = endState.authorityResponse || endState.burnhamResponse;
-  if (authorityResp) {
-    sections.push(`<section class="ending-section ending-authority"><blockquote>“${authorityResp}”</blockquote></section>`);
-  }
-  if (perf.cluesDiscovered !== undefined) {
-    const correct = endState.correctSuspectIdentified;
-    sections.push(`<div class="ending-stats">
-      <div class="ending-stat"><span class="ending-stat-label">What You Knew</span><span class="ending-stat-value">${perf.cluesDiscovered} / ${perf.totalClues}</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Suspect Identified</span><span class="ending-stat-value">${correct ? 'Yes' : 'No'}</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Time Remaining</span><span class="ending-stat-value">${perf.timeRemaining} min</span></div>
-      <div class="ending-stat"><span class="ending-stat-label">Outcome</span><span class="ending-stat-value ending-result--${result}">${resultLabel}</span></div>
-    </div>`);
+  const aftermath = scenario?.historical_aftermath || '';
+  aftermathEl.textContent = aftermath;
+
+  overlay.classList.remove('hidden');
+
+  function revealSequence(withProse) {
+    dotsEl.classList.add('hidden');
+    let delay = 200;
+    const step = 1300;
+    if (withProse) {
+      setTimeout(() => proseEl.classList.add('visible'),     delay); delay += step;
+    }
+    setTimeout(() => aftermathEl.classList.add('visible'),   delay); delay += step;
+    setTimeout(() => lineEl.classList.add('visible'),        delay); delay += step;
+    setTimeout(() => returnEl.classList.add('visible'),      delay);
   }
 
-  const card = document.createElement('div');
-  card.className = `ending-card ending-card--${result}`;
-  card.innerHTML = `<div class="ending-header"><span class="ending-result ending-result--${result}">${resultLabel}</span></div>${sections.join('')}`;
+  // Hold the screen on black until prose arrives or times out at 20 seconds.
+  // 8 seconds was too short — a 25KB transcript takes 10-20s for the LLM call.
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 20000);
 
-  const playAgainBtn = document.createElement('button');
-  playAgainBtn.type = 'button';
-  playAgainBtn.className = 'play-again-btn';
-  playAgainBtn.textContent = 'New Game';
-  playAgainBtn.addEventListener('click', restartGame);
-  card.appendChild(playAgainBtn);
-
-  storyEl.appendChild(card);
-  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  fetch(`${API_BASE}/closing-prose?sessionId=${encodeURIComponent(sessionId)}`, { signal: controller.signal })
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(data => {
+      clearTimeout(timeoutId);
+      if (data.prose) proseEl.textContent = data.prose;
+      revealSequence(!!data.prose);
+    })
+    .catch(() => {
+      clearTimeout(timeoutId);
+      revealSequence(false);
+    });
 }
 
 // ── Time decision ─────────────────────────────────────────────────────────────
@@ -1029,7 +1028,7 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
       formEl.querySelector('button').disabled = true;
       inputEl.disabled = true;
       renderChoices([]);
-      renderEnding(data.output.endState);
+      showClosingScreen(data.output.endState, sessionId);
     }
   } finally {
     submitting = false;

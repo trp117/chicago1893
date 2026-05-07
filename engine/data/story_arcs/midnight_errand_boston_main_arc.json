@@ -4,7 +4,7 @@
   "name": "The Errand That Cannot Be Undone",
   "premise": "A woman appears at the back door of Gill's Print Shop with a sealed dispatch and a route map that could change the course of a colonial uprising. The apprentice has less than an hour to move through a city laced with Loyalist informers and Redcoat patrols.",
   "goal": "Deliver the dispatch and the troop route map to the Sons of Liberty contact at the Green Dragon Tavern before ten o'clock, without exposing the network or destroying the Gill family.",
-  "openingSituation": "It is nine o'clock on the night of April 18th, 1775. Hannah Cross has knocked at the back door of Gill's Print Shop holding a oilskin packet. Benjamin Gill is awake upstairs. The streets outside are unusually quiet — the kind of quiet that means soldiers.",
+  "openingSituation": "It is nine o'clock on the night of April 18th, 1775. A courier has arrived at the back door of Gill's Print Shop with a sealed oilskin packet. Benjamin Gill is awake upstairs. The streets outside are unusually quiet — the kind of quiet that means soldiers.",
   "acts": [
     {
       "actNumber": 1,
@@ -14,7 +14,7 @@
         8
       ],
       "beats": [
-        "Hannah Cross arrives at the print shop's back door with the sealed dispatch and whispered urgency.",
+        "The courier arrives at the print shop's back door with the sealed dispatch and whispered urgency.",
         "The player learns the dispatch must reach Thomas Wren at the Green Dragon Tavern before ten o'clock.",
         "Benjamin Gill's footsteps are heard upstairs — the player must decide whether to hide Hannah or send her away.",
         "First exploration of the print shop reveals the troop route map hidden inside a type drawer, left by an earlier contact."
@@ -32,7 +32,7 @@
         "The player ventures into the North End streets and encounters the Redcoat checkpoint on Ann Street, manned by Captain Aldrich.",
         "At the chandler's shop, Silas Murch offers a back-alley route — for a price or a favor.",
         "The player discovers that Owen Pryce, a journeyman printer, has been watching the shop and may be feeding information to Loyalist contacts.",
-        "Hannah Cross, if she left the shop, can be found near the rope-walk and will reveal what she knows about the network — but she is frightened and may bolt."
+        "The courier, if she has left the shop, may still be near the rope-walk and could share what she knows about the network — but she is frightened and will not stay if pressed carelessly."
       ],
       "title": ""
     },

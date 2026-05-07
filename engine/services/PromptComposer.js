@@ -40,7 +40,19 @@ const SENSORY_DEFAULTS = {
   tts_pacing_hint:  'slow',
 };
 
-export function buildSensoryOpeningRule(_cfg = {}) {
+export function buildNarrativeStyleRules(_cfg = {}) {
+  // Builds two narrative style rules injected into every scene generation call:
+  //
+  // 1. SENSORY OPENING RULE — ensures physical and period detail is woven
+  //    into narrative rather than fired as a standalone descriptive block.
+  //
+  // 2. NARRATIVE DISTANCE RULE — keeps prose inside the player character's
+  //    body and immediate experience. Prevents the scene generation from
+  //    stepping back to explain, summarize, or editorialize.
+  //
+  // Both rules apply globally to every story and every character.
+  // Inserted at {{SENSORY_OPENING_RULE}} in game_system_prompt.md (line 144)
+  // and via buildSystemPromptLegacy() for all scenarios.
   return [
     '## SENSORY OPENING RULE',
     '',
@@ -57,6 +69,39 @@ export function buildSensoryOpeningRule(_cfg = {}) {
     '- Never stop the narrative to describe — describe while the narrative moves',
     '',
     '`sensory_opening` is optional. Populate it ONLY when the player enters a new location or the scene context shifts significantly — and even then, 1–2 sentences before action begins. When continuing within the same scene or responding to a chosen action, omit `sensory_opening` entirely. All environmental texture belongs inside `narrative`.',
+    '',
+    '---',
+    '',
+    '## NARRATIVE DISTANCE RULE — STAY CLOSE',
+    '',
+    'Write from inside the body. Never step back to observe, explain, or editorialize.',
+    '',
+    'NEVER:',
+    '- Explain what a character\'s behavior means or reveals',
+    '  WRONG: "He has the stillness of a man who has been carrying this question for years"',
+    '  RIGHT: "He sets the candle down. Does not speak."',
+    '',
+    '- Have the player character narrate their own qualities or history',
+    '  WRONG: "You have spent years learning to move through rooms without being seen"',
+    '  RIGHT: "Your shoulder finds the wall. Your weight shifts forward. No sound."',
+    '',
+    '- Describe a situation as a type or pattern',
+    '  WRONG: "The kind of silence that means a decision has already been made"',
+    '  RIGHT: "The candle burns. Neither of you moves."',
+    '',
+    '- Use abstract nouns where physical detail is possible',
+    '  WRONG: "Something shifts in his expression"',
+    '  RIGHT: "His hand leaves the newel post"',
+    '',
+    'ALWAYS:',
+    '- Anchor every moment in the body: breath, weight, temperature, smell, sound, the specific object in the specific hand',
+    '- Let other characters reveal themselves through what they do and say — never explain them to the reader',
+    '- Trust the reader to draw conclusions from physical detail',
+    '- When in doubt, go smaller and more specific, not larger and more explanatory',
+    '',
+    'THE TEST: If a sentence could be removed and the scene would still be fully understood from the physical action alone — remove it. If a sentence explains something the action already shows — remove it. Every sentence that remains should be doing work that no other sentence is doing.',
+    '',
+    'THE STANDARD: The reader should be inside a body in the scene, not reading about one.',
     '',
     '---',
   ].join('\n');
@@ -200,7 +245,7 @@ export function buildSystemPrompt(scenario, locations) {
 
   return systemPromptTemplate
     .replace('{{SCENARIO_CONTEXT}}', context)
-    .replace('{{SENSORY_OPENING_RULE}}', buildSensoryOpeningRule(scenario.sensory_opening));
+    .replace('{{SENSORY_OPENING_RULE}}', buildNarrativeStyleRules(scenario.sensory_opening));
 }
 
 // ── Turn prompt builders ───────────────────────────────────────────────────────
@@ -221,6 +266,31 @@ function buildReferenceContext(input, state, locations) {
   return parts.length ? `[Reference context: ${parts.join(', ')}]` : null;
 }
 
+function buildAliasProtectionBlock(state) {
+  if (!Array.isArray(state.playerAliases) || state.playerAliases.length === 0) return '';
+
+  const allNames = [
+    state.playerRealName,
+    state.playerCoverName,
+    ...state.playerAliases.map(a => a.name),
+  ].filter((n, i, arr) => n && arr.indexOf(n) === i);
+
+  const knownAsMap   = state.playerKnownAs || {};
+  const knownAsLines = Object.entries(knownAsMap)
+    .map(([who, name]) => `- ${who.replace(/_/g, ' ')}: ${name}`)
+    .join('\n');
+
+  return [
+    'IDENTITY PROTECTION — ALL OF THE FOLLOWING REFER TO THE SAME PERSON (THE PLAYER):',
+    allNames.join(', '),
+    '',
+    'This character operates under multiple names. These are not different people. There is one person and they are the player.',
+    '',
+    'Never write any of these names as an NPC, bystander, or third party in any scene. If any of these names appears in your output as anyone other than the player, rewrite it.',
+    ...(knownAsLines ? ['', 'How other characters address the player:', knownAsLines] : []),
+  ].join('\n');
+}
+
 function buildPlayerRoleSection(state) {
   const roleId      = state.playerRoleId    || 'unknown';
   const roleName    = state.playerRoleName  || 'Investigator';
@@ -235,14 +305,8 @@ function buildPlayerRoleSection(state) {
     `HARD RULE: The player is ${roleName}. Never address them as a different character. Never have ${roleName} appear as an NPC speaking to the player.`,
   ];
 
-  if (state.playerRealName && state.playerCoverName) {
-    lines.push(`IDENTITY CONFLICT PREVENTION: "${state.playerRealName}" and "${state.playerCoverName}" are the same person — the player. Never render "${state.playerRealName}" as an NPC, bystander, or any character separate from the player.`);
-  }
-
-  if (Array.isArray(state.playerAliases) && state.playerAliases.length > 0) {
-    const nameList = state.playerAliases.map(a => `"${a.name}" (${a.context})`).join(', ');
-    lines.push(`ALIAS PROTECTION: This character is known by multiple names: ${nameList}. None of these names may appear as a separate NPC or character in any scene.`);
-  }
+  const aliasBlock = buildAliasProtectionBlock(state);
+  if (aliasBlock) lines.push('', aliasBlock);
 
   return lines.join('\n');
 }

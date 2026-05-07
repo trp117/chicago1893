@@ -3,6 +3,43 @@ export class SchemaValidator {
     this.repos = repos;
   }
 
+  validateIdentityIntegrity() {
+    const issues = [];
+    const scenarios = this.repos.scenarios.findAll();
+
+    for (const scenario of scenarios) {
+      const roles      = this.repos.scenarios.findPlayerRoles(scenario.id);
+      const characters = this.repos.characters.findAll()
+        .filter(c => (c.scenarioIds || []).includes(scenario.id));
+
+      for (const role of roles) {
+        const namesToCheck = [
+          role.real_name,
+          role.cover_name,
+          ...(role.aliases || []).map(a => a.name),
+        ].filter(Boolean);
+
+        for (const name of namesToCheck) {
+          const conflict = characters.find(c =>
+            c.name === name ||
+            (c.display_name && c.display_name.includes(name))
+          );
+          if (conflict) {
+            issues.push({
+              severity: 'error',
+              type: 'identity-conflict',
+              id: `${scenario.id}/${role.id}`,
+              field: 'aliases',
+              note: `"${name}" is both a player alias (role: ${role.id}) and an NPC (character: ${conflict.id}) in scenario "${scenario.id}". Remove from NPC roster — this causes the identity split bug.`,
+            });
+          }
+        }
+      }
+    }
+
+    return issues;
+  }
+
   validate() {
     const issues = [];
 
@@ -62,6 +99,8 @@ export class SchemaValidator {
       const hasChars = l.linkedCharacterIds?.length || l.linkedNPCs?.length;
       if (!hasChars)       warn('location', l.id, 'linkedCharacterIds', 'no NPCs linked — location may feel empty');
     }
+
+    issues.push(...this.validateIdentityIntegrity());
 
     return issues;
   }

@@ -1,0 +1,5 @@
+[deploy]
+startCommand = "node engine/server/server.js"
+
+[[mounts]]
+mountPath = "/app/engine/data/transcripts"

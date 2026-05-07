@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
 import { randomUUID } from 'crypto';
-import { appendFile, mkdir } from 'fs/promises';
+import { appendFile, mkdir, readFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -14,6 +14,7 @@ import {
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
+import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
 
 // ID of the primary scenario backed by the flat data/ files
@@ -85,6 +86,41 @@ function applyNpcUpdates(npcStates, npcUpdates) {
     updated[id] = s;
   }
   return updated;
+}
+
+// ── Identity split validator ───────────────────────────────────────────────────
+
+function validateSceneOutput(narrative, state) {
+  if (!Array.isArray(state.playerAliases) || state.playerAliases.length === 0) {
+    return { valid: true };
+  }
+
+  const namesToCheck = [
+    state.playerRealName,
+    state.playerCoverName,
+    ...state.playerAliases.map(a => a.name),
+  ].filter((n, i, arr) => n && arr.indexOf(n) === i);
+
+  const npcPatterns = [
+    /\b(NAME)\s+(stands|sits|moves|says|speaks|turns|looks|watches|steps|walks|runs|enters|leaves|crosses|approaches|appears|emerges|arrives)/i,
+    /\b(NAME)\s*:\s*\S/i,
+    /\bnear\s+(NAME)\b/i,
+    /\bbeside\s+(NAME)\b/i,
+    /\btoward\s+(NAME)\b/i,
+    /\b(NAME)\s+is\s+(a|the)\b/i,
+  ];
+
+  for (const name of namesToCheck) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    for (const pattern of npcPatterns) {
+      const specific = new RegExp(pattern.source.replace('NAME', escaped), pattern.flags);
+      if (specific.test(narrative)) {
+        return { valid: false, reason: `"${name}" appears to be written as an NPC rather than the player` };
+      }
+    }
+  }
+
+  return { valid: true };
 }
 
 // ── Retry signal detectors ─────────────────────────────────────────────────────
@@ -171,6 +207,15 @@ export function createGameRouter(repos, config = {}) {
 
       const role = playerRoles.find(r => r.id === roleId);
       if (!role) return res.status(404).json({ error: `Role "${roleId}" not found.` });
+
+      // Block start if any player alias collides with an NPC in this scenario
+      const identityIssues = new SchemaValidator(repos).validateIdentityIntegrity()
+        .filter(i => i.id.startsWith(scenarioId + '/') && i.severity === 'error');
+      if (identityIssues.length > 0) {
+        const detail = identityIssues.map(i => i.note).join(' | ');
+        console.error(`[IDENTITY CONFLICT] Blocked start for scenario "${scenarioId}": ${detail}`);
+        return res.status(409).json({ error: `Identity conflict detected in scenario data: ${detail}` });
+      }
 
       // Empty introducedNpcs so all start-location NPCs trigger intro anchor injection
       const initialState = buildInitialState(scenario, role, locations);
@@ -391,6 +436,32 @@ export function createGameRouter(repos, config = {}) {
         } catch {}
       }
 
+      // Retry: identity split (player character written as a separate NPC)
+      const sceneValidation = validateSceneOutput(output.narrative || '', state);
+      if (!sceneValidation.valid) {
+        traceTags.push('has-retry', 'identity-split');
+        console.warn(`[IDENTITY SPLIT] ${sceneValidation.reason} — retrying`);
+        const retryMessages = [
+          ...baseMessages,
+          { role: 'assistant', content: text },
+          { role: 'user', content: `Identity conflict in your response: ${sceneValidation.reason}. That name refers only to the player — remove the conflicting reference and rewrite so no character by that name appears separately from the player's own perspective. Return only valid JSON.` },
+        ];
+        try {
+          const { text: retryText } = await callModel(retryMessages, null, 'retry-identity-split');
+          if (retryText) {
+            const retryOutput = extractJson(retryText);
+            const revalidation = validateSceneOutput(retryOutput.narrative || '', state);
+            if (revalidation.valid) {
+              output = retryOutput;
+              text   = retryText;
+            } else {
+              traceTags.push('identity-split-unresolved');
+              console.error(`[IDENTITY SPLIT] Second failure — flagging for admin review. Session: ${sessionId}`);
+            }
+          }
+        } catch {}
+      }
+
       const prevAct = state.act || 1;
       let nextState = mergeState(state, output, scenario, clues, playerInput);
       if (state.finalAccusation) nextState.remainingMinutes = 0;
@@ -568,6 +639,54 @@ export function createGameRouter(repos, config = {}) {
     } catch (err) {
       console.error(`[TTS ERROR] ${err.message}`);
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ── Closing prose ──────────────────────────────────────────────────────────
+  r.get('/closing-prose', async (req, res) => {
+    const { sessionId } = req.query;
+    if (!sessionId) return res.status(400).json({ error: 'sessionId is required.' });
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+
+    const transcriptPath = join(TRANSCRIPTS_DIR, `${sessionId}.md`);
+    let transcript;
+    try {
+      transcript = await readFile(transcriptPath, 'utf8');
+    } catch {
+      return res.status(404).json({ error: 'Transcript not found.' });
+    }
+
+    const closingPrompt = [
+      'Based on the session transcript below, write 2-3 sentences of closing interior prose for this character.',
+      'This is not a summary of events.',
+      'It is what the character understood about themselves by the end of this night — what it cost them, what it revealed, what they will carry forward.',
+      'Write in the same voice and tense as the session.',
+      'Do not mention success or failure. Do not reference game mechanics.',
+      'Write as if this is the last paragraph of a novel.',
+      '',
+      '---',
+      '',
+      transcript,
+    ].join('\n');
+
+    try {
+      const signal = AbortSignal.timeout(30000);
+      const resp = await fetch(ANTHROPIC_URL, {
+        method: 'POST', signal,
+        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: MODEL, max_tokens: 300, temperature: 0.9,
+          messages: [{ role: 'user', content: closingPrompt }],
+        }),
+      });
+      const data = await resp.json();
+      const prose = data?.content?.[0]?.text?.trim();
+      if (!prose) return res.status(500).json({ error: 'No prose returned.' });
+      return res.json({ prose });
+    } catch (err) {
+      const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+      console.error(`[CLOSING-PROSE] ${isTimeout ? 'timeout' : err.message}`);
+      return res.status(500).json({ error: isTimeout ? 'Request timed out.' : err.message });
     }
   });
 

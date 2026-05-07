@@ -370,6 +370,7 @@ const ENTITIES = {
     cardTags: r => [
       ...(r.scenarioId ? [{ label: r.scenarioId, cls: 'scenario' }] : []),
       ...(r.accessLevel ? [{ label: r.accessLevel }] : []),
+      ...(r.is_player_character ? [{ label: 'player character' }] : []),
     ],
     sections: [
       { title: 'Role Details', fields: [
@@ -386,6 +387,7 @@ const ENTITIES = {
         { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
         { key: 'opening.choices',   label: 'Opening Choices',   type: 'list',     help: 'The three initial actions offered to the player (aim for exactly 3).' },
       ]},
+      { title: 'Alternate Identities', type: 'aliases' },
     ],
   },
 
@@ -524,6 +526,74 @@ function buildField(field, item, related) {
   return `<input type="text" name="${field.key}" id="${id}" value="${String(value).replace(/"/g,'&quot;')}">`;
 }
 
+function buildAliasRow(alias, i) {
+  const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const typeOpts = ['real_name','cover_name','nickname','title'].map(t =>
+    `<option value="${t}" ${alias.type === t ? 'selected' : ''}>${t.replace('_',' ')}</option>`
+  ).join('');
+  const knownTo = Array.isArray(alias.known_to) ? alias.known_to.join(', ') : (alias.known_to || '');
+  return `
+    <div class="alias-row" data-alias-index="${i}" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;background:#f8fafc">
+      <div class="two-col" style="margin-bottom:10px">
+        <div class="field-group" style="margin:0">
+          <label style="font-size:12px">Name</label>
+          <input type="text" class="alias-name" value="${esc(alias.name)}" placeholder="e.g. Hannah Cross">
+        </div>
+        <div class="field-group" style="margin:0">
+          <label style="font-size:12px">Type</label>
+          <select class="alias-type">${typeOpts}</select>
+        </div>
+      </div>
+      <div class="field-group" style="margin-bottom:8px">
+        <label style="font-size:12px">Known to (comma-separated IDs — use "player" or "general_public")</label>
+        <input type="text" class="alias-known-to" value="${esc(knownTo)}" placeholder="e.g. thomas_wren, player">
+      </div>
+      <button type="button" class="btn btn-danger btn-sm remove-alias-btn">Remove</button>
+    </div>`;
+}
+
+function buildAliasesEditor(role) {
+  const aliases = role?.aliases || [];
+  return `
+    <div style="border:2px solid var(--warn);border-radius:10px;padding:20px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:13px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.5px">ALTERNATE IDENTITIES</span>
+        <span style="font-size:11px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;font-weight:600">Engine-enforced</span>
+      </div>
+      <p class="help-text" style="margin-bottom:16px">
+        If this character operates under any name other than their display name — cover identity,
+        alias, nickname, title, or real name kept secret — define it here. The engine uses this
+        to prevent the character appearing as two people in the same scene.
+        <strong>Do not skip this field for undercover or alias characters.</strong>
+      </p>
+      <div class="two-col" style="margin-bottom:14px">
+        <div class="field-group" style="margin:0">
+          <label style="font-size:12px">Real name (if different from display name)</label>
+          <input type="text" id="alias-real-name" value="${(role?.real_name||'').replace(/"/g,'&quot;')}" placeholder="e.g. Hannah Cross">
+        </div>
+        <div class="field-group" style="margin:0">
+          <label style="font-size:12px">Cover name (the name used in public tonight)</label>
+          <input type="text" id="alias-cover-name" value="${(role?.cover_name||'').replace(/"/g,'&quot;')}" placeholder="e.g. Margaret Vane">
+        </div>
+      </div>
+      <div class="field-group" style="margin-bottom:14px">
+        <label class="checkbox-row">
+          <input type="checkbox" id="alias-is-player-char" ${role?.is_player_character ? 'checked' : ''}>
+          This is the player character (prevents all names from appearing as NPCs)
+        </label>
+      </div>
+      <div class="field-group" style="margin-bottom:14px">
+        <label style="font-size:12px">Identity note (injected verbatim into every scene generation call)</label>
+        <textarea id="alias-identity-note" style="min-height:70px">${(role?.identity_note||'')}</textarea>
+        <p class="help-text">Summarise the identity rule in one sentence. e.g. "Hannah Cross and Margaret Vane are one person — they must never be rendered as two separate characters."</p>
+      </div>
+      <div id="aliases-rows-wrap">
+        ${aliases.map((a, i) => buildAliasRow(a, i)).join('')}
+      </div>
+      <button type="button" id="add-alias-row-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">＋ Add alternate name</button>
+    </div>`;
+}
+
 function buildFormHTML(cfg, item, related) {
   const isNew = !item;
   item = item || {};
@@ -534,6 +604,11 @@ function buildFormHTML(cfg, item, related) {
       return `<div class="form-section">
         <h3>Acts</h3>
         ${buildActsEditor(item)}
+      </div>`;
+    }
+    if (section.type === 'aliases') {
+      return `<div class="form-section" style="padding:0;border:none;background:none">
+        ${buildAliasesEditor(item)}
       </div>`;
     }
     const fields = (section.fields || []).map(field => `
@@ -595,6 +670,22 @@ function extractFormData(cfg, formEl, existingItem) {
     }));
   }
 
+  // Aliases editor
+  const aliasesWrap = formEl.querySelector('#aliases-rows-wrap');
+  if (aliasesWrap) {
+    data.real_name          = formEl.querySelector('#alias-real-name')?.value.trim() || null;
+    data.cover_name         = formEl.querySelector('#alias-cover-name')?.value.trim() || null;
+    data.is_player_character = formEl.querySelector('#alias-is-player-char')?.checked || false;
+    data.identity_note      = formEl.querySelector('#alias-identity-note')?.value.trim() || null;
+    data.aliases = [...aliasesWrap.querySelectorAll('.alias-row')].map(row => {
+      const name    = row.querySelector('.alias-name')?.value.trim() || '';
+      const type    = row.querySelector('.alias-type')?.value || 'real_name';
+      const rawKnown = row.querySelector('.alias-known-to')?.value || '';
+      const known_to = rawKnown.split(',').map(s => s.trim()).filter(Boolean);
+      return name ? { name, type, known_to } : null;
+    }).filter(Boolean);
+  }
+
   return data;
 }
 
@@ -603,7 +694,7 @@ function extractFormData(cfg, formEl, existingItem) {
 // ═══════════════════════════════════════════════════════════════
 function bindDynamicLists(container) {
   container.addEventListener('click', e => {
-    // Add item
+    // Add item (standard dynamic list)
     const addBtn = e.target.closest('[data-list-add]');
     if (addBtn) {
       const key   = addBtn.dataset.listAdd;
@@ -617,10 +708,26 @@ function bindDynamicLists(container) {
       row.querySelector('input').focus();
       return;
     }
-    // Remove item
+    // Remove item (standard dynamic list)
     const removeBtn = e.target.closest('.remove-btn[data-list]');
     if (removeBtn) {
       removeBtn.closest('.list-item-row').remove();
+      return;
+    }
+    // Add alias row
+    if (e.target.closest('#add-alias-row-btn')) {
+      const wrap = container.querySelector('#aliases-rows-wrap');
+      if (!wrap) return;
+      const idx = wrap.querySelectorAll('.alias-row').length;
+      const div = document.createElement('div');
+      div.innerHTML = buildAliasRow({ name: '', type: 'real_name', known_to: [] }, idx);
+      wrap.appendChild(div.firstElementChild);
+      return;
+    }
+    // Remove alias row
+    const removeAlias = e.target.closest('.remove-alias-btn');
+    if (removeAlias) {
+      removeAlias.closest('.alias-row').remove();
     }
   });
 }

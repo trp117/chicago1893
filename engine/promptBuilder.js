@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as data from './data.js';
-import { buildSensoryOpeningRule } from './services/PromptComposer.js';
+import { buildNarrativeStyleRules } from './services/PromptComposer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -82,7 +82,7 @@ export function buildSystemPrompt(sessionId) {
   const sections = [];
 
   // ── BEHAVIORAL RULES ──────────────────────────────────────────────────────
-  const sensoryRule    = buildSensoryOpeningRule(scenario.sensory_opening);
+  const sensoryRule    = buildNarrativeStyleRules(scenario.sensory_opening);
   const rulesWithSensory = _rulesBody.replace('{{SENSORY_OPENING_RULE}}', sensoryRule);
   const BEHAVIORAL_RULES = `${_preamble}\n\n${rulesWithSensory}\n\n${PLAYER_ACTION_RULE}\n\n${NPC_TRUST_RULE}\n\n${CHARACTER_BEHAVIOR_RULE}`;
   sections.push(`## BEHAVIORAL RULES\n\n${BEHAVIORAL_RULES}`);
@@ -161,8 +161,34 @@ export function buildSystemPrompt(sessionId) {
       `Starting Knowledge: ${(session.playerStartingKnowledge || []).join('; ') || 'none'}`,
     ];
     if (session.playerRealName && session.playerCoverName) {
-      const firstName = session.playerRealName.split(' ')[0];
-      ctxLines.push('', `CRITICAL IDENTITY NOTE: The player character is ${session.playerRealName}, operating under the cover name ${session.playerCoverName}. These are the same person. ${session.playerRealName} must NEVER appear as a separate NPC, bystander, or named character in any scene. If you are about to write "${firstName}" or "${session.playerRealName}" as someone other than the player, stop — that is the player. Other characters may refer to her as ${session.playerCoverName} or by no name at all depending on what they know. There is one woman. She is the player.`);
+      const realName   = session.playerRealName;
+      const coverName  = session.playerCoverName;
+      const firstName  = realName.split(' ')[0];
+      const knownAsMap = session.playerKnownAs || {};
+      const knownAsLines = Object.entries(knownAsMap)
+        .map(([who, name]) => `- ${who.replace(/_/g, ' ')}: ${name}`)
+        .join('\n');
+
+      const identityBlock = [
+        'IDENTITY RULE — ABSOLUTE AND NON-NEGOTIABLE:',
+        '',
+        `The player is ${realName}, operating tonight under the cover name ${coverName}. These are the same person. There is one woman.`,
+        '',
+        'You must NEVER:',
+        `- Write ${realName} as a character who appears in a scene`,
+        `- Write ${realName} speaking dialogue`,
+        `- Write ${realName} standing near, watching, or interacting with the player or any other character`,
+        `- Refer to ${realName} in the third person as someone other than the player`,
+        '',
+        'When other characters refer to the player they use whatever name they know her by:',
+        knownAsLines || `- Other characters use "${coverName}" or do not address the player by name`,
+        '',
+        `If you are about to write the name "${firstName}" or "${realName}" as anyone other than the player character — stop. That is the player. Rewrite the sentence from the player's perspective instead.`,
+        '',
+        'Violation of this rule breaks the story completely. There is one woman. She is the player.',
+      ].join('\n');
+
+      ctxLines.push('', identityBlock);
     }
     if (session.character_context) {
       ctxLines.push('', 'Character Briefing (player read this before the game started):', session.character_context);

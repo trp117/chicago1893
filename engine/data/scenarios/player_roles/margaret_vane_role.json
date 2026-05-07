@@ -2,21 +2,29 @@
   "id": "margaret_vane_role",
   "scenarioId": "midnight_errand_boston",
   "name": "Margaret Vane — The Courier",
+  "is_player_character": true,
   "real_name": "Hannah Cross",
   "cover_name": "Margaret Vane",
-  "alias_note": "Hannah Cross and Margaret Vane are the same person. Hannah Cross is her real name. Margaret Vane is her cover identity in use tonight. These must never be rendered as two separate characters in the same scene.",
+  "identity_note": "Hannah Cross and Margaret Vane are one person. Hannah Cross is her real name. Margaret Vane is her cover identity tonight. These must never be rendered as two separate characters under any circumstances.",
   "aliases": [
     {
       "name": "Hannah Cross",
-      "context": "real identity",
-      "known_to": ["player"]
+      "type": "real_name",
+      "known_to": ["thomas_wren", "player"]
     },
     {
       "name": "Margaret Vane",
-      "context": "cover identity",
+      "type": "cover_name",
       "known_to": ["nathaniel_gill", "general_public"]
     }
   ],
+  "known_as": {
+    "to_player": "Hannah Cross",
+    "to_nathaniel_gill": "Margaret Vane",
+    "to_benjamin_gill": "unknown — she is a stranger",
+    "to_owen_pryce": "unknown — she is a stranger",
+    "to_thomas_wren": "Hannah Cross"
+  },
   "description": "You are Hannah Cross, operating tonight under the name Margaret Vane — a woman who has been carrying messages through this city for two years and has learned that the most dangerous moment is always the handoff. You have placed the dispatch in the apprentice's hands. Now you must decide whether to trust him.",
   "startLocationId": "gill_print_shop_back",
   "startingKnowledge": [
