@@ -17,6 +17,11 @@ import { mergeState, buildInitialState } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
+import { AnchorTracker } from '../services/AnchorTracker.js';
+
+// In-memory stores — non-serializable, lost on server restart (acceptable)
+const anchorTrackers       = new Map(); // sessionId -> AnchorTracker
+const anchorViolationNotes = new Map(); // sessionId -> string
 
 // ID of the primary scenario backed by the flat data/ files
 const PRIMARY_SCENARIO_ID = appData.getScenario().id;
@@ -346,6 +351,9 @@ export function createGameRouter(repos, config = {}) {
       const sessionId = clientSessionId || randomUUID();
       const seededInitial = appData.saveSession(sessionId, initialState);
 
+      // Per-session anchor tracker — fresh instance on every /start
+      anchorTrackers.set(sessionId, new AnchorTracker(scenario.overused_anchors || []));
+
       const systemPrompt         = selectSystemPrompt(scenarioId, sessionId, scenario, locations);
       const resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', 'opening');
 
@@ -485,10 +493,22 @@ export function createGameRouter(repos, config = {}) {
       // Save current state so promptBuilder can read session context
       if (sessionId) appData.saveSession(sessionId, state);
 
-      const systemPrompt         = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
-      const arcPosition          = getArcPosition(state.remainingMinutes, scenario.sessionTargetMinutes || 15);
-      const resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', arcPosition);
-      const prompt               = composeTurnPrompt(state, playerInput, gameData);
+      const systemPrompt = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
+      const arcPosition  = getArcPosition(state.remainingMinutes, scenario.sessionTargetMinutes || 15);
+      let resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', arcPosition);
+
+      // Inject per-turn anchor correction note, then clear it
+      if (sessionId && anchorViolationNotes.has(sessionId)) {
+        resolvedSystemPrompt += `\n\n${anchorViolationNotes.get(sessionId)}`;
+        anchorViolationNotes.delete(sessionId);
+      }
+
+      // Ensure tracker exists (survives server restarts mid-session)
+      if (sessionId && !anchorTrackers.has(sessionId)) {
+        anchorTrackers.set(sessionId, new AnchorTracker(scenario.overused_anchors || []));
+      }
+
+      const prompt = composeTurnPrompt(state, playerInput, gameData);
 
       const isEndingTurn  = !!(state.finalAccusation || state.remainingMinutes <= 0);
       const endingSignals = checkEndingReadiness(state, scenario);
@@ -629,6 +649,23 @@ export function createGameRouter(repos, config = {}) {
         } catch {}
       }
 
+      // Anchor violation check — runs after all retries, before streaming done
+      if (sessionId && anchorTrackers.has(sessionId) && output.narrative) {
+        const violations = anchorTrackers.get(sessionId).check(output.narrative);
+        if (violations.length > 0) {
+          console.warn(
+            `[ANCHOR VIOLATION] Session ${sessionId}:`,
+            violations.map(v => `"${v.match}" (use #${v.uses})`).join(', ')
+          );
+          anchorViolationNotes.set(
+            sessionId,
+            `IMPORTANT: Do not use these phrases in your next response — ` +
+            `they have already appeared in this session: ` +
+            violations.map(v => `"${v.anchor || v.pattern}"`).join(', ')
+          );
+        }
+      }
+
       const prevAct = state.act || 1;
       let nextState = mergeState(state, output, scenario, clues, playerInput);
       if (state.finalAccusation) nextState.remainingMinutes = 0;
@@ -695,7 +732,20 @@ export function createGameRouter(repos, config = {}) {
         chunk.push(``);
         const transcriptWrite = appendFile(join(TRANSCRIPTS_DIR, `${sessionId}.md`), chunk.join('\n'))
           .catch(e => console.error('[TRANSCRIPT]', e.message));
-        if (output.endState?.isEnding) await transcriptWrite;
+        if (output.endState?.isEnding) {
+          await transcriptWrite;
+          // Anchor usage summary — append only when any anchor was used more than once
+          if (sessionId && anchorTrackers.has(sessionId)) {
+            const anchorSummary = anchorTrackers.get(sessionId).getSummary();
+            const hasViolations = Object.values(anchorSummary).some(v => v > 1);
+            if (hasViolations) {
+              await appendFile(
+                join(TRANSCRIPTS_DIR, `${sessionId}.md`),
+                `\n\n## Anchor Usage\n\`\`\`json\n${JSON.stringify(anchorSummary, null, 2)}\n\`\`\`\n`
+              ).catch(e => console.error('[TRANSCRIPT ANCHOR]', e.message));
+            }
+          }
+        }
       }
 
       console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} isEnding=${output.endState?.isEnding ?? false}`);
