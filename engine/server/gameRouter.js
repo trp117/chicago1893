@@ -758,15 +758,15 @@ export function createGameRouter(repos, config = {}) {
     const voiceId = elevenLabsVoiceId || 'onwK4e9ZLuTAKqWW03F9';
 
     function trustVoiceSettings(tl) {
-      if (tl == null)  return { stability: 0.5,  similarity_boost: 0.75, style: 0.50 };
-      if (tl <= 3)     return { stability: 0.25, similarity_boost: 0.75, style: 0.80 };
-      if (tl <= 6)     return { stability: 0.55, similarity_boost: 0.75, style: 0.50 };
-      return             { stability: 0.75, similarity_boost: 0.75, style: 0.30 };
+      if (tl == null)  return { stability: 0.75, similarity_boost: 0.75, style: 0.30, use_speaker_boost: true, speed: 0.9 };
+      if (tl <= 3)     return { stability: 0.25, similarity_boost: 0.75, style: 0.80, use_speaker_boost: true, speed: 0.9 };
+      if (tl <= 6)     return { stability: 0.55, similarity_boost: 0.75, style: 0.50, use_speaker_boost: true, speed: 0.9 };
+      return             { stability: 0.75, similarity_boost: 0.75, style: 0.30, use_speaker_boost: true, speed: 0.9 };
     }
 
     async function elevenLabsCall(rawText, speed = null, applyTrust = false) {
       const cleaned       = prepareForTts(rawText);
-      const voiceSettings = applyTrust ? trustVoiceSettings(trust_level) : { stability: 0.5, similarity_boost: 0.75 };
+      const voiceSettings = applyTrust ? trustVoiceSettings(trust_level) : { stability: 0.75, similarity_boost: 0.75, use_speaker_boost: true, speed: 0.9 };
       if (speed != null) voiceSettings.speed = speed;
       const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
