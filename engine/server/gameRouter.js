@@ -373,25 +373,41 @@ export function createGameRouter(repos, config = {}) {
       console.log(`[START] scenario=${scenarioId} role=${roleId}`);
       const startTrace = langfuse?.trace({ name: 'start', input: { scenarioId, roleId } });
 
+      res.set({
+        'Content-Type':      'text/event-stream',
+        'Cache-Control':     'no-cache',
+        'Connection':        'keep-alive',
+        'X-Accel-Buffering': 'no',
+      });
+      res.flushHeaders();
+
       const signal = AbortSignal.timeout(55000);
       const resp   = await fetch(ANTHROPIC_URL, {
         method: 'POST', signal,
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
-          model: MODEL, max_tokens: 900, temperature: 0.8,
+          model: MODEL, max_tokens: 900, temperature: 0.8, stream: true,
           system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
           messages: [{ role: 'user', content: prompt }]
         })
       });
-      const data = await resp.json();
-      const text = data?.content?.[0]?.text;
+      const { text } = await collectAnthropicStream(
+        resp,
+        chunk => sendSse(res, { type: 'chunk', text: chunk }),
+      );
       startTrace?.update({ output: { text: text?.slice(0, 200) } });
 
-      if (!text) return res.status(500).json({ error: 'No text returned from Anthropic.' });
+      if (!text) {
+        sendSse(res, { type: 'error', error: 'No text returned from Anthropic.' });
+        res.end();
+        return;
+      }
 
       let output;
       try { output = extractJson(text); } catch {
-        return res.status(500).json({ error: 'Model returned invalid JSON for opening.' });
+        sendSse(res, { type: 'error', error: 'Model returned invalid JSON for opening.' });
+        res.end();
+        return;
       }
 
       output.timeAdvance = 0;  // guard: opening never advances the clock
@@ -427,11 +443,19 @@ export function createGameRouter(repos, config = {}) {
         ].join('\n')
       ).catch(e => console.error('[TRANSCRIPT]', e.message));
 
-      return res.json({ output, nextState, sessionId });
+      sendSse(res, { type: 'done', output, nextState, sessionId });
+      res.end();
+      return;
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
+      const msg = isTimeout ? 'AI request timed out.' : (error.message || 'Server error');
       console.error(`[START ERROR] ${isTimeout ? 'timeout' : error.message}`);
-      return res.status(500).json({ error: isTimeout ? 'AI request timed out.' : (error.message || 'Server error') });
+      if (res.headersSent) {
+        sendSse(res, { type: 'error', error: msg });
+        res.end();
+      } else {
+        res.status(500).json({ error: msg });
+      }
     }
   });
 

@@ -653,12 +653,8 @@ function renderChoices(choices = []) {
   const labelEl = document.getElementById('choices-label');
   if (labelEl) {
     labelEl.classList.toggle('visible', choices.length > 0);
-    if (choices.length > 0 && isMobileDevice()) {
-      document.querySelector('.choices-wrap')?.classList.add('mobile-collapsed');
-      labelEl.dataset.arrow = ' ▾';
-    } else {
-      labelEl.dataset.arrow = '';
-    }
+    labelEl.dataset.arrow = '';
+    document.querySelector('.choices-wrap')?.classList.remove('mobile-collapsed');
   }
 }
 
@@ -1485,7 +1481,12 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   renderSidebar();
   updateLocationDisplay(gameState.location);
 
-  // Show loading indicator while the engine generates the opening
+  // Hide choices area and show streaming dots while opening generates
+  choicesAreaWrapEl.classList.add('hidden');
+  streamOptionsDots.classList.remove('hidden');
+  submitBtn.disabled = true;
+
+  // Show thinking dots while waiting for first chunk
   const loadingEl = document.createElement('div');
   loadingEl.className = 'feed-entry';
   const dotsEl = document.createElement('div');
@@ -1517,15 +1518,52 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
           }),
         });
     warmStart = null;
-    if (!startResp.ok) throw new Error(`/start returned ${startResp.status}`);
-    const startData = await startResp.json();
-    openingOutput    = startData.output;
-    openingNextState = startData.nextState;
+
+    // Consume SSE stream — identical pattern to submitTurn
+    let streamEl     = null;
+    let streamBuffer = '';
+    const sseReader  = startResp.body.getReader();
+    const sseDecoder = new TextDecoder();
+    let sseBuffer = '';
+
+    while (true) {
+      const { done, value } = await sseReader.read();
+      if (done) break;
+      sseBuffer += sseDecoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+        if (evt.type === 'chunk') {
+          if (!streamEl) {
+            dotsEl.remove();
+            streamEl = document.createElement('div');
+            streamEl.className = 'scene-card';
+            loadingEl.appendChild(streamEl);
+          }
+          streamBuffer += evt.text;
+          streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+          storyEl.scrollTop = storyEl.scrollHeight;
+        } else if (evt.type === 'done') {
+          openingOutput    = evt.output;
+          openingNextState = evt.nextState;
+        } else if (evt.type === 'error') {
+          throw new Error(evt.error || '/start SSE error');
+        }
+      }
+    }
+
+    if (!openingOutput || !openingNextState) throw new Error('No opening data received');
+
   } catch (err) {
     warmStart = null;
     loadingEl.remove();
+    streamOptionsDots.classList.add('hidden');
+    choicesAreaWrapEl.classList.remove('hidden');
+    submitBtn.disabled = false;
     console.error('[START]', err);
-    // Graceful fallback: render static opening if the engine call fails
     const fallback = role.opening?.narrative
       ? role.opening
       : { narrative: `The investigation begins. You are ${role.name}.`, choices: [] };
@@ -1536,39 +1574,16 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   // Promote server state as authoritative
   gameState = { ...openingNextState, narrativeStyle: gameState.narrativeStyle };
 
-  if (ttsEnabled && audioUnlocked) {
-    let audioBlobUrl = null;
-    try {
-      const ttsBody = openingOutput.sensory_opening
-        ? { text: openingOutput.narrative, sensory_opening: openingOutput.sensory_opening }
-        : { text: openingOutput.narrative };
-      const ttsResp = await fetch(`${API_BASE}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ttsBody)
-      });
-      if (ttsResp.ok) audioBlobUrl = URL.createObjectURL(await ttsResp.blob());
-    } catch {}
+  loadingEl.remove();
+  renderOutput(openingOutput);
 
-    loadingEl.remove();
-    renderOutput(openingOutput, { skipTts: true });
-
-    if (audioBlobUrl && audioEl) {
-      audioEl.src = audioBlobUrl;
-      audioEl.playbackRate = 1.0;
-      audioEl.onended = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; };
-      audioEl.onerror = () => { URL.revokeObjectURL(audioBlobUrl); currentAudio = null; console.warn('[TTS] opening: audio element error — falling back to browser TTS.'); ttsSpeakFallback(openingOutput.narrative); };
-      currentAudio = audioEl;
-      try {
-        await audioEl.play();
-        if (pendingTeleprompterEl) { startTeleprompter(pendingTeleprompterEl); pendingTeleprompterEl = null; }
-      } catch (e) { console.warn('[TTS] opening: playback exception — falling back to browser TTS.', e); ttsSpeakFallback(openingOutput.narrative); }
-    } else {
-      console.warn('[TTS] opening: ElevenLabs unavailable — no audio for opening scene.');
-    }
-  } else {
-    loadingEl.remove();
-    renderOutput(openingOutput);
-  }
+  streamOptionsDots.classList.add('hidden');
+  choicesAreaWrapEl.classList.remove('hidden');
+  choicesAreaWrapEl.style.opacity = '0';
+  void choicesAreaWrapEl.offsetHeight;
+  choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
+  choicesAreaWrapEl.style.opacity = '1';
+  submitBtn.disabled = false;
 }
 
 // ── Restart ───────────────────────────────────────────────────────────────────
@@ -1592,6 +1607,12 @@ function restartGame() {
 
   const h1 = document.getElementById('header-title');
   if (h1) h1.textContent = scenario?.title || 'Investigation';
+
+  choicesAreaWrapEl.classList.remove('hidden');
+  choicesAreaWrapEl.style.opacity = '';
+  choicesAreaWrapEl.style.transition = '';
+  streamOptionsDots.classList.add('hidden');
+  submitBtn.disabled = false;
 
   document.getElementById('role-overlay').classList.remove('hidden');
   showRoleSelection();
