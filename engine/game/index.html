@@ -268,6 +268,49 @@ li { margin-bottom: 8px; }
   .choices-arrow { display: none !important; }
   .choice-btn { flex: none; width: 100%; border-radius: 8px; }
 }
+#candle-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+#candle-indicator:hover { opacity: 0.7; }
+#candle-flame {
+  width: 6px;
+  height: 10px;
+  background: #C9A84C;
+  border-radius: 50% 50% 20% 20%;
+  animation: flicker 2.5s ease-in-out infinite;
+  margin-bottom: 1px;
+  transition: height 2s ease, width 2s ease;
+}
+#candle-body {
+  width: 10px;
+  background: #e8dcc8;
+  border-radius: 2px;
+  transition: height 3s ease;
+}
+#candle-base {
+  width: 14px;
+  height: 3px;
+  background: #8B7340;
+  border-radius: 1px;
+}
+@keyframes flicker {
+  0%, 100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+  25%  { transform: scaleX(0.9) scaleY(1.1); opacity: 0.95; }
+  50%  { transform: scaleX(1.1) scaleY(0.95); opacity: 1; }
+  75%  { transform: scaleX(0.95) scaleY(1.05); opacity: 0.98; }
+}
+@media (max-width: 600px) {
+  #candle-indicator { top: 12px; right: 12px; opacity: 0.35; }
+}
   </style>
 </head>
 <body>
@@ -341,6 +384,12 @@ li { margin-bottom: 8px; }
       </div>
     </div>
   </main>
+</div>
+
+<div id="candle-indicator" aria-hidden="true">
+  <div id="candle-flame"></div>
+  <div id="candle-body"></div>
+  <div id="candle-base"></div>
 </div>
 
 <div id="role-overlay" class="role-overlay" role="dialog" aria-modal="true" aria-label="Begin investigation">
@@ -607,6 +656,21 @@ function updateChaseUI() {
   }
 }
 
+// ── Candle indicator ──────────────────────────────────────────────────────────
+
+function updateCandleIndicator(minutesRemaining, totalMinutes) {
+  const progress     = minutesRemaining / totalMinutes;
+  const maxHeight    = 60;
+  const minHeight    = 4;
+  const currentHeight = Math.max(minHeight, Math.round(minHeight + (progress * (maxHeight - minHeight))));
+  const flameSize    = Math.max(4, Math.round(4 + (progress * 6)));
+  const flameWidth   = Math.max(4, Math.round(4 + (progress * 2)));
+  const bodyEl  = document.getElementById('candle-body');
+  const flameEl = document.getElementById('candle-flame');
+  if (bodyEl)  bodyEl.style.height  = currentHeight + 'px';
+  if (flameEl) { flameEl.style.height = flameSize + 'px'; flameEl.style.width = flameWidth + 'px'; }
+}
+
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 function renderSidebar() {
@@ -800,6 +864,8 @@ function showClosingScreen(endState, sessionId) {
     console.error('[CLOSING] missing DOM element — closing screen cannot show');
     return;
   }
+
+  document.getElementById('candle-indicator').style.display = 'none';
 
   const aftermath = scenario?.historical_aftermath || '';
   aftermathEl.textContent = aftermath;
@@ -1038,6 +1104,7 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     renderSidebar();
     updateChaseUI();
     renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
+    updateCandleIndicator(gameState.remainingMinutes, scenario?.sessionTargetMinutes || 15);
 
     streamOptionsDots.classList.add('hidden');
     choicesAreaWrapEl.classList.remove('hidden');    // display:block before setting opacity
@@ -1576,6 +1643,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
 
   loadingEl.remove();
   renderOutput(openingOutput);
+  updateCandleIndicator(gameState.remainingMinutes, scenario?.sessionTargetMinutes || 15);
 
   streamOptionsDots.classList.add('hidden');
   choicesAreaWrapEl.classList.remove('hidden');

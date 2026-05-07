@@ -11,6 +11,7 @@ import {
   checkEndingReadiness,
   prepareForTts,
   getClueById,
+  getArcPosition,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
@@ -345,7 +346,8 @@ export function createGameRouter(repos, config = {}) {
       const sessionId = clientSessionId || randomUUID();
       const seededInitial = appData.saveSession(sessionId, initialState);
 
-      const systemPrompt = selectSystemPrompt(scenarioId, sessionId, scenario, locations);
+      const systemPrompt         = selectSystemPrompt(scenarioId, sessionId, scenario, locations);
+      const resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', 'opening');
 
       const openingChoicesText = (role.opening?.choices || [])
         .map(c => `- ${c.text || c}`)
@@ -387,7 +389,7 @@ export function createGameRouter(repos, config = {}) {
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
           model: MODEL, max_tokens: 900, temperature: 0.8, stream: true,
-          system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+          system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
           messages: [{ role: 'user', content: prompt }]
         })
       });
@@ -483,8 +485,10 @@ export function createGameRouter(repos, config = {}) {
       // Save current state so promptBuilder can read session context
       if (sessionId) appData.saveSession(sessionId, state);
 
-      const systemPrompt = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
-      const prompt       = composeTurnPrompt(state, playerInput, gameData);
+      const systemPrompt         = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
+      const arcPosition          = getArcPosition(state.remainingMinutes, scenario.sessionTargetMinutes || 15);
+      const resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', arcPosition);
+      const prompt               = composeTurnPrompt(state, playerInput, gameData);
 
       const isEndingTurn  = !!(state.finalAccusation || state.remainingMinutes <= 0);
       const endingSignals = checkEndingReadiness(state, scenario);
@@ -502,14 +506,14 @@ export function createGameRouter(repos, config = {}) {
 
       const callModel = async (messages, tokenOverride, callName = 'call') => {
         const toks = tokenOverride || maxToks;
-        const gen  = turnTrace?.generation({ name: callName, model: MODEL, modelParameters: { max_tokens: toks, temperature: 0.8 }, input: [{ role: 'system', content: systemPrompt }, ...messages] });
+        const gen  = turnTrace?.generation({ name: callName, model: MODEL, modelParameters: { max_tokens: toks, temperature: 0.8 }, input: [{ role: 'system', content: resolvedSystemPrompt }, ...messages] });
         const signal = AbortSignal.timeout(55000);
         const resp   = await fetch(ANTHROPIC_URL, {
           method: 'POST', signal,
           headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
           body: JSON.stringify({
             model: MODEL, max_tokens: toks, temperature: 0.8,
-            system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+            system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
             messages
           })
         });
@@ -527,7 +531,7 @@ export function createGameRouter(repos, config = {}) {
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
           model: MODEL, max_tokens: maxToks, temperature: 0.8, stream: true,
-          system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+          system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
           messages: baseMessages,
         }),
       });

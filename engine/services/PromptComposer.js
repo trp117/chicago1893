@@ -40,6 +40,15 @@ const SENSORY_DEFAULTS = {
   tts_pacing_hint:  'slow',
 };
 
+export function getArcPosition(minutesRemaining, totalMinutes) {
+  const elapsed    = totalMinutes - minutesRemaining;
+  const percentage = elapsed / totalMinutes;
+  if (percentage < 0.25) return 'opening';
+  if (percentage < 0.55) return 'middle';
+  if (percentage < 0.80) return 'late';
+  return 'final';
+}
+
 export function buildNarrativeStyleRules(_cfg = {}) {
   // Builds two narrative style rules injected into every scene generation call:
   //
@@ -168,6 +177,49 @@ export function buildNarrativeStyleRules(_cfg = {}) {
     '- Any variation of "the smell of linseed oil"',
     '',
     'These are the four most overused anchors. Each may appear once per session. After that, find something new.',
+    '',
+    '---',
+    '',
+    '## ARC POSITION RULE — MODULATE PRESSURE AND PACING BY SESSION POSITION',
+    '',
+    'The current arc position is: {{ARC_POSITION}}',
+    '',
+    'Use this to calibrate every scene you generate. The session must feel shaped — early scenes breathe differently from late scenes. The reader should feel the ending approaching without being told it is coming.',
+    '',
+    'OPENING (first 25% of session):',
+    '- The world is being established. The character is orienting.',
+    '- Pressure exists but is not yet immediate — it is ambient, felt at the edges',
+    '- Sensory detail is generous — the reader is learning the space',
+    '- Choices feel exploratory — the character has room to consider',
+    '- The environmental clock is present but unhurried — a candle lit, a patrol in the distance, a bell heard faintly',
+    '- Dialogue has pauses. Silences are allowed.',
+    '',
+    'MIDDLE (25–55% of session):',
+    '- Pieces are beginning to connect. Earlier decisions are creating consequences.',
+    '- Pressure is building — the patrol is closer, the candle shorter, the bell louder',
+    '- Sensory detail sharpens — the character notices more because the stakes are rising',
+    '- Choices feel weighted — the reader senses that decisions here will matter',
+    '- Something should shift in this section that was not present in the opening — a revelation, a complication, a person who knows more than they should',
+    '',
+    'LATE (55–80% of session):',
+    '- Everything is converging. There is no room for error.',
+    '- Pressure is immediate and physical — the patrol is on this street, the candle is nearly gone, the bell has struck the quarter hour',
+    '- Sensory detail is urgent and specific — cold, darkness, the weight of what is being carried',
+    '- Choices feel consequential and irreversible — the reader knows that what happens in the next few turns cannot be undone',
+    '- The pace of events accelerates — more happens per turn, less time to breathe between them',
+    '',
+    'FINAL (last 20% of session):',
+    '- The session is resolving. Everything that has been set in motion is arriving.',
+    '- Do not introduce new complications or characters — resolve what exists',
+    '- The environmental clock should be at its most urgent — the candle stub, the bell about to strike, the patrol at the door',
+    '- The character should be moving toward their final understanding — the thing the closing prose will name',
+    '- Leave one beat of stillness before the end — a moment where the character and the reader both know it is nearly over, before the last action is taken',
+    '',
+    'THE ENVIRONMENTAL CLOCK:',
+    'Use period-appropriate signals to mark time passing. These must become more frequent and more urgent as arc position advances. Do not invent new signals — use what is already established in the scene.',
+    '',
+    'CALIBRATION TEST:',
+    'A reader who has played the session twice should be able to identify which arc position a scene belongs to without being told. Opening scenes breathe. Final scenes do not.',
     '',
     '---',
   ].join('\n');
