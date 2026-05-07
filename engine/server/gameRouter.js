@@ -471,15 +471,12 @@ export function createGameRouter(repos, config = {}) {
       }
 
       if (state.finalAccusation && !output.endState?.isEnding) {
-        // Fallback endings pulled from scenario data — no hardcoded story content
         const failCond = (scenario.failConditions || [])[0] || 'The investigation ends inconclusively.';
-        const cluesFound = nextState.discoveredClueIds?.length || 0;
-        const totalClues = clues.length;
         output.endState = {
           isEnding: true, result: 'failure',
           scene: `Time has run out. ${failCond}`,
           conspiracySummary: (scenario.partialSuccessExamples || [])[0] || 'The conspiracy was not fully exposed.',
-          whatPlayerDiscovered: `${cluesFound} of ${totalClues} clue(s) found. No conclusion was reached in time.`,
+          whatPlayerDiscovered: 'No conclusion was reached in time.',
           outcome: (scenario.failConditions || [])[0] || 'The case remains unresolved.',
           playerContribution: 'The investigation could not be completed in the time available.',
           authorityResponse: scenario.coreSystems?.failureAuthorityQuote || 'We ran out of time.',
@@ -489,10 +486,8 @@ export function createGameRouter(repos, config = {}) {
 
       if (output.endState?.isEnding) {
         output.endState.performance = {
-          cluesDiscovered: nextState.discoveredClueIds?.length || 0,
-          totalClues:      clues.length,
-          timeRemaining:   nextState.remainingMinutes,
-          result:          output.endState.result || 'failure'
+          timeRemaining: nextState.remainingMinutes,
+          result:        output.endState.result || 'failure'
         };
       }
 
@@ -518,7 +513,6 @@ export function createGameRouter(repos, config = {}) {
           chunk.push(`## Ending — ${(output.endState.result || 'unknown').toUpperCase()}`);
           chunk.push(``);
           chunk.push(`**Result:** ${output.endState.result || '—'}`);
-          chunk.push(`**Clues found:** ${p.cluesDiscovered ?? '?'} of ${p.totalClues ?? '?'}`);
           chunk.push(`**Time remaining:** ${p.timeRemaining ?? '?'} min`);
           chunk.push(``);
         }
@@ -529,7 +523,7 @@ export function createGameRouter(repos, config = {}) {
         if (output.endState?.isEnding) await transcriptWrite;
       }
 
-      console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} newClues=${JSON.stringify(output.newClues)} isEnding=${output.endState?.isEnding ?? false}`);
+      console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} isEnding=${output.endState?.isEnding ?? false}`);
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 

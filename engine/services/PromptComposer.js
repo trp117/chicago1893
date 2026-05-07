@@ -179,6 +179,29 @@ export function buildSensoryOpeningCheck(_cfg = {}) {
 const PRONOUN_RE   = /\b(him|her|them|there)\b/i;
 const SPEECH_VERBS = ['says', 'states', 'explains', 'claims', 'adds', 'continues', 'replies', 'notes', 'murmurs', 'answers'];
 
+// ── Period time string ────────────────────────────────────────────────────────
+
+const PERIOD_NUMS = ['','one','two','three','four','five','six','seven','eight','nine','ten',
+  'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen',
+  'twenty','twenty-one','twenty-two','twenty-three','twenty-four','twenty-five',
+  'twenty-six','twenty-seven','twenty-eight','twenty-nine'];
+const PERIOD_HOURS = ['twelve','one','two','three','four','five','six','seven','eight','nine','ten','eleven'];
+
+export function timeToPeriodString(minutesRemaining, sessionTargetMinutes = 30) {
+  const elapsed = sessionTargetMinutes - (minutesRemaining ?? 0);
+  const total   = 9 * 60 + 30 + Math.max(0, elapsed);
+  const h = Math.floor(total / 60) % 12;
+  const m = total % 60;
+  const hw = PERIOD_HOURS[h], nw = PERIOD_HOURS[(h + 1) % 12];
+  if (m === 0)  return `${hw} o'clock`;
+  if (m === 15) return `quarter past ${hw}`;
+  if (m === 30) return `half past ${hw}`;
+  if (m === 45) return `quarter to ${nw}`;
+  if (m < 30 && m < PERIOD_NUMS.length)  return `${PERIOD_NUMS[m]} past ${hw}`;
+  const rem = 60 - m;
+  return rem < PERIOD_NUMS.length ? `${PERIOD_NUMS[rem]} to ${nw}` : hw;
+}
+
 // ── Data query helpers (also used by StateManager) ─────────────────────────────
 
 export function getLocationById(id, locations) {
@@ -425,43 +448,39 @@ function buildChaseInstruction(state, characters) {
 }
 
 export function checkEndingReadiness(state, scenario) {
-  const ids    = state.discoveredClueIds || [];
-  const keyIds = scenario.keyEvidenceClueIds || [];
-  const hasKey = keyIds.some(id => ids.includes(id));
-  const allKey = keyIds.length > 0 && keyIds.every(id => ids.includes(id));
   const hasConspirators = (state.namedConspirators || []).length >= 1;
+  const isLateTurn      = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
   return {
-    keyEvidenceFound:    hasKey,
-    allKeyEvidenceFound: allKey,
-    readyForClimax:      allKey || (hasKey && hasConspirators),
-    totalCluesFound:     ids.length,
-    keyEvidenceNeeded:   keyIds.length
+    readyForClimax: hasConspirators || isLateTurn,
   };
 }
 
 export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues }) {
-  const location        = getLocationById(state.location, locations);
-  const relevantChars   = getRelevantCharacters(state, location, characters, locations);
-  const charRoutes      = buildCharacterRoutes(characters, locations);
-  const discoveredClues = (state.discoveredClueIds || []).map(id => getClueById(id, clues)).filter(Boolean);
-  const availableClues  = getAvailableCluesAt(state.location, state.discoveredClueIds || [], clues);
-  const endingSignals   = checkEndingReadiness(state, scenario);
+  const location      = getLocationById(state.location, locations);
+  const relevantChars = getRelevantCharacters(state, location, characters, locations);
+  const charRoutes    = buildCharacterRoutes(characters, locations);
+  const endingSignals = checkEndingReadiness(state, scenario);
 
   const refContext    = buildReferenceContext(playerInput, state, locations);
   const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
 
   const finalAccusationNote = state.finalAccusation
-    ? '\n\n⚠️ FINAL ACCUSATION: The player has chosen to end the investigation and make their final accusation. This is their last move. You MUST return endState with isEnding: true. Evaluate as strong/partial/weak based on discovered clues.'
+    ? '\n\n⚠️ FINAL ACCUSATION: The player has chosen to end the investigation and make their final accusation. This is their last move. You MUST return endState with isEnding: true. Evaluate as strong/partial/weak based on the player\'s reasoning and what they have observed.'
     : '';
+
+  // Replace raw minute count with period-appropriate time language
+  const { remainingMinutes, ...stateRest } = state;
+  const promptState = {
+    ...stateRest,
+    timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes),
+  };
 
   return turnTemplate
     .replace('{{PLAYER_ROLE_SECTION}}',    buildPlayerRoleSection(state))
-    .replace('{{STATE_JSON}}',             JSON.stringify(state))
+    .replace('{{STATE_JSON}}',             JSON.stringify(promptState))
     .replace('{{LOCATION_JSON}}',          JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}',               JSON.stringify(relevantChars))
     .replace('{{NPC_ROUTES_JSON}}',        JSON.stringify(charRoutes))
-    .replace('{{DISCOVERED_CLUES_JSON}}',  JSON.stringify(discoveredClues))
-    .replace('{{AVAILABLE_CLUES_JSON}}',   JSON.stringify(availableClues))
     .replace('{{ENDING_SIGNALS_JSON}}',    JSON.stringify(endingSignals))
     .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location))
     .replace('{{NPC_INTRO_INSTRUCTION}}',  [

@@ -13,12 +13,6 @@ Relevant NPCs:
 NPC locations (use to set the top-level location field when the player moves to find someone):
 {{NPC_ROUTES_JSON}}
 
-Clues the player has already discovered:
-{{DISCOVERED_CLUES_JSON}}
-
-Clues available at this location (not yet discovered):
-{{AVAILABLE_CLUES_JSON}}
-
 Ending readiness signals:
 {{ENDING_SIGNALS_JSON}}
 
@@ -44,14 +38,11 @@ Player input:
 {{NPC_INTRO_INSTRUCTION}}
 
 Instructions:
-- Apply NPC information tier strictly by suspicion score. Tier 1 (0–1): surface demeanor only. Tier 2 (2–3): partial detail. Tier 3 (4+): specific facts. Tier can only advance mid-scene if the player references a specific discovered clue.
-- Stay grounded in the current act and elapsed time.
+- Apply NPC information tier strictly by suspicion score. Tier 1 (0–1): surface demeanor only. Tier 2 (2–3): partial detail. Tier 3 (4+): specific facts. Tier can only advance mid-scene if the player references specific evidence observed earlier.
+- Stay grounded in the current act and time of night.
 - Update only the state fields that actually change this turn.
 - Only change the top-level `location` field if the player's input explicitly says they are moving somewhere.
 - If you change `location` this turn, the narrative must begin at the new location — do NOT include dialogue or reactions from NPCs at the previous location.
-- Introduce at most one major new clue unless near the climax.
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
-- Only include a clue ID in `newClues` if the player's action directly and specifically uncovers it — physical examination, an NPC explicitly revealing it, or direct observation. A confrontation alone does NOT automatically award clues.
-- `newClues` must contain only valid clue IDs from the available clues list above.
 - If `readyForClimax` is true in the ending signals, steer toward resolution.
 - Return valid JSON only, per the output contract.

@@ -86,7 +86,6 @@ Return JSON only. No markdown fences. Fields:
     "flags": {},
     "namedConspirators": []
   },
-  "newClues": ["clue_id_from_catalog"],
   "npcMoments": [{ "npc": "character_id", "text": "spoken dialogue only — no italics, no stage directions" }],
   "npc_updates": {
     "character_id": {
@@ -117,7 +116,6 @@ Return JSON only. No markdown fences. Fields:
 
 - `sensory_opening`: Optional. Populate only when the player enters a new location or the scene context shifts significantly. 1–2 sentences max, no characters, no plot. Omit entirely when continuing within the same scene or responding to a chosen action — carry all environmental texture inside `narrative` instead.
 - `stateChanges`: omit any sub-field that did not change this turn.
-- `newClues`: IDs from the available clues list only. Omit or use `[]` if none.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
 - `npc_updates`: REQUIRED on every turn where an NPC appears. For each NPC who appeared, return their id as a key. `trust_delta` is an integer (+1, -1, +2, etc.) reflecting whether the player's action built or damaged trust. `knows_add` is an array of strings for new things the NPC learned about the player this turn (omit or use [] if nothing new). `aggression_mode` is "neutral", "mild", or "heavy" based on current tension. `last_interaction` is a one-sentence summary of this scene from this NPC's perspective — used in future turns.
 - `chaseInitiated`: include only when an NPC begins fleeing this turn. Omit otherwise.
@@ -136,7 +134,7 @@ You will receive a state object. Respect it exactly.
 - `threat`: current threat level (0–10)
 - `authorityTrust`: the authority figure's trust in the player
 - `suspicion`: per-character suspicion scores
-- `discoveredClueIds`: clues already found — reference naturally, never repeat as if new
+- `timeOfNight`: period-appropriate time string (e.g. "half past nine") — use to calibrate urgency and atmosphere
 - `act`: current act — escalate accordingly
 
 ---
@@ -346,41 +344,40 @@ NPCs are not neutral. Every NPC has a private goal, a public face, a knowledge b
 - Tier 1 (suspicion 0–1): surface demeanor only — no specific facts, no names, no operational details.
 - Tier 2 (suspicion 2–3): partial detail, hints at irregularities.
 - Tier 3 (suspicion 4+): specific facts and clearer direction.
-- A tier can only advance mid-scene if the player references a specific clue from their discovered clues list.
+- A tier can only advance mid-scene if the player references specific observed evidence from earlier in the session.
 - The first exchange with any NPC always produces Tier 1 only. No exceptions.
 
 ---
 
-## RULE 3 — Clue Engagement (Critical)
-When a clue is referenced or discovered:
-- explain what it suggests
-- connect it to possible motives or suspects
-- increase tension or suspicion
+## ACTION OPTIONS RULE
 
-Only award clues whose IDs appear in the available clues list you receive. Return the ID in `newClues`.
+Generated action options must read as the character's own thoughts or impulses — not as tactical instructions to a player.
 
----
+NEVER:
+- Explain the strategy or consequence of a choice
+- Use "and" to chain action with justification
+- Write in the second person imperative ("Go upstairs and distract Benjamin — give Nathaniel whatever time he needs")
 
-## Clue system rules
-- Only return a clue ID in `newClues` if the player's action logically uncovers it and it appears in the available clues list.
-- Do not invent new clue IDs.
-- Usually reveal no more than 1 new clue per turn.
-- A clue should feel earned through investigation, questioning, or close observation.
-- When `readyForClimax` is true in ending signals, steer toward resolution.
+ALWAYS:
+- Write as a thought that occurs to the character
+- Keep options to one clause where possible
+- Trust the player to understand the implication
 
----
+WRONG: "Go upstairs and distract Benjamin — give Nathaniel whatever time he needs to get out the back."
+RIGHT: "Go upstairs. Benjamin doesn't know yet."
 
-## Evidence requirement rules
-- A correct conclusion is NOT sufficient on its own.
-- To be a strong solution, the player must correctly identify the culprit AND reference at least one relevant clue.
-- If the player names the correct culprit without evidence: classify as "partial".
-- If the player provides correct culprit + correct reasoning + supporting clues: classify as "strong".
-- If incorrect or unsupported: classify as "weak".
+WRONG: "Take the Sheafe Street alley — longer, avoids Ann Street, risks crossing Pryce at the rope-walk end."
+RIGHT: "The Sheafe Street alley. Longer, but no checkpoint."
+
+WRONG: "Tell him the truth: there is a dispatch, there is a name at the Green Dragon, and you are carrying it tonight whether he helps or not."
+RIGHT: "Tell him the truth. All of it."
+
+Options should be 10 words or fewer where possible. The shorter the option, the more it feels like a thought rather than a plan.
 
 ---
 
 ## RULE 8 — Player Choice
-At the end of every response, offer exactly 2–3 choices reflecting the current clues, location, and NPCs present.
+At the end of every response, offer exactly 2–3 choices reflecting the current situation, location, and NPCs present.
 
 ### High-stakes scenes (Act 2 or 3, primary conspirator present, suspicion 2+):
 The first choice must be an escalation option — a bold move that could credibly trigger a confrontation, chase, or force the NPC's hand.
