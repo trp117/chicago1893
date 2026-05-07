@@ -1,5 +1,20 @@
 # Scenario Authoring Guide
 
+## overused_anchors (optional)
+
+A list of setting-specific sensory details and character gestures that are powerful once and deadening when repeated. The engine limits each to one use per session automatically.
+
+Add this field whenever playtesting reveals a sensory detail or character gesture repeating across turns. It is discovered through playtesting, not designed upfront.
+
+Format — plain language descriptions, not regex patterns:
+- `"dispatch or packet pressing against the ribs or body"`
+- `"smell of ink, linseed oil, tallow, or type metal"`
+- `"spectacles picked up and not put on"`
+
+Each future scenario should build its own list through playtesting. A Chicago 1893 scenario will have completely different anchors from a Boston 1775 scenario. The engine handles both through the same mechanism.
+
+---
+
 ## Characters with aliases or cover identities
 
 If any character in your scenario operates under more than one name

@@ -49,7 +49,7 @@ export function getArcPosition(minutesRemaining, totalMinutes) {
   return 'final';
 }
 
-export function buildNarrativeStyleRules(_cfg = {}) {
+export function buildNarrativeStyleRules(scenario = {}) {
   // Builds two narrative style rules injected into every scene generation call:
   //
   // 1. SENSORY OPENING RULE — ensures physical and period detail is woven
@@ -62,7 +62,7 @@ export function buildNarrativeStyleRules(_cfg = {}) {
   // Both rules apply globally to every story and every character.
   // Inserted at {{SENSORY_OPENING_RULE}} in game_system_prompt.md (line 144)
   // and via buildSystemPromptLegacy() for all scenarios.
-  return [
+  let rules = [
     '## SENSORY OPENING RULE',
     '',
     'Do not open each response with a dedicated sensory description block. Instead, weave physical, environmental, and period detail continuously throughout the narrative — embedded in action, in what the character notices, in how other characters appear, in what the body registers while moving through the space.',
@@ -170,13 +170,17 @@ export function buildNarrativeStyleRules(_cfg = {}) {
     '',
     'THE STANDARD: each turn should introduce at least one physical or sensory detail that has not appeared before in this session.',
     '',
-    'Do not repeat within a single session:',
-    '- Any variation of "the dispatch against the ribs"',
-    '- Any variation of "the cold finding the gap at [body part]"',
-    '- Any variation of "the candle guttering"',
-    '- Any variation of "the smell of linseed oil"',
+    'UNIVERSAL OVERUSED ANCHORS — apply to every story regardless of setting. Each pattern may appear ONCE per session maximum:',
     '',
-    'These are the four most overused anchors. Each may appear once per session. After that, find something new.',
+    '- Any object carried secretly pressing against the body or ribs — establish it once, trust the reader to remember it is there',
+    '',
+    '- Any temperature sensation finding a gap in clothing — cold at the collar, heat on the face, wind at the wrist — one use establishes the environment, repetition deadens it',
+    '',
+    '- Any single light source described as diminishing — a candle burning low, a lamp guttering, daylight fading — the reader tracks this without being reminded',
+    '',
+    '- Any single dominant smell used to establish a space — once named, a smell belongs to that space permanently. Do not rename it.',
+    '',
+    '- Any repeated physical gesture belonging to one character — if a character has a gesture (picking up spectacles, turning a coin, smoothing a broadsheet) it is powerful once and invisible by the third use. One use per session.',
     '',
     '---',
     '',
@@ -223,6 +227,15 @@ export function buildNarrativeStyleRules(_cfg = {}) {
     '',
     '---',
   ].join('\n');
+
+  if (Array.isArray(scenario.overused_anchors) && scenario.overused_anchors.length > 0) {
+    rules += '\n\nFOR THIS SCENARIO SPECIFICALLY — these exact phrases and their variations are already established in the reader\'s mind. Do not repeat them:\n';
+    for (const anchor of scenario.overused_anchors) {
+      rules += `- ${anchor}\n`;
+    }
+  }
+
+  return rules;
 }
 
 export function buildSensoryOpeningCheck(_cfg = {}) {
@@ -386,7 +399,7 @@ export function buildSystemPrompt(scenario, locations) {
 
   return systemPromptTemplate
     .replace('{{SCENARIO_CONTEXT}}', context)
-    .replace('{{SENSORY_OPENING_RULE}}', buildNarrativeStyleRules(scenario.sensory_opening));
+    .replace('{{SENSORY_OPENING_RULE}}', buildNarrativeStyleRules(scenario));
 }
 
 // ── Turn prompt builders ───────────────────────────────────────────────────────

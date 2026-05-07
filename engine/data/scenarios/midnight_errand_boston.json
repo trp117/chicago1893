@@ -13,6 +13,13 @@
   "historicalRealism": "high",
   "freedomLevel": "guided",
   "sessionTargetMinutes": 30,
+  "overused_anchors": [
+    "dispatch or packet pressing against the ribs or body",
+    "candle guttering, burning low, or nearly gone",
+    "smell of ink, linseed oil, tallow, or type metal",
+    "spectacles picked up and not put on",
+    "cold finding a gap at collar, wrist, or neck"
+  ],
   "storyArcIds": [
     "midnight_errand_boston_main_arc"
   ],

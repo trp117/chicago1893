@@ -82,7 +82,7 @@ export function buildSystemPrompt(sessionId) {
   const sections = [];
 
   // ── BEHAVIORAL RULES ──────────────────────────────────────────────────────
-  const sensoryRule    = buildNarrativeStyleRules(scenario.sensory_opening);
+  const sensoryRule    = buildNarrativeStyleRules(scenario);
   const rulesWithSensory = _rulesBody.replace('{{SENSORY_OPENING_RULE}}', sensoryRule);
   const BEHAVIORAL_RULES = `${_preamble}\n\n${rulesWithSensory}\n\n${PLAYER_ACTION_RULE}\n\n${NPC_TRUST_RULE}\n\n${CHARACTER_BEHAVIOR_RULE}`;
   sections.push(`## BEHAVIORAL RULES\n\n${BEHAVIORAL_RULES}`);
