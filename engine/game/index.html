@@ -61,6 +61,13 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .input-section-label { margin: 0; padding: 8px 28px 0; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: system-ui, sans-serif; }
 .choices-label { display: none; padding: 0; margin: 0; height: 0; }
 .choices-label.visible { display: block; border-top: 1px solid var(--border); margin: 8px 28px 0; height: 0; }
+.choices-area-wrap { transition: opacity 250ms ease; }
+.choices-area-wrap.hidden { display: none; }
+.stream-options-dots { display: flex; gap: 5px; padding: 12px 28px 8px; }
+.stream-options-dots.hidden { display: none; }
+.stream-options-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: dot-pulse 1.2s ease-in-out infinite; }
+.stream-options-dots span:nth-child(2) { animation-delay: 0.2s; }
+.stream-options-dots span:nth-child(3) { animation-delay: 0.4s; }
 .choices-wrap { display: flex; align-items: center; }
 .choices-arrow { display: none; flex-shrink: 0; background: none; border: none; color: var(--muted); font-size: 1.6rem; line-height: 1; padding: 0 6px; cursor: pointer; opacity: 0; transition: opacity 0.2s; pointer-events: none; user-select: none; }
 .choices-arrow.visible { opacity: 1; pointer-events: auto; }
@@ -323,11 +330,14 @@ li { margin-bottom: 8px; }
           <button type="submit">Submit</button>
         </div>
       </form>
-      <p id="choices-label" class="choices-label"></p>
-      <div class="choices-wrap">
-        <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
-        <section id="choices" class="choices"></section>
-        <button type="button" class="choices-arrow choices-arrow--right" aria-hidden="true" tabindex="-1">&#8250;</button>
+      <div id="stream-options-dots" class="stream-options-dots hidden"><span></span><span></span><span></span></div>
+      <div id="choices-area-wrap" class="choices-area-wrap">
+        <p id="choices-label" class="choices-label"></p>
+        <div class="choices-wrap">
+          <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
+          <section id="choices" class="choices"></section>
+          <button type="button" class="choices-arrow choices-arrow--right" aria-hidden="true" tabindex="-1">&#8250;</button>
+        </div>
       </div>
     </div>
   </main>
@@ -452,6 +462,9 @@ const arrowLeft  = document.querySelector('.choices-arrow--left');
 const arrowRight = document.querySelector('.choices-arrow--right');
 const formEl     = document.getElementById('input-form');
 const inputEl    = document.getElementById('player-input');
+const choicesAreaWrapEl = document.getElementById('choices-area-wrap');
+const streamOptionsDots = document.getElementById('stream-options-dots');
+const submitBtn         = formEl.querySelector('button[type="submit"]');
 const ttsBarEl   = document.getElementById('tts-bar');
 const ttsToggleBtn = document.getElementById('tts-toggle');
 const ttsStopBtn   = document.getElementById('tts-stop');
@@ -929,6 +942,9 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   }
   submitting = true;
   inputEl.value = '';
+  choicesAreaWrapEl.classList.add('hidden');
+  streamOptionsDots.classList.remove('hidden');
+  submitBtn.disabled = true;
 
   const entryEl = document.createElement('div');
   entryEl.className = 'feed-entry';
@@ -983,6 +999,9 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
           output    = evt.output;
           nextState = evt.nextState;
         } else if (evt.type === 'error') {
+          streamOptionsDots.classList.add('hidden');
+          choicesAreaWrapEl.classList.remove('hidden');
+          submitBtn.disabled = false;
           if (streamEl) streamEl.remove();
           else dotsEl.remove();
           const errEl = document.createElement('div');
@@ -996,6 +1015,9 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     }
 
     if (!output || !nextState) {
+      streamOptionsDots.classList.add('hidden');
+      choicesAreaWrapEl.classList.remove('hidden');
+      submitBtn.disabled = false;
       if (streamEl) streamEl.remove();
       else dotsEl.remove();
       const errEl = document.createElement('div');
@@ -1022,6 +1044,15 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     renderSidebar();
     updateChaseUI();
     renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
+
+    streamOptionsDots.classList.add('hidden');
+    choicesAreaWrapEl.style.opacity = '0';
+    choicesAreaWrapEl.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
+      choicesAreaWrapEl.style.opacity = '1';
+    });
+    submitBtn.disabled = false;
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
       gameState.timeExpired = true;
