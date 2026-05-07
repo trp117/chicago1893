@@ -226,7 +226,8 @@ async function collectAnthropicStream(fetchResponse, onChunk) {
 async function streamRawText(fetchResponse, onChunk) {
   const reader  = fetchResponse.body.getReader();
   const decoder = new TextDecoder();
-  let lineBuffer = '';
+  let lineBuffer  = '';
+  let accumulated = '';
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -240,10 +241,12 @@ async function streamRawText(fetchResponse, onChunk) {
       let evt;
       try { evt = JSON.parse(raw); } catch { continue; }
       if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+        accumulated += evt.delta.text;
         onChunk(evt.delta.text);
       }
     }
   }
+  return accumulated;
 }
 
 // ── Router export ──────────────────────────────────────────────────────────────
@@ -827,9 +830,25 @@ export function createGameRouter(repos, config = {}) {
           messages: [{ role: 'user', content: closingPrompt }],
         }),
       });
-      await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
+      const prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
       sendSse(res, { type: 'done' });
       res.end();
+
+      // Append closing prose (and historical aftermath) to the session transcript
+      if (prose) {
+        try {
+          const scenarioMatch = transcript.match(/^scenario:\s*(.+)$/m);
+          const scenarioId    = scenarioMatch?.[1]?.trim();
+          const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
+          const aftermath     = scenarioData?.historical_aftermath || '';
+          const lines = ['', '## Closing Prose', '', prose];
+          if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
+          lines.push('');
+          await appendFile(transcriptPath, lines.join('\n'));
+        } catch (e) {
+          console.error('[TRANSCRIPT CLOSING]', e.message);
+        }
+      }
     } catch (err) {
       const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
       console.error(`[CLOSING-PROSE] ${isTimeout ? 'timeout' : err.message}`);

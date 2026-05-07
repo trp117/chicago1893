@@ -812,11 +812,9 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
 
   function triggerAftermath() {
-    const step = 1300;
-    let delay = 400;
-    setTimeout(() => aftermathEl.classList.add('visible'), delay); delay += step;
-    setTimeout(() => lineEl.classList.add('visible'),      delay); delay += step;
-    setTimeout(() => returnEl.classList.add('visible'),    delay);
+    setTimeout(() => aftermathEl.classList.add('visible'), 2500);
+    setTimeout(() => lineEl.classList.add('visible'),      5500);
+    setTimeout(() => returnEl.classList.add('visible'),    7000);
   }
 
   const controller = new AbortController();
@@ -1046,12 +1044,11 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
 
     streamOptionsDots.classList.add('hidden');
+    choicesAreaWrapEl.classList.remove('hidden');    // display:block before setting opacity
     choicesAreaWrapEl.style.opacity = '0';
-    choicesAreaWrapEl.classList.remove('hidden');
-    requestAnimationFrame(() => {
-      choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
-      choicesAreaWrapEl.style.opacity = '1';
-    });
+    void choicesAreaWrapEl.offsetHeight;             // force reflow so transition fires from opacity:0
+    choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
+    choicesAreaWrapEl.style.opacity = '1';
     submitBtn.disabled = false;
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
