@@ -501,7 +501,8 @@ export function createGameRouter(repos, config = {}) {
       }
       if (sessionId) appData.saveSession(sessionId, nextState);
 
-      // Transcript — fire-and-forget
+      // Transcript — fire-and-forget on normal turns, awaited on ending turns
+      // so the file is on disk before the client immediately calls /closing-prose
       if (sessionId) {
         const locName = locations.find(l => l.id === (output.location || state.location))?.name || (output.location || state.location);
         const chunk = [
@@ -523,8 +524,9 @@ export function createGameRouter(repos, config = {}) {
         }
         chunk.push(`---`);
         chunk.push(``);
-        appendFile(join(TRANSCRIPTS_DIR, `${sessionId}.md`), chunk.join('\n'))
+        const transcriptWrite = appendFile(join(TRANSCRIPTS_DIR, `${sessionId}.md`), chunk.join('\n'))
           .catch(e => console.error('[TRANSCRIPT]', e.message));
+        if (output.endState?.isEnding) await transcriptWrite;
       }
 
       console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} newClues=${JSON.stringify(output.newClues)} isEnding=${output.endState?.isEnding ?? false}`);

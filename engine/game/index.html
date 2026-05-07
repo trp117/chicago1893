@@ -853,6 +853,11 @@ function showClosingScreen(endState, sessionId) {
   const lineEl      = document.getElementById('closing-line');
   const returnEl    = document.getElementById('closing-return');
 
+  if (!overlay || !dotsEl || !proseEl || !aftermathEl || !lineEl || !returnEl) {
+    console.error('[CLOSING] missing DOM element — closing screen cannot show');
+    return;
+  }
+
   const aftermath = scenario?.historical_aftermath || '';
   aftermathEl.textContent = aftermath;
 
@@ -1025,10 +1030,15 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
       gameState.timeExpired = true;
       showTimeDecision();
     } else if (data.output?.endState?.isEnding) {
-      formEl.querySelector('button').disabled = true;
-      inputEl.disabled = true;
-      renderChoices([]);
-      showClosingScreen(data.output.endState, sessionId);
+      try {
+        formEl.querySelector('button[type="submit"]').disabled = true;
+        inputEl.value = '';
+        inputEl.disabled = true;
+        renderChoices([]);
+        showClosingScreen(data.output.endState, sessionId);
+      } catch (e) {
+        console.error('[CLOSING] failed to show closing screen:', e);
+      }
     }
   } finally {
     submitting = false;
