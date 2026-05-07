@@ -136,6 +136,116 @@ function endsOnNpcQuestion(narrative, npcMoments) {
   return /^[A-Z][A-Za-z'\-\s]{1,30}:\s*["""'].+\?["""']\s*$/.test(last);
 }
 
+// ── SSE helpers ────────────────────────────────────────────────────────────────
+
+function sendSse(res, obj) {
+  res.write(`data: ${JSON.stringify(obj)}\n\n`);
+  if (typeof res.flush === 'function') res.flush();
+}
+
+// Consume an Anthropic streaming response. Calls onChunk(text) for each
+// narrative text fragment as it arrives. Returns { text, stopReason, usage }.
+async function collectAnthropicStream(fetchResponse, onChunk) {
+  const reader  = fetchResponse.body.getReader();
+  const decoder = new TextDecoder();
+  let lineBuffer = '';
+  let accumulated = '';
+  let stopReason  = null;
+  let usage       = null;
+
+  // Narrative extraction state — persists across partial reads
+  let narCursor  = -1;    // -1 = "narrative" field not yet found
+  let narEscaped = false;
+  let narDone    = false;
+
+  function flushNarrative() {
+    if (narDone) return;
+    if (narCursor === -1) {
+      const m = /"narrative"\s*:\s*"/.exec(accumulated);
+      if (!m) return;
+      narCursor = m.index + m[0].length;
+    }
+    let chunk = '';
+    let i = narCursor;
+    while (i < accumulated.length) {
+      const ch = accumulated[i];
+      if (narEscaped) {
+        switch (ch) {
+          case 'n':  chunk += '\n'; break;
+          case 't':  chunk += '\t'; break;
+          case 'r':  chunk += '\r'; break;
+          case '"':  chunk += '"';  break;
+          case '\\': chunk += '\\'; break;
+          case 'u': {
+            const hex = accumulated.slice(i + 1, i + 5);
+            if (hex.length === 4) { chunk += String.fromCharCode(parseInt(hex, 16)); i += 4; }
+            break;
+          }
+          default: chunk += ch;
+        }
+        narEscaped = false;
+      } else if (ch === '\\') {
+        narEscaped = true;
+      } else if (ch === '"') {
+        narDone = true;
+        i++;
+        break;
+      } else {
+        chunk += ch;
+      }
+      i++;
+    }
+    narCursor = i;
+    if (chunk) onChunk(chunk);
+  }
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    lineBuffer += decoder.decode(value, { stream: true });
+    const lines = lineBuffer.split('\n');
+    lineBuffer = lines.pop() || '';
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (!raw || raw === '[DONE]') continue;
+      let evt;
+      try { evt = JSON.parse(raw); } catch { continue; }
+      if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+        accumulated += evt.delta.text;
+        flushNarrative();
+      } else if (evt.type === 'message_delta') {
+        if (evt.delta?.stop_reason) stopReason = evt.delta.stop_reason;
+        if (evt.usage) usage = evt.usage;
+      }
+    }
+  }
+  return { text: accumulated, stopReason, usage };
+}
+
+async function streamRawText(fetchResponse, onChunk) {
+  const reader  = fetchResponse.body.getReader();
+  const decoder = new TextDecoder();
+  let lineBuffer = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    lineBuffer += decoder.decode(value, { stream: true });
+    const lines = lineBuffer.split('\n');
+    lineBuffer = lines.pop() || '';
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice(6).trim();
+      if (!raw || raw === '[DONE]') continue;
+      let evt;
+      try { evt = JSON.parse(raw); } catch { continue; }
+      if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+        onChunk(evt.delta.text);
+      }
+    }
+  }
+}
+
 // ── Router export ──────────────────────────────────────────────────────────────
 
 export function createGameRouter(repos, config = {}) {
@@ -330,6 +440,14 @@ export function createGameRouter(repos, config = {}) {
       if (!state.scenarioId)       return res.status(400).json({ error: 'state.scenarioId is required.' });
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
+      res.set({
+        'Content-Type':      'text/event-stream',
+        'Cache-Control':     'no-cache',
+        'Connection':        'keep-alive',
+        'X-Accel-Buffering': 'no',
+      });
+      res.flushHeaders();
+
       console.log(`[TURN] scenario=${state.scenarioId} loc=${state.location} act=${state.act} input="${playerInput.slice(0, 60)}"`);
 
       const gameData = getScenarioData(repos, state.scenarioId);
@@ -375,18 +493,34 @@ export function createGameRouter(repos, config = {}) {
       };
 
       const baseMessages = [...history.slice(-MAX_HISTORY_MSGS), { role: 'user', content: prompt }];
-      let { data, text } = await callModel(baseMessages, null, 'initial');
+
+      const streamSignal = AbortSignal.timeout(55000);
+      const streamResp   = await fetch(ANTHROPIC_URL, {
+        method: 'POST', signal: streamSignal,
+        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
+        body: JSON.stringify({
+          model: MODEL, max_tokens: maxToks, temperature: 0.8, stream: true,
+          system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+          messages: baseMessages,
+        }),
+      });
+      const { text, stopReason: streamStopReason } = await collectAnthropicStream(
+        streamResp,
+        chunk => sendSse(res, { type: 'chunk', text: chunk }),
+      );
 
       if (!text) {
         scoreTrace(0, 'no-text-returned');
-        return res.status(500).json({ error: 'No text returned from Anthropic.', raw: data });
+        sendSse(res, { type: 'error', error: 'No text returned from Anthropic.' });
+        res.end();
+        return;
       }
 
       let output;
       try {
         output = extractJson(text);
       } catch {
-        const stopReason = data?.stop_reason || 'unknown';
+        const stopReason = streamStopReason || 'unknown';
         const truncatedEnding = stopReason === 'max_tokens' && /"isEnding"\s*:\s*true/.test(text);
         if (truncatedEnding && maxToks < 2000) {
           traceTags.push('has-retry', 'truncated-ending');
@@ -400,7 +534,9 @@ export function createGameRouter(repos, config = {}) {
           traceTags.push('json-error');
           scoreTrace(0, `invalid-json stop_reason=${stopReason}`);
           console.error(`[TURN ERROR] invalid JSON stop_reason=${stopReason} len=${text.length}`);
-          return res.status(500).json({ error: `Model returned invalid JSON (stop_reason: ${stopReason}).` });
+          sendSse(res, { type: 'error', error: `Model returned invalid JSON (stop_reason: ${stopReason}).` });
+          res.end();
+          return;
         }
       }
 
@@ -527,11 +663,19 @@ export function createGameRouter(repos, config = {}) {
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 
-      return res.json({ output, nextState, mockMode: false });
+      sendSse(res, { type: 'done', output, nextState, mockMode: false });
+      res.end();
+      return;
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
+      const msg = isTimeout ? 'AI request timed out — please try again.' : (error.message || 'Server error');
       console.error(`[TURN ERROR] ${isTimeout ? 'timeout' : error.message}`);
-      return res.status(500).json({ error: isTimeout ? 'AI request timed out — please try again.' : (error.message || 'Server error') });
+      if (res.headersSent) {
+        sendSse(res, { type: 'error', error: msg });
+        res.end();
+      } else {
+        res.status(500).json({ error: msg });
+      }
     }
   });
 
@@ -641,7 +785,7 @@ export function createGameRouter(repos, config = {}) {
   // ── Closing prose ──────────────────────────────────────────────────────────
   r.get('/closing-prose', async (req, res) => {
     const { sessionId } = req.query;
-    if (!sessionId) return res.status(400).json({ error: 'sessionId is required.' });
+    if (!sessionId)       return res.status(400).json({ error: 'sessionId is required.' });
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
     const transcriptPath = join(TRANSCRIPTS_DIR, `${sessionId}.md`);
@@ -665,24 +809,36 @@ export function createGameRouter(repos, config = {}) {
       transcript,
     ].join('\n');
 
+    res.set({
+      'Content-Type':      'text/event-stream',
+      'Cache-Control':     'no-cache',
+      'Connection':        'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+    res.flushHeaders();
+
     try {
       const signal = AbortSignal.timeout(30000);
       const resp = await fetch(ANTHROPIC_URL, {
         method: 'POST', signal,
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({
-          model: MODEL, max_tokens: 300, temperature: 0.9,
+          model: MODEL, max_tokens: 300, temperature: 0.9, stream: true,
           messages: [{ role: 'user', content: closingPrompt }],
         }),
       });
-      const data = await resp.json();
-      const prose = data?.content?.[0]?.text?.trim();
-      if (!prose) return res.status(500).json({ error: 'No prose returned.' });
-      return res.json({ prose });
+      await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
+      sendSse(res, { type: 'done' });
+      res.end();
     } catch (err) {
       const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
       console.error(`[CLOSING-PROSE] ${isTimeout ? 'timeout' : err.message}`);
-      return res.status(500).json({ error: isTimeout ? 'Request timed out.' : err.message });
+      if (res.headersSent) {
+        sendSse(res, { type: 'error', error: isTimeout ? 'Request timed out.' : err.message });
+        res.end();
+      } else {
+        res.status(500).json({ error: isTimeout ? 'Request timed out.' : err.message });
+      }
     }
   });
 

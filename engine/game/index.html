@@ -796,34 +796,57 @@ function showClosingScreen(endState, sessionId) {
   aftermathEl.textContent = aftermath;
 
   overlay.classList.remove('hidden');
+  proseEl.textContent = '';
 
-  function revealSequence(withProse) {
-    dotsEl.classList.add('hidden');
-    let delay = 200;
+  function triggerAftermath() {
     const step = 1300;
-    if (withProse) {
-      setTimeout(() => proseEl.classList.add('visible'),     delay); delay += step;
-    }
-    setTimeout(() => aftermathEl.classList.add('visible'),   delay); delay += step;
-    setTimeout(() => lineEl.classList.add('visible'),        delay); delay += step;
-    setTimeout(() => returnEl.classList.add('visible'),      delay);
+    let delay = 400;
+    setTimeout(() => aftermathEl.classList.add('visible'), delay); delay += step;
+    setTimeout(() => lineEl.classList.add('visible'),      delay); delay += step;
+    setTimeout(() => returnEl.classList.add('visible'),    delay);
   }
 
-  // Hold the screen on black until prose arrives or times out at 20 seconds.
-  // 8 seconds was too short — a 25KB transcript takes 10-20s for the LLM call.
   const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 20000);
+  const timeoutId  = setTimeout(() => controller.abort(), 30000);
+  let firstChunk   = true;
 
   fetch(`${API_BASE}/closing-prose?sessionId=${encodeURIComponent(sessionId)}`, { signal: controller.signal })
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(data => {
-      clearTimeout(timeoutId);
-      if (data.prose) proseEl.textContent = data.prose;
-      revealSequence(!!data.prose);
+    .then(async resp => {
+      const cpReader  = resp.body.getReader();
+      const cpDecoder = new TextDecoder();
+      let cpBuffer = '';
+      while (true) {
+        const { done, value } = await cpReader.read();
+        if (done) break;
+        cpBuffer += cpDecoder.decode(value, { stream: true });
+        const lines = cpBuffer.split('\n');
+        cpBuffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          let evt;
+          try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+          if (evt.type === 'chunk') {
+            if (firstChunk) {
+              firstChunk = false;
+              dotsEl.classList.add('hidden');
+              proseEl.classList.add('visible');
+            }
+            proseEl.textContent += evt.text;
+          } else if (evt.type === 'done') {
+            clearTimeout(timeoutId);
+            triggerAftermath();
+          } else if (evt.type === 'error') {
+            clearTimeout(timeoutId);
+            dotsEl.classList.add('hidden');
+            triggerAftermath();
+          }
+        }
+      }
     })
     .catch(() => {
       clearTimeout(timeoutId);
-      revealSequence(false);
+      dotsEl.classList.add('hidden');
+      triggerAftermath();
     });
 }
 
@@ -927,24 +950,68 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(isChoice ? {} : { player_action: playerInput }) })
     });
-    const data = await resp.json();
 
-    if (data.error) {
-      dotsEl.remove();
+    // Consume SSE stream
+    let streamEl = null;
+    let output = null, nextState = null;
+    const sseReader  = resp.body.getReader();
+    const sseDecoder = new TextDecoder();
+    let sseBuffer = '';
+
+    while (true) {
+      const { done, value } = await sseReader.read();
+      if (done) break;
+      sseBuffer += sseDecoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+        if (evt.type === 'chunk') {
+          if (!streamEl) {
+            dotsEl.remove();
+            streamEl = document.createElement('div');
+            streamEl.className = 'scene-card';
+            entryEl.appendChild(streamEl);
+          }
+          streamEl.textContent += evt.text;
+          storyEl.scrollTop = storyEl.scrollHeight;
+        } else if (evt.type === 'done') {
+          output    = evt.output;
+          nextState = evt.nextState;
+        } else if (evt.type === 'error') {
+          if (streamEl) streamEl.remove();
+          else dotsEl.remove();
+          const errEl = document.createElement('div');
+          errEl.className = 'scene-card scene-error';
+          errEl.innerHTML = `<p>${evt.error}</p>`;
+          entryEl.appendChild(errEl);
+          pendingEntryEl = null;
+          return;
+        }
+      }
+    }
+
+    if (!output || !nextState) {
+      if (streamEl) streamEl.remove();
+      else dotsEl.remove();
       const errEl = document.createElement('div');
       errEl.className = 'scene-card scene-error';
-      errEl.innerHTML = `<p>${data.error}</p>`;
+      errEl.innerHTML = `<p>No response received.</p>`;
       entryEl.appendChild(errEl);
       pendingEntryEl = null;
       return;
     }
 
+    if (streamEl) streamEl.remove();
+
     const prevLocation = gameState?.location;
-    gameState = data.nextState;
+    gameState = nextState;
 
     conversationHistory.push(
       { role: 'user',      content: playerInput },
-      { role: 'assistant', content: buildAssistantHistoryContent(data.output) }
+      { role: 'assistant', content: buildAssistantHistoryContent(output) }
     );
     if (conversationHistory.length > MAX_HISTORY_TURNS * 2) {
       conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS * 2);
@@ -952,18 +1019,18 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
 
     renderSidebar();
     updateChaseUI();
-    renderOutput(data.output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
+    renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
       gameState.timeExpired = true;
       showTimeDecision();
-    } else if (data.output?.endState?.isEnding) {
+    } else if (output?.endState?.isEnding) {
       try {
         formEl.querySelector('button[type="submit"]').disabled = true;
         inputEl.value = '';
         inputEl.disabled = true;
         renderChoices([]);
-        showClosingScreen(data.output.endState, sessionId);
+        showClosingScreen(output.endState, sessionId);
       } catch (e) {
         console.error('[CLOSING] failed to show closing screen:', e);
       }
