@@ -6,9 +6,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import Anthropic from '@anthropic-ai/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load .env from project root (../../ relative to engine/agents/)
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 // Paths relative to engine/agents/
 const SCENARIOS_DIR  = path.join(__dirname, '../data/scenarios');
@@ -30,7 +34,7 @@ async function reviewTranscript(transcriptPath, scenario) {
   try {
     response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1000,
+      max_tokens: 2000,
       messages: [{
         role: 'user',
         content: `You are a prose quality reviewer for an immersive historical fiction engine. Read this session transcript and identify two categories of issue. Respond in JSON only.
@@ -93,8 +97,13 @@ ${transcript}`
   try {
     return JSON.parse(text);
   } catch {
-    const match = text.match(/\{[\s\S]*\}/);
-    return match ? JSON.parse(match[0]) : null;
+    try {
+      const match = text.match(/\{[\s\S]*\}/);
+      return match ? JSON.parse(match[0]) : null;
+    } catch (e) {
+      console.error(`[SKIP] Could not parse model response for ${transcriptPath}: ${e.message}`);
+      return null;
+    }
   }
 }
 
