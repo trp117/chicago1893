@@ -1123,6 +1123,16 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
         inputEl.value = '';
         inputEl.disabled = true;
         renderChoices([]);
+        // Scroll to the bottom of the final scene so the player sees it in full
+        storyEl.scrollTop = storyEl.scrollHeight;
+        // Fade out the input/choices area — visual cue that the session is concluding
+        const bottomBar = document.querySelector('.bottom-bar');
+        if (bottomBar) {
+          bottomBar.style.transition = 'opacity 1.5s ease';
+          bottomBar.style.opacity = '0';
+        }
+        // Give the player time to read the final turn before transitioning
+        await new Promise(resolve => setTimeout(resolve, 4000));
         showClosingScreen(output.endState, sessionId);
       } catch (e) {
         console.error('[CLOSING] failed to show closing screen:', e);
@@ -1682,6 +1692,10 @@ function restartGame() {
   streamOptionsDots.classList.add('hidden');
   submitBtn.disabled = false;
 
+  const bottomBar = document.querySelector('.bottom-bar');
+  if (bottomBar) { bottomBar.style.transition = ''; bottomBar.style.opacity = ''; }
+
+  document.getElementById('candle-indicator').style.display = '';
   document.getElementById('role-overlay').classList.remove('hidden');
   showRoleSelection();
 }

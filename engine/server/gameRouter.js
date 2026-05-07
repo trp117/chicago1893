@@ -637,6 +637,14 @@ export function createGameRouter(repos, config = {}) {
         output.actTransition = { from: prevAct, to: nextState.act };
       }
 
+      // Prevent LLM-generated endings before the FINAL arc threshold (80% elapsed)
+      if (arcPosition !== 'final' && !state.finalAccusation) {
+        if (output.endState?.isEnding) {
+          console.log(`[ARC GUARD] arcPosition=${arcPosition} — suppressed premature isEnding`);
+          output.endState.isEnding = false;
+        }
+      }
+
       if (state.finalAccusation && !output.endState?.isEnding) {
         const failCond = (scenario.failConditions || [])[0] || 'The investigation ends inconclusively.';
         output.endState = {
