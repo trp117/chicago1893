@@ -1,7 +1,7 @@
 {
   "id": "boston_tea_party_version_2",
   "order": 11,
-  "hidden": false,
+  "hidden": true,
   "version": "1.0.0",
   "title": "boston tea party version 2",
   "setting": "Boston, 1773",
