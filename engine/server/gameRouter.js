@@ -129,6 +129,14 @@ function validateSceneOutput(narrative, state) {
   return { valid: true };
 }
 
+// ── Player attribution fixer ───────────────────────────────────────────────────
+
+function fixPlayerAttribution(text) {
+  return text.replace(/(?:^|\n)You:\s*(".*?")/gm, (match, quote) => {
+    return `\n${quote}`;
+  });
+}
+
 // ── Retry signal detectors ─────────────────────────────────────────────────────
 
 function hasSpeech(narrative) {
@@ -647,6 +655,15 @@ export function createGameRouter(repos, config = {}) {
             }
           }
         } catch {}
+      }
+
+      // Strip any "You:" attribution tags that slipped through generation
+      if (output.narrative) {
+        const fixed = fixPlayerAttribution(output.narrative);
+        if (fixed !== output.narrative) {
+          console.warn(`[ATTRIBUTION FIX] "You:" tag stripped — session ${sessionId}`);
+          output.narrative = fixed;
+        }
       }
 
       // Anchor violation check — runs after all retries, before streaming done
