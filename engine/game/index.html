@@ -324,7 +324,6 @@ li { margin-bottom: 8px; }
     <div class="panel stat-grid">
       <div><span class="label">Location</span><div id="location"></div></div>
       <div><span class="label">Threat</span><div id="threat"></div></div>
-      <div><span id="trust-label" class="label">Trust</span><div id="trust"></div></div>
     </div>
   </aside>
 
@@ -500,7 +499,6 @@ let locationShowing = false;
 let bootstrapData        = null;
 let ttsNarrationSpeed    = 1.0;
 let lastChoices          = [];
-let trustLabel           = 'Trust';
 
 // Pre-warmed /start request fired as soon as role is selected, resolved in startGame()
 let warmStart = null; // { promise, roleId, style, characterContext, activeHook }
@@ -678,7 +676,6 @@ function renderSidebar() {
   const _loc = locationsList.find(l => l.id === gameState.location);
   document.getElementById('location').textContent = _loc ? _loc.name : prettifyId(gameState.location);
   document.getElementById('threat').textContent   = String(gameState.threat);
-  document.getElementById('trust').textContent    = String(gameState.authorityTrust ?? 0);
 
   const sub = document.getElementById('header-subtitle');
   if (sub) {
@@ -1163,13 +1160,6 @@ async function loadGame() {
     ttsNarrationSpeed  = scenario.tts_narration_speed ?? 1.0;
     locationsList      = bootstrapData.locations    || [];
 
-    // Set trust label from scenario scales if available
-    const tLabel = scenario.systems?.scales?.authorityTrust?.label;
-    if (tLabel) {
-      trustLabel = tLabel;
-      const trustLabelEl = document.getElementById('trust-label');
-      if (trustLabelEl) trustLabelEl.textContent = tLabel;
-    }
 
     document.title = scenario.title || 'Investigation';
     if (titleEl) titleEl.textContent = scenario.title || 'Investigation';
