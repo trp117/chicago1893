@@ -521,7 +521,7 @@ const isMobileDevice = () => 'ontouchstart' in window || window.innerWidth <= 76
 // ── TTS ───────────────────────────────────────────────────────────────────────
 
 const synth = window.speechSynthesis;
-let ttsEnabled = localStorage.getItem('readAloudOn') !== 'false';
+let ttsEnabled = false;
 let audioUnlocked = false;
 let audioEl = null;
 let currentAudio = null;
@@ -539,7 +539,6 @@ const SVG_PLAY_ICON   = `<svg width="10" height="10" viewBox="0 0 10 10" fill="c
 
 function setTtsEnabled(val) {
   ttsEnabled = val;
-  localStorage.setItem('readAloudOn', String(val));
 }
 
 function cleanForSpeech(text) {

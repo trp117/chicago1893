@@ -169,6 +169,14 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .saved-pill.ok  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
 .saved-pill.warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
 
+/* ── Health indicator ────────────────────────────────────────── */
+.health-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; cursor: help; transition: background .3s; }
+.health-dot.checking     { background: var(--warn); animation: hpulse .9s ease-in-out infinite; }
+.health-dot.healthy      { background: var(--success); }
+.health-dot.needs-repair { background: var(--danger); }
+@keyframes hpulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+.repair-btn { display: none; }
+
 /* ── Scene Opening Style panel ──────────────────────────────── */
 .sop-panel { background: #f8fafc; border-top: 1px solid var(--border); padding: 16px; display: none; }
 .sop-panel.open { display: block; }
@@ -768,13 +776,17 @@ async function renderDashboard() {
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
     <div class="scenario-cards">${scenarios.map(s => `
-      <div class="scenario-play-card" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
+      <div class="scenario-play-card" data-scenario="${s.id}" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
-          <div class="scenario-play-card-info">
-            <div class="scenario-play-card-title">${s.title || s.id}</div>
-            <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+          <div class="scenario-play-card-info" style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span class="health-dot checking" title="Checking health…"></span>
+            <div style="min-width:0;">
+              <div class="scenario-play-card-title">${s.title || s.id}</div>
+              <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+            </div>
           </div>
           <div class="scenario-play-card-actions">
+            <button class="btn btn-secondary btn-sm repair-btn" data-scenario-id="${s.id}">⚕ Repair</button>
             <button class="btn btn-secondary btn-sm sop-toggle-btn" data-scenario-id="${s.id}">⚙ Scene Opening</button>
             <button class="btn btn-secondary btn-sm scenario-edit-btn" data-scenario-id="${s.id}">✏ Edit</button>
             <a class="btn btn-primary btn-sm" href="/game?scenarioId=${encodeURIComponent(s.id)}" target="_blank">▶ Play</a>
@@ -892,6 +904,15 @@ async function renderDashboard() {
 
   document.querySelectorAll('.scenario-edit-btn').forEach(btn => {
     btn.addEventListener('click', () => renderScenarioEditor(btn.dataset.scenarioId));
+  });
+
+  document.querySelectorAll('.repair-btn').forEach(btn => {
+    btn.addEventListener('click', () => repairScenario(btn.dataset.scenarioId));
+  });
+
+  // Auto health-check every scenario card on load
+  document.querySelectorAll('[data-scenario]').forEach(card => {
+    checkScenarioHealth(card.dataset.scenario);
   });
 }
 
@@ -1679,6 +1700,47 @@ async function renderReview() {
   if (sel) {
     sel.addEventListener('change', () => loadReport(sel.value));
     if (sel.value) loadReport(sel.value);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCENARIO HEALTH + REPAIR
+// ═══════════════════════════════════════════════════════════════
+async function checkScenarioHealth(scenarioId) {
+  const card = document.querySelector(`[data-scenario="${scenarioId}"]`);
+  if (!card) return;
+  const dot = card.querySelector('.health-dot');
+  try {
+    const health = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/health`);
+    if (!dot) return;
+    if (health.healthy) {
+      dot.className = 'health-dot healthy';
+      dot.title = 'All required fields present';
+    } else {
+      dot.className = 'health-dot needs-repair';
+      dot.title = `Missing: ${health.missing.join(' · ')}`;
+      const repairBtn = card.querySelector('.repair-btn');
+      if (repairBtn) repairBtn.style.display = 'inline-flex';
+    }
+  } catch {
+    if (dot) { dot.className = 'health-dot'; dot.style.background = 'var(--border)'; dot.title = 'Health check unavailable'; }
+  }
+}
+
+async function repairScenario(scenarioId) {
+  const card = document.querySelector(`[data-scenario="${scenarioId}"]`);
+  const btn  = card?.querySelector('.repair-btn');
+  if (btn) { btn.textContent = 'Repairing…'; btn.disabled = true; }
+  try {
+    const result = await apiFetch('POST', `/scenarios/${encodeURIComponent(scenarioId)}/repair`, {});
+    if (result.repairs?.length)  toast(`Repaired: ${result.repairs.join(', ')}`, 'success');
+    else                         toast(result.message || 'No repairs needed', 'info');
+    if (result.errors?.length)   toast(`Errors: ${result.errors.join(', ')}`, 'error');
+    await checkScenarioHealth(scenarioId);
+  } catch (err) {
+    toast(`Repair failed: ${err.message}`, 'error');
+  } finally {
+    if (btn) { btn.textContent = '⚕ Repair'; btn.disabled = false; }
   }
 }
 

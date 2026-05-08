@@ -1,5 +1,24 @@
 # Scenario Authoring Guide
 
+## briefing (required on every playerRole)
+
+Per-character entry paragraph. 150–250 words, second person present tense. Places the player at the exact threshold of the story's opening moment from this character's perspective.
+
+The briefing must:
+- Place the character in a specific physical location at the story's opening moment
+- Reference what this character knows that the others do not
+- Establish their emotional and physical state right now (not backstory)
+- End at the exact threshold of their first choice — the last breath before the player acts
+- Match the literary voice of the scenario introduction sections
+
+This text appears on the character introduction screen before the game begins and is written to the session transcript as the `## Character Brief` section. A missing briefing produces a blank section in every transcript for that character.
+
+**Required for every character in every scenario.** A missing or too-short briefing (`< 50 chars`) will cause the scenario generation validator to reject the output before saving.
+
+See `engine/data/scenarios/player_roles/dorothy_gill_role.json` for a reference implementation.
+
+---
+
 ## overused_anchors (optional)
 
 A list of setting-specific sensory details and character gestures that are powerful once and deadening when repeated. The engine limits each to one use per session automatically.

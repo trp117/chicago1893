@@ -39,6 +39,94 @@ function extractJson(raw) {
   throw new Error('No valid JSON found in model response.');
 }
 
+function extractAndValidateJson(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try { return JSON.parse(match[0]); } catch { return null; }
+}
+
+function validateGeneratedScenario(generated) {
+  const errors = [];
+  const roles = generated.playerRoles || [];
+
+  if (roles.length === 0) errors.push('No playerRoles defined');
+
+  roles.forEach(role => {
+    if (!role.briefing || role.briefing.trim().length < 50)
+      errors.push(`Role "${role.id}" missing or too-short briefing`);
+    if (!role.name)
+      errors.push(`Role "${role.id}" missing name`);
+    if (!role.description)
+      errors.push(`Role "${role.id}" missing description`);
+  });
+
+  const sections = generated.scenario?.introduction?.sections;
+  if (!sections || sections.length === 0)
+    errors.push('Missing introduction sections');
+
+  if (!generated.scenario?.sessionTargetMinutes)
+    errors.push('Missing scenario.sessionTargetMinutes');
+
+  return errors;
+}
+
+// Validates a scenario + its separately-loaded player roles (stored format).
+function validateStoredScenario(scenario, playerRoles) {
+  const errors = [];
+  if (!playerRoles || playerRoles.length === 0) errors.push('No playerRoles defined');
+  (playerRoles || []).forEach(role => {
+    if (!role.briefing || role.briefing.trim().length < 50)
+      errors.push(`Role "${role.id}" missing or too-short briefing`);
+    if (!role.name)        errors.push(`Role "${role.id}" missing name`);
+    if (!role.description) errors.push(`Role "${role.id}" missing description`);
+  });
+  if (!scenario?.introduction?.sections?.length) errors.push('Missing introduction sections');
+  if (!scenario?.sessionTargetMinutes)           errors.push('Missing sessionTargetMinutes');
+  return errors;
+}
+
+// Calls the Anthropic API to write a briefing for a single role.
+async function generateBriefingText(scenario, role, anthropicApiKey) {
+  const introText = (scenario.introduction?.sections || [])
+    .map(s => s.text || '').filter(Boolean).join('\n\n');
+
+  const prompt = [
+    'Write a character briefing for an immersive historical fiction experience.',
+    '',
+    `SCENARIO: ${scenario.title}`,
+    introText ? `SCENARIO INTRODUCTION:\n${introText}` : '',
+    '',
+    `CHARACTER: ${role.name}`,
+    `DESCRIPTION: ${role.description || ''}`,
+    role.perspective ? `PERSPECTIVE: ${role.perspective}` : '',
+    '',
+    'Write a briefing paragraph of 150-250 words in second person present tense.',
+    'Place the player inside this character\'s consciousness at the exact moment the story begins.',
+    '',
+    'The briefing must:',
+    '- Place the character in a specific physical location at the story\'s opening moment',
+    '- Reference what this character uniquely knows that others do not',
+    '- Establish their emotional and physical state right now — not backstory',
+    '- End at the exact threshold of their first choice — the last breath before the player acts',
+    '- Match the literary voice of the scenario introduction exactly',
+    '',
+    'Write only the briefing paragraph. No preamble, no explanation, no quotation marks.',
+  ].filter(Boolean).join('\n');
+
+  const signal = AbortSignal.timeout(30_000);
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', signal,
+    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 600, temperature: 0.8,
+      messages: [{ role: 'user', content: prompt }] })
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(`Anthropic API error (${resp.status}): ${data?.error?.message || JSON.stringify(data)}`);
+  const text = data?.content?.[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  return text;
+}
+
 function scalingGuide(minutes) {
   if (minutes <= 10) return { acts: 2, chars: '3–4', locs: '4–5',  clues: '3–4',  roles: 2, tpt: 2 };
   if (minutes <= 15) return { acts: 3, chars: '4–5', locs: '5–6',  clues: '5–6',  roles: 3, tpt: 2 };
@@ -97,13 +185,22 @@ Write a 4-section pre-game reading experience in the style of a serious narrativ
 Each section: 3–5 sentences. No section headers in the text. No meta-commentary.
 
 PLAYER BRIEFING RULES (required on every playerRole):
-- briefing: exactly 5 sentences, second person (You are...)
-  S1: who they are (name, trade, station in this world)
-  S2: one relationship with another character that has tension right now
-  S3: one thing they know they were not meant to know
-  S4: one want they have not yet acted on
-  S5: one sensory/physical detail placing them in this world right now
-  Must make the player feel already late for something. No backstory, no history lesson.
+- briefing: 150–250 word entry paragraph, second person present tense.
+  Places this character in a specific physical location at the story's opening moment.
+  References what this character knows that the others do not.
+  Establishes their emotional and physical state right now — not backstory, not history.
+  Ends at the exact threshold of their first choice: the last breath before the player acts.
+  Written in the same literary voice as the scenario introduction sections.
+  Do NOT use the 5-sentence formula. Write as continuous prose, not labelled sentences.
+  Example structure (adapt for this character and scenario):
+    "You are standing [specific location] with [specific physical detail].
+     You have [what this character uniquely knows that others do not].
+     [What is at stake for them personally, right now, not historically].
+     [The immediate sensory detail anchoring this moment].
+     [Final sentence lands them at the threshold of their first action]."
+  This text appears as the Character Brief on the introduction screen and is written
+  to the session transcript. A missing or template-copied briefing will create a blank
+  transcript section. Write it specific to this character and this opening moment.
 - character_hooks: array of exactly 3 first-person sentences — alternative starting conditions (different debt, different rumour, different relationship). One is picked randomly each session.
 - suggested_secret: one sentence. Something nobody in the story knows about this player character.
 
@@ -223,7 +320,7 @@ REQUIRED JSON STRUCTURE:
       "startingKnowledge": ["something they know at start"],
       "accessLevel": "worker | staff | director",
       "perspective": "How the AI should write for this role's point of view",
-      "briefing": "You are [name]. [Tension sentence]. [Forbidden knowledge]. [Unfulfilled want]. [Sensory anchor right now].",
+      "briefing": "You are standing [specific location] with [specific physical detail]. You have [what this character uniquely knows that others do not]. [What is at stake for them personally right now]. [The immediate sensory detail of this moment]. [Final sentence lands them at the threshold of their first action].",
       "character_hooks": ["First-person hook one.", "First-person hook two.", "First-person hook three."],
       "suggested_secret": "One sentence nobody in the story knows.",
       "opening": {
@@ -327,6 +424,57 @@ export function createAdminRouter(repos, config = {}) {
     const clues       = repos.clues.findByScenario(scenario.id);
     const playerRoles = repos.scenarios.findPlayerRoles(scenario.id);
     res.json({ scenario, storyArc: storyArc || null, characters, locations, clues, playerRoles });
+  });
+
+  // ── Scenario health check ────────────────────────────────────────────────────
+  r.get('/scenarios/:id/health', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
+    const missing = validateStoredScenario(scenario, playerRoles);
+    const roles = playerRoles.map(role => ({
+      id:             role.id,
+      name:           role.name,
+      hasBriefing:    !!(role.briefing && role.briefing.trim().length >= 50),
+      hasDescription: !!role.description,
+    }));
+    res.json({ scenarioId: req.params.id, healthy: missing.length === 0, missing, roles });
+  });
+
+  // ── Scenario repair ──────────────────────────────────────────────────────────
+  r.post('/scenarios/:id/repair', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
+
+    const repairs = [];
+    const errors  = [];
+
+    const rolesMissingBriefing = playerRoles.filter(
+      r => !r.briefing || r.briefing.trim().length < 50
+    );
+
+    if (rolesMissingBriefing.length === 0) {
+      return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [] });
+    }
+
+    for (const role of rolesMissingBriefing) {
+      try {
+        const briefing = await generateBriefingText(scenario, role, anthropicApiKey);
+        repos.scenarios.savePlayerRole({ ...role, briefing });
+        repairs.push(`Generated briefing for ${role.name}`);
+        console.log(`[REPAIR] ${req.params.id} — briefing written for "${role.name}" (${briefing.length} chars)`);
+      } catch (err) {
+        errors.push(`Failed to generate briefing for ${role.name}: ${err.message}`);
+        console.error(`[REPAIR ERROR] ${role.name}: ${err.message}`);
+      }
+    }
+
+    const updatedRoles = repos.scenarios.findPlayerRoles(req.params.id);
+    const remaining    = validateStoredScenario(scenario, updatedRoles);
+
+    res.json({ success: errors.length === 0, repairs, errors, remaining });
   });
   r.get('/locations',      (req, res) => res.json(
     req.query.scenarioId ? repos.locations.findByScenario(req.query.scenarioId) : repos.locations.findAll()
@@ -475,9 +623,10 @@ export function createAdminRouter(repos, config = {}) {
     const genTrace = langfuse?.trace({ name: 'story-generate', input: { playTimeMinutes, tokenBudget: toks } });
     const genSpan  = genTrace?.generation({ name: 'generate', model: 'claude-sonnet-4-6', modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
 
+    const timeoutMs = Math.max(480_000, toks * 25);  // ~25ms/token + headroom
+    const signal    = AbortSignal.timeout(timeoutMs);
     let text;
     try {
-      const signal   = AbortSignal.timeout(300_000);
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST', signal,
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
@@ -506,25 +655,34 @@ export function createAdminRouter(repos, config = {}) {
       const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
       genSpan?.end({ metadata: { error: isTimeout ? 'timeout' : err.message } });
       genTrace?.update({ tags: [isTimeout ? 'timeout' : 'error'] });
-      console.error(`[GENERATE ERROR] ${isTimeout ? 'timeout after 300s' : err.message}`);
+      console.error(`[GENERATE ERROR] ${isTimeout ? `timeout after ${timeoutMs / 1000}s` : err.message}`);
       return res.status(500).json({ error: isTimeout ? 'Generation timed out — try a shorter play time.' : err.message });
     }
 
-    try {
-      const generated = extractJson(text);
-      const missing = ['scenario','storyArc','characters','locations','clues','playerRoles'].filter(k => !generated[k]);
-      if (missing.length) {
-        genTrace?.update({ tags: ['missing-keys'] });
-        return res.status(500).json({ error: `Generated JSON is missing: ${missing.join(', ')}`, rawText: text.slice(0,500) });
-      }
-      genTrace?.update({ tags: ['success'], output: { scenarioId: generated.scenario?.id, characters: generated.characters?.length, locations: generated.locations?.length, clues: generated.clues?.length } });
-      console.log(`[GENERATE] saved scenario=${generated.scenario?.id} chars=${generated.characters?.length} locs=${generated.locations?.length} clues=${generated.clues?.length}`);
-      return res.json(generated);
-    } catch (err) {
-      const tail = text.slice(-200);
+    const generated = extractAndValidateJson(text);
+    if (!generated) {
+      console.error('[SCENARIO GEN] JSON truncated or malformed');
+      console.error('[SCENARIO GEN] Last 500 chars:', text.slice(-500));
       genTrace?.update({ tags: ['invalid-json'] });
-      return res.status(500).json({ error: `Claude returned invalid JSON (response may be truncated).\n\nLast 200 chars:\n${tail}` });
+      return res.status(500).json({
+        error: 'Scenario generation failed — response truncated. The max_tokens limit may still be too low for this scenario size.',
+        lastChars: text.slice(-500)
+      });
     }
+    const missing = ['scenario','storyArc','characters','locations','clues','playerRoles'].filter(k => !generated[k]);
+    if (missing.length) {
+      genTrace?.update({ tags: ['missing-keys'] });
+      return res.status(500).json({ error: `Generated JSON is missing: ${missing.join(', ')}`, rawText: text.slice(0,500) });
+    }
+    const completenessErrors = validateGeneratedScenario(generated);
+    if (completenessErrors.length > 0) {
+      console.error('[SCENARIO GEN] Validation failed:', completenessErrors);
+      genTrace?.update({ tags: ['validation-failed'] });
+      return res.status(500).json({ error: 'Generated scenario is incomplete', missing: completenessErrors });
+    }
+    genTrace?.update({ tags: ['success'], output: { scenarioId: generated.scenario?.id, characters: generated.characters?.length, locations: generated.locations?.length, clues: generated.clues?.length } });
+    console.log(`[GENERATE] saved scenario=${generated.scenario?.id} chars=${generated.characters?.length} locs=${generated.locations?.length} clues=${generated.clues?.length}`);
+    return res.json(generated);
   });
 
   r.post('/generate/player-briefings', async (req, res) => {

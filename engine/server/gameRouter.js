@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
 import { randomUUID } from 'crypto';
-import { appendFile, mkdir, readFile } from 'fs/promises';
+import { appendFile, mkdir, readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -435,30 +435,44 @@ export function createGameRouter(repos, config = {}) {
       }
       appData.saveSession(sessionId, nextState);
 
-      // Transcript — fire-and-forget
-      appendFile(
+      // Transcript — fire-and-forget (writeFile creates fresh; no stale append risk)
+      const introSections = scenario.introduction?.sections || [];
+      let introText = '';
+      for (const section of introSections) {
+        const text = section.type === 'entry'
+          ? (section.character_entries?.[roleId] || section.text || '')
+          : (section.text || '');
+        if (text) introText += text + '\n\n';
+      }
+
+      const transcriptHeader = [
+        `# ${scenario.title || scenarioId}`,
+        `## Scenario: ${scenarioId}`,
+        `## Character: ${role.name}`,
+        `## Session: ${sessionId}`,
+        `## Date: ${new Date().toISOString()}`,
+        `## Play Time: ${scenario.sessionTargetMinutes || '?'} minutes`,
+        ``,
+        `---`,
+        ``,
+        `## Character Brief`,
+        ``,
+        role.briefing || '',
+        ``,
+        `---`,
+        ``,
+        introText.trimEnd()
+          ? `## Introduction\n\n${introText.trimEnd()}\n\n---\n\n## Session\n\n`
+          : `## Session\n\n`,
+        output.narrative || '',
+        ``,
+        `---`,
+        ``,
+      ].join('\n');
+
+      writeFile(
         join(TRANSCRIPTS_DIR, `${sessionId}.md`),
-        [
-          `---`,
-          `scenario: ${scenarioId}`,
-          `character: ${role.name}`,
-          `session: ${sessionId}`,
-          `started: ${new Date().toISOString()}`,
-          `---`,
-          ``,
-          `# ${scenario.title || scenarioId}`,
-          ``,
-          `**Role:** ${role.name}`,
-          ``,
-          `---`,
-          ``,
-          `## Introduction`,
-          ``,
-          output.narrative || '',
-          ``,
-          `---`,
-          ``,
-        ].join('\n')
+        transcriptHeader
       ).catch(e => console.error('[TRANSCRIPT]', e.message));
 
       sendSse(res, { type: 'done', output, nextState, sessionId });
@@ -940,13 +954,13 @@ export function createGameRouter(repos, config = {}) {
       // Append closing prose (and historical aftermath) to the session transcript
       if (prose) {
         try {
-          const scenarioMatch = transcript.match(/^scenario:\s*(.+)$/m);
+          const scenarioMatch = transcript.match(/^##\s+Scenario:\s*(.+)$/m) || transcript.match(/^scenario:\s*(.+)$/m);
           const scenarioId    = scenarioMatch?.[1]?.trim();
           const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
           const aftermath     = scenarioData?.historical_aftermath || '';
           const lines = ['', '## Closing Prose', '', prose];
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
-          lines.push('');
+          lines.push('', '## Closing Line', '', 'You were there.', '');
           await appendFile(transcriptPath, lines.join('\n'));
         } catch (e) {
           console.error('[TRANSCRIPT CLOSING]', e.message);
