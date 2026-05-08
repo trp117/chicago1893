@@ -1,0 +1,94 @@
+{
+  "id": "lightning_and_the_midnight_coach",
+  "version": "1.0.0",
+  "title": "Lightning and the Midnight Coach",
+  "description": "In the autumn of 1856, a red fire message crackles across Ezra Cornell's expanding telegraph lines, carrying a bounty description of freedom-seekers moving through the Ohio corridor. A veteran Underground Railroad conductor and his son — a telegraph operator at the Sandusky junction — must outmaneuver the brass and the law before the iron horse delivers its human cargo into the hands of slave catchers.",
+  "genre": [
+    "historical_thriller",
+    "mystery",
+    "moral_drama"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 30,
+  "storyArcIds": [
+    "lightning_and_the_midnight_coach_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_conductor",
+    "role_lightning_flinger",
+    "role_stationmaster"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_red_fire_dispatch",
+    "clue_nulled_codebook"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "A relay station east of Sandusky re-transmits the bounty description with updated physical particulars — threat rises by 2.",
+      "Deputy Marshal Crane is spotted on horseback near the Huron River crossing, closing the northern route — threat rises by 1.",
+      "The telegraph line goes silent for twelve minutes; operators assume sabotage and begin manual inspection patrols — authorityTrust drops by 1."
+    ]
+  },
+  "winConditions": [
+    "The midnight coach passengers reach the Lake Erie ferry before the bounty wire is re-transmitted and the sheriff acts on it.",
+    "The informant inside the network is identified and neutralized before they can confirm the passengers' location to Marshal Crane.",
+    "Caleb Morse successfully phantoms a false route on the brass, sending Crane's posse toward Huron while the real party crosses at Marblehead."
+  ],
+  "failConditions": [
+    "Marshal Crane intercepts the midnight coach on the Sandusky Road with the bounty description in hand.",
+    "The informant successfully transmits the passengers' exact location before being exposed.",
+    "Time expires with the passengers still south of the lake and the threat scale at 8 or above."
+  ],
+  "partialSuccessExamples": [
+    "The passengers escape but Elias Cutter is arrested — the network survives at great personal cost.",
+    "The informant is exposed but the bounty wire reaches Crane before the phantom message can misdirect him — one passenger is recaptured.",
+    "Caleb destroys the brass at the junction, silencing the line but also alerting the company to sabotage and endangering the entire Ohio network."
+  ],
+  "introduction": {
+    "enabled": true,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": "It is October 1856, and the telegraph wire has changed everything. Ezra Cornell's New York and Erie Telegraph Company now strings its copper and gutta-percha across nearly every major rail corridor in the northern states, and where the wire goes, the law follows within minutes rather than days. Samuel Morse, who drew his first patent in 1837, has made no secret of his sympathies — his 1863 pamphlet defending slavery is still a decade away, but his politics are already well known in the operator rooms and the parlors of men who use his invention to enforce the Fugitive Slave Act of 1850. In the Ohio corridor between Cincinnati and the Lake Erie shore, the Underground Railroad moves an estimated 1,500 freedom-seekers per year through a web of safe houses, root cellars, church lofts, and false-bottomed wagons — but every year the web grows more dangerous, because the men hunting them can now speak faster than a horse can run."
+      },
+      {
+        "type": "stakes",
+        "text": "Tonight, three passengers — a man, a woman, and a child of perhaps seven — are moving north through Erie County toward a Lake Erie ferry captain who will not wait past four in the morning. If they do not reach Marblehead by three-fifteen, the captain sails without them, and they will be stranded in open country with a fresh bounty description already on the wire. The description was filed this evening by a slave catcher named Aldous Greer out of Columbus, who paid a relay operator twenty dollars to mark it red fire — the highest priority designation, reserved for life and death. For the people in that wagon, it is precisely that."
+      },
+      {
+        "type": "scene",
+        "text": "The Sandusky rail junction smells of coal smoke, horse dung, and the faint mineral bite of lake air pushing inland on a northwest wind. The station lamp throws a yellow oval across the platform planking, and somewhere in the instrument room the sounder is clicking in its tin cup — a sound like a man tapping his finger on a table, patient and relentless. The maples along the Huron Road have dropped most of their leaves, and what remains rattles in the dark like dry paper. It is eleven forty in the evening, the temperature is falling toward freezing, and the last regular passenger consist cleared the main forty minutes ago."
+      },
+      {
+        "type": "entry",
+        "text": "You have been watching this junction for three hours from different angles — from the woodpile behind the freight house, from the shadow of the water tower, from the road itself. You know the schedule, you know the faces, and you know that somewhere between here and the lake a message is already moving that could end everything you have built over the last eleven years. The sounder inside the instrument room has gone quiet for the last four minutes, which is either nothing or the most important silence of your life. You are standing at the edge of the lamplight, close enough to smell the coal oil in the lantern, and the door to the instrument room is ten feet away.",
+        "character_entries": {
+          "role_conductor": "",
+          "role_lightning_flinger": "",
+          "role_stationmaster": ""
+        }
+      }
+    ]
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.452Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": []
+}

@@ -1,0 +1,20 @@
+{
+  "id": "loc_freight_house",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "name": "The Freight House and Root Cellar",
+  "description": "A long timber building beside the rail spur, smelling of sawdust, axle grease, and something damp from below — the root cellar access is a trapdoor beneath a stack of empty crates, invisible unless you know to look.",
+  "mood": "hidden, urgent, fearful, close",
+  "linkedCharacterIds": [
+    "elias_cutter",
+    "prentiss_hoyle"
+  ],
+  "atmosphericDetails": [
+    "The trapdoor hinges have been oiled recently — they make no sound.",
+    "Three bedrolls are arranged in the cellar, two adult-sized and one small, still holding the warmth of recent occupation.",
+    "A lantern with a red glass panel hangs on a nail beside the trapdoor — the signal color for danger."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.460Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

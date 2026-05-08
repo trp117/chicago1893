@@ -1,0 +1,17 @@
+{
+  "id": "clue_worn_heel_bootprint",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Worn-Heel Bootprint Pattern",
+  "description": "A boot print in the coal dust near the depot platform edge shows a distinctive worn-down right heel — the same pattern visible at the telegraph pole scrape site on the rail spur and near the freight house trapdoor. Three locations, one boot. The stride length and depth suggest a man of medium height and working-class build who moves quickly and quietly over rough ground.",
+  "category": "observation",
+  "discoveryLocationId": "loc_depot_platform",
+  "implicatesCharacterIds": [
+    "prentiss_hoyle"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.470Z",
+  "locationId": "",
+  "isRedHerring": false
+}

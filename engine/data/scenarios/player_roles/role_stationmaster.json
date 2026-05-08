@@ -1,0 +1,51 @@
+{
+  "id": "role_stationmaster",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "name": "The Stationmaster",
+  "description": "You are Harriet Voss, stationmaster of the Sandusky depot, and you know more than you have told anyone — about the pocket relay you found on the wire, about the federal notification that arrived before the red fire, and about what you saw near the water tower two nights ago.",
+  "startLocationId": "loc_stationmaster_office",
+  "startingKnowledge": [
+    "A federal notification arrived at 10:15 PM informing the depot that a deputy marshal was operating in the area.",
+    "You removed a pocket relay tap from the wire south of the depot three nights ago and kept it.",
+    "You saw Prentiss Hoyle speaking with an unknown man near the water tower two nights ago.",
+    "The freight house root cellar exists and you have never asked what it is used for, which is a choice you made deliberately."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a woman who has survived in a man's institution by being more precise, more prepared, and more aware of consequences than anyone around her. She sees everything in terms of exposure and liability — her own first, then the depot's, then other people's.",
+  "briefing": "You are Harriet Voss, stationmaster of the Sandusky junction depot, and you are the only person in this building tonight who has read both the federal notification and the red fire dispatch and understood exactly what they mean together. Marshal Crane will be at your platform within the hour, and in your locked desk drawer is a piece of evidence that could either protect the people moving through your freight house or destroy you professionally if it is found. You have not told Caleb Morse what you know about the tap on the wire, and you have not told Elias Cutter that you know he uses the root cellar, and you are sitting in your office right now deciding which silence to break first. The lamp on your desk is burning and the logbook is open and you have written nothing in it for the last forty minutes.",
+  "character_hooks": [
+    "I have been leaving the freight house unlocked on certain nights for three years, and I have never once asked what was stored there — tonight I am going to have to decide if that was cowardice or wisdom.",
+    "I know that the man Prentiss Hoyle was speaking with near the water tower was Aldous Greer, because I have seen Greer's description in a circular that came through the depot six months ago, and I said nothing.",
+    "I have the pocket relay in my drawer and I know whose clip marks match it, and I have been protecting that person for reasons I have not fully examined."
+  ],
+  "suggested_secret": "Harriet has been keeping a private log — separate from the official depot logbook — that documents every irregular event at the station for the last two years, including three previous occasions when the root cellar was used. She has kept it as insurance, but it would also be the most complete record of the network's operations that exists in any single document.",
+  "opening": {
+    "narrative": "You received the federal notification at 10:15 and the red fire at 11:31 and you have been sitting with both of them for the last nine minutes, which is exactly as long as Caleb Morse has been sitting with his. The logbook entry for tonight stops at 11:22 and you have not written anything since because you are not sure what the truthful version of tonight's events looks like yet. The pocket relay in your drawer is the size of a large pocket watch and it weighs almost nothing, but it feels heavier every time you think about it. You can hear the sounder clicking in the instrument room through the wall, which means Caleb is either sending or receiving, and you do not know which.",
+    "npcMoments": [],
+    "choices": [
+      "Go to the instrument room and tell Caleb what you know about the federal notification and the tap.",
+      "Send a message to Elias Cutter through the freight house — you know how to leave a signal.",
+      "Lock the office, destroy the pocket relay, and write a complete and innocent account of tonight in the logbook."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "The depot logbook, open to tonight's incomplete entry.",
+      "The pocket relay tap, locked in the desk drawer.",
+      "A copy of the federal notification wire, folded in her coat pocket.",
+      "The depot master key, which opens every locked room in the station."
+    ],
+    "flags": {
+      "federal_notification_received": true,
+      "pocket_relay_in_possession": true,
+      "hoyle_sighting_unreported": true,
+      "root_cellar_knowledge": true
+    },
+    "suspicion": {
+      "marshal_crane": 0,
+      "prentiss_hoyle": 1
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.473Z"
+}

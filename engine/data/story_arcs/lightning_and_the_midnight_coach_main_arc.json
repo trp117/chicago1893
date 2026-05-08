@@ -1,0 +1,73 @@
+{
+  "id": "lightning_and_the_midnight_coach_main_arc",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "name": "The Red Fire on the Sandusky Wire",
+  "premise": "A bounty description transmitted as red fire on Ezra Cornell's telegraph line threatens to deliver three freedom-seekers into the hands of a federal marshal. A conductor and his telegraph-operator son must use the enemy's own technology against itself — but someone inside the network has already been talking to the law.",
+  "goal": "Identify the informant, phantom a false route on the telegraph brass, and move the midnight coach passengers to the Lake Erie ferry before Marshal Crane acts on the bounty wire.",
+  "openingSituation": "The red fire dispatch has been received at the Sandusky junction. Caleb Morse, the night operator, has seen it and knows his father's passengers match the description. He has not yet responded to the sending station. He has approximately twelve minutes before the relay protocol requires him to acknowledge and forward.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Brass Speaks",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        "Players discover that the red fire dispatch has already been received and partially forwarded — the Huron relay station has a copy.",
+        "First contact between the conductor role and the lightning flinger role establishes the scope of the crisis and the time remaining.",
+        "A gandy dancer named Prentiss Hoyle is found loitering near the freight house with no clear reason to be there at this hour.",
+        "The codebook used by the network's safe-house chain is found to have been recently handled — pages are bent at entries that correspond to the passengers' descriptions."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "Ground Wire",
+      "minuteRange": [
+        8,
+        16
+      ],
+      "beats": [
+        "Caleb attempts to phantom a false route message, directing Crane's attention toward the Huron crossing instead of Marblehead — but the sending is interrupted by an unexpected incoming wire.",
+        "The stationmaster, Harriet Voss, reveals she intercepted a pocket-relay tap on the line south of the depot three nights ago and said nothing — her reasons are ambiguous.",
+        "Players discover that Aldous Greer, the slave catcher, is not in Columbus as his filing suggested — he is within twelve miles of Sandusky.",
+        "The passengers are moved from the root cellar beneath the freight house to a secondary cache point, but one item is left behind that implicates the network."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "Nulls in the Wire",
+      "minuteRange": [
+        16,
+        24
+      ],
+      "beats": [
+        "The nulled codebook clue becomes legible — hidden at every third entry is a message that names the informant and the method they used to communicate with Greer.",
+        "Marshal Crane arrives at the junction depot asking routine questions about northbound wagon traffic — his suspicion score begins rising based on player actions.",
+        "The phantom message Caleb sent is working, but a second operator at the Huron station — a known plug — has misread it and is asking for a repeat, threatening to expose the deception.",
+        "Elias Cutter must make a physical choice about the route: the main road is faster but exposed; the ballast path along the rail spur is slower but dark."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "Highball to Marblehead",
+      "minuteRange": [
+        24,
+        30
+      ],
+      "beats": [
+        "The informant is confronted — their response depends on accumulated suspicion score and which clues have been presented.",
+        "Caleb must send a final wire — either a clean phantom to close the deception, a line-grounding to silence the entire corridor, or a 30 to end his own transmission and walk away from the brass forever.",
+        "Elias and the midnight coach make their final approach to the Marblehead ferry dock — threat scale determines whether Crane or Greer intercepts them.",
+        "Resolution: the passengers either reach the ferry, are intercepted, or the network is exposed depending on player choices across all four acts."
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.453Z",
+  "opening": ""
+}

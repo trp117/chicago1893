@@ -1,0 +1,18 @@
+{
+  "id": "clue_crane_advance_wire",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "Crane's Advance Intelligence Wire",
+  "description": "In the depot logbook, an incoming wire logged at 10:15 PM — before the red fire dispatch arrived — is recorded as a routine federal notification. But the logbook entry is in Harriet Voss's handwriting, and she has added a notation in the margin that reads only: CRANE ALREADY KNOWS ROUTE. The wire itself has been removed from the receiving tray, but the impression on the wax paper beneath it is still legible under oblique lamplight: it is a federal notification to all Erie corridor stations that a deputy marshal is operating in the area and that station personnel should cooperate with his inquiries.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_stationmaster_office",
+  "implicatesCharacterIds": [
+    "marshal_crane",
+    "harriet_voss"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.471Z",
+  "locationId": "",
+  "isRedHerring": false
+}

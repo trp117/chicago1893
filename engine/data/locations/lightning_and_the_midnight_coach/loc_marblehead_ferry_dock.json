@@ -1,0 +1,19 @@
+{
+  "id": "loc_marblehead_ferry_dock",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "name": "The Marblehead Ferry Dock",
+  "description": "A stone-and-timber dock on the Lake Erie shore, the water black and cold beyond it, the ferry lantern visible as a point of orange light on the dark water — the captain is there, waiting, but his patience has a clock on it.",
+  "mood": "final, open, cold, hopeful, precarious",
+  "linkedCharacterIds": [
+    "elias_cutter"
+  ],
+  "atmosphericDetails": [
+    "The lake wind is sharp and smells of deep water and coming ice — the first freeze is three weeks away.",
+    "The ferry captain's signal lantern is showing white, not red — the way is clear for now.",
+    "The dock planking is slick with spray and the footing is treacherous for anyone moving fast."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.464Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

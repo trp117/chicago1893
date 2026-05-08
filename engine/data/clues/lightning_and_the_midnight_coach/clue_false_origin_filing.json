@@ -1,0 +1,17 @@
+{
+  "id": "clue_false_origin_filing",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Columbus Timestamp Contradiction",
+  "description": "Cross-referencing the red fire dispatch timestamp against the Erie rail schedule in the depot logbook reveals that no passenger train ran from Columbus to the Erie corridor today — and a man on horseback would require at least eighteen hours to cover the distance. Greer filed the dispatch claiming a Columbus origin at 9:47 PM, but if he is close enough to Sandusky to act on the bounty tonight, he was already north of Columbus when he filed. He used a relay operator to send the message under a false origin station, placing himself legally in Columbus while physically near the target.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_stationmaster_office",
+  "implicatesCharacterIds": [
+    "aldous_greer"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.469Z",
+  "locationId": "",
+  "isRedHerring": false
+}

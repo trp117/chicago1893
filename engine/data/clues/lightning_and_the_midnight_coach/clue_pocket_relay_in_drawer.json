@@ -1,0 +1,20 @@
+{
+  "id": "clue_pocket_relay_in_drawer",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Pocket Relay in Harriet's Drawer",
+  "description": "Inside the locked desk drawer in the stationmaster's office — accessible if Harriet is persuaded or the drawer is examined while she is absent — sits a small spring-clip pocket relay sounder, a portable device used for tapping telegraph lines. It is not standard depot equipment. It smells of damp wood and pine resin, consistent with having been used outdoors. The spring clip shows wear consistent with multiple uses. Harriet removed this from the wire south of the depot three nights ago and kept it.",
+  "category": "physical",
+  "discoveryLocationId": "loc_stationmaster_office",
+  "implicatesCharacterIds": [
+    "harriet_voss",
+    "prentiss_hoyle"
+  ],
+  "unlocks": [
+    "clue_pocket_relay_scrape"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.468Z",
+  "locationId": "",
+  "isRedHerring": false
+}

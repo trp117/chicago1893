@@ -1,0 +1,17 @@
+{
+  "id": "clue_warm_bedrolls",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Three Warm Bedrolls",
+  "description": "In the root cellar beneath the freight house, three bedrolls are arranged on a raised wooden pallet — two adult-sized and one small, approximately sized for a child of six or seven. All three are still warm to the touch, meaning the occupants left within the last thirty to forty-five minutes. The small bedroll holds a child's cloth doll, left behind in haste. This directly contradicts the bounty dispatch, which describes only two adults — meaning whoever informed on the passengers did not know about the child.",
+  "category": "observation",
+  "discoveryLocationId": "loc_freight_house",
+  "implicatesCharacterIds": [
+    "prentiss_hoyle"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.470Z",
+  "locationId": "",
+  "isRedHerring": false
+}

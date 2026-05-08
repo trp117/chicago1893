@@ -1,0 +1,20 @@
+{
+  "id": "loc_instrument_room",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "name": "The Instrument Room, Sandusky Junction Depot",
+  "description": "A narrow room off the main waiting hall, lit by two oil lamps and dominated by the telegraph table — the brass key and sounder sit on green baize, the sounder's tin resonator amplifying every click into the low ceiling.",
+  "mood": "tense, intimate, claustrophobic, electric",
+  "linkedCharacterIds": [
+    "caleb_morse",
+    "harriet_voss"
+  ],
+  "atmosphericDetails": [
+    "The sounder clicks in irregular bursts — the Huron station is asking for a repeat.",
+    "A smell of hot metal and lamp oil hangs in the air, mixed with the coal smoke drifting in from the platform.",
+    "The codebook lies open on the corner of the table, its spine cracked from heavy use, one page corner folded down."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.460Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

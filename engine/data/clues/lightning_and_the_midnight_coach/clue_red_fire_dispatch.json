@@ -1,0 +1,20 @@
+{
+  "id": "clue_red_fire_dispatch",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Red Fire Dispatch",
+  "description": "A paper tape from the sounder, still in the receiving tray at the Sandusky instrument room. The message is marked with the double-dash prefix that designates red fire priority. It contains a physical description of three people — a tall man with a scar above his left eye, a woman with a child of approximately seven years — and names Aldous Greer of Columbus as the filing party. The description matches Elias Cutter's current passengers precisely. The filing timestamp shows the message was sent from Columbus at 9:47 PM, but Columbus is 140 miles south — Greer could not have filed it from Columbus if he is already within twelve miles of Sandusky.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_instrument_room",
+  "implicatesCharacterIds": [
+    "aldous_greer",
+    "marshal_crane"
+  ],
+  "unlocks": [
+    "clue_false_origin_filing"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.465Z",
+  "locationId": "",
+  "isRedHerring": false
+}

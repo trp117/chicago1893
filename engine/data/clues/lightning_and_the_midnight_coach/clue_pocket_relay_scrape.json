@@ -1,0 +1,17 @@
+{
+  "id": "clue_pocket_relay_scrape",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "title": "The Wire Tap Scrape Marks",
+  "description": "On the cedar telegraph pole at the quarter-mile mark of the rail spur, fresh scrape marks in the wood show where a spring-clip pocket relay was recently attached — the bark is still pale and raw where the metal bit in. The marks are at a height consistent with a man of average build reaching up. The ground beneath the pole shows a boot print with a distinctive worn heel pattern.",
+  "category": "physical",
+  "discoveryLocationId": "loc_rail_spur_ballast",
+  "implicatesCharacterIds": [
+    "prentiss_hoyle"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.467Z",
+  "locationId": "",
+  "isRedHerring": false
+}
