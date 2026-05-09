@@ -1,23 +1,43 @@
 {
   "id": "chicago_1893_v1",
   "order": 2,
-  "hidden": true,
+  "hidden": false,
   "version": "1.0.0",
   "title": "Chicago, 1893: Shadows of the White City",
   "setting": "Chicago, 1893",
   "description": "A 20-minute historical thriller set during the World's Columbian Exposition. A conspiracy threatens to sabotage the fair's opening night lighting demonstration.",
-  "genre": ["historical thriller", "mystery"],
+  "genre": [
+    "historical thriller",
+    "mystery"
+  ],
   "historicalRealism": "high",
   "freedomLevel": "guided",
   "sessionTargetMinutes": 20,
-  "storyArcIds": ["chicago1893_main_arc"],
-  "playerRoleIds": ["burnhams_assistant", "daniel_burnham", "watchman_murphy"],
-  "keyEvidenceClueIds": ["tampered_wiring_diagrams", "opening_night_note"],
+  "storyArcIds": [
+    "chicago1893_main_arc"
+  ],
+  "playerRoleIds": [
+    "burnhams_assistant",
+    "daniel_burnham",
+    "watchman_murphy"
+  ],
+  "keyEvidenceClueIds": [
+    "tampered_wiring_diagrams",
+    "opening_night_note"
+  ],
   "systems": {
     "timePerTurnDefault": 2,
     "scales": {
-      "threat":       { "min": 0,  "max": 10, "default": 1 },
-      "burnhamTrust": { "min": -3, "max": 5,  "default": 1 }
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "burnhamTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
     },
     "pressureEvents": [
       "A telegraph arrives with contradictory instructions",
@@ -42,5 +62,183 @@
     "Burnham is saved political embarrassment, but the player sacrifices an ally"
   ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2026-05-09T21:42:16.501Z",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "White City Construction & Fair Administration Argot",
+        "context": "Used by Burnham, his engineers, and senior fair staff when discussing logistics, infrastructure, and the exposition's internal operations.",
+        "terms": [
+          {
+            "term": "the Court",
+            "meaning": "The Court of Honor, the central lagoon plaza — the symbolic and operational heart of the exposition; shorthand for anything of highest priority or visibility."
+          },
+          {
+            "term": "staff work",
+            "meaning": "Construction using plaster mixed with jute fiber to create the fair's iconic white facades — 'staff' refers both to the material and to any rushed, surface-level fix meant to look permanent."
+          },
+          {
+            "term": "the Schedule",
+            "meaning": "Burnham's master construction and event timetable, treated as near-sacred; to 'break the Schedule' is a serious professional offense."
+          },
+          {
+            "term": "dark circuit",
+            "meaning": "Any electrical line or zone that has lost power or been deliberately disconnected; also used metaphorically for a department or person cut out of communications."
+          },
+          {
+            "term": "the Machinery Hall crowd",
+            "meaning": "Engineers and technical exhibitors centered in Machinery Hall — considered pragmatic, unglamorous, and politically reliable compared to the fine-arts faction."
+          },
+          {
+            "term": "a Burnham order",
+            "meaning": "A directive issued with absolute authority and no expectation of debate; invoking Burnham's name directly to end an argument or commandeer resources."
+          },
+          {
+            "term": "the lakefront problem",
+            "meaning": "Any logistical or structural issue caused by the exposition's proximity to Lake Michigan — flooding, wind, unstable ground — used broadly for any crisis with no clean solution."
+          }
+        ]
+      },
+      {
+        "name": "Chicago Ward Politics & Fixer Cant",
+        "context": "Used by Hanrahan and his network of aldermen, precinct captains, and procurement contacts when conducting informal business around the fair.",
+        "terms": [
+          {
+            "term": "the combine",
+            "meaning": "The informal alliance of aldermen and ward bosses who control city contracts and patronage — to 'go through the combine' means to pay the appropriate political toll."
+          },
+          {
+            "term": "a consideration",
+            "meaning": "A bribe or kickback, always spoken of in polite, euphemistic terms; the amount is never named aloud in a first conversation."
+          },
+          {
+            "term": "boodle",
+            "meaning": "Money paid for political favors or graft; a 'boodler' is an alderman known to accept such payments, which in 1893 Chicago describes most of them."
+          },
+          {
+            "term": "the Gray Wolves",
+            "meaning": "The corrupt faction of the Chicago City Council notorious for selling franchises and contracts; Hanrahan's primary institutional connection."
+          },
+          {
+            "term": "square the roundsman",
+            "meaning": "To pay off or otherwise neutralize a beat cop or low-level official who might interfere with an arrangement."
+          },
+          {
+            "term": "a river job",
+            "meaning": "A contract or task handled entirely off the books, with no paper trail — named for the practice of disposing of inconvenient records in the Chicago River."
+          },
+          {
+            "term": "on the slate",
+            "meaning": "A debt of favor owed to Hanrahan or the ward; someone 'on the slate' is expected to deliver a service when called upon, no questions asked."
+          },
+          {
+            "term": "the precinct captain's nod",
+            "meaning": "Tacit approval from ward-level political authority — without it, no significant business in a given neighborhood proceeds safely."
+          }
+        ]
+      },
+      {
+        "name": "Electrical Trade Shorthand",
+        "context": "Used by Mercier and the fair's electrical engineers when discussing the Tesla-Westinghouse AC lighting system powering the exposition's opening-night demonstration.",
+        "terms": [
+          {
+            "term": "the alternating current",
+            "meaning": "The Westinghouse AC system powering the fair — always referred to with a note of professional pride by its supporters and barely concealed contempt by Edison partisans."
+          },
+          {
+            "term": "the dynamos",
+            "meaning": "The twelve Westinghouse generators in the Machinery Hall that produce the fair's electrical supply; the physical and symbolic core of the lighting demonstration."
+          },
+          {
+            "term": "a ground fault",
+            "meaning": "An unintended electrical connection to earth that can disrupt or short an entire circuit — the most plausible cover story for a deliberate act of sabotage."
+          },
+          {
+            "term": "the switchboard",
+            "meaning": "The central control panel governing power distribution across the fairgrounds; access to it is tightly restricted and its location is not on public maps."
+          },
+          {
+            "term": "Hertz",
+            "meaning": "The unit of electrical frequency, newly named for Heinrich Hertz — Mercier uses it casually as a marker of technical sophistication; American engineers sometimes still say 'cycles.'"
+          },
+          {
+            "term": "dead wire",
+            "meaning": "A conductor carrying no current, either by design or failure — used figuratively by Mercier to describe a contact or lead that has gone silent or unreliable."
+          },
+          {
+            "term": "the load",
+            "meaning": "The total electrical demand of the fairgrounds at any given moment; 'carrying the load' on opening night is the central engineering challenge and point of vulnerability."
+          }
+        ]
+      },
+      {
+        "name": "Press & Society Reporter's Vernacular",
+        "context": "Used by Clara Hale and her journalistic peers when discussing sources, stories, and the social intelligence network surrounding the exposition.",
+        "terms": [
+          {
+            "term": "the morgue",
+            "meaning": "A newspaper's archive of clippings and reference files — Clara's primary research tool and a source of leverage when she needs background on a suspicious figure."
+          },
+          {
+            "term": "a stringer",
+            "meaning": "A freelance correspondent paid by the column inch — Clara's network of stringers feeds her gossip from hotels, restaurants, and exposition offices she cannot access directly."
+          },
+          {
+            "term": "society page material",
+            "meaning": "Information too polite or too dangerous to print as hard news — used ironically to describe rumors with serious implications that no editor will touch without ironclad sourcing."
+          },
+          {
+            "term": "the hotel beat",
+            "meaning": "The informal circuit of exposition-adjacent hotels — the Palmer House, the Auditorium — where Clara cultivates sources among visiting dignitaries, exhibitors, and their staff."
+          },
+          {
+            "term": "a scoop",
+            "meaning": "An exclusive story obtained before rival papers — in 1893 Chicago journalism, obtaining one sometimes requires trading favors as much as conducting interviews."
+          },
+          {
+            "term": "off the record",
+            "meaning": "Information given in confidence, not for direct attribution — Clara uses this agreement strategically, sometimes honoring it and sometimes finding creative ways around it."
+          },
+          {
+            "term": "the wires",
+            "meaning": "The telegraph news services — Associated Press and United Press — whose correspondents Clara both competes with and occasionally feeds selective information to shape a story's national framing."
+          }
+        ]
+      },
+      {
+        "name": "Fair Security & Chicago Police Cant",
+        "context": "Used by O'Donnell and the Columbian Guard officers when coordinating patrols, reporting incidents, and navigating the uneasy boundary between fair jurisdiction and city police authority.",
+        "terms": [
+          {
+            "term": "the Guard",
+            "meaning": "The Columbian Guard, the exposition's private security force — distinct from the Chicago Police Department and a frequent source of jurisdictional friction with it."
+          },
+          {
+            "term": "a floater",
+            "meaning": "An unidentified body found in the lagoon or on fairgrounds — a recurring and politically sensitive problem given the exposition's international press coverage."
+          },
+          {
+            "term": "the Black Maria",
+            "meaning": "The police wagon used to transport arrested persons — its appearance on fairgrounds is considered a public-relations disaster to be avoided at nearly any cost."
+          },
+          {
+            "term": "on the pad",
+            "meaning": "Receiving regular graft payments from a fixed source — O'Donnell uses this to identify which city officers can be trusted to act independently and which cannot."
+          },
+          {
+            "term": "a shadow detail",
+            "meaning": "Covert surveillance of a suspect or area, conducted without the subject's knowledge — authorized only by O'Donnell personally and kept off the official duty roster."
+          },
+          {
+            "term": "the Pinkertons",
+            "meaning": "The Pinkerton National Detective Agency, whose operatives are sometimes hired for sensitive exposition security matters that O'Donnell cannot handle through official channels — a professional rivalry he resents."
+          },
+          {
+            "term": "close the gate",
+            "meaning": "To lock down a section of the fairgrounds and restrict movement — a drastic measure O'Donnell resists using because it draws press attention and requires Burnham's authorization."
+          }
+        ]
+      }
+    ]
+  }
 }

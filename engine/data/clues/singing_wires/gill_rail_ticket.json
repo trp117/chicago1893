@@ -1,0 +1,17 @@
+{
+  "id": "gill_rail_ticket",
+  "scenarioId": "singing_wires",
+  "title": "Pittsburgh Rail Ticket Under False Name",
+  "description": "Found in Arden Gill's coat pocket or on the table at the Commercial Hotel: a pre-purchased one-way rail ticket for the 6 a.m. southbound consist to Pittsburgh, issued in the name 'A. Greer.' The ticket was purchased this afternoon at the depot window — the ticket agent remembers the transaction because the man paid in silver and asked specifically whether the consist would be on time. A man who planned to stay in Sandusky does not buy a dawn rail ticket the same afternoon he arranges an arrest.",
+  "category": "physical",
+  "discoveryLocationId": "commercial_hotel_bar",
+  "implicatesCharacterIds": [
+    "arden_gill"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.487Z",
+  "locationId": "",
+  "isRedHerring": false
+}

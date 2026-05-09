@@ -1,0 +1,35 @@
+{
+  "id": "silas_pratt",
+  "scenarioIds": [
+    "singing_wires"
+  ],
+  "name": "Silas Pratt",
+  "role": "Day telegraph operator, Lake Shore Railroad junction, Sandusky",
+  "publicFace": "A competent, unremarkable operator of middle years who keeps regular hours, drinks moderately, and is well-liked at the station for his reliability.",
+  "privateGoal": "Collect the informant's fee from Arden Gill, ensure the red fire dispatch reaches Deputy Crane without interference, and avoid being identified as the source before he can leave Sandusky permanently.",
+  "fear": "That Thomas Cole has already read the station ledger and knows about the extra payments — and that a lightning flinger of Thomas's skill will be able to prove the red fire message originated from Pratt's own key, not from a distant station.",
+  "knowledge": [
+    "He knows Elias Cole's name, the rough number of passengers in the current group, and the general route north — information given to him by Arden Gill, who received it from a source Pratt does not know.",
+    "He knows Thomas Cole sent an unauthorized null-laden message tonight and has noted it in the log with the intention of using it as leverage.",
+    "He knows the departure schedule of the shore road vessel because he intercepted a commercial codebook message three weeks ago and deciphered it."
+  ],
+  "voice": "Professionally warm, slightly unctuous, quick to agree and slow to commit — the voice of a man who has learned that being forgettable is a survival skill.",
+  "trustLogic": "Performs openness and collegial warmth; actually closes at any question about the traffic log, extra income, or Arden Gill.",
+  "secrets": [
+    "He did not know the passengers included children when he sold the information; this fact disturbs him more than he expected and he is not entirely sure he would do it again.",
+    "He has already purchased a one-way rail ticket to Pittsburgh under a false name, departing on the 6 a.m. consist."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Expresses concern, asks clarifying questions, appears to be trying to help while giving nothing useful.",
+    "heavyPressure": "Becomes visibly nervous, over-explains, begins to contradict himself on timing details.",
+    "breakingPoint": "He will not name his contact above Arden Gill because he genuinely does not know who that person is.",
+    "fleeCondition": "If the bounty ledger page is produced and connected to his handwriting, or if Arden Gill is arrested and begins talking.",
+    "fleeStyle": "Moves immediately toward the rail yard and the pre-purchased Pittsburgh ticket.",
+    "chaseStyle": "Runs — not a physical man, panics badly, will shout for help from anyone nearby.",
+    "capturedBehavior": "Talks immediately and at length, giving everything he knows about Arden Gill and the payment arrangement in exchange for any promise of leniency.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.477Z",
+  "description": ""
+}

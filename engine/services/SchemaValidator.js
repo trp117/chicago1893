@@ -71,12 +71,13 @@ export class SchemaValidator {
         if (!r.opening?.choices?.length)  warn('role', r.id, 'opening.choices',   'player will have no opening choices');
         if (!r.perspective)               warn('role', r.id, 'perspective',        'AI has no role perspective guidance');
 
-        if (!r.briefing) {
-          warn('role', r.id, 'briefing', 'mission briefing screen will be blank');
-        } else {
-          if (!r.briefing.who)     warn('role', r.id, 'briefing.who',     'who-you-are line missing');
-          if (!r.briefing.mission) warn('role', r.id, 'briefing.mission', 'mission line missing');
-          if (!r.briefing.stakes)  warn('role', r.id, 'briefing.stakes',  'stakes line missing');
+        {
+          const bt = !r.briefing ? '' :
+            typeof r.briefing === 'string' ? r.briefing.trim() :
+            typeof r.briefing === 'object' ? Object.values(r.briefing).filter(Boolean).join(' ').trim() :
+            String(r.briefing).trim();
+          if (bt.length === 0)  warn('role', r.id, 'briefing', 'mission briefing screen will be blank');
+          else if (bt.length < 50) warn('role', r.id, 'briefing', 'briefing too short — under 50 chars');
         }
       }
     }

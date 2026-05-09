@@ -1,0 +1,51 @@
+{
+  "id": "thomas_cole_operator",
+  "scenarioId": "singing_wires",
+  "name": "Thomas Cole — The Lightning Flinger",
+  "description": "You are the night operator at the Sandusky telegraph junction, and you have just read a red fire dispatch that describes your father and his passengers to the law. You have the skills to fight on the wire, but every move you make leaves a mark in the traffic log.",
+  "startLocationId": "sandusky_telegraph_office",
+  "startingKnowledge": [
+    "You know the red fire dispatch originated from the Sandusky station's own secondary key, not from a distant station.",
+    "You know Silas Pratt has been receiving unexplained payments for two months.",
+    "You know how to phantom a false circuit at the rail yard junction box.",
+    "You already sent an unauthorized null-laden warning to Mercy Voss tonight, and it is in the traffic log."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write for this role from inside the telegraph office — technical, fast, operating under time pressure with professional consequences for every action. Thomas has access to the wire traffic, the station logs, and the rail yard, but his actions on the brass are visible to anyone who reads the log. His decisions are about what to send, what to suppress, and how much to risk.",
+  "briefing": "You are at the main desk of the Sandusky telegraph office with the traffic log open in front of you and the red fire dispatch in your hand, and you have read it three times because the first two times you were hoping you had misread it. You have not misread it. The description in the bounty language — height, build, the scar on the left forearm from a wagon chain — is your father, and the seven persons in his care include two children whose ages are given as six and eight. The sounder on the side table connected to the Norwalk spur has been silent for eleven minutes, which is either nothing or is the silence after someone has already done what they needed to do on that line. You know, because you have been watching the ledger for two months, that Silas Pratt has been paid four dollars a month from a private account that does not exist in the station's authorized budget, and you know the dates of those payments correspond to the last three times your father's groups were watched. You placed a cipher message in the Concordance at Voss Dry Goods an hour ago when you first saw the secondary key traffic, and you do not know if Mercy Voss has found it. What you have not done yet — what you are sitting here deciding right now — is whether to phantom the Norwalk circuit to misdirect Crane's catchers south, knowing that the junction box work will be visible in the morning and that your career and your freedom will be in the traffic log for anyone who knows how to read it.",
+  "character_hooks": [
+    "I am in love with Clara Redd, whose family used the network to reach Sandusky three years ago — she does not know I helped arrange their passage, and she does not know that protecting her family is the real reason I am willing to destroy my career tonight.",
+    "I have been the fastest brass pounder on the Lake Shore line for two years, and I have spent that time building a reputation I am about to burn — but I know something every other operator on this line does not: I know how to phantom a circuit that will hold for six hours without detection.",
+    "I found Silas Pratt's payment notations six weeks ago and said nothing because I had no proof and because I told myself it might be innocent — tonight's red fire dispatch is the proof I was waiting for, and the waiting has cost me six weeks."
+  ],
+  "suggested_secret": "Thomas Cole has been secretly transcribing every Underground Railroad message that has passed through the Sandusky office for two years, encoding them in a personal cipher and hiding the transcripts in a tin box in the rail yard — he believes the record of what the wire has been used for, on both sides, will matter to someone someday.",
+  "opening": {
+    "narrative": "It is 9:14 p.m. and the red fire dispatch has just come off the main sounder. The traffic log is open. The secondary key on the Norwalk spur is silent. Silas Pratt left the office forty minutes ago and is not due back until six. You are alone with the brass, the log, and a decision that will define everything that comes after it.",
+    "npcMoments": [],
+    "choices": [
+      "Go immediately to the rail yard junction box and install the phantom circuit before Pratt returns or Crane acts.",
+      "Search the traffic log first for the full routing history of the red fire dispatch to build a provable case against Pratt.",
+      "Send a coded null-laden message on the main line to Mercy Voss confirming the 13 and the red fire, then decide what to do with the wire."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "Traffic log access",
+      "Spare copper wire and terminal tools",
+      "Cruden's Concordance cipher key (memorized)",
+      "Unauthorized warning message already sent — noted in log"
+    ],
+    "flags": {
+      "phantom_circuit_installed": false,
+      "pratt_identified": true,
+      "voss_warned": true
+    },
+    "suspicion": {
+      "silas_pratt": 3,
+      "arden_gill": 0,
+      "deputy_crane": 1
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.491Z"
+}

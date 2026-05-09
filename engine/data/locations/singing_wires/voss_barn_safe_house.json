@@ -1,0 +1,20 @@
+{
+  "id": "voss_barn_safe_house",
+  "scenarioId": "singing_wires",
+  "name": "Voss Barn, North Edge of Sandusky, Shore Road",
+  "description": "A weathered hay barn a quarter mile north of the dry goods store on the road toward the lake, its hayloft converted into a hidden rest space with blankets and a water barrel. This is the last station before the shore road, and seven people are currently inside it waiting for word.",
+  "mood": "desperate, hushed, fearful, close",
+  "linkedCharacterIds": [
+    "elias_cole"
+  ],
+  "atmosphericDetails": [
+    "The sound of the lake is audible from the hayloft — the low chop of Erie in a northeast wind, closer than it seemed an hour ago.",
+    "Seven people in the hayloft: five adults and two children, the children asleep against each other under a single wool blanket.",
+    "A lantern hangs on a peg inside the barn door, unlit — it will be lit only as a signal that it is safe to move to the shore.",
+    "The ballast stones from the nearby rail spur are visible through the barn's east-facing gap in the siding — the iron horse's infrastructure is within a stone's throw of the network's most vulnerable point."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.482Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

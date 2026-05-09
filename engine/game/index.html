@@ -135,6 +135,9 @@ li { margin-bottom: 8px; }
 .closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
 .closing-return.visible { opacity: 1; }
 .closing-return:hover { color: #d0b06a; }
+.closing-narration-toggle { position: fixed; top: 20px; right: 20px; z-index: 221; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3429; background: transparent; color: #6a6050; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-weight: normal; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.closing-narration-toggle:hover { border-color: #d0b06a; color: #d0b06a; }
+.closing-narration-toggle.active { border-color: #d0b06a; color: #d0b06a; background: rgba(208,176,106,0.1); }
 .closing-dots { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 0; letter-spacing: 0.6em; }
 .closing-dots span { font-size: 1.2rem; color: #d0b06a; opacity: 0; animation: closing-dot-breathe 2.4s ease-in-out infinite; }
 .closing-dots span:nth-child(2) { animation-delay: 0.8s; }
@@ -461,6 +464,7 @@ li { margin-bottom: 8px; }
 </div>
 
 <div id="closing-overlay" class="closing-overlay hidden" role="region" aria-label="Story closing">
+  <button id="closing-narration-toggle" class="closing-narration-toggle" aria-label="Toggle narration" onclick="toggleClosingNarration()"></button>
   <div id="closing-dots" class="closing-dots" aria-hidden="true">
     <span>·</span><span>·</span><span>·</span>
   </div>
@@ -846,6 +850,68 @@ function updateLocationDisplay(locationId) {
   }
 }
 
+// ── Closing screen narration ──────────────────────────────────────────────────
+
+let closingNarrResolve = null;
+
+function ttsClosingSpeak(text) {
+  if (!ttsEnabled || !audioUnlocked || !audioEl) return Promise.resolve();
+  const cleaned = cleanForSpeech(text);
+  if (!cleaned) return Promise.resolve();
+  ttsStop();
+  return new Promise(async (resolve) => {
+    let settled = false;
+    const done = () => {
+      if (!settled) {
+        settled = true;
+        closingNarrResolve = null;
+        currentAudio = null;
+        resolve();
+      }
+    };
+    closingNarrResolve = done;
+    try {
+      const resp = await fetch(`${API_BASE}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: cleaned, narrative_speed: 0.85 })
+      });
+      if (!resp.ok) { done(); return; }
+      const blob = await resp.blob();
+      const url  = URL.createObjectURL(blob);
+      audioEl.src = url;
+      audioEl.playbackRate = 1.0;
+      audioEl.onended = () => { URL.revokeObjectURL(url); done(); };
+      audioEl.onerror = () => { URL.revokeObjectURL(url); done(); };
+      currentAudio = audioEl;
+      await audioEl.play();
+    } catch (e) {
+      console.warn('[TTS] closing narration error:', e);
+      done();
+    }
+  });
+}
+
+function syncClosingNarrationBtn() {
+  const btn = document.getElementById('closing-narration-toggle');
+  if (!btn) return;
+  btn.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+  btn.classList.toggle('active', ttsEnabled);
+  const label = ttsEnabled ? 'Mute narration' : 'Unmute narration';
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+}
+
+function toggleClosingNarration() {
+  setTtsEnabled(!ttsEnabled);
+  if (!ttsEnabled) {
+    ttsStop();
+    if (closingNarrResolve) { closingNarrResolve(); closingNarrResolve = null; }
+  }
+  syncClosingNarrationBtn();
+  updateTtsToggleUI();
+  updateTtsBarUI();
+}
+
 // ── Closing screen ────────────────────────────────────────────────────────────
 
 function showClosingScreen(endState, sessionId) {
@@ -868,11 +934,23 @@ function showClosingScreen(endState, sessionId) {
 
   overlay.classList.remove('hidden');
   proseEl.textContent = '';
+  syncClosingNarrationBtn();
 
-  function triggerAftermath() {
-    setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-    setTimeout(() => lineEl.classList.add('visible'),      5500);
-    setTimeout(() => returnEl.classList.add('visible'),    7000);
+  async function triggerClosingSequence() {
+    if (ttsEnabled) {
+      await ttsClosingSpeak(proseEl.textContent);
+      aftermathEl.classList.add('visible');
+      if (aftermath) await ttsClosingSpeak(aftermathEl.textContent);
+      await new Promise(r => setTimeout(r, 1500));
+      lineEl.classList.add('visible');
+      await ttsClosingSpeak(lineEl.textContent);
+      await new Promise(r => setTimeout(r, 500));
+      returnEl.classList.add('visible');
+    } else {
+      setTimeout(() => aftermathEl.classList.add('visible'), 2500);
+      setTimeout(() => lineEl.classList.add('visible'),      5500);
+      setTimeout(() => returnEl.classList.add('visible'),    7000);
+    }
   }
 
   const controller = new AbortController();
@@ -903,11 +981,11 @@ function showClosingScreen(endState, sessionId) {
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
-            triggerAftermath();
+            triggerClosingSequence();
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             dotsEl.classList.add('hidden');
-            triggerAftermath();
+            triggerClosingSequence();
           }
         }
       }
@@ -915,7 +993,7 @@ function showClosingScreen(endState, sessionId) {
     .catch(() => {
       clearTimeout(timeoutId);
       dotsEl.classList.add('hidden');
-      triggerAftermath();
+      triggerClosingSequence();
     });
 }
 

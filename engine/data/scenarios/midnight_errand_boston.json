@@ -4,6 +4,7 @@
   "hidden": false,
   "version": "1.0.0",
   "title": "Midnight Errand: Boston, 1775",
+  "setting": "Boston, Massachusetts, 1775",
   "description": "On the eve of the Regulars' march, a printer's apprentice must decide whether to carry a secret dispatch through a city on the edge of war. Every choice tonight will echo for years — but the clock strikes ten in less than an hour.",
   "genre": [
     "historical",
@@ -95,8 +96,47 @@
     ]
   },
   "historical_aftermath": "Paul Revere rode at midnight. William Dawes rode west. A third rider took a road that was never written down. The militia at Lexington stood at dawn on April 19th, 1775 — and what made that possible moved through Boston in the hours before, carried by people whose names the history books did not keep.",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Print Shop Language",
+        "context": "Used by Benjamin and workers in the shop. Natural in description and action.",
+        "terms": [
+          { "term": "compositing stone", "meaning": "the flat stone surface where type is assembled" },
+          { "term": "frisket", "meaning": "the frame that holds paper in place during printing" },
+          { "term": "broadsheet", "meaning": "a single large sheet newspaper or notice" },
+          { "term": "standing order", "meaning": "a recurring print job for a regular customer" },
+          { "term": "type drawer", "meaning": "the shallow drawer holding sorted lead type" },
+          { "term": "linseed oil", "meaning": "oil used to thin printing ink" },
+          { "term": "hand press", "meaning": "the manually operated printing press" }
+        ]
+      },
+      {
+        "name": "Patriot Network Language",
+        "context": "Used carefully and sparingly — only between people who know each other's allegiances.",
+        "terms": [
+          { "term": "Sons of Liberty", "meaning": "the patriot resistance network" },
+          { "term": "the Green Dragon", "meaning": "the tavern used as a meeting point for the network" },
+          { "term": "warning riders", "meaning": "Revere, Dawes, and others riding to alert the militia" },
+          { "term": "the Regulars", "meaning": "British Army soldiers" },
+          { "term": "the dispatch", "meaning": "the message being carried tonight" }
+        ]
+      },
+      {
+        "name": "Period Boston",
+        "context": "Physical and navigational language for moving through the city at night.",
+        "terms": [
+          { "term": "curfew", "meaning": "the garrison's ten o'clock order to clear the streets" },
+          { "term": "the Back Bay", "meaning": "the tidal marshes west of the city" },
+          { "term": "King Street", "meaning": "the main commercial street — now State Street" },
+          { "term": "the rope-walk", "meaning": "the long narrow building where rope is made" },
+          { "term": "broadside", "meaning": "a printed sheet with news or political content" }
+        ]
+      }
+    ]
+  },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-06T00:00:00.000Z",
+  "updatedAt": "2026-05-09T00:00:00.000Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",

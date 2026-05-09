@@ -265,7 +265,45 @@ export function buildNarrativeStyleRules(scenario = {}) {
     }
   }
 
+  const vocabBlock = buildPeriodVocabularyBlock(scenario);
+  if (vocabBlock) {
+    rules += '\n\n' + vocabBlock;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[VOCAB] Period vocabulary injected:',
+        scenario.period_vocabulary.categories.map(c => c.name).join(', ')
+      );
+    }
+  }
+
   return rules;
+}
+
+function buildPeriodVocabularyBlock(scenario) {
+  if (!scenario.period_vocabulary?.categories?.length) {
+    return '';
+  }
+
+  let block = '## PERIOD VOCABULARY — USE NATURALLY, NEVER EXPLAIN:\n\n';
+  block += 'These terms belong to this world. Use them in dialogue ';
+  block += 'and prose when they fit the moment. Do not define them ';
+  block += 'or call attention to them. Let context carry the meaning.\n\n';
+
+  for (const category of scenario.period_vocabulary.categories) {
+    block += `${category.name.toUpperCase()}\n`;
+    block += `${category.context}\n`;
+    for (const { term, meaning } of category.terms) {
+      block += `- "${term}" — ${meaning}\n`;
+    }
+    block += '\n';
+  }
+
+  block += 'USE AT LEAST ONE period vocabulary term per scene ';
+  block += 'when a character from that vocabulary category is ';
+  block += 'present or speaking. Telegraph scenes should feel ';
+  block += 'like telegraph scenes. Railroad scenes should feel ';
+  block += 'like railroad scenes.\n';
+
+  return block;
 }
 
 export function buildSensoryOpeningCheck(_cfg = {}) {

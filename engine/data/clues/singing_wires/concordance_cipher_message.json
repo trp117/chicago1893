@@ -1,0 +1,20 @@
+{
+  "id": "concordance_cipher_message",
+  "scenarioId": "singing_wires",
+  "title": "Cipher Message in the Concordance",
+  "description": "Tucked inside the front cover of the 1844 Cruden's Concordance on the counter of Voss Dry Goods: a small folded paper in Thomas Cole's hand, using the book cipher. When decoded — Page 47, Line 3, Word 6; Page 112, Line 8, Word 2; Page 203, Line 1, Word 9 — it reads: 'Judas in the house. 13 on the wire. Move the small dry goods first. 30.' The message was placed here by Thomas Cole earlier tonight, before the player takes control, confirming that he knew about the threat before the red fire dispatch was formally received — which means he had already read something in the traffic that alarmed him, and that he chose to warn Mercy Voss rather than Deputy Crane.",
+  "category": "documentary",
+  "discoveryLocationId": "voss_dry_goods",
+  "implicatesCharacterIds": [
+    "thomas_cole",
+    "silas_pratt"
+  ],
+  "unlocks": [
+    "pratt_ledger_payments"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.484Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,21 @@
+{
+  "id": "commercial_hotel_bar",
+  "scenarioId": "singing_wires",
+  "name": "The Commercial Hotel Bar, Market Street",
+  "description": "The ground-floor saloon of Sandusky's principal commercial hotel, where traveling men, railroad contractors, and merchants drink in the amber light of six oil lamps. Arden Gill has a room upstairs and is currently at the corner table with a glass of rye whiskey and a commercial codebook open in front of him.",
+  "mood": "public, deceptive, observed, performative",
+  "linkedCharacterIds": [
+    "arden_gill",
+    "silas_pratt"
+  ],
+  "atmosphericDetails": [
+    "Arden Gill's commercial codebook is open on the table but he is not writing in it — he is watching the door with the patient attention of a man who is waiting for something that should have happened already.",
+    "Silas Pratt came in twenty minutes ago, had one drink, spoke to Gill for less than two minutes, and left — the bartender noticed but did not think much of it.",
+    "The hotel's front window faces Market Street and the corner of Columbus Avenue; from this table, a man can see the door of the sheriff's office.",
+    "A folded piece of paper under Gill's whiskey glass, when unfolded, proves to be a rail schedule for the 6 a.m. southbound consist to Pittsburgh."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.482Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

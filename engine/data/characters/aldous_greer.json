@@ -1,0 +1,36 @@
+{
+  "id": "aldous_greer",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
+  ],
+  "name": "Aldous Greer",
+  "role": "Professional slave catcher, operating under private contract",
+  "publicFace": "A traveling livestock buyer — he carries papers describing him as an agent for a Cincinnati cattle concern.",
+  "privateGoal": "Intercept the three passengers before they reach the ferry, collect the bounty, and establish a permanent paid-informant network in Erie County.",
+  "fear": "Federal oversight — he operates in a legal gray zone and a formal investigation would expose methods he cannot defend in court.",
+  "knowledge": [
+    "The passengers' physical descriptions in detail — he has been tracking this family since Columbus.",
+    "The location of the root cellar beneath the freight house, courtesy of Prentiss Hoyle.",
+    "That Marshal Crane is useful but unreliable — Crane has political ambitions that make him cautious.",
+    "That the ferry captain at Marblehead was warned off but that warnings do not always hold when money is offered."
+  ],
+  "voice": "Affable, uses commercial language — talks about people as inventory, routes as supply chains, capture as delivery.",
+  "trustLogic": "Responds to money and to information. Does not trust anyone who offers help without an obvious self-interest.",
+  "secrets": [
+    "He coerced Prentiss Hoyle through blackmail — if this becomes known, his informant network collapses and he faces criminal exposure.",
+    "He is currently camped at a farm four miles south of the depot, not in Columbus as his telegraph filing implied — he filed the false location deliberately to prevent the network from knowing how close he was."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Maintains the livestock buyer cover with practiced ease — produces his papers and asks what the trouble is.",
+    "heavyPressure": "Invokes the Fugitive Slave Act by statute number and reminds the questioner of the federal penalties for obstruction.",
+    "breakingPoint": "He will not admit the blackmail of Hoyle under any circumstances — it is his only legal vulnerability.",
+    "fleeCondition": "If Marshal Crane formally distances himself from Greer's methods in front of witnesses.",
+    "fleeStyle": "Rides south immediately — he has a horse at the farm and knows the back roads.",
+    "chaseStyle": "Rides hard, does not engage — distance is his defense.",
+    "capturedBehavior": "Produces his federal contractor papers and says nothing further without a lawyer.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.458Z",
+  "description": ""
+}

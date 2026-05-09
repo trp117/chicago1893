@@ -1,6 +1,7 @@
 {
   "id": "lightning_and_the_midnight_coach_main_arc",
   "scenarioId": "lightning_and_the_midnight_coach",
+  "setting": "Erie County, Ohio, 1856",
   "name": "The Red Fire on the Sandusky Wire",
   "premise": "A bounty description transmitted as red fire on Ezra Cornell's telegraph line threatens to deliver three freedom-seekers into the hands of a federal marshal. A conductor and his telegraph-operator son must use the enemy's own technology against itself — but someone inside the network has already been talking to the law.",
   "goal": "Identify the informant, phantom a false route on the telegraph brass, and move the midnight coach passengers to the Lake Erie ferry before Marshal Crane acts on the bounty wire.",

@@ -1,0 +1,35 @@
+{
+  "id": "wickes_huron",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
+  ],
+  "name": "Operator Silas Wickes",
+  "role": "Telegraph relay operator, Huron station",
+  "publicFace": "A steady, if slow, company man — his colleagues call him a plug behind his back but he has never made a consequential error.",
+  "privateGoal": "Get through his shift without incident and collect his weekly wage.",
+  "fear": "Being blamed for a transmission error that causes a federal problem — he has a family and no savings.",
+  "knowledge": [
+    "He received the red fire dispatch and forwarded it per protocol.",
+    "He received what appeared to be a routine location update from the Sandusky station that contradicted the red fire route — he is not sure which to believe.",
+    "He knows the Sandusky night operator is fast — faster than him — and fast operators sometimes send things that look wrong but are not.",
+    "He is about to request a repeat of the contradictory location update, which will expose the phantom if Caleb cannot respond convincingly."
+  ],
+  "voice": "Hesitant, apologetic, uses protocol language — always refers to procedure when uncertain.",
+  "trustLogic": "Follows whoever sounds most authoritative and most certain. Can be manipulated by confident technical language.",
+  "secrets": [
+    "He once lost a message for six hours because he fell asleep at the key — he covered it by claiming line interference. No one ever verified this."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Defers immediately and asks what the correct procedure should be.",
+    "heavyPressure": "Retreats to the rulebook — says he is only doing what protocol requires.",
+    "breakingPoint": "He will not admit the sleeping incident.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Cooperates fully and immediately.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.459Z",
+  "description": ""
+}

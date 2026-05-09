@@ -1,0 +1,20 @@
+{
+  "id": "red_fire_dispatch",
+  "scenarioId": "singing_wires",
+  "title": "The Red Fire Dispatch",
+  "description": "The original red fire message received at the Sandusky telegraph office, logged at 9:14 p.m. in the traffic ledger. The text describes seven persons moving north on the Huron Road, including a man matching Elias Cole's physical description, and names a bounty of four hundred and eighty dollars payable to the Erie County sheriff's office. The critical detail is in the routing header: the message originated not from Cincinnati or Columbus as the sender's notation claims, but from the Sandusky station's own secondary key — the instrument on the side table connected to the Norwalk spur. Someone sent this message from inside this building.",
+  "category": "documentary",
+  "discoveryLocationId": "sandusky_telegraph_office",
+  "implicatesCharacterIds": [
+    "silas_pratt"
+  ],
+  "unlocks": [
+    "pratt_ledger_payments",
+    "bounty_ledger_page"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.489Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,72 @@
+{
+  "id": "singing_wires_main_arc",
+  "scenarioId": "singing_wires",
+  "name": "The Red Fire Wire",
+  "premise": "A red fire telegraph dispatch has identified Underground Railroad conductor Elias Cole and his seven passengers to slave catchers in Sandusky. Someone inside the network is the source, and the players have thirty minutes before Deputy Crane rides north to intercept the group before they reach Lake Erie.",
+  "goal": "Identify the informant inside the network, use the telegraph to misdirect the catchers, and ensure the passengers reach a vessel on the Lake Erie shore before Deputy Crane closes the road.",
+  "openingSituation": "The red fire message has just been received at the Sandusky telegraph office. Thomas Cole, reading the dispatch as night operator, recognizes his father's description in the bounty language. Deputy Crane is at the sheriff's office two blocks away reading his own copy. The passengers are somewhere on the Huron Road, four miles south of town, moving in the dark.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Brass Speaks",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        "Thomas Cole reads the red fire dispatch and recognizes his father's description; he must decide whether to suppress the message, relay it falsely, or alert Mercy Voss at the safe house before Crane acts.",
+        "Elias Cole, moving his parcels through the Huron River bottomland, hears the telegraph wires singing above the tree line and senses something has gone wrong — a gandy dancer he trusts brings him a 13 warning from a boy on a fast horse.",
+        "Mercy Voss, running the dry goods store that serves as the Sandusky station, receives an incomplete coded message and must determine whether the network has been compromised or whether she is being tested by a Judas in the house."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "Nulls and Blood Money",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        "Players begin gathering evidence about who sent the original intelligence to the slave catchers — the bounty ledger, a torn commercial codebook page, and the timing of recent wire traffic all point toward someone with inside knowledge.",
+        "Thomas attempts to phantom a false circuit or send null-laden misdirection on the wire; he must deal with Silas Pratt, the day operator who is suspicious of the night traffic, and avoid tipping off Deputy Crane's informant at the station.",
+        "Elias reaches a secondary station — the Voss barn — and must decide whether to wait for word from his son or push his passengers north toward the shore road, knowing that waiting costs time and moving without information costs safety.",
+        "The pressure event fires: a second red fire message arrives or Deputy Crane is spotted riding north, forcing all players to accelerate their plans."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "Line Grounding",
+      "minuteRange": [
+        15,
+        23
+      ],
+      "beats": [
+        "The identity of the Judas in the house becomes provable — the bounty ledger page and the red fire dispatch together name the informant, and the players must confront or neutralize that person before they can send again.",
+        "Thomas must execute the most dangerous technical act of the night: either ground the line to silence the Sandusky station entirely, or phantom a false route that will send Crane's catchers south toward Norwalk while the passengers move north.",
+        "Elias, with the passengers now moving on the shore road, encounters an unexpected obstacle — a gandy dancer crew working a night repair on the main, or a deadheading railroad man who has seen too much — and must decide how much to reveal and how much to risk.",
+        "Mercy Voss confronts the informant directly, using what the players have gathered; the confrontation can be handled quietly or it can break open into something that draws Crane's attention."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Other Shore",
+      "minuteRange": [
+        23,
+        30
+      ],
+      "beats": [
+        "The final window: the vessel on the Lake Erie shore is waiting, but it cannot hold past a specific hour before the captain must sail to avoid the morning light and the revenue cutter that patrols the harbor.",
+        "Deputy Crane is either misdirected by the phantomed wire traffic or he has seen through the deception and is closing on the shore road — the players' earlier choices determine which.",
+        "Elias Cole must make the final call: highball north with his passengers and trust that his son's work on the brass has bought them the minutes they need, or find a third route and risk missing the vessel entirely.",
+        "Resolution: the passengers either board the vessel and reach the other shore, or they do not. The informant is either exposed and silenced, or they escape to betray the network again. Elias Cole is either free or in irons. The wire either sings a victory or carries the news of a capture south before morning."
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.473Z",
+  "opening": ""
+}

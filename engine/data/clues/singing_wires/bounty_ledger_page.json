@@ -1,0 +1,21 @@
+{
+  "id": "bounty_ledger_page",
+  "scenarioId": "singing_wires",
+  "title": "Gill's Bounty Authorization Document",
+  "description": "A folded paper found beneath Arden Gill's whiskey glass at the Commercial Hotel, or on his person if he is detained. It is a signed authorization from a Cincinnati law firm acting on behalf of a named slave owner, authorizing Arden Gill as a recovery agent and specifying the bounty amounts for each named person in Elias Cole's current group. The document includes a handwritten annotation in a second hand — Silas Pratt's rounded script — giving the departure time and the barn location as the final station before the shore. This annotation is the direct link between Pratt and Gill and constitutes proof of conspiracy under Ohio law if not under federal law.",
+  "category": "documentary",
+  "discoveryLocationId": "commercial_hotel_bar",
+  "implicatesCharacterIds": [
+    "arden_gill",
+    "silas_pratt"
+  ],
+  "unlocks": [
+    "lattimore_connection",
+    "gill_rail_ticket"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.485Z",
+  "locationId": "",
+  "isRedHerring": false
+}

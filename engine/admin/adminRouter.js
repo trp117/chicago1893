@@ -1,8 +1,15 @@
 import { Router } from 'express';
 import { Langfuse } from 'langfuse';
+import Anthropic from '@anthropic-ai/sdk';
 import { readdir, readFile, unlink, stat } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+
+let _anthropicClient = null;
+function getAnthropicClient(apiKey) {
+  if (!_anthropicClient) _anthropicClient = new Anthropic({ apiKey });
+  return _anthropicClient;
+}
 
 const _dir = dirname(fileURLToPath(import.meta.url));
 const TRANSCRIPTS_DIR = join(_dir, '../data/transcripts');
@@ -26,6 +33,24 @@ function slugify(str) {
 
 function notFound(res) { return res.status(404).json({ error: 'Not found.' }); }
 function badRequest(res, msg) { return res.status(400).json({ error: msg }); }
+
+// Safely extract briefing as a plain string regardless of how it was stored.
+// Older scenario generation returned { who, mission, stakes } objects instead of a flat string.
+function getBriefingText(briefing) {
+  if (!briefing) return '';
+  if (typeof briefing === 'string') return briefing.trim();
+  if (Array.isArray(briefing)) return briefing.join(' ').trim();
+  if (typeof briefing === 'object') return Object.values(briefing).filter(Boolean).join(' ').trim();
+  return String(briefing).trim();
+}
+
+// Normalize a player role's briefing field to a plain string in-place.
+function normalizeBriefing(role) {
+  if (role.briefing && typeof role.briefing !== 'string') {
+    role.briefing = getBriefingText(role.briefing);
+  }
+  return role;
+}
 
 // ── Generation helpers ────────────────────────────────────────────────────────
 
@@ -52,7 +77,7 @@ function validateGeneratedScenario(generated) {
   if (roles.length === 0) errors.push('No playerRoles defined');
 
   roles.forEach(role => {
-    if (!role.briefing || role.briefing.trim().length < 50)
+    if (getBriefingText(role.briefing).length < 50)
       errors.push(`Role "${role.id}" missing or too-short briefing`);
     if (!role.name)
       errors.push(`Role "${role.id}" missing name`);
@@ -75,13 +100,21 @@ function validateStoredScenario(scenario, playerRoles) {
   const errors = [];
   if (!playerRoles || playerRoles.length === 0) errors.push('No playerRoles defined');
   (playerRoles || []).forEach(role => {
-    if (!role.briefing || role.briefing.trim().length < 50)
+    if (getBriefingText(role.briefing).length < 50)
       errors.push(`Role "${role.id}" missing or too-short briefing`);
     if (!role.name)        errors.push(`Role "${role.id}" missing name`);
     if (!role.description) errors.push(`Role "${role.id}" missing description`);
   });
   if (!scenario?.introduction?.sections?.length) errors.push('Missing introduction sections');
   if (!scenario?.sessionTargetMinutes)           errors.push('Missing sessionTargetMinutes');
+
+  const entrySection = scenario?.introduction?.sections?.find(s => s.type === 'entry');
+  (playerRoles || []).forEach(role => {
+    const entry = entrySection?.character_entries?.[role.id];
+    if (!entry || entry.trim().length < 50)
+      errors.push(`Missing entry paragraph for ${role.name} — click Repair to generate`);
+  });
+
   return errors;
 }
 
@@ -113,18 +146,126 @@ async function generateBriefingText(scenario, role, anthropicApiKey) {
     'Write only the briefing paragraph. No preamble, no explanation, no quotation marks.',
   ].filter(Boolean).join('\n');
 
-  const signal = AbortSignal.timeout(30_000);
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST', signal,
-    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 600, temperature: 0.8,
-      messages: [{ role: 'user', content: prompt }] })
-  });
-  const data = await resp.json();
-  if (!resp.ok) throw new Error(`Anthropic API error (${resp.status}): ${data?.error?.message || JSON.stringify(data)}`);
-  const text = data?.content?.[0]?.text?.trim();
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: 'claude-sonnet-4-6', max_tokens: 600, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+    { timeout: 60_000 }
+  );
+  const text = msg.content[0]?.text?.trim();
   if (!text) throw new Error('No text returned from Anthropic');
   return text;
+}
+
+async function generateCharacterEntry(scenario, role, allRoles, anthropicApiKey) {
+  const introText = (scenario.introduction?.sections || [])
+    .filter(s => s.type !== 'entry')
+    .map(s => s.text || '').filter(Boolean).join('\n\n');
+
+  const otherRoleNames = (allRoles || [])
+    .filter(r => r.id !== role.id)
+    .map(r => r.name)
+    .join(', ');
+
+  const prompt = [
+    'Write a character entry paragraph for an immersive historical fiction experience.',
+    '150-200 words, second person present tense.',
+    '',
+    `SCENARIO: ${scenario.title}`,
+    introText ? `SCENARIO INTRODUCTION:\n${introText}` : '',
+    '',
+    `CHARACTER: ${role.name}`,
+    `DESCRIPTION: ${role.description || ''}`,
+    getBriefingText(role.briefing) ? `CHARACTER BRIEFING (use as foundation):\n${getBriefingText(role.briefing)}` : '',
+    role.perspective ? `PERSPECTIVE: ${role.perspective}` : '',
+    role.startingKnowledge?.length
+      ? `WHAT THIS CHARACTER KNOWS:\n${role.startingKnowledge.map(k => `- ${k}`).join('\n')}`
+      : '',
+    otherRoleNames ? `OTHER PLAYERS IN THIS SCENARIO: ${otherRoleNames}` : '',
+    '',
+    'The paragraph must:',
+    '- Place this character in a specific physical location at the story\'s opening moment',
+    '- Reference what they uniquely know that the others do not',
+    '- Establish their emotional and physical state right now — not backstory',
+    '- End at the exact threshold of their first choice — the last breath before they act',
+    '- Match the literary voice of the scenario introduction exactly',
+    '- Second person present tense throughout',
+    '',
+    'CRITICAL — FIRST LINE RULE:',
+    'Never open with "You are [character name]" or any variation that names or introduces the character.',
+    'The reader is already inside the character. Begin with physical placement — where they are standing,',
+    'what their body is registering, what they can see or hear or smell right now.',
+    '',
+    'WRONG: "You are Elias Cutter, and you are standing..."',
+    'WRONG: "You are a veteran conductor standing..."',
+    'WRONG: "As the conductor, you find yourself..."',
+    'RIGHT: "You are standing in the dark behind the freight house..."',
+    'RIGHT: "The freight house door is ten feet away and..."',
+    'RIGHT: "Coal smoke and wet ballast — that is what..."',
+    '',
+    'The first word should place the reader in a body at a specific location. Never in an identity.',
+    '',
+    'Write only the paragraph. No preamble, no explanation.',
+  ].filter(Boolean).join('\n');
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: 'claude-sonnet-4-6', max_tokens: 500, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+    { timeout: 60_000 }
+  );
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  return text;
+}
+
+async function generatePeriodVocabulary(scenario, characters, anthropicApiKey) {
+  const npcList = (characters || [])
+    .map(c => `- ${c.name} (${c.role || 'unknown role'})`)
+    .join('\n') || '(none listed)';
+
+  const introText = (scenario.introduction?.sections || [])
+    .filter(s => s.type !== 'entry')
+    .map(s => s.text || '').filter(Boolean).join('\n\n');
+
+  const prompt = [
+    'Generate a period_vocabulary object for an immersive historical fiction scenario.',
+    'This vocabulary is injected into every AI-generated scene so NPCs and narration use authentic period language.',
+    '',
+    `SCENARIO: ${scenario.title}`,
+    scenario.description ? `DESCRIPTION: ${scenario.description}` : '',
+    introText ? `SETTING CONTEXT:\n${introText}` : '',
+    `NPCS IN THIS STORY:\n${npcList}`,
+    '',
+    'Generate 3–5 vocabulary categories. Each category covers one trade, faction, or social group in this story.',
+    'Good categories: trade argot, criminal cant, organizational codes, period slang, technical shorthand.',
+    'Every term must be historically authentic to the period and location — no generic or modern language.',
+    '',
+    'Each category:',
+    '- name: short label (e.g. "Dockworkers\' Argot", "Police Cant", "Revolutionary Codes")',
+    '- context: one sentence — who uses this vocabulary and when',
+    '- terms: 5–8 entries: { "term": "the word or phrase", "meaning": "what it means in this world" }',
+    '',
+    'Return ONLY valid JSON:',
+    '{ "period_vocabulary": { "categories": [ { "name": "...", "context": "...", "terms": [ { "term": "...", "meaning": "..." } ] } ] } }',
+  ].filter(Boolean).join('\n');
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+    { timeout: 90_000 }
+  );
+  if (msg.stop_reason === 'max_tokens') {
+    throw new Error(`Vocabulary response truncated at max_tokens (${msg.usage?.output_tokens} tokens) — JSON will be incomplete`);
+  }
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  let parsed;
+  try {
+    parsed = extractJson(text);
+  } catch (parseErr) {
+    console.error(`[VOCAB] extractJson failed — response was ${text.length} chars, last 200: ...${text.slice(-200)}`);
+    throw new Error(`Vocabulary JSON parse failed: ${parseErr.message}`);
+  }
+  if (!Array.isArray(parsed?.period_vocabulary?.categories) || parsed.period_vocabulary.categories.length === 0) {
+    throw new Error('Invalid period_vocabulary structure returned — categories missing or not an array');
+  }
+  return parsed.period_vocabulary;
 }
 
 function scalingGuide(minutes) {
@@ -134,11 +275,14 @@ function scalingGuide(minutes) {
   return               { acts: 6, chars: '7–10',locs: '8–12', clues: '10–14', roles: 4, tpt: 3 };
 }
 
-function maxTokens(minutes) {
-  if (minutes <= 10) return 8000;
-  if (minutes <= 15) return 12000;
-  if (minutes <= 30) return 16000;
-  return 20000;
+function generationMaxTokens(minutes) {
+  // Scenario JSON output is larger than scene output — period_vocabulary, aggressionProfiles,
+  // role briefings, and opening narratives together exceed the old scene-generation budget.
+  if (minutes <= 10) return  8_000;
+  if (minutes <= 20) return 14_000;
+  if (minutes <= 30) return 24_000;
+  if (minutes <= 60) return 32_000;
+  return               48_000;
 }
 
 function buildGenerationPrompt({ description, playTimeMinutes }) {
@@ -198,11 +342,25 @@ PLAYER BRIEFING RULES (required on every playerRole):
      [What is at stake for them personally, right now, not historically].
      [The immediate sensory detail anchoring this moment].
      [Final sentence lands them at the threshold of their first action]."
+  CRITICAL — FIRST LINE RULE: Never open with "You are [character name]" or any variation
+  that names or introduces the character. Begin with physical placement — where they are,
+  what their body registers. WRONG: "You are Elias Cutter, and you are standing..."
+  RIGHT: "You are standing in the dark behind the freight house..."
   This text appears as the Character Brief on the introduction screen and is written
   to the session transcript. A missing or template-copied briefing will create a blank
   transcript section. Write it specific to this character and this opening moment.
 - character_hooks: array of exactly 3 first-person sentences — alternative starting conditions (different debt, different rumour, different relationship). One is picked randomly each session.
 - suggested_secret: one sentence. Something nobody in the story knows about this player character.
+
+PERIOD VOCABULARY RULES (required on scenario):
+Generate a period_vocabulary object with 3–5 categories of authentic language from this specific world.
+Each category covers one trade, faction, or social group central to this story.
+Good categories: trade argot, criminal cant, organizational codes, period slang, technical shorthand.
+- name: short category label (e.g. "Dockworkers' Language", "Rebel Cipher Codes", "Police Jargon")
+- context: one sentence — who uses this vocabulary and in what situations
+- terms: 5–8 entries per category — use historically authentic vocabulary specific to the period, location, and world
+Each term: { "term": "the word or phrase", "meaning": "what it means in this world" }
+Do not use generic or modern slang. Every term should be specific to this era, place, and cast.
 
 REQUIRED JSON STRUCTURE:
 {
@@ -237,6 +395,17 @@ REQUIRED JSON STRUCTURE:
         { "type": "stakes", "text": "Stakes paragraph." },
         { "type": "scene",  "text": "Immediate scene paragraph." },
         { "type": "entry",  "text": "Entry paragraph — second person, lands at the threshold." }
+      ]
+    },
+    "period_vocabulary": {
+      "categories": [
+        {
+          "name": "Category Name",
+          "context": "Who uses this language and in what situations.",
+          "terms": [
+            { "term": "example term", "meaning": "what it means in this world" }
+          ]
+        }
       ]
     },
     "createdAt": "2025-01-01T00:00:00Z",
@@ -320,7 +489,7 @@ REQUIRED JSON STRUCTURE:
       "startingKnowledge": ["something they know at start"],
       "accessLevel": "worker | staff | director",
       "perspective": "How the AI should write for this role's point of view",
-      "briefing": "You are standing [specific location] with [specific physical detail]. You have [what this character uniquely knows that others do not]. [What is at stake for them personally right now]. [The immediate sensory detail of this moment]. [Final sentence lands them at the threshold of their first action].",
+      "briefing": "MUST BE A PLAIN STRING — NOT an object, NOT an array. Write the full briefing paragraph as a single string of 150-250 words. Example: 'You are standing [specific location] with [specific physical detail]. You have [what this character uniquely knows that others do not]. [What is at stake for them personally right now]. [The immediate sensory detail of this moment]. [Final sentence lands them at the threshold of their first action].'",
       "character_hooks": ["First-person hook one.", "First-person hook two.", "First-person hook three."],
       "suggested_secret": "One sentence nobody in the story knows.",
       "opening": {
@@ -432,13 +601,21 @@ export function createAdminRouter(repos, config = {}) {
     if (!scenario) return notFound(res);
     const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
     const missing = validateStoredScenario(scenario, playerRoles);
+    const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
     const roles = playerRoles.map(role => ({
-      id:             role.id,
-      name:           role.name,
-      hasBriefing:    !!(role.briefing && role.briefing.trim().length >= 50),
-      hasDescription: !!role.description,
+      id:               role.id,
+      name:             role.name,
+      hasBriefing:      getBriefingText(role.briefing).length >= 50,
+      hasDescription:   !!role.description,
+      hasEntryParagraph: !!(entrySection?.character_entries?.[role.id]?.trim().length >= 50),
     }));
-    res.json({ scenarioId: req.params.id, healthy: missing.length === 0, missing, roles });
+    res.json({
+      scenarioId: req.params.id,
+      healthy: missing.length === 0,
+      missing,
+      roles,
+      hasPeriodVocabulary: !!(scenario.period_vocabulary?.categories?.length),
+    });
   });
 
   // ── Scenario repair ──────────────────────────────────────────────────────────
@@ -451,15 +628,8 @@ export function createAdminRouter(repos, config = {}) {
     const repairs = [];
     const errors  = [];
 
-    const rolesMissingBriefing = playerRoles.filter(
-      r => !r.briefing || r.briefing.trim().length < 50
-    );
-
-    if (rolesMissingBriefing.length === 0) {
-      return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [] });
-    }
-
-    for (const role of rolesMissingBriefing) {
+    // Repair missing briefings
+    for (const role of playerRoles.filter(r => getBriefingText(r.briefing).length < 50)) {
       try {
         const briefing = await generateBriefingText(scenario, role, anthropicApiKey);
         repos.scenarios.savePlayerRole({ ...role, briefing });
@@ -471,9 +641,61 @@ export function createAdminRouter(repos, config = {}) {
       }
     }
 
+    // Repair missing character entry paragraphs
+    const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
+    const missingEntries = playerRoles.filter(role => {
+      const entry = entrySection?.character_entries?.[role.id];
+      return !entry || entry.trim().length < 50;
+    });
+
+    if (missingEntries.length > 0) {
+      if (!entrySection) {
+        errors.push('No entry section found in scenario introduction — cannot generate character entries');
+      } else {
+        for (const role of missingEntries) {
+          try {
+            const entryParagraph = await generateCharacterEntry(scenario, role, playerRoles, anthropicApiKey);
+            if (!entrySection.character_entries) entrySection.character_entries = {};
+            entrySection.character_entries[role.id] = entryParagraph;
+            repairs.push(`Generated entry paragraph for ${role.name}`);
+            console.log(`[REPAIR] ${req.params.id} — entry written for "${role.name}" (${entryParagraph.length} chars)`);
+          } catch (err) {
+            errors.push(`Failed to generate entry for ${role.name}: ${err.message}`);
+            console.error(`[REPAIR ERROR] entry ${role.name}: ${err.message}`);
+          }
+        }
+        repos.scenarios.save(scenario);
+      }
+    }
+
+    // Repair missing period vocabulary
+    if (!Array.isArray(scenario.period_vocabulary?.categories) || scenario.period_vocabulary.categories.length === 0) {
+      try {
+        const characters = repos.characters.findAll().filter(c => c.scenarioIds?.includes(scenario.id));
+        const vocab = await generatePeriodVocabulary(scenario, characters, anthropicApiKey);
+        if (!Array.isArray(vocab?.categories) || vocab.categories.length === 0) {
+          throw new Error('generatePeriodVocabulary returned invalid structure');
+        }
+        for (const cat of vocab.categories) {
+          if (!Array.isArray(cat.terms)) cat.terms = [];
+        }
+        scenario.period_vocabulary = vocab;
+        console.log(`[REPAIR] Writing vocabulary to ${req.params.id} — ${vocab.categories.length} categories, keys: ${Object.keys(vocab).join(', ')}`);
+        repos.scenarios.save(scenario);
+        repairs.push(`Generated period vocabulary (${vocab.categories.length} categories)`);
+        console.log(`[REPAIR] ${req.params.id} — period vocabulary written successfully`);
+      } catch (err) {
+        errors.push(`Failed to generate period vocabulary: ${err.message}`);
+        console.error(`[REPAIR ERROR] period vocabulary: ${err.message}`);
+      }
+    }
+
+    if (repairs.length === 0 && errors.length === 0) {
+      return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [] });
+    }
+
     const updatedRoles = repos.scenarios.findPlayerRoles(req.params.id);
     const remaining    = validateStoredScenario(scenario, updatedRoles);
-
     res.json({ success: errors.length === 0, repairs, errors, remaining });
   });
   r.get('/locations',      (req, res) => res.json(
@@ -616,43 +838,43 @@ export function createAdminRouter(repos, config = {}) {
     if (!description) return badRequest(res, '"description" is required.');
 
     const prompt = buildGenerationPrompt({ description, playTimeMinutes: Number(playTimeMinutes) });
-    const toks   = maxTokens(Number(playTimeMinutes));
+    const toks   = generationMaxTokens(Number(playTimeMinutes));
 
     console.log(`[GENERATE] playTime=${playTimeMinutes}min tokenBudget=${toks}`);
 
     const genTrace = langfuse?.trace({ name: 'story-generate', input: { playTimeMinutes, tokenBudget: toks } });
     const genSpan  = genTrace?.generation({ name: 'generate', model: 'claude-sonnet-4-6', modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
 
-    const timeoutMs = Math.max(480_000, toks * 25);  // ~25ms/token + headroom
-    const signal    = AbortSignal.timeout(timeoutMs);
-    let text;
+    const timeoutMs = Math.max(600_000, toks * 30);  // streaming: per-chunk timeout with headroom
+    let text = '';
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', signal,
-        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: toks,
-          temperature: 0.7,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        const apiErr = data?.error?.message || data?.error || JSON.stringify(data);
-        genSpan?.end({ metadata: { error: apiErr, status: response.status } });
-        genTrace?.update({ tags: ['api-error'] });
-        return res.status(500).json({ error: `Anthropic API error (${response.status}): ${apiErr}` });
+      const stream = getAnthropicClient(anthropicApiKey).messages.stream(
+        { model: 'claude-sonnet-4-6', max_tokens: toks, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+        { timeout: timeoutMs, maxRetries: 0 }
+      );
+
+      for await (const chunk of stream) {
+        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+          text += chunk.delta.text;
+        }
       }
-      text = data?.content?.[0]?.text;
-      genSpan?.end({ output: `${text?.length ?? 0} chars`, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens }, metadata: { stop_reason: data?.stop_reason } });
-      console.log(`[GENERATE] response received stop_reason=${data?.stop_reason} input_tokens=${data?.usage?.input_tokens} output_tokens=${data?.usage?.output_tokens}`);
+
+      const finalMsg = await stream.finalMessage();
+      genSpan?.end({ output: `${text.length} chars`, usage: { input: finalMsg.usage?.input_tokens, output: finalMsg.usage?.output_tokens }, metadata: { stop_reason: finalMsg.stop_reason } });
+      console.log(`[GENERATE] stream complete stop_reason=${finalMsg.stop_reason} chars=${text.length} input_tokens=${finalMsg.usage?.input_tokens} output_tokens=${finalMsg.usage?.output_tokens}`);
+
+      if (finalMsg.stop_reason === 'max_tokens') {
+        console.error(`[GENERATE ERROR] Truncated at max_tokens — ${text.length} chars, budget was ${toks}`);
+        genTrace?.update({ tags: ['truncated'] });
+        return res.status(500).json({ error: 'Scenario generation failed — response truncated.', lastChars: text.slice(-500) });
+      }
+
       if (!text) {
         genTrace?.update({ tags: ['no-text'] });
-        return res.status(500).json({ error: 'No response from Claude.', raw: data });
+        return res.status(500).json({ error: 'No response from Claude.' });
       }
     } catch (err) {
-      const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+      const isTimeout = err?.status === 408 || err?.code === 'ETIMEDOUT' || err?.message?.toLowerCase().includes('timeout') || err?.name === 'APITimeoutError';
       genSpan?.end({ metadata: { error: isTimeout ? 'timeout' : err.message } });
       genTrace?.update({ tags: [isTimeout ? 'timeout' : 'error'] });
       console.error(`[GENERATE ERROR] ${isTimeout ? `timeout after ${timeoutMs / 1000}s` : err.message}`);
@@ -742,18 +964,14 @@ Return ONLY valid JSON in this exact structure:
 
     let text;
     try {
-      const signal   = AbortSignal.timeout(120_000);
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', signal,
-        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.8, messages: [{ role: 'user', content: prompt }] })
-      });
-      const data = await response.json();
-      if (!response.ok) return res.status(500).json({ error: `Anthropic API error (${response.status}): ${data?.error?.message || JSON.stringify(data?.error)}` });
-      text = data?.content?.[0]?.text;
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        { model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+        { timeout: 120_000, maxRetries: 0 }
+      );
+      text = msg.content[0]?.text;
       if (!text) return res.status(500).json({ error: 'No response from Claude.' });
     } catch (err) {
-      const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+      const isTimeout = err?.status === 408 || err?.code === 'ETIMEDOUT' || err?.message?.toLowerCase().includes('timeout') || err?.name === 'APITimeoutError';
       return res.status(500).json({ error: isTimeout ? 'Briefing generation timed out.' : err.message });
     }
 
@@ -836,7 +1054,7 @@ Return ONLY valid JSON in this exact structure:
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
-      playerRoles.forEach(r => repos.scenarios.savePlayerRole(r));
+      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(r)));
       res.json({ ok: true, scenarioId: scenario.id });
     } catch (err) {
       res.status(500).json({ error: err.message });

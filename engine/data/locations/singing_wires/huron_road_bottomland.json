@@ -1,0 +1,20 @@
+{
+  "id": "huron_road_bottomland",
+  "scenarioId": "singing_wires",
+  "name": "Huron River Bottomland, Shore Road North",
+  "description": "The low, wooded ground between the Huron River crossing and the north edge of Sandusky — a mile and a half of elm and cottonwood forest threaded by a single dirt track and two informal paths that only the conductors know. The telegraph line runs along the main road on cedar poles, its wires audible in the wind.",
+  "mood": "dark, physical, urgent, ancient",
+  "linkedCharacterIds": [
+    "elias_cole"
+  ],
+  "atmosphericDetails": [
+    "The telegraph poles here are new — the insulators still white and clean — and the wires hum in the northeast wind with a sound that Elias Cole has come to hate on a level that is almost physical.",
+    "The bottomland mud holds boot prints for hours; a group of seven people moving north would leave a readable trail to anyone with a lantern and the will to follow it.",
+    "A gandy dancer's tool cache — a wooden box of track spikes and a tamping bar — sits beside the ballast of the rail spur that runs parallel to the shore road here, left by a work crew that will return at dawn.",
+    "The river crossing is a plank bridge wide enough for a single wagon; the planks are wet from the evening's rain and the water below is running fast and dark."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.479Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

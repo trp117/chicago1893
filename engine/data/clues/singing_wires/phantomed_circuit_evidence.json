@@ -1,0 +1,17 @@
+{
+  "id": "phantomed_circuit_evidence",
+  "scenarioId": "singing_wires",
+  "title": "The Junction Box Ground Wire",
+  "description": "At the telegraph junction box in the Lake Shore rail yard, where the Norwalk spur connects to the main line, a second wire has been recently attached to the binding post — not a standard installation but a clean, competent addition using fresh copper wire and a proper terminal. This is the physical evidence of Thomas Cole's phantomed circuit, which he installed earlier tonight to route false traffic toward Norwalk. It is also evidence that someone with real technical skill has been manipulating the line — and that the manipulation was done from the Sandusky end, not from a distant station.",
+  "category": "physical",
+  "discoveryLocationId": "lake_shore_rail_yard",
+  "implicatesCharacterIds": [
+    "thomas_cole"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.488Z",
+  "locationId": "",
+  "isRedHerring": false
+}

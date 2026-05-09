@@ -1,0 +1,36 @@
+{
+  "id": "prentiss_hoyle",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
+  ],
+  "name": "Prentiss Hoyle",
+  "role": "Gandy dancer, Erie rail maintenance crew",
+  "publicFace": "A quiet, hardworking track laborer who is often seen along the Sandusky spur at odd hours — his work schedule is irregular, which is normal for maintenance crews.",
+  "privateGoal": "Collect the remaining payment Aldous Greer promised him for confirming the passengers' location and route.",
+  "fear": "Being identified as the informant by Elias Cutter, whom he has worked alongside on two previous network operations and who trusted him.",
+  "knowledge": [
+    "He confirmed to Greer, via a dead-drop message at the Huron Road mile marker, that the passengers were in the root cellar beneath the freight house.",
+    "He knows the secondary cache point location because Elias mentioned it in passing three weeks ago.",
+    "He knows the ferry signal pattern — he overheard Elias describe it to a safe-house keeper.",
+    "He does not know that Caleb is aware of his role — he believes his contact with Greer was entirely covert."
+  ],
+  "voice": "Slow-spoken, uses physical labor metaphors, refers to everything in terms of weight and distance — uncomfortable with direct questions.",
+  "trustLogic": "Responds to being treated as a peer by working men. Becomes evasive when questioned by anyone who seems educated or official.",
+  "secrets": [
+    "He did not do this for political reasons — Greer threatened to report him for a theft from a previous employer unless he cooperated.",
+    "He has already sent one message to Greer tonight using a written note passed to a rider at the Huron Road tavern — he cannot take it back."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Talks about his work, the ballast condition, the weather — anything adjacent to the actual question.",
+    "heavyPressure": "Claims he was just walking the line for a night inspection, which is within his job description.",
+    "breakingPoint": "He will not admit the note to the rider — that is the one act he cannot explain away.",
+    "fleeCondition": "If shown the nulled codebook clue and told his name appears in it.",
+    "fleeStyle": "Runs along the rail spur toward the Huron crossing — he knows the ballast path in the dark.",
+    "chaseStyle": "Fast over rough ground, uses the rail ties as stepping stones, cuts toward the tree line.",
+    "capturedBehavior": "Breaks quickly once cornered — offers Greer's location in exchange for being allowed to leave.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.457Z",
+  "description": ""
+}

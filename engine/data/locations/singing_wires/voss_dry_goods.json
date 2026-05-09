@@ -1,0 +1,21 @@
+{
+  "id": "voss_dry_goods",
+  "scenarioId": "singing_wires",
+  "name": "Voss Dry Goods Store, Water Street, Sandusky",
+  "description": "A well-kept merchant's storefront on Water Street, its shelves of calico bolts and barrel goods a careful disguise for the hidden room behind the back storeroom where passengers rest before the final leg north. The store is dark at this hour but a lamp burns in the rear window — the lantern is lit.",
+  "mood": "secretive, domestic, precarious, watchful",
+  "linkedCharacterIds": [
+    "mercy_voss",
+    "jerome_lattimore"
+  ],
+  "atmosphericDetails": [
+    "The floorboards of the back storeroom have been reinforced from below — they do not creak under weight the way new boards do, which is not how new boards usually behave.",
+    "A copy of the 1844 edition of Cruden's Concordance sits on the counter beside the accounts book, its spine worn at specific intervals from use.",
+    "The smell of the store is flour, dried herbs, and beneath that, faintly, the wood smoke of a fire that has been burning in the hidden room for warmth.",
+    "A small chalk mark on the door frame at shoulder height — two horizontal lines — is the current signal that the station is occupied and the lantern is lit."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.483Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

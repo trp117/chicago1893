@@ -1,0 +1,35 @@
+{
+  "id": "arden_gill",
+  "scenarioIds": [
+    "singing_wires"
+  ],
+  "name": "Arden Gill",
+  "role": "Commercial traveler and slave-catcher intermediary",
+  "publicFace": "A traveling agent for a Cincinnati dry goods wholesaler — plausible, well-dressed, present in Sandusky for legitimate commercial reasons at least three times a year.",
+  "privateGoal": "Ensure the catchers intercept Elias Cole's group tonight, collect the broker's fee from the bounty, and leave Sandusky before anyone connects him to Silas Pratt or the red fire dispatch.",
+  "fear": "Being identified as the intermediary in a state where harboring is a crime but so, increasingly, is being the man who set the law on a group that includes children — Ohio juries are unpredictable.",
+  "knowledge": [
+    "He knows the name of the slave owner who posted the original bounty and the name of the professional catcher he has hired — a man named Dodd who is currently riding north with Deputy Crane.",
+    "He knows the source above Silas Pratt — a free Black man named Jerome Lattimore who was himself a passenger three years ago and who has been feeding information to Gill for money ever since.",
+    "He does not know about Thomas Cole's interference with the wire and believes the red fire dispatch has gone through cleanly."
+  ],
+  "voice": "Smooth, commercial, practiced in the language of reasonable men doing reasonable business — never uses the word slave, says 'property' or 'the owner's interest.'",
+  "trustLogic": "Performs as a neutral commercial party; opens slightly to anyone who seems sympathetic to the owner's legal rights under the 1850 Act. Closes hard at any mention of Silas Pratt by name.",
+  "secrets": [
+    "Jerome Lattimore, his source inside the network, does not know that Gill has given his name to the slave owner as a bonus piece of intelligence — Lattimore himself is now at risk of being sold south by the very men he is helping.",
+    "Gill carries a copy of the bounty description in his coat pocket, already signed by the owner's agent."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Expresses polite confusion, produces his commercial credentials, suggests the questioner has mistaken him for someone else.",
+    "heavyPressure": "Invokes the Fugitive Slave Act directly and by section number, suggests that interference with lawful recovery of property is a federal offense.",
+    "breakingPoint": "He will not name Jerome Lattimore under any pressure — Lattimore is his only reliable inside source and Gill intends to use him again.",
+    "fleeCondition": "If the bounty document in his coat pocket is demanded by someone with legal authority, or if Dodd is arrested.",
+    "fleeStyle": "Boards the next southbound train with his commercial luggage, entirely within his rights as a traveling man.",
+    "chaseStyle": "Does not flee physically — calls for the law, loudly, claiming he is being robbed or harassed.",
+    "capturedBehavior": "Produces the bounty document and the owner's legal authorization and claims he is simply a courier for a lawful federal process.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.473Z",
+  "description": ""
+}

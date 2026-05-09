@@ -1,0 +1,36 @@
+{
+  "id": "elias_cutter",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
+  ],
+  "name": "Elias Cutter",
+  "role": "Underground Railroad conductor, former canal boatman",
+  "publicFace": "A taciturn freight hauler known for night deliveries along the lake road — locals assume he runs untaxed whiskey and ask no questions.",
+  "privateGoal": "Move his three current passengers to the Marblehead ferry and then retire from conducting — he has been doing this for eleven years and his body is failing him.",
+  "fear": "That his son Caleb will be arrested because of him, and that the network he helped build will be destroyed by his own mistakes.",
+  "knowledge": [
+    "The location of every safe house between Oberlin and the lake shore in Erie County.",
+    "The ferry captain's real name and the signal lantern pattern that means the boat will wait.",
+    "That someone has been feeding information to the slave catchers for at least six weeks — three routes have been compromised in that time.",
+    "That the telegraph line runs within forty yards of the secondary cache point and that operators can sometimes hear wagon wheels on a still night."
+  ],
+  "voice": "Flat, economical, uses railroad and canal language by habit — says 'highball' when he means go, 'ballast' when he means trouble underfoot.",
+  "trustLogic": "Opens up only when shown physical proof of loyalty — words mean nothing to him. Shuts down completely if he senses anyone is fishing for network names.",
+  "secrets": [
+    "He once left a passenger behind at a compromised safe house to save the others — the man was recaptured and returned south. Elias has never told anyone.",
+    "He has been corresponding with Reverend John Rankin using a book cipher keyed to the 1844 edition of Webster's Dictionary, and two of those letters are hidden in the false bottom of his wagon."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Goes still and quiet, answers only what was directly asked, watches the questioner's hands.",
+    "heavyPressure": "Deflects with logistics — talks about road conditions, wagon weight, the iron horse schedule — anything but the actual question.",
+    "breakingPoint": "He will never name another conductor or safe-house keeper under any circumstances, even if arrested.",
+    "fleeCondition": "If Marshal Crane produces a warrant with his name on it.",
+    "fleeStyle": "Moves immediately to the rail spur ballast path — he knows the terrain in the dark and Crane does not.",
+    "chaseStyle": "Does not run — walks fast and deliberately, using his knowledge of the landscape to make pursuit difficult without appearing to flee.",
+    "capturedBehavior": "Gives his name, gives nothing else. Asks for a minister. Waits.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.454Z",
+  "description": ""
+}

@@ -11,11 +11,45 @@ The briefing must:
 - End at the exact threshold of their first choice — the last breath before the player acts
 - Match the literary voice of the scenario introduction sections
 
+## Entry paragraph — first line rule
+
+Never open with "You are [character name]" or any variation that names or introduces the character. The reader is already inside the character. Begin with physical placement — where they are standing, what their body is registering, what they can see or hear or smell right now.
+
+WRONG: "You are Elias Cutter, standing in the dark behind the freight house..."
+RIGHT: "You are standing in the dark behind the freight house with coal smoke..."
+
+The first word of every entry paragraph should place the reader in a body at a specific location — not in an identity. This rule applies to both the `briefing` field on player roles and the `character_entries` inside the introduction entry section.
+
 This text appears on the character introduction screen before the game begins and is written to the session transcript as the `## Character Brief` section. A missing briefing produces a blank section in every transcript for that character.
 
 **Required for every character in every scenario.** A missing or too-short briefing (`< 50 chars`) will cause the scenario generation validator to reject the output before saving.
 
 See `engine/data/scenarios/player_roles/dorothy_gill_role.json` for a reference implementation.
+
+---
+
+## period_vocabulary (optional but strongly recommended)
+
+Defines period-specific language, slang, codes, and technical terminology that the
+scene generation engine should use naturally during play. Terms are injected into the
+system prompt and surfaced to the LLM on every turn.
+
+Structure:
+- `categories`: array of vocabulary groups
+  - `name`: category label (e.g. "Telegraphers' Slang")
+  - `context`: instruction for when and how to use these terms
+  - `terms`: array of `{ term, meaning }` pairs
+
+Terms should appear naturally in dialogue and prose — never explained directly to the
+player. Context carries the meaning.
+
+Add this field whenever a scenario has specialized language that would deepen
+immersion. Every period and profession has its own vocabulary. The engine only uses
+what is defined here.
+
+A scenario without `period_vocabulary` defined produces no vocabulary block and no
+error. A scenario with it defined gets the full block injected on every turn, after
+the narrative style rules and before the arc position instruction.
 
 ---
 

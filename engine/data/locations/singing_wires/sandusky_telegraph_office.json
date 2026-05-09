@@ -1,0 +1,21 @@
+{
+  "id": "sandusky_telegraph_office",
+  "scenarioId": "singing_wires",
+  "name": "Sandusky Telegraph Office, Lake Shore Railroad Junction",
+  "description": "A narrow frame building attached to the rail depot, smelling of battery acid and lamp oil, its single operational window overlooking the dark rail yard where three sidings converge. The sounder on the main desk clicks with a steady rhythm of distant traffic, and the traffic log lies open beside it.",
+  "mood": "tense, technical, isolated, electric",
+  "linkedCharacterIds": [
+    "thomas_cole",
+    "silas_pratt"
+  ],
+  "atmosphericDetails": [
+    "The Grove cell battery jars line the back shelf, their copper plates faintly visible in the sulfurous liquid, humming with stored current.",
+    "The traffic log is a cloth-bound ledger with entries in two different hands — Thomas Cole's small, fast script and Silas Pratt's larger, rounder notation.",
+    "Outside the window, the telegraph poles along the main line are audible in the wind off the lake — a low, resonant chord that the operators call the singing of the wires.",
+    "A second sounder on the side table is connected to the Norwalk line and has been silent for eleven minutes, which is either normal or is not."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.480Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}
