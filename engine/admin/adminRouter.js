@@ -52,6 +52,22 @@ function normalizeBriefing(role) {
   return role;
 }
 
+// Strip ending_notes sub-objects that have no actual content so that saving
+// a preview form never writes empty ending_notes structures into role files.
+function stripEmptyEndingNotes(role) {
+  if (!role.ending_notes) return role;
+  for (const type of ['partial', 'failure']) {
+    const notes = role.ending_notes[type];
+    if (!notes) continue;
+    const hasContent = Object.values(notes).some(v => typeof v === 'string' && v.trim());
+    if (!hasContent) delete role.ending_notes[type];
+  }
+  if (!role.ending_notes.partial && !role.ending_notes.failure) {
+    delete role.ending_notes;
+  }
+  return role;
+}
+
 // ── Generation helpers ────────────────────────────────────────────────────────
 
 function extractJson(raw) {
@@ -1060,7 +1076,7 @@ Return ONLY valid JSON in this exact structure:
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
-      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(r)));
+      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(r))));
       res.json({ ok: true, scenarioId: scenario.id });
     } catch (err) {
       res.status(500).json({ error: err.message });
