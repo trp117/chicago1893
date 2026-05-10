@@ -1,5 +1,7 @@
 {
   "id": "singing_wires",
+  "order": 2,
+  "hidden": false,
   "version": "1.0.0",
   "title": "Singing Wires",
   "setting": "Sandusky, Ohio, 1853",

@@ -1,5 +1,7 @@
 {
   "id": "dog_green_sector",
+  "order": 1,
+  "hidden": false,
   "version": "1.0.0",
   "title": "Dog Green: The Longest Morning",
   "description": "June 6, 1944, 0630 hours. The ramps of the landing craft are dropping on the deadliest stretch of Omaha Beach. Three men — a coxswain, a Ranger sergeant, and a battalion medic — must navigate chaos, impossible choices, and the rising tide to break through the Atlantic Wall at the Vierville Draw before the second wave drowns in the same blood as the first.",
