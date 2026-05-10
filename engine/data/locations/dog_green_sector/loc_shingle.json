@@ -1,0 +1,21 @@
+{
+  "id": "loc_shingle",
+  "scenarioId": "dog_green_sector",
+  "name": "The Shingle — The Seawall",
+  "description": "A bank of smooth, fist-sized stones rising four feet above the sand, offering the first real defilade from direct fire — men press against it in clusters, some reorganizing, some unable to move, some past moving.",
+  "mood": "fragile refuge, organized desperation, rallying point",
+  "linkedCharacterIds": [
+    "char_lt_hargrove",
+    "char_sgt_kowalski",
+    "char_petty_officer_reed"
+  ],
+  "atmosphericDetails": [
+    "The stones are cold and wet and rattle underfoot with every near-miss, as if the earth itself is flinching.",
+    "Officers are moving along the shingle line trying to identify who is still functional — the faces are white under the helmet rims, eyes tracking the wire fifty yards ahead.",
+    "A bangalore torpedo section lies against the shingle wall, its carrying handle still attached, owner unknown."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.339Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

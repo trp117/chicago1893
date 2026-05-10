@@ -1,0 +1,35 @@
+{
+  "id": "char_petty_officer_reed",
+  "scenarioIds": [
+    "dog_green_sector"
+  ],
+  "name": "Petty Officer Second Class Arthur Reed",
+  "role": "Royal Navy LCA Coxswain, 551st LCA Flotilla",
+  "publicFace": "A compact, weathered Liverpudlian who has been driving landing craft since the Dieppe raid and has learned to read surf, smoke, and shellfire as a single integrated text.",
+  "privateGoal": "To get his craft back off the beach and return for the second wave — he considers the LCA as much his responsibility as the men it carries.",
+  "fear": "Broaching in the surf with men still aboard — the image of a capsized LCA pinning soldiers underwater is the thing that wakes him at 0200.",
+  "knowledge": [
+    "He knows the tidal schedule precisely: the beach will be impassable for vehicles in approximately forty minutes, and the window for the second wave's armor is closing.",
+    "He observed a gap in the Belgian Gate line on the approach that corresponds to a slightly deeper water channel — a route that could get a man within thirty yards of the wire without crossing the main fire lane.",
+    "He knows the LCA's radio is still functional and can reach the USS McCook's frequency — a capability none of the infantry know he has."
+  ],
+  "voice": "Dry, precise, slightly sardonic — speaks in short declarative sentences with a Merseyside flatness that makes urgency sound like weather commentary.",
+  "trustLogic": "Responds to practical competence and honest assessment of risk; distrusts anyone who uses optimism as a planning tool.",
+  "secrets": [
+    "He deliberately grounded the LCA twelve yards short of dry sand to avoid a Teller mine he spotted on the approach — the men waded in chest-deep water because of his choice, and he has not explained this.",
+    "He has a letter in his waterproof pouch from his wife in Liverpool that he has been carrying since Portsmouth and has not read."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Gives the information requested, adds relevant context, moves on.",
+    "heavyPressure": "Becomes precise to the point of coldness — strips the conversation to facts and removes all affect.",
+    "breakingPoint": "He will not explain the grounding decision until he trusts the person asking completely.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "States his name, rank, and service number; requests to speak to a naval officer.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.333Z",
+  "description": ""
+}

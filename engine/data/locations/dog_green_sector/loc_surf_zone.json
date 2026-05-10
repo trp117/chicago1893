@@ -1,0 +1,21 @@
+{
+  "id": "loc_surf_zone",
+  "scenarioId": "dog_green_sector",
+  "name": "The Surf Zone — Obstacle Belt",
+  "description": "Chest-deep water churned white by propeller wash and shellfire, threaded with steel hedgehogs and Belgian Gates, the sand beneath invisible and unreliable. Men move through it in slow motion, weighed down by eighty pounds of soaked equipment.",
+  "mood": "lethal, chaotic, disorienting, desperate",
+  "linkedCharacterIds": [
+    "char_cpl_drennan",
+    "char_pvt_szymanski",
+    "char_medic_calloway"
+  ],
+  "atmosphericDetails": [
+    "The water has turned a dilute rust color in the shallows where the tide is pulling blood back out to sea.",
+    "Abandoned equipment bobs in the surf — a rifle, a Mae West still inflated, a single boot — marking where men went down.",
+    "The sound here is total: the MG-42's tearing bursts, the flat crack of mortar rounds, the surf, and underneath it all, men calling for the medic in voices that are trying to stay controlled."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.339Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

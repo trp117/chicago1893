@@ -1,0 +1,35 @@
+{
+  "id": "char_lt_hargrove",
+  "scenarioIds": [
+    "dog_green_sector"
+  ],
+  "name": "First Lieutenant Calvin Hargrove",
+  "role": "Platoon Commander, Company A, 116th Infantry Regiment",
+  "publicFace": "A composed, squared-away officer who speaks in clipped commands and projects certainty even when he has none — the kind of man soldiers follow because the alternative is paralysis.",
+  "privateGoal": "To prove that the frontal assault doctrine he was ordered to execute was not a death sentence — that leadership and aggression can overcome what planning failed to provide.",
+  "fear": "That the men dying around him are dying because of orders he did not question loudly enough in the planning stages.",
+  "knowledge": [
+    "He knows the pre-assault intelligence estimated the 716th Division held Dog Green — not the battle-hardened 352nd, which changes the entire threat calculus.",
+    "He knows that Colonel Canham is somewhere on the beach and will relieve any officer who goes to ground — Hargrove's authority depends on being seen moving forward.",
+    "He has a marked map showing the planned route through the draw that is now three minutes obsolete."
+  ],
+  "voice": "Flat, clipped, institutional — gives orders in the imperative without preamble, rarely asks questions, uses rank as punctuation.",
+  "trustLogic": "Opens up when shown concrete tactical information that lets him revise his plan without admitting the original was wrong; shuts down completely when his authority is challenged publicly.",
+  "secrets": [
+    "He froze for eleven seconds at the ramp drop — a paralysis he is certain his sergeant saw — and he has been overcorrecting with aggression ever since.",
+    "His marked map shows an alternate route through the bluff grass that bypasses the wire entirely, but he has not shared it because it would require splitting the platoon."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Acknowledges the question with a nod, gives a partial answer, and immediately redirects to the tactical problem at hand.",
+    "heavyPressure": "Goes very still, meets the challenger's eyes, and speaks quietly — more dangerous than shouting.",
+    "breakingPoint": "He will never admit the eleven-second freeze at the ramp.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Maintains rank and composure; attempts to negotiate from a position of authority even when he has none.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.332Z",
+  "description": ""
+}

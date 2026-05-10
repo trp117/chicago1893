@@ -1,0 +1,19 @@
+{
+  "id": "loc_lca_cockpit",
+  "scenarioId": "dog_green_sector",
+  "name": "LCA Cockpit — The Run-In",
+  "description": "A steel box the size of a wardrobe, smelling of diesel and vomit, with a narrow armored viewing slit through which the beach appears as a strip of smoke and white water between two walls of grey sky. The engine is loud enough to feel in the sternum.",
+  "mood": "claustrophobic, tense, mechanical, isolated",
+  "linkedCharacterIds": [
+    "char_petty_officer_reed"
+  ],
+  "atmosphericDetails": [
+    "The hull rings like a bell each time a near-miss mortar round detonates in the water alongside.",
+    "Through the viewing slit, the Belgian Gates are visible as dark crosses in the surf, some of them already tipped with the orange flash of a craft hitting a Teller mine.",
+    "The men behind the coxswain are silent except for the sound of equipment rattling and one man praying in a low, continuous murmur."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.336Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

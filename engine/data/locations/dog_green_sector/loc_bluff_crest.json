@@ -1,0 +1,20 @@
+{
+  "id": "loc_bluff_crest",
+  "scenarioId": "dog_green_sector",
+  "name": "The Vierville Bluff Crest",
+  "description": "The top of the hundred-foot chalk bluff above the Vierville Draw, where the Atlantic Wall's inland face is exposed and the beach below is visible in its full, terrible geometry — the first high ground the Allies have taken on Dog Green.",
+  "mood": "hard-won, panoramic, grief-weighted, historic",
+  "linkedCharacterIds": [
+    "char_lt_hargrove",
+    "char_sgt_kowalski"
+  ],
+  "atmosphericDetails": [
+    "From here, the entire Dog Green Sector is visible below — the surf line, the open sand, the shingle, the wire — reduced to a diagram of the last ninety minutes.",
+    "The second wave of LCAs is visible on the horizon, their wakes white against the grey Channel, moving toward whatever the draw has become.",
+    "The wind at the crest is steady and cold and carries the smell of the beach upward — a smell that will not leave the men who are standing here for the rest of their lives."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.340Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

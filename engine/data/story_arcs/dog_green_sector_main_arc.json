@@ -1,0 +1,73 @@
+{
+  "id": "dog_green_sector_main_arc",
+  "scenarioId": "dog_green_sector",
+  "name": "The Vierville Draw",
+  "premise": "Three men with different functions and different views of the same catastrophe must coordinate across the chaos of Dog Green Sector to breach the wire, neutralize WN-71, and open the Vierville Draw before the rising tide makes the beach impassable and the second wave repeats the slaughter of the first.",
+  "goal": "Breach the concertina wire obstacle at the base of the Vierville Draw using the Bangalore Torpedo, signal the USS McCook for direct fire support against WN-71, and lead survivors to the top of the bluffs by 0800 hours.",
+  "openingSituation": "It is 0630 hours. The LCA is sixty yards from the beach and taking mortar near-misses. The Ranger sergeant is pinned behind a hedgehog in the surf. The medic is already in the water with casualties. The draw is defended, the wire is intact, and the tide is coming in.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Run-In",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        "The coxswain must navigate the LCA through the obstacle belt — choosing between a sandbar risk and a mine-threaded gap — to land the men as close to dry sand as possible.",
+        "The Ranger sergeant, already in the water from an earlier craft, must reach the shingle without being cut down by the MG-42 at WN-71.",
+        "The medic encounters the first casualty wave in the surf and must make an immediate triage decision that will define his moral position for the rest of the session.",
+        "The three roles become aware of each other's presence and the shared problem: the wire at the draw's base is the bottleneck everything depends on."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Killing Ground",
+      "minuteRange": [
+        8,
+        16
+      ],
+      "beats": [
+        "Pinned at the shingle, the characters must gather information about the WN-71 firing arc — the key intelligence that will allow the USS McCook to engage the bunker effectively.",
+        "Lieutenant Hargrove attempts to organize a frontal assault on the wire; his plan is tactically sound but will cost every man in the open — the players must evaluate whether to follow, modify, or circumvent his orders.",
+        "Corporal Drennan, the demolitions man carrying the second Bangalore section, is wounded in the surf — the sergeant must decide whether to retrieve him or proceed with a partial charge.",
+        "The medic discovers that Private Olek Szymanski, the only man who has crawled close enough to observe the WN-71 Tobruk position, is categorized as expectant — but he is still conscious and talking."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Wire",
+      "minuteRange": [
+        16,
+        24
+      ],
+      "beats": [
+        "The Bangalore Torpedo must be assembled and pushed through the concertina wire under direct fire — a physical and tactical problem requiring coordination between the sergeant and at least one other character.",
+        "Feldwebel Brandt's machine-gun position at WN-71 shifts its arc of fire, suggesting the crew has spotted the torpedo push — the characters must identify the new threat axis before detonation.",
+        "The coxswain, having beached the LCA and joined the survivors at the shingle, possesses navigational knowledge of the tidal schedule that changes the urgency calculus: the beach closes in forty minutes.",
+        "The USS McCook makes radio contact — but the fire mission requires a confirmed grid reference for WN-71 that only Szymanski's testimony can provide."
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Bluffs",
+      "minuteRange": [
+        24,
+        30
+      ],
+      "beats": [
+        "The Bangalore detonates — the wire is breached or it fails, and the characters must respond to whichever reality they have created.",
+        "The path through the draw is exposed; the survivors must move through it under fire from the remaining German positions while the USS McCook engages WN-71 directly.",
+        "The final choice: who goes up the bluff and who stays behind — the medic's triage logic now applies to the entire group.",
+        "At the top of the Vierville bluffs, the surviving characters look back at the beach as the second wave appears on the horizon — the draw is open, or it is not, and the cost of either outcome is visible in both directions."
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.329Z",
+  "opening": ""
+}

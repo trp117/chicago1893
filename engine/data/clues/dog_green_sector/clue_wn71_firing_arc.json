@@ -1,0 +1,20 @@
+{
+  "id": "clue_wn71_firing_arc",
+  "scenarioId": "dog_green_sector",
+  "title": "WN-71 Traverse Limits — The Dead Zone",
+  "description": "Szymanski's account, cross-referenced with Kowalski's own observation, confirms that the MG-42 in WN-71's Tobruk pit has a fixed traverse limit imposed by the concrete embrasure — the gun cannot depress far enough to cover the fifteen-yard strip immediately to the left of the wire obstacle. This is the approach corridor. Without this intelligence, any push on the wire is a frontal crossing of the primary fire lane. With it, a man carrying a Bangalore can reach the wire with a reasonable chance of surviving long enough to push it through.",
+  "category": "testimony",
+  "discoveryLocationId": "loc_surf_zone",
+  "implicatesCharacterIds": [
+    "char_feldwebel_brandt",
+    "char_pvt_szymanski"
+  ],
+  "unlocks": [
+    "clue_bangalore_breach"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.346Z",
+  "locationId": "",
+  "isRedHerring": false
+}

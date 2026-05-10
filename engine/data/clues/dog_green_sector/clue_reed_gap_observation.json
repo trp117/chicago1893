@@ -1,0 +1,18 @@
+{
+  "id": "clue_reed_gap_observation",
+  "scenarioId": "dog_green_sector",
+  "title": "The Belgian Gate Gap — Reed's Approach Observation",
+  "description": "On the run-in, Reed observed a gap in the Belgian Gate obstacle line thirty yards west of the main approach — a slightly deeper water channel that a man could use to reach within thirty yards of the wire without crossing the MG-42's primary arc of fire. He did not report this because no one asked him. He is a coxswain, not an infantryman, and the information sat in him like ballast. If asked directly about the approach, or if shown the dead zone intelligence, he volunteers this immediately.",
+  "category": "observation",
+  "discoveryLocationId": "loc_lca_beached",
+  "implicatesCharacterIds": [
+    "char_petty_officer_reed",
+    "char_sgt_kowalski"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.344Z",
+  "locationId": "",
+  "isRedHerring": false
+}

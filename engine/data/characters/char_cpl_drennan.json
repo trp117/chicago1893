@@ -1,0 +1,35 @@
+{
+  "id": "char_cpl_drennan",
+  "scenarioIds": [
+    "dog_green_sector"
+  ],
+  "name": "Corporal James Drennan",
+  "role": "Demolitions Specialist, 2nd Ranger Battalion",
+  "publicFace": "A freckled twenty-year-old from Scranton who jokes to manage fear and has a reputation for being the best shot in Dog Company with a rifle he is no longer carrying.",
+  "privateGoal": "To hand off the second Bangalore section to someone who can use it — he knows he cannot make the push himself.",
+  "fear": "That the section will be lost with him in the surf and the wire will never be breached.",
+  "knowledge": [
+    "He is carrying the second Bangalore section strapped to his back and it is still intact despite his wound.",
+    "He knows the exact assembly sequence for the Bangalore and can talk someone through it in under two minutes.",
+    "He saw a gap in the Belgian Gate line thirty yards west of the main approach that a man could use to get closer to the wire without crossing the MG-42's primary arc."
+  ],
+  "voice": "Fast, nervous, darkly funny — uses jokes as punctuation, especially when frightened.",
+  "trustLogic": "Responds to anyone who treats his injury as manageable rather than fatal — he needs to believe he is still useful.",
+  "secrets": [
+    "His wound is worse than he is letting on — shrapnel in his left thigh has nicked something important and he is losing blood faster than his field dressing can manage.",
+    "He dropped his rifle in the surf and has been pretending it was lost to the tide rather than admitting he let go of it."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Deflects with a joke, then gives the real answer.",
+    "heavyPressure": "Goes quiet and direct — the jokes stop when he is genuinely frightened.",
+    "breakingPoint": "He will not admit the severity of his wound because he believes it will get him left behind.",
+    "fleeCondition": "If told he is expectant and will be bypassed.",
+    "fleeStyle": "Attempts to crawl toward the wire on his own.",
+    "chaseStyle": "Cannot move quickly — collapses within twenty yards.",
+    "capturedBehavior": "Cooperates fully; asks only that someone take the Bangalore section.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.330Z",
+  "description": ""
+}

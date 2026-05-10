@@ -1,0 +1,62 @@
+{
+  "id": "role_coxswain",
+  "scenarioId": "dog_green_sector",
+  "name": "The Coxswain",
+  "description": "You are piloting the LCA on its final run toward Dog Green. You alone can read the surf, the obstacles, and the tidal schedule — and you alone can reach the USS McCook by radio. The men behind you do not know what you know about where the mines are.",
+  "startLocationId": "loc_lca_cockpit",
+  "startingKnowledge": [
+    "The tidal window for vehicle traffic closes in approximately forty minutes.",
+    "The LCA radio is functional and tuned to the USS McCook's naval gunfire support frequency.",
+    "There is a gap in the Belgian Gate obstacle line thirty yards west of the main approach.",
+    "The Teller mine on the direct approach forced a course correction that put the men into chest-deep water — a decision not yet explained to anyone."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a man whose entire professional identity is the craft under his hands — he reads the world through hull vibration, surf patterns, and engine sound. He is not a soldier; he is a technician in a soldier's war, and his authority is the boat.",
+  "briefing": "You are at the tiller of LCA-551, sixty yards from the beach, reading the surf through a slit of armored glass the width of your hand. The engine is loud enough to feel in your back teeth, and the hull has been ringing like a struck bell for the last four minutes from mortar near-misses that have come close enough to blister the paint. You know something the thirty-four men crouched behind you do not: the direct approach is mined, and the course correction you made two minutes ago put them into chest-deep water instead of dry sand. You made the right call — the Teller mine on the direct line would have killed everyone aboard — but no one has asked you yet, and you have not volunteered it. What you also know, from the naval chart folded in your waterproof pouch, is that the tide will close this beach to armor in forty minutes, and that the LCA's radio — the only functioning link to the USS McCook's main battery — is sitting in the cockpit behind you, crackling with unanswered traffic from the fleet. The ramp is about to drop. The men will go forward. And you will have to decide whether to kedge off and go back for the second wave, or stay on this beach and use what you know.",
+  "character_hooks": [
+    "I was at Dieppe in '42 and I watched a beach turn into a charnel house because the timing was wrong — I have been running tidal calculations in my head since Portsmouth and I know exactly how long we have.",
+    "I owe the sergeant behind me a debt I cannot name — he pulled me out of a pub fight in Weymouth three weeks ago and said nothing about it — and that debt is sitting in me as the ramp goes down.",
+    "I spotted the Teller mine on the direct approach and made the call alone, without telling the officer aboard, because there was no time — and now I have to live with what that chest-deep water cost the men who went in."
+  ],
+  "suggested_secret": "Reed has already been recommended for relief of duty by his flotilla commander for insubordination at a previous exercise — this run is his last chance to keep his rating, and he knows it.",
+  "opening": {
+    "narrative": "It is 0628 hours and the beach is two minutes away. Through the viewing slit, Dog Green Sector resolves from smoke and abstraction into specific, terrible detail: the Belgian Gates in the surf, the flat open sand beyond them, the dark line of the shingle, and above it all the bluffs with their concrete positions that have been firing without pause since the first craft touched the beach twelve minutes ago. The LCA's hull shudders as the engine fights the Channel chop. Behind you, the men are silent in the way that men go silent when there is nothing left to say. The radio crackles: USS McCook is requesting fire mission coordinates for WN-71 and getting no answer from the shore. You have the frequency. You have the radio. You do not yet have the coordinates.",
+    "npcMoments": [],
+    "choices": [
+      "Push through the obstacle belt on the direct approach and drop the ramp as close to dry sand as possible — accepting the mine risk to give the men the best landing.",
+      "Take the western gap in the Belgian Gate line that you spotted on the run-in — longer approach, but mine-clear, landing in shallower water than the direct route.",
+      "Ground the LCA short of the obstacle belt on the sandbar and drop the ramp now — the men wade in chest-deep water but the craft stays off the mines entirely."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "LCA tiller and engine controls",
+      "Royal Navy waterproof chart pouch with tidal schedule",
+      "LCA radio handset tuned to McCook frequency",
+      "kedging anchor rigged but not deployed"
+    ],
+    "flags": {
+      "ramp_dropped": false,
+      "radio_used": false,
+      "tidal_window_shared": false,
+      "mine_decision_explained": false
+    },
+    "suspicion": {}
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.348Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully landed the craft, but grounded it on a sandbar. The men had to wade through neck-deep water under enfilade fire, losing half their heavy equipment. You managed to back the LCA off the beach, but the hull is riddled with holes and the engine is seizing.",
+      "who_present": "The Sergeant, The Medic",
+      "emotional_weight": "Professional Guilt—knowing you gave them a chance, but a \"wet\" one that cost lives.",
+      "closing_line_override": "You watched the ramp close on a sea of red, praying the tide wouldn't take the rest."
+    },
+    "failure": {
+      "what_happened": "A direct hit from a 75mm shell or a submerged mine destroyed the LCA before the ramp could drop. The craft is a burning pyre in the surf, and the mission for LCA-821 ended before it began.",
+      "who_present": "None (isolated in the surf)",
+      "emotional_weight": "Absolute Futility—the feeling of being stopped before the fight even started.",
+      "closing_line_override": "The cold Atlantic rushed in to meet the fire, and then there was only the sound of the waves."
+    }
+  }
+}

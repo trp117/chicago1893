@@ -1,0 +1,18 @@
+{
+  "id": "clue_calloway_supply_inventory",
+  "scenarioId": "dog_green_sector",
+  "title": "Medical Supply State — Calloway's Count",
+  "description": "Calloway's precise inventory of remaining medical supplies — four morphine syrettes, one plasma unit, sulfa for six wounds — is a resource map for the next forty minutes. It tells the players who can realistically be treated, who must be bypassed, and what the cost of stopping for Drennan versus pushing to the wire will be in terms of what is left for the men who come through the breach. It is also a measure of how many men Calloway has already treated — eleven — and what that number means for the unit's remaining combat effectiveness.",
+  "category": "observation",
+  "discoveryLocationId": "loc_surf_zone",
+  "implicatesCharacterIds": [
+    "char_medic_calloway",
+    "char_cpl_drennan"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.342Z",
+  "locationId": "",
+  "isRedHerring": false
+}

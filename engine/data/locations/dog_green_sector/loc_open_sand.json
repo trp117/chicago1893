@@ -1,0 +1,20 @@
+{
+  "id": "loc_open_sand",
+  "scenarioId": "dog_green_sector",
+  "name": "The Open Sand — The Killing Ground",
+  "description": "Five hundred yards of flat, featureless beach between the surf line and the shingle, with no cover of any kind — a geometric problem in exposure that the German gunners solved before the first American boot touched it.",
+  "mood": "exposed, merciless, vast, annihilating",
+  "linkedCharacterIds": [
+    "char_lt_hargrove",
+    "char_sgt_kowalski"
+  ],
+  "atmosphericDetails": [
+    "The sand is pocked with the small craters of mortar rounds and the larger, wetter depressions where men have gone down and been dragged by the tide.",
+    "Smoke from burning landing craft drifts across the beach in low curtains, providing thirty seconds of cover and then clearing to reveal everything.",
+    "The MG-42 from WN-71 fires in four-second bursts at precise intervals — the pattern is regular enough to time, but the men who have tried to run between bursts have not all made it."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.338Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

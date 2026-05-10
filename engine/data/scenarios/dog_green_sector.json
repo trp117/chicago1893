@@ -1,0 +1,234 @@
+{
+  "id": "dog_green_sector",
+  "version": "1.0.0",
+  "title": "Dog Green: The Longest Morning",
+  "description": "June 6, 1944, 0630 hours. The ramps of the landing craft are dropping on the deadliest stretch of Omaha Beach. Three men — a coxswain, a Ranger sergeant, and a battalion medic — must navigate chaos, impossible choices, and the rising tide to break through the Atlantic Wall at the Vierville Draw before the second wave drowns in the same blood as the first.",
+  "genre": [
+    "historical",
+    "war",
+    "survival",
+    "drama"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 30,
+  "storyArcIds": [
+    "dog_green_sector_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_coxswain",
+    "role_ranger_sergeant",
+    "role_battalion_medic"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_wn71_firing_arc",
+    "clue_bangalore_breach"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 3
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "A mortar round detonates thirty yards to the left — the concussion knocks men flat and the tide advances another six inches up the sand.",
+      "MG-42 enfilade fire from WN-71 sweeps the waterline; men caught in the open go down in clusters and the beach narrows as the tide rises.",
+      "Radio contact with USS McCook cuts to static — the destroyer's fire support is blind until someone on shore marks the bunker positions.",
+      "The second wave of LCAs is visible on the horizon — they will hit the same obstacles in twelve minutes unless the draw is opened.",
+      "A wounded man in the surf grabs at a passing soldier's ankle, screaming; every second spent there is a second the wire remains uncut."
+    ]
+  },
+  "winConditions": [
+    "The Bangalore Torpedo is detonated and the concertina wire at the base of the Vierville Draw is breached.",
+    "Survivors reach the top of the bluffs at WN-71 before 0800 hours and signal the USS McCook.",
+    "The draw is opened in time for the second wave's armor to pass through before the tide closes the beach."
+  ],
+  "failConditions": [
+    "All three player characters are killed or incapacitated before reaching the Vierville Draw.",
+    "The session clock expires at 0800 hours with the wire unbreached and the draw still under German control.",
+    "The Bangalore Torpedo is destroyed by enemy fire before it can be placed."
+  ],
+  "partialSuccessExamples": [
+    "The wire is blown and the draw opens, but the Ranger sergeant does not survive to see it — his story ends at the shingle.",
+    "The coxswain beaches the craft successfully and the men land dry, but the medic is lost in the surf triage and the assault pushes inland without him.",
+    "The bluffs are taken but the draw remains blocked by a disabled tank; the second wave must fight through the surf as the first wave did."
+  ],
+  "introduction": {
+    "enabled": true,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": "It is the morning of June 6, 1944, and the largest seaborne invasion in human history is already fracturing along its most critical seam. Operation Overlord has committed 156,000 Allied soldiers to five beaches along a fifty-mile stretch of the Normandy coast, but at Dog Green Sector — the westernmost sub-sector of Omaha Beach, fronting the Vierville-sur-Mer draw — the German 352nd Infantry Division has placed its most experienced machine-gun crews in positions that command every yard of open sand. The men of the 116th Infantry Regiment and the 2nd Ranger Battalion do not yet know that the aerial bombardment missed the bluffs by three miles, that the amphibious DD tanks have sunk in the Channel swells, and that they will cross five hundred yards of killing ground with no armor and no air cover. The Atlantic Wall here is not a wall — it is a carefully engineered abattoir, and the tide is rising."
+      },
+      {
+        "type": "stakes",
+        "text": "If the Vierville Draw — Exit D-1 — cannot be opened by mid-morning, the entire western flank of Omaha Beach remains a closed pocket, and the armor massing offshore has nowhere to land. Supreme Commander Eisenhower has already drafted a message conceding failure; it sits in his breast pocket. For the men in the water right now, the stakes are not strategic — they are the width of a rifle barrel, the distance between a steel obstacle and a man's chest, the difference between a morphine syrette reaching a wounded soldier before the tide does. History will record what happens at the macro scale; the men making that history have no access to that record. They have only the next ten yards of sand."
+      },
+      {
+        "type": "scene",
+        "text": "The air at 0630 hours smells of cordite, diesel exhaust, and salt water gone wrong — a mineral, copper-edged smell that the veterans will later struggle to name. The English Channel is running a four-foot chop and the sky is a low, grey ceiling of overcast that turns the beach into a colorless panorama of smoke and spray. Steel hedgehogs and Belgian Gates crowd the surf line, many of them tipped with Teller mines that detonate against the hulls of landing craft with a flat, percussive crack. The shingle — a bank of smooth fist-sized stones above the waterline — is the only cover on the beach, and it is two hundred yards from the water's edge. Between the surf and the shingle, the sand is open, flat, and entirely without mercy."
+      },
+      {
+        "type": "entry",
+        "text": "You are one of three men whose choices in the next ninety minutes will determine whether any part of this unit survives to climb the bluffs at Vierville. The coxswain is still at the tiller, reading the surf for a gap between the mines. The Ranger sergeant is crouched behind a hedgehog with a Bangalore Torpedo across his knees and the wire fifty yards ahead of him. The medic is on his hands and knees in the surf, working on a man who may already be past saving, while three others call for him from the shingle. The ramp of the nearest LCA is about to drop. You are standing at the exact moment where individual decisions stop being personal and become, without anyone's permission, historical.",
+        "character_entries": {
+          "role_coxswain": "Sixty yards out, and the hull is telling you everything the armored glass cannot — a low, grinding shudder through the tiller that means the surf is steepening over a sandbar, a rhythm the engine has no part in. The men behind you are a single mass of wool and webbing and held breath, and you have not looked at them since the last near-miss blew spray across the cockpit and left your ears ringing with a frequency the engine cannot touch. What you know sits in your chest like swallowed iron: the direct line is mined, the course correction you made two minutes ago will put them into chest-deep water instead of firm sand, and the radio crackling behind your left shoulder is the only voice on this beach that can reach the McCook's five-inch guns. The tidal window is forty minutes, maybe thirty-eight now. There is a gap in the Belgian Gate line thirty yards west — you can see it, the way you can read a current from the way light breaks on moving water — and no one has asked you, and you have not said. The ramp lock is vibrating under the surf pressure. Your hand is on the tiller. The next thing you do will be the thing you live with.",
+          "role_ranger_sergeant": "The Bangalore section is across your knees and the water is at your waist and you have been counting. Six minutes behind this hedgehog. Forty-three seconds between MG-42 bursts at the primary arc, eleven seconds when it walks left, and on the third traverse you saw it — the dead zone, fifteen yards left of the wire, a corridor of maybe four feet where the gun cannot go without the emplacement rotating, which it has not done once. You know this. Hargrove does not know this. Hargrove is at the shingle twenty yards behind you shouting assembly and you can hear him the way you can hear the surf, as background, as weather, because what you are doing is arithmetic and the arithmetic is not finished. One Bangalore section gives you an unreliable breach, a partial cut, a gap that may not pass a man sideways. Two sections give you a lane. Drennan has the second section and Drennan went into the surf somewhere east of you and has not come up, and the tide is still rising, and the wire is still fifty yards across open sand that is not sand anymore but a geometry of death you have memorized down to the yard markers. The frontal push Hargrove is assembling will walk men directly across the primary arc. You have not moved to join it. The water reaches your chest now, cold enough to make the arithmetic feel like the only warm thing left, and somewhere behind you Hargrove is shouting your name, and you are looking east into the surf for Drennan, and you are looking left at the dead zone, and you take one breath.",
+          "role_battalion_medic": "Your knees are on sand that is no longer sand — it is a suspension of salt water and something darker, and the four-foot chop is at your elbows now, which means it was at your wrists three minutes ago, which means the arithmetic is not in your favor. The man beneath your hands presents with a traumatic amputation at the mid-femur, the stump already grey-white in the cold water, the hemorrhage rate suggesting he has perhaps eight minutes of useful pressure left before the decision is made for you by his cardiovascular system rather than by you. You have sutured the clinical language around yourself like a dressing — *presents with, suggests, indicates* — because the clinical language is the only thing standing between you and the fact that you know his name, that he told you about a sister in Roanoke while you were still in the Channel, that he is twenty-two years old and looking at the sky with an expression that is not fear but something quieter and more final than fear. Thirty feet to your left, the soldier you marked expectant — *penetrating abdominal trauma, non-survivable, do not expend resources* — is propped against a steel hedgehog and speaking with a precision that cuts through the surf noise in a way that screaming cannot. The light has shifted. The blood is wrong. It is running from his hairline, not his belly, and the man you wrote off twenty minutes ago is alive and mobile and saying something in careful, deliberate English that is not his first language, to no one, or to everyone, or to whoever will come. You know something the Ranger Sergeant does not know, something the Coxswain cannot know — you know that your triage assessment on Private Szymanski was wrong, that the error is yours, that he is carrying words in his mouth that may matter more than anything in your bag, and that you cannot reach him until you finish what is under your hands or choose not to finish it. The morphine syrette is in your fingers. The tide is at your forearms. You look down at the man who told you about Roanoke, and then you look left at the man who should be dead and isn't, and the clinical language goes very quiet, and you take a breath."
+        }
+      }
+    ]
+  },
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Royal Navy / LCVP Coxswain Argot",
+        "context": "Used by British Royal Navy and U.S. Navy coxswains piloting landing craft during the Normandy assault; spoken over engine noise and shellfire.",
+        "terms": [
+          {
+            "term": "the wash",
+            "meaning": "The water between the transport ships and the beach, now churned by propellers, surf, and shellfire"
+          },
+          {
+            "term": "grounding",
+            "meaning": "Beaching the craft intentionally — dropping the ramp on dry or shallow sand rather than deep water"
+          },
+          {
+            "term": "broaching",
+            "meaning": "When a craft turns broadside to the surf and is swamped or capsized — a coxswain's worst fear"
+          },
+          {
+            "term": "kedging off",
+            "meaning": "Using a stern anchor to pull a grounded craft back off the beach after unloading"
+          },
+          {
+            "term": "the run-in",
+            "meaning": "The final approach from the line of departure to the beach — typically the most dangerous three minutes of the operation"
+          },
+          {
+            "term": "LCA",
+            "meaning": "Landing Craft Assault — the British-built armored craft carrying approximately 35 soldiers"
+          },
+          {
+            "term": "the spit",
+            "meaning": "A sandbar or shallow ridge that could ground a craft prematurely, leaving troops to wade in deep water under fire"
+          }
+        ]
+      },
+      {
+        "name": "Ranger and Infantry Field Language",
+        "context": "Used by soldiers of the 116th Infantry and 2nd Ranger Battalion during combat operations; a mix of Army regulation terminology and front-line slang developed in training and North Africa.",
+        "terms": [
+          {
+            "term": "the shingle",
+            "meaning": "The bank of smooth stones above the waterline at Omaha Beach — the first real cover on the beach"
+          },
+          {
+            "term": "Bangalore",
+            "meaning": "Short form of Bangalore Torpedo — a sectional pipe explosive used to breach wire obstacles"
+          },
+          {
+            "term": "WN",
+            "meaning": "Widerstandsnest — German 'resistance nest'; a fortified strongpoint. WN-71 and WN-72 bracketed the Vierville Draw"
+          },
+          {
+            "term": "enfilade",
+            "meaning": "Gunfire directed along the length of a line of men rather than at its face — the most lethal geometry of fire on the beach"
+          },
+          {
+            "term": "the draw",
+            "meaning": "A natural valley or gully cutting through the bluffs — the only vehicle exit from the beach; controlling it is the day's objective"
+          },
+          {
+            "term": "cricket",
+            "meaning": "A small metal clicker used for friend-or-foe identification in low visibility; one click answered by two"
+          },
+          {
+            "term": "Mae West",
+            "meaning": "The inflatable life belt worn over the combat jacket — named for its silhouette when inflated"
+          },
+          {
+            "term": "K-ration",
+            "meaning": "A compact individual daily ration in a waxed cardboard box — carried but rarely eaten on D-Day"
+          }
+        ]
+      },
+      {
+        "name": "Combat Medic and Triage Vocabulary",
+        "context": "Used by battalion aid men (medics) of the U.S. Army Medical Corps during field triage operations; drawn from both medical training and improvised practice under fire.",
+        "terms": [
+          {
+            "term": "expectant",
+            "meaning": "Triage category for a wounded man whose injuries are fatal even with treatment — bypassed to conserve supplies for survivable cases"
+          },
+          {
+            "term": "syrette",
+            "meaning": "A single-dose morphine injector resembling a small toothpaste tube with a needle; the primary pain management tool in the field"
+          },
+          {
+            "term": "sulfa",
+            "meaning": "Sulfonamide powder poured directly into a wound to prevent infection — every soldier carried a packet in his first-aid kit"
+          },
+          {
+            "term": "plasma",
+            "meaning": "Dried blood plasma reconstituted with sterile water and administered intravenously to treat shock from blood loss"
+          },
+          {
+            "term": "aid station",
+            "meaning": "A temporary forward medical post, often no more than a sheltered depression in the ground or the lee side of a seawall"
+          },
+          {
+            "term": "walking wounded",
+            "meaning": "Casualties mobile enough to move under their own power — lower priority for the medic, directed to move to the rear independently"
+          },
+          {
+            "term": "the red cross",
+            "meaning": "The Geneva Convention marker on a medic's helmet and brassard — theoretically granting non-combatant protection, widely ignored at close range"
+          }
+        ]
+      },
+      {
+        "name": "German Fortification and Fire Control Terms",
+        "context": "Terms used in German Army doctrine for the Atlantic Wall positions; known to Allied intelligence officers and translated into planning documents studied by Ranger NCOs before the assault.",
+        "terms": [
+          {
+            "term": "Tobruk",
+            "meaning": "A small, circular, reinforced concrete pit for a single machine gun or mortar crew — low profile, difficult to spot from the beach"
+          },
+          {
+            "term": "Pak front",
+            "meaning": "An anti-tank gun emplacement oriented to fire along the beach rather than out to sea — the source of much of the flanking fire"
+          },
+          {
+            "term": "Sicherungstruppen",
+            "meaning": "Security troops — the lower-grade garrison soldiers of the 716th Division, distinct from the combat-hardened 352nd Infantry"
+          },
+          {
+            "term": "MG-42",
+            "meaning": "The German belt-fed machine gun firing at 1,200 rounds per minute — its distinctive tearing sound gave it the nickname 'Hitler's buzzsaw'"
+          },
+          {
+            "term": "Teller mine",
+            "meaning": "A large anti-tank pressure mine mounted atop beach obstacles to detonate against landing craft hulls"
+          }
+        ]
+      }
+    ]
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.328Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": [],
+  "structured_endings_enabled": true
+}

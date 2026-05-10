@@ -1,0 +1,35 @@
+{
+  "id": "char_feldwebel_brandt",
+  "scenarioIds": [
+    "dog_green_sector"
+  ],
+  "name": "Feldwebel Heinrich Brandt",
+  "role": "MG-42 Section Commander, WN-71, 352nd Infantry Division",
+  "publicFace": "Unseen but omnipresent — his gun's position is known only by the sound and the pattern of men going down; he is the invisible architect of the killing ground.",
+  "privateGoal": "To hold WN-71 until the tide forces the Americans back — he believes the beach can be held if the wire holds.",
+  "fear": "Naval gunfire from the destroyers — the bunker was not designed to withstand direct fire from a ship's main battery at close range.",
+  "knowledge": [
+    "He knows the exact traverse limits of his MG-42 position and has pre-registered fire on the wire obstacle to prevent exactly the kind of Bangalore approach being planned.",
+    "He knows the bunker's rear entrance is exposed and undefended since two of his men left to reinforce the draw's interior position.",
+    "He does not know that the USS McCook has moved to within eight hundred yards of the shore."
+  ],
+  "voice": "Never directly heard — represented only through the sound of his weapon and the pattern of fire; described in third person by other characters.",
+  "trustLogic": "Not applicable — encountered only through indirect evidence and the testimony of those who have observed his position.",
+  "secrets": [
+    "He has been awake for thirty-one hours and his hands are shaking — his rate of fire has been inconsistent in ways the men on the beach have not yet noticed.",
+    "He received orders at 0600 to fall back to the secondary position at the top of the draw but has not complied — he believes the order was premature."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Increases rate of fire — any movement near the wire draws a burst.",
+    "heavyPressure": "Shifts traverse to cover the new threat axis, exposing the dead zone to the left.",
+    "breakingPoint": "Naval gunfire on the bunker's position — at that point the crew will abandon the Tobruk.",
+    "fleeCondition": "Direct fire from USS McCook confirmed on WN-71 coordinates.",
+    "fleeStyle": "Withdraws through the bunker's rear passage toward the draw interior.",
+    "chaseStyle": "Does not pursue — falls back to the secondary position.",
+    "capturedBehavior": "Surrenders formally; states his rank and requests treatment under the Geneva Convention.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T15:15:14.331Z",
+  "description": ""
+}
