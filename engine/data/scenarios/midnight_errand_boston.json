@@ -2,6 +2,7 @@
   "id": "midnight_errand_boston",
   "order": 1,
   "hidden": false,
+  "structured_endings_enabled": true,
   "version": "1.0.0",
   "title": "Midnight Errand: Boston, 1775",
   "setting": "Boston, Massachusetts, 1775",

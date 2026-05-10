@@ -506,6 +506,7 @@ let lastChoices          = [];
 
 // Pre-warmed /start request fired as soon as role is selected, resolved in startGame()
 let warmStart = null; // { promise, roleId, style, characterContext, activeHook }
+let currentRoleId = null;
 
 const storyEl    = document.getElementById('story');
 const choicesEl  = document.getElementById('choices');
@@ -957,7 +958,11 @@ function showClosingScreen(endState, sessionId) {
   const timeoutId  = setTimeout(() => controller.abort(), 30000);
   let firstChunk   = true;
 
-  fetch(`${API_BASE}/closing-prose?sessionId=${encodeURIComponent(sessionId)}`, { signal: controller.signal })
+  const cpParams = new URLSearchParams({ sessionId });
+  if (currentRoleId) cpParams.set('roleId', currentRoleId);
+  if (endState?.result) cpParams.set('endResult', endState.result);
+
+  fetch(`${API_BASE}/closing-prose?${cpParams}`, { signal: controller.signal })
     .then(async resp => {
       const cpReader  = resp.body.getReader();
       const cpDecoder = new TextDecoder();
@@ -981,6 +986,7 @@ function showClosingScreen(endState, sessionId) {
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
+            if (evt.closingLineOverride) lineEl.textContent = evt.closingLineOverride;
             triggerClosingSequence();
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
@@ -1606,6 +1612,8 @@ function buildClientInitialState(scenario, role) {
 async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   const role = (scenario.playerRoleOptions || []).find(r => r.id === roleId);
   if (!role) return;
+
+  currentRoleId = roleId;
 
   // Temporary local state so the sidebar is visible while /start is in flight
   gameState = buildClientInitialState(scenario, role);

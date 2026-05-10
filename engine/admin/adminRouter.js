@@ -785,6 +785,12 @@ export function createAdminRouter(repos, config = {}) {
     if (!repos.scenarios.findPlayerRole(req.params.id)) return notFound(res);
     res.json(repos.scenarios.savePlayerRole({ ...req.body, id: req.params.id }));
   });
+  r.patch('/player-roles/:id/ending-notes', (req, res) => {
+    const role = repos.scenarios.findPlayerRole(req.params.id);
+    if (!role) return notFound(res);
+    role.ending_notes = { ...(role.ending_notes || {}), ...req.body };
+    res.json(repos.scenarios.savePlayerRole(role));
+  });
   r.delete('/player-roles/:id', (req, res) => {
     return repos.scenarios.deletePlayerRole(req.params.id) ? res.json({ ok: true }) : notFound(res);
   });

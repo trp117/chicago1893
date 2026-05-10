@@ -904,7 +904,7 @@ export function createGameRouter(repos, config = {}) {
 
   // ── Closing prose ──────────────────────────────────────────────────────────
   r.get('/closing-prose', async (req, res) => {
-    const { sessionId } = req.query;
+    const { sessionId, roleId, endResult } = req.query;
     if (!sessionId)       return res.status(400).json({ error: 'sessionId is required.' });
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
@@ -916,18 +916,59 @@ export function createGameRouter(repos, config = {}) {
       return res.status(404).json({ error: 'Transcript not found.' });
     }
 
-    const closingPrompt = [
-      'Based on the session transcript below, write 2-3 sentences of closing interior prose for this character.',
-      'This is not a summary of events.',
-      'It is what the character understood about themselves by the end of this night — what it cost them, what it revealed, what they will carry forward.',
-      'Write in the same voice and tense as the session.',
-      'Do not mention success or failure. Do not reference game mechanics.',
-      'Write as if this is the last paragraph of a novel.',
-      '',
-      '---',
-      '',
-      transcript,
-    ].join('\n');
+    // Resolve scenario and role for structured endings
+    const scenarioMatch = transcript.match(/^##\s+Scenario:\s*(.+)$/m) || transcript.match(/^scenario:\s*(.+)$/m);
+    const scenarioId    = scenarioMatch?.[1]?.trim();
+    const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
+    const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
+
+    // Use notes-guided path for partial/failure when the feature is enabled and notes exist
+    const useStructured = scenarioData?.structured_endings_enabled
+      && role
+      && (endResult === 'partial' || endResult === 'failure')
+      && role.ending_notes?.[endResult]?.what_happened;
+
+    let closingPrompt;
+    let closingLineOverride = null;
+
+    if (useStructured) {
+      const notes = role.ending_notes[endResult];
+      closingLineOverride = notes.closing_line_override || null;
+      closingPrompt = [
+        'You are writing the closing interior prose for a historical interactive fiction session.',
+        `Character: ${role.name || roleId}`,
+        `Ending type: ${endResult}`,
+        '',
+        'ENDING NOTES — ground your prose specifically in these details:',
+        `What happened: ${notes.what_happened}`,
+        `Who was present: ${notes.who_present || '—'}`,
+        `Emotional weight: ${notes.emotional_weight || '—'}`,
+        '',
+        'SESSION TRANSCRIPT (final 2000 characters):',
+        transcript.slice(-2000),
+        '',
+        'Write 2-3 sentences of closing interior prose for this character.',
+        'Ground it in the specific ending notes above — what happened, who was there, what it cost.',
+        'This is what the character understood about themselves by the end of this night.',
+        'Write in the same voice and tense as the session transcript.',
+        'Do not mention success or failure explicitly. Do not reference game mechanics.',
+        'Write as if this is the last paragraph of a novel.',
+        'Write only the prose — no title, no attribution.',
+      ].join('\n');
+    } else {
+      closingPrompt = [
+        'Based on the session transcript below, write 2-3 sentences of closing interior prose for this character.',
+        'This is not a summary of events.',
+        'It is what the character understood about themselves by the end of this night — what it cost them, what it revealed, what they will carry forward.',
+        'Write in the same voice and tense as the session.',
+        'Do not mention success or failure. Do not reference game mechanics.',
+        'Write as if this is the last paragraph of a novel.',
+        '',
+        '---',
+        '',
+        transcript,
+      ].join('\n');
+    }
 
     res.set({
       'Content-Type':      'text/event-stream',
@@ -948,19 +989,17 @@ export function createGameRouter(repos, config = {}) {
         }),
       });
       const prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
-      sendSse(res, { type: 'done' });
+      sendSse(res, { type: 'done', closingLineOverride });
       res.end();
 
       // Append closing prose (and historical aftermath) to the session transcript
       if (prose) {
         try {
-          const scenarioMatch = transcript.match(/^##\s+Scenario:\s*(.+)$/m) || transcript.match(/^scenario:\s*(.+)$/m);
-          const scenarioId    = scenarioMatch?.[1]?.trim();
-          const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
-          const aftermath     = scenarioData?.historical_aftermath || '';
+          const aftermath   = scenarioData?.historical_aftermath || '';
+          const closingLine = closingLineOverride || 'You were there.';
           const lines = ['', '## Closing Prose', '', prose];
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
-          lines.push('', '## Closing Line', '', 'You were there.', '');
+          lines.push('', '## Closing Line', '', closingLine, '');
           await appendFile(transcriptPath, lines.join('\n'));
         } catch (e) {
           console.error('[TRANSCRIPT CLOSING]', e.message);

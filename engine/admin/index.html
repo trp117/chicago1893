@@ -1368,6 +1368,7 @@ function renderScenarioSection(data) {
     ${edField('Opening Situation', edTextarea('scenario.openingSituation', s.openingSituation, 2))}
     ${edField('Tone',              edInput('scenario.tone',             toneVal, 'data-type="csv"'), 'Comma-separated')}
     ${edField('Historical Realism', edInput('scenario.historicalRealism', s.historicalRealism))}
+    ${edField('Structured Endings', `<label class="checkbox-row"><input type="checkbox" data-path="scenario.structured_endings_enabled" ${s.structured_endings_enabled ? 'checked' : ''}> Enable notes-guided prose for partial and failure endings</label>`, 'When checked, partial and failure endings use per-role ending notes instead of the generic transcript path. Success always uses the transcript.')}
     ${edDetails('Introduction', intro.enabled ? 'enabled' : 'off', introBody, !!intro.enabled)}
   `);
 }
@@ -1461,6 +1462,23 @@ function renderPlayerRolesSection(data) {
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
       ${hooksHtml}
       ${edField('Suggested Secret',   edTextarea(`playerRoles.${i}.suggested_secret`,  r.suggested_secret,  2), 'One thing nobody in the story knows')}
+      ${edDetails('Ending Notes', 'partial + failure', `
+        <p class="help-text" style="margin-bottom:12px">Used when <em>Structured Endings</em> is enabled on the scenario. Notes guide the closing prose for partial and failure outcomes — success always uses the transcript.</p>
+        <div style="margin-bottom:18px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid var(--border)">Partial Success</div>
+          ${edField('What Happened', edTextarea(`playerRoles.${i}.ending_notes.partial.what_happened`, r.ending_notes?.partial?.what_happened, 3), 'Specific outcome for this character — what they did or did not manage to do')}
+          ${edField('Who Was Present', edInput(`playerRoles.${i}.ending_notes.partial.who_present`, r.ending_notes?.partial?.who_present), 'Characters present at the resolution, comma-separated')}
+          ${edField('Emotional Weight', edTextarea(`playerRoles.${i}.ending_notes.partial.emotional_weight`, r.ending_notes?.partial?.emotional_weight, 2), 'The specific feeling this ending carries — what the player will take away')}
+          ${edField('Closing Line Override', edTextarea(`playerRoles.${i}.ending_notes.partial.closing_line_override`, r.ending_notes?.partial?.closing_line_override, 2), 'Replaces "You were there." — one strong sentence. Leave blank to keep the default.')}
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid var(--border)">Failure</div>
+          ${edField('What Happened', edTextarea(`playerRoles.${i}.ending_notes.failure.what_happened`, r.ending_notes?.failure?.what_happened, 3), 'Specific outcome for this character — what failed and why')}
+          ${edField('Who Was Present', edInput(`playerRoles.${i}.ending_notes.failure.who_present`, r.ending_notes?.failure?.who_present), 'Characters present, comma-separated')}
+          ${edField('Emotional Weight', edTextarea(`playerRoles.${i}.ending_notes.failure.emotional_weight`, r.ending_notes?.failure?.emotional_weight, 2), 'The specific feeling this ending carries')}
+          ${edField('Closing Line Override', edTextarea(`playerRoles.${i}.ending_notes.failure.closing_line_override`, r.ending_notes?.failure?.closing_line_override, 2), 'Replaces "You were there." — one strong sentence. Leave blank to keep the default.')}
+        </div>
+      `)}
     `, i === 0);
   }).join('');
   return edSection('Player Roles', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');

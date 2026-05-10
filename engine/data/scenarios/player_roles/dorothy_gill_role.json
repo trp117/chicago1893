@@ -52,6 +52,20 @@
       "silas_murch": 0
     }
   },
+  "ending_notes": {
+    "partial": {
+      "what_happened": "Dorothy helped Nathaniel and the courier escape but was seen by the patrol — her position at the print shop is broken and Benjamin now knows everything she has kept from him.",
+      "who_present": "Benjamin, the woman courier, the patrol captain",
+      "emotional_weight": "The cost of one night's honesty landing on people she spent a year protecting with silence",
+      "closing_line_override": "She had always known the shop would go. She had not known she would be the one to lose it for them."
+    },
+    "failure": {
+      "what_happened": "The patrol caught Nathaniel at the back door — Dorothy's silence in the front room, her careful waiting for certainty, was the last thing that might have saved him and was not enough.",
+      "who_present": "Nathaniel, Benjamin, Captain Aldrich",
+      "emotional_weight": "The particular weight of knowing she held the one piece of information that could have changed everything and chose to hold it one minute too long",
+      "closing_line_override": "She had kept every secret. She had given away nothing. And still it had not been enough."
+    }
+  },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:38:05.698Z"
+  "updatedAt": "2026-05-09T00:00:00.000Z"
 }
