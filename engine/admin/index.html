@@ -1368,7 +1368,7 @@ function renderScenarioSection(data) {
     ${edField('Opening Situation', edTextarea('scenario.openingSituation', s.openingSituation, 2))}
     ${edField('Tone',              edInput('scenario.tone',             toneVal, 'data-type="csv"'), 'Comma-separated')}
     ${edField('Historical Realism', edInput('scenario.historicalRealism', s.historicalRealism))}
-    ${edField('Structured Endings', `<label class="checkbox-row"><input type="checkbox" data-path="scenario.structured_endings_enabled" ${s.structured_endings_enabled ? 'checked' : ''}> Enable notes-guided prose for partial and failure endings</label>`, 'When checked, partial and failure endings use per-role ending notes instead of the generic transcript path. Success always uses the transcript.')}
+    ${edField('Structured Endings', `<select data-path="scenario.structured_endings_enabled"><option value="false"${!s.structured_endings_enabled ? ' selected' : ''}>Disabled</option><option value="true"${s.structured_endings_enabled ? ' selected' : ''}>Enabled — notes-guided prose for partial and failure endings</option></select>`, 'When enabled, partial and failure endings use per-role ending notes. Success always uses the transcript path.')}
     ${edDetails('Introduction', intro.enabled ? 'enabled' : 'off', introBody, !!intro.enabled)}
   `);
 }

@@ -1072,7 +1072,7 @@ Return ONLY valid JSON in this exact structure:
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
       repos.scenarios.save(scenario);
-      repos.storyArcs.save(storyArc);
+      if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
