@@ -10,12 +10,18 @@
     {
       "name": "Hannah Cross",
       "type": "real_name",
-      "known_to": ["thomas_wren", "player"]
+      "known_to": [
+        "thomas_wren",
+        "player"
+      ]
     },
     {
       "name": "Margaret Vane",
       "type": "cover_name",
-      "known_to": ["nathaniel_gill", "general_public"]
+      "known_to": [
+        "nathaniel_gill",
+        "general_public"
+      ]
     }
   ],
   "known_as": {
@@ -75,5 +81,5 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:38:05.699Z"
+  "updatedAt": "2026-05-10T03:09:06.927Z"
 }
