@@ -1067,6 +1067,44 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  r.post('/generate/essential-beats', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const { title = '', premise = '', world = '', stakes = '', briefings = [] } = req.body;
+
+    const prompt = [
+      `SCENARIO TITLE: ${title}`,
+      premise  ? `PREMISE: ${premise}`                              : '',
+      world    ? `WORLD CONTEXT: ${world}`                         : '',
+      stakes   ? `STAKES / GOAL: ${stakes}`                        : '',
+      briefings.length
+        ? `ROLE BRIEFINGS:\n${briefings.map((b, i) => `Role ${i + 1}: ${b}`).join('\n\n')}`
+        : '',
+      '',
+      'Given the scenario structure provided, generate an essential beats checklist for the dramatic closure system. The checklist must contain between three and six items. Each beat must describe a specific dramatic action that constitutes a complete session — not a topic the player might raise, but a concrete thing that must have occurred in the generated response confirming it. Beats must be ordered by the sequence in which they would naturally occur in the session. The final beat must represent the session\'s natural dramatic conclusion — the moment after which no new dramatic threads need to be opened.',
+      'Each beat description must be written in past tense and must describe what the engine confirmed in generated text, not what the player typed.',
+      'Return only a JSON array in this exact format with no other text:',
+      '[',
+      '  { "id": "snake_case_id", "description": "Past tense one sentence description." }',
+      ']',
+    ].filter(Boolean).join('\n');
+
+    try {
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        { model: 'claude-sonnet-4-6', max_tokens: 1000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+        { timeout: 60_000, maxRetries: 0 }
+      );
+      const text = msg.content[0]?.text?.trim();
+      if (!text) return res.status(500).json({ error: 'No response from Claude.' });
+      const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+      const beats = JSON.parse(cleaned);
+      if (!Array.isArray(beats)) throw new Error('Response is not a JSON array');
+      res.json(beats);
+    } catch (err) {
+      console.error('[ESSENTIAL-BEATS]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.post('/generate/save', (req, res) => {
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');

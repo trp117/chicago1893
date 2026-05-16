@@ -227,10 +227,11 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T15:15:14.328Z",
+  "updatedAt": "2026-05-16T23:12:31.730Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
   "tone": [],
-  "structured_endings_enabled": true
+  "structured_endings_enabled": true,
+  "beats_status": "not_generated"
 }

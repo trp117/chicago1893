@@ -1283,6 +1283,38 @@ function collectEdits(containerEl, data) {
     else                        val = raw;
     setDeep(data, path, val);
   });
+
+  // Collect structured beats from act repeaters
+  const beatActMap = {};
+  containerEl.querySelectorAll('.beat-desc[data-beat-act]').forEach(descEl => {
+    const actIdx = parseInt(descEl.dataset.beatAct, 10);
+    const row  = descEl.closest('.beat-row');
+    const idEl = row?.querySelector('.beat-id');
+    const id   = idEl?.value.trim() || '';
+    const desc = descEl.value.trim();
+    if (!desc) return;
+    if (!beatActMap[actIdx]) beatActMap[actIdx] = [];
+    beatActMap[actIdx].push({ id, description: desc });
+  });
+  // If beat list containers are present, always sync (covers the "all deleted" case)
+  const beatListEls = containerEl.querySelectorAll('[data-beat-list]');
+  if (beatListEls.length > 0 && data.storyArc?.acts) {
+    data.storyArc.acts.forEach((act, i) => { act.beats = beatActMap[i] || []; });
+  }
+
+  // Collect review checklist
+  const checklistWrap = containerEl.querySelector('#review-checklist-container');
+  if (checklistWrap) {
+    if (!data.scenario) data.scenario = {};
+    const checklist = {};
+    checklistWrap.querySelectorAll('[data-checklist-key]').forEach(item => {
+      const key      = item.dataset.checklistKey;
+      const checkbox = item.querySelector('.checklist-cb');
+      const notes    = item.querySelector('.checklist-notes');
+      checklist[key] = { checked: checkbox?.checked ?? false, notes: notes?.value?.trim() || '' };
+    });
+    data.scenario.review_checklist = checklist;
+  }
 }
 
 // ── Section renderers ─────────────────────────────────────────────────────────
@@ -1373,24 +1405,70 @@ function renderScenarioSection(data) {
   `);
 }
 
+function buildBeatRow(beat, actIdx) {
+  const id   = (typeof beat === 'object' ? beat.id          : '') || '';
+  const desc = (typeof beat === 'object' ? beat.description : beat) || '';
+  return `<div class="beat-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+    <input type="text" class="beat-id" data-beat-act="${actIdx}" placeholder="beat_id" value="${esc(id)}" style="width:140px;flex-shrink:0;font-family:monospace;font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg)">
+    <textarea class="beat-desc" data-beat-act="${actIdx}" placeholder="Past tense — describe what the engine confirmed occurred." rows="2" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;resize:vertical">${esc(desc)}</textarea>
+    <button type="button" class="remove-beat-btn" style="flex-shrink:0;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;color:var(--text-soft);font-size:14px;line-height:1;margin-top:2px" title="Remove">×</button>
+  </div>`;
+}
+
 function renderArcSection(data) {
   const arc  = data.storyArc || {};
   const acts = Array.isArray(arc.acts) ? arc.acts : [];
-  const actsHtml = acts.map((act, i) => {
-    const beatsVal = Array.isArray(act.beats) ? act.beats.join('\n') : '';
+
+  // Migrate legacy string beats to structured objects on load
+  const migratedActs = acts.map(act => ({
+    ...act,
+    beats: Array.isArray(act.beats) ? act.beats.map(b => {
+      if (typeof b !== 'string') return b;
+      const words = b.trim().split(/\s+/).slice(0, 3)
+        .map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
+      return { id: words.join('_') || 'beat', description: b.trim() };
+    }) : []
+  }));
+
+  const actsHtml = migratedActs.map((act, i) => {
+    const beatsHtml = act.beats.map(b => buildBeatRow(b, i)).join('');
     return edDetails(
       `Act ${act.actNumber ?? i + 1}: ${act.title || ''}`, '',
       `${edField('Title', edInput(`storyArc.acts.${i}.title`, act.title))}
-       ${edField('Beats', edTextarea(`storyArc.acts.${i}.beats`, beatsVal, 4, 'data-type="array"'), 'One beat per line')}`,
+       <div class="field-group">
+         <label>Beats</label>
+         <div id="beat-rows-act-${i}" data-beat-list="${i}">${beatsHtml}</div>
+         <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px" data-add-beat="${i}">＋ Add Beat</button>
+       </div>`,
       i === 0
     );
   }).join('');
+
+  const totalBeats = migratedActs.reduce((sum, a) => sum + a.beats.length, 0);
+  const countColor = totalBeats < 3 ? 'var(--warn)' : totalBeats > 6 ? 'var(--danger)' : 'var(--success)';
+  const countHtml = `<div id="beat-count-indicator" style="display:flex;align-items:center;gap:8px;padding:10px 0 4px;font-size:13px">
+    <span style="color:${countColor};font-weight:600">Total beats: ${totalBeats}</span>
+    <span style="color:var(--text-soft)">/ target 3–6</span>
+  </div>`;
+
+  const worldVal    = arc.premise || '';
+  const stakesVal   = arc.goal    || '';
+  const hasBriefing = (data.playerRoles || []).some(r => r.briefing?.trim());
+  const genDisabled = (!worldVal || !stakesVal || !hasBriefing) ? 'disabled' : '';
+  const genTooltip  = genDisabled ? 'Complete World, Stakes, and at least one Role Briefing first' : '';
+  const genBtn = `<div style="margin-top:12px">
+    <button type="button" id="gen-beats-btn" class="btn btn-secondary" ${genDisabled} title="${genTooltip}">✦ Generate Essential Beats</button>
+    ${genDisabled ? `<p class="help-text" style="margin-top:6px">${genTooltip}</p>` : ''}
+  </div>`;
+
   return edSection('Story Arc', `
     ${edField('Arc Name', edInput('storyArc.name', arc.name))}
     ${edField('Goal',     edTextarea('storyArc.goal',    arc.goal,    2))}
     ${edField('Premise',  edTextarea('storyArc.premise', arc.premise, 2))}
     ${edField('Opening',  edTextarea('storyArc.opening', arc.opening, 2))}
     ${actsHtml}
+    ${countHtml}
+    ${genBtn}
   `);
 }
 
@@ -1484,6 +1562,61 @@ function renderPlayerRolesSection(data) {
   return edSection('Player Roles', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');
 }
 
+function renderPublicationReview(data) {
+  const status = data.scenario?.beats_status || 'not_generated';
+  const cl     = data.scenario?.review_checklist || {};
+  const statusCfg = {
+    not_generated:  { label: 'Not Generated',              color: 'var(--text-soft)', bg: '#f1f5f9' },
+    pending_review: { label: 'Generated — Pending Review',  color: '#92400e',          bg: '#fef3c7' },
+    approved:       { label: 'Reviewer Approved',           color: '#166534',          bg: '#f0fdf4' },
+  };
+  const s = statusCfg[status] || statusCfg.not_generated;
+
+  const checkItems = [
+    { key: 'beat_count',         label: 'Beat count',                desc: 'The checklist contains between three and six beats total across all acts.' },
+    { key: 'sequence_check',     label: 'Sequence check',            desc: 'Beats are ordered correctly across the act structure. Beat one is reachable in Act 1. The final beat occurs in Act 3 or Act 4.' },
+    { key: 'path_independence',  label: 'Path independence',          desc: 'Each beat is reachable across multiple valid player choices, not dependent on one specific decision.' },
+    { key: 'final_beat_spec',    label: 'Specificity of final beat',  desc: 'The final beat is specific enough that the engine can confirm with certainty when it has been reached.' },
+    { key: 'tense_attribution',  label: 'Tense and attribution',      desc: 'Every beat description is written in past tense and describes what the engine confirmed in generated text, not what the player typed.' },
+    { key: 'reviewer_summary',   label: 'Reviewer summary',           desc: 'The generated beats reflect the scenario\'s actual dramatic structure and the final beat represents the correct dramatic conclusion.' },
+    { key: 'manual_playthrough', label: 'Manual play-through',        desc: 'All beats are reachable on at least two different play paths through the scenario.' },
+  ];
+
+  const checkHtml = checkItems.map(item => {
+    const state = cl[item.key] || {};
+    return `<div data-checklist-key="${item.key}" style="padding:12px 0;border-bottom:1px solid var(--border)">
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-bottom:8px">
+        <input type="checkbox" class="checklist-cb" ${state.checked ? 'checked' : ''} style="margin-top:3px;flex-shrink:0">
+        <span>
+          <span style="font-weight:600;font-size:13px;display:block">${item.label}</span>
+          <span style="font-size:12px;color:var(--text-soft)">${item.desc}</span>
+        </span>
+      </label>
+      <textarea class="checklist-notes" rows="2" placeholder="Notes…" style="width:100%;padding:6px 8px;font-size:12px;border:1px solid var(--border);border-radius:4px;resize:vertical;color:var(--text-soft)">${esc(state.notes || '')}</textarea>
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-bottom:20px">
+    <details id="pub-review-details">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:10px;list-style:none;user-select:none">
+        Publication Review
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <input type="hidden" id="beats-status-input" data-path="scenario.beats_status" value="${status}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
+          <span id="beats-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${s.bg};color:${s.color}">${s.label}</span>
+          <button type="button" id="mark-approved-btn" class="btn btn-primary btn-sm" ${status === 'pending_review' ? '' : 'disabled'}>Mark as Approved</button>
+        </div>
+        <div id="review-checklist-container">
+          ${checkHtml}
+        </div>
+      </div>
+    </details>
+  </div>`;
+}
+
 async function handleManualSave(data, containerEl) {
   const btn = document.getElementById('preview-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
@@ -1539,6 +1672,10 @@ function renderPreview(data, autoSaved = false) {
       ${renderLocationsSection(data)}
       ${renderCluesSection(data)}
       ${renderPlayerRolesSection(data)}
+      ${renderPublicationReview(data)}
+      ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
+        ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
+        : ''}
       <div class="form-actions" style="padding-bottom:32px">
         <button class="btn btn-success"   id="preview-play">▶ Play Now</button>
         <button class="btn btn-primary"   id="preview-save">💾 Save</button>
@@ -1555,6 +1692,118 @@ function renderPreview(data, autoSaved = false) {
     () => handleManualSave(data, formEl));
   document.getElementById('preview-restart').addEventListener('click',
     () => renderGenerator());
+
+  // ── Beat count indicator ────────────────────────────────────────
+  function updateBeatCount() {
+    const filled = [...formEl.querySelectorAll('.beat-desc')].filter(el => el.value.trim()).length;
+    const color  = filled < 3 ? 'var(--warn)' : filled > 6 ? 'var(--danger)' : 'var(--success)';
+    const ind = document.getElementById('beat-count-indicator');
+    if (ind) ind.innerHTML = `<span style="color:${color};font-weight:600">Total beats: ${filled}</span> <span style="color:var(--text-soft)">/ target 3–6</span>`;
+  }
+
+  // ── Status display updater ──────────────────────────────────────
+  function updateStatusDisplay(newStatus) {
+    const cfg = {
+      not_generated:  { label: 'Not Generated',             color: 'var(--text-soft)', bg: '#f1f5f9' },
+      pending_review: { label: 'Generated — Pending Review', color: '#92400e',          bg: '#fef3c7' },
+      approved:       { label: 'Reviewer Approved',          color: '#166534',          bg: '#f0fdf4' },
+    };
+    const s = cfg[newStatus] || cfg.not_generated;
+    const badge = formEl.querySelector('#beats-status-badge');
+    if (badge) { badge.style.background = s.bg; badge.style.color = s.color; badge.textContent = s.label; }
+    const appBtn = formEl.querySelector('#mark-approved-btn');
+    if (appBtn) appBtn.disabled = newStatus !== 'pending_review';
+    if (newStatus === 'approved') {
+      const warn = document.getElementById('approval-warn');
+      if (warn) warn.remove();
+    }
+    const statusInput = formEl.querySelector('#beats-status-input');
+    if (statusInput) statusInput.value = newStatus;
+    data.scenario = data.scenario || {};
+    data.scenario.beats_status = newStatus;
+  }
+
+  // ── Beat add / remove / mark-approved delegation ────────────────
+  formEl.addEventListener('click', e => {
+    const addBtn = e.target.closest('[data-add-beat]');
+    if (addBtn) {
+      const actIdx = parseInt(addBtn.dataset.addBeat, 10);
+      const wrap = formEl.querySelector(`#beat-rows-act-${actIdx}`);
+      if (wrap) {
+        const div = document.createElement('div');
+        div.innerHTML = buildBeatRow({ id: '', description: '' }, actIdx);
+        wrap.appendChild(div.firstElementChild);
+        updateBeatCount();
+      }
+      return;
+    }
+    const remBtn = e.target.closest('.remove-beat-btn');
+    if (remBtn) { remBtn.closest('.beat-row').remove(); updateBeatCount(); return; }
+    if (e.target.closest('#mark-approved-btn')) {
+      updateStatusDisplay('approved');
+      handleManualSave(data, formEl);
+    }
+  });
+
+  // ── Keep generate button enabled state in sync ──────────────────
+  formEl.addEventListener('input', e => {
+    if (e.target.classList.contains('beat-desc') || e.target.classList.contains('beat-id')) {
+      updateBeatCount();
+    }
+    const genBtn = formEl.querySelector('#gen-beats-btn');
+    if (genBtn) {
+      const world    = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim();
+      const stakes   = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim();
+      const hasBrief = [...formEl.querySelectorAll('[data-path]')]
+        .some(el => /^playerRoles\.\d+\.briefing$/.test(el.dataset.path) && el.value.trim());
+      const dis = !world || !stakes || !hasBrief;
+      genBtn.disabled = dis;
+      genBtn.title = dis ? 'Complete World, Stakes, and at least one Role Briefing first' : '';
+    }
+  });
+
+  // ── Generate Essential Beats ────────────────────────────────────
+  const genBeatsBtn = document.getElementById('gen-beats-btn');
+  if (genBeatsBtn) {
+    genBeatsBtn.addEventListener('click', async () => {
+      const existing = [...formEl.querySelectorAll('.beat-desc')].some(el => el.value.trim());
+      if (existing && !confirm('This will replace existing beats. Continue?')) return;
+
+      const title    = formEl.querySelector('[data-path="scenario.title"]')?.value.trim()   || '';
+      const premise  = formEl.querySelector('[data-path="scenario.premise"]')?.value.trim() || '';
+      const world    = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
+      const stakes   = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim()    || '';
+      const briefings = [...formEl.querySelectorAll('[data-path]')]
+        .filter(el => /^playerRoles\.\d+\.briefing$/.test(el.dataset.path))
+        .map(el => el.value.trim()).filter(Boolean);
+
+      genBeatsBtn.disabled = true;
+      genBeatsBtn.textContent = 'Generating…';
+      try {
+        const beats = await apiPost('/generate/essential-beats', { title, premise, world, stakes, briefings });
+        if (!Array.isArray(beats)) throw new Error('Unexpected response shape');
+
+        // Clear all act repeaters then populate into Act 1
+        formEl.querySelectorAll('[data-beat-list]').forEach(w => { w.innerHTML = ''; });
+        const act0 = formEl.querySelector('[data-beat-list="0"]');
+        if (act0) {
+          beats.forEach(beat => {
+            const div = document.createElement('div');
+            div.innerHTML = buildBeatRow(beat, 0);
+            act0.appendChild(div.firstElementChild);
+          });
+        }
+        updateBeatCount();
+        updateStatusDisplay('pending_review');
+        toast('Essential beats generated. Review and approve before publishing.', 'success');
+      } catch (err) {
+        toast(`Beat generation failed: ${err.message}`, 'error');
+      } finally {
+        genBeatsBtn.disabled = false;
+        genBeatsBtn.textContent = '✦ Generate Essential Beats';
+      }
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

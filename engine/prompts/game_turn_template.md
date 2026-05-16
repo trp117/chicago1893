@@ -46,3 +46,6 @@ Instructions:
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
 - If `readyForClimax` is true in the ending signals, steer toward resolution.
 - Return valid JSON only, per the output contract.
+
+⚠️ NARRATION CONSTRAINT: The physical detail is always sufficient. Never write a sentence of narration that explains what a scene means. Never write narration that names what the player character has learned or understood about themselves in abstract terms. If you find yourself writing a sentence that begins with "he understood," "what this meant," "the truth was," or any equivalent formulation, delete it and return to the physical. The image does the work. The sentence that explains the image undoes it.
+This constraint applies to narration only — the second-person narration describing what the player character does, feels, and notices. It does not apply to NPC dialogue. A named historical character may say something that carries meaning; that is characterization, not editorializing. What is prohibited is the narration layer explaining or amplifying what an NPC's line meant after the line has been delivered. The dialogue speaks. The narration does not summarize it.

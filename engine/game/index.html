@@ -1208,11 +1208,15 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
         // Fade out the input/choices area — visual cue that the session is concluding
         const bottomBar = document.querySelector('.bottom-bar');
         if (bottomBar) {
-          bottomBar.style.transition = 'opacity 1.5s ease';
+          bottomBar.style.transition = 'opacity 2s ease';
           bottomBar.style.opacity = '0';
         }
-        // Give the player time to read the final turn before transitioning
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        // Scale reading pause to final scene length (lastRenderedSpeakText = last turn's prose)
+        const finalSceneWords = (lastRenderedSpeakText || '').trim().split(/\s+/).filter(Boolean).length;
+        const readingMs = Math.round((finalSceneWords / 200) * 60000);
+        const pauseMs = Math.min(Math.max(readingMs, 5000), 12000);
+        console.log(`[CLOSING] final scene ${finalSceneWords} words → ${pauseMs}ms reading pause`);
+        await new Promise(resolve => setTimeout(resolve, pauseMs));
         showClosingScreen(output.endState, sessionId);
       } catch (e) {
         console.error('[CLOSING] failed to show closing screen:', e);
