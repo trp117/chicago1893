@@ -84,7 +84,13 @@ Return JSON only. No markdown fences. Fields:
     "authorityTrust": 0,
     "suspicion": { "character_id": 1 },
     "flags": {},
-    "namedConspirators": []
+    "namedConspirators": [],
+    "inventory_updates": [
+      { "object_name": "item name exactly as in inventory", "holder": "player|npc_id|location_id", "status": "in_play|used|lost|destroyed" }
+    ],
+    "resolved_threads": [
+      { "thread_id": "unique_snake_case_id", "summary": "one sentence — what was confirmed or closed" }
+    ]
   },
   "npcMoments": [{ "npc": "character_id", "text": "spoken dialogue only — no italics, no stage directions" }],
   "npc_updates": {

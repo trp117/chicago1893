@@ -30,7 +30,12 @@ export function buildInitialState(scenario, role, locations) {
     targetNpc:               null,
     suspicion:               { ...(role.roleInitialState?.suspicion || {}) },
     flags:                   { ...(role.roleInitialState?.flags || {}) },
-    inventory:               [...(role.roleInitialState?.inventory || [])],
+    inventory:               (role.roleInitialState?.inventory || []).map(item =>
+      typeof item === 'string'
+        ? { object_name: item, holder: 'player', status: 'in_play', turn: 0 }
+        : item
+    ),
+    resolved_threads:        [],
     namedConspirators:       [],
     escapedNpcs:             [],
     physicalConflicts:       [],
@@ -165,6 +170,43 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
   if (delta.flags && typeof delta.flags === 'object') next.flags = { ...next.flags, ...delta.flags };
   if (Array.isArray(delta.namedConspirators)) {
     next.namedConspirators = Array.from(new Set([...next.namedConspirators, ...delta.namedConspirators]));
+  }
+
+  // ── Inventory updates ──────────────────────────────────────────────────────
+  if (Array.isArray(delta.inventory_updates)) {
+    next.inventory = next.inventory || [];
+    for (const update of delta.inventory_updates) {
+      if (!update?.object_name) continue;
+      const existing = next.inventory.find(i => i.object_name === update.object_name);
+      if (existing) {
+        if (update.holder   !== undefined) existing.holder = update.holder;
+        if (update.status   !== undefined) existing.status = update.status;
+        existing.turn = next.elapsedMinutes;
+      } else {
+        next.inventory.push({
+          object_name: update.object_name,
+          holder:      update.holder  || 'player',
+          status:      update.status  || 'in_play',
+          turn:        next.elapsedMinutes,
+        });
+      }
+    }
+  }
+
+  // ── Resolved threads ───────────────────────────────────────────────────────
+  if (Array.isArray(delta.resolved_threads)) {
+    next.resolved_threads = next.resolved_threads || [];
+    for (const thread of delta.resolved_threads) {
+      if (!thread?.thread_id) continue;
+      const already = next.resolved_threads.find(t => t.thread_id === thread.thread_id);
+      if (!already) {
+        next.resolved_threads.push({
+          thread_id:     thread.thread_id,
+          summary:       thread.summary || '',
+          turn_resolved: next.elapsedMinutes,
+        });
+      }
+    }
   }
 
   return next;

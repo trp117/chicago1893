@@ -580,6 +580,35 @@ function buildChaseInstruction(state, characters) {
   return `⚠️ CHASE IN PROGRESS — ${name} is fleeing. ${turnsRemaining} turn(s) remaining before escape is guaranteed. Chase style: ${chaseStyle}. Present exactly 2 pursuit choices. Narrative must be short and kinetic — no dialogue, no reflection. Signal resolution via chaseResolved.`;
 }
 
+function buildObjectStateBlock(state) {
+  const inventory = state.inventory || [];
+  if (inventory.length === 0) return '';
+  const playerItems = inventory.filter(i => i.holder === 'player' && i.status === 'in_play');
+  const otherItems  = inventory.filter(i => i.holder !== 'player' || i.status !== 'in_play');
+  const lines = [];
+  if (playerItems.length > 0) lines.push(`Player holds: ${playerItems.map(i => i.object_name).join(', ')}`);
+  for (const item of otherItems) lines.push(`${item.object_name}: holder=${item.holder}, status=${item.status}`);
+  return `OBJECT STATE (authoritative — do not contradict):\n${lines.join('\n')}`;
+}
+
+function buildPossessionNote(state, characters, playerInput) {
+  const inventory = state.inventory || [];
+  const playerItems = inventory.filter(i => i.holder === 'player' && i.status === 'in_play');
+  if (playerItems.length === 0) return '';
+  const itemNames = playerItems.map(i => i.object_name.toLowerCase());
+  const inputLower = playerInput.toLowerCase();
+  const mentioned = itemNames.filter(n => inputLower.includes(n));
+  if (mentioned.length === 0) return '';
+  return `⚠️ POSSESSION CHECK: Player referenced item(s) they currently hold: ${mentioned.join(', ')}. Confirm use in narrative and update inventory_updates in stateChanges if status or holder changes.`;
+}
+
+function buildResolvedThreadsBlock(state) {
+  const threads = state.resolved_threads || [];
+  if (threads.length === 0) return '';
+  const lines = threads.map(t => `- [${t.thread_id}] (turn ${t.turn_resolved}): ${t.summary}`);
+  return `RESOLVED THREADS (closed — do not reopen or contradict):\n${lines.join('\n')}`;
+}
+
 export function checkEndingReadiness(state, scenario) {
   const hasConspirators = (state.namedConspirators || []).length >= 1;
   const isLateTurn      = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
@@ -616,9 +645,12 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NPC_ROUTES_JSON}}',        JSON.stringify(charRoutes))
     .replace('{{ENDING_SIGNALS_JSON}}',    JSON.stringify(endingSignals))
     .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location))
+    .replace('{{OBJECT_STATE}}',           buildObjectStateBlock(state))
+    .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))
     .replace('{{NPC_INTRO_INSTRUCTION}}',  [
       buildNpcIntroInstruction(state, location, characters, playerInput),
-      buildChaseInstruction(state, characters)
+      buildChaseInstruction(state, characters),
+      buildPossessionNote(state, characters, playerInput),
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))

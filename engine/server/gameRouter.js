@@ -703,6 +703,9 @@ export function createGameRouter(repos, config = {}) {
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
+        const existing = anchorViolationNotes.get(sessionId) || '';
+        const actNote  = `ACT BOUNDARY: The story has just entered Act ${nextState.act}. Raise the stakes — introduce new pressure, a revelation, or a forced choice. Do not repeat information or beats already covered in Act ${prevAct}.`;
+        anchorViolationNotes.set(sessionId, existing ? `${existing}\n\n${actNote}` : actNote);
       }
 
       // Prevent LLM-generated endings before the FINAL arc threshold (80% elapsed)

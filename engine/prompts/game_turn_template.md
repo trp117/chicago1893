@@ -18,6 +18,10 @@ Ending readiness signals:
 
 {{LOCATION_CONSTRAINT}}
 
+{{OBJECT_STATE}}
+
+{{RESOLVED_THREADS}}
+
 Narrative style for this session: {{NARRATIVE_STYLE}}
 
 Player input:
