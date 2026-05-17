@@ -1,0 +1,17 @@
+{
+  "id": "lifeboat_capacity_manifest",
+  "scenarioId": "titanic_final_hours",
+  "title": "Lightoller's Falsified Boat Manifest",
+  "description": "A folded White Star Line departure manifest found in Second Officer Lightoller's breast pocket — or on the officer's table on the Boat Deck — recording the passenger count for each lifeboat lowered. Boats 7, 5, 3, and 1 are listed with inflated numbers: Boat 7 is recorded as '41' when the actual count was 28, Boat 5 as '55' when it held 36. The handwriting is Lightoller's, and the corrections — visible as faint erasure marks under the lamplight — are damning evidence that the under-loading has been systematic and concealed.",
+  "category": "documentary",
+  "discoveryLocationId": "boat_deck_port",
+  "implicatesCharacterIds": [
+    "charles_lightoller"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.070Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1147,13 +1147,14 @@ Return ONLY valid JSON in this exact structure:
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
         {
           model: 'claude-sonnet-4-6',
-          max_tokens: 4096,
+          max_tokens: 8000,
           temperature: 0.3,
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }],
         },
         { timeout: 120_000, maxRetries: 0 }
       );
+      console.log('[EPILOGUE-DATA] stop_reason:', msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
       if (msg.stop_reason === 'max_tokens') {
         return res.status(500).json({ error: 'Epilogue generation truncated — the scenario has too many beats. Reduce to 3–6 essential beats and retry.' });
       }

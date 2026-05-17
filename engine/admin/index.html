@@ -1668,7 +1668,7 @@ function renderEpilogueSection(data) {
   const reviewed     = ep.reviewed   === true;
   const chars        = data.characters || [];
   const beats        = (data.storyArc?.acts || []).flatMap(a => a.beats || []);
-  const hasPrereqs   = chars.length > 0 && beats.length > 0;
+  const hasPrereqs   = chars.length > 0 && beats.length > 0; // enabled as long as there is at least one beat
   const genDisabled  = !hasPrereqs;
   const genTitle     = genDisabled ? 'Complete scenario characters and essential beats first' : '';
 
@@ -1727,6 +1727,7 @@ function renderEpilogueSection(data) {
         <button type="button" id="mark-epilogue-reviewed-btn" class="btn btn-primary" ${reviewed ? 'disabled' : ''}>
           ${reviewed ? '✓ Historical Data Reviewed' : 'Mark Historical Data Reviewed'}
         </button>
+        <button type="button" id="download-epilogue-facts-btn" class="btn btn-secondary">↓ Download Facts (.txt)</button>
         ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Review all entries carefully before marking as reviewed.</span>' : ''}
       </div>`;
   }
@@ -2012,6 +2013,86 @@ function renderPreview(data, autoSaved = false) {
       handleManualSave(data, formEl);
       return;
     }
+
+    // Download epilogue facts as plain text
+    if (e.target.closest('#download-epilogue-facts-btn')) {
+      const epDetails = formEl.querySelector('#epilogue-data-details');
+      if (!epDetails) return;
+
+      const lines = [];
+      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
+      lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
+      lines.push('');
+
+      lines.push('=== CHARACTER FATES ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
+        const name    = row.querySelector('.ep-char-name')?.value.trim()   || '(unnamed)';
+        const id      = row.querySelector('.ep-char-id')?.value.trim()     || '';
+        const outcome = row.querySelector('.ep-char-outcome')?.value       || '';
+        const record  = row.querySelector('.ep-char-record')?.value.trim() || '';
+        const source  = row.querySelector('.ep-char-source')?.value.trim() || '';
+        lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
+        if (record)  lines.push(record);
+        if (source)  lines.push(`Source: ${source}`);
+        lines.push('');
+      });
+
+      lines.push('=== IMMEDIATE OUTCOME ===');
+      lines.push('');
+      const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
+      if (ioSummary) { lines.push(ioSummary); lines.push(''); }
+      const facts = [...epDetails.querySelectorAll('.ep-fact-val')]
+        .map(el => el.value.trim()).filter(Boolean);
+      if (facts.length) {
+        lines.push('Key Facts:');
+        facts.forEach(f => lines.push(`- ${f}`));
+        lines.push('');
+      }
+
+      lines.push('=== HISTORICAL FRAME ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-frame-val').forEach(el => {
+        const v = el.value.trim();
+        if (v) { lines.push(`- ${v}`); lines.push(''); }
+      });
+
+      lines.push('=== OPEN THREADS ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
+        const id     = row.querySelector('.ep-thread-id')?.value.trim()     || '';
+        const record = row.querySelector('.ep-thread-record')?.value.trim() || '';
+        if (id || record) {
+          if (id) lines.push(`Thread: ${id}`);
+          if (record) lines.push(record);
+          lines.push('');
+        }
+      });
+
+      lines.push('=== CHOICE ECHOES ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
+        const id     = row.querySelector('.ep-echo-beat-id')?.value.trim() || '';
+        const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
+        if (id || record) {
+          if (id) lines.push(`Beat: ${id}`);
+          if (record) lines.push(record);
+          lines.push('');
+        }
+      });
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), {
+        href:     url,
+        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_epilogue_facts.txt`,
+      });
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }
   }, true); // capture phase so it fires before the existing click delegation
 
   // ── Mark as Approved — warn if epilogue not reviewed ───────────
@@ -2041,7 +2122,12 @@ function renderPreview(data, autoSaved = false) {
         name:         c.name,
         role:         c.role || c.publicFace || '',
       }));
-      const essential_beats = (data.storyArc?.acts || []).flatMap(a => a.beats || []);
+      // Filter to structured beats only (must have both id and description).
+      const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
+        .filter(b => b.id?.trim() && b.description?.trim());
+      // Cap at 10 — the epilogue system is built around the 3-6 essential beats checklist;
+      // sending all raw act beats overruns the token budget.
+      const essential_beats = allBeats.slice(0, 10);
 
       genEpilogueBtn.disabled    = true;
       genEpilogueBtn.textContent = 'Generating historical data…';

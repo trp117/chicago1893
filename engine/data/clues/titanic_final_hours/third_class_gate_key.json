@@ -1,0 +1,17 @@
+{
+  "id": "third_class_gate_key",
+  "scenarioId": "titanic_final_hours",
+  "title": "E-Deck Gate Key Ring",
+  "description": "Hanging on a numbered hook in the steward's office on F-Deck, a brass key ring labeled 'E-DECK FWD PROMENADE — THIRD CLASS SEPARATION' holds the padlock key for the gate currently trapping Third Class passengers below the boat deck. The hook is in plain sight on a board with twenty other key rings, but this one has been turned face-inward on its hook — a small, deliberate concealment.",
+  "category": "physical",
+  "discoveryLocationId": "c_deck_corridor",
+  "implicatesCharacterIds": [
+    "charles_lightoller"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.073Z",
+  "locationId": "",
+  "isRedHerring": false
+}

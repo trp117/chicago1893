@@ -1,0 +1,34 @@
+{
+  "id": "char_john_aaron",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
+  ],
+  "name": "John Aaron",
+  "role": "Systems Engineer — Power, Mission Control (off-shift, called back in)",
+  "publicFace": "Known in Mission Control as 'the steely-eyed missile man' — the engineer who saved Apollo 12 by remembering an obscure switch setting no one else knew. Called back from home at midnight.",
+  "privateGoal": "Write the power-up sequence for Odyssey that Swigert can execute alone, in the cold, with shaking hands, using only what is on the spacecraft.",
+  "fear": "That the sequence he writes will assume a component state that the cold has changed — that his procedure will be correct on paper and fatal in practice.",
+  "knowledge": [
+    "The Command Module's electrical system has never been powered up from a cold-soak state — there is no procedure because no one designed for this scenario",
+    "He has identified a way to reduce the power-up sequence from 43 amp-hours to 12 amp-hours by eliminating redundant checks — but the eliminated checks exist for a reason",
+    "The condensation risk on the instrument panel is highest in the first 90 seconds of power-up; if nothing shorts in that window, the sequence will likely complete"
+  ],
+  "voice": "Speaks in conditionals and sequences; never says 'should' when he means 'will'; uses system designations with the ease of a man who has memorized the wiring diagram",
+  "trustLogic": "Trusts people who ask the right follow-up question. Opens immediately to anyone who demonstrates they understand the system. Closes to anyone who wants reassurance rather than procedure.",
+  "secrets": [
+    "The 12 amp-hour sequence he has designed eliminates a check that protects the main parachute deployment circuit — he has calculated the risk as acceptable but has not disclosed the trade-off to Kranz"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Explains the constraint; offers the trade-off explicitly",
+    "heavyPressure": "Defends the sequence on engineering grounds; will not yield without a better number",
+    "breakingPoint": "Will not disclose the parachute circuit trade-off unless directly asked about that specific system",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Discloses the full trade-off, the calculation, and the probability estimate; asks if there is an alternative",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.762Z",
+  "description": ""
+}

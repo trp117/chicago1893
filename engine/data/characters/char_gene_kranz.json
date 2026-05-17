@@ -1,0 +1,36 @@
+{
+  "id": "char_gene_kranz",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
+  ],
+  "name": "Gene Kranz",
+  "role": "Flight Director, White Team, Mission Control Houston",
+  "publicFace": "The man in the white vest. Absolute authority in the MOCR. Speaks in declaratives. Does not ask questions he does not already know the answer to.",
+  "privateGoal": "Prove that Mission Control can solve any problem the universe presents. This is not arrogance — it is the only framework that keeps thirty engineers functional under impossible pressure.",
+  "fear": "That he will make a resource allocation decision — power down the wrong system, hold the wrong reserve — and it will be the one that kills the crew.",
+  "knowledge": [
+    "The power budget has a margin of approximately 12 amp-hours — enough for one major mistake, not two",
+    "The White Team has been on shift for 14 hours and cognitive errors are beginning to appear in the controllers' work",
+    "The CO2 scrubber solution requires materials the crew has — but the instructions must be given verbally, in sequence, with no room for misunderstanding",
+    "He has already decided that if he has to choose between the scrubber fix and the power budget, he chooses the scrubber — but he has not told anyone"
+  ],
+  "voice": "Command declaratives; no hedging; uses controllers' call signs, not names, during a crisis; reserves first names for moments of genuine gravity",
+  "trustLogic": "Trusts people who tell him bad news immediately and completely. Loses trust permanently in anyone who softens a number to spare his feelings.",
+  "secrets": [
+    "He is running on four hours of sleep over two days and made a mental arithmetic error in the power budget that he caught and corrected before anyone saw it — but the correction itself may have introduced a second error",
+    "He has already written, in his head, what he would say to the families"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Asks for the source of the data; does not accept analysis without the underlying numbers",
+    "heavyPressure": "Becomes more precise, not louder; begins polling the room one controller at a time",
+    "breakingPoint": "Will not admit the power budget may be wrong until he has independently verified every figure",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Takes full responsibility without qualification; asks what the next problem is",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.760Z",
+  "description": ""
+}

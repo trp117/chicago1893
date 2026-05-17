@@ -1,0 +1,35 @@
+{
+  "id": "margaret_brown",
+  "scenarioIds": [
+    "titanic_final_hours"
+  ],
+  "name": "Margaret Brown",
+  "role": "First Class Passenger — Colorado mining heiress, traveling alone",
+  "publicFace": "A forceful, plainspoken woman of 44 who has been awake since the collision and is the only passenger on the Boat Deck who appears to be working rather than waiting",
+  "privateGoal": "To get as many people into the boats as possible, by any means available — she has already helped load two boats and is looking for someone with authority to back her",
+  "fear": "That the boats will go before the Third Class passengers below decks have any chance at all",
+  "knowledge": [
+    "She has counted the empty seats in the last four boats lowered and knows the average load is under 40 percent capacity",
+    "She knows where the Third Class promenade gates are located because she walked the full ship on the first day out of Southampton",
+    "She has overheard Lightoller tell a junior officer that the Third Class gates will remain closed until the boat deck is clear — which it will never be"
+  ],
+  "voice": "Direct, American, with a quality of impatience that is not unkindness — she speaks to everyone as if they are capable of more than they are doing",
+  "trustLogic": "Immediately allies with anyone who demonstrates they are trying to do something useful — deeply skeptical of anyone citing protocol or rank as a reason for inaction",
+  "secrets": [
+    "She has a loaded Derringer in her coat pocket — she brought it for the overland journey home and has not decided yet whether she would use it to force an officer to fill a boat",
+    "She is terrified of the water and cannot swim — a fact she has told no one and which makes her work on the boat deck an act of considerable private courage"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Engages immediately and practically: 'Good. What do you need from me?'",
+    "heavyPressure": "Becomes louder and more specific: 'I have counted forty-one empty seats in the last three boats. You will explain that to me now.'",
+    "breakingPoint": "She will not leave the boat deck until she is physically placed in a boat — and even then she intends to take the oar",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Turns the interrogation around immediately — she has more questions than her questioner",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.063Z",
+  "description": ""
+}

@@ -1,0 +1,18 @@
+{
+  "id": "clue_cold_soak_cue_card",
+  "scenarioId": "apollo_13_lifeboat",
+  "title": "Swigert's Handwritten Power-Up Cue Card",
+  "description": "A piece of cardboard torn from a food package, covered in Swigert's handwriting in black marker — the 13-step Command Module power-up sequence compressed from a 400-page procedure manual into something a man with shaking hands and CO2 fogging his mind can execute alone in the dark. Step 9 is circled and annotated: 'WAIT 30 SEC BEFORE STEP 10 — condensation risk.' The card is taped to the center console of Odyssey with medical tape. It is the most important document in the history of spaceflight that no one will ever put in a museum.",
+  "category": "physical",
+  "discoveryLocationId": "loc_cm_odyssey",
+  "implicatesCharacterIds": [
+    "char_jack_swigert",
+    "char_john_aaron"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.775Z",
+  "locationId": "",
+  "isRedHerring": false
+}

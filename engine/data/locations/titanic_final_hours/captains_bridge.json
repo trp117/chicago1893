@@ -1,0 +1,20 @@
+{
+  "id": "captains_bridge",
+  "scenarioId": "titanic_final_hours",
+  "name": "The Bridge",
+  "description": "The wheelhouse and open bridge wing at the forward end of the Boat Deck — Captain Smith stands at the forward window looking at the black water that is now only forty feet below the bow, and the compass binnacle glows green in the dark, a small domestic detail in a room that has become a vigil.",
+  "mood": "isolated, solemn, command-weight",
+  "linkedCharacterIds": [
+    "charles_lightoller",
+    "thomas_andrews"
+  ],
+  "atmosphericDetails": [
+    "Captain Smith has not given an order in twenty minutes — he stands with his hands behind his back, watching the bow, and the quartermaster at the wheel has nothing to do but stand at his post",
+    "The engine room telegraphs are set to STOP and their brass handles are cold — the vibration that has been the ship's constant companion for four days is gone, replaced by a silence that feels wrong",
+    "Andrews's notebook lies open on the chart table, his flooding calculations visible in neat pencil columns — someone has placed it there deliberately, and it has not been moved"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.068Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

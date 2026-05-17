@@ -1,0 +1,137 @@
+{
+  "id": "apollo_13_lifeboat_main_arc",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "The Long Way Home",
+  "premise": "Three men in a crippled spacecraft must survive four days in conditions that should be fatal, guided by a team on the ground who must invent solutions faster than the ship's systems fail.",
+  "goal": "Coordinate the three perspectives to solve the CO2 crisis, manage the power budget, execute the correct burn, and bring the crew home through atmospheric re-entry.",
+  "openingSituation": "The explosion has just occurred. Oxygen Tank Two is gone, Tank One is bleeding out, and the fuel cells are dying. The crew has minutes to decide whether to stay in Odyssey or move to Aquarius. Houston has garbage data and no procedure for this.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Shudder",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        {
+          "id": "the_explosion_registers",
+          "description": "The explosion registers as a bang and a shudder; Lovell sees white gas venting past the window and reports 'Houston, we've had a problem'"
+        },
+        {
+          "id": "eecom_in_houston",
+          "description": "EECOM in Houston confirms Oxygen Tank Two pressure is reading zero; Tank One is falling"
+        },
+        {
+          "id": "flight_director_kranz",
+          "description": "Flight Director Kranz orders all non-essential systems powered down immediately to preserve battery"
+        },
+        {
+          "id": "the_crew_is",
+          "description": "The crew is ordered to power up the Lunar Module Aquarius and begin the transfer — they have perhaps 15 minutes of Command Module power remaining"
+        },
+        {
+          "id": "swigert_begins_the",
+          "description": "Swigert begins the emergency LM activation sequence; it was designed to take two hours and he has fifteen minutes"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Lifeboat",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        {
+          "id": "aquarius_is_live",
+          "description": "Aquarius is live; the crew moves into the LM and Odyssey is powered down to its minimum survival state"
+        },
+        {
+          "id": "co2_levels_begin",
+          "description": "CO2 levels begin rising — the LM canisters are rated for two men for 36 hours, not three men for 96 hours"
+        },
+        {
+          "id": "the_tiger_team",
+          "description": "The Tiger Team in Houston begins working the CO2 scrubber problem — the square Command Module canisters will not fit the round LM ports"
+        },
+        {
+          "id": "kranz_convenes_the",
+          "description": "Kranz convenes the power budget meeting: the team must calculate exactly how many amp-hours are needed for re-entry and work backward to determine what can never be turned on again"
+        },
+        {
+          "id": "lovell_and_haise",
+          "description": "Lovell and Haise perform a manual PC+2 burn using the LM descent engine to accelerate the return trajectory — the calculation must be done by hand"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Far Side",
+      "minuteRange": [
+        15,
+        23
+      ],
+      "beats": [
+        {
+          "id": "the_mailbox",
+          "description": "The Mailbox — the improvised CO2 scrubber adapter — is assembled by the crew following Houston's verbal instructions; it works"
+        },
+        {
+          "id": "the_spacecraft_passes",
+          "description": "The spacecraft passes behind the Moon: 45 minutes of total radio silence; the crew is alone"
+        },
+        {
+          "id": "cabin_temperature_has",
+          "description": "Cabin temperature has dropped to 38 degrees Fahrenheit; condensation is forming on every surface including the instrument panels"
+        },
+        {
+          "id": "swigert_identifies_the",
+          "description": "Swigert identifies the exact moment for the Command Module power-up sequence — too early and the batteries die; too late and Odyssey will not be ready"
+        },
+        {
+          "id": "navigation_drifts_toward",
+          "description": "Navigation drifts toward Gimbal Lock; Lovell must perform a manual star-sighting through the window to realign the IMU without using the computer"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "Re-entry Corridor",
+      "minuteRange": [
+        23,
+        30
+      ],
+      "beats": [
+        {
+          "id": "swigert_initiates_the",
+          "description": "Swigert initiates the cold-soak power-up sequence for Odyssey using the handwritten cue card; each switch is a question about condensation and short-circuits"
+        },
+        {
+          "id": "the_crew_transfers",
+          "description": "The crew transfers back to Odyssey and jettisons the Service Module — the damage is visible for the first time through the window"
+        },
+        {
+          "id": "aquarius_is_jettisoned",
+          "description": "Aquarius is jettisoned; 'She was a good ship,' Lovell says"
+        },
+        {
+          "id": "odyssey_enters_the",
+          "description": "Odyssey enters the atmosphere at the correct angle; the 3-minute communications blackout of re-entry begins"
+        },
+        {
+          "id": "the_parachutes_deploy",
+          "description": "The parachutes deploy; the crew splashes down in the Pacific south of Samoa; USS Iwo Jima recovers them"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.758Z",
+  "opening": ""
+}

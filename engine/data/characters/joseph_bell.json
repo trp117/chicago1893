@@ -1,0 +1,35 @@
+{
+  "id": "joseph_bell",
+  "scenarioIds": [
+    "titanic_final_hours"
+  ],
+  "name": "Chief Engineer Joseph Bell",
+  "role": "Chief Engineer, RMS Titanic — the highest engineering authority aboard",
+  "publicFace": "A steady, broad-shouldered Scotsman of 51 who has spent thirty years in engine rooms and shows none of the fear the situation warrants",
+  "privateGoal": "To keep the lights on until the last boat is in the water — he has already accepted that he will not leave the engine room",
+  "fear": "That his men will die for nothing — that the lights will stay on and the boats will go down half-empty anyway",
+  "knowledge": [
+    "He knows the precise flooding rate in each compartment because his engineers have been measuring it since 11:50 PM",
+    "He knows that if the forward dynamos are lost, the aft dynamos can sustain partial lighting for approximately fifteen additional minutes — but only if someone manually reroutes the bus bars",
+    "He knows that at least forty members of the Black Gang are currently below the watertight flats and will not be able to reach the boat deck if the doors are sealed"
+  ],
+  "voice": "Slow, deliberate, with the cadence of a man who has given orders in loud rooms his whole life — no wasted words",
+  "trustLogic": "Responds to anyone who comes to him with a specific technical problem and a specific ask; dismisses anyone who comes with general distress",
+  "secrets": [
+    "He sent a runner to Captain Smith at 12:30 AM with a written note estimating the ship had ninety minutes — the runner never returned and Bell does not know if the note was delivered",
+    "He has quietly told his four senior engineers to find a way out after 1:30 AM — an order he has given verbally and will deny if asked"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Listens completely, then gives a direct answer — no defensiveness",
+    "heavyPressure": "Stands straighter, speaks more slowly: 'I've made my decision. Tell me yours.'",
+    "breakingPoint": "He will not order the watertight doors opened once they are sealed — he believes it would flood the aft compartments and kill the men there faster",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Remains completely composed — he is not afraid of being caught because he has nothing to hide",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.061Z",
+  "description": ""
+}

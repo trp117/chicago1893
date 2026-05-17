@@ -1,0 +1,117 @@
+{
+  "id": "titanic_final_hours_main_arc",
+  "scenarioId": "titanic_final_hours",
+  "name": "The Final Hours of the RMS Titanic",
+  "premise": "Three crew members — a wireless operator, a second engineer, and a first class steward — must coordinate their separate crises across a sinking ship to maximize survival before 02:20 AM. Each controls a system the others depend on; each faces a human authority that may prevent them from doing what the situation demands.",
+  "goal": "Maintain wireless contact with Carpathia, keep the dynamos running until the last lifeboat is clear, and ensure the boats are filled to meaningful capacity — then survive.",
+  "openingSituation": "It is 11:55 PM. The ship has been struck for fifteen minutes. Thomas Andrews has told the Captain she will sink. The lifeboats are not yet being loaded. The three player characters are each at their posts, each in possession of information the others do not have, and the clock is already moving.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Arithmetic of Survival",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        {
+          "id": "each_player_character",
+          "description": "Each player character discovers the true severity of the damage through their professional lens — the wireless operator receives Andrews's position update, the engineer sees water on the plates of Boiler Room No. 5, the steward finds a locked Third Class gate and a passenger manifest showing 2,224 souls"
+        },
+        {
+          "id": "first_contacts_are",
+          "description": "First contacts are made: the wireless operator raises Carpathia at 12:10 AM; the engineer receives the order to maintain steam from Chief Engineer Bell; the steward receives mustering orders from Purser McElroy"
+        },
+        {
+          "id": "the_first_lifeboat",
+          "description": "The first lifeboat is lowered half-empty — Boat No. 7 with 28 passengers — establishing the central tension of the evacuation"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Machinery of Panic",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        {
+          "id": "officer_lightoller_enforces",
+          "description": "Officer Lightoller enforces women-and-children protocol on the port side with increasing rigidity, turning away men from boats with empty seats; the steward must decide how far to push back"
+        },
+        {
+          "id": "boiler_room_no",
+          "description": "Boiler Room No. 6 floods and the Black Gang retreats to No. 5; the second engineer must choose whether to seal the watertight door and save his men or hold it open to maintain cross-compartment access"
+        },
+        {
+          "id": "the_wireless_operator",
+          "description": "The wireless operator receives a garbled position from Frankfurt and must determine whether to waste time correcting it or focus exclusively on Carpathia's confirmed course"
+        },
+        {
+          "id": "first_evidence_of",
+          "description": "First evidence of the lifeboat capacity manifest surfaces, revealing that officers have been recording departure numbers — the documented proof of half-empty boats"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Price of Each Minute",
+      "minuteRange": [
+        15,
+        23
+      ],
+      "beats": [
+        {
+          "id": "power_fluctuates_in",
+          "description": "Power fluctuates in the Marconi Room as Engine Room No. 1 floods; the wireless operator must negotiate with the engineer through a runner or speaking tube to prioritize the wireless dynamo"
+        },
+        {
+          "id": "the_flooding_rate",
+          "description": "The flooding rate calculation — the key evidence document in Andrews's notebook — becomes available; whoever holds it can prove to Captain Smith that the timeline is shorter than officers believe, potentially accelerating the lifeboat order"
+        },
+        {
+          "id": "the_steward_discovers",
+          "description": "The steward discovers that Third Class passengers are still being held below decks and must decide whether to open the gates unilaterally, risking a rush to the boat deck that officers fear will capsize loaded boats"
+        },
+        {
+          "id": "first_officer_murdoch",
+          "description": "First Officer Murdoch is confronted with the evidence of half-empty boats; his response determines whether the final six boats are filled properly"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Final Plunge",
+      "minuteRange": [
+        23,
+        30
+      ],
+      "beats": [
+        {
+          "id": "0205_am",
+          "description": "02:05 AM — The bow submerges to the level of the Forecastle Deck; the Grand Staircase skylight implodes; only Collapsibles C and D remain on the davits"
+        },
+        {
+          "id": "each_player_character",
+          "description": "Each player character faces their terminal decision: the wireless operator chooses between staying at the key or abandoning the room; the engineer chooses between the pumps and the escape ladder; the steward chooses between the last boat and the locked Third Class gates"
+        },
+        {
+          "id": "the_outcome_is",
+          "description": "The outcome is determined by the cumulative weight of decisions made in Acts 1–3: Carpathia's course, the state of the dynamos, and the average capacity of launched boats"
+        },
+        {
+          "id": "0217_am",
+          "description": "02:17 AM — Titanic's stern rises to 45 degrees; the ship breaks between the third and fourth funnels; the final outcome is narrated based on the three possible endings"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.059Z",
+  "opening": ""
+}

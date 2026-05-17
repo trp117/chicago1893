@@ -1,0 +1,422 @@
+{
+  "id": "apollo_13_lifeboat",
+  "version": "1.0.0",
+  "title": "Apollo 13: Lifeboat",
+  "description": "April 13, 1970: an oxygen tank has exploded 200,000 miles from Earth, and three men must survive four days in a spacecraft never designed for survival. Three perspectives — commander, flight director, command module pilot — must coordinate across silence, cold, and failing systems to bring the crew home alive.",
+  "genre": [
+    "historical",
+    "survival",
+    "crisis-simulation"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 30,
+  "storyArcIds": [
+    "apollo_13_lifeboat_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_mission_commander",
+    "role_flight_director",
+    "role_cm_pilot"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_co2_saturation_graph",
+    "clue_power_budget_sheet"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 4
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 2
+      }
+    },
+    "pressureEvents": [
+      "CO2 levels reach warning threshold — crew has 90 minutes before cognitive impairment begins",
+      "Command Module battery drain accelerates; the power budget must be revised immediately",
+      "Passive Thermal Control roll fails — one side of the spacecraft is beginning to freeze",
+      "Radio contact lost as Aquarius passes behind the Moon — 45 minutes of total silence",
+      "Condensation detected on Command Module instrument panel — short-circuit risk is now critical",
+      "Navigation gyroscopes drift toward Gimbal Lock — manual star-sighting required immediately",
+      "Re-entry window is closing; the burn must be calculated and executed within the next turn"
+    ]
+  },
+  "winConditions": [
+    "The CO2 scrubber workaround is successfully constructed and deployed before crew incapacitation",
+    "The power budget is correctly calculated and all non-essential systems are shut down in the right sequence",
+    "The Command Module cold-soak power-up is initiated at the correct moment and Odyssey comes online for re-entry",
+    "The PC burn is executed within the required margin and the ship enters the re-entry corridor safely",
+    "All three crew members survive atmospheric re-entry and splashdown in the Pacific"
+  ],
+  "failConditions": [
+    "CO2 levels reach fatal concentration before the scrubber fix is implemented",
+    "Battery power is exhausted before re-entry, leaving the crew without guidance or communications",
+    "The Command Module power-up sequence is initiated too early, draining the last reserves before re-entry",
+    "The burn calculation error places the ship outside the re-entry corridor — skip-out or burn-up",
+    "Gimbal Lock is triggered and navigation is lost with no time remaining to recover"
+  ],
+  "partialSuccessExamples": [
+    "The crew survives but the Command Module powers up with only partial systems — re-entry is survivable but the parachute deployment is uncertain",
+    "The CO2 fix works but the power budget is wrong — the ship enters re-entry with minimal battery, communications lost in the final minutes",
+    "The burn is slightly off — the ship enters the re-entry corridor at the shallow edge, skipping once before catching the atmosphere; recovery is possible but the heat shield is stressed"
+  ],
+  "introduction": {
+    "enabled": true,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": "It is 1970, and the United States has already walked on the Moon. The first landing — Apollo 11, July 1969 — was watched by 600 million people, the largest television audience in human history. By April of 1970, the wonder has begun to erode: the CBS network declined to carry Apollo 13's live broadcast from space because ratings for lunar missions were already falling. The spacecraft heading for the Fra Mauro Highlands carries three men — James Lovell, Jack Swigert, and Fred Haise — aboard two conjoined modules: the Command Module Odyssey, where the crew lives and works, and the Lunar Module Aquarius, designed to land two men on the Moon for a day and a half. The mission is, by NASA's own assessment, routine."
+      },
+      {
+        "type": "stakes",
+        "text": "At 9:08 PM Central Standard Time on April 13th, Oxygen Tank Number Two in the Service Module ruptures. The explosion is not loud — in the vacuum of space, nothing is loud — but the shudder moves through the hull like a fist through paper. Within minutes, Tank Number One begins bleeding out through a damaged line, and the three fuel cells that generate all of the Command Module's electricity begin to die. The Moon landing is already over. What remains is the problem of whether three men can survive in a spacecraft with 45 amp-hours of battery power, lithium hydroxide canisters rated for two men, and cabin temperatures that will fall to 38 degrees Fahrenheit before morning. The political cost of losing this crew — after the triumph of Apollo 11, after the national investment in the space program — is incalculable. The human cost requires no calculation at all."
+      },
+      {
+        "type": "scene",
+        "text": "In Houston, the Mission Operations Control Room smells of cigarette smoke and burnt coffee and the particular anxiety of men who understand exactly how bad the numbers are. The Telemetry screens are showing data that does not make sense — pressures dropping, voltages collapsing, a master alarm that has been sounding for four minutes. Two hundred thousand miles away, the crew of Apollo 13 can see a white cloud of venting oxygen drifting past the window of Odyssey, catching the sunlight like a ghost. The cabin is still warm. That will change. In both places — the steel-and-glass building on the Gulf Coast and the aluminum capsule falling through the dark — men are reaching for checklists that do not cover this situation, because no one wrote a checklist for this."
+      },
+      {
+        "type": "entry",
+        "text": "You have been handed a role in the worst malfunction in the history of human spaceflight, and the word 'malfunction' does not begin to cover what has happened. The systems you were trained to trust are failing in sequence. The procedures you memorized do not apply. What applies now is the specific knowledge in your head, the people you can reach, and the time remaining before the next system crosses its threshold and takes an option off the table permanently. The clock is running. You are standing at the exact moment where preparation ends and improvisation — the real kind, with real consequences — begins.",
+        "character_entries": {
+          "role_mission_commander": "Standing in the Lunar Module Aquarius, you can see your breath. The instrument light catches it — a small, pale exhalation that disappears before it reaches the triangular window, where the Earth sits at thumbnail distance and does not appear to be getting larger. Your fingers are stiff inside the cabin gloves. You have been stiff for six hours and you have stopped registering it as a sensation separate from everything else. Through the forward window, the venting oxygen has thinned to almost nothing, which means most of it is gone, which means the arithmetic on what follows is no longer a projection. It is a schedule. Gene Kranz is asking for systems status in a voice that is steady in the way that a man's voice is steady when he has made a decision to be steady, and you understand that, because you have made the same decision. What Kranz does not know — what you have not transmitted and will not transmit — is that the figure on the second page of the burn calculation is the figure you erased. You rewrote it. You are less certain of the rewritten number than you were of the first, and you cannot verify it, because the guidance computer is off and the cold is already in your hands. You reach for the transmit switch.",
+          "role_flight_director": "You are standing at the Flight Director's console and the wall of screens in front of you is showing data that ends, in every configuration you have run, in the same place. The room smells of cigarette smoke and the burnt-coffee smell of fourteen hours and the particular silence of thirty engineers who have stopped talking to each other and started watching you. Your back is to them. You know the power budget down to the amp-hour — twelve of margin, which is enough for one error and not enough for the error that is already coming, because something else is always coming, and the CO2 graph climbing on screen four is the proof of that. You know that John Aaron's revised power-up sequence changes the numbers, but you have not seen the full trade-off analysis, and you will not act on a number you have not verified. You know that Liebergot waited nearly two minutes, and you have filed that fact in the part of your mind that is not useful right now. What is useful is the graph. What is useful is the sequence. The loop crackles — Lovell's voice, two hundred thousand miles away, steady as a man reading a weather report — and he is asking about the CO2 projection, and the silence on your end has already lasted long enough to mean something. You key the mic.",
+          "role_cm_pilot": "The instrument panel is wet. Not damp — wet, the way a window is wet in winter, the way metal gets when the temperature has been falling for long enough that the air itself gives up and condenses on every surface it can find. You press your thumb against the center console and it comes away cold and damp, and you wipe it on your thigh without thinking about it, the way you have been wiping it on your thigh for the last hour. The cue card is still there, taped at the top corners, thirteen steps written in block letters large enough to read with hands that are not shaking yet. Step nine has the thirty-second wait. You put it there yourself, in a conversation with John Aaron that Aaron may or may not remember the same way you do, and the question of whether he remembers it — whether he built that margin into the revised sequence or discarded it without knowing what he was discarding — is the question you cannot ask on the loop without explaining why you are asking it. The condensation on the left side of the panel is heavier than the right. You do not know what it means. You know what it could mean. The CO2 reads 4.2, and somewhere behind you the Moon is getting smaller, and your thumb is on the first switch."
+        }
+      }
+    ]
+  },
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Flight Operations Shorthand",
+        "context": "Used by flight controllers, flight directors, and crew during mission communications; the compressed language of people managing multiple simultaneous crises.",
+        "terms": [
+          {
+            "term": "FIDO",
+            "meaning": "Flight Dynamics Officer — the controller responsible for trajectory and orbital mechanics; pronounced 'FIE-doe'"
+          },
+          {
+            "term": "EECOM",
+            "meaning": "Electrical, Environmental, and Consumables Manager — the controller tracking power, oxygen, and CO2 levels"
+          },
+          {
+            "term": "GUIDO",
+            "meaning": "Guidance Officer — responsible for the navigation computer and inertial measurement unit; pronounced 'GUY-doe'"
+          },
+          {
+            "term": "Flight",
+            "meaning": "The Flight Director; the single word used to address Gene Kranz or any flight director on the loop"
+          },
+          {
+            "term": "Go/No-Go",
+            "meaning": "The formal poll of all controllers confirming readiness to proceed with a critical maneuver"
+          },
+          {
+            "term": "Loop",
+            "meaning": "The audio communication channel connecting Houston to the crew; 'on the loop' means actively monitoring"
+          },
+          {
+            "term": "Consumables",
+            "meaning": "The finite resources — oxygen, water, battery power, lithium hydroxide — that determine survival time"
+          },
+          {
+            "term": "Nominal",
+            "meaning": "Within expected parameters; the highest praise a flight controller can offer a system reading"
+          }
+        ]
+      },
+      {
+        "name": "Spacecraft Systems Language",
+        "context": "Technical vocabulary used by crew and engineers to describe the physical state of the spacecraft; each term refers to a specific system with life-or-death implications.",
+        "terms": [
+          {
+            "term": "LiOH",
+            "meaning": "Lithium hydroxide — the chemical compound in the scrubber canisters that absorbs exhaled CO2; the crew's air depends on it"
+          },
+          {
+            "term": "RCS",
+            "meaning": "Reaction Control System — the small thrusters used for attitude control; fuel is finite and every firing costs margin"
+          },
+          {
+            "term": "IMU",
+            "meaning": "Inertial Measurement Unit — the gyroscope platform that tells the ship where it is pointing; if it reaches Gimbal Lock, navigation is lost"
+          },
+          {
+            "term": "DPS",
+            "meaning": "Descent Propulsion System — the Lunar Module's descent engine, now being used as the main engine for course-correction burns"
+          },
+          {
+            "term": "Cold Soak",
+            "meaning": "The condition of the Command Module after days without power — components chilled to near-freezing, behavior on power-up unpredictable"
+          },
+          {
+            "term": "Amp-hours",
+            "meaning": "The unit of electrical energy remaining in the batteries; the crew's entire survival margin expressed as a single number"
+          },
+          {
+            "term": "Barbecue Roll",
+            "meaning": "Passive Thermal Control — rotating the spacecraft slowly on its long axis to distribute solar heating evenly and prevent one side from freezing"
+          }
+        ]
+      },
+      {
+        "name": "Crew and Controller Informal Speech",
+        "context": "The vernacular used between crew members and between controllers off the formal loop; the language of men under sustained pressure who have stopped being formal.",
+        "terms": [
+          {
+            "term": "The Mailbox",
+            "meaning": "The improvised CO2 scrubber adapter built from a flight manual cover, plastic bags, and a sock — named for its approximate shape"
+          },
+          {
+            "term": "The Far Side",
+            "meaning": "The 45-minute period of total radio blackout as the spacecraft passes behind the Moon; no communication in either direction"
+          },
+          {
+            "term": "Lifeboat",
+            "meaning": "Informal name for Aquarius, the Lunar Module being used as the crew's survival habitat — a vehicle with no heat shield and no designed purpose for this mission"
+          },
+          {
+            "term": "Slingshot",
+            "meaning": "The Free Return Trajectory — using the Moon's gravity to curve the ship back toward Earth without requiring a large engine burn"
+          },
+          {
+            "term": "The Trench",
+            "meaning": "The front row of consoles in Mission Control where the trajectory and guidance officers sit; the most technically demanding seats in the room"
+          },
+          {
+            "term": "Cue card",
+            "meaning": "The handwritten power-up sequence taped to the instrument panel — the improvised checklist replacing the 400-page procedure that assumes working computers"
+          }
+        ]
+      },
+      {
+        "name": "NASA Institutional Language",
+        "context": "The formal vocabulary of the agency itself — the bureaucratic and engineering idiom that shapes how problems are named, reported, and escalated.",
+        "terms": [
+          {
+            "term": "Anomaly",
+            "meaning": "NASA's formal term for any unexpected event or system failure, regardless of severity; the word that begins every emergency"
+          },
+          {
+            "term": "Tiger Team",
+            "meaning": "An ad-hoc group of specialists assembled to solve a single specific problem under time pressure; Gene Kranz's White Team is operating as one"
+          },
+          {
+            "term": "Sim",
+            "meaning": "Simulation — the training runs that prepared controllers for emergencies; in 1970, no sim had covered this specific failure mode"
+          },
+          {
+            "term": "Workaround",
+            "meaning": "A solution that uses available materials and systems in ways they were not designed for; the only category of solution available tonight"
+          },
+          {
+            "term": "Trajectory corridor",
+            "meaning": "The narrow band of atmospheric entry angle — roughly 6 degrees wide — within which the spacecraft can survive re-entry; outside it, the ship burns or escapes"
+          }
+        ]
+      }
+    ]
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.756Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": [],
+  "structured_endings_enabled": false,
+  "beats_status": "not_generated",
+  "epilogue": {
+    "generated": true,
+    "reviewed": true,
+    "character_fates": [
+      {
+        "character_id": "char_jim_lovell",
+        "name": "James A. Lovell Jr.",
+        "outcome": "survived",
+        "historical_record": "Lovell splashed down safely in the South Pacific on April 17, 1970, recovered by USS Iwo Jima. He never flew in space again. Apollo 13 was his fourth and final spaceflight. He retired from NASA and the U.S. Navy in 1973 and went on to a career in business. As of the time of this scenario's composition he is alive.",
+        "primary_source": "NASA Mission Report: Apollo 13 Review Board Report (1970); Lovell, James A. and Jeffrey Kluger, 'Lost Moon' (1994)"
+      },
+      {
+        "character_id": "char_jack_swigert",
+        "name": "John L. Swigert Jr.",
+        "outcome": "died",
+        "historical_record": "Swigert splashed down safely on April 17, 1970. He left NASA in 1977 and entered politics. He was elected to the U.S. House of Representatives from Colorado's 6th congressional district in November 1982 but died of bone cancer on December 27, 1982, before he could be sworn in.",
+        "primary_source": "Congressional Record; NASA Astronaut Biography, JSC"
+      },
+      {
+        "character_id": "char_fred_haise",
+        "name": "Fred W. Haise Jr.",
+        "outcome": "survived",
+        "historical_record": "Haise splashed down safely on April 17, 1970. He was assigned to Apollo 19 but that mission was cancelled in September 1970. He later flew the Space Shuttle Enterprise in the Approach and Landing Tests in 1977. He retired from NASA in 1979. As of the time of this scenario's composition he is alive.",
+        "primary_source": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Astronaut Biography, JSC"
+      },
+      {
+        "character_id": "char_gene_kranz",
+        "name": "Gene Kranz",
+        "outcome": "survived",
+        "historical_record": "Kranz served as Flight Director through the Apollo 13 crisis and subsequent Apollo missions. He became Chief of the Flight Director Office and later Director of Mission Operations at NASA Johnson Space Center. He retired from NASA in 1994. His White Team was awarded the Presidential Medal of Freedom collectively with the Apollo 13 crew and Mission Control in April 1970. As of the time of this scenario's composition he is alive.",
+        "primary_source": "Presidential Medal of Freedom citation, April 18, 1970; Kranz, Gene, 'Failure Is Not an Option' (2000)"
+      },
+      {
+        "character_id": "char_glynn_lunney",
+        "name": "Glynn Lunney",
+        "outcome": "survived",
+        "historical_record": "Lunney's Black Team took over from Kranz's White Team during the crisis rotation and managed the critical hours of LM activation and initial power-down procedures. He continued as a Flight Director through the Apollo program and later managed the Apollo-Soyuz Test Project. He retired from NASA in 1985. As of the time of this scenario's composition he is alive.",
+        "primary_source": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Johnson Space Center oral history, Lunney interview"
+      },
+      {
+        "character_id": "char_john_aaron",
+        "name": "John Aaron",
+        "outcome": "survived",
+        "historical_record": "Aaron was off-shift when the accident occurred and was called back to Mission Control. He led the power budget analysis that determined the minimum electrical load required to safely power up the Command Module for re-entry. His power-up sequence was executed successfully on April 17, 1970. He later became Chief of the Spacecraft Energy Systems Section and worked on early Space Shuttle development. He later served as manager of the Space Station Freedom project and acting director of the Johnson Space Center before retiring from NASA in 1993. As of the time of this scenario's composition he is alive.",
+        "primary_source": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Johnson Space Center oral history, Aaron interview (1999)"
+      },
+      {
+        "character_id": "char_sy_liebergot",
+        "name": "Seymour 'Sy' Liebergot",
+        "outcome": "survived",
+        "historical_record": "Liebergot was the EECOM on duty when the oxygen tank rupture occurred and was the first controller to identify the anomalous readings. He continued working at NASA Mission Control and later wrote a memoir about his experiences. He retired from NASA. As of the time of this scenario's composition he is alive.",
+        "primary_source": "Liebergot, Sy and David Harland, 'Apollo EECOM: Journey of a Lifetime' (2003); NASA Mission Report: Apollo 13 Review Board Report (1970)"
+      }
+    ],
+    "immediate_outcome": {
+      "summary": "Apollo 13 splashed down safely in the South Pacific Ocean at 18:07:41 UTC on April 17, 1970, and all three crew members were recovered alive by USS Iwo Jima. The mission, intended as the third crewed lunar landing, did not land on the Moon. The crew spent approximately 87 hours in the Lunar Module Aquarius, which served as a lifeboat, before re-entering and splashing down in the Command Module Odyssey.",
+      "key_facts": [
+        "Oxygen Tank Two in Service Module Bay 4 ruptured at 03:07:53 UTC on April 14, 1970, approximately 55 hours 54 minutes 53 seconds into the mission",
+        "The spacecraft was approximately 321,860 kilometers (199,990 miles) from Earth at the time of the explosion",
+        "Splashdown occurred at 18:07:41 UTC on April 17, 1970, in the South Pacific Ocean at approximately 21°38'S, 165°22'W",
+        "Recovery was performed by USS Iwo Jima (LPH-2)",
+        "Total mission elapsed time at splashdown was 142 hours 54 minutes 41 seconds",
+        "The crew spent approximately 87 hours living in the Lunar Module Aquarius",
+        "The Apollo 13 Review Board, chaired by Edgar Cortright, concluded the accident was caused by damaged wire insulation in Oxygen Tank Two that had been compromised during a pre-launch detanking procedure on March 27–28, 1970"
+      ]
+    },
+    "historical_frame": [
+      "Apollo 13 was the seventh crewed Apollo mission and was intended to land in the Fra Mauro highlands; that landing was accomplished instead by Apollo 14 in February 1971.",
+      "The Presidential Medal of Freedom was awarded on April 18, 1970, to the Apollo 13 crew and the Mission Operations team at NASA Manned Spacecraft Center, Houston.",
+      "The Apollo 13 Review Board report, released June 15, 1970, identified the root cause as damaged Teflon insulation on wires inside Oxygen Tank Two, damage that occurred during ground operations, and led to redesign of the oxygen tank and service module bay configuration for subsequent Apollo missions."
+    ],
+    "open_threads": [
+      {
+        "thread_id": "the_explosion_registers",
+        "historical_record": "The precise sequence of events in the seconds before and during the tank rupture was investigated by the Apollo 13 Review Board. The Board concluded the most probable cause was electrical arcing inside Oxygen Tank Two igniting Teflon insulation, but the exact microsecond sequence of internal failure could not be fully reconstructed from telemetry. The famous phrase reported by the crew was 'Houston, we've had a problem,' spoken by Swigert and then repeated by Lovell; the present-tense phrasing 'we have a problem' used in popular culture is not what the transcript records."
+      },
+      {
+        "thread_id": "eecom_in_houston",
+        "historical_record": "Liebergot's initial readings showed Oxygen Tank Two pressure at zero and Tank One falling, but early telemetry was ambiguous enough that some controllers initially considered the possibility of a sensor failure rather than an actual tank loss. The Review Board documented that the ambiguity in early readings delayed full recognition of the severity of the situation by several minutes. The question of whether earlier recognition could have changed outcomes was raised but not formally resolved by the Board."
+      },
+      {
+        "thread_id": "flight_director_kranz",
+        "historical_record": "The handoff between Kranz's White Team and Lunney's Black Team during the crisis has been a subject of some historical discussion regarding precisely which team was on console during which critical decisions. NASA records and the Review Board report document that Lunney's Black Team took the console during the LM activation phase. Kranz himself has written that he pulled his White Team off the floor to work the re-entry procedures, a decision he made on his own authority."
+      },
+      {
+        "thread_id": "the_crew_is",
+        "historical_record": "The exact remaining power margin in the Command Module at the time the crew was ordered to transfer to the LM has been reported with some variation in different accounts. The Apollo 13 Review Board report and mission logs confirm the transfer was ordered under extreme time pressure, but the precise number of minutes of Command Module power remaining at the moment the order was given is not stated with a single agreed figure in primary sources; estimates in various accounts range from approximately 15 to 30 minutes."
+      },
+      {
+        "thread_id": "swigert_begins_the",
+        "historical_record": "The LM activation was accomplished in approximately 1 hour and 53 minutes according to mission logs, compared to the nominal two-hour procedure. The procedure used was an emergency checklist developed in real time by the LM systems and TELMU ground teams, with Command and Service Module (CSM) systems support led by engineers like Arnie Aldrich. The question of whether the abbreviated activation introduced any risk to LM systems was examined by the Review Board, which found no evidence of damage attributable to the rapid power-up."
+      },
+      {
+        "thread_id": "aquarius_is_live",
+        "historical_record": "The minimum power state to which Odyssey was reduced during the lifeboat phase was a subject of careful engineering calculation. The Apollo 13 Review Board confirmed that the Command Module was successfully maintained in a condition that allowed re-entry power-up, but noted that the procedures for doing so had never been tested or fully documented before the mission. The power-up sequence developed by John Aaron and his team was transmitted to the crew and executed on April 17, 1970."
+      },
+      {
+        "thread_id": "co2_levels_begin",
+        "historical_record": "CO2 partial pressure in the LM cabin began rising measurably within the first day of the crew's occupation of Aquarius. Mission logs record that CO2 levels reached a level requiring action before the improvised scrubber adapter was completed and deployed. The exact peak CO2 partial pressure reached before the adapter became operational is documented in mission telemetry but has been cited with slight variation across secondary sources; the Review Board report is the authoritative primary record."
+      },
+      {
+        "thread_id": "the_tiger_team",
+        "historical_record": "The improvised CO2 scrubber adapter, constructed from materials available on the spacecraft including a plastic bag, cardboard from a flight manual cover, a sock, and duct tape, was developed by a team at Mission Control and the procedure was read up to the crew. The crew successfully built and deployed the adapter. The exact composition of the ground team that developed the procedure and the precise timeline of its development are documented in NASA records and oral histories but have been described with minor variations in different accounts."
+      },
+      {
+        "thread_id": "kranz_convenes_the",
+        "historical_record": "The power budget meeting and the calculations that produced the re-entry power-up sequence are documented in NASA records and in John Aaron's oral history. The final power budget required the Command Module to be powered up using only the re-entry batteries, which had been preserved throughout the lifeboat phase. Whether the power margins were sufficient was not known with certainty until the actual power-up on April 17, 1970; the Review Board confirmed the margins were adequate but noted they were tighter than any previously flown re-entry."
+      },
+      {
+        "thread_id": "lovell_and_haise",
+        "historical_record": "The PC+2 burn (pericynthion plus 2 hours) was executed using the LM descent engine at 20:40 UTC on April 14, 1970. The burn lasted 4 minutes 23 seconds and added approximately 262 meters per second to the spacecraft's velocity, shortening the return time by approximately 10 hours. The burn calculations were performed by the Mission Control trajectory team and verified manually; the crew executed the burn using the LM guidance system with manual backup. The Review Board confirmed the burn was executed within acceptable parameters."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "the_explosion_registers",
+        "historical_record": "At 03:07:53 UTC on April 14, 1970, Oxygen Tank Two in Service Module Bay 4 ruptured. The crew reported a loud bang and felt the spacecraft shudder. Lovell observed white gas venting past the window. Jack Swigert radioed 'Houston, we've had a problem here' at approximately 03:08 UTC, followed by Lovell repeating 'Houston, we've had a problem.' Mission elapsed time at the event was 55:54:53. The spacecraft was approximately 321,860 kilometers from Earth."
+      },
+      {
+        "beat_id": "eecom_in_houston",
+        "historical_record": "EECOM Sy Liebergot observed Oxygen Tank Two pressure drop to zero on his console. Tank One pressure was also falling, having been damaged by the explosion that vented the oxygen from Bay 4. Telemetry also showed loss of two of the three fuel cells, which required oxygen to generate power. The loss of Tank Two and the damage to Tank One meant the Service Module could no longer sustain the Command Module for the planned mission duration. These readings were confirmed within minutes of the event."
+      },
+      {
+        "beat_id": "flight_director_kranz",
+        "historical_record": "Flight Director Gene Kranz directed controllers to preserve all data and begin assessing the spacecraft's condition. He subsequently pulled his White Team off the console and tasked them exclusively with developing re-entry procedures, while Glynn Lunney's Black Team took over real-time flight direction. Kranz's decision to dedicate a team solely to re-entry planning is documented in his memoir and in NASA oral histories and is credited as a key factor in the successful development of the re-entry power-up sequence."
+      },
+      {
+        "beat_id": "the_crew_is",
+        "historical_record": "Mission Control directed the crew to power up the Lunar Module Aquarius and begin transferring to it as a lifeboat. The Command Module Odyssey's batteries, which were the only remaining power source after the fuel cell loss, had to be preserved for re-entry. The crew began LM activation while the Command Module was still providing power, then transferred to the LM and powered Odyssey down to its minimum survival configuration. The transfer and LM activation were completed within approximately two hours of the explosion."
+      },
+      {
+        "beat_id": "swigert_begins_the",
+        "historical_record": "The nominal LM activation checklist required approximately two hours. The emergency activation was completed in approximately 1 hour 53 minutes using a condensed procedure developed in real time by Mission Control engineers and read up to the crew. While Lovell and Haise hurried into the Lunar Module to execute the emergency power-up, Swigert remained in the Command Module to meticulously execute its sequence of emergency power-down procedures, preserving the vital re-entry batteries before they drained completely. The procedure was successfully completed and Aquarius was confirmed operational."
+      },
+      {
+        "beat_id": "aquarius_is_live",
+        "historical_record": "Aquarius was confirmed operational and the crew transferred into the LM. Odyssey was powered down to a minimum configuration intended to preserve its re-entry batteries. The LM was designed to support two crew members for approximately 45 hours for a lunar landing mission; it was required to support three crew members for approximately 90 hours as a lifeboat. Modifications to consumables usage, including power reduction and water rationing, were implemented throughout the lifeboat phase."
+      },
+      {
+        "beat_id": "co2_levels_begin",
+        "historical_record": "The LM's lithium hydroxide canisters were sized for two crew members for the planned LM operational period. With three crew members occupying the LM for an extended period, CO2 levels rose to a level requiring intervention. The Command Module carried additional lithium hydroxide canisters, but they used a square cartridge incompatible with the LM's round canister ports. Mission Control developed an improvised adapter procedure using materials on board the spacecraft. The crew successfully built and deployed the adapter, and CO2 levels returned to acceptable levels."
+      },
+      {
+        "beat_id": "the_tiger_team",
+        "historical_record": "A team at Mission Control developed the improvised CO2 scrubber adapter procedure using only materials known to be present on the spacecraft. The materials used included a plastic bag, cardboard from a flight manual cover, a sock, and duct tape. The procedure was read up to the crew by Mission Control. The crew assembled the adapter and it functioned successfully, reducing CO2 partial pressure to acceptable levels. This event is documented in the Apollo 13 Review Board report and in multiple NASA oral histories."
+      },
+      {
+        "beat_id": "kranz_convenes_the",
+        "historical_record": "John Aaron, working off-shift, led the intense power budget analysis and re-entry sequencing at Mission Control. The analysis determined the minimum electrical load required to power up the Command Module for re-entry using only the entry batteries, which had been preserved throughout the lifeboat phase. The resulting power-up checklist was a new procedure with no prior flight history. It was transmitted to the crew and executed on April 17, 1970. The Command Module was successfully powered up and all systems required for re-entry were confirmed operational. The Review Board confirmed the power margins were adequate."
+      },
+      {
+        "beat_id": "lovell_and_haise",
+        "historical_record": "The PC+2 burn was executed at 20:40 UTC on April 14, 1970, using the LM descent engine. The burn duration was 4 minutes 23 seconds. The burn imparted approximately 262 meters per second of delta-v to the spacecraft, placing it on a free-return trajectory and shortening the return time by approximately 10 hours, enabling splashdown on April 17 rather than April 18, 1970. The burn was calculated by the Mission Control trajectory team. Lovell and Haise executed the burn; Swigert monitored the Command Module. The burn was confirmed successful by Mission Control tracking."
+      }
+    ]
+  },
+  "review_checklist": {
+    "beat_count": {
+      "checked": false,
+      "notes": ""
+    },
+    "sequence_check": {
+      "checked": false,
+      "notes": ""
+    },
+    "path_independence": {
+      "checked": false,
+      "notes": ""
+    },
+    "final_beat_spec": {
+      "checked": false,
+      "notes": ""
+    },
+    "tense_attribution": {
+      "checked": false,
+      "notes": ""
+    },
+    "reviewer_summary": {
+      "checked": false,
+      "notes": ""
+    },
+    "manual_playthrough": {
+      "checked": false,
+      "notes": ""
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "boiler_room_four",
+  "scenarioId": "titanic_final_hours",
+  "name": "Boiler Room No. 4",
+  "description": "Five decks below the Boat Deck, the aft boiler room is still operational — six double-ended boilers roar with coal fire, but the floor plates are slick with a thin film of seawater that has begun seeping under the forward bulkhead, and the temperature differential between the furnace heat and the incoming Atlantic water creates a rolling fog at ankle height.",
+  "mood": "hellish, desperate, loud",
+  "linkedCharacterIds": [
+    "joseph_bell"
+  ],
+  "atmosphericDetails": [
+    "The noise is total — the roar of furnaces, the hiss of escaping steam from a relief valve, and beneath it all the deep metallic groan of the hull plates under pressure",
+    "Coal-black water swirls around the floor grating in thin ribbons, growing thicker every ten minutes — the men working here have stopped pretending it is condensation",
+    "The emergency lighting casts everything in amber, making the stokers' faces look like figures in a painting of hell, their shovels moving in mechanical rhythm despite the water rising around their boots"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.065Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

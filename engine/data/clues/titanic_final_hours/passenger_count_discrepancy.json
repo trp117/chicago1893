@@ -1,0 +1,20 @@
+{
+  "id": "passenger_count_discrepancy",
+  "scenarioId": "titanic_final_hours",
+  "title": "Purser's Embarkation Roll vs. Boat Deck Count",
+  "description": "In the First Class Lounge, the ship's Purser has left his embarkation roll on the writing desk — a complete passenger and crew manifest showing 2,224 souls aboard. Next to it, in Margaret Brown's handwriting on a cocktail napkin, is a running tally of people she has personally counted entering boats: after Boats 1 through 8, her count totals 312. The official boat capacity for those eight boats is 520. The napkin and the manifest together make the arithmetic of the under-loading visible and undeniable.",
+  "category": "observation",
+  "discoveryLocationId": "first_class_lounge",
+  "implicatesCharacterIds": [
+    "charles_lightoller",
+    "margaret_brown"
+  ],
+  "unlocks": [
+    "lifeboat_capacity_manifest"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.075Z",
+  "locationId": "",
+  "isRedHerring": false
+}

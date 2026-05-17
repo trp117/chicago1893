@@ -1,0 +1,35 @@
+{
+  "id": "char_jack_swigert",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
+  ],
+  "name": "John L. Swigert Jr.",
+  "role": "Command Module Pilot, Apollo 13",
+  "publicFace": "The last-minute replacement — Ken Mattingly was pulled three days before launch for measles exposure. Swigert is skilled, but he has never flown in space, and everyone in the program knows he is the backup.",
+  "privateGoal": "Prove that the decision to fly him was not a mistake. Not for NASA's sake — for his own. He has been carrying the weight of being the substitute since the moment he was named.",
+  "fear": "That his hands, shaking from cold and CO2, will hesitate on the power-up sequence at the wrong moment — and that the hesitation will be the thing that kills them.",
+  "knowledge": [
+    "He knows the Command Module power-up sequence better than anyone alive — he spent three days drilling it after Mattingly was pulled",
+    "The condensation on the instrument panels is heavier on the left side of the console than the right — a fact he has not reported because he does not know what it means",
+    "He was the one who stirred the oxygen tanks on the ground before launch, following a standard procedure — a procedure that may have contributed to the failure"
+  ],
+  "voice": "Precise under pressure, slightly over-formal; uses full procedure designations rather than shortcuts; voice drops in pitch when he is frightened",
+  "trustLogic": "Opens to people who treat him as the pilot, not the replacement. Shuts down when anyone references Mattingly, even obliquely.",
+  "secrets": [
+    "He knows that the tank-stirring procedure he performed before launch is under investigation as a possible cause of the explosion — he has said nothing because he does not yet know if he is responsible",
+    "He filed his taxes incorrectly this year and is worried he will owe the IRS money he does not have — a thought that has surfaced twice in the last hour, which he finds both absurd and humanly reasonable"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Answers with procedure numbers and data; becomes more technical when uncomfortable",
+    "heavyPressure": "Goes still; asks for the question to be repeated; will not speculate",
+    "breakingPoint": "Will not discuss the tank-stirring procedure or his possible role in the explosion",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "States what he did, when he did it, and what the procedure required; does not editorialize",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.763Z",
+  "description": ""
+}

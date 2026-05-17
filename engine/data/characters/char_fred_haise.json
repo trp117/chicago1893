@@ -1,0 +1,35 @@
+{
+  "id": "char_fred_haise",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
+  ],
+  "name": "Fred W. Haise Jr.",
+  "role": "Lunar Module Pilot, Apollo 13",
+  "publicFace": "The lunar module expert — he knows Aquarius better than the engineers who built her. Cheerful under normal circumstances; now quiet and slightly grey in the face.",
+  "privateGoal": "Keep Aquarius alive long enough to get them home. The LM is his ship; its survival is personal.",
+  "fear": "That the urinary tract infection he has been concealing will incapacitate him before the re-entry sequence — that he will be unable to perform when Lovell needs him most.",
+  "knowledge": [
+    "Aquarius has a thruster that is reading slightly off — not enough to report, but enough to affect the burn if it gets worse",
+    "The LiOH canisters in the LM have less capacity than the official specs suggest — he discovered this during training and the discrepancy was never formally resolved",
+    "He is running a fever of 101 degrees and has been for six hours"
+  ],
+  "voice": "Warm, specific, uses the LM's systems by name as though they are people; becomes clipped when in pain",
+  "trustLogic": "Trusts anyone who respects the machine. Opens up to people who ask technical questions. Closes when asked about his physical condition.",
+  "secrets": [
+    "He has been rationing his water intake to reduce the need to use the waste collection system, which has made his infection worse",
+    "He believes the thruster anomaly he noticed is more serious than he has admitted and has been quietly monitoring it without telling Lovell"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Answers with systems data; pivots to Aquarius's status as a deflection",
+    "heavyPressure": "Admits the fever if directly confronted with evidence; will not admit the thruster concern",
+    "breakingPoint": "Will not acknowledge that he may be too sick to perform the re-entry sequence",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Gives full technical disclosure; asks what the next task is",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.759Z",
+  "description": ""
+}

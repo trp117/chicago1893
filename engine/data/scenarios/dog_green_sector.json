@@ -227,7 +227,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T00:41:56.655Z",
+  "updatedAt": "2026-05-17T16:02:56.663Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -249,7 +249,7 @@
         "character_id": "char_feldwebel_brandt",
         "name": "Feldwebel Heinrich Brandt",
         "outcome": "unknown",
-        "historical_record": "No individual named Heinrich Brandt appears in surviving German personnel records for Widerstandsnest 71 or the 352nd Infantry Division for June 6, 1944. WN-71 was overrun by American forces during the morning of June 6, 1944, and its garrison was killed, captured, or withdrew. The specific fates of individual enlisted MG section commanders at WN-71 are not documented in surviving records. This character is a composite fictional figure placed within a documented position.",
+        "historical_record": "No individual named Heinrich Brandt appears in surviving German personnel records for Widerstandsnest 72 or the 352nd Infantry Division for June 6, 1944. WN-72 directly enfiladed the Dog Green Sector at the Vierville draw and was neutralized by American forces during the morning of June 6, 1944, when its garrison was killed, captured, or forced to withdraw inland. The specific fates of individual enlisted MG section commanders at WN-72 are not documented in surviving records. This character is a composite fictional figure placed within a documented position.",
         "primary_source": null
       },
       {
@@ -289,14 +289,14 @@
       }
     ],
     "immediate_outcome": {
-      "summary": "The Vierville draw — Exit D-1 — was not opened until approximately 0900 hours on June 6, 1944, after sustained small-unit actions by surviving elements of the 116th Infantry Regiment and Ranger units, combined with direct naval gunfire support from destroyers including USS McCook and USS Carmick, which closed to within approximately 800 yards of the beach to engage German strongpoints. Company A of the 116th Infantry Regiment, which landed in the first wave at Dog Green Sector, was effectively destroyed as a fighting unit within the first thirty minutes, suffering casualties estimated at over 90 percent killed, wounded, or missing.",
+      "summary": "The Vierville draw — Exit D-1 — was bypassed and its flanking bluffs cleared by approximately 0900 hours on June 6, 1944, after sustained small-unit actions by surviving elements of the 116th Infantry Regiment and Ranger units. This was combined with direct naval gunfire support from destroyers including USS McCook and USS Carmick, which closed dangerously close to the shallows—within 600 to 800 yards of the beach—to engage German strongpoints. Company A of the 116th Infantry Regiment, which landed in the first wave at Dog Green Sector, was effectively destroyed as a fighting unit within the first thirty minutes, suffering casualties estimated at over 90 percent killed, wounded, or missing.",
       "key_facts": [
         "Company A, 116th Infantry Regiment, 29th Infantry Division, landed at Dog Green Sector at approximately 0636 hours on June 6, 1944.",
         "The 741st Tank Battalion's DD tanks, assigned to support the Omaha Beach assault, lost 27 of 29 tanks launched in the eastern sector; the 743rd Tank Battalion, assigned to the western sector including Dog Green, launched tanks directly from LCTs closer to shore, with better survival rates.",
         "The 352nd Infantry Division, a full-strength experienced German division, had moved into the Omaha Beach defensive sector in March 1944; Allied intelligence had not confirmed its presence at the time of the assault.",
         "The USAAF bombardment preceding the landing at Omaha Beach dropped approximately 13,000 bombs; due to cloud cover and concern about hitting landing craft, bombardiers delayed release, causing bombs to fall up to three miles inland, leaving German beach defenses largely intact.",
-        "USS McCook (DD-496) and USS Carmick (DD-493) provided direct fire support against WN-71 and adjacent strongpoints during the morning of June 6, 1944, closing to ranges of approximately 800 yards.",
-        "Exit D-1 at Vierville-sur-Mer was reported opened to vehicle traffic by approximately 1100 hours on June 6, 1944.",
+        "USS McCook (DD-496) and USS Carmick (DD-493) provided direct fire support against WN-72 and adjacent strongpoints during the morning of June 6, 1944, closing to ranges as tight as 600 yards from the shore.",
+        "Exit D-1 at Vierville-sur-Mer was reported cleared of heavy concrete obstacles and officially opened to vehicle traffic by approximately 1100 hours on June 6, 1944.",
         "The 2nd Ranger Battalion landed elements at Dog Green and adjacent sectors on June 6, 1944, with Dog Company among the units committed to the Vierville draw area."
       ]
     },
@@ -324,7 +324,7 @@
       },
       {
         "thread_id": "pinned_at_the",
-        "historical_record": "The process by which naval gunfire was directed against WN-71 and adjacent strongpoints on June 6, 1944, is partially documented. USS McCook's deck log and action report for June 6, 1944, record that the ship engaged targets on the beach at Omaha in response to requests and observed fire, but the specific mechanism by which firing arc and position data for WN-71 was communicated from shore to ship is not fully reconstructed in surviving records. Naval gunfire liaison officers were assigned to the assault waves, but their individual actions and the specific intelligence they transmitted are not documented at the level of individual communications. The question of exactly how and when WN-71's position was fixed for naval gunfire purposes remains incompletely answered in the historical record."
+        "historical_record": "The process by which naval gunfire was directed against WN-72 and adjacent strongpoints on June 6, 1944, is partially documented. USS McCook's deck log and action report for June 6, 1944, record that the ship engaged targets on the beach at Omaha in response to requests and observed fire, but the specific mechanism by which firing arc and position data for WN-72 was communicated from shore to ship is not fully reconstructed in surviving records. Naval gunfire liaison officers were assigned to the assault waves, but their individual actions and the specific intelligence they transmitted are not documented at the level of individual communications. The question of exactly how and when WN-72's position was fixed for naval gunfire purposes remains incompletely answered in the historical record."
       },
       {
         "thread_id": "lieutenant_hargrove_attempts",
@@ -338,7 +338,7 @@
       },
       {
         "beat_id": "the_ranger_sergeant",
-        "historical_record": "Elements of the 2nd Ranger Battalion landed at Omaha Beach on June 6, 1944, with Dog Company among the units assigned to the Dog Green and Dog White sector area. The battalion's after-action report records that craft were hit by fire before and during the landing and that men entered the water at varying distances from shore. The shingle bank below the bluffs at Dog Green provided the first significant defilade from direct fire. German MG-42 positions at WN-71, located at the western edge of the Vierville draw, had direct fields of fire across the beach. The 2nd Ranger Battalion's after-action report records that the battalion suffered significant casualties crossing the beach but does not reconstruct individual movements."
+        "historical_record": "Elements of the 2nd Ranger Battalion landed at Omaha Beach on June 6, 1944, with Dog Company among the units assigned to the Dog Green and Dog White sector area. The battalion's after-action report records that craft were hit by fire before and during the landing and that men entered the water at varying distances from shore. The shingle bank below the bluffs at Dog Green provided the first significant defilade from direct fire. German MG-42 positions at WN-72, located at the cliff edge of the Vierville draw, had direct fields of fire across the beach. The 2nd Ranger Battalion's after-action report records that the battalion suffered significant casualties crossing the beach but does not reconstruct individual movements."
       },
       {
         "beat_id": "the_medic_encounters",
@@ -350,12 +350,42 @@
       },
       {
         "beat_id": "pinned_at_the",
-        "historical_record": "USS McCook (DD-496) action report for June 6, 1944, records that the destroyer engaged targets at Omaha Beach beginning in the early morning hours and continued fire support throughout the day. The report records specific engagements against gun emplacements and troop concentrations on the beach and bluffs. USS Carmick (DD-493) similarly recorded close-range fire support against strongpoints in the Dog sector. The destroyers closed to ranges described in action reports as approximately 800 yards in some instances. The specific intelligence about WN-71's firing arc that enabled effective engagement is not reconstructed in surviving naval records. The Naval Gunfire Support after-action report for Operation Neptune notes that communication between shore fire control parties and ships was disrupted by casualties among liaison personnel in the first wave."
+        "historical_record": "USS McCook (DD-496) action report for June 6, 1944, records that the destroyer engaged targets at Omaha Beach beginning in the early morning hours and continued fire support throughout the day. The report records specific engagements against gun emplacements and troop concentrations on the beach and bluffs. USS Carmick (DD-493) similarly recorded close-range fire support against strongpoints in the Dog sector. The destroyers closed to shallow depths described in action reports as close as 600 yards from the line of fire. The specific intelligence about WN-72's firing arc that enabled effective engagement is not reconstructed in surviving naval records. The Naval Gunfire Support after-action report for Operation Neptune notes that communication between shore fire control parties and ships was disrupted by casualties among liaison personnel in the first wave."
       },
       {
         "beat_id": "lieutenant_hargrove_attempts",
         "historical_record": "Captain Taylor Fellers, commanding officer of Company A, 116th Infantry Regiment, was killed in the first minutes of the landing at Dog Green Sector on June 6, 1944. The company suffered casualties estimated at over 90 percent in the first thirty minutes. Gordon Harrison's 'Cross-Channel Attack' (U.S. Army in World War II series, 1951) records that the Vierville draw was eventually breached and Exit D-1 opened through the actions of mixed groups of survivors, including Rangers and infantry, acting largely without intact command structures. The report of the Army Board of Review on Omaha Beach operations notes that the destruction of first-wave company command elements meant that tactical decisions in the critical period between 0700 and 0900 hours were made at the squad and individual level rather than at the platoon or company level."
       }
     ]
+  },
+  "review_checklist": {
+    "beat_count": {
+      "checked": false,
+      "notes": ""
+    },
+    "sequence_check": {
+      "checked": false,
+      "notes": ""
+    },
+    "path_independence": {
+      "checked": false,
+      "notes": ""
+    },
+    "final_beat_spec": {
+      "checked": false,
+      "notes": ""
+    },
+    "tense_attribution": {
+      "checked": false,
+      "notes": ""
+    },
+    "reviewer_summary": {
+      "checked": false,
+      "notes": ""
+    },
+    "manual_playthrough": {
+      "checked": false,
+      "notes": ""
+    }
   }
 }

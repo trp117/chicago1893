@@ -1,0 +1,18 @@
+{
+  "id": "carpathia_signal_log",
+  "scenarioId": "titanic_final_hours",
+  "title": "Carpathia's Confirmed Response — Signal Log",
+  "description": "A page torn from the Marconi Room's incoming signal log shows Carpathia's 12:25 AM response to the SOS: her position as 41°10'N 52°14'W, speed 17 knots, ETA approximately 4:00 AM. The log also shows a crossed-out Frankfurt entry — the Frankfurt operator initially misread the position and had to retransmit, losing six minutes. The confirmed Carpathia course is circled in pencil by Bride.",
+  "category": "documentary",
+  "discoveryLocationId": "marconi_room",
+  "implicatesCharacterIds": [
+    "harold_bride",
+    "jack_phillips"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.071Z",
+  "locationId": "",
+  "isRedHerring": false
+}

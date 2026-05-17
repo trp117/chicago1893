@@ -1,0 +1,65 @@
+{
+  "id": "first_class_steward",
+  "scenarioId": "titanic_final_hours",
+  "name": "First Class Steward",
+  "description": "You serve the wealthiest passengers on C-Deck and know every corridor, gate, and key ring on this ship. You have seen the boats go down half-empty. You know where the Third Class passengers are locked. The question is what you are willing to do about it.",
+  "startLocationId": "c_deck_corridor",
+  "startingKnowledge": [
+    "The E-Deck Third Class promenade gate is locked and the key is in the steward's office — the passengers behind it can see water advancing in their corridor",
+    "Lightoller's departure manifest has been recording inflated boat loads — you overheard him correct a junior officer's count upward by twelve people",
+    "The davit falls were load-tested to 70-person capacity in Southampton four days ago — the claim that they cannot hold a full boat is false",
+    "Margaret Brown has been counting passengers entering boats from the rail and her numbers are significantly below the official record"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a man who has spent his professional life making the machinery of class hierarchy run smoothly and invisibly, and who is now watching that machinery produce a specific, countable, preventable death toll. He knows every physical detail of this ship. He knows the social architecture of it just as well. His crisis is not fear — it is the collision between his training and his conscience, and the question of which one has more force.",
+  "briefing": "You are standing in the C-Deck corridor with a ring of passenger keys in your left hand and a lifebelt you have been carrying for forty minutes without putting on in your right, and the corridor smells of dinner and carpet and the faint wrong smell of cold seawater that has been advancing up from the lower decks since midnight. You have knocked on eleven stateroom doors in the last twenty minutes and convinced eight passengers to go to the boat deck, and you know — because you have been watching the davits from the rail — that the boats going down are not full, that Boat 7 left with twenty-eight people in a boat rated for sixty-five, and that Lightoller's manifest records it as forty-one. What you know that Lightoller does not know you know is that the E-Deck gate key is in the steward's office one deck below you, that the Third Class passengers behind that gate can see water in their corridor, and that the boat deck will be clear of standard lifeboats in approximately forty minutes. You have the access. You have the knowledge. You have, if you choose to use it, the authority of a man who knows this ship better than the officers loading the boats. The corridor is empty for the moment. The steward's office is thirty feet behind you. The boat deck is two decks above. You are deciding which direction to walk.",
+  "character_hooks": [
+    "I have been on White Star ships for eleven years and I have never once questioned a loading order — until tonight, when I watched a boat leave with twenty-eight people in it and an officer record forty-one.",
+    "I know a family in Third Class — a woman and three children from County Cork whom I helped find their cabin on embarkation day — and I have been thinking about that gate for the last hour.",
+    "I found Lightoller's manifest on the officer's table when I brought coffee to the boat deck at 12:30 AM, and I read it before I put it down, and I have been carrying what I read ever since."
+  ],
+  "suggested_secret": "You have already unlocked the E-Deck gate once tonight — at 12:40 AM, when no one was watching — and then locked it again when you heard an officer coming, and the memory of that moment is the specific thing you cannot stop returning to.",
+  "opening": {
+    "narrative": "It is 12:50 AM on April 15, 1912. The C-Deck corridor is quiet. The boats are being loaded above you. The Third Class passengers are locked below you. You have the keys. You have seen the manifest. The ship has between one and two hours.",
+    "npcMoments": [],
+    "choices": [
+      "Go to the steward's office and retrieve the E-Deck gate key",
+      "Go to the boat deck and confront Lightoller directly with what you know about the manifest",
+      "Find Thomas Andrews in the First Class Lounge and ask him directly how much time remains"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "C-Deck passenger key ring",
+      "Lifebelt (not yet worn)",
+      "Mental note of Lightoller's inflated manifest figures"
+    ],
+    "flags": {
+      "gate_key_retrieved": false,
+      "lightoller_confronted": false,
+      "andrews_consulted": false,
+      "brown_allied": false
+    },
+    "suspicion": {
+      "charles_lightoller": 3,
+      "thomas_andrews": 0,
+      "margaret_brown": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.077Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You managed to fill your assigned lifeboats to their full 65-person capacity, bypassing \"Class\" restrictions to save steerage passengers. You stayed on deck to help with the last collapsible, eventually finding yourself in the water as the ship went down.",
+      "who_present": "The Senior Wireless Operator, The Second Engineer",
+      "emotional_weight": "Haunted Survival—the relief of being alive shadowed by the faces of those you couldn't fit in the boats.",
+      "closing_line_override": "You filled the boats as best you could, but the ocean's ledger was never going to balance."
+    },
+    "failure": {
+      "what_happened": "You were unable to convince the passengers to leave in time, or the lifeboats under your care were lowered nearly empty due to fear and confusion. You were trapped on the lower decks as the water flooded the Grand Staircase.",
+      "who_present": "None",
+      "emotional_weight": "Profound Regret—the failure of duty at the most critical moment.",
+      "closing_line_override": "The palace became a tomb, and your service finally ended."
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "second_engineer",
+  "scenarioId": "titanic_final_hours",
+  "name": "Second Engineer",
+  "description": "You are five decks below the gala and the lifeboats, in the flooding heat of Boiler Room No. 4, keeping the dynamos alive. The lights above depend on your hands. So do the electric winches on the davits. So does everyone.",
+  "startLocationId": "boiler_room_four",
+  "startingKnowledge": [
+    "Boiler Room No. 6 is fully flooded and No. 5 has thirty-one inches of water on the plates as of 1:05 AM",
+    "The aft dynamos can be isolated from the flooding forward compartments by closing two bus bar switches on the throttle platform — this buys approximately twenty minutes of additional power",
+    "Chief Engineer Bell has quietly told the four senior engineers to find a way out after 1:30 AM, an order Bell will deny",
+    "At least forty members of the Black Gang are currently below the watertight flats and will be trapped if the doors are sealed"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a man who has spent his professional life translating abstract engineering principles into physical action in loud, hot, dangerous spaces. He thinks in systems and tolerances. He measures time in pressure gauges and water levels. He does not dramatize — he calculates. The drama comes from the gap between what the calculation says and what he chooses to do with it.",
+  "briefing": "You are standing on the throttle platform of the engine room with your boots in two inches of water that was not there twenty minutes ago, and the water level log in your hand shows a rate of increase that you have done the arithmetic on three times because the answer keeps being the same. The aft dynamos are running at nominal — you can hear them, a deep harmonic thrum beneath the roar of the remaining boilers — and the electrical gauges on the bulkhead show the boat deck winches are drawing current, which means boats are moving, which means your job is working. What you know that the men on the boat deck do not know is that the bus bar switches on the port side of this platform, if closed, would isolate the aft dynamos from the flooding forward compartments and extend your power window by twenty minutes — but closing them requires both hands and approximately ninety seconds during which you cannot also be watching the water level in Boiler Room No. 4, and the water in No. 4 has been behaving unpredictably for the last ten minutes. Bell's voice came down the speaking tube at 1:05 AM with three words — 'your discretion, son' — which is the closest he will come to telling you to save yourself, and you are standing here deciding what your discretion actually is. The stokers are watching you. The water is at your ankles now. The dynamo gauge reads nominal. You put your hand on the first bus bar switch.",
+  "character_hooks": [
+    "I have a brother in the Black Gang — a trimmer in Boiler Room No. 5 — and I have not been able to reach him since the watertight door on the forward bulkhead was closed at 12:50 AM.",
+    "I was offered a posting on the Olympic last spring and turned it down for this voyage because the Titanic was the flagship and I wanted the commission — a decision I have been revising in my mind for the last hour.",
+    "I know the flooding rate figures in my notebook are more accurate than the ones Andrews gave the Captain, because I have been measuring every ten minutes and Andrews measured once at 11:50 PM and extrapolated — and my numbers are worse."
+  ],
+  "suggested_secret": "You closed the watertight door between Boiler Rooms 5 and 6 at 12:15 AM on your own authority, without waiting for the bridge order — sealing three trimmers inside No. 6 who were still clearing coal — because you calculated that holding the door open would flood No. 5 in under four minutes and take the dynamos with it.",
+  "opening": {
+    "narrative": "It is 1:05 AM on April 15, 1912. Boiler Room No. 4 is the last operational boiler space on the ship. The water on the floor plates has been rising for an hour. The dynamos are running. The lights are on. Chief Engineer Bell's last message down the speaking tube was three words. The stokers are looking at you.",
+    "npcMoments": [],
+    "choices": [
+      "Close the aft dynamo bus bar switches now to isolate the power circuit and buy twenty minutes",
+      "Send a runner up to the Marconi Room via the speaking tube to coordinate the power isolation with the wireless operators",
+      "Order the stokers to draw fires and begin moving the Black Gang toward the escape ladder before the water level rises further"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "Water level log — Boiler Rooms 4 and 5",
+      "Aft dynamo isolation schematic (pinned to bulkhead)",
+      "Engineer's pocket watch — currently reading 1:07 AM"
+    ],
+    "flags": {
+      "bus_bars_closed": false,
+      "black_gang_warned": false,
+      "bell_order_received": true
+    },
+    "suspicion": {
+      "joseph_bell": 0,
+      "charles_lightoller": 2,
+      "thomas_andrews": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.077Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You kept the dynamos running until the very last boats were lowered, preventing a total blackout and riot. You managed to lead your stokers to the upper decks, but you reached the rail after the last collapsible had departed.",
+      "who_present": "The First Class Steward",
+      "emotional_weight": "Stoic Sacrifice—the pride of a job well done in the face of inevitable disaster.",
+      "closing_line_override": "You kept the light alive until the sea finally turned it out."
+    },
+    "failure": {
+      "what_happened": "A bulkhead failed or the pumps were overwhelmed too early; the ship lost power before the lifeboats were launched, leading to a disorganized and panicked evacuation in the dark.",
+      "who_present": "None",
+      "emotional_weight": "Utter Despair—the feeling of a massive mechanical and moral failure.",
+      "closing_line_override": "The dark came too soon, and the engines stopped forever."
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "loc_mocr_main_floor",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "Mission Operations Control Room — Main Floor",
+  "description": "The nerve center of the American space program, now running on adrenaline and cigarette smoke. Rows of consoles face a wall of screens showing data that makes no sense and trajectories that lead to death unless someone changes them.",
+  "mood": "urgent, pressurized, institutional, exhausted",
+  "linkedCharacterIds": [
+    "char_gene_kranz",
+    "char_glynn_lunney"
+  ],
+  "atmosphericDetails": [
+    "The overhead fluorescent lights are too bright; every controller looks slightly ill in the light, or perhaps they are slightly ill",
+    "The room smells of cigarette smoke, burnt coffee from the urn that has been running for 14 hours, and the particular human smell of men who have not left their seats",
+    "The main screen shows the Free Return Trajectory — a curved line arcing around the Moon and back to Earth — and the small blinking dot that is the spacecraft",
+    "Every console has a phone handset lying off the hook; the background noise is a continuous low murmur of technical language from a dozen simultaneous conversations",
+    "Gene Kranz's white vest is the brightest thing in the room; controllers orient to it the way sailors orient to a lighthouse"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.766Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

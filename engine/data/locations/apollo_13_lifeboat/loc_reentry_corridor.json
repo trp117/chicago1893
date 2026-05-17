@@ -1,0 +1,22 @@
+{
+  "id": "loc_reentry_corridor",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "Re-entry Corridor — Atmospheric Interface",
+  "description": "The narrow band of atmosphere where survival is possible — 6 degrees wide, 400,000 feet above the Pacific Ocean. The spacecraft is a falling stone; the corridor is a needle's eye.",
+  "mood": "terminal, irreversible, precise, culminating",
+  "linkedCharacterIds": [
+    "char_jack_swigert",
+    "char_jim_lovell"
+  ],
+  "atmosphericDetails": [
+    "The first sign of atmosphere is a faint pink glow at the edges of the heat shield — plasma building as the ship decelerates from 25,000 miles per hour",
+    "The communications blackout of re-entry lasts 3 minutes and 14 seconds; in Houston, no one speaks",
+    "The g-forces build to 6.5 times normal gravity; the crew is pressed into their seats as though by a physical hand",
+    "Through the window, the plasma sheath turns from pink to orange to white — the color of the Sun, inches from the glass",
+    "Then the parachutes deploy, and the roar becomes a flutter, and the Pacific Ocean is below, grey and enormous and safe"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.767Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

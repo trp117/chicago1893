@@ -1,0 +1,71 @@
+{
+  "id": "role_cm_pilot",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "Command Module Pilot — Jack Swigert",
+  "description": "You are the last-minute replacement who is now the only person who can bring Odyssey back to life. The power-up sequence lives in your head and on a handwritten card taped to a wet instrument panel.",
+  "startLocationId": "loc_cm_odyssey",
+  "startingKnowledge": [
+    "The Command Module power-up sequence — you have drilled it so many times you can recite it in sequence from any step",
+    "The condensation on the left side of the instrument panel is heavier than the right, and you do not know what it means for the power-up",
+    "The tank-stirring procedure you performed before launch is under informal investigation as a possible cause of the explosion",
+    "John Aaron's revised sequence reduces the amp-hour requirement but eliminates a check you know exists for a specific reason — a reason Aaron may not have considered"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a man who prepared obsessively for exactly this scenario and is now discovering that obsessive preparation and the real thing are not the same thing. Swigert's voice is precise under pressure, slightly over-formal, and drops in register when he is frightened. He reaches for procedure numbers when he does not know what else to reach for.",
+  "briefing": "You are in the Command Module Odyssey, alone, and it is dark and wet and cold in a way that the word 'cold' does not cover — 38 degrees Fahrenheit, and every surface you touch is damp with condensation that has been building for hours. The instrument panel in front of you is the one you have spent three days memorizing since Ken Mattingly was pulled from the mission, and you know it the way you know your own face, and right now it is covered in water and you cannot tell which circuit breakers are wet and which are merely cold. Your handwritten cue card is taped to the center console — 13 steps, written large enough to read with shaking hands — and step 9 has a 30-second wait that you added yourself, based on a conversation with John Aaron about condensation risk, a conversation that Aaron may or may not remember having. You know that the tank-stirring procedure you performed before launch is being looked at. You have not been told this officially. You know it because of the way certain conversations stopped when you entered the room in the days after the explosion. Your hands are not shaking yet. The CO2 is at 4.2 and climbing, and at some point in the next few hours you will need to flip the switches that either bring this ship back to life or cause the last short-circuit it will ever have, and the timing of that moment is the only question that matters right now.",
+  "character_hooks": [
+    "I know the power-up sequence better than anyone alive, which means I also know exactly which step Aaron's revised procedure has eliminated — and I know why that step exists.",
+    "The condensation on the left side of the panel has been bothering me for two hours and I have said nothing because I do not know what it means and I am afraid of what it might mean.",
+    "I filed my taxes wrong this year and somewhere in the back of my mind, behind the burn calculations and the CO2 numbers, that fact keeps surfacing — which tells me something about the human mind under pressure that I did not know before tonight."
+  ],
+  "suggested_secret": "Swigert knows, from a pre-launch conversation he was not supposed to hear, that the tank-stirring procedure he performed had been flagged as potentially problematic by a technician six months earlier — a flag that was reviewed, accepted, and filed. He has told no one.",
+  "opening": {
+    "narrative": "It is 9:14 PM Central Standard Time, and you have been in Odyssey for four minutes — not to work, but to check. To look at the condensation. To read the panel in the dark and try to understand what the cold has done to it. The cue card is in place. The medical tape is holding. Houston will want to know the timing of the power-up sequence within the next hour, and you do not yet have an answer you are confident in.",
+    "npcMoments": [
+      {
+        "characterId": "char_jim_lovell",
+        "action": "Lovell's voice comes through the tunnel from Aquarius: 'Jack. How does she look?' Three words. The weight of the question is not in the words."
+      },
+      {
+        "characterId": "char_john_aaron",
+        "action": "Aaron's voice on the loop, from Houston: 'Swigert, Aaron. When you have a moment — I need to walk you through a modification to the power-up sequence. Step 9 specifically.'"
+      }
+    ],
+    "choices": [
+      "Tell Lovell the panel looks manageable — which is true, within a specific definition of manageable",
+      "Tell Lovell about the heavier condensation on the left side before speaking to Aaron",
+      "Respond to Aaron first and get the full revised sequence before reporting to Lovell"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "handwritten power-up cue card (taped to center console)",
+      "flight manual (annotated, cover removed for Mailbox)",
+      "medical tape (partial roll)",
+      "pen (black marker)"
+    ],
+    "flags": {
+      "condensation_reported": false,
+      "aaron_sequence_received": false,
+      "tank_stirring_disclosed": false,
+      "powerup_initiated": false
+    },
+    "suspicion": {}
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.776Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
+      "who_present": "The Mission Commander, The Lunar Module Pilot",
+      "emotional_weight": "Fragile Relief—the shaking hands and shallow breath of a man who knows he narrowly avoided a fatal technical error.",
+      "closing_line_override": "You flipped the final switch and held your breath until you felt the weight of Earth's gravity again."
+    },
+    "failure": {
+      "what_happened": "The \"Cold Soak\" startup was initiated too late, or a major short circuit caused by condensation on the main control panels completely disabled the re-entry thrusters. The Command Module was unable to maintain its precise entry orientation and broke apart.",
+      "who_present": "The Mission Commander, The Lunar Module Pilot",
+      "emotional_weight": "Fatal Regret—the horrifying, split-second realization of a mechanical failure in the final seconds of the mission.",
+      "closing_line_override": "The condensation on the window glass was the last thing you saw before the heat of re-entry took everything else."
+    }
+  }
+}

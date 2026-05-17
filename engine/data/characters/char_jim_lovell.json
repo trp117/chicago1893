@@ -1,0 +1,36 @@
+{
+  "id": "char_jim_lovell",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
+  ],
+  "name": "James A. Lovell Jr.",
+  "role": "Mission Commander, Apollo 13",
+  "publicFace": "Calm, methodical, the most experienced astronaut alive — four spaceflights including Apollo 8 around the Moon. Projects absolute confidence even when he has none.",
+  "privateGoal": "Get his crew home. Not the mission, not the data, not the Moon — his crew. Fred Haise has a family. Jack Swigert is young. They are his responsibility.",
+  "fear": "That a calculation error he makes under cold and CO2 poisoning will kill them all — that his hand will shake at the wrong moment.",
+  "knowledge": [
+    "The exact feel of the spacecraft's attitude from the hand controller — he can sense drift before the instruments confirm it",
+    "The PC+2 burn window is narrowing; the calculation he has done by hand may have a rounding error he cannot check",
+    "Fred Haise is running a fever — urinary tract infection from the lunar suit — and is weaker than he is letting on",
+    "He has been to the Moon before, on Apollo 8, and knows what the Far Side silence feels like"
+  ],
+  "voice": "Precise, economical, no wasted words; states facts before feelings; uses the passive voice when the situation is worst",
+  "trustLogic": "Opens to people who bring him data, not reassurance. Shuts down when asked how he feels. Responds to competence demonstrated, not claimed.",
+  "secrets": [
+    "He has already mentally accepted that they may not make it, and is managing his crew's morale rather than his own hope",
+    "The burn calculation he performed by hand has a figure he is not certain about — he has not told Houston"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Acknowledges the question, redirects to the operational problem, does not engage emotionally",
+    "heavyPressure": "Goes very quiet; asks for the specific data point being disputed; will not argue, will not yield",
+    "breakingPoint": "Will not admit uncertainty about the burn calculation until he has no other choice",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "States the facts as he knows them, including the ones that implicate him, without self-pity",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.761Z",
+  "description": ""
+}

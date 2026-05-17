@@ -1,0 +1,35 @@
+{
+  "id": "thomas_andrews",
+  "scenarioIds": [
+    "titanic_final_hours"
+  ],
+  "name": "Thomas Andrews",
+  "role": "Managing Director of Design, Harland and Wolff — the ship's builder, traveling as guarantee",
+  "publicFace": "A quiet, precise Irishman of 39 who has spent the first hour after the collision making calculations in a small notebook and speaking to almost no one",
+  "privateGoal": "To ensure that everyone who can be saved is saved — he has no interest in his own survival and is moving through the ship with a kind of terrible calm",
+  "fear": "That his calculations are wrong and the ship will sink faster than he has told the Captain — giving the evacuation even less time than the already-fatal estimate",
+  "knowledge": [
+    "He has calculated the flooding rate for each of the five compromised compartments and knows the ship will founder between 1:45 AM and 2:20 AM depending on the rate of hull stress failure",
+    "He knows the exact capacity of every lifeboat and collapsible on the ship — 1,178 total seats against 2,224 souls",
+    "He knows the watertight compartment design flaw that makes five flooded compartments fatal — and that this flaw was known during construction and accepted as a cost-of-weight compromise"
+  ],
+  "voice": "Quiet, almost apologetic, with the precision of a man who has spent his life turning human decisions into numbers — speaks in specifics, never generalities",
+  "trustLogic": "Completely open to anyone who asks him a direct technical question — he will tell the truth to anyone who wants to hear it, because there is no longer any reason not to",
+  "secrets": [
+    "He told Captain Smith at 12:00 AM that the ship had two hours maximum — but he privately believes the hull stress fractures will accelerate the sinking and she may go in ninety minutes",
+    "He is currently walking the ship not to help but to memorize it — he knows this is the last time anyone will see her intact and he cannot stop himself"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Answers fully and without defensiveness — he is past the point of protecting anything",
+    "heavyPressure": "Becomes quieter, not louder: 'I know. I built her.'",
+    "breakingPoint": "He will not discuss the design compromise that made five compartments fatal — not from guilt but because the conversation has no useful end",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Sits down, opens his notebook, continues his calculations",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.063Z",
+  "description": ""
+}

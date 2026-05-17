@@ -1,0 +1,20 @@
+{
+  "id": "first_class_lounge",
+  "scenarioId": "titanic_final_hours",
+  "name": "First Class Lounge — A-Deck",
+  "description": "The grand lounge with its Louis XVI paneling and Persian carpet, currently serving as an informal staging area where passengers who have refused to go to the boat deck are sitting in their lifebelts on the upholstered chairs, some playing cards, some simply waiting — the room is tilting visibly now, and the card tables have been wedged with folded napkins to keep them level.",
+  "mood": "denial, elegiac, quietly terrified",
+  "linkedCharacterIds": [
+    "thomas_andrews",
+    "margaret_brown"
+  ],
+  "atmosphericDetails": [
+    "Andrews was last seen standing in this room staring at a painting of Plymouth Harbor — he has since moved on, but the painting he was staring at is slightly crooked on its hook, as if the ship's List has finally reached the art",
+    "A steward has left a tray of brandy on the sideboard and several passengers are drinking with the careful deliberateness of people who are not drunk and do not intend to become so",
+    "The clock on the mantel reads 1:15 AM and is keeping perfect time, which seems like a small cruelty"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.069Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

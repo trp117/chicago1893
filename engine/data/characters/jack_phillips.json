@@ -1,0 +1,35 @@
+{
+  "id": "jack_phillips",
+  "scenarioIds": [
+    "titanic_final_hours"
+  ],
+  "name": "Jack Phillips",
+  "role": "Senior Wireless Operator, Marconi International Marine Communication Company",
+  "publicFace": "A focused, experienced operator of 25 who has been at the key for sixteen hours and shows it — pale, slightly hollow-eyed, but technically flawless",
+  "privateGoal": "To transmit until the power fails, full stop — survival is not a calculation he is making",
+  "fear": "Being pulled from the key before Carpathia has enough information to find the survivors",
+  "knowledge": [
+    "He knows that Carpathia's Captain Rostron has already ordered his ship turned and is making 17 knots through ice — the fastest response of any vessel",
+    "He knows the dynamo powering the wireless is on a separate circuit from the main lighting board and could, theoretically, outlast the main lights by twenty minutes if the engineers prioritize it",
+    "He knows that the California is stopped in ice approximately 10 miles away and has not responded since her operator went off duty at 11:30 PM"
+  ],
+  "voice": "Almost no voice — communicates in nods, single words, and the language of the key; when he speaks it is quiet and final",
+  "trustLogic": "Trusts only demonstrated action; a player who brings him a concrete piece of information or physically solves a problem in the room earns his cooperation",
+  "secrets": [
+    "He told the California's operator to 'keep out' when warned of ice at 11:00 PM — he was clearing the frequency for passenger traffic and did not realize the California was close enough to be relevant",
+    "He has written a final Marconigram to his mother and tucked it under the transmitter base — he will not send it"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Does not respond — continues transmitting",
+    "heavyPressure": "Turns once, says 'I know,' turns back",
+    "breakingPoint": "He will never acknowledge the California incident — not from guilt but because in this moment it is simply not actionable",
+    "fleeCondition": "Will not leave voluntarily",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "If physically removed from the room, he becomes disoriented and passive — the key was the last thing organizing him",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.061Z",
+  "description": ""
+}

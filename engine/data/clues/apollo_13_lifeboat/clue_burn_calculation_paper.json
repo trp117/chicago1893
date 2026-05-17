@@ -1,0 +1,17 @@
+{
+  "id": "clue_burn_calculation_paper",
+  "scenarioId": "apollo_13_lifeboat",
+  "title": "Lovell's Manual Burn Calculation",
+  "description": "Three pages of graph paper covered in Lovell's handwriting — the PC+2 burn calculation performed by hand using a slide rule and a celestial mechanics reference card, without the guidance computer. The numbers are dense and precise. On the second page, a single figure has been erased and rewritten — the correction is visible as a slight smudge. The rewritten figure is circled. Whether the circled number is the correct one or the error is the question that will determine whether the ship enters the re-entry corridor or misses it entirely.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_lm_aquarius",
+  "implicatesCharacterIds": [
+    "char_jim_lovell"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.773Z",
+  "locationId": "",
+  "isRedHerring": false
+}

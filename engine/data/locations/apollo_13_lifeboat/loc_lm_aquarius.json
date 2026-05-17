@@ -1,0 +1,22 @@
+{
+  "id": "loc_lm_aquarius",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "Lunar Module Aquarius — Interior",
+  "description": "A triangular cabin roughly the size of a broom closet, designed for two men standing up for 36 hours. Three men now live here, and the walls are beginning to sweat. Every surface is covered in switches, circuit breakers, and handwritten notes taped over the original labels.",
+  "mood": "claustrophobic, cold, focused, survival",
+  "linkedCharacterIds": [
+    "char_jim_lovell",
+    "char_fred_haise"
+  ],
+  "atmosphericDetails": [
+    "The temperature has dropped to 38 degrees Fahrenheit; breath is visible as thin vapor in the instrument light",
+    "The CO2 warning light cycles on and off — not yet critical, but the rhythm of it has become the cabin's heartbeat",
+    "Water droplets form on the cold metal walls and fall in slow motion in the fractional gravity; the floor is damp",
+    "The descent engine bell is directly below the crew's feet, separated by a thin aluminum floor — they can feel it when it fires",
+    "Lovell's handwritten burn calculations are taped to the instrument panel with a strip torn from a food package"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.765Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

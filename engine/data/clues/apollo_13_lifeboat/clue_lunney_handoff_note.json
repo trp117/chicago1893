@@ -1,0 +1,18 @@
+{
+  "id": "clue_lunney_handoff_note",
+  "scenarioId": "apollo_13_lifeboat",
+  "title": "Lunney's Shift Handoff Annotation",
+  "description": "A single page of notes passed from Glynn Lunney to Gene Kranz at the shift change — the summary of decisions made during the Black Team's watch. Most entries are terse and procedural. One entry, near the bottom, is different: 'Power-down sequence step 7 (GUIDO recommendation): concern flagged by [name redacted], not escalated. Monitoring.' The name is redacted with a single horizontal line, but the controller's call sign is visible at the edge of the redaction: 'GU' — the GUIDO station. The concern was logged. It was not acted on.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_mocr_main_floor",
+  "implicatesCharacterIds": [
+    "char_glynn_lunney",
+    "char_gene_kranz"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.774Z",
+  "locationId": "",
+  "isRedHerring": false
+}

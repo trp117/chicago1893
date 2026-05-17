@@ -1,0 +1,17 @@
+{
+  "id": "dynamo_circuit_diagram",
+  "scenarioId": "titanic_final_hours",
+  "title": "Aft Dynamo Isolation Schematic",
+  "description": "Pinned to the engine room control platform bulkhead, a hand-annotated electrical schematic shows that the aft dynamos — the ones currently generating power — can be isolated from the flooding forward compartments by manually closing two bus bar switches on the port side of the throttle platform. An engineer has written in grease pencil beside the switches: 'CLOSE BOTH — BUYS 20 MIN.' The switches are visible and accessible.",
+  "category": "physical",
+  "discoveryLocationId": "engine_room_control",
+  "implicatesCharacterIds": [
+    "joseph_bell"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.072Z",
+  "locationId": "",
+  "isRedHerring": false
+}

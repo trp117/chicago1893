@@ -1,0 +1,23 @@
+{
+  "id": "loc_far_side_silence",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "The Far Side — Radio Blackout Zone",
+  "description": "The spacecraft passes behind the Moon and all communication with Earth ceases for 45 minutes. In this silence, the crew is more alone than any human beings have ever been.",
+  "mood": "isolated, silent, existential, suspended",
+  "linkedCharacterIds": [
+    "char_jim_lovell",
+    "char_fred_haise",
+    "char_jack_swigert"
+  ],
+  "atmosphericDetails": [
+    "The radio goes silent mid-sentence; Houston's last transmission cuts off as though a door has been closed",
+    "The Moon fills the window — grey and ancient and completely indifferent, close enough to see individual craters",
+    "In the silence, the only sounds are the crew's breathing, the soft hiss of the environmental system, and the occasional click of a circuit breaker",
+    "The Earth is not visible from this position; the crew is on the far side of a world from every other human being alive",
+    "Lovell looks at the lunar surface passing below and thinks about the Fra Mauro Highlands — the place he was supposed to walk — and says nothing"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.769Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

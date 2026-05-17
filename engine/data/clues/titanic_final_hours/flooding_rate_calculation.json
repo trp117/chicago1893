@@ -1,0 +1,20 @@
+{
+  "id": "flooding_rate_calculation",
+  "scenarioId": "titanic_final_hours",
+  "title": "Andrews's Flooding Rate Notebook",
+  "description": "Thomas Andrews's open notebook on the chart table of the Bridge contains a column of figures in pencil: compartment-by-compartment flooding rates measured by his engineers since 11:50 PM, with a final calculation at the bottom circled twice — '1h 45m from 00:00. Possibly less. Hull stress unknown.' The calculation proves the ship will founder by 1:45 AM, forty minutes earlier than the estimate given to the officers loading boats — and it is signed with Andrews's initials.",
+  "category": "documentary",
+  "discoveryLocationId": "captains_bridge",
+  "implicatesCharacterIds": [
+    "thomas_andrews",
+    "charles_lightoller"
+  ],
+  "unlocks": [
+    "lifeboat_capacity_manifest"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:55:02.070Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,21 @@
+{
+  "id": "loc_cm_odyssey",
+  "scenarioId": "apollo_13_lifeboat",
+  "name": "Command Module Odyssey — Instrument Panel",
+  "description": "Powered down to its minimum survival state, Odyssey is cold and dark — a dead ship waiting to be resurrected. The instrument panel is covered in condensation that catches the faint light from the LM tunnel.",
+  "mood": "dark, tense, dormant, threatening",
+  "linkedCharacterIds": [
+    "char_jack_swigert"
+  ],
+  "atmosphericDetails": [
+    "Every surface is wet; condensation runs down the instrument panel in thin rivulets and pools at the base of the circuit breaker rows",
+    "The cabin smells of cold metal and the faint chemical tang of the fuel cells that are no longer running",
+    "In the dark, the only light comes through the tunnel connecting Odyssey to Aquarius — a dim, warm rectangle that makes the CM feel like a cave",
+    "Swigert's handwritten cue card — the improvised power-up sequence — is taped to the center console with medical tape from the first aid kit",
+    "The heat shield is on the other side of the hull, six inches away, and it is the only thing standing between the crew and 5,000-degree plasma"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-17T15:29:11.764Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}
