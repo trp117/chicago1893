@@ -1829,14 +1829,260 @@ async function handleManualSave(data, containerEl) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// SCENARIO DOWNLOAD
+// ═══════════════════════════════════════════════════════════════
+function downloadScenarioDoc(data) {
+  const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
+  const L  = lines => lines.join('\n');
+  const HR = '═'.repeat(60);
+  const hr = '─'.repeat(60);
+  const sec  = title => ['', HR, title.toUpperCase(), HR, ''].join('\n');
+  const sub  = label => ['', `── ${label} ──`, ''].join('\n');
+  const list = (arr, fn) => (arr || []).map(fn).join('\n');
+  const indent = (text, n = 2) => String(text || '').split('\n').map(l => ' '.repeat(n) + l).join('\n');
+
+  const out = [];
+
+  // ── Header ─────────────────────────────────────────────────
+  out.push(HR);
+  out.push(`${(scenario.title || 'Untitled').toUpperCase()}`);
+  const genreLine = [scenario.id, ...(scenario.genre || [])].filter(Boolean).join(' | ');
+  if (genreLine) out.push(genreLine);
+  if (scenario.sessionTargetMinutes) out.push(`Session target: ${scenario.sessionTargetMinutes} min`);
+  out.push(HR);
+  if (scenario.description) { out.push(''); out.push(scenario.description); }
+
+  // ── Opening Scene ───────────────────────────────────────────
+  const intro = scenario.introduction;
+  if (intro?.sections?.length) {
+    out.push(sec('Opening Scene'));
+    const typeLabel = { world: 'WORLD', stakes: 'STAKES', scene: 'SCENE', entry: 'ENTRY' };
+    for (const s of intro.sections) {
+      out.push(sub(typeLabel[s.type] || s.type));
+      out.push(s.text || '');
+      if (s.type === 'entry' && s.character_entries) {
+        for (const [roleId, entryText] of Object.entries(s.character_entries)) {
+          const role = playerRoles.find(r => r.id === roleId);
+          out.push('');
+          out.push(`  [${role?.name || roleId}]`);
+          out.push(indent(entryText));
+        }
+      }
+    }
+  }
+
+  // ── Win / Fail / Pressure ───────────────────────────────────
+  out.push(sec('Win / Fail Conditions'));
+  if (scenario.winConditions?.length) {
+    out.push('WIN CONDITIONS');
+    scenario.winConditions.forEach(c => out.push(`  + ${c}`));
+  }
+  if (scenario.failConditions?.length) {
+    out.push(''); out.push('FAIL CONDITIONS');
+    scenario.failConditions.forEach(c => out.push(`  ✕ ${c}`));
+  }
+  if (scenario.partialSuccessExamples?.length) {
+    out.push(''); out.push('PARTIAL SUCCESS EXAMPLES');
+    scenario.partialSuccessExamples.forEach(c => out.push(`  ~ ${c}`));
+  }
+  if (scenario.systems?.pressureEvents?.length) {
+    out.push(''); out.push('PRESSURE EVENTS');
+    scenario.systems.pressureEvents.forEach(e => out.push(`  • ${e}`));
+  }
+
+  // ── Story Arc ───────────────────────────────────────────────
+  if (storyArc) {
+    out.push(sec(`Story Arc — ${storyArc.name || storyArc.id || ''}`));
+    if (storyArc.premise)          { out.push('PREMISE'); out.push(indent(storyArc.premise)); out.push(''); }
+    if (storyArc.goal)             { out.push('GOAL'); out.push(indent(storyArc.goal)); out.push(''); }
+    if (storyArc.openingSituation) { out.push('OPENING SITUATION'); out.push(indent(storyArc.openingSituation)); out.push(''); }
+    (storyArc.acts || []).forEach(act => {
+      out.push(`Act ${act.actNumber || ''}: ${act.name || ''}`);
+      (act.beats || []).forEach(b => {
+        if (typeof b === 'string') out.push(`  • ${b}`);
+        else out.push(`  [${b.id || '?'}] ${b.description || ''}`);
+      });
+      out.push('');
+    });
+  }
+
+  // ── Player Roles ────────────────────────────────────────────
+  if (playerRoles.length) {
+    out.push(sec(`Player Roles (${playerRoles.length})`));
+    for (const r of playerRoles) {
+      out.push(sub(`${r.name || r.id} (${r.id})`));
+      if (r.description)  { out.push(r.description); out.push(''); }
+      if (r.perspective)  { out.push('PERSPECTIVE'); out.push(indent(r.perspective)); out.push(''); }
+      if (r.briefing)     { out.push('BRIEFING'); out.push(indent(r.briefing)); out.push(''); }
+      if (r.opening?.narrative) { out.push('OPENING NARRATIVE'); out.push(indent(r.opening.narrative)); out.push(''); }
+      if (r.opening?.choices?.length) {
+        out.push('OPENING CHOICES');
+        r.opening.choices.forEach(c => out.push(`  • ${c}`));
+        out.push('');
+      }
+      if (r.startingKnowledge?.length) {
+        out.push('STARTING KNOWLEDGE');
+        r.startingKnowledge.forEach(k => out.push(`  • ${k}`));
+        out.push('');
+      }
+      if (r.character_hooks?.length) {
+        out.push('CHARACTER HOOKS');
+        r.character_hooks.forEach(h => out.push(`  • ${h}`));
+        out.push('');
+      }
+      if (r.suggested_secret) { out.push('SUGGESTED SECRET'); out.push(indent(r.suggested_secret)); out.push(''); }
+      if (r.roleInitialState?.inventory?.length) {
+        out.push('STARTING INVENTORY');
+        r.roleInitialState.inventory.forEach(i => out.push(`  • ${i}`));
+        out.push('');
+      }
+      if (r.ending_notes) {
+        for (const [outcome, notes] of Object.entries(r.ending_notes)) {
+          out.push(`ENDING — ${outcome.toUpperCase()}`);
+          if (notes.what_happened)    out.push(indent(`What happened: ${notes.what_happened}`));
+          if (notes.emotional_weight) out.push(indent(`Tone: ${notes.emotional_weight}`));
+          if (notes.closing_line_override) out.push(indent(`Closing line: ${notes.closing_line_override}`));
+          out.push('');
+        }
+      }
+      out.push(hr);
+    }
+  }
+
+  // ── Characters ──────────────────────────────────────────────
+  if (characters.length) {
+    out.push(sec(`Characters (${characters.length})`));
+    for (const c of characters) {
+      out.push(sub(`${c.name || c.id} (${c.id})`));
+      if (c.role)        out.push(`Role: ${c.role}`);
+      if (c.publicFace)  { out.push(''); out.push('PUBLIC FACE'); out.push(indent(c.publicFace)); }
+      if (c.privateGoal) { out.push(''); out.push('PRIVATE GOAL'); out.push(indent(c.privateGoal)); }
+      if (c.fear)        { out.push(''); out.push(`Fear: ${c.fear}`); }
+      if (c.voice)       out.push(`Voice: ${c.voice}`);
+      if (c.trustLogic)  { out.push(''); out.push('TRUST LOGIC'); out.push(indent(c.trustLogic)); }
+      if (c.knowledge?.length) {
+        out.push(''); out.push('KNOWLEDGE');
+        c.knowledge.forEach(k => out.push(`  • ${k}`));
+      }
+      if (c.secrets?.length) {
+        out.push(''); out.push('SECRETS');
+        const s = Array.isArray(c.secrets) ? c.secrets : c.secrets.split('\n').filter(Boolean);
+        s.forEach(k => out.push(`  • ${k}`));
+      }
+      out.push(''); out.push(hr);
+    }
+  }
+
+  // ── Locations ───────────────────────────────────────────────
+  if (locations.length) {
+    out.push(sec(`Locations (${locations.length})`));
+    for (const l of locations) {
+      out.push(sub(`${l.name || l.id} (${l.id})`));
+      if (l.description) out.push(l.description);
+      if (l.mood)        out.push(`Mood: ${l.mood}`);
+      if (l.atmosphericDetails?.length) {
+        out.push('ATMOSPHERIC DETAILS');
+        l.atmosphericDetails.forEach(d => out.push(`  • ${d}`));
+      }
+      out.push('');
+    }
+  }
+
+  // ── Clues ───────────────────────────────────────────────────
+  if (clues.length) {
+    out.push(sec(`Clues (${clues.length})`));
+    for (const cl of clues) {
+      out.push(sub(`${cl.title || cl.name || cl.id} (${cl.id})`));
+      if (cl.category)              out.push(`Category: ${cl.category}`);
+      if (cl.discoveryLocationId)   out.push(`Discovery location: ${cl.discoveryLocationId}`);
+      if (cl.implicatesCharacterIds?.length) out.push(`Implicates: ${cl.implicatesCharacterIds.join(', ')}`);
+      if (cl.isKeyEvidence)         out.push('Key evidence: yes');
+      if (cl.isRedHerring)          out.push('Red herring: yes');
+      if (cl.description)           { out.push(''); out.push(cl.description); }
+      out.push('');
+    }
+  }
+
+  // ── Period Vocabulary ───────────────────────────────────────
+  const vocab = scenario.period_vocabulary?.categories || [];
+  if (vocab.length) {
+    out.push(sec('Period Vocabulary'));
+    for (const cat of vocab) {
+      out.push(sub(cat.name));
+      if (cat.context) out.push(cat.context);
+      out.push('');
+      (cat.terms || []).forEach(t => out.push(`  ${t.term}: ${t.meaning}`));
+      out.push('');
+    }
+  }
+
+  // ── Epilogue Data ───────────────────────────────────────────
+  const ep = scenario.epilogue;
+  if (ep?.generated) {
+    out.push(sec('Historical Epilogue Data'));
+    out.push(`Status: ${ep.reviewed ? 'Reviewed' : 'PENDING REVIEW — not yet verified'}`);
+
+    if (ep.character_fates?.length) {
+      out.push(''); out.push('CHARACTER FATES');
+      for (const f of ep.character_fates) {
+        out.push('');
+        out.push(`${f.name || f.character_id} (${f.character_id}) — ${f.outcome}`);
+        if (f.historical_record) out.push(indent(f.historical_record));
+        if (f.primary_source)    out.push(indent(`Source: ${f.primary_source}`));
+      }
+    }
+    if (ep.immediate_outcome?.summary) {
+      out.push(''); out.push('IMMEDIATE OUTCOME');
+      out.push(indent(ep.immediate_outcome.summary));
+      if (ep.immediate_outcome.key_facts?.length) {
+        out.push(''); out.push('  KEY FACTS');
+        ep.immediate_outcome.key_facts.forEach(f => out.push(`    • ${f}`));
+      }
+    }
+    if (ep.historical_frame?.length) {
+      out.push(''); out.push('HISTORICAL FRAME');
+      ep.historical_frame.forEach(f => out.push(indent(`• ${f}`)));
+    }
+    if (ep.open_threads?.length) {
+      out.push(''); out.push('OPEN THREADS');
+      for (const t of ep.open_threads) {
+        out.push('');
+        out.push(`  Thread: ${t.thread_id}`);
+        if (t.historical_record) out.push(indent(t.historical_record, 4));
+      }
+    }
+    if (ep.choice_echoes?.length) {
+      out.push(''); out.push('CHOICE ECHOES');
+      for (const c of ep.choice_echoes) {
+        out.push('');
+        out.push(`  Beat: ${c.beat_id}`);
+        if (c.historical_record) out.push(indent(c.historical_record, 4));
+      }
+    }
+  }
+
+  out.push(''); out.push(HR); out.push('');
+
+  const filename = `${(scenario.id || scenario.title || 'scenario').replace(/\s+/g, '_')}_review.txt`;
+  const blob = new Blob([out.join('\n')], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function renderPreview(data, autoSaved = false) {
   const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
   const scenarioId = scenario.id || scenario.scenario_id || '';
 
   setTopbar(scenario.title || 'Generated Story', [
-    { label: '▶ Play',      cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
-    { label: '💾 Save',     cls: 'btn-primary',   action: () => handleManualSave(data, document.getElementById('preview-form')) },
-    { label: '+ New Story', cls: 'btn-secondary', action: () => renderGenerator() },
+    { label: '▶ Play',        cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
+    { label: '💾 Save',       cls: 'btn-primary',   action: () => handleManualSave(data, document.getElementById('preview-form')) },
+    { label: '↓ Download',    cls: 'btn-secondary', action: () => downloadScenarioDoc(data) },
+    { label: '+ New Story',   cls: 'btn-secondary', action: () => renderGenerator() },
   ]);
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
   document.querySelector('.nav-link[data-view="generate"]')?.classList.add('active');
