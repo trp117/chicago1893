@@ -2,7 +2,7 @@
   "id": "clue_liebergot_delay_log",
   "scenarioId": "apollo_13_lifeboat",
   "title": "EECOM Console Log — The Two-Minute Gap",
-  "description": "The Mission Control telemetry log for the first four minutes after the explosion, printed from the EECOM station. The anomaly is flagged at 21:07:53. Liebergot's first recommendation — 'stand by, possible sensor failure' — is logged at 21:08:11. The order to begin emergency procedures is logged at 21:10:04. The gap between the anomaly flag and the emergency order is one minute and fifty-three seconds. A handwritten note in the margin reads: 'Apollo 12 sensor glitch — similar signature — SL.' The initials are Liebergot's.",
+  "description": "The Mission Control telemetry log for the first four minutes after the explosion, printed from the EECOM station. The anomaly is flagged at 22:07:53 CDT. Liebergot's first recommendation — 'stand by, possible sensor failure' — is logged at 22:08:11 CDT. The order to begin emergency power isolation procedures is logged at 22:10:04 CDT. The gap between the anomaly flag and the emergency order is one minute and fifty-three seconds. A handwritten note in the margin reads: 'Apollo 12 sensor glitch — similar signature — SL.' The initials are Liebergot's.",
   "category": "documentary",
   "discoveryLocationId": "loc_mocr_main_floor",
   "implicatesCharacterIds": [
@@ -11,7 +11,7 @@
   "unlocks": [],
   "isKeyEvidence": false,
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:29:11.770Z",
+  "updatedAt": "2026-05-17T19:28:54.923Z",
   "locationId": "",
   "isRedHerring": false
 }
