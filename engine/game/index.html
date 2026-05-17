@@ -130,8 +130,12 @@ li { margin-bottom: 8px; }
 .closing-prose.visible { opacity: 1; }
 .closing-aftermath { font-size: 1rem; opacity: 0; transition: opacity 1.2s ease; margin-bottom: 2.8em; }
 .closing-aftermath.visible { opacity: 1; }
-.closing-line { font-size: 1.2rem; color: #d0b06a; text-align: center; opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; }
-.closing-line.visible { opacity: 1; }
+.closing-epilogue { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
+.closing-epilogue.visible { opacity: 1; }
+.closing-epilogue-separator { text-align: center; color: #4a4540; font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 0.8em; }
+.closing-epilogue-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-epilogue-text { font-size: 0.95rem; font-style: normal; color: #b8b4ae; line-height: 1.75; margin-bottom: 1.4em; }
+.closing-epilogue-sources { font-size: 0.75rem; color: #4a4540; font-style: italic; line-height: 1.6; }
 .closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
 .closing-return.visible { opacity: 1; }
 .closing-return:hover { color: #d0b06a; }
@@ -471,7 +475,12 @@ li { margin-bottom: 8px; }
   <div class="closing-inner">
     <div id="closing-prose" class="closing-prose"></div>
     <div id="closing-aftermath" class="closing-aftermath"></div>
-    <div id="closing-line" class="closing-line">You were there.</div>
+    <div id="closing-epilogue" class="closing-epilogue">
+      <div class="closing-epilogue-separator">— — —</div>
+      <div class="closing-epilogue-label">Historical Record</div>
+      <div id="closing-epilogue-text" class="closing-epilogue-text"></div>
+      <div id="closing-epilogue-sources" class="closing-epilogue-sources"></div>
+    </div>
     <a id="closing-return" href="/" class="closing-return">&#8592; Return to Stories</a>
   </div>
 </div>
@@ -916,14 +925,16 @@ function toggleClosingNarration() {
 // ── Closing screen ────────────────────────────────────────────────────────────
 
 function showClosingScreen(endState, sessionId) {
-  const overlay     = document.getElementById('closing-overlay');
-  const dotsEl      = document.getElementById('closing-dots');
-  const proseEl     = document.getElementById('closing-prose');
-  const aftermathEl = document.getElementById('closing-aftermath');
-  const lineEl      = document.getElementById('closing-line');
-  const returnEl    = document.getElementById('closing-return');
+  const overlay      = document.getElementById('closing-overlay');
+  const dotsEl       = document.getElementById('closing-dots');
+  const proseEl      = document.getElementById('closing-prose');
+  const aftermathEl  = document.getElementById('closing-aftermath');
+  const epilogueEl   = document.getElementById('closing-epilogue');
+  const epTextEl     = document.getElementById('closing-epilogue-text');
+  const epSourcesEl  = document.getElementById('closing-epilogue-sources');
+  const returnEl     = document.getElementById('closing-return');
 
-  if (!overlay || !dotsEl || !proseEl || !aftermathEl || !lineEl || !returnEl) {
+  if (!overlay || !dotsEl || !proseEl || !aftermathEl || !epilogueEl || !returnEl) {
     console.error('[CLOSING] missing DOM element — closing screen cannot show');
     return;
   }
@@ -937,20 +948,22 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
   syncClosingNarrationBtn();
 
-  async function triggerClosingSequence() {
+  async function triggerClosingSequence(hasEpilogue) {
     if (ttsEnabled) {
       await ttsClosingSpeak(proseEl.textContent);
       aftermathEl.classList.add('visible');
       if (aftermath) await ttsClosingSpeak(aftermathEl.textContent);
       await new Promise(r => setTimeout(r, 1500));
-      lineEl.classList.add('visible');
-      await ttsClosingSpeak(lineEl.textContent);
+      if (hasEpilogue) {
+        epilogueEl.classList.add('visible');
+        await ttsClosingSpeak(epTextEl.textContent);
+      }
       await new Promise(r => setTimeout(r, 500));
       returnEl.classList.add('visible');
     } else {
-      setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-      setTimeout(() => lineEl.classList.add('visible'),      5500);
-      setTimeout(() => returnEl.classList.add('visible'),    7000);
+      setTimeout(() => aftermathEl.classList.add('visible'),                  2500);
+      setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
+      setTimeout(() => returnEl.classList.add('visible'),                     hasEpilogue ? 8500 : 7000);
     }
   }
 
@@ -986,12 +999,19 @@ function showClosingScreen(endState, sessionId) {
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
-            if (evt.closingLineOverride) lineEl.textContent = evt.closingLineOverride;
-            triggerClosingSequence();
+            let hasEpilogue = false;
+            if (evt.epilogue?.text) {
+              hasEpilogue = true;
+              epTextEl.textContent = evt.epilogue.text;
+              if (evt.epilogue.sources?.length) {
+                epSourcesEl.textContent = 'Sources: ' + evt.epilogue.sources.join('; ');
+              }
+            }
+            triggerClosingSequence(hasEpilogue);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             dotsEl.classList.add('hidden');
-            triggerClosingSequence();
+            triggerClosingSequence(false);
           }
         }
       }
@@ -999,7 +1019,7 @@ function showClosingScreen(endState, sessionId) {
     .catch(() => {
       clearTimeout(timeoutId);
       dotsEl.classList.add('hidden');
-      triggerClosingSequence();
+      triggerClosingSequence(false);
     });
 }
 

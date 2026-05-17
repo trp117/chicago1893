@@ -263,6 +263,75 @@ async function streamRawText(fetchResponse, onChunk) {
   return accumulated;
 }
 
+// ── Epilogue generation ────────────────────────────────────────────────────────
+
+function buildEpilogueSummary(state, endResult) {
+  return {
+    interacted_characters: state?.introducedNpcs     || [],
+    named_conspirators:    state?.namedConspirators  || [],
+    completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
+    resolved_threads:      state?.resolved_threads   || [],
+    outcome:               endResult || 'unknown',
+  };
+}
+
+async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey) {
+  const systemPrompt = [
+    'You are writing the historical epilogue for a completed Living History session. This is not closing prose. It is historical record — a different register entirely: precise, unsentimental, a careful historian\'s final note. The closing prose has already been delivered. Do not repeat it or continue its style.',
+    '',
+    'You have two inputs: the session summary showing what this specific player did, and the scenario\'s verified historical facts. Select and sequence the relevant facts into an epilogue of 150 to 250 words.',
+    '',
+    'Follow the concentric circle rule:',
+    'Layer 1 — The room: what happened to the named characters this player interacted with directly. Cover every character whose character_id appears in the session summary\'s interacted_characters list. Do not omit any.',
+    'Layer 2 — The immediate event: the verified outcome from immediate_outcome.',
+    'Layer 3 — The larger frame: maximum two facts from historical_frame that connect to what this player actually did. Do not reach beyond this.',
+    '',
+    'Additional rules:',
+    'Open with the player\'s last significant action or the immediate consequence of the session\'s closing moment. Do not open with a general historical statement.',
+    'Include open_threads entries only when the matching thread_id appears in the session\'s resolved_threads.',
+    'Include choice_echoes entries only when the matching beat_id appears in the session\'s completed_beats.',
+    'Do not invent, extrapolate, or editorialize. Every fact must come from the epilogue data block provided.',
+    'Register: historian\'s record. Precise. Clean. Unsentimental. No literary reach. No interiority.',
+    'Last sentence: a verified historical fact. Not a meaning-statement. A fact.',
+    'Length: 150 to 250 words exactly.',
+  ].join('\n');
+
+  const userContent = [
+    'SESSION SUMMARY:',
+    JSON.stringify(sessionSummary, null, 2),
+    '',
+    'EPILOGUE DATA BLOCK:',
+    JSON.stringify(epilogueData, null, 2),
+    '',
+    'CLOSING PROSE (do not repeat or continue its style):',
+    closingProse,
+  ].join('\n');
+
+  const signal = AbortSignal.timeout(30000);
+  const resp   = await fetch(ANTHROPIC_URL, {
+    method: 'POST', signal,
+    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 400, temperature: 0.5,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userContent }],
+    }),
+  });
+  if (!resp.ok) throw new Error(`Anthropic API error: ${resp.status}`);
+  const respData = await resp.json();
+  const text     = respData.content?.[0]?.text?.trim();
+  if (!text) throw new Error('No epilogue text returned');
+
+  const interacted = new Set(sessionSummary.interacted_characters || []);
+  const sources    = [...new Set(
+    (epilogueData.character_fates || [])
+      .filter(f => interacted.has(f.character_id) && f.primary_source)
+      .map(f => f.primary_source)
+  )];
+
+  return { text, label: 'Historical Record', sources, style_hint: 'historian' };
+}
+
 // ── Router export ──────────────────────────────────────────────────────────────
 
 export function createGameRouter(repos, config = {}) {
@@ -932,11 +1001,9 @@ export function createGameRouter(repos, config = {}) {
       && role.ending_notes?.[endResult]?.what_happened;
 
     let closingPrompt;
-    let closingLineOverride = null;
 
     if (useStructured) {
       const notes = role.ending_notes[endResult];
-      closingLineOverride = notes.closing_line_override || null;
       closingPrompt = [
         'You are writing the closing interior prose for a historical interactive fiction session.',
         `Character: ${role.name || roleId}`,
@@ -996,17 +1063,32 @@ export function createGameRouter(repos, config = {}) {
         }),
       });
       const prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
-      sendSse(res, { type: 'done', closingLineOverride });
+
+      // Generate historical epilogue if data block is ready and reviewed
+      let epilogueResult = null;
+      if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
+        try {
+          const sessionState = sessionId ? repos.sessions.findById(sessionId) : null;
+          const summary      = buildEpilogueSummary(sessionState, endResult);
+          epilogueResult     = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey);
+        } catch (e) {
+          console.error('[EPILOGUE]', e.message);
+        }
+      } else if (scenarioData?.epilogue?.generated && !scenarioData?.epilogue?.reviewed) {
+        console.warn(`[EPILOGUE] Skipped for session ${sessionId} — epilogue data not reviewed on scenario "${scenarioId}"`);
+      }
+
+      sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult });
       res.end();
 
-      // Append closing prose (and historical aftermath) to the session transcript
+      // Append closing prose and epilogue to the session transcript
       if (prose) {
         try {
-          const aftermath   = scenarioData?.historical_aftermath || '';
-          const closingLine = closingLineOverride || 'You were there.';
+          const aftermath = scenarioData?.historical_aftermath || '';
           const lines = ['', '## Closing Prose', '', prose];
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
-          lines.push('', '## Closing Line', '', closingLine, '');
+          if (epilogueResult?.text) lines.push('', '## Historical Record', '', epilogueResult.text);
+          lines.push('');
           await appendFile(transcriptPath, lines.join('\n'));
         } catch (e) {
           console.error('[TRANSCRIPT CLOSING]', e.message);

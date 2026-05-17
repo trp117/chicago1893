@@ -227,11 +227,135 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-16T23:12:31.730Z",
+  "updatedAt": "2026-05-17T00:41:56.655Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
   "tone": [],
   "structured_endings_enabled": true,
-  "beats_status": "not_generated"
+  "beats_status": "not_generated",
+  "epilogue": {
+    "generated": true,
+    "reviewed": false,
+    "character_fates": [
+      {
+        "character_id": "char_cpl_drennan",
+        "name": "Corporal James Drennan",
+        "outcome": "unknown",
+        "historical_record": "No individual named James Drennan appears in the verified casualty rolls or after-action reports of the 2nd Ranger Battalion for June 6, 1944. The 2nd Ranger Battalion suffered approximately 50 percent casualties on D-Day across its companies. This character is a composite fictional figure placed within a documented unit. Outcome cannot be assigned from the historical record.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_feldwebel_brandt",
+        "name": "Feldwebel Heinrich Brandt",
+        "outcome": "unknown",
+        "historical_record": "No individual named Heinrich Brandt appears in surviving German personnel records for Widerstandsnest 71 or the 352nd Infantry Division for June 6, 1944. WN-71 was overrun by American forces during the morning of June 6, 1944, and its garrison was killed, captured, or withdrew. The specific fates of individual enlisted MG section commanders at WN-71 are not documented in surviving records. This character is a composite fictional figure placed within a documented position.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_lt_hargrove",
+        "name": "First Lieutenant Calvin Hargrove",
+        "outcome": "unknown",
+        "historical_record": "No individual named Calvin Hargrove appears in the verified officer roster or casualty records of Company A, 116th Infantry Regiment, 29th Infantry Division for June 6, 1944. Company A, 116th Infantry, suffered catastrophic casualties at Dog Green Sector on the morning of June 6, 1944, with the company effectively destroyed as a fighting unit within the first thirty minutes of landing. This character is a composite fictional figure placed within a documented unit.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_medic_calloway",
+        "name": "T/5 Raymond Calloway",
+        "outcome": "unknown",
+        "historical_record": "No individual named Raymond Calloway appears in the verified enlisted records or casualty rolls of the 116th Infantry Regiment's medical personnel for June 6, 1944. This character is a composite fictional figure. The documented experience of battalion aid men at Dog Green Sector on June 6, 1944, is recorded in the 29th Infantry Division's after-action reports and in survivor testimony collected by the U.S. Army Center of Military History.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_petty_officer_reed",
+        "name": "Petty Officer Second Class Arthur Reed",
+        "outcome": "unknown",
+        "historical_record": "No individual named Arthur Reed appears in the verified crew records of the 551st LCA Flotilla for June 6, 1944. Royal Navy LCA coxswains operating at Omaha Beach on June 6, 1944, suffered significant casualties. Individual crew fates for the 551st LCA Flotilla are not fully documented in publicly available records. This character is a composite fictional figure placed within a documented flotilla designation.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_pvt_szymanski",
+        "name": "Private Olek Szymanski",
+        "outcome": "unknown",
+        "historical_record": "No individual named Olek Szymanski appears in the verified enlisted casualty rolls or morning reports of Company A, 116th Infantry Regiment for June 6, 1944. This character is a composite fictional figure placed within a documented unit. Company A, 116th Infantry, sustained casualties estimated at over 90 percent killed, wounded, or missing in the first assault wave at Dog Green Sector.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_sgt_kowalski",
+        "name": "Staff Sergeant Thomas Kowalski",
+        "outcome": "unknown",
+        "historical_record": "No individual named Thomas Kowalski appears in the verified NCO roster or casualty records of Dog Company, 2nd Ranger Battalion for June 6, 1944. This character is a composite fictional figure placed within a documented unit. Dog Company, 2nd Ranger Battalion, landed at Omaha Beach on June 6, 1944, and participated in the assault on the Vierville draw sector.",
+        "primary_source": null
+      }
+    ],
+    "immediate_outcome": {
+      "summary": "The Vierville draw — Exit D-1 — was not opened until approximately 0900 hours on June 6, 1944, after sustained small-unit actions by surviving elements of the 116th Infantry Regiment and Ranger units, combined with direct naval gunfire support from destroyers including USS McCook and USS Carmick, which closed to within approximately 800 yards of the beach to engage German strongpoints. Company A of the 116th Infantry Regiment, which landed in the first wave at Dog Green Sector, was effectively destroyed as a fighting unit within the first thirty minutes, suffering casualties estimated at over 90 percent killed, wounded, or missing.",
+      "key_facts": [
+        "Company A, 116th Infantry Regiment, 29th Infantry Division, landed at Dog Green Sector at approximately 0636 hours on June 6, 1944.",
+        "The 741st Tank Battalion's DD tanks, assigned to support the Omaha Beach assault, lost 27 of 29 tanks launched in the eastern sector; the 743rd Tank Battalion, assigned to the western sector including Dog Green, launched tanks directly from LCTs closer to shore, with better survival rates.",
+        "The 352nd Infantry Division, a full-strength experienced German division, had moved into the Omaha Beach defensive sector in March 1944; Allied intelligence had not confirmed its presence at the time of the assault.",
+        "The USAAF bombardment preceding the landing at Omaha Beach dropped approximately 13,000 bombs; due to cloud cover and concern about hitting landing craft, bombardiers delayed release, causing bombs to fall up to three miles inland, leaving German beach defenses largely intact.",
+        "USS McCook (DD-496) and USS Carmick (DD-493) provided direct fire support against WN-71 and adjacent strongpoints during the morning of June 6, 1944, closing to ranges of approximately 800 yards.",
+        "Exit D-1 at Vierville-sur-Mer was reported opened to vehicle traffic by approximately 1100 hours on June 6, 1944.",
+        "The 2nd Ranger Battalion landed elements at Dog Green and adjacent sectors on June 6, 1944, with Dog Company among the units committed to the Vierville draw area."
+      ]
+    },
+    "historical_frame": [
+      "Omaha Beach was the only Allied landing beach on June 6, 1944, where the outcome was in serious doubt during the assault; the other four beaches — Utah, Gold, Juno, and Sword — achieved their objectives with significantly lower casualties.",
+      "American casualties at Omaha Beach on June 6, 1944, are estimated at approximately 2,000 killed, wounded, and missing, out of a total Allied casualty figure for D-Day estimated between 10,000 and 12,000 across all beaches and airborne operations.",
+      "The five beach exits at Omaha Beach — designated D-1 through F-1 — were the only vehicle routes off the beach; the bluffs flanking them rose to approximately 150 feet and were impassable to wheeled and tracked vehicles except through the draws."
+    ],
+    "open_threads": [
+      {
+        "thread_id": "the_coxswain_must",
+        "historical_record": "The navigation decisions made by individual LCA coxswains at Omaha Beach on June 6, 1944, were not systematically documented in after-action reports. The Royal Navy's official report on LCA operations at Omaha noted that strong tidal drift of approximately 1 knot to the east caused many craft to land off their designated sectors. Whether individual coxswains chose to navigate through or around the obstacle belt, and the reasoning behind those choices, is not recorded for specific craft. The U.S. Army's official history notes that the obstacle belt extended from approximately 250 yards offshore at low tide and that many craft were holed or destroyed by Teller mines and Element C obstacles. The precise navigational choices made at the craft level remain undocumented."
+      },
+      {
+        "thread_id": "the_ranger_sergeant",
+        "historical_record": "The movement of individual Rangers from disabled or sunk craft to the shingle at Dog Green Sector is documented only in aggregate in after-action reports and in selected survivor testimony. The 2nd Ranger Battalion's official after-action report for June 6, 1944, describes the general conditions of the landing but does not reconstruct the movement of individual enlisted men across the beach. The specific paths taken by Rangers who entered the water from disabled craft and reached the shingle are not documented at the individual level in surviving primary sources."
+      },
+      {
+        "thread_id": "the_medic_encounters",
+        "historical_record": "The triage decisions made by individual aid men in the surf and on the beach at Dog Green Sector on June 6, 1944, are not documented in surviving medical records at the individual decision level. The 29th Infantry Division's medical after-action report describes the general collapse of organized medical support in the first wave at Omaha Beach and notes that many wounded men drowned in the rising tide before they could be evacuated. The moral and practical triage choices made by individual T/5 aid men in the water are recorded only in fragmentary survivor testimony and are not part of any official inquiry record."
+      },
+      {
+        "thread_id": "the_three_roles",
+        "historical_record": "The coordination between surviving elements of the 116th Infantry Regiment and 2nd Ranger Battalion at the shingle below the Vierville draw on the morning of June 6, 1944, is documented only in general terms in after-action reports. The specific moment at which surviving soldiers from different units recognized the wire obstacle at the draw's base as the shared tactical problem is not recorded. The 116th Infantry Regiment's after-action report notes that wire obstacles at the draw exits delayed the advance but does not reconstruct the individual-level awareness or communication that preceded organized action against those obstacles."
+      },
+      {
+        "thread_id": "pinned_at_the",
+        "historical_record": "The process by which naval gunfire was directed against WN-71 and adjacent strongpoints on June 6, 1944, is partially documented. USS McCook's deck log and action report for June 6, 1944, record that the ship engaged targets on the beach at Omaha in response to requests and observed fire, but the specific mechanism by which firing arc and position data for WN-71 was communicated from shore to ship is not fully reconstructed in surviving records. Naval gunfire liaison officers were assigned to the assault waves, but their individual actions and the specific intelligence they transmitted are not documented at the level of individual communications. The question of exactly how and when WN-71's position was fixed for naval gunfire purposes remains incompletely answered in the historical record."
+      },
+      {
+        "thread_id": "lieutenant_hargrove_attempts",
+        "historical_record": "The tactical decisions made by surviving junior officers of Company A, 116th Infantry Regiment, at Dog Green Sector on June 6, 1944, are largely undocumented because so few officers survived the first thirty minutes of the assault. The company's commanding officer, Captain Taylor Fellers, was killed in the first minutes of the landing; the fates and decisions of his surviving lieutenants are not fully reconstructed in after-action reports. The U.S. Army's official history, 'Cross-Channel Attack' by Gordon Harrison (1951), notes that organized assault on the Vierville draw was eventually achieved by mixed groups of survivors acting largely on individual initiative after the command structure of the first-wave units had been destroyed, but the specific orders given and decisions made by individual surviving officers in the period between landing and the eventual assault on the wire are not documented."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "the_coxswain_must",
+        "historical_record": "LCA craft approaching Dog Green Sector on June 6, 1944, encountered a belt of German beach obstacles beginning approximately 250 yards from the waterline at the time of the assault, which was conducted near low tide. The obstacles included Element C steel gates, Belgian Gates, stakes tipped with Teller mines, and hedgehogs. Many craft were destroyed or holed by these obstacles. The U.S. Army Engineer Special Brigades tasked with clearing sixteen fifty-yard gaps through the obstacle belt were unable to complete their mission due to casualties and the presence of infantry sheltering among the obstacles. Royal Navy after-action reports note that tidal drift and smoke caused significant navigational disorientation among coxswains. No systematic record exists of the specific navigational choices made by individual coxswains at Dog Green."
+      },
+      {
+        "beat_id": "the_ranger_sergeant",
+        "historical_record": "Elements of the 2nd Ranger Battalion landed at Omaha Beach on June 6, 1944, with Dog Company among the units assigned to the Dog Green and Dog White sector area. The battalion's after-action report records that craft were hit by fire before and during the landing and that men entered the water at varying distances from shore. The shingle bank below the bluffs at Dog Green provided the first significant defilade from direct fire. German MG-42 positions at WN-71, located at the western edge of the Vierville draw, had direct fields of fire across the beach. The 2nd Ranger Battalion's after-action report records that the battalion suffered significant casualties crossing the beach but does not reconstruct individual movements."
+      },
+      {
+        "beat_id": "the_medic_encounters",
+        "historical_record": "The 29th Infantry Division's medical after-action report for June 6, 1944, records that the first-wave landing at Dog Green Sector produced casualties at a rate that overwhelmed available medical personnel immediately. The report notes that many wounded men were unable to move out of the surf and drowned as the tide rose. Aid men who landed with the assault waves faced conditions in which standard triage protocols — prioritizing the salvageable wounded — conflicted with the physical impossibility of moving casualties out of the water under fire. The report does not reconstruct individual triage decisions. Survivor testimony collected by the U.S. Army Center of Military History describes aid men working in the surf under direct fire but does not document specific individual decisions at the level of individual casualties."
+      },
+      {
+        "beat_id": "the_three_roles",
+        "historical_record": "The 116th Infantry Regiment's after-action report for June 6, 1944, records that by approximately 0800 hours, surviving elements of multiple companies and attached units had consolidated at the shingle bank below the bluffs in the Dog Green and Dog White sectors. The report notes that the wire and mined obstacles at the base of the Vierville draw represented the primary physical obstacle to advance off the beach in that sector. The 2nd Ranger Battalion's after-action report corroborates the presence of mixed unit groups at the shingle. The specific moment of inter-unit recognition and the communication that established the draw's wire as the shared tactical objective is not reconstructed in either report."
+      },
+      {
+        "beat_id": "pinned_at_the",
+        "historical_record": "USS McCook (DD-496) action report for June 6, 1944, records that the destroyer engaged targets at Omaha Beach beginning in the early morning hours and continued fire support throughout the day. The report records specific engagements against gun emplacements and troop concentrations on the beach and bluffs. USS Carmick (DD-493) similarly recorded close-range fire support against strongpoints in the Dog sector. The destroyers closed to ranges described in action reports as approximately 800 yards in some instances. The specific intelligence about WN-71's firing arc that enabled effective engagement is not reconstructed in surviving naval records. The Naval Gunfire Support after-action report for Operation Neptune notes that communication between shore fire control parties and ships was disrupted by casualties among liaison personnel in the first wave."
+      },
+      {
+        "beat_id": "lieutenant_hargrove_attempts",
+        "historical_record": "Captain Taylor Fellers, commanding officer of Company A, 116th Infantry Regiment, was killed in the first minutes of the landing at Dog Green Sector on June 6, 1944. The company suffered casualties estimated at over 90 percent in the first thirty minutes. Gordon Harrison's 'Cross-Channel Attack' (U.S. Army in World War II series, 1951) records that the Vierville draw was eventually breached and Exit D-1 opened through the actions of mixed groups of survivors, including Rangers and infantry, acting largely without intact command structures. The report of the Army Board of Review on Omaha Beach operations notes that the destruction of first-wave company command elements meant that tactical decisions in the critical period between 0700 and 0900 hours were made at the squad and individual level rather than at the platoon or company level."
+      }
+    ]
+  }
 }

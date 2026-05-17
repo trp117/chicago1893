@@ -1315,6 +1315,55 @@ function collectEdits(containerEl, data) {
     });
     data.scenario.review_checklist = checklist;
   }
+
+  // Collect epilogue fields — runs after [data-path] loop so generated/reviewed are already set
+  const epDetails = containerEl.querySelector('#epilogue-data-details');
+  if (epDetails && epDetails.querySelector('#ep-fates-list')) {
+    if (!data.scenario) data.scenario = {};
+    const ep = data.scenario.epilogue || {};
+
+    const fates = [];
+    epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
+      const character_id     = row.querySelector('.ep-char-id')?.value.trim()     || '';
+      const name             = row.querySelector('.ep-char-name')?.value.trim()   || '';
+      const outcome          = row.querySelector('.ep-char-outcome')?.value       || 'unknown';
+      const historical_record = row.querySelector('.ep-char-record')?.value.trim() || '';
+      const primary_source   = row.querySelector('.ep-char-source')?.value.trim() || null;
+      if (character_id || name || historical_record) {
+        fates.push({ character_id, name, outcome, historical_record, primary_source: primary_source || null });
+      }
+    });
+
+    const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
+    const ioFacts   = [];
+    epDetails.querySelectorAll('.ep-fact-val').forEach(el => { const v = el.value.trim(); if (v) ioFacts.push(v); });
+
+    const frame = [];
+    epDetails.querySelectorAll('.ep-frame-val').forEach(el => { const v = el.value.trim(); if (v) frame.push(v); });
+
+    const threads = [];
+    epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
+      const thread_id        = row.querySelector('.ep-thread-id')?.value.trim()     || '';
+      const historical_record = row.querySelector('.ep-thread-record')?.value.trim() || '';
+      if (thread_id || historical_record) threads.push({ thread_id, historical_record });
+    });
+
+    const echoes = [];
+    epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
+      const beat_id           = row.querySelector('.ep-echo-beat-id')?.value.trim()  || '';
+      const historical_record = row.querySelector('.ep-echo-record')?.value.trim()   || '';
+      if (beat_id || historical_record) echoes.push({ beat_id, historical_record });
+    });
+
+    data.scenario.epilogue = {
+      ...ep,
+      character_fates:   fates,
+      immediate_outcome: { summary: ioSummary, key_facts: ioFacts },
+      historical_frame:  frame,
+      open_threads:      threads,
+      choice_echoes:     echoes,
+    };
+  }
 }
 
 // ── Section renderers ─────────────────────────────────────────────────────────
@@ -1562,6 +1611,148 @@ function renderPlayerRolesSection(data) {
   return edSection('Player Roles', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EPILOGUE DATA SECTION
+// ═══════════════════════════════════════════════════════════════
+
+function renderEpilogueCharFateRow(f) {
+  return `<div class="ep-fate-row" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative">
+    <button type="button" class="remove-ep-fate-btn" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:18px;line-height:1;padding:0">×</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <input type="text" class="ep-char-id"   placeholder="character_id" value="${esc(f.character_id || '')}" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      <input type="text" class="ep-char-name" placeholder="Name"         value="${esc(f.name         || '')}" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    </div>
+    <select class="ep-char-outcome" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:8px">
+      <option value="survived" ${f.outcome === 'survived' ? 'selected' : ''}>survived</option>
+      <option value="died"     ${f.outcome === 'died'     ? 'selected' : ''}>died</option>
+      <option value="unknown"  ${f.outcome === 'unknown'  ? 'selected' : ''}>unknown</option>
+    </select>
+    <textarea class="ep-char-record" rows="2" placeholder="Historical record (1–3 sentences)" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;margin-bottom:6px">${esc(f.historical_record || '')}</textarea>
+    <input type="text" class="ep-char-source" placeholder="Primary source (optional)" value="${esc(f.primary_source || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+  </div>`;
+}
+
+function renderEpilogueFactRow(fact) {
+  return `<div class="ep-fact-row" style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">
+    <input type="text" class="ep-fact-val" placeholder="Key fact…" value="${esc(fact)}" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    <button type="button" class="remove-ep-fact-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:4px 0">×</button>
+  </div>`;
+}
+
+function renderEpilogueFrameRow(text) {
+  return `<div class="ep-frame-row" style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">
+    <textarea class="ep-frame-val" rows="2" placeholder="Verified historical frame fact…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(text)}</textarea>
+    <button type="button" class="remove-ep-frame-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  </div>`;
+}
+
+function renderEpilogueThreadRow(t) {
+  return `<div class="ep-thread-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+    <input type="text" class="ep-thread-id" placeholder="thread_id" value="${esc(t.thread_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    <textarea class="ep-thread-record" rows="2" placeholder="Historical record of this open thread…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(t.historical_record || '')}</textarea>
+    <button type="button" class="remove-ep-thread-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  </div>`;
+}
+
+function renderEpilogueEchoRow(c) {
+  return `<div class="ep-echo-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+    <input type="text" class="ep-echo-beat-id" placeholder="beat_id" value="${esc(c.beat_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    <textarea class="ep-echo-record" rows="2" placeholder="What actually happened at this beat in documented history…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(c.historical_record || '')}</textarea>
+    <button type="button" class="remove-ep-echo-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  </div>`;
+}
+
+function renderEpilogueSection(data) {
+  const ep           = data.scenario?.epilogue || {};
+  const generated    = ep.generated  === true;
+  const reviewed     = ep.reviewed   === true;
+  const chars        = data.characters || [];
+  const beats        = (data.storyArc?.acts || []).flatMap(a => a.beats || []);
+  const hasPrereqs   = chars.length > 0 && beats.length > 0;
+  const genDisabled  = !hasPrereqs;
+  const genTitle     = genDisabled ? 'Complete scenario characters and essential beats first' : '';
+
+  const badge = generated
+    ? reviewed
+      ? `<span id="epilogue-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#f0fdf4;color:#166534">Reviewed</span>`
+      : `<span id="epilogue-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#fef3c7;color:#92400e">Pending Review</span>`
+    : `<span id="epilogue-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#f1f5f9;color:var(--text-soft)">Not Generated</span>`;
+
+  let fieldsHtml = '';
+  if (generated) {
+    const fatesHtml   = (ep.character_fates   || []).map(renderEpilogueCharFateRow).join('');
+    const ioFactsHtml = (ep.immediate_outcome?.key_facts || []).map(renderEpilogueFactRow).join('');
+    const frameHtml   = (ep.historical_frame  || []).map(renderEpilogueFrameRow).join('');
+    const threadsHtml = (ep.open_threads      || []).map(renderEpilogueThreadRow).join('');
+    const echoesHtml  = (ep.choice_echoes     || []).map(renderEpilogueEchoRow).join('');
+
+    fieldsHtml = `
+      <div style="margin:16px 0;padding:12px 14px;background:#fef2f2;border:1px solid #f87171;border-radius:6px;font-size:13px;color:#991b1b;font-weight:500">
+        ⚠ AI-generated historical facts must be verified before publication. Incorrect facts will appear in player epilogues. Review each entry carefully.
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Character Fates</div>
+        <div id="ep-fates-list">${fatesHtml}</div>
+        <button type="button" id="add-ep-fate-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">+ Add Character</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Immediate Outcome — Summary</div>
+        <textarea class="ep-io-summary" rows="3" placeholder="Two to three sentences describing the verified historical result…" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(ep.immediate_outcome?.summary || '')}</textarea>
+        <div style="font-size:11px;font-weight:600;margin:10px 0 6px;color:var(--text-soft)">Key Facts</div>
+        <div id="ep-facts-list">${ioFactsHtml}</div>
+        <button type="button" id="add-ep-fact-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">+ Add Key Fact</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Historical Frame <span style="font-weight:400;font-size:10px">(max 3)</span></div>
+        <div id="ep-frame-list">${frameHtml}</div>
+        <button type="button" id="add-ep-frame-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">+ Add Frame Entry</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Open Threads</div>
+        <div id="ep-threads-list">${threadsHtml}</div>
+        <button type="button" id="add-ep-thread-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">+ Add Thread</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Choice Echoes</div>
+        <div id="ep-echoes-list">${echoesHtml}</div>
+        <button type="button" id="add-ep-echo-btn" class="btn btn-secondary btn-sm" style="margin-top:4px">+ Add Choice Echo</button>
+      </div>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button type="button" id="mark-epilogue-reviewed-btn" class="btn btn-primary" ${reviewed ? 'disabled' : ''}>
+          ${reviewed ? '✓ Historical Data Reviewed' : 'Mark Historical Data Reviewed'}
+        </button>
+        ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Review all entries carefully before marking as reviewed.</span>' : ''}
+      </div>`;
+  }
+
+  return `<div style="margin-bottom:20px">
+    <details id="epilogue-data-details">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:10px;list-style:none;user-select:none">
+        Historical Epilogue Data
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <input type="hidden" id="epilogue-generated-input" data-path="scenario.epilogue.generated" value="${generated}">
+        <input type="hidden" id="epilogue-reviewed-input"  data-path="scenario.epilogue.reviewed"  value="${reviewed}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
+          ${badge}
+          <button type="button" id="gen-epilogue-btn" class="btn btn-primary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
+            ${generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data'}
+          </button>
+        </div>
+        ${fieldsHtml}
+      </div>
+    </details>
+  </div>`;
+}
+
 function renderPublicationReview(data) {
   const status = data.scenario?.beats_status || 'not_generated';
   const cl     = data.scenario?.review_checklist || {};
@@ -1676,6 +1867,7 @@ function renderPreview(data, autoSaved = false) {
       ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
         : ''}
+      ${renderEpilogueSection(data)}
       <div class="form-actions" style="padding-bottom:32px">
         <button class="btn btn-success"   id="preview-play">▶ Play Now</button>
         <button class="btn btn-primary"   id="preview-save">💾 Save</button>
@@ -1761,6 +1953,122 @@ function renderPreview(data, autoSaved = false) {
       genBtn.title = dis ? 'Complete World, Stakes, and at least one Role Briefing first' : '';
     }
   });
+
+  // ── Epilogue section — add/remove row delegation ────────────────
+  formEl.addEventListener('click', e => {
+    if (e.target.closest('.remove-ep-fate-btn'))   { e.target.closest('.ep-fate-row').remove();   return; }
+    if (e.target.closest('.remove-ep-fact-btn'))   { e.target.closest('.ep-fact-row').remove();   return; }
+    if (e.target.closest('.remove-ep-frame-btn'))  { e.target.closest('.ep-frame-row').remove();  return; }
+    if (e.target.closest('.remove-ep-thread-btn')) { e.target.closest('.ep-thread-row').remove(); return; }
+    if (e.target.closest('.remove-ep-echo-btn'))   { e.target.closest('.ep-echo-row').remove();   return; }
+
+    if (e.target.closest('#add-ep-fate-btn')) {
+      const div = document.createElement('div');
+      div.innerHTML = renderEpilogueCharFateRow({});
+      formEl.querySelector('#ep-fates-list')?.appendChild(div.firstElementChild);
+      return;
+    }
+    if (e.target.closest('#add-ep-fact-btn')) {
+      const div = document.createElement('div');
+      div.innerHTML = renderEpilogueFactRow('');
+      formEl.querySelector('#ep-facts-list')?.appendChild(div.firstElementChild);
+      return;
+    }
+    if (e.target.closest('#add-ep-frame-btn')) {
+      const frameList = formEl.querySelector('#ep-frame-list');
+      if (frameList && frameList.querySelectorAll('.ep-frame-row').length >= 3) {
+        toast('Maximum three historical frame entries allowed.', 'error');
+        return;
+      }
+      const div = document.createElement('div');
+      div.innerHTML = renderEpilogueFrameRow('');
+      frameList?.appendChild(div.firstElementChild);
+      return;
+    }
+    if (e.target.closest('#add-ep-thread-btn')) {
+      const div = document.createElement('div');
+      div.innerHTML = renderEpilogueThreadRow({});
+      formEl.querySelector('#ep-threads-list')?.appendChild(div.firstElementChild);
+      return;
+    }
+    if (e.target.closest('#add-ep-echo-btn')) {
+      const div = document.createElement('div');
+      div.innerHTML = renderEpilogueEchoRow({});
+      formEl.querySelector('#ep-echoes-list')?.appendChild(div.firstElementChild);
+      return;
+    }
+
+    // Mark Historical Data Reviewed
+    if (e.target.closest('#mark-epilogue-reviewed-btn')) {
+      const revInput = formEl.querySelector('#epilogue-reviewed-input');
+      if (revInput) revInput.value = 'true';
+      const badge = formEl.querySelector('#epilogue-status-badge');
+      if (badge) { badge.style.background = '#f0fdf4'; badge.style.color = '#166534'; badge.textContent = 'Reviewed'; }
+      const btn = formEl.querySelector('#mark-epilogue-reviewed-btn');
+      if (btn) { btn.disabled = true; btn.textContent = '✓ Historical Data Reviewed'; }
+      if (!data.scenario) data.scenario = {};
+      if (!data.scenario.epilogue) data.scenario.epilogue = {};
+      data.scenario.epilogue.reviewed = true;
+      handleManualSave(data, formEl);
+      return;
+    }
+  }, true); // capture phase so it fires before the existing click delegation
+
+  // ── Mark as Approved — warn if epilogue not reviewed ───────────
+  formEl.addEventListener('click', e => {
+    if (!e.target.closest('#mark-approved-btn')) return;
+    const epReviewed = formEl.querySelector('#epilogue-reviewed-input')?.value === 'true'
+      || data.scenario?.epilogue?.reviewed === true;
+    const epGenerated = formEl.querySelector('#epilogue-generated-input')?.value === 'true'
+      || data.scenario?.epilogue?.generated === true;
+    if (epGenerated && !epReviewed) {
+      toast('Warning: epilogue historical data has not been reviewed. Approve anyway or review the Historical Epilogue Data section first.', 'error');
+    }
+  });
+
+  // ── Generate Epilogue Data ──────────────────────────────────────
+  const genEpilogueBtn = document.getElementById('gen-epilogue-btn');
+  if (genEpilogueBtn) {
+    genEpilogueBtn.addEventListener('click', async () => {
+      if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+
+      const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
+      const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
+      const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
+      const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+      const characters = (data.characters || []).map(c => ({
+        character_id: c.id,
+        name:         c.name,
+        role:         c.role || c.publicFace || '',
+      }));
+      const essential_beats = (data.storyArc?.acts || []).flatMap(a => a.beats || []);
+
+      genEpilogueBtn.disabled    = true;
+      genEpilogueBtn.textContent = 'Generating historical data…';
+      try {
+        const epilogue = await apiPost('/generate/epilogue-data', {
+          scenarioId, title, world, stakes, characters, essential_beats,
+        });
+        // Rebuild the epilogue data in the in-memory data object
+        if (!data.scenario) data.scenario = {};
+        data.scenario.epilogue = epilogue;
+        // Re-render just the epilogue section
+        const epDetails = formEl.querySelector('#epilogue-data-details');
+        if (epDetails) {
+          const newHtml = renderEpilogueSection(data);
+          const tmp = document.createElement('div');
+          tmp.innerHTML = newHtml;
+          epDetails.replaceWith(tmp.firstElementChild);
+        }
+        toast('Epilogue data generated. Review each entry carefully before marking as reviewed.', 'success');
+      } catch (err) {
+        toast(`Epilogue generation failed: ${err.message}`, 'error');
+      } finally {
+        genEpilogueBtn.disabled    = false;
+        genEpilogueBtn.textContent = data.scenario?.epilogue?.generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data';
+      }
+    });
+  }
 
   // ── Generate Essential Beats ────────────────────────────────────
   const genBeatsBtn = document.getElementById('gen-beats-btn');

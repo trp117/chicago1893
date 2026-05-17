@@ -1105,6 +1105,84 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  r.post('/generate/epilogue-data', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const { scenarioId, title = '', world = '', stakes = '', characters = [], essential_beats = [] } = req.body;
+    if (!scenarioId) return badRequest(res, 'scenarioId is required.');
+    const scenario = repos.scenarios.findById(scenarioId);
+    if (!scenario) return notFound(res);
+
+    const systemPrompt = [
+      'You are generating the historical epilogue data block for an immersive historical fiction scenario. Your output will be used to generate personalized epilogue text for players after they complete a session. Every fact you produce must be historically accurate and verifiable. Do not invent, approximate, or editorialize.',
+      '',
+      'Generate the following:',
+      'character_fates: For every named character in the scenario, provide their historical outcome after the event depicted — what actually happened to them in the days, months, and years that followed. Include a primary source reference where one exists. If the outcome is not documented, set outcome to "unknown" and say so honestly in historical_record.',
+      'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of strings.',
+      'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements.',
+      'open_threads: For each essential beat in the scenario, consider whether that beat corresponds to a historical question that was raised at inquiry, disputed, or never satisfactorily resolved. If so, include an entry with the beat\'s id as thread_id and the historical record of that open question.',
+      'choice_echoes: For each essential beat in the scenario, provide the verified historical record of what actually happened at that moment. This is what the epilogue will compare the player\'s choices against.',
+      'Return only a JSON object matching this exact schema with no other text, no markdown, no explanation:',
+      '{',
+      '"character_fates": [{ "character_id": "string", "name": "string", "outcome": "survived|died|unknown", "historical_record": "string", "primary_source": "string|null" }],',
+      '"immediate_outcome": { "summary": "string", "key_facts": ["string"] },',
+      '"historical_frame": ["string"],',
+      '"open_threads": [{ "thread_id": "string", "historical_record": "string" }],',
+      '"choice_echoes": [{ "beat_id": "string", "historical_record": "string" }]',
+      '}',
+    ].join('\n');
+
+    const userPrompt = [
+      `SCENARIO TITLE: ${title}`,
+      world  ? `WORLD CONTEXT:\n${world}`  : '',
+      stakes ? `STAKES / GOAL:\n${stakes}` : '',
+      characters.length
+        ? `NAMED CHARACTERS:\n${characters.map(c => `- ${c.character_id || c.id}: ${c.name} (${c.role || c.publicFace || ''})`).join('\n')}`
+        : '',
+      essential_beats.length
+        ? `ESSENTIAL BEATS (use each beat id as thread_id in open_threads and beat_id in choice_echoes):\n${essential_beats.map(b => `- id: ${b.id}, description: ${b.description}`).join('\n')}`
+        : '',
+    ].filter(Boolean).join('\n\n');
+
+    try {
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        {
+          model: 'claude-sonnet-4-6',
+          max_tokens: 4096,
+          temperature: 0.3,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        },
+        { timeout: 120_000, maxRetries: 0 }
+      );
+      if (msg.stop_reason === 'max_tokens') {
+        return res.status(500).json({ error: 'Epilogue generation truncated — the scenario has too many beats. Reduce to 3–6 essential beats and retry.' });
+      }
+      const text = msg.content[0]?.text?.trim();
+      if (!text) return res.status(500).json({ error: 'No response from Claude.' });
+      const cleaned     = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+      const epilogueData = JSON.parse(cleaned);
+
+      const updated = {
+        ...scenario,
+        epilogue: {
+          generated:        true,
+          reviewed:         false,
+          character_fates:  epilogueData.character_fates   || [],
+          immediate_outcome: epilogueData.immediate_outcome || { summary: '', key_facts: [] },
+          historical_frame: epilogueData.historical_frame  || [],
+          open_threads:     epilogueData.open_threads      || [],
+          choice_echoes:    epilogueData.choice_echoes     || [],
+        },
+      };
+      repos.scenarios.save(updated);
+      console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
+      res.json(updated.epilogue);
+    } catch (err) {
+      console.error('[EPILOGUE-DATA]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.post('/generate/save', (req, res) => {
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
