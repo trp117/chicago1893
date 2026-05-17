@@ -20,7 +20,7 @@
   ],
   "suggested_secret": "Kranz has already written, in his head, the statement he would give to the press if the crew does not come home — and the act of composing it made him more certain they will, not less.",
   "opening": {
-    "narrative": "It is 9:14 PM Central Standard Time, and the Mission Operations Control Room has been in emergency configuration for six minutes. The main screen shows the Free Return Trajectory — the curved line that represents the crew's best chance of survival — and the small blinking dot that is Apollo 13, moving along it at 25,000 feet per second. The CO2 partial pressure in Aquarius is 4.2 millimeters and climbing. The power budget meeting is scheduled to begin in three minutes.",
+    "narrative": "It is 10:14 PM Central Daylight Time, and the Mission Operations Control Room has been in emergency configuration for seven minutes. The main screen shows the Free Return Trajectory — the curved line that represents the crew's best chance of survival — and the small blinking dot that is Apollo 13, moving along it at 25,000 feet per second. Main Bus B pressure has collapsed, and Tank 1 oxygen is visibly venting into space. The emergency power-down and LM transfer operations are underway.",
     "npcMoments": [
       {
         "characterId": "char_sy_liebergot",
@@ -53,5 +53,10 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:29:11.777Z"
+  "updatedAt": "2026-05-17T19:35:17.219Z",
+  "real_name": null,
+  "cover_name": null,
+  "is_player_character": false,
+  "identity_note": null,
+  "aliases": []
 }

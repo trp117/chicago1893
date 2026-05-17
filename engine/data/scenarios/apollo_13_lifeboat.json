@@ -76,11 +76,11 @@
       },
       {
         "type": "stakes",
-        "text": "At 9:08 PM Central Standard Time on April 13th, Oxygen Tank Number Two in the Service Module ruptures. The explosion is not loud — in the vacuum of space, nothing is loud — but the shudder moves through the hull like a fist through paper. Within minutes, Tank Number One begins bleeding out through a damaged line, and the three fuel cells that generate all of the Command Module's electricity begin to die. The Moon landing is already over. What remains is the problem of whether three men can survive in a spacecraft with 45 amp-hours of battery power, lithium hydroxide canisters rated for two men, and cabin temperatures that will fall to 38 degrees Fahrenheit before morning. The political cost of losing this crew — after the triumph of Apollo 11, after the national investment in the space program — is incalculable. The human cost requires no calculation at all."
+        "text": "At 10:07 PM Central Daylight Time on April 13th, Oxygen Tank Number Two in the Service Module ruptures. The explosion is not loud — in the vacuum of space, nothing is loud — but the shudder moves through the hull like a fist through paper. Within minutes, Tank Number One begins bleeding out through a damaged line, and the three fuel cells that generate all of the Command Module's electricity begin to die. The Moon landing is already over. What remains is the problem of whether three men can survive the journey home with less than 45 amp-hours of remaining battery capacity preserved for re-entry, lithium hydroxide canisters rated for only two men, and cabin temperatures that will fall to 38 degrees Fahrenheit as the ship goes dark. The political cost of losing this crew — after the triumph of Apollo 11, after the national investment in the space program — is incalculable. The human cost requires no calculation at all."
       },
       {
         "type": "scene",
-        "text": "In Houston, the Mission Operations Control Room smells of cigarette smoke and burnt coffee and the particular anxiety of men who understand exactly how bad the numbers are. The Telemetry screens are showing data that does not make sense — pressures dropping, voltages collapsing, a master alarm that has been sounding for four minutes. Two hundred thousand miles away, the crew of Apollo 13 can see a white cloud of venting oxygen drifting past the window of Odyssey, catching the sunlight like a ghost. The cabin is still warm. That will change. In both places — the steel-and-glass building on the Gulf Coast and the aluminum capsule falling through the dark — men are reaching for checklists that do not cover this situation, because no one wrote a checklist for this."
+        "text": "In Houston, the Mission Operations Control Room smells of cigarette smoke and burnt coffee and the particular anxiety of men who understand exactly how bad the numbers are. The Telemetry screens are showing data that does not make sense — pressures dropping, voltages collapsing, a master alarm that has been sounding intermittently. Two hundred thousand miles away, the crew of Apollo 13 can see a white cloud of venting oxygen drifting past the window of Odyssey, catching the sunlight like a ghost. The main power buses are dropping rapidly. In both places — the steel-and-glass building on the Gulf Coast and the aluminum capsule falling through the dark — men are reaching for emergency checklists that do not cover this combined systems loss, because no one wrote a checklist for a dual tank failure."
       },
       {
         "type": "entry",
@@ -226,7 +226,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:29:11.756Z",
+  "updatedAt": "2026-05-17T19:28:54.910Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",

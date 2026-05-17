@@ -12,7 +12,7 @@
   ],
   "accessLevel": "staff",
   "perspective": "Write from the perspective of a man who prepared obsessively for exactly this scenario and is now discovering that obsessive preparation and the real thing are not the same thing. Swigert's voice is precise under pressure, slightly over-formal, and drops in register when he is frightened. He reaches for procedure numbers when he does not know what else to reach for.",
-  "briefing": "You are in the Command Module Odyssey, alone, and it is dark and wet and cold in a way that the word 'cold' does not cover — 38 degrees Fahrenheit, and every surface you touch is damp with condensation that has been building for hours. The instrument panel in front of you is the one you have spent three days memorizing since Ken Mattingly was pulled from the mission, and you know it the way you know your own face, and right now it is covered in water and you cannot tell which circuit breakers are wet and which are merely cold. Your handwritten cue card is taped to the center console — 13 steps, written large enough to read with shaking hands — and step 9 has a 30-second wait that you added yourself, based on a conversation with John Aaron about condensation risk, a conversation that Aaron may or may not remember having. You know that the tank-stirring procedure you performed before launch is being looked at. You have not been told this officially. You know it because of the way certain conversations stopped when you entered the room in the days after the explosion. Your hands are not shaking yet. The CO2 is at 4.2 and climbing, and at some point in the next few hours you will need to flip the switches that either bring this ship back to life or cause the last short-circuit it will ever have, and the timing of that moment is the only question that matters right now.",
+  "briefing": " You are in the Command Module Odyssey, and the master alarm is a physical pressure in your ears. The instrument panel in front of you—the one you spent three intense days memorizing after Ken Mattingly was pulled from the mission—is lit up like a Christmas tree with warning lights. Main Bus B has dropped offline, and Bus A is dying. You know that the tank-stirring procedure you performed minutes ago preceded this disaster. You don't know why, and you can't dwell on it. John Aaron and the EECOM desk are frantically working to figure out how to save your entry batteries, and your immediate job is to systematically execute an emergency power-down of your own ship while Lovell and Haise scramble to bring the Lunar Module Aquarius to life. If you pull the plugs too slowly, the entry batteries drain and you are dead before you even clear the Moon. If you pull them too fast, you drop navigation before the LM can mirror the guidance data. Your hands cannot shake. You have minutes to kill the power to a ship you were trained only to keep alive.",
   "character_hooks": [
     "I know the power-up sequence better than anyone alive, which means I also know exactly which step Aaron's revised procedure has eliminated — and I know why that step exists.",
     "The condensation on the left side of the panel has been bothering me for two hours and I have said nothing because I do not know what it means and I am afraid of what it might mean.",
@@ -20,7 +20,7 @@
   ],
   "suggested_secret": "Swigert knows, from a pre-launch conversation he was not supposed to hear, that the tank-stirring procedure he performed had been flagged as potentially problematic by a technician six months earlier — a flag that was reviewed, accepted, and filed. He has told no one.",
   "opening": {
-    "narrative": "It is 9:14 PM Central Standard Time, and you have been in Odyssey for four minutes — not to work, but to check. To look at the condensation. To read the panel in the dark and try to understand what the cold has done to it. The cue card is in place. The medical tape is holding. Houston will want to know the timing of the power-up sequence within the next hour, and you do not yet have an answer you are confident in.",
+    "narrative": "It is 10:14 PM Central Daylight Time, exactly seven minutes since the shudder rattled the hull. Odyssey is bleeding out its electrical life. Lovell is in the tunnel, calling out for the emergency LM activation checklists. Houston is on the loop, their voices carrying the tight, controlled cadence of men staring at a dying spacecraft. You are standing at the main circuit breaker panel, your fingers poised over the switches that will intentionally turn Odyssey into a cold, dark tomb.",
     "npcMoments": [
       {
         "characterId": "char_jim_lovell",
@@ -32,9 +32,9 @@
       }
     ],
     "choices": [
-      "Tell Lovell the panel looks manageable — which is true, within a specific definition of manageable",
-      "Tell Lovell about the heavier condensation on the left side before speaking to Aaron",
-      "Respond to Aaron first and get the full revised sequence before reporting to Lovell"
+      "Execute the immediate, aggressive power-down sequence to preserve the re-entry battery bank at all costs.",
+      "Hold the main telemetry and guidance links active for an extra 60 seconds to ensure the LM perfectly copies the IMU alignment data.",
+      "Challenge the EECOM desk’s emergency battery configuration before cutting the main bus ties"
     ]
   },
   "roleInitialState": {
@@ -53,7 +53,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:29:11.776Z",
+  "updatedAt": "2026-05-17T19:34:34.439Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
@@ -67,5 +67,10 @@
       "emotional_weight": "Fatal Regret—the horrifying, split-second realization of a mechanical failure in the final seconds of the mission.",
       "closing_line_override": "The condensation on the window glass was the last thing you saw before the heat of re-entry took everything else."
     }
-  }
+  },
+  "real_name": null,
+  "cover_name": null,
+  "is_player_character": false,
+  "identity_note": null,
+  "aliases": []
 }

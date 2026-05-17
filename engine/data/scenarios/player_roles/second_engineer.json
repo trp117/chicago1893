@@ -2,42 +2,41 @@
   "id": "second_engineer",
   "scenarioId": "titanic_final_hours",
   "name": "Second Engineer",
-  "description": "You are five decks below the gala and the lifeboats, in the flooding heat of Boiler Room No. 4, keeping the dynamos alive. The lights above depend on your hands. So do the electric winches on the davits. So does everyone.",
-  "startLocationId": "boiler_room_four",
+  "description": "You are inside the massive power plant of the Titanic — five decks below the lifeboats, standing at the main throttle platform with the switchboard at your back and the dynamos humming behind the bulkhead. Every kilowatt on the boat deck runs through the circuits you are managing right now. The davit winches, the wireless room, the emergency lighting — all of it depends on your hands and your judgment. Every kilowatt must be fiercely defended.",
+  "startLocationId": "engine_room_control",
   "startingKnowledge": [
-    "Boiler Room No. 6 is fully flooded and No. 5 has thirty-one inches of water on the plates as of 1:05 AM",
-    "The aft dynamos can be isolated from the flooding forward compartments by closing two bus bar switches on the throttle platform — this buys approximately twenty minutes of additional power",
-    "Chief Engineer Bell has quietly told the four senior engineers to find a way out after 1:30 AM, an order Bell will deny",
-    "At least forty members of the Black Gang are currently below the watertight flats and will be trapped if the doors are sealed"
+    "The aft dynamos can outlast the flooding if the main switchboard buses are split early — shedding the luxury loads from the passenger decks protects the wireless transmission circuits and the primary bilge pumps from overload collapse.",
+    "Chief Engineer Bell's standing order is to keep engine room staff at their stations until he personally authorizes withdrawal — but Bell has never managed a flooding scenario, and the order was written for fire, not water.",
+    "Boiler Room No. 4 is the critical buffer zone between the engine room and the flooding forward compartments: as long as its firemen can maintain steam pressure, the dynamos run."
   ],
   "accessLevel": "staff",
   "perspective": "Write from the perspective of a man who has spent his professional life translating abstract engineering principles into physical action in loud, hot, dangerous spaces. He thinks in systems and tolerances. He measures time in pressure gauges and water levels. He does not dramatize — he calculates. The drama comes from the gap between what the calculation says and what he chooses to do with it.",
-  "briefing": "You are standing on the throttle platform of the engine room with your boots in two inches of water that was not there twenty minutes ago, and the water level log in your hand shows a rate of increase that you have done the arithmetic on three times because the answer keeps being the same. The aft dynamos are running at nominal — you can hear them, a deep harmonic thrum beneath the roar of the remaining boilers — and the electrical gauges on the bulkhead show the boat deck winches are drawing current, which means boats are moving, which means your job is working. What you know that the men on the boat deck do not know is that the bus bar switches on the port side of this platform, if closed, would isolate the aft dynamos from the flooding forward compartments and extend your power window by twenty minutes — but closing them requires both hands and approximately ninety seconds during which you cannot also be watching the water level in Boiler Room No. 4, and the water in No. 4 has been behaving unpredictably for the last ten minutes. Bell's voice came down the speaking tube at 1:05 AM with three words — 'your discretion, son' — which is the closest he will come to telling you to save yourself, and you are standing here deciding what your discretion actually is. The stokers are watching you. The water is at your ankles now. The dynamo gauge reads nominal. You put your hand on the first bus bar switch.",
+  "briefing": "You are standing at the main throttle platform in the reciprocating engine room at 11:55 PM, and the main telegraph has just slammed to STOP after nineteen knots. The engines are coasting down — you can feel the change in the floor vibration — and your immediate task is to secure the machinery so that nothing tears itself apart as the drive shafts decelerate. The engine room is dry. The dynamos are running at nominal. The switchboard on the starboard bulkhead is showing full load across all circuits: passenger-deck lighting, heating elements, the galley, the first-class elevators, the gymnasium — everything drawing current simultaneously. You know, from your knowledge of the electrical schematic pinned to this bulkhead, that if you split the main switchboard buses now — before the flooding begins, before anyone panics — you can shed the luxury loads and concentrate the remaining power on the wireless room, the bilge pumps, and the davit winches. The water has not reached you yet. The stokers in No. 4 are at their stations. Bell has not ordered anything. You have perhaps thirty minutes before the flooding mathematics begin to constrain your choices, and right now every choice is still available.",
   "character_hooks": [
-    "I have a brother in the Black Gang — a trimmer in Boiler Room No. 5 — and I have not been able to reach him since the watertight door on the forward bulkhead was closed at 12:50 AM.",
-    "I was offered a posting on the Olympic last spring and turned it down for this voyage because the Titanic was the flagship and I wanted the commission — a decision I have been revising in my mind for the last hour.",
-    "I know the flooding rate figures in my notebook are more accurate than the ones Andrews gave the Captain, because I have been measuring every ten minutes and Andrews measured once at 11:50 PM and extrapolated — and my numbers are worse."
+    "I have a brother in the forward stokehold — a fireman in Boiler Room No. 6, the compartment nearest the bow — and no one on this platform has heard anything from the forward bulkhead telephone since the engines stopped.",
+    "I know the precise pump capacity figures for each bilge circuit, and I have already done the arithmetic: the pumps can handle the current inflow rate, but only if the dynamos stay above 70% load — which means I cannot let the passenger deck circuits drag the voltage down.",
+    "I turned down a shore posting last spring specifically to take the flagship commission on Titanic — a decision I made on the grounds that this was the finest engineering plant afloat, and I wanted to see what she could do at sea."
   ],
-  "suggested_secret": "You closed the watertight door between Boiler Rooms 5 and 6 at 12:15 AM on your own authority, without waiting for the bridge order — sealing three trimmers inside No. 6 who were still clearing coal — because you calculated that holding the door open would flood No. 5 in under four minutes and take the dynamos with it.",
+  "suggested_secret": "During the afternoon watch, you noticed a pressure variation in the starboard low-pressure turbine that you flagged mentally as worth monitoring — but you did not log it, because logging it would have required a formal report to Bell and a possible speed reduction. The variation resolved on its own within the hour. You have not thought about it since. You are thinking about it now.",
   "opening": {
-    "narrative": "It is 1:05 AM on April 15, 1912. Boiler Room No. 4 is the last operational boiler space on the ship. The water on the floor plates has been rising for an hour. The dynamos are running. The lights are on. Chief Engineer Bell's last message down the speaking tube was three words. The stokers are looking at you.",
+    "narrative": "It is 11:55 PM on April 14, 1912. The reciprocating engines have ground to a halt, and the enormous engine room is settling into an unfamiliar quiet broken only by the hiss of steam venting from the cooling drive shafts and the steady throb of the dynamos behind the aft bulkhead. Boiler Room No. 4 is currently clear — no water on the plates, stokers at their stations, fires banked and steam pressure nominal. The switchboard beside you is drawing full load from every luxury circuit on the ship. You have the schematic. You have the authority to split the buses. You have the time — for now.",
     "npcMoments": [],
     "choices": [
-      "Close the aft dynamo bus bar switches now to isolate the power circuit and buy twenty minutes",
-      "Send a runner up to the Marconi Room via the speaking tube to coordinate the power isolation with the wireless operators",
-      "Order the stokers to draw fires and begin moving the Black Gang toward the escape ladder before the water level rises further"
+      "Split the main switchboard buses now, shedding luxury loads to protect the wireless room and bilge pump circuits before any flooding reaches the engine spaces.",
+      "Send a stoker runner up through the escape trunk to the Marconi Room to coordinate power management with the wireless operators directly.",
+      "Inspect the forward watertight door seals on Boiler Room No. 5 yourself before committing to any electrical action — you need to know the actual water state in the forward compartments."
     ]
   },
   "roleInitialState": {
     "inventory": [
-      "Water level log — Boiler Rooms 4 and 5",
-      "Aft dynamo isolation schematic (pinned to bulkhead)",
-      "Engineer's pocket watch — currently reading 1:07 AM"
+      "Water level log sheet (blank — flooding has not yet reached engine spaces)",
+      "Main switchboard schematic (pinned to engine room bulkhead)",
+      "Engineer's pocket watch"
     ],
     "flags": {
-      "bus_bars_closed": false,
-      "black_gang_warned": false,
-      "bell_order_received": true
+      "buses_split": false,
+      "runner_sent": false,
+      "seals_inspected": false
     },
     "suspicion": {
       "joseph_bell": 0,
@@ -46,7 +45,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:55:02.077Z",
+  "updatedAt": "2026-05-17T00:00:00Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You kept the dynamos running until the very last boats were lowered, preventing a total blackout and riot. You managed to lead your stokers to the upper decks, but you reached the rail after the last collapsible had departed.",

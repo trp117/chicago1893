@@ -20,7 +20,7 @@
   ],
   "suggested_secret": "Lovell has already mentally composed what he would say to his crew if the re-entry fails — a short, specific speech — and he has rehearsed it twice in the silence of the Far Side passage.",
   "opening": {
-    "narrative": "It is 9:14 PM Central Standard Time on April 13, 1970, and you have been in the Lunar Module for six minutes. The Command Module is powered down behind you — dark and cold and waiting. Houston is on the loop, their voices steady in the way that trained men's voices are steady when they are frightened. The CO2 partial pressure is 4.2 millimeters of mercury and climbing. The burn window for the PC+2 trajectory correction opens in forty minutes.",
+    "narrative": "It is 10:14 PM Central Daylight Time on April 13, 1970, and you have just floated into the Lunar Module Aquarius. The Command Module is dying behind you — its fuel cells starved of oxygen, its systems systematically going dark as Swigert executes the emergency isolation. Houston is on the loop, their voices steady in the way that trained men's voices are steady when they are fighting for a crew's life. The immediate task is completing the emergency LM power-up before Odyssey's main buses completely fail.",
     "npcMoments": [
       {
         "characterId": "char_fred_haise",
@@ -52,7 +52,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:29:11.778Z",
+  "updatedAt": "2026-05-17T19:35:45.719Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully navigated the \"Free Return Trajectory\" and guided the crew through the narrow re-entry corridor. However, the extreme freezing conditions caused severe exposure for the crew, and a system delay forced a brutal, hard splashdown far from the recovery ship.",
@@ -66,5 +66,10 @@
       "emotional_weight": "Eternal Isolation—the cold, weightless realization that the distance between you and Earth is now infinite.",
       "closing_line_override": "The stars were no longer a destination; they were a final, cold resting place."
     }
-  }
+  },
+  "real_name": null,
+  "cover_name": null,
+  "is_player_character": false,
+  "identity_note": null,
+  "aliases": []
 }

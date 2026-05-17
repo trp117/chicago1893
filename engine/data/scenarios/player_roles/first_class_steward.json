@@ -2,43 +2,41 @@
   "id": "first_class_steward",
   "scenarioId": "titanic_final_hours",
   "name": "First Class Steward",
-  "description": "You serve the wealthiest passengers on C-Deck and know every corridor, gate, and key ring on this ship. You have seen the boats go down half-empty. You know where the Third Class passengers are locked. The question is what you are willing to do about it.",
+  "description": "You serve the wealthiest passengers on C-Deck and know every corridor, gate, and key ring on this ship. You are among the first to notice the subtle changes on the passenger decks, and you know where the Third Class passengers are restricted below. The question is what you are willing to do about it.",
   "startLocationId": "c_deck_corridor",
   "startingKnowledge": [
-    "The E-Deck Third Class promenade gate is locked and the key is in the steward's office — the passengers behind it can see water advancing in their corridor",
-    "Lightoller's departure manifest has been recording inflated boat loads — you overheard him correct a junior officer's count upward by twelve people",
-    "The davit falls were load-tested to 70-person capacity in Southampton four days ago — the claim that they cannot hold a full boat is false",
-    "Margaret Brown has been counting passengers entering boats from the rail and her numbers are significantly below the official record"
+    "The emergency gate keys are located in the E-Deck steward's station, governing the structural barriers between steerage and the upper decks.",
+    "The davit falls were load-tested to 70-person capacity in Southampton four days ago — any subsequent claim that they cannot hold a full boat under load is false.",
+    "The total passenger and crew manifest stands at 2,224 souls, while the total lifeboat capacity provides seats for only 1,178."
   ],
   "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has spent his professional life making the machinery of class hierarchy run smoothly and invisibly, and who is now watching that machinery produce a specific, countable, preventable death toll. He knows every physical detail of this ship. He knows the social architecture of it just as well. His crisis is not fear — it is the collision between his training and his conscience, and the question of which one has more force.",
-  "briefing": "You are standing in the C-Deck corridor with a ring of passenger keys in your left hand and a lifebelt you have been carrying for forty minutes without putting on in your right, and the corridor smells of dinner and carpet and the faint wrong smell of cold seawater that has been advancing up from the lower decks since midnight. You have knocked on eleven stateroom doors in the last twenty minutes and convinced eight passengers to go to the boat deck, and you know — because you have been watching the davits from the rail — that the boats going down are not full, that Boat 7 left with twenty-eight people in a boat rated for sixty-five, and that Lightoller's manifest records it as forty-one. What you know that Lightoller does not know you know is that the E-Deck gate key is in the steward's office one deck below you, that the Third Class passengers behind that gate can see water in their corridor, and that the boat deck will be clear of standard lifeboats in approximately forty minutes. You have the access. You have the knowledge. You have, if you choose to use it, the authority of a man who knows this ship better than the officers loading the boats. The corridor is empty for the moment. The steward's office is thirty feet behind you. The boat deck is two decks above. You are deciding which direction to walk.",
+  "perspective": "Write from the perspective of a man who has spent his professional life making the machinery of class hierarchy run smoothly and invisibly, and who is now watching that machinery begin to complicate an emergency evacuation. He knows every physical detail of this ship. He knows the social architecture of it just as well. His crisis is not fear — it is the collision between his training and his conscience, and the question of which one has more force.",
+  "briefing": "You are standing in the C-Deck corridor with a ring of passenger keys in your left hand and a lifebelt you have been carrying since the engines stopped. The corridor still smells of dinner and carpet, but there is a faint, cold draft advancing up from the forward stairwells. You have just come from the Purser's office on E-Deck, where you saw the master embarkation rolls: 2,224 souls aboard. You know—from your knowledge of the ship's layout—that the emergency gate keys are secured in the chief steward's station on E-Deck, and that if the forward bulkheads are compromised, the steerage spaces near the bow will face water long before the boat deck even uncovers a canvas cover. The corridor is quiet for the moment as passengers slowly wake to the silence of the stopped engines. You have the access. You have the structural knowledge. You are deciding which direction to walk.",
   "character_hooks": [
-    "I have been on White Star ships for eleven years and I have never once questioned a loading order — until tonight, when I watched a boat leave with twenty-eight people in it and an officer record forty-one.",
-    "I know a family in Third Class — a woman and three children from County Cork whom I helped find their cabin on embarkation day — and I have been thinking about that gate for the last hour.",
-    "I found Lightoller's manifest on the officer's table when I brought coffee to the boat deck at 12:30 AM, and I read it before I put it down, and I have been carrying what I read ever since."
+    "I have been on White Star ships for eleven years and I have never once questioned a structural regulation—until tonight, when the complete lack of a general alarm makes me question what the bridge is hiding.",
+    "I know a family in Third Class — a woman and three children from County Cork whom I helped find their cabin on embarkation day — and I know exactly how many corridors stand between them and the sky.",
+    "I saw the ship's actual capacity log on the Purser's desk less than an hour ago; the mathematical deficit is burned into my mind."
   ],
-  "suggested_secret": "You have already unlocked the E-Deck gate once tonight — at 12:40 AM, when no one was watching — and then locked it again when you heard an officer coming, and the memory of that moment is the specific thing you cannot stop returning to.",
+  "suggested_secret": "You accidentally left an unauthorized pass key inside a First Class stateroom door locker earlier this evening—a minor infraction that could reveal a private compromise of ship rules if discovered during the evacuation.",
   "opening": {
-    "narrative": "It is 12:50 AM on April 15, 1912. The C-Deck corridor is quiet. The boats are being loaded above you. The Third Class passengers are locked below you. You have the keys. You have seen the manifest. The ship has between one and two hours.",
+    "narrative": "It is 11:55 PM on April 14, 1912. The C-Deck corridor is eerie in its stillness. The order to uncover the lifeboats has not yet been broadcast to the passengers. You have the keys. The ship has less than two and a half hours, though no one around you believes it yet.",
     "npcMoments": [],
     "choices": [
-      "Go to the steward's office and retrieve the E-Deck gate key",
-      "Go to the boat deck and confront Lightoller directly with what you know about the manifest",
-      "Find Thomas Andrews in the First Class Lounge and ask him directly how much time remains"
+      "Descend immediately to the E-Deck station to secure the Third Class separation keys before the stairwells clear.",
+      "Begin methodically knocking on your assigned First Class stateroom doors to quietly warn high-value passengers before an official order.",
+      "Locate Managing Director Thomas Andrews near the Grand Staircase to visually confirm the structural damage report yourself."
     ]
   },
   "roleInitialState": {
     "inventory": [
       "C-Deck passenger key ring",
       "Lifebelt (not yet worn)",
-      "Mental note of Lightoller's inflated manifest figures"
+      "Master passenger count ledger notes"
     ],
     "flags": {
       "gate_key_retrieved": false,
-      "lightoller_confronted": false,
-      "andrews_consulted": false,
-      "brown_allied": false
+      "first_class_warned": false,
+      "andrews_consulted": false
     },
     "suspicion": {
       "charles_lightoller": 3,
@@ -47,7 +45,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:55:02.077Z",
+  "updatedAt": "2026-05-17T00:00:00Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You managed to fill your assigned lifeboats to their full 65-person capacity, bypassing \"Class\" restrictions to save steerage passengers. You stayed on deck to help with the last collapsible, eventually finding yourself in the water as the ship went down.",

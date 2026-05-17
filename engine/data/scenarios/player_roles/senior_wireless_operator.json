@@ -2,42 +2,41 @@
   "id": "senior_wireless_operator",
   "scenarioId": "titanic_final_hours",
   "name": "Senior Wireless Operator",
-  "description": "You command the Marconi Room on the Boat Deck — the ship's only link to the outside world. You know Carpathia is coming but the power is failing and every minute at the key is a minute not spent fighting for a place in the last boats.",
+  "description": "You are seated at the Marconi apparatus on the Boat Deck with the transmitter key under your right hand and every ocean frequency at your command. The power running this room comes from the engineers five decks below you, and both you and they know it will not run forever. You must find a rescue ship before the power fails, balancing every transmission against the cold reality of the ticking clock. You already know there are ships out there who should have answered the ice warnings and did not.",
   "startLocationId": "marconi_room",
   "startingKnowledge": [
-    "Carpathia has confirmed she is making for Titanic's position at 17 knots, ETA approximately 4:00 AM",
-    "The Frankfurt wasted six minutes with a garbled position retransmission",
-    "The aft dynamos can outlast the forward ones if someone isolates the circuit — but only an engineer can do it",
-    "The Mesaba ice warning from 9:40 PM was never delivered to the bridge"
+    "The main wireless transmitter requires a steady steam supply from the engine room dynamos — if the engineers cannot maintain power, transmission range collapses to the emergency battery's limited reach of approximately 100 miles.",
+    "An ice warning from the SS Mesaba, received at 9:40 PM tonight, is sitting on the desk in front of you undelivered to the bridge — the message described pack ice directly across Titanic's course.",
+    "The nearest vessels with confirmed wireless capability are the Carpathia to the southeast and the Californian to the north-northwest, but the Californian has been transmitting dense commercial traffic all evening and her operator may have gone off-watch."
   ],
   "accessLevel": "staff",
   "perspective": "Write from the perspective of a technically expert young man who understands the physics of his situation with complete clarity and is choosing, moment by moment, how much of that clarity to act on. The Morse key is his anchor. The room is his world. Everything outside it is secondary until it isn't.",
-  "briefing": "You are seated at the Marconi transmitter with the key under your right hand and the receiver pressed to your left ear, and the room smells of ozone and something faintly burnt from the transformer that has been running without a break for sixteen hours. The signal log beside you shows Carpathia's 12:25 AM confirmation in your own handwriting — position, course, speed — and you know that what you have done in the last forty-five minutes may be the most consequential thing you will ever do, though you are twenty-two years old and have not yet framed it in those terms. What you know, and Phillips beside you knows, and no one on the boat deck above you knows, is that the aft dynamos can be isolated from the flooding forward compartments by a procedure that would buy this room twenty additional minutes of transmission power — but it requires someone in the engine room to close two bus bar switches, and the only way to reach them is through the speaking tube on the engine room control platform, which may or may not still have a man at the other end. The floor has tilted two degrees since you sat down. The band outside is playing something you recognize but cannot name. Phillips is transmitting without pause, his face entirely without expression, and you are aware with a physical certainty that you are going to have to decide, in the next few minutes, whether to go down to the engine room yourself or stay at the secondary key and keep the frequency clear. The speaking tube cap is off. The static hisses. You reach for it.",
+  "briefing": "You are seated at the Marconi apparatus in the wireless room at 11:55 PM, and Captain Smith has just left the room after delivering the distress order verbally — his exact words were 'send the call for assistance.' Phillips is beside you, but it is your log, your frequency plan, and your judgment about which ships to raise first. The signal log on the desk is empty of distress traffic — you have not yet transmitted the first CQD. On the desk to your left, under a folded chart, is the Mesaba ice warning that came in at 9:40 PM, which you noted and set aside because Phillips was clearing a commercial backlog and the bridge had not asked for it. You know that warning described pack ice at the position the ship passed approximately ninety minutes ago. You know the distress position the Captain gave you — 41°43'N, 49°56'W, derived from dead reckoning by the Fourth Officer — and you know dead reckoning accumulates error over time. You have a working transmitter, a steady power supply, and a room full of choices. The Captain's order was three words. The rest is yours to determine.",
   "character_hooks": [
-    "I owe my posting on Titanic to a favor from Phillips — he vouched for me when I was nearly passed over for the assignment, and I have never been able to tell him I know.",
-    "I have a Marconigram in my pocket that I received at 10:00 PM and chose not to deliver — it was from a shore station relaying a private message to a First Class passenger, and the content told me something about the ice reports that I don't know how to explain.",
-    "I have been awake for twenty-two hours and my hands are beginning to shake slightly on the key — not enough to affect my transmission, not yet, but I am aware of it in a way I cannot afford to be."
+    "I have been handling private Marconigrams for First Class passengers all evening — commercial traffic that displaced the ice reports from the Mesaba and the Californian in my queue — and I have spent the last five minutes deciding whether that displacement matters now.",
+    "I know the Atlantic operator code keys for three different ship lines, which means I can reach vessels that have not responded to the open distress frequency by addressing their private commercial channels directly.",
+    "I have a cable in my pocket — my fiancée's arrival confirmation, sent from Southampton four days ago — and I have been carrying it through the voyage as a kind of anchor, and I am aware that I have stopped taking it out to read it."
   ],
-  "suggested_secret": "You sent a personal Marconigram to your fiancée in Godalming at 11:30 PM — before the collision — telling her you would be home by the 20th, and you have spent the last hour wondering whether that message will be the last thing she receives from you.",
+  "suggested_secret": "Twenty minutes into the evening watch, you shut down the auxiliary receiver to replace a faulty condenser component — a repair that took longer than expected and left a gap of approximately twenty minutes in the incoming signal log. You did not report the gap to Phillips or to the bridge because you had repaired the fault and the log looked continuous. You have thought about what might have come in during those twenty minutes. You have not told anyone.",
   "opening": {
-    "narrative": "It is 11:55 PM on April 14, 1912. The Marconi Room on the Boat Deck of the RMS Titanic is lit by a single electric bulb and filled with the sound of the transmitter key. Fifteen minutes ago, the ship struck an iceberg at 41°43'N 49°56'W, and the Captain has just ordered you to begin transmitting the distress call. Phillips is at the primary key. You are at the secondary receiver, logging incoming traffic. The floor is level — for now — and the power is steady — for now. Outside, through the thin steel wall, the band has begun to play.",
+    "narrative": "It is 11:55 PM on April 14, 1912. The Captain has just left the Marconi Room after ordering you to send the call for assistance. The transmitter is warm and the power is steady. The signal log in front of you is empty of distress traffic. The Mesaba ice warning is on the desk to your left. Outside, through the Boat Deck port, you can see the first officer directing passengers toward the lifeboats in the dark. You have not yet sent the first transmission.",
     "npcMoments": [],
     "choices": [
-      "Transmit the SOS on the international distress frequency and log Carpathia's response",
-      "Go to the speaking tube and attempt to raise the engine room about the dynamo isolation procedure",
-      "Review the incoming signal log to verify Carpathia's confirmed position and course before anything else"
+      "Broadcast the CQD distress call immediately on the international frequency, transmitting Titanic's position and the nature of the emergency.",
+      "Test the emergency battery circuit first to confirm its range before committing to a transmission strategy — if the main dynamos fail, you need to know what you have left.",
+      "Open the speaking tube to the engine room to coordinate directly with the engineers about how long the main wireless power supply will hold."
     ]
   },
   "roleInitialState": {
     "inventory": [
-      "Marconi signal log — current session",
-      "Carpathia's confirmed response (partial — position confirmed, ETA approximate)",
-      "Mesaba ice warning form (undelivered, in desk drawer)"
+      "Marconi signal log ledger (current session — evening commercial traffic logged, distress log blank)",
+      "Dead-reckoning position slip from Captain Smith (41°43'N, 49°56'W)",
+      "Undelivered Mesaba ice warning slip (received 9:40 PM, set aside during commercial traffic backlog)"
     ],
     "flags": {
-      "carpathia_confirmed": true,
+      "carpathia_confirmed": false,
       "dynamo_isolation_known": false,
-      "mesaba_warning_discovered": false
+      "mesaba_warning_discovered": true
     },
     "suspicion": {
       "harold_bride": 0,
@@ -46,7 +45,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T15:55:02.076Z",
+  "updatedAt": "2026-05-17T00:00:00Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully transmitted the final SOS, and the Carpathia acknowledged your position. You stayed at your post until the power flickered out, but you were unable to reach a lifeboat in time and had to jump into the freezing water.",
