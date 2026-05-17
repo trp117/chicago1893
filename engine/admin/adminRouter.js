@@ -1121,5 +1121,27 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  // ╔══════════════════════════════════════════════════════════════════╗
+  // ║  TEMPORARY EXPORT ROUTE — REMOVE AFTER EXPORT IS COMPLETE       ║
+  // ║  File: engine/admin/adminRouter.js  Line: ~1127                  ║
+  // ╚══════════════════════════════════════════════════════════════════╝
+  r.get('/export/scenario/:id', async (req, res) => {
+    const exportKey = process.env.SCENARIO_EXPORT_KEY;
+    if (!exportKey || req.query.export_key !== exportKey) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
+    const scenarioPath = join(_dir, '../../data/scenarios', `${req.params.id}.json`);
+    try {
+      const contents = await readFile(scenarioPath, 'utf8');
+      res.set('Content-Type', 'application/json').status(200).send(contents);
+    } catch (err) {
+      if (err.code === 'ENOENT') return res.status(404).json({ error: 'not found' });
+      res.status(500).json({ error: err.message });
+    }
+  });
+  // ╔══════════════════════════════════════════════════════════════════╗
+  // ║  END TEMPORARY EXPORT ROUTE                                      ║
+  // ╚══════════════════════════════════════════════════════════════════╝
+
   return r;
 }

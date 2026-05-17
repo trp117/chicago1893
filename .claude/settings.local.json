@@ -3,7 +3,30 @@
     "allow": [
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(node -e \"import\\('./server/gameRouter.js'\\).then\\(\\(\\) => console.log\\('OK'\\)\\).catch\\(e => console.error\\('IMPORT ERROR:', e.message\\)\\)\")",
+      "Bash(node --input-type=module)",
+      "Bash(cd /d D:\\\\chicago1893_v1\\\\chicago1893_v1)",
+      "Bash(Get-ChildItem -Recurse -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(cd /d \"D:\\\\chicago1893_v1\\\\chicago1893_v1\")",
+      "Bash(findstr /s \"character\\\\|CHARACTER\" engine\\\\*.js engine\\\\services\\\\*.js)",
+      "Bash(Get-Content \"engine\\\\data\\\\characters\\\\hannah_cross.json\")",
+      "Bash(ConvertFrom-Json)",
+      "Bash(Get-Member -MemberType NoteProperty)",
+      "Bash(Select-Object Name)",
+      "Bash(findstr /n \"margaret_vane\" \"engine\\\\data\\\\scenarios\\\\midnight_errand_boston.json\")",
+      "Bash(node --input-type=module --check)",
+      "Bash(dir data/)",
+      "Bash(dir engine/data/)",
+      "Bash(node *)",
+      "Bash(curl -s http://localhost:3001/admin/api/scenarios)",
+      "Bash(Get-ChildItem -Recurse -Include \"*.js\" -Exclude \"node_modules\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(curl -s http://localhost:3001/admin/dashboard)",
+      "Bash(Get-ChildItem -Path \"D:\\\\chicago1893_v1\\\\chicago1893_v1\" -Directory)",
+      "Bash(curl -s http://localhost:3000/admin/api/scenarios/dog_green_sector/full)",
+      "Bash(curl *)"
     ]
   }
 }
