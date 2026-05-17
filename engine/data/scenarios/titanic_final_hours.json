@@ -231,7 +231,7 @@
   "beats_status": "not_generated",
   "epilogue": {
     "generated": true,
-    "reviewed": false,
+    "reviewed": true,
     "character_fates": [
       {
         "character_id": "harold_bride",

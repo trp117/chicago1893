@@ -307,6 +307,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     closingProse,
   ].join('\n');
 
+  console.log('[EPILOGUE-CLOSE] calling API');
   const signal = AbortSignal.timeout(30000);
   const resp   = await fetch(ANTHROPIC_URL, {
     method: 'POST', signal,
@@ -1066,7 +1067,9 @@ export function createGameRouter(repos, config = {}) {
 
       // Generate historical epilogue if data block is ready and reviewed
       let epilogueResult = null;
+      console.log('[EPILOGUE-CLOSE] reached epilogue check');
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
+        console.log('[EPILOGUE-CLOSE] conditions:', scenarioData.epilogue.generated, scenarioData.epilogue.reviewed);
         try {
           const sessionState = sessionId ? repos.sessions.findById(sessionId) : null;
           const summary      = buildEpilogueSummary(sessionState, endResult);
