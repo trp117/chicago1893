@@ -88,6 +88,7 @@ app.get('/ping', (_, res) => res.json({ ok: true, ts: Date.now() }));
 const HTML_HEADERS = { headers: { 'Cache-Control': 'public, max-age=300, must-revalidate' } };
 
 app.get('/',     (_, res) => res.sendFile(path.join(publicDir, 'index.html'), HTML_HEADERS));
+app.get('/test', (_, res) => res.sendFile(path.join(publicDir, 'test.html'),  HTML_HEADERS));
 app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   HTML_HEADERS));
 
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));

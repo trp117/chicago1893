@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Sessions — Living History Admin</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f1f5f9; color: #1e293b; min-height: 100vh;
+}
+
+.topbar {
+  background: #1e2a4a; color: #fff;
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-title { font-size: 15px; font-weight: 700; letter-spacing: .3px; }
+.topbar-sub   { font-size: 12px; color: #8899bb; margin-top: 2px; }
+.topbar-nav { display: flex; gap: 16px; }
+.topbar-nav a {
+  font-size: 12px; color: #8899bb; text-decoration: none;
+  transition: color .15s;
+}
+.topbar-nav a:hover { color: #fff; }
+
+.content { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p  { font-size: 14px; color: #64748b; margin-top: 6px; }
+
+.scenario-block {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.scenario-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex; align-items: baseline; gap: 12px;
+}
+.scenario-name { font-size: 16px; font-weight: 700; }
+.scenario-meta { font-size: 12px; color: #64748b; }
+.scenario-id   { font-size: 11px; color: #94a3b8; font-family: monospace; margin-left: auto; }
+
+.roles-list { padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.role-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 8px;
+  border: 1px solid #e2e8f0; background: #f8fafc;
+  transition: background .15s, border-color .15s;
+}
+.role-row:hover { background: #eef2ff; border-color: #c7d2fe; }
+.role-name { font-size: 14px; font-weight: 600; flex: 1; }
+.role-id   { font-size: 11px; color: #94a3b8; font-family: monospace; }
+.play-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  background: #4f8ef7; color: #fff; text-decoration: none;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.play-btn:hover { background: #3a7de8; }
+.copy-btn {
+  display: inline-flex; align-items: center;
+  padding: 7px 10px; border-radius: 6px; font-size: 12px;
+  background: #e2e8f0; color: #64748b; border: none; cursor: pointer;
+  transition: background .15s;
+}
+.copy-btn:hover { background: #cbd5e1; color: #1e293b; }
+
+.loading {
+  text-align: center; padding: 60px 24px;
+  font-size: 14px; color: #94a3b8;
+}
+.error-msg {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 16px 20px; color: #b91c1c; font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Living History — Test Sessions</div>
+    <div class="topbar-sub">Pick a scenario and role to launch a play session directly</div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="/admin">← Admin</a>
+    <a href="/">Homepage</a>
+    <a href="/game">Game</a>
+  </nav>
+</div>
+
+<div class="content">
+  <div class="page-header">
+    <h1>Playable Scenarios</h1>
+    <p>Every scenario with at least one player role. Click Play to open the game engine directly, or copy the URL to share.</p>
+  </div>
+  <div id="scenario-list"><div class="loading">Loading scenarios…</div></div>
+</div>
+
+<script>
+const BASE = window.location.origin;
+
+function gameUrl(scenarioId, roleId) {
+  return `${BASE}/game?scenarioId=${encodeURIComponent(scenarioId)}&roleId=${encodeURIComponent(roleId)}`;
+}
+
+async function load() {
+  const container = document.getElementById('scenario-list');
+  try {
+    // Fetch scenario list and all player roles in parallel
+    const [storiesRes, rolesRes] = await Promise.all([
+      fetch('/api/stories'),
+      fetch('/admin/api/player-roles'),
+    ]);
+    if (!storiesRes.ok || !rolesRes.ok) throw new Error('API error');
+
+    const stories = await storiesRes.json();
+    const allRoles = await rolesRes.json();
+
+    if (!stories.length) {
+      container.innerHTML = '<p class="error-msg">No scenarios found. Make sure scenarios have at least one player role defined.</p>';
+      return;
+    }
+
+    const rolesByScenario = {};
+    allRoles.forEach(r => {
+      if (!rolesByScenario[r.scenarioId]) rolesByScenario[r.scenarioId] = [];
+      rolesByScenario[r.scenarioId].push(r);
+    });
+
+    container.innerHTML = stories.map(s => {
+      const roles = rolesByScenario[s.id] || [];
+      const rolesHtml = roles.length
+        ? roles.map(r => {
+            const url = gameUrl(s.id, r.id);
+            return `<div class="role-row">
+              <div>
+                <div class="role-name">${esc(r.name || r.id)}</div>
+                <div class="role-id">${esc(r.id)}</div>
+              </div>
+              <a href="${url}" target="_blank" class="play-btn">▶ Play</a>
+              <button class="copy-btn" onclick="copyUrl('${url.replace(/'/g, "\\'")}', this)" title="Copy URL">⎘</button>
+            </div>`;
+          }).join('')
+        : '<div style="padding:10px 0;font-size:13px;color:#94a3b8">No roles defined for this scenario</div>';
+
+      return `<div class="scenario-block">
+        <div class="scenario-head">
+          <div class="scenario-name">${esc(s.title || s.id)}</div>
+          <div class="scenario-meta">${esc(s.era || '')}${s.duration ? ' · ' + esc(s.duration) : ''}</div>
+          <div class="scenario-id">${esc(s.id)}</div>
+        </div>
+        <div class="roles-list">${rolesHtml}</div>
+      </div>`;
+    }).join('');
+
+  } catch (err) {
+    container.innerHTML = `<p class="error-msg">Failed to load scenarios: ${err.message}</p>`;
+  }
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function copyUrl(url, btn) {
+  try {
+    await navigator.clipboard.writeText(url);
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  } catch {}
+}
+
+load();
+</script>
+</body>
+</html>
