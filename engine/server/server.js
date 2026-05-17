@@ -24,6 +24,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
 const adminDir  = path.resolve(__dirname, '../admin');
 const gameDir   = path.resolve(__dirname, '../game');
+const publicDir = path.resolve(__dirname, '../../public');
 
 const store = new JsonFileStore(dataDir);
 const repos = {
@@ -40,6 +41,7 @@ const app = express();
 app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+app.use(express.static(publicDir, { maxAge: '5m' }));
 
 const gameConfig = {
   anthropicApiKey:    process.env.ANTHROPIC_API_KEY,
@@ -50,12 +52,42 @@ const gameConfig = {
 app.use('/admin/api', createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
 app.use('/game/api',  createGameRouter(repos, gameConfig));
 
+// Public scenario listing — no auth required
+const ERA_TAG = { war: 'World War II', 'crisis-simulation': 'Space Race', maritime: 'Maritime', 'civil-war': 'American Civil War', sail: 'Age of Sail', space: 'Space Race' };
+function deriveEra(s) {
+  for (const t of (s.genre || [])) if (ERA_TAG[t]) return ERA_TAG[t];
+  const title = (s.title || '').toLowerCase();
+  if (title.includes('titanic') || title.includes('marconi')) return 'Maritime';
+  if (title.includes('apollo') || title.includes('space'))    return 'Space Race';
+  const rest = (s.genre || []).filter(g => !['historical','drama','survival'].includes(g));
+  return rest[0] || 'Historical';
+}
+app.get('/api/stories', (req, res) => {
+  try {
+    const allRoles = repos.scenarios.findPlayerRoles();
+    const rolesBy  = {};
+    allRoles.forEach(r => { rolesBy[r.scenarioId] = (rolesBy[r.scenarioId] || 0) + 1; });
+    const stories = repos.scenarios.findAll()
+      .filter(s => s.hidden !== true && (rolesBy[s.id] || 0) > 0)
+      .map(s => ({
+        id:          s.id,
+        title:       s.title,
+        description: s.description,
+        era:         deriveEra(s),
+        duration:    s.sessionTargetMinutes ? `~${s.sessionTargetMinutes} min` : null,
+      }));
+    res.json(stories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Keep-warm ping — Railway and uptime monitors hit this to prevent cold starts
 app.get('/ping', (_, res) => res.json({ ok: true, ts: Date.now() }));
 
 const HTML_HEADERS = { headers: { 'Cache-Control': 'public, max-age=300, must-revalidate' } };
 
-app.get('/',     (_, res) => res.sendFile(path.join(gameDir,  'landing.html'), HTML_HEADERS));
+app.get('/',     (_, res) => res.sendFile(path.join(publicDir, 'index.html'), HTML_HEADERS));
 app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   HTML_HEADERS));
 
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
