@@ -40,6 +40,18 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .story-feed::-webkit-scrollbar { width: 4px; }
 .story-feed::-webkit-scrollbar-track { background: transparent; }
 .story-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.scroll-hint {
+  position: sticky; bottom: 16px;
+  display: flex; justify-content: center;
+  pointer-events: none; opacity: 0; transition: opacity 0.4s ease;
+}
+.scroll-hint.visible { opacity: 1; }
+.scroll-hint-chevron {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
 .player-turn { font-size: 0.85rem; color: var(--muted); font-style: italic; margin: 20px 0 6px; padding-left: 10px; border-left: 2px solid var(--border); }
 .scene-card { line-height: 1.75; font-size: 1rem; margin-bottom: 4px; }
 .scene-card p { margin: 0 0 14px; }
@@ -526,6 +538,26 @@ const inputEl    = document.getElementById('player-input');
 const choicesAreaWrapEl = document.getElementById('choices-area-wrap');
 const streamOptionsDots = document.getElementById('stream-options-dots');
 const submitBtn         = formEl.querySelector('button[type="submit"]');
+
+const scrollHintEl = (() => {
+  const wrap = document.createElement('div');
+  wrap.className = 'scroll-hint';
+  const icon = document.createElement('div');
+  icon.className = 'scroll-hint-chevron';
+  icon.textContent = '↓';
+  wrap.appendChild(icon);
+  storyEl.appendChild(wrap);
+  return wrap;
+})();
+function feedAppend(el) { storyEl.insertBefore(el, scrollHintEl); }
+function feedScrollTop(el) {
+  storyEl.scrollTop = el.getBoundingClientRect().top
+    - storyEl.getBoundingClientRect().top + storyEl.scrollTop;
+}
+function showScrollHint() {
+  if (storyEl.scrollHeight > storyEl.clientHeight + 20) scrollHintEl.classList.add('visible');
+}
+storyEl.addEventListener('scroll', () => scrollHintEl.classList.remove('visible'), { passive: true });
 const ttsBarEl   = document.getElementById('tts-bar');
 const ttsToggleBtn = document.getElementById('tts-toggle');
 const ttsStopBtn   = document.getElementById('tts-stop');
@@ -773,6 +805,7 @@ function renderOutput(output, meta = {}) {
     if (!isTransitionTurn) {
       locationFeed = [];
       storyEl.innerHTML = '';
+      storyEl.appendChild(scrollHintEl);
       pendingEntryEl = null;
     }
   }
@@ -791,7 +824,7 @@ function renderOutput(output, meta = {}) {
     const entryEl = document.createElement('div');
     entryEl.className = 'feed-entry';
     entryEl.appendChild(sceneEl);
-    storyEl.appendChild(entryEl);
+    feedAppend(entryEl);
   }
 
   pendingTeleprompterEl = sceneEl;
@@ -1052,8 +1085,8 @@ function showTimeDecision() {
     sceneEl.className = 'scene-card';
     sceneEl.innerHTML = `<p><span class="line"><em>*Five minutes. There is no more room for error.*</em></span></p>`;
     overtimeEl.appendChild(sceneEl);
-    storyEl.appendChild(overtimeEl);
-    storyEl.scrollTop = storyEl.scrollHeight;
+    feedAppend(overtimeEl);
+    feedScrollTop(overtimeEl);
 
     renderSidebar();
     updateChaseUI();
@@ -1102,6 +1135,7 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   }
   submitting = true;
   inputEl.value = '';
+  scrollHintEl.classList.remove('visible');
   choicesAreaWrapEl.classList.add('hidden');
   streamOptionsDots.classList.remove('hidden');
   submitBtn.disabled = true;
@@ -1116,8 +1150,8 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   dotsEl.className = 'thinking-dots';
   dotsEl.innerHTML = '<span></span><span></span><span></span>';
   entryEl.appendChild(dotsEl);
-  storyEl.appendChild(entryEl);
-  storyEl.scrollTop = storyEl.scrollHeight;
+  feedAppend(entryEl);
+  feedScrollTop(entryEl);
   pendingEntryEl = entryEl;
 
   try {
@@ -1151,10 +1185,10 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
             streamEl = document.createElement('div');
             streamEl.className = 'scene-card';
             entryEl.appendChild(streamEl);
+            feedScrollTop(streamEl);
           }
           streamBuffer += evt.text;
           streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
-          storyEl.scrollTop = storyEl.scrollHeight;
         } else if (evt.type === 'done') {
           output    = evt.output;
           nextState = evt.nextState;
@@ -1212,6 +1246,7 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     void choicesAreaWrapEl.offsetHeight;             // force reflow so transition fires from opacity:0
     choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
     choicesAreaWrapEl.style.opacity = '1';
+    showScrollHint();
     submitBtn.disabled = false;
 
     if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
@@ -1658,6 +1693,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   updateLocationDisplay(gameState.location);
 
   // Hide choices area and show streaming dots while opening generates
+  scrollHintEl.classList.remove('visible');
   choicesAreaWrapEl.classList.add('hidden');
   streamOptionsDots.classList.remove('hidden');
   submitBtn.disabled = true;
@@ -1669,8 +1705,8 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   dotsEl.className = 'thinking-dots';
   dotsEl.innerHTML = '<span></span><span></span><span></span>';
   loadingEl.appendChild(dotsEl);
-  storyEl.appendChild(loadingEl);
-  storyEl.scrollTop = storyEl.scrollHeight;
+  feedAppend(loadingEl);
+  feedScrollTop(loadingEl);
 
   let openingOutput, openingNextState;
   try {
@@ -1718,10 +1754,10 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
             streamEl = document.createElement('div');
             streamEl.className = 'scene-card';
             loadingEl.appendChild(streamEl);
+            feedScrollTop(streamEl);
           }
           streamBuffer += evt.text;
           streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
-          storyEl.scrollTop = storyEl.scrollHeight;
         } else if (evt.type === 'done') {
           openingOutput    = evt.output;
           openingNextState = evt.nextState;
@@ -1760,6 +1796,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   void choicesAreaWrapEl.offsetHeight;
   choicesAreaWrapEl.style.transition = 'opacity 250ms ease';
   choicesAreaWrapEl.style.opacity = '1';
+  showScrollHint();
   submitBtn.disabled = false;
 }
 
