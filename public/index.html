@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Living History — Immersive Historical Fiction</title>
+<meta name="description" content="Project Limen — immersive historical fiction where you question witnesses, gather clues, and solve mysteries drawn from real events.">
+<meta property="og:title" content="Project Limen">
+<meta property="og:site_name" content="Project Limen">
+<meta property="og:url" content="https://projectlimen.com">
+<title>Project Limen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
@@ -117,6 +121,17 @@ body::after {
   margin-top: clamp(24px, 4vw, 40px);
   display: flex; flex-wrap: wrap; gap: 12px;
   opacity: 0; animation: fadeUp 0.9s 0.95s forwards;
+}
+.hero-brand {
+  position: absolute;
+  top: clamp(100px, 22vh, 180px);
+  left: 0; right: 0;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 4.5vw, 52px);
+  font-weight: 300; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gold-light);
+  opacity: 0; animation: fadeUp 0.9s 0.1s forwards;
 }
 .btn-primary {
   font-family: 'Barlow Condensed', sans-serif;
@@ -524,7 +539,7 @@ footer {
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">Living<span>/</span>History</div>
+  <div class="nav-logo">Project Limen</div>
   <ul class="nav-links">
     <li class="nav-hide"><a href="#featured">Stories</a></li>
     <li class="nav-hide"><a href="#categories">Categories</a></li>
@@ -910,6 +925,7 @@ footer {
 
   </svg>
   </div>
+  <div class="hero-brand">Project Limen</div>
   <div class="hero-content">
     <div class="hero-rule"></div>
     <p class="hero-eyebrow">Immersive Historical Fiction</p>
@@ -1037,8 +1053,9 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Living / History</div>
+  <div class="footer-logo">Project Limen</div>
   <p class="footer-note">All scenarios verified against primary sources</p>
+  <p class="footer-note">© 2026 Project Limen</p>
 </footer>
 
 <script>

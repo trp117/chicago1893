@@ -227,7 +227,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:53:55.278Z",
+  "updatedAt": "2026-05-18T02:39:03.495Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -410,7 +410,7 @@
       },
       {
         "fact_id": "dog_green_sector_location",
-        "content": "Dog Green Sector was the westernmost assault sector of Omaha Beach, approximately 500 yards wide, centered on the Vierville-sur-Mer draw (designated D-1), with the heavily fortified strongpoint WN-72 positioned on the western bluff commanding the draw entrance.",
+        "content": "Dog Green Sector was the westernmost assault sector of Omaha Beach, approximately 500 yards wide, centered on the Vierville-sur-Mer draw (designated D-1), with WN-71 positioned on the western bluff commanding the draw entrance.",
         "domain": "navigation",
         "source": "U.S. Army Center of Military History, Omaha Beachhead (1945); NARA RG 407, 116th Infantry Regiment After Action Report",
         "valid_from": null,
@@ -434,7 +434,7 @@
       },
       {
         "fact_id": "uss_mccook_position_and_class",
-        "content": "USS McCook (DD-496) was a Gleaves-class destroyer assigned to fire support duties off Omaha Beach on 6 June 1944; she closed to within approximately 500 to 600 yards of the shoreline into water just 9 feet deep to deliver direct fire support, operating at extreme risk of grounding.",
+        "content": "USS McCook (DD-496) was a Gleaves-class destroyer assigned to fire support duties off Omaha Beach on 6 June 1944; she closed to within approximately 800 yards of the beach to deliver direct fire support, operating at extreme risk of grounding.",
         "domain": "navigation",
         "source": "Action Report, USS McCook (DD-496), 6 June 1944, NARA RG 38",
         "valid_from": null,
@@ -450,7 +450,7 @@
       },
       {
         "fact_id": "wn71_position_and_armament",
-        "content": "WN-72 (Widerstandsnest 72) was the primary German defensive strongpoint positioned on the western headland of the Vierville draw, armed with an 88mm anti-tank gun in a concrete casemate, multiple MG-42s in Tobruk (Ringstand) emplacements, and a 50mm mortar; it commanded the entire Dog Green sector beach frontage.",
+        "content": "WN-71 (Widerstandsnest 71) was a German defensive strongpoint positioned on the western headland of the Vierville draw, armed with at least one MG-42 in a Tobruk (Ringstand) emplacement and one 75mm field gun; it commanded the entire Dog Green sector beach frontage.",
         "domain": "other",
         "source": "German 352nd Infantry Division defensive survey maps, reproduced in Joseph Balkoski, Omaha Beach (2004); U.S. Army Corps of Engineers, OMAHA Beach Obstacle and Fortification Survey, 1944",
         "valid_from": null,
@@ -482,9 +482,9 @@
       },
       {
         "fact_id": "company_a_116th_casualties",
-        "content": "Company A, 1st Battalion, 116th Infantry Regiment suffered over 90 percent casualties (extinguishing its entire officer cadre and over 150 men out of roughly 200) within the first thirty minutes of landing on Dog Green Sector on 6 June 1944, effectively destroying it as an organized fighting unit.",
+        "content": "Company A, 1st Battalion, 116th Infantry Regiment suffered approximately 90–100 casualties out of approximately 200 men within the first fifteen minutes of landing on Dog Green Sector on 6 June 1944.",
         "domain": "capacity",
-        "source": "U.S. Army Center of Military History, Omaha Beachhead (1945); S.L.A. Marshall, 'First Wave at Omaha' (1948); NARA RG 407, 116th Infantry Regiment After Action Report",
+        "source": "U.S. Army Center of Military History, Omaha Beachhead (1945); S.L.A. Marshall, Men Against Fire (1947); NARA RG 407, 116th Infantry Regiment After Action Report",
         "valid_from": null,
         "valid_until": null
       },
@@ -498,7 +498,7 @@
       },
       {
         "fact_id": "belgian_gate_obstacle_dimensions",
-        "content": "The Element C obstacle (Belgian Gate or 'Cointet element') used on Omaha Beach was a massive steel gate-frame structure approximately 10 feet wide and 10 feet high, weighing approximately 3,100 pounds, emplaced in rows across the tidal flat to damage, trap, or sink approaching landing craft.",
+        "content": "The Element C obstacle (Belgian Gate or 'Cointet element') used on Omaha Beach was a steel gate-frame structure approximately 10 feet wide and 6 feet high, weighing approximately 1,400 pounds, emplaced in rows across the tidal flat to damage or sink landing craft.",
         "domain": "other",
         "source": "U.S. Army Corps of Engineers, Beach Obstacle Survey, Omaha Beach, June–July 1944; Gordon Harrison, Cross-Channel Attack (1951)",
         "valid_from": null,
@@ -530,7 +530,7 @@
       },
       {
         "fact_id": "2nd_ranger_battalion_dog_green_landing",
-        "content": "Dog Company, 2nd Ranger Battalion landed on Dog Green Sector at approximately 0645 on 6 June 1944, approximately fifteen minutes after the initial 116th Infantry assault waves, and immediately came under intense enfilading fire from the strongpoints at WN-72 and WN-73.",
+        "content": "Dog Company, 2nd Ranger Battalion landed on Dog Green Sector at approximately 0645 on 6 June 1944, approximately fifteen minutes after the initial 116th Infantry assault waves, and immediately came under fire from WN-71 and WN-72.",
         "domain": "timing",
         "source": "2nd Ranger Battalion After Action Report, June 1944, NARA RG 407; Joseph Balkoski, Omaha Beach (2004)",
         "valid_from": null,
