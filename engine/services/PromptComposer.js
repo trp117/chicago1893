@@ -320,9 +320,14 @@ const PERIOD_NUMS = ['','one','two','three','four','five','six','seven','eight',
   'twenty-six','twenty-seven','twenty-eight','twenty-nine'];
 const PERIOD_HOURS = ['twelve','one','two','three','four','five','six','seven','eight','nine','ten','eleven'];
 
-export function timeToPeriodString(minutesRemaining, sessionTargetMinutes = 30) {
-  const elapsed = sessionTargetMinutes - (minutesRemaining ?? 0);
-  const total   = 9 * 60 + 30 + Math.max(0, elapsed);
+export function timeToPeriodString(minutesRemaining, sessionTargetMinutes = 30, sessionStartTime = null) {
+  const elapsed    = sessionTargetMinutes - (minutesRemaining ?? 0);
+  let   baseline   = 9 * 60 + 30; // default: 9:30 PM
+  if (sessionStartTime) {
+    const [hh, mm] = sessionStartTime.split(':').map(Number);
+    baseline = hh * 60 + (mm || 0);
+  }
+  const total = baseline + Math.max(0, elapsed);
   const h = Math.floor(total / 60) % 12;
   const m = total % 60;
   const hw = PERIOD_HOURS[h], nw = PERIOD_HOURS[(h + 1) % 12];
@@ -609,6 +614,18 @@ function buildResolvedThreadsBlock(state) {
   return `RESOLVED THREADS (closed — do not reopen or contradict):\n${lines.join('\n')}`;
 }
 
+function buildVerifiedFactsBlock(state) {
+  const facts = (state.technicalFacts || []).filter(f => f.pre_seeded);
+  if (facts.length === 0) return '';
+  const lines = facts.map(f => `- [VERIFIED] ${f.content}\n  Source: ${f.source}`);
+  return [
+    'VERIFIED HISTORICAL FACTS — use these exactly; do not generate alternative values:',
+    lines.join('\n'),
+    '',
+    'You must draw all technical data — voltages, flooding rates, timing, capacity figures, personnel actions — from the VERIFIED HISTORICAL FACTS list above when relevant facts exist. Do not generate alternative values. Do not approximate. If a verified fact is relevant to the current turn, use it exactly as stated.',
+  ].join('\n');
+}
+
 export function checkEndingReadiness(state, scenario) {
   const hasConspirators = (state.namedConspirators || []).length >= 1;
   const isLateTurn      = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
@@ -634,7 +651,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   const { remainingMinutes, ...stateRest } = state;
   const promptState = {
     ...stateRest,
-    timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes),
+    timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes, scenario.sessionStartTime || null),
   };
 
   return turnTemplate
@@ -645,6 +662,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NPC_ROUTES_JSON}}',        JSON.stringify(charRoutes))
     .replace('{{ENDING_SIGNALS_JSON}}',    JSON.stringify(endingSignals))
     .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location))
+    .replace('{{VERIFIED_FACTS}}',          buildVerifiedFactsBlock(state))
     .replace('{{OBJECT_STATE}}',           buildObjectStateBlock(state))
     .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))
     .replace('{{NPC_INTRO_INSTRUCTION}}',  [

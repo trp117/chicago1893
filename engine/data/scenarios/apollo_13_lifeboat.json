@@ -226,7 +226,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T19:28:54.910Z",
+  "updatedAt": "2026-05-18T01:23:19.653Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -418,5 +418,171 @@
       "checked": false,
       "notes": ""
     }
+  },
+  "technical_facts": {
+    "generated": true,
+    "reviewed": false,
+    "facts": [
+      {
+        "fact_id": "explosion_timestamp_cdt",
+        "content": "The oxygen tank explosion aboard Apollo 13 occurred at 21:07:53 CDT on April 13, 1970 (03:07:53 UTC on April 14, 1970), at 55 hours, 54 minutes, and 53 seconds Mission Elapsed Time.",
+        "domain": "timing",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 4; Edgar Cortright Review Board Report, 1970",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lovell_actual_words",
+        "content": "James Lovell's actual transmission to Mission Control was 'Houston, we've had a problem,' spoken in past tense; the present-tense version 'we have a problem' is a film inaccuracy.",
+        "domain": "personnel",
+        "source": "Apollo 13 Air-to-Ground Voice Transcription, NASA Manned Spacecraft Center, April 1970, page 175",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "spacecraft_distance_at_explosion",
+        "content": "At the time of the explosion, Apollo 13 was approximately 200,000 statute miles (321,860 kilometers) from Earth.",
+        "domain": "navigation",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I; Cortright Review Board Report, 1970",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "oxygen_tank_two_pressure_zero",
+        "content": "Oxygen Tank Two pressure dropped to zero within approximately 130 minutes of the explosion; Oxygen Tank One pressure fell from 865 psia to zero over approximately 130 minutes as oxygen vented through the damaged bay.",
+        "domain": "flooding",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 4.2; Cortright Review Board Report, Appendix D",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lm_co2_canister_rated_capacity",
+        "content": "The Lunar Module Aquarius lithium hydroxide canisters were rated to support two men for 36 hours; the actual requirement was to support three men for approximately 87 hours.",
+        "domain": "capacity",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; testimony of mission controllers in Cortright Review Board proceedings",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "co2_danger_threshold",
+        "content": "The danger threshold for carbon dioxide partial pressure in the spacecraft cabin was 7.6 mmHg (1% partial pressure); cognitive impairment begins at approximately 15 mmHg.",
+        "domain": "other",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; NASA Environmental Control System specifications",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "mailbox_adapter_materials",
+        "content": "The improvised CO2 scrubber adapter — called the 'mailbox' — was constructed using materials confirmed aboard the spacecraft: a Command Module lithium hydroxide canister, plastic bags, a flight plan cover, a sock, and duct tape, connected with suit hose.",
+        "domain": "other",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "pc_plus_2_burn_met",
+        "content": "The PC+2 (pericynthion plus 2 hours) burn using the Lunar Module Descent Propulsion System was executed at approximately 79 hours, 27 minutes, 38.9 seconds Mission Elapsed Time, lasting 263.1 seconds (4 minutes, 23.1 seconds).",
+        "domain": "timing",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II; Apollo 13 Flight Journal, NASA",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "pc_plus_2_burn_delta_v",
+        "content": "The PC+2 burn produced a delta-V of approximately 860.5 feet per second (262.3 m/s), shortening the return time to Earth by approximately 10 hours.",
+        "domain": "navigation",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "command_module_reentry_power_requirement",
+        "content": "The Command Module Odyssey required a minimum of approximately 43 amp-hours of battery power to support re-entry; the three entry batteries had a combined capacity of approximately 135 amp-hours but had been partially depleted.",
+        "domain": "power",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; testimony of John Aaron, Cortright Review Board",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lm_battery_capacity",
+        "content": "The Lunar Module Aquarius carried two descent batteries with a combined capacity of approximately 1,600 amp-hours at 28–32 volts DC, designed for a 45-hour lunar surface mission; they were used over approximately 87 hours as a lifeboat.",
+        "domain": "power",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; Grumman LM Systems Handbook",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lm_activation_time_actual",
+        "content": "The emergency activation of the Lunar Module Aquarius was completed in approximately 1 hour and 23 minutes; the standard activation procedure was designed to take approximately 2 hours.",
+        "domain": "timing",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.1; Apollo 13 Flight Journal, NASA",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "splashdown_timestamp",
+        "content": "Apollo 13 splashed down in the South Pacific Ocean at 12:07:44 CDT on April 17, 1970 (18:07:44 UTC), at 142 hours, 54 minutes, 41 seconds Mission Elapsed Time.",
+        "domain": "timing",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "splashdown_coordinates",
+        "content": "Apollo 13 splashed down at approximately 21°38' South latitude, 165°22' West longitude, approximately 3.5 nautical miles from the primary recovery ship USS Iwo Jima.",
+        "domain": "navigation",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "liebergot_sensor_failure_assessment",
+        "content": "EECOM Sy Liebergot's initial assessment of the anomaly was that it was likely a sensor failure, based in part on a similar telemetry signature from an Apollo 12 instrumentation anomaly; he recommended standing by before initiating emergency procedures.",
+        "domain": "personnel",
+        "source": "Sy Liebergot with David Harland, Apollo EECOM: Journey of a Lifetime (2003); Cortright Review Board testimony",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "kranz_tiger_team_isolation",
+        "content": "Flight Director Gene Kranz isolated his White Team as a dedicated 'Tiger Team' to work re-entry procedures exclusively, handing ongoing mission management to Flight Director Glynn Lunney's Black Team immediately after the explosion.",
+        "domain": "personnel",
+        "source": "Gene Kranz, Failure Is Not an Option (2000); NASA Mission Control shift logs, April 1970",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "john_aaron_off_duty_recalled",
+        "content": "Systems engineer John Aaron was off-shift and at home when the Apollo 13 emergency began; he was called back to Mission Control specifically to lead the Command Module power-up budget calculations for re-entry.",
+        "domain": "personnel",
+        "source": "Gene Kranz, Failure Is Not an Option (2000); NASA oral history, John Aaron interview, 2000",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "cabin_temperature_lm",
+        "content": "Cabin temperature inside the Lunar Module Aquarius dropped to approximately 38°F (3°C) during the coast phase as all non-essential heaters were powered off to conserve electricity.",
+        "domain": "other",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.5; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "haise_illness_during_mission",
+        "content": "Fred Haise developed a urinary tract infection during the mission, caused in part by reduced water intake — the crew was rationed to approximately 6 ounces of water per man per day, well below the normal 32 ounces.",
+        "domain": "personnel",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.6 (Medical); NASA post-mission crew debriefing",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "service_module_jettison_timing",
+        "content": "The Service Module was jettisoned at 138 hours, 2 minutes Mission Elapsed Time, approximately 4 hours and 15 minutes before re-entry; the crew photographed the damage through the Command Module windows immediately after separation.",
+        "domain": "timing",
+        "source": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I; Apollo 13 Flight Journal, NASA",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ]
   }
 }

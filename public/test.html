@@ -71,6 +71,40 @@ body {
 }
 .copy-btn:hover { background: #cbd5e1; color: #1e293b; }
 
+.sim-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  background: #7c3aed; color: #fff; border: none; cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.sim-btn:hover:not(:disabled) { background: #6d28d9; }
+.sim-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.sim-panel {
+  display: none;
+  margin: 8px 0 4px;
+  border: 1px solid #e0d4f8; border-radius: 8px;
+  background: #faf8ff; padding: 12px 14px;
+  font-size: 12px; line-height: 1.6;
+}
+.sim-panel.active { display: block; }
+
+.sim-line { color: #475569; margin-bottom: 3px; }
+.sim-status { color: #6d28d9; font-weight: 600; }
+.sim-turn   { color: #0369a1; }
+.sim-preview { color: #64748b; font-style: italic; margin-left: 16px; }
+.sim-done  { color: #15803d; font-weight: 700; margin-top: 6px; }
+.sim-error { color: #b91c1c; font-weight: 700; margin-top: 6px; }
+
+.dl-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 8px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  background: #15803d; color: #fff; text-decoration: none;
+  transition: background .15s;
+}
+.dl-btn:hover { background: #166534; }
+
 .loading {
   text-align: center; padding: 60px 24px;
   font-size: 14px; color: #94a3b8;
@@ -98,7 +132,7 @@ body {
 <div class="content">
   <div class="page-header">
     <h1>Playable Scenarios</h1>
-    <p>Every scenario with at least one player role. Click Play to open the game engine directly, or copy the URL to share.</p>
+    <p>Every scenario with at least one player role. Click Play to open the game engine directly, copy the URL, or run an automated simulation.</p>
   </div>
   <div id="scenario-list"><div class="loading">Loading scenarios…</div></div>
 </div>
@@ -113,7 +147,6 @@ function gameUrl(scenarioId, roleId) {
 async function load() {
   const container = document.getElementById('scenario-list');
   try {
-    // Fetch scenario list and all player roles in parallel
     const [storiesRes, rolesRes] = await Promise.all([
       fetch('/api/stories'),
       fetch('/admin/api/player-roles'),
@@ -139,14 +172,17 @@ async function load() {
       const rolesHtml = roles.length
         ? roles.map(r => {
             const url = gameUrl(s.id, r.id);
-            return `<div class="role-row">
+            const simId = `sim-${CSS.escape(s.id)}-${CSS.escape(r.id)}`;
+            return `<div class="role-row" data-scenario="${esc(s.id)}" data-role="${esc(r.id)}">
               <div>
                 <div class="role-name">${esc(r.name || r.id)}</div>
                 <div class="role-id">${esc(r.id)}</div>
               </div>
               <a href="${url}" target="_blank" class="play-btn">▶ Play</a>
               <button class="copy-btn" onclick="copyUrl('${url.replace(/'/g, "\\'")}', this)" title="Copy URL">⎘</button>
-            </div>`;
+              <button class="sim-btn" onclick="simulate(this)" title="Run automated simulation">⚡ Simulate</button>
+            </div>
+            <div class="sim-panel" id="${simId}"></div>`;
           }).join('')
         : '<div style="padding:10px 0;font-size:13px;color:#94a3b8">No roles defined for this scenario</div>';
 
@@ -178,6 +214,87 @@ async function copyUrl(url, btn) {
     btn.textContent = '✓';
     setTimeout(() => { btn.textContent = orig; }, 1500);
   } catch {}
+}
+
+async function simulate(btn) {
+  const row = btn.closest('.role-row');
+  const scenarioId = row.dataset.scenario;
+  const roleId = row.dataset.role;
+
+  const panelId = `sim-${CSS.escape(scenarioId)}-${CSS.escape(roleId)}`;
+  const panel = document.getElementById(panelId);
+
+  btn.disabled = true;
+  btn.textContent = '⚡ Running…';
+  panel.innerHTML = '';
+  panel.classList.add('active');
+
+  function addLine(cls, text) {
+    const div = document.createElement('div');
+    div.className = `sim-line ${cls}`;
+    div.textContent = text;
+    panel.appendChild(div);
+    panel.scrollTop = panel.scrollHeight;
+  }
+
+  try {
+    const resp = await fetch('/admin/api/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenarioId, roleId }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: resp.statusText }));
+      throw new Error(err.error || resp.statusText);
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    let sessionId = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const parts = buf.split('\n\n');
+      buf = parts.pop();
+      for (const part of parts) {
+        const line = part.replace(/^data:\s*/, '').trim();
+        if (!line) continue;
+        let evt;
+        try { evt = JSON.parse(line); } catch { continue; }
+
+        if (evt.type === 'status') {
+          addLine('sim-status', evt.message);
+        } else if (evt.type === 'turn') {
+          addLine('sim-turn', `Turn ${evt.n}: "${evt.playerInput}"`);
+        } else if (evt.type === 'turn_done') {
+          addLine('sim-preview', evt.narrative_preview + '…');
+        } else if (evt.type === 'done') {
+          sessionId = evt.sessionId;
+          addLine('sim-done', `Complete — ${evt.turns} turn(s), result: ${evt.result}`);
+          const dl = document.createElement('a');
+          dl.href = `/admin/api/transcripts/${sessionId}/download`;
+          dl.className = 'dl-btn';
+          dl.download = `transcript-${sessionId}.md`;
+          dl.textContent = '⬇ Download Transcript';
+          panel.appendChild(dl);
+        } else if (evt.type === 'error') {
+          addLine('sim-error', 'Error: ' + evt.message);
+        }
+      }
+    }
+  } catch (err) {
+    const div = document.createElement('div');
+    div.className = 'sim-line sim-error';
+    div.textContent = 'Error: ' + err.message;
+    panel.appendChild(div);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Simulate';
+  }
 }
 
 load();

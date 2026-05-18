@@ -1017,9 +1017,9 @@ Return ONLY valid JSON in this exact structure:
         const id = f.slice(0, -3);
         const filePath = join(TRANSCRIPTS_DIR, f);
         const [content, stats] = await Promise.all([readFile(filePath, 'utf8'), stat(filePath)]);
-        const scenario  = content.match(/^scenario: (.+)$/m)?.[1]?.trim() || '—';
-        const character = content.match(/^character: (.+)$/m)?.[1]?.trim() || '—';
-        const started   = content.match(/^started: (.+)$/m)?.[1]?.trim() || null;
+        const scenario  = content.match(/^## Scenario:\s*(.+)$/m)?.[1]?.trim() || '—';
+        const character = content.match(/^## Character:\s*(.+)$/m)?.[1]?.trim() || '—';
+        const started   = content.match(/^## Date:\s*(.+)$/m)?.[1]?.trim() || null;
         const turns     = (content.match(/^\*\*Player:\*\*/gm) || []).length;
         const endMatch  = content.match(/^## Ending — (.+)$/m);
         const result    = endMatch ? endMatch[1].toLowerCase() : 'in-progress';
@@ -1101,6 +1101,103 @@ Return ONLY valid JSON in this exact structure:
       res.json(beats);
     } catch (err) {
       console.error('[ESSENTIAL-BEATS]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  r.post('/generate/technical-facts', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const { scenarioId, title = '', world = '', stakes = '', characters = [], clues = [], period_vocabulary = '', essential_beats = [] } = req.body;
+    if (!scenarioId) return badRequest(res, 'scenarioId is required.');
+    const scenario = repos.scenarios.findById(scenarioId);
+    if (!scenario) return notFound(res);
+
+    const systemPrompt = [
+      'You are generating the technical facts block for an immersive historical fiction scenario. This block will be injected into every session turn as verified data. The engine will draw from these facts and will not generate alternative values for anything listed here. Every fact you produce must be historically accurate, specific, and verifiable.',
+      '',
+      'Generate a list of technical facts covering the following domains where they are relevant to this scenario:',
+      'power — electrical specifications, voltage, generator capacity, circuit configurations',
+      'flooding — water level measurements, flooding rates, compartment sequences, timing',
+      'timing — precise timestamps for key events, durations, sequences',
+      'capacity — vessel capacity, lifeboat figures, personnel counts, load specifications',
+      'navigation — positions, distances, speeds, bearings, courses',
+      'personnel — what named characters actually did, their documented actions and fates during the event depicted',
+      'other — any other technical fact a player might trigger the engine to generate incorrectly',
+      '',
+      'Rules:',
+      '- Every fact must be specific and numerical where the historical record provides numbers',
+      '- Every fact must have a source reference — a named inquiry, testimony, document, or established historical record',
+      '- Do not include facts that are disputed or unverifiable — omit rather than approximate',
+      '- Do not include interpretive or analytical statements — facts only',
+      '- Generate between 8 and 20 facts depending on the scenario\'s technical complexity',
+      '- Each fact_id must be unique and descriptive in snake_case',
+      '',
+      'Return only a JSON array in this exact format with no other text:',
+      '[',
+      '  {',
+      '    "fact_id": "snake_case_id",',
+      '    "content": "The specific verified fact as a complete sentence.",',
+      '    "domain": "power|flooding|timing|capacity|navigation|personnel|other",',
+      '    "source": "Primary source reference",',
+      '    "valid_from": null,',
+      '    "valid_until": null',
+      '  }',
+      ']',
+    ].join('\n');
+
+    const userPrompt = [
+      `SCENARIO TITLE: ${title}`,
+      world   ? `WORLD CONTEXT:\n${world}`   : '',
+      stakes  ? `STAKES / GOAL:\n${stakes}`  : '',
+      characters.length
+        ? `NAMED CHARACTERS:\n${characters.map(c => [
+            `- ${c.character_id || c.id}: ${c.name} (${c.role || c.publicFace || ''})`,
+            c.startingKnowledge?.length ? `  Known at session start: ${c.startingKnowledge.join('; ')}` : '',
+          ].filter(Boolean).join('\n')).join('\n')}`
+        : '',
+      clues.length
+        ? `CLUES / DOCUMENTS:\n${clues.map(cl => `- ${cl.name || cl.id}: ${cl.description || cl.content || ''}`).join('\n')}`
+        : '',
+      period_vocabulary ? `PERIOD VOCABULARY / TECHNICAL TERMS:\n${period_vocabulary}` : '',
+      essential_beats.length
+        ? `ESSENTIAL BEATS:\n${essential_beats.map(b => `- id: ${b.id}, description: ${b.description}`).join('\n')}`
+        : '',
+    ].filter(Boolean).join('\n\n');
+
+    try {
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        {
+          model: 'claude-sonnet-4-6',
+          max_tokens: 4000,
+          temperature: 0.2,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        },
+        { timeout: 90_000, maxRetries: 0 }
+      );
+      console.log('[TECHNICAL-FACTS] stop_reason:', msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
+      if (msg.stop_reason === 'max_tokens') {
+        return res.status(500).json({ error: 'Technical facts generation truncated — reduce scenario complexity and retry.' });
+      }
+      const text = msg.content[0]?.text?.trim();
+      if (!text) return res.status(500).json({ error: 'No response from Claude.' });
+      const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+      const facts = JSON.parse(cleaned);
+      if (!Array.isArray(facts)) throw new Error('Response is not a JSON array');
+
+      const updated = {
+        ...scenario,
+        technical_facts: {
+          generated: true,
+          reviewed:  false,
+          facts,
+        },
+      };
+      repos.scenarios.save(updated);
+      console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
+      res.json(updated.technical_facts);
+    } catch (err) {
+      console.error('[TECHNICAL-FACTS]', err.message);
       res.status(500).json({ error: err.message });
     }
   });
@@ -1197,6 +1294,109 @@ Return ONLY valid JSON in this exact structure:
       res.json({ ok: true, scenarioId: scenario.id });
     } catch (err) {
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ── Simulate (automated play-through) ────────────────────────────────────────
+  r.post('/simulate', async (req, res) => {
+    const { scenarioId, roleId } = req.body;
+    if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
+
+    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+    res.flushHeaders();
+
+    const send = obj => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+    const BASE     = `${req.protocol}://${req.get('host')}`;
+    const MAX_TURNS = 20;
+
+    const SIM_INPUTS = [
+      'I take stock of the situation and act on the most urgent thing in front of me.',
+      'I focus on what I can control and move carefully.',
+      'I speak to whoever is nearest and try to learn more.',
+      'I examine the environment closely before deciding.',
+      'I act on my best instinct given what I know.',
+      'I prioritize the people who need me most right now.',
+      'I press forward and deal with the consequences as they come.',
+      'I pause, observe, and choose the safest path available.',
+    ];
+    function pickChoice(n) {
+      return SIM_INPUTS[n % SIM_INPUTS.length];
+    }
+
+    async function drainSSE(fetchResp) {
+      const decoder = new TextDecoder();
+      let buf = '';
+      let last = null;
+      for await (const chunk of fetchResp.body) {
+        buf += decoder.decode(chunk, { stream: true });
+        const parts = buf.split('\n\n');
+        buf = parts.pop();
+        for (const part of parts) {
+          const line = part.replace(/^data:\s*/, '').trim();
+          if (!line) continue;
+          try { last = JSON.parse(line); } catch {}
+        }
+      }
+      return last;
+    }
+
+    try {
+      send({ type: 'status', message: 'Starting session…' });
+
+      const startResp = await fetch(`${BASE}/game/api/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenarioId, roleId, narrativeStyle: 'immersive' }),
+      });
+      if (!startResp.ok) throw new Error(`Start failed: ${startResp.status}`);
+
+      const startResult = await drainSSE(startResp);
+      if (!startResult?.sessionId) throw new Error('No sessionId from start');
+
+      const { sessionId } = startResult;
+      let state   = startResult.nextState;
+      let history = startResult.output?.history || [];
+
+      send({ type: 'status', message: `Session ${sessionId} started. Running turns…` });
+
+      let turnCount = 0;
+      let finalResult = 'in-progress';
+
+      while (turnCount < MAX_TURNS) {
+        const playerInput = pickChoice(turnCount);
+        send({ type: 'turn', n: turnCount + 1, playerInput });
+
+        const turnResp = await fetch(`${BASE}/game/api/turn`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ state, playerInput, history, sessionId }),
+        });
+        if (!turnResp.ok) throw new Error(`Turn ${turnCount + 1} failed: ${turnResp.status}`);
+
+        const turnResult = await drainSSE(turnResp);
+        turnCount++;
+
+        const narrative = turnResult?.output?.narrative || '';
+        send({ type: 'turn_done', n: turnCount, narrative_preview: narrative.slice(0, 120) });
+
+        state   = turnResult?.nextState   || state;
+        history = turnResult?.output?.history || history;
+
+        if (turnResult?.output?.endState?.isEnding) {
+          finalResult = turnResult?.output?.endState?.result || 'complete';
+          break;
+        }
+      }
+
+      send({ type: 'status', message: 'Fetching closing prose…' });
+      await fetch(`${BASE}/game/api/closing-prose?sessionId=${encodeURIComponent(sessionId)}&scenarioId=${encodeURIComponent(scenarioId)}&roleId=${encodeURIComponent(roleId)}`);
+
+      send({ type: 'done', sessionId, turns: turnCount, result: finalResult });
+    } catch (err) {
+      send({ type: 'error', message: err.message });
+    } finally {
+      res.end();
     }
   });
 

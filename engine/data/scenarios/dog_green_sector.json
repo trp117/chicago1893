@@ -227,7 +227,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-17T16:02:56.663Z",
+  "updatedAt": "2026-05-18T01:53:55.278Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -387,5 +387,155 @@
       "checked": false,
       "notes": ""
     }
+  },
+  "technical_facts": {
+    "generated": true,
+    "reviewed": false,
+    "facts": [
+      {
+        "fact_id": "bangalore_torpedo_section_length",
+        "content": "A standard U.S. Army M1A1 Bangalore Torpedo section is five feet long, 2.2 inches in diameter, and contains approximately eight pounds of TNT; two sections coupled together produce a ten-foot charge capable of cutting a gap approximately eight feet wide through standard concertina wire.",
+        "domain": "other",
+        "source": "TM 5-2650, Bangalore Torpedo M1A1, U.S. War Department Technical Manual, 1943",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "bangalore_coupling_procedure",
+        "content": "Bangalore Torpedo sections are joined by threading the male coupling collar of one section into the female collar of the next; the firing assembly — a pull-friction fuze or blasting cap and time fuze — attaches to the rear of the assembled charge, not the leading end.",
+        "domain": "other",
+        "source": "TM 5-2650, Bangalore Torpedo M1A1, U.S. War Department Technical Manual, 1943",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "dog_green_sector_location",
+        "content": "Dog Green Sector was the westernmost assault sector of Omaha Beach, approximately 500 yards wide, centered on the Vierville-sur-Mer draw (designated D-1), with the heavily fortified strongpoint WN-72 positioned on the western bluff commanding the draw entrance.",
+        "domain": "navigation",
+        "source": "U.S. Army Center of Military History, Omaha Beachhead (1945); NARA RG 407, 116th Infantry Regiment After Action Report",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "h_hour_dog_green",
+        "content": "H-Hour for the 116th Infantry Regiment's assault on Omaha Beach was 0630 on 6 June 1944.",
+        "domain": "timing",
+        "source": "OVERLORD Operation Order, First U.S. Army; U.S. Army Center of Military History, Omaha Beachhead (1945)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "low_tide_high_tide_timing_omaha",
+        "content": "Low tide at Omaha Beach on 6 June 1944 occurred at approximately 0525; high tide followed approximately six hours and twelve minutes later, with the beach becoming progressively impassable to wheeled and tracked vehicles as the tide rose through the obstacle belt during the period 0630–0900.",
+        "domain": "timing",
+        "source": "Naval History and Heritage Command, Action Report USS Ancon (AGC-4), June 1944; Tidal predictions, Admiralty Tide Tables 1944",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "uss_mccook_position_and_class",
+        "content": "USS McCook (DD-496) was a Gleaves-class destroyer assigned to fire support duties off Omaha Beach on 6 June 1944; she closed to within approximately 500 to 600 yards of the shoreline into water just 9 feet deep to deliver direct fire support, operating at extreme risk of grounding.",
+        "domain": "navigation",
+        "source": "Action Report, USS McCook (DD-496), 6 June 1944, NARA RG 38",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "uss_mccook_main_battery",
+        "content": "USS McCook was armed with four 5-inch/38-caliber dual-purpose guns in single mounts; her main battery could deliver naval gunfire support against shore targets at ranges from approximately 800 yards to over 17,000 yards.",
+        "domain": "other",
+        "source": "NavShips 900,116, Destroyer Characteristics and Armament, U.S. Navy Bureau of Ships; Action Report, USS McCook (DD-496), 6 June 1944",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "wn71_position_and_armament",
+        "content": "WN-72 (Widerstandsnest 72) was the primary German defensive strongpoint positioned on the western headland of the Vierville draw, armed with an 88mm anti-tank gun in a concrete casemate, multiple MG-42s in Tobruk (Ringstand) emplacements, and a 50mm mortar; it commanded the entire Dog Green sector beach frontage.",
+        "domain": "other",
+        "source": "German 352nd Infantry Division defensive survey maps, reproduced in Joseph Balkoski, Omaha Beach (2004); U.S. Army Corps of Engineers, OMAHA Beach Obstacle and Fortification Survey, 1944",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "mg42_rate_of_fire",
+        "content": "The MG-42 machine gun had a cyclic rate of fire of approximately 1,200 rounds per minute; the standard 50-round belt was expended in approximately 2.5 seconds of sustained fire, requiring a belt change that took a trained two-man crew approximately 5–8 seconds.",
+        "domain": "other",
+        "source": "Handbook on German Military Forces, TM-E 30-451, U.S. War Department, 1945",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "mg42_standard_crew",
+        "content": "The standard German MG-42 light machine-gun section in a fixed defensive position consisted of four men: a gunner (Schütze 1), an assistant gunner (Schütze 2) who fed and changed belts, and two ammunition carriers; a two-man crew operating the weapon would have significantly reduced sustained fire capability.",
+        "domain": "other",
+        "source": "Handbook on German Military Forces, TM-E 30-451, U.S. War Department, 1945",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "352nd_infantry_division_identity",
+        "content": "The German 352nd Infantry Division was the primary defending formation at Omaha Beach on 6 June 1944; its presence was not confirmed by Allied intelligence prior to the assault, and its units manned the WN strongpoints along the entire Omaha Beach frontage.",
+        "domain": "other",
+        "source": "Cornelius Ryan, The Longest Day (1959); NARA RG 242, 352nd Infantry Division War Diary; U.S. Army Center of Military History, Omaha Beachhead (1945)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "company_a_116th_casualties",
+        "content": "Company A, 1st Battalion, 116th Infantry Regiment suffered over 90 percent casualties (extinguishing its entire officer cadre and over 150 men out of roughly 200) within the first thirty minutes of landing on Dog Green Sector on 6 June 1944, effectively destroying it as an organized fighting unit.",
+        "domain": "capacity",
+        "source": "U.S. Army Center of Military History, Omaha Beachhead (1945); S.L.A. Marshall, 'First Wave at Omaha' (1948); NARA RG 407, 116th Infantry Regiment After Action Report",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lca_specifications",
+        "content": "A British Landing Craft Assault (LCA) had a capacity of 35 fully equipped troops or approximately 800 pounds of stores; it was 41.5 feet long with a draft of approximately 2 feet 3 inches forward when loaded, and was powered by two Ford V8 engines producing a maximum speed of approximately 7 knots.",
+        "domain": "capacity",
+        "source": "Admiralty Landing Craft Manual, CB 04050, 1943; Combined Operations Headquarters Technical Notes",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "belgian_gate_obstacle_dimensions",
+        "content": "The Element C obstacle (Belgian Gate or 'Cointet element') used on Omaha Beach was a massive steel gate-frame structure approximately 10 feet wide and 10 feet high, weighing approximately 3,100 pounds, emplaced in rows across the tidal flat to damage, trap, or sink approaching landing craft.",
+        "domain": "other",
+        "source": "U.S. Army Corps of Engineers, Beach Obstacle Survey, Omaha Beach, June–July 1944; Gordon Harrison, Cross-Channel Attack (1951)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "naval_gunfire_support_frequency_procedure",
+        "content": "Naval gunfire support for Omaha Beach assault units was coordinated through Shore Fire Control Parties (SFCPs) using SCR-284 or SCR-300 radios on pre-assigned frequencies; a valid fire mission required a target grid reference, a description of the target, and a call-for-fire format including observer identification.",
+        "domain": "other",
+        "source": "FM 6-135, Adjustment of Artillery Fire, U.S. War Department, 1944; Naval Gunfire Support doctrine, COMINCH P-008, 1944",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "morphine_syrette_dose",
+        "content": "The U.S. Army Syrette of morphine tartrate issued to medical personnel in 1944 contained one-half grain (32 mg) of morphine tartrate; standard dosage was one syrette per casualty, with a second syrette permitted only in cases of severe pain and only if the first had not produced effect, with the used syrette pinned to the casualty's collar to prevent overdose.",
+        "domain": "other",
+        "source": "TM 8-230, Medical Department Supply Manual, U.S. War Department, 1944; FM 8-10, Medical Service Field Manual, U.S. War Department, 1942",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "vierville_draw_gradient",
+        "content": "The Vierville draw (D-1) rose approximately 150 feet in elevation over a horizontal distance of approximately 800 yards from the beach to the plateau above the bluffs; the draw road was the only vehicle-passable exit from Dog Green Sector.",
+        "domain": "navigation",
+        "source": "U.S. Army Corps of Engineers, Terrain Study No. 60, Normandy, 1944; Gordon Harrison, Cross-Channel Attack (1951)",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "2nd_ranger_battalion_dog_green_landing",
+        "content": "Dog Company, 2nd Ranger Battalion landed on Dog Green Sector at approximately 0645 on 6 June 1944, approximately fifteen minutes after the initial 116th Infantry assault waves, and immediately came under intense enfilading fire from the strongpoints at WN-72 and WN-73.",
+        "domain": "timing",
+        "source": "2nd Ranger Battalion After Action Report, June 1944, NARA RG 407; Joseph Balkoski, Omaha Beach (2004)",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ]
   }
 }

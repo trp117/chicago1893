@@ -1317,6 +1317,27 @@ function collectEdits(containerEl, data) {
     data.scenario.review_checklist = checklist;
   }
 
+  // Collect technical facts repeater
+  const tfDetails = containerEl.querySelector('#tf-data-details');
+  if (tfDetails) {
+    if (!data.scenario) data.scenario = {};
+    const tf = data.scenario.technical_facts || {};
+    const facts = [];
+    tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
+      const fact_id    = row.querySelector('.tf-fact-id')?.value.trim()         || '';
+      const content    = row.querySelector('.tf-fact-content')?.value.trim()    || '';
+      const domain     = row.querySelector('.tf-fact-domain')?.value            || 'other';
+      const source     = row.querySelector('.tf-fact-source')?.value.trim()     || '';
+      const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()  || null;
+      const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim() || null;
+      if (fact_id || content) {
+        facts.push({ fact_id, content, domain, source,
+          valid_from: valid_from || null, valid_until: valid_until || null });
+      }
+    });
+    data.scenario.technical_facts = { ...tf, facts };
+  }
+
   // Collect epilogue fields — runs after [data-path] loop so generated/reviewed are already set
   const epDetails = containerEl.querySelector('#epilogue-data-details');
   if (epDetails && epDetails.querySelector('#ep-fates-list')) {
@@ -1660,6 +1681,105 @@ function renderEpilogueEchoRow(c) {
     <input type="text" class="ep-echo-beat-id" placeholder="beat_id" value="${esc(c.beat_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
     <textarea class="ep-echo-record" rows="2" placeholder="What actually happened at this beat in documented history…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(c.historical_record || '')}</textarea>
     <button type="button" class="remove-ep-echo-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  </div>`;
+}
+
+function buildTfFactRow(f) {
+  f = f || {};
+  const DOMAINS = ['power','flooding','timing','capacity','navigation','personnel','other'];
+  const domainOptions = DOMAINS.map(d =>
+    `<option value="${d}" ${(f.domain || '') === d ? 'selected' : ''}>${d}</option>`
+  ).join('');
+  return `<div class="tf-fact-row" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative">
+    <button type="button" class="remove-tf-fact-btn" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:18px;line-height:1;padding:0">×</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Fact ID</div>
+        <input type="text" class="tf-fact-id" placeholder="fact_id" value="${esc(f.fact_id || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Domain</div>
+        <select class="tf-fact-domain" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">${domainOptions}</select>
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Content</div>
+      <textarea class="tf-fact-content" rows="2" placeholder="The specific verified fact as a complete sentence." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(f.content || '')}</textarea>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Source</div>
+      <input type="text" class="tf-fact-source" placeholder="Primary source — inquiry, testimony, document" value="${esc(f.source || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Valid From (session time)</div>
+        <input type="text" class="tf-fact-valid-from" placeholder="null" value="${esc(f.valid_from || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Valid Until (session time)</div>
+        <input type="text" class="tf-fact-valid-until" placeholder="null" value="${esc(f.valid_until || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTechnicalFactsSection(data) {
+  const tf         = data.scenario?.technical_facts || {};
+  const generated  = tf.generated === true;
+  const reviewed   = tf.reviewed  === true;
+  const hasPrereqs = !!(data.scenario?.world || data.scenario?.stakes || (data.characters || []).length > 0);
+  const genDisabled = !hasPrereqs;
+  const genTitle    = genDisabled ? 'Complete scenario world, stakes, and characters first' : '';
+
+  const badge = generated
+    ? reviewed
+      ? `<span id="tf-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#f0fdf4;color:#166534">Reviewed</span>`
+      : `<span id="tf-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#fef3c7;color:#92400e">Pending Review</span>`
+    : `<span id="tf-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#f1f5f9;color:var(--text-soft)">Not Generated</span>`;
+
+  const factsHtml = (tf.facts || []).map(f => buildTfFactRow(f)).join('');
+  const emptyState = !factsHtml
+    ? `<div style="padding:20px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px">
+        No technical facts yet. Click Generate Technical Facts to populate from scenario content, or Add Fact to add manually.
+       </div>`
+    : '';
+
+  const fieldsHtml = `
+    <div style="margin:0 0 16px;padding:12px 14px;background:#fef2f2;border:1px solid #f87171;border-radius:6px;font-size:13px;color:#991b1b;font-weight:500">
+      ⚠ Facts listed here are injected verbatim into every session turn. The engine will not generate alternative values for anything listed here. Verify every fact against a primary source before marking reviewed.
+    </div>
+    <div id="tf-facts-list">${emptyState}${factsHtml}</div>
+    <button type="button" id="add-tf-fact-btn" class="btn btn-secondary btn-sm" style="margin-top:8px">+ Add Fact</button>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button type="button" id="mark-tf-reviewed-btn" class="btn btn-primary" ${reviewed ? 'disabled' : ''}>
+        ${reviewed ? '✓ Technical Facts Reviewed' : 'Mark Technical Facts Reviewed'}
+      </button>
+      ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Verify every fact against its source before marking as reviewed.</span>' : ''}
+    </div>`;
+
+  const pendingReview = generated && !reviewed;
+  return `<div style="margin-bottom:20px">
+    <details id="tf-data-details" ${pendingReview ? 'open' : ''}>
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;${pendingReview ? 'background:#fffbeb;border:2px solid #d97706;border-radius:10px;' : 'background:var(--card);border:1px solid var(--border);border-radius:10px;'}">
+        <span style="display:flex;align-items:center;gap:10px">
+          Technical Facts
+          ${pendingReview ? '<span style="font-size:11px;font-weight:700;background:#d97706;color:#fff;padding:2px 8px;border-radius:10px;letter-spacing:.03em;text-transform:none">⚠ Needs Review</span>' : ''}
+        </span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <input type="hidden" id="tf-generated-input" data-path="scenario.technical_facts.generated" value="${generated}">
+        <input type="hidden" id="tf-reviewed-input"  data-path="scenario.technical_facts.reviewed"  value="${reviewed}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
+          ${badge}
+          <button type="button" id="gen-tf-btn" class="btn btn-primary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
+            ${generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts'}
+          </button>
+        </div>
+        <div style="margin-top:16px">${fieldsHtml}</div>
+      </div>
+    </details>
   </div>`;
 }
 
@@ -2119,6 +2239,7 @@ function renderPreview(data, autoSaved = false) {
       ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
         : ''}
+      ${renderTechnicalFactsSection(data)}
       ${renderEpilogueSection(data)}
       <div class="form-actions" style="padding-bottom:32px">
         <button class="btn btn-success"   id="preview-play">▶ Play Now</button>
@@ -2203,6 +2324,22 @@ function renderPreview(data, autoSaved = false) {
       const dis = !world || !stakes || !hasBrief;
       genBtn.disabled = dis;
       genBtn.title = dis ? 'Complete World, Stakes, and at least one Role Briefing first' : '';
+    }
+  });
+
+  // ── Technical Facts — add/remove row delegation ─────────────────
+  formEl.addEventListener('click', e => {
+    if (e.target.closest('.remove-tf-fact-btn')) { e.target.closest('.tf-fact-row').remove(); return; }
+    if (e.target.closest('#add-tf-fact-btn')) {
+      const list = formEl.querySelector('#tf-facts-list');
+      if (list) {
+        const empty = list.querySelector('div[style*="dashed"]');
+        if (empty) empty.remove();
+        const div = document.createElement('div');
+        div.innerHTML = buildTfFactRow({});
+        list.appendChild(div.firstElementChild);
+      }
+      return;
     }
   });
 
@@ -2346,9 +2483,16 @@ function renderPreview(data, autoSaved = false) {
     }
   }, true); // capture phase so it fires before the existing click delegation
 
-  // ── Mark as Approved — warn if epilogue not reviewed ───────────
+  // ── Mark as Approved — warn if technical facts or epilogue not reviewed ───────────
   formEl.addEventListener('click', e => {
     if (!e.target.closest('#mark-approved-btn')) return;
+    const tfReviewed  = formEl.querySelector('#tf-reviewed-input')?.value === 'true'
+      || data.scenario?.technical_facts?.reviewed === true;
+    const tfGenerated = formEl.querySelector('#tf-generated-input')?.value === 'true'
+      || data.scenario?.technical_facts?.generated === true;
+    if (tfGenerated && !tfReviewed) {
+      toast('Warning: technical facts have not been reviewed. Approve anyway or review the Technical Facts section first.', 'error');
+    }
     const epReviewed = formEl.querySelector('#epilogue-reviewed-input')?.value === 'true'
       || data.scenario?.epilogue?.reviewed === true;
     const epGenerated = formEl.querySelector('#epilogue-generated-input')?.value === 'true'
@@ -2357,6 +2501,71 @@ function renderPreview(data, autoSaved = false) {
       toast('Warning: epilogue historical data has not been reviewed. Approve anyway or review the Historical Epilogue Data section first.', 'error');
     }
   });
+
+  // ── Mark Technical Facts Reviewed ──────────────────────────────
+  formEl.addEventListener('click', e => {
+    if (!e.target.closest('#mark-tf-reviewed-btn')) return;
+    const revInput = formEl.querySelector('#tf-reviewed-input');
+    if (revInput) revInput.value = 'true';
+    const badge = formEl.querySelector('#tf-status-badge');
+    if (badge) { badge.textContent = 'Reviewed'; badge.style.background = '#f0fdf4'; badge.style.color = '#166534'; }
+    const btn = formEl.querySelector('#mark-tf-reviewed-btn');
+    if (btn) { btn.textContent = '✓ Technical Facts Reviewed'; btn.disabled = true; }
+    if (!data.scenario.technical_facts) data.scenario.technical_facts = {};
+    data.scenario.technical_facts.reviewed = true;
+  });
+
+  // ── Generate Technical Facts ────────────────────────────────────
+  const genTfBtn = document.getElementById('gen-tf-btn');
+  if (genTfBtn) {
+    genTfBtn.addEventListener('click', async () => {
+      if (!confirm('Generate technical facts for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+
+      const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
+      const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
+      const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
+      const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+      const characters = (data.characters || []).map(c => ({
+        character_id:     c.id,
+        name:             c.name,
+        role:             c.role || c.publicFace || '',
+        startingKnowledge: c.startingKnowledge || [],
+      }));
+      const clues = (data.clues || []).map(cl => ({
+        id:          cl.id,
+        name:        cl.name,
+        description: cl.description || cl.content || '',
+      }));
+      const period_vocabulary = data.scenario?.period_vocabulary || '';
+      const essential_beats = (data.storyArc?.acts || [])
+        .flatMap(a => a.beats || [])
+        .filter(b => b.id?.trim() && b.description?.trim())
+        .slice(0, 10);
+
+      genTfBtn.disabled    = true;
+      genTfBtn.textContent = 'Generating historical facts…';
+      try {
+        const tf = await apiPost('/generate/technical-facts', {
+          scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
+        });
+        if (!data.scenario) data.scenario = {};
+        data.scenario.technical_facts = tf;
+        const tfDetails = formEl.querySelector('#tf-data-details');
+        if (tfDetails) {
+          const newHtml = renderTechnicalFactsSection(data);
+          const tmp = document.createElement('div');
+          tmp.innerHTML = newHtml;
+          tfDetails.replaceWith(tmp.firstElementChild);
+        }
+        toast(`${tf.facts?.length || 0} technical facts generated. Verify each against its primary source before marking as reviewed.`, 'success');
+      } catch (err) {
+        toast(`Technical facts generation failed: ${err.message}`, 'error');
+      } finally {
+        genTfBtn.disabled    = false;
+        genTfBtn.textContent = data.scenario?.technical_facts?.generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts';
+      }
+    });
+  }
 
   // ── Generate Epilogue Data ──────────────────────────────────────
   const genEpilogueBtn = document.getElementById('gen-epilogue-btn');

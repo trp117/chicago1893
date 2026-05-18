@@ -418,6 +418,24 @@ export function createGameRouter(repos, config = {}) {
       initialState.narrativeStyle  = narrativeStyle || 'focused';
       initialState.introducedNpcs  = [];
 
+      // Pre-seed verified technical facts
+      if (scenario.technical_facts?.reviewed === true) {
+        initialState.technicalFacts = (scenario.technical_facts.facts || []).map(f => ({
+          ...f,
+          status:                  'current',
+          source_character:        'scenario_record',
+          pre_seeded:              true,
+          turn_stated:             0,
+          session_minutes_stated:  0,
+        }));
+        console.log(`[TECHNICAL-FACTS] Pre-seeded ${initialState.technicalFacts.length} fact(s) for scenario "${scenarioId}"`);
+      } else {
+        if (scenario.technical_facts?.generated) {
+          console.log(`[TECHNICAL-FACTS] Skipped — not reviewed for scenario: ${scenarioId}`);
+        }
+        initialState.technicalFacts = [];
+      }
+
       // Attach briefing context from the briefing screen
       if (character_context)   initialState.character_context = character_context;
       if (player_addition)     initialState.player_addition   = player_addition;

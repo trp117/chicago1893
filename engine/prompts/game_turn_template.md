@@ -18,6 +18,8 @@ Ending readiness signals:
 
 {{LOCATION_CONSTRAINT}}
 
+{{VERIFIED_FACTS}}
+
 {{OBJECT_STATE}}
 
 {{RESOLVED_THREADS}}
