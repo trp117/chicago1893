@@ -36,7 +36,7 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .panel h2 { margin-top: 0; font-size: 1rem; color: var(--accent); }
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-.story-feed { flex: 1; padding: 24px 28px; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.story-feed { flex: 1; padding: 24px 28px; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; transition: opacity 0.2s ease; }
 .story-feed::-webkit-scrollbar { width: 4px; }
 .story-feed::-webkit-scrollbar-track { background: transparent; }
 .story-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -1246,6 +1246,24 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   streamOptionsDots.classList.remove('hidden');
   submitBtn.disabled = true;
 
+  // Fade out current narrative, fetch in parallel so network isn't blocked by animation
+  storyEl.style.opacity = '0';
+  const respPromise = fetch(`${API_BASE}/turn`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(isChoice ? {} : { player_action: playerInput }) })
+  });
+
+  // Wait for fade to finish, then clear and rebuild the zone (timeout guards against missed transitionend)
+  await Promise.race([
+    new Promise(resolve => storyEl.addEventListener('transitionend', resolve, { once: true })),
+    new Promise(resolve => setTimeout(resolve, 350))
+  ]);
+  storyEl.innerHTML = '';
+  storyEl.appendChild(scrollHintEl);
+  storyEl.scrollTop = 0;
+  storyEl.style.opacity = '1';
+
   const entryEl = document.createElement('div');
   entryEl.className = 'feed-entry';
   const playerEl = document.createElement('div');
@@ -1257,15 +1275,10 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   dotsEl.innerHTML = '<span></span><span></span><span></span>';
   entryEl.appendChild(dotsEl);
   feedAppend(entryEl);
-  feedScrollTop(entryEl);
   pendingEntryEl = entryEl;
 
   try {
-    const resp = await fetch(`${API_BASE}/turn`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(isChoice ? {} : { player_action: playerInput }) })
-    });
+    const resp = await respPromise;
 
     // Consume SSE stream
     let streamEl     = null;
@@ -1291,7 +1304,6 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
             streamEl = document.createElement('div');
             streamEl.className = 'scene-card';
             entryEl.appendChild(streamEl);
-            feedScrollTop(streamEl);
           }
           streamBuffer += evt.text;
           streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
