@@ -127,11 +127,17 @@ body::after {
   top: clamp(100px, 22vh, 180px);
   left: 0; right: 0;
   text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(26px, 4.5vw, 52px);
   font-weight: 300; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--gold-light);
   opacity: 0; animation: fadeUp 0.9s 0.1s forwards;
+}
+.hero-tagline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--parchment); opacity: 0.5;
 }
 .btn-primary {
   font-family: 'Barlow Condensed', sans-serif;
@@ -925,7 +931,10 @@ footer {
 
   </svg>
   </div>
-  <div class="hero-brand">Project Limen</div>
+  <div class="hero-brand">
+    Project Limen
+    <div class="hero-tagline">The moment before history was made</div>
+  </div>
   <div class="hero-content">
     <div class="hero-rule"></div>
     <p class="hero-eyebrow">Immersive Historical Fiction</p>
