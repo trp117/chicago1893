@@ -80,10 +80,11 @@ body::after {
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 80% 55% at 65% 35%, rgba(139,58,42,0.13) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 70% at 15% 85%, rgba(196,154,60,0.08) 0%, transparent 60%),
-    linear-gradient(160deg, #1c1510 0%, #0d0b08 55%, #090807 100%);
+  background: #0c0a22;
+}
+.hero-bg svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
 }
 .hero-content { position: relative; max-width: 860px; }
 .hero-rule {
@@ -217,6 +218,10 @@ body::after {
 .bg-engineer {
   background: linear-gradient(160deg, #6a2c10 0%, #481c0a 50%, #2c1008 100%);
 }
+.bg-apollo {
+  background: linear-gradient(160deg, #0a0a1e 0%, #10103a 45%, #1a1a50 100%);
+}
+a.featured-card { display: block; text-decoration: none; color: inherit; }
 
 /* category card backgrounds — distinct gradient per era */
 .cat-img { position: absolute; inset: 0; z-index: 0; transition: transform 0.5s ease; }
@@ -530,7 +535,381 @@ footer {
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
+  <div class="hero-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <!-- Sky gradient -->
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#0c0a22"/>
+        <stop offset="55%"  stop-color="#151230"/>
+        <stop offset="100%" stop-color="#1e1a3a"/>
+      </linearGradient>
+      <!-- Sea gradient -->
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#10102a"/>
+        <stop offset="100%" stop-color="#08081a"/>
+      </linearGradient>
+      <!-- Horizon glow -->
+      <radialGradient id="hglow" cx="55%" cy="56%" r="42%" gradientUnits="objectBoundingBox">
+        <stop offset="0%"  stop-color="#c49a3c" stop-opacity="0.42"/>
+        <stop offset="35%" stop-color="#8b5a2b" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+      </radialGradient>
+      <!-- Ship window glow -->
+      <radialGradient id="wglow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#e8c46a" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#c49a3c" stop-opacity="0"/>
+      </radialGradient>
+      <!-- Bottom fade for text legibility -->
+      <linearGradient id="botfade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#06050a" stop-opacity="0"/>
+        <stop offset="65%"  stop-color="#06050a" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#06050a" stop-opacity="0.72"/>
+      </linearGradient>
+      <!-- Moon glow -->
+      <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#f5f0e8" stop-opacity="0.95"/>
+        <stop offset="35%" stop-color="#e8c46a" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
+      </radialGradient>
+      <!-- Water reflection shimmer -->
+      <linearGradient id="reflectShip" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stop-color="#10102a" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#08081a" stop-opacity="0.9"/>
+      </linearGradient>
+      <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="2.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- Sky -->
+    <rect width="1440" height="900" fill="url(#sky)"/>
+
+    <!-- Stars layer 1 — tiny -->
+    <g fill="#f5f0e8" opacity="0.80">
+      <circle cx="42"   cy="28"  r="0.7"/><circle cx="118"  cy="61"  r="0.5"/><circle cx="195"  cy="14"  r="0.8"/>
+      <circle cx="267"  cy="44"  r="0.6"/><circle cx="331"  cy="19"  r="0.5"/><circle cx="402"  cy="72"  r="0.7"/>
+      <circle cx="478"  cy="33"  r="0.6"/><circle cx="544"  cy="8"   r="0.8"/><circle cx="610"  cy="55"  r="0.5"/>
+      <circle cx="683"  cy="22"  r="0.7"/><circle cx="759"  cy="47"  r="0.6"/><circle cx="835"  cy="11"  r="0.8"/>
+      <circle cx="908"  cy="38"  r="0.5"/><circle cx="984"  cy="65"  r="0.7"/><circle cx="1049" cy="18"  r="0.6"/>
+      <circle cx="1118" cy="50"  r="0.8"/><circle cx="1192" cy="29"  r="0.5"/><circle cx="1265" cy="74"  r="0.7"/>
+      <circle cx="1338" cy="12"  r="0.6"/><circle cx="1402" cy="43"  r="0.8"/><circle cx="88"   cy="95"  r="0.5"/>
+      <circle cx="162"  cy="82"  r="0.7"/><circle cx="238"  cy="110" r="0.6"/><circle cx="312"  cy="88"  r="0.8"/>
+      <circle cx="388"  cy="122" r="0.5"/><circle cx="462"  cy="97"  r="0.7"/><circle cx="535"  cy="115" r="0.6"/>
+      <circle cx="606"  cy="84"  r="0.8"/><circle cx="675"  cy="107" r="0.5"/><circle cx="748"  cy="90"  r="0.7"/>
+      <circle cx="820"  cy="118" r="0.6"/><circle cx="894"  cy="79"  r="0.8"/><circle cx="966"  cy="103" r="0.5"/>
+      <circle cx="1040" cy="86"  r="0.7"/><circle cx="1112" cy="121" r="0.6"/><circle cx="1184" cy="93"  r="0.8"/>
+      <circle cx="1254" cy="108" r="0.5"/><circle cx="1326" cy="77"  r="0.7"/><circle cx="1395" cy="116" r="0.6"/>
+      <circle cx="55"   cy="148" r="0.5"/><circle cx="133"  cy="134" r="0.7"/><circle cx="210"  cy="158" r="0.6"/>
+      <circle cx="285"  cy="139" r="0.8"/><circle cx="357"  cy="162" r="0.5"/><circle cx="430"  cy="145" r="0.7"/>
+      <circle cx="502"  cy="172" r="0.6"/><circle cx="574"  cy="136" r="0.8"/><circle cx="645"  cy="155" r="0.5"/>
+      <circle cx="717"  cy="141" r="0.7"/><circle cx="790"  cy="168" r="0.6"/><circle cx="863"  cy="130" r="0.8"/>
+      <circle cx="935"  cy="152" r="0.5"/><circle cx="1008" cy="143" r="0.7"/><circle cx="1080" cy="165" r="0.6"/>
+      <circle cx="1155" cy="138" r="0.8"/><circle cx="1228" cy="158" r="0.5"/><circle cx="1300" cy="128" r="0.7"/>
+      <circle cx="1373" cy="170" r="0.6"/><circle cx="1430" cy="149" r="0.8"/>
+    </g>
+    <!-- Stars layer 2 — brighter -->
+    <g fill="#f5f0e8" opacity="1.0">
+      <circle cx="74"   cy="52"  r="1.1"/><circle cx="220"  cy="31"  r="1.3"/><circle cx="380"  cy="58"  r="1.0"/>
+      <circle cx="519"  cy="22"  r="1.2"/><circle cx="666"  cy="68"  r="1.1"/><circle cx="800"  cy="35"  r="1.3"/>
+      <circle cx="945"  cy="18"  r="1.0"/><circle cx="1085" cy="55"  r="1.2"/><circle cx="1230" cy="39"  r="1.1"/>
+      <circle cx="1380" cy="24"  r="1.3"/><circle cx="145"  cy="118" r="1.0"/><circle cx="290"  cy="96"  r="1.2"/>
+      <circle cx="450"  cy="130" r="1.1"/><circle cx="600"  cy="108" r="1.3"/><circle cx="740"  cy="125" r="1.0"/>
+      <circle cx="885"  cy="92"  r="1.2"/><circle cx="1025" cy="118" r="1.1"/><circle cx="1165" cy="99"  r="1.3"/>
+      <circle cx="1310" cy="133" r="1.0"/><circle cx="1415" cy="107" r="1.2"/>
+    </g>
+    <!-- Milky way faint band -->
+    <ellipse cx="720" cy="200" rx="580" ry="90" fill="#e8d89a" opacity="0.07"/>
+
+    <!-- Moon halo -->
+    <circle cx="1100" cy="95" r="70" fill="#e8c46a" opacity="0.09"/>
+    <circle cx="1100" cy="95" r="40" fill="#f5f0e8" opacity="0.14"/>
+    <!-- Moon disc -->
+    <circle cx="1100" cy="95" r="16" fill="url(#moon)"/>
+
+    <!-- Horizon atmospheric glow -->
+    <rect width="1440" height="900" fill="url(#hglow)"/>
+
+    <!-- ── TITANIC SILHOUETTE ── -->
+    <!-- Origin: waterline ~y=530, ship occupies roughly x=180–1320 -->
+
+    <!-- Hull (below waterline) -->
+    <path d="M 210 530 L 240 555 L 1200 555 L 1220 530 Z" fill="#04030a"/>
+
+    <!-- Main hull body -->
+    <path d="M 200 530 L 190 520 L 185 510 L 188 500 L 210 498
+             L 280 495 L 350 493 L 450 492 L 600 491 L 750 491
+             L 900 492 L 1050 493 L 1150 495 L 1210 498 L 1230 505
+             L 1240 515 L 1235 530 Z" fill="#05040b"/>
+
+    <!-- Superstructure — main body (upper decks A–D) -->
+    <path d="M 300 491 L 300 455 L 320 450 L 400 448 L 500 446
+             L 650 445 L 800 445 L 950 446 L 1080 448 L 1130 452
+             L 1145 458 L 1148 491 Z" fill="#04030a"/>
+
+    <!-- Boat deck (top deck) -->
+    <path d="M 330 455 L 330 432 L 350 428 L 440 426 L 550 425
+             L 700 424 L 850 424 L 980 426 L 1070 429 L 1090 434
+             L 1090 455 Z" fill="#03020a"/>
+
+    <!-- Bridge / wheelhouse -->
+    <path d="M 780 432 L 780 415 L 800 410 L 870 408 L 930 410
+             L 950 415 L 950 432 Z" fill="#03020a"/>
+    <!-- Bridge top -->
+    <path d="M 795 415 L 795 404 L 820 400 L 910 400 L 932 404
+             L 932 415 Z" fill="#02010a"/>
+
+    <!-- Officers quarters / forecastle extensions -->
+    <path d="M 330 432 L 330 418 L 360 414 L 440 412 L 520 412
+             L 520 432 Z" fill="#03020a"/>
+    <path d="M 980 432 L 980 420 L 1000 416 L 1060 414 L 1090 416
+             L 1090 432 Z" fill="#03020a"/>
+
+    <!-- Funnel 1 -->
+    <path d="M 455 426 L 462 360 L 480 355 L 498 360 L 505 426 Z" fill="#04030b"/>
+    <!-- Funnel top band -->
+    <rect x="460" y="355" width="42" height="10" rx="1" fill="#03020a"/>
+    <!-- Funnel cap smoke (very faint) -->
+    <ellipse cx="480" cy="348" rx="18" ry="6" fill="#0a0815" opacity="0.6"/>
+    <ellipse cx="475" cy="330" rx="14" ry="10" fill="#0a0815" opacity="0.35"/>
+    <ellipse cx="468" cy="310" rx="18" ry="14" fill="#0a0815" opacity="0.18"/>
+
+    <!-- Funnel 2 -->
+    <path d="M 555 425 L 562 362 L 578 357 L 596 362 L 603 425 Z" fill="#04030b"/>
+    <rect x="560" y="357" width="40" height="10" rx="1" fill="#03020a"/>
+    <ellipse cx="578" cy="350" rx="17" ry="6" fill="#0a0815" opacity="0.55"/>
+    <ellipse cx="574" cy="332" rx="13" ry="10" fill="#0a0815" opacity="0.3"/>
+
+    <!-- Funnel 3 -->
+    <path d="M 655 425 L 662 364 L 678 359 L 694 364 L 700 425 Z" fill="#04030b"/>
+    <rect x="660" y="359" width="38" height="10" rx="1" fill="#03020a"/>
+    <ellipse cx="677" cy="352" rx="16" ry="5" fill="#0a0815" opacity="0.5"/>
+
+    <!-- Funnel 4 (dummy — shorter, no smoke) -->
+    <path d="M 750 425 L 756 375 L 770 371 L 784 375 L 789 425 Z" fill="#04030b"/>
+    <rect x="754" y="371" width="36" height="9" rx="1" fill="#03020a"/>
+
+    <!-- Forward mast -->
+    <line x1="385" y1="428" x2="385" y2="310" stroke="#03020a" stroke-width="2.5"/>
+    <!-- Crow's nest -->
+    <rect x="378" y="330" width="14" height="10" rx="2" fill="#04030a"/>
+    <!-- Forward mast wireless stays -->
+    <line x1="385" y1="315" x2="480" y2="355" stroke="#05040c" stroke-width="1" opacity="0.7"/>
+    <line x1="385" y1="315" x2="295" y2="460" stroke="#05040c" stroke-width="1" opacity="0.6"/>
+
+    <!-- Aft mast -->
+    <line x1="1030" y1="428" x2="1030" y2="320" stroke="#03020a" stroke-width="2"/>
+    <!-- Wireless stays aft -->
+    <line x1="1030" y1="325" x2="750" y2="372" stroke="#05040c" stroke-width="1" opacity="0.65"/>
+    <line x1="1030" y1="325" x2="1100" y2="408" stroke="#05040c" stroke-width="1" opacity="0.6"/>
+
+    <!-- Davits / lifeboats (small bumps on boat deck) -->
+    <g fill="#04030a">
+      <rect x="360" y="420" width="8"  height="6" rx="1"/>
+      <rect x="390" y="420" width="8"  height="6" rx="1"/>
+      <rect x="420" y="420" width="8"  height="6" rx="1"/>
+      <rect x="530" y="420" width="8"  height="6" rx="1"/>
+      <rect x="560" y="420" width="8"  height="6" rx="1"/>
+      <rect x="820" y="420" width="8"  height="6" rx="1"/>
+      <rect x="850" y="420" width="8"  height="6" rx="1"/>
+      <rect x="990" y="420" width="8"  height="6" rx="1"/>
+      <rect x="1020" y="420" width="8" height="6" rx="1"/>
+      <rect x="1050" y="420" width="8" height="6" rx="1"/>
+    </g>
+
+    <!-- ── WINDOWS / PORTHOLES — gold amber glow ── -->
+
+    <!-- A Deck windows (superstructure top band) -->
+    <g filter="url(#glow)">
+      <g fill="#f0c84a" opacity="1.0">
+        <!-- Promenade A Deck row -->
+        <rect x="340" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="355" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="370" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="385" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="400" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="415" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="430" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="510" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="525" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="540" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="610" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="625" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="640" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="710" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="725" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="810" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="825" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="840" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="855" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="920" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="935" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="950" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="965" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1000" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1015" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1030" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1060" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1075" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1090" y="460" width="5" height="4" rx="0.5"/>
+        <rect x="1105" y="460" width="5" height="4" rx="0.5"/>
+      </g>
+    </g>
+
+    <!-- B Deck portholes -->
+    <g filter="url(#glow)">
+      <g fill="#e8b840" opacity="0.95">
+        <circle cx="305" cy="477" r="2.2"/>
+        <circle cx="320" cy="477" r="2.2"/>
+        <circle cx="335" cy="477" r="2.2"/>
+        <circle cx="350" cy="477" r="2.2"/>
+        <circle cx="370" cy="477" r="2.2"/>
+        <circle cx="385" cy="477" r="2.2"/>
+        <circle cx="400" cy="477" r="2.2"/>
+        <circle cx="415" cy="477" r="2.2"/>
+        <circle cx="435" cy="477" r="2.2"/>
+        <circle cx="455" cy="477" r="2.2"/>
+        <circle cx="510" cy="477" r="2.2"/>
+        <circle cx="526" cy="477" r="2.2"/>
+        <circle cx="542" cy="477" r="2.2"/>
+        <circle cx="608" cy="477" r="2.2"/>
+        <circle cx="624" cy="477" r="2.2"/>
+        <circle cx="640" cy="477" r="2.2"/>
+        <circle cx="656" cy="477" r="2.2"/>
+        <circle cx="712" cy="477" r="2.2"/>
+        <circle cx="728" cy="477" r="2.2"/>
+        <circle cx="744" cy="477" r="2.2"/>
+        <circle cx="810" cy="477" r="2.2"/>
+        <circle cx="826" cy="477" r="2.2"/>
+        <circle cx="842" cy="477" r="2.2"/>
+        <circle cx="858" cy="477" r="2.2"/>
+        <circle cx="920" cy="477" r="2.2"/>
+        <circle cx="936" cy="477" r="2.2"/>
+        <circle cx="952" cy="477" r="2.2"/>
+        <circle cx="968" cy="477" r="2.2"/>
+        <circle cx="1005" cy="477" r="2.2"/>
+        <circle cx="1021" cy="477" r="2.2"/>
+        <circle cx="1037" cy="477" r="2.2"/>
+        <circle cx="1068" cy="477" r="2.2"/>
+        <circle cx="1084" cy="477" r="2.2"/>
+        <circle cx="1100" cy="477" r="2.2"/>
+        <circle cx="1116" cy="477" r="2.2"/>
+        <circle cx="1132" cy="477" r="2.2"/>
+      </g>
+    </g>
+
+    <!-- C Deck portholes (more, smaller) -->
+    <g fill="#d4a040" opacity="0.88">
+      <circle cx="225" cy="494" r="1.8"/>
+      <circle cx="240" cy="494" r="1.8"/>
+      <circle cx="255" cy="494" r="1.8"/>
+      <circle cx="270" cy="494" r="1.8"/>
+      <circle cx="285" cy="494" r="1.8"/>
+      <circle cx="305" cy="494" r="1.8"/>
+      <circle cx="321" cy="494" r="1.8"/>
+      <circle cx="337" cy="494" r="1.8"/>
+      <circle cx="353" cy="494" r="1.8"/>
+      <circle cx="373" cy="494" r="1.8"/>
+      <circle cx="393" cy="494" r="1.8"/>
+      <circle cx="413" cy="494" r="1.8"/>
+      <circle cx="433" cy="494" r="1.8"/>
+      <circle cx="453" cy="494" r="1.8"/>
+      <circle cx="510" cy="494" r="1.8"/>
+      <circle cx="526" cy="494" r="1.8"/>
+      <circle cx="542" cy="494" r="1.8"/>
+      <circle cx="558" cy="494" r="1.8"/>
+      <circle cx="608" cy="494" r="1.8"/>
+      <circle cx="624" cy="494" r="1.8"/>
+      <circle cx="640" cy="494" r="1.8"/>
+      <circle cx="656" cy="494" r="1.8"/>
+      <circle cx="672" cy="494" r="1.8"/>
+      <circle cx="712" cy="494" r="1.8"/>
+      <circle cx="728" cy="494" r="1.8"/>
+      <circle cx="744" cy="494" r="1.8"/>
+      <circle cx="760" cy="494" r="1.8"/>
+      <circle cx="810" cy="494" r="1.8"/>
+      <circle cx="826" cy="494" r="1.8"/>
+      <circle cx="842" cy="494" r="1.8"/>
+      <circle cx="858" cy="494" r="1.8"/>
+      <circle cx="874" cy="494" r="1.8"/>
+      <circle cx="890" cy="494" r="1.8"/>
+      <circle cx="920" cy="494" r="1.8"/>
+      <circle cx="936" cy="494" r="1.8"/>
+      <circle cx="952" cy="494" r="1.8"/>
+      <circle cx="968" cy="494" r="1.8"/>
+      <circle cx="984" cy="494" r="1.8"/>
+      <circle cx="1000" cy="494" r="1.8"/>
+      <circle cx="1016" cy="494" r="1.8"/>
+      <circle cx="1032" cy="494" r="1.8"/>
+      <circle cx="1048" cy="494" r="1.8"/>
+      <circle cx="1064" cy="494" r="1.8"/>
+      <circle cx="1080" cy="494" r="1.8"/>
+      <circle cx="1096" cy="494" r="1.8"/>
+      <circle cx="1112" cy="494" r="1.8"/>
+      <circle cx="1130" cy="494" r="1.8"/>
+      <circle cx="1148" cy="494" r="1.8"/>
+      <circle cx="1168" cy="494" r="1.8"/>
+      <circle cx="1185" cy="494" r="1.8"/>
+      <circle cx="1202" cy="494" r="1.8"/>
+    </g>
+
+    <!-- Bridge windows (lit) -->
+    <g filter="url(#glow)" fill="#ffe07a" opacity="1.0">
+      <rect x="800" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="815" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="830" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="845" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="860" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="875" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="890" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="905" y="413" width="6" height="5" rx="0.5"/>
+      <rect x="920" y="413" width="6" height="5" rx="0.5"/>
+    </g>
+
+    <!-- ── SEA ── -->
+    <!-- Water body -->
+    <path d="M 0 530 L 0 900 L 1440 900 L 1440 530
+             C 1320 532 1200 534 1100 533 C 950 531 850 530 720 530
+             C 590 530 440 530 300 531 C 180 532 80 533 0 530 Z"
+          fill="url(#sea)"/>
+
+    <!-- Water surface sheen — subtle wave lines -->
+    <g stroke="#0e0c1e" stroke-width="0.8" opacity="0.5" fill="none">
+      <path d="M 0 538 Q 180 535 360 538 Q 540 541 720 538 Q 900 535 1080 538 Q 1260 541 1440 538"/>
+      <path d="M 0 548 Q 200 545 400 548 Q 600 551 800 548 Q 1000 545 1200 548 Q 1320 550 1440 548"/>
+      <path d="M 0 560 Q 240 557 480 560 Q 720 563 960 560 Q 1200 557 1440 560"/>
+      <path d="M 0 575 Q 200 572 400 575 Q 600 578 800 575 Q 1000 572 1200 575 Q 1320 577 1440 575"/>
+    </g>
+
+    <!-- Ship reflection (blurred, broken) -->
+    <g opacity="0.25" transform="scale(1,-1) translate(0,-1060)">
+      <!-- Inverted hull reflection -->
+      <path d="M 250 530 L 240 540 L 1200 540 L 1190 530 Z" fill="#05040c"/>
+      <!-- Reflection porthole shimmer -->
+      <g fill="#c49a3c">
+        <ellipse cx="370" cy="548" rx="8" ry="2"/>
+        <ellipse cx="480" cy="550" rx="6" ry="1.5"/>
+        <ellipse cx="580" cy="549" rx="8" ry="2"/>
+        <ellipse cx="680" cy="548" rx="6" ry="1.5"/>
+        <ellipse cx="780" cy="549" rx="8" ry="2"/>
+        <ellipse cx="880" cy="548" rx="6" ry="1.5"/>
+        <ellipse cx="980" cy="549" rx="8" ry="2"/>
+        <ellipse cx="1080" cy="550" rx="6" ry="1.5"/>
+      </g>
+    </g>
+    <!-- Fade the reflection with an overlay -->
+    <rect x="0" y="530" width="1440" height="100" fill="url(#reflectShip)"/>
+
+    <!-- Bottom legibility gradient -->
+    <rect width="1440" height="900" fill="url(#botfade)"/>
+
+  </svg>
+  </div>
   <div class="hero-content">
     <div class="hero-rule"></div>
     <p class="hero-eyebrow">Immersive Historical Fiction</p>
@@ -555,22 +934,22 @@ footer {
   </div>
 
   <div class="featured-grid">
-    <div class="featured-card fc-large reveal">
-      <div class="fc-bg bg-titanic"></div>
+    <a class="featured-card fc-large reveal" href="/game?scenarioId=apollo_13_lifeboat">
+      <div class="fc-bg bg-apollo"></div>
       <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
       <div class="fc-inner">
-        <div class="fc-tag">Maritime — April 1912</div>
-        <h3 class="fc-title">The Marconi Room,<br>RMS Titanic</h3>
-        <p class="fc-desc">You are Junior Operator Harold Bride. The Mesaba warning is in your hand. The Bridge is twenty yards away. You have not moved.</p>
+        <div class="fc-tag">Space Race — April 1970</div>
+        <h3 class="fc-title">Apollo 13:<br>Lifeboat</h3>
+        <p class="fc-desc">The explosion has happened. The mission is over. The crew has moved into the LM. Three men, four days, one trajectory — and no margin for error.</p>
         <div class="fc-meta">
           <span class="meta-pill">Historical</span>
           <span class="meta-pill">Primary Sources</span>
-          <span class="meta-time">~25 min</span>
+          <span class="meta-time">~30 min</span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <div class="featured-card fc-small reveal rd1">
+    <a class="featured-card fc-small reveal rd1" href="/game?scenarioId=dog_green_sector">
       <div class="fc-bg bg-dday"></div>
       <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
       <div class="fc-inner">
@@ -583,21 +962,22 @@ footer {
           <span class="meta-time">~20 min</span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <div class="featured-card fc-small reveal rd2">
-      <div class="fc-bg bg-engineer"></div>
+    <a class="featured-card fc-small reveal rd2" href="/game?scenarioId=titanic_final_hours">
+      <div class="fc-bg bg-titanic"></div>
       <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
       <div class="fc-inner">
         <div class="fc-tag">Maritime — April 1912</div>
-        <h3 class="fc-title">Second Engineer,<br>Dynamo Flat</h3>
-        <p class="fc-desc">Bell is at the gauge. The water is at your shins. The notebook is still in your pocket.</p>
+        <h3 class="fc-title">The Marconi Room,<br>RMS Titanic</h3>
+        <p class="fc-desc">You are Junior Operator Harold Bride. The Mesaba warning is in your hand. The Bridge is twenty yards away. You have not moved.</p>
         <div class="fc-meta">
-          <span class="meta-pill">Titanic</span>
-          <span class="meta-time">~30 min</span>
+          <span class="meta-pill">Historical</span>
+          <span class="meta-pill">Primary Sources</span>
+          <span class="meta-time">~25 min</span>
         </div>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 
@@ -772,6 +1152,50 @@ const scenes = {
     [0.36,0.50].forEach(x => {
       ctx.fillStyle='rgba(150,65,18,0.55)'; ctx.fillRect(w*x,h*0.08,11,h*0.82);
     });
+  },
+
+  'bg-apollo': (ctx, w, h) => {
+    // Deep space background
+    ctx.fillStyle='#06060f'; ctx.fillRect(0,0,w,h);
+    // Stars
+    stars(ctx, w, h, 220);
+    // Earth limb glow bottom-left
+    const earthG = ctx.createRadialGradient(w*0.08, h*1.05, h*0.15, w*0.08, h*1.05, h*0.75);
+    earthG.addColorStop(0,'rgba(40,80,180,0.55)'); earthG.addColorStop(0.4,'rgba(20,50,120,0.25)'); earthG.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=earthG; ctx.fillRect(0,0,w,h);
+    // Subtle sunlight streak top-right
+    const sunG = ctx.createRadialGradient(w*0.88, h*0.08, 20, w*0.88, h*0.08, h*0.55);
+    sunG.addColorStop(0,'rgba(255,220,140,0.22)'); sunG.addColorStop(1,'rgba(255,220,140,0)');
+    ctx.fillStyle=sunG; ctx.fillRect(0,0,w,h);
+    // LM silhouette (boxy ascent stage + descent legs)
+    const cx=w*0.60, cy=h*0.42;
+    ctx.fillStyle='#0d0d1e'; ctx.globalAlpha=0.95;
+    // Ascent stage box
+    ctx.fillRect(cx-28, cy-24, 56, 44);
+    // Docking probe
+    ctx.fillRect(cx-3, cy-38, 6, 16);
+    // Descent stage wider base
+    ctx.fillRect(cx-38, cy+20, 76, 18);
+    // Landing legs
+    [[-38,-22],[38,-22],[-48,12],[48,12]].forEach(([dx,dy]) => {
+      ctx.beginPath(); ctx.moveTo(cx+dx*0.3, cy+20); ctx.lineTo(cx+dx, cy+38+dy*0.2);
+      ctx.strokeStyle='#0d0d1e'; ctx.lineWidth=3; ctx.stroke();
+    });
+    // Window
+    ctx.globalAlpha=1;
+    ctx.beginPath(); ctx.arc(cx+10, cy-8, 7, 0, Math.PI*2);
+    ctx.fillStyle='rgba(180,210,255,0.35)'; ctx.fill();
+    ctx.strokeStyle='rgba(180,210,255,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+    // Foil thermal detail lines
+    ctx.globalAlpha=0.18;
+    [cy-22,cy-12,cy-2,cy+8,cy+18].forEach(y => {
+      ctx.fillStyle='#ffd080'; ctx.fillRect(cx-28,y,56,2);
+    });
+    ctx.globalAlpha=1;
+    // Mission text glow — subtle
+    const txtG = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
+    txtG.addColorStop(0,'rgba(180,200,255,0.08)'); txtG.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=txtG; ctx.fillRect(0,0,w,h);
   },
 
   // ── CATEGORY CARDS ──
@@ -1004,9 +1428,9 @@ function applyStoryImage(index, sceneKey) {
 
 window.addEventListener('DOMContentLoaded', async () => {
   // Featured cards
-  applyFeaturedImage('bg-titanic',  'bg-titanic');
-  applyFeaturedImage('bg-dday',     'bg-dday');
-  applyFeaturedImage('bg-engineer', 'bg-engineer');
+  applyFeaturedImage('bg-apollo',  'bg-apollo');
+  applyFeaturedImage('bg-dday',    'bg-dday');
+  applyFeaturedImage('bg-titanic', 'bg-titanic');
 
   // Category cards
   applyCategoryImage('ci-wwii');
@@ -1027,14 +1451,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     apollo_13_lifeboat:  'ci-space',
   };
   const FALLBACK_HTML = `
-    <div class="story-card" onclick="location.href='/game?scenarioId=titanic_final_hours'">
-      <div class="story-card-img" style="background:linear-gradient(160deg,#1a3060,#061228)"></div>
+    <div class="story-card" onclick="location.href='/game?scenarioId=apollo_13_lifeboat'">
+      <div class="story-card-img" style="background:linear-gradient(160deg,#141428,#0a0a1c)"></div>
       <div class="story-card-body">
-        <p class="story-era">Maritime</p>
-        <h3 class="story-title">The Marconi Room, RMS Titanic</h3>
-        <p class="story-desc">You are Junior Operator Harold Bride. The warning is in your hand. The Bridge is twenty yards away.</p>
+        <p class="story-era">Space Race</p>
+        <h3 class="story-title">Apollo 13: Lifeboat</h3>
+        <p class="story-desc">The explosion has happened. The mission is over. Now you have to get them home.</p>
         <div class="story-footer">
-          <div class="story-pills"><span class="meta-pill">April 1912</span><span class="meta-pill">Primary Sources</span></div>
+          <div class="story-pills"><span class="meta-pill">April 1970</span><span class="meta-pill">Space Race</span></div>
           <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
         </div>
       </div>
@@ -1051,14 +1475,14 @@ window.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
     </div>
-    <div class="story-card" onclick="location.href='/game?scenarioId=apollo_13_lifeboat'">
-      <div class="story-card-img" style="background:linear-gradient(160deg,#141428,#0a0a1c)"></div>
+    <div class="story-card" onclick="location.href='/game?scenarioId=titanic_final_hours'">
+      <div class="story-card-img" style="background:linear-gradient(160deg,#1a3060,#061228)"></div>
       <div class="story-card-body">
-        <p class="story-era">Space Race</p>
-        <h3 class="story-title">Apollo 13: Lifeboat</h3>
-        <p class="story-desc">The explosion has happened. The mission is over. Now you have to get them home.</p>
+        <p class="story-era">Maritime</p>
+        <h3 class="story-title">The Marconi Room, RMS Titanic</h3>
+        <p class="story-desc">You are Junior Operator Harold Bride. The warning is in your hand. The Bridge is twenty yards away.</p>
         <div class="story-footer">
-          <div class="story-pills"><span class="meta-pill">April 1970</span><span class="meta-pill">Space Race</span></div>
+          <div class="story-pills"><span class="meta-pill">April 1912</span><span class="meta-pill">Primary Sources</span></div>
           <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
         </div>
       </div>
@@ -1088,6 +1512,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (!resp.ok) throw new Error('fetch failed');
     const stories = await resp.json();
     if (!Array.isArray(stories) || stories.length === 0) throw new Error('empty');
+    const ORDER = ['apollo_13_lifeboat', 'dog_green_sector', 'titanic_final_hours'];
+    stories.sort((a, b) => {
+      const ai = ORDER.indexOf(a.id), bi = ORDER.indexOf(b.id);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
     grid.innerHTML = stories.map(buildCard).join('');
     grid.querySelectorAll('.story-card-img[data-scene]').forEach(el => {
       const key = el.dataset.scene;
