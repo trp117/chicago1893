@@ -551,8 +551,10 @@ const scrollHintEl = (() => {
 })();
 function feedAppend(el) { storyEl.insertBefore(el, scrollHintEl); }
 function feedScrollTop(el) {
-  storyEl.scrollTop = el.getBoundingClientRect().top
-    - storyEl.getBoundingClientRect().top + storyEl.scrollTop;
+  requestAnimationFrame(() => {
+    storyEl.scrollTop = el.getBoundingClientRect().top
+      - storyEl.getBoundingClientRect().top + storyEl.scrollTop;
+  });
 }
 function showScrollHint() {
   if (storyEl.scrollHeight > storyEl.clientHeight + 20) scrollHintEl.classList.add('visible');
