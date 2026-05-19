@@ -1307,7 +1307,7 @@ Return ONLY valid JSON in this exact structure:
 
     const send = obj => res.write(`data: ${JSON.stringify(obj)}\n\n`);
 
-    const BASE     = `${req.protocol}://${req.get('host')}`;
+    const BASE     = `http://localhost:${req.socket.localPort}`;
     const MAX_TURNS = 20;
 
     const SIM_INPUTS = [
