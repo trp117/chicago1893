@@ -1972,6 +1972,7 @@ function downloadScenarioDoc(data) {
   const genreLine = [scenario.id, ...(scenario.genre || [])].filter(Boolean).join(' | ');
   if (genreLine) out.push(genreLine);
   if (scenario.sessionTargetMinutes) out.push(`Session target: ${scenario.sessionTargetMinutes} min`);
+  if (scenario.historicalRealism)    out.push(`Historical realism: ${scenario.historicalRealism}`);
   out.push(HR);
   if (scenario.description) { out.push(''); out.push(scenario.description); }
 
@@ -2020,7 +2021,8 @@ function downloadScenarioDoc(data) {
     if (storyArc.goal)             { out.push('GOAL'); out.push(indent(storyArc.goal)); out.push(''); }
     if (storyArc.openingSituation) { out.push('OPENING SITUATION'); out.push(indent(storyArc.openingSituation)); out.push(''); }
     (storyArc.acts || []).forEach(act => {
-      out.push(`Act ${act.actNumber || ''}: ${act.name || ''}`);
+      const range = act.minuteRange?.length === 2 ? ` [${act.minuteRange[0]}–${act.minuteRange[1]} min]` : '';
+      out.push(`Act ${act.actNumber || ''}: ${act.name || ''}${range}`);
       (act.beats || []).forEach(b => {
         if (typeof b === 'string') out.push(`  • ${b}`);
         else out.push(`  [${b.id || '?'}] ${b.description || ''}`);
@@ -2091,6 +2093,17 @@ function downloadScenarioDoc(data) {
         out.push(''); out.push('SECRETS');
         const s = Array.isArray(c.secrets) ? c.secrets : c.secrets.split('\n').filter(Boolean);
         s.forEach(k => out.push(`  • ${k}`));
+      }
+      const ap = c.aggressionProfile;
+      if (ap && Object.values(ap).some(Boolean)) {
+        out.push(''); out.push('BEHAVIOR UNDER PRESSURE');
+        if (ap.mildPressure)     { out.push('  Mild pressure:');  out.push(indent(ap.mildPressure, 4)); }
+        if (ap.heavyPressure)    { out.push('  Heavy pressure:'); out.push(indent(ap.heavyPressure, 4)); }
+        if (ap.breakingPoint)    { out.push('  Breaking point:'); out.push(indent(ap.breakingPoint, 4)); }
+        if (ap.fleeCondition)    out.push(`  Flee condition: ${ap.fleeCondition}`);
+        if (ap.fleeStyle)        out.push(`  Flee style: ${ap.fleeStyle}`);
+        if (ap.chaseStyle)       out.push(`  Chase style: ${ap.chaseStyle}`);
+        if (ap.capturedBehavior) out.push(`  If captured: ${ap.capturedBehavior}`);
       }
       out.push(''); out.push(hr);
     }
@@ -2182,6 +2195,43 @@ function downloadScenarioDoc(data) {
         if (c.historical_record) out.push(indent(c.historical_record, 4));
       }
     }
+  }
+
+  // ── Technical Facts ─────────────────────────────────────────
+  const tf = scenario.technical_facts;
+  if (tf?.facts?.length) {
+    out.push(sec('Technical Facts'));
+    out.push(`Status: ${tf.reviewed ? 'Reviewed' : tf.generated ? 'PENDING REVIEW — not yet verified' : 'Not generated'}`);
+    out.push('');
+    for (const f of tf.facts) {
+      out.push(`[${f.fact_id || '?'}]${f.domain ? ` (${f.domain})` : ''}`);
+      if (f.content) out.push(indent(f.content));
+      if (f.source)  out.push(indent(`Source: ${f.source}`));
+      if (f.valid_from || f.valid_until) out.push(indent(`Valid: ${f.valid_from || '—'} → ${f.valid_until || '—'}`));
+      out.push('');
+    }
+  }
+
+  // ── Review Checklist ────────────────────────────────────────
+  const cl = scenario.review_checklist;
+  if (cl && Object.keys(cl).length) {
+    out.push(sec('Review Checklist'));
+    const clLabels = {
+      beat_count:         'Beat count',
+      sequence_check:     'Sequence check',
+      path_independence:  'Path independence',
+      final_beat_spec:    'Specificity of final beat',
+      tense_attribution:  'Tense & attribution',
+      reviewer_summary:   'Reviewer summary',
+      manual_playthrough: 'Manual playthrough',
+    };
+    for (const [key, item] of Object.entries(cl)) {
+      const label  = clLabels[key] || key;
+      const status = item.checked ? '✓' : '✗';
+      out.push(`${status}  ${label}`);
+      if (item.notes) out.push(indent(item.notes));
+    }
+    out.push('');
   }
 
   out.push(''); out.push(HR); out.push('');
