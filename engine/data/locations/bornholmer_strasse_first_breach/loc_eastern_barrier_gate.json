@@ -1,0 +1,21 @@
+{
+  "id": "loc_eastern_barrier_gate",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "Eastern Barrier and Turnstile",
+  "description": "The primary Passkontrolle gate on the eastern side of the checkpoint — a heavy steel turnstile set into a concrete frame, flanked by two guard booths with bulletproof glass, the whole structure now bending visibly under the sustained pressure of the crowd. The floodlights above cast everything in a flat white that makes the guards' faces unreadable.",
+  "mood": "volatile, compressed, historically charged",
+  "linkedCharacterIds": [
+    "char_brenner",
+    "char_mueller",
+    "char_protester"
+  ],
+  "atmosphericDetails": [
+    "The cold steel of the turnstile bar pressing into ribs and shoulders — the physical reality of the barrier as a body-level experience",
+    "The sound of thousands of voices merging into a single rhythmic chant, punctuated by individual shouts that spike above the mass and then dissolve back into it",
+    "The smell of two-stroke Trabant exhaust mixing with cold fog and the sweat of bodies pressed together in the November air"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.167Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

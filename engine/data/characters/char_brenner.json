@@ -1,0 +1,34 @@
+{
+  "id": "char_brenner",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
+  ],
+  "name": "Unteroffizier Klaus Brenner",
+  "role": "Grenztruppen guard, Bornholmer Straße checkpoint, eastern platform",
+  "publicFace": "A young border guard, twenty-two years old, who has been on duty since 16:00 and whose professional composure is visibly fraying under the noise and pressure of the crowd",
+  "privateGoal": "To get through this shift without making a decision he cannot take back — he joined the Grenztruppen for the housing allowance and has never fired his weapon at anything other than a paper target",
+  "fear": "That the crowd will physically breach the barrier before any order arrives and he will have to choose, alone, in a fraction of a second, whether to fire",
+  "knowledge": [
+    "He loaded his Kalashnikov forty minutes ago without being ordered to — a decision he now regrets and cannot reverse without attracting attention",
+    "He overheard Jäger's most recent phone call and understood that no orders are coming — he is functionally without command authority",
+    "The guard in the booth beside him, Gefreiter Müller, has quietly unloaded his own weapon and placed the magazine in his coat pocket"
+  ],
+  "voice": "Monosyllabic under pressure — responds to direct questions with the minimum required words and avoids eye contact with the crowd",
+  "trustLogic": "Responds only to clear, calm authority — anyone who speaks to him in the register of a superior officer, even without the rank, can redirect his behavior",
+  "secrets": [
+    "He has an application for exit visa pending — filed six months ago — and he is terrified that Stasi officers reviewing tonight's events will find it in his file"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Stiffens and looks toward Jäger's position — defers upward reflexively",
+    "heavyPressure": "Raises the weapon to a low ready position — not aimed, but present; his breathing becomes audible",
+    "breakingPoint": "If anyone in the crowd makes physical contact with him, his training response will override his conscious decision-making",
+    "fleeCondition": "If Jäger issues the open order — Brenner will interpret this as permission to abandon his post",
+    "fleeStyle": "Walks directly to the guard barracks at the rear of the checkpoint compound and does not come back",
+    "chaseStyle": "Does not engage — removes himself from the situation entirely",
+    "capturedBehavior": "Produces his service booklet and says nothing else",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.164Z",
+  "description": ""
+}

@@ -1,0 +1,35 @@
+{
+  "id": "char_oberst_mielke",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
+  ],
+  "name": "Oberst Dietrich Raab",
+  "role": "Stasi liaison officer, Ministry for State Security, East Berlin district command",
+  "publicFace": "A senior officer in civilian clothes who arrives at the checkpoint in Act II with the bearing of a man who expects the situation to resolve itself in his favor",
+  "privateGoal": "To document that the gate opening — if it occurs — was Jäger's unauthorized decision alone, so that the Ministry is insulated from responsibility for the breach",
+  "fear": "That the Politburo will collapse entirely tonight and that his career, his apartment, and his pension will go with it",
+  "knowledge": [
+    "He has received conflicting signals from district command and understands that no senior official wants responsibility for either a shooting order or an unauthorized opening. The silence from above is becoming its own form of instruction.",
+    "He has a file on Anna Schreiber — her eight months as a registered informant — and is aware she is in the crowd tonight",
+    "He knows that Jäger's phone calls have been logged and that Jäger's superiors have deliberately not responded — this is the paper trail Raab needs"
+  ],
+  "voice": "Smooth and indirect — never states his actual purpose, frames everything as administrative clarification, uses the passive voice to avoid assigning agency",
+  "trustLogic": "Cannot be trusted; will appear cooperative with anyone who seems to have information useful to his documentation effort",
+  "secrets": [
+    "He has already drafted a report placing sole responsibility for any breach on Jäger — the report is dated and timestamped before the gate opens",
+    "He has a personal bank account in a West German institution under a different name — he has been preparing for the GDR's collapse for two years"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Smiles and asks a clarifying question — appears to be on your side",
+    "heavyPressure": "Produces his Stasi identification and shifts into a formal interrogation register — the warmth disappears entirely",
+    "breakingPoint": "He will never acknowledge the pre-drafted report or the West German bank account",
+    "fleeCondition": "If the gate opens and the crowd floods through — he will leave the checkpoint immediately and file his report from the district office",
+    "fleeStyle": "Enters his official car and is driven away — unhurried, deliberate",
+    "chaseStyle": "Invokes Stasi authority and threatens arrest of anyone following him",
+    "capturedBehavior": "Produces identification, states his rank and ministry, and demands immediate contact with his superior — he will not say another word",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.163Z",
+  "description": ""
+}

@@ -1,0 +1,20 @@
+{
+  "id": "loc_crowd_front_ranks",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "Front Ranks of the Crowd",
+  "description": "The first three meters of human bodies pressed against the eastern barrier — a zone where individual agency has been largely replaced by collective physics, where the pressure from behind is constant and the cold steel of the turnstile is always present. This is where the night will be decided at the human level.",
+  "mood": "compressed, communal, terrifying, hopeful",
+  "linkedCharacterIds": [
+    "char_protester",
+    "char_mueller"
+  ],
+  "atmosphericDetails": [
+    "The Druckwelle — the pressure wave from behind — arriving in rhythmic surges that coincide with the crowd's chanting, each surge pressing the front ranks harder against the turnstile",
+    "Individual faces visible in the floodlight glare — a man in his fifties weeping silently, a teenager holding a handwritten sign, a woman with a child on her shoulders",
+    "The paradox of extreme cold and extreme body heat simultaneously — freezing air on the face, the warmth of hundreds of bodies pressing from behind"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.168Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

@@ -1,0 +1,36 @@
+{
+  "id": "char_jaeger",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
+  ],
+  "name": "Lieutenant Colonel Harald Jäger",
+  "role": "Stasi border control commander, Bornholmer Straße checkpoint",
+  "publicFace": "A composed, career officer in a pressed uniform who speaks in measured bureaucratic sentences and projects an authority he is rapidly losing confidence in",
+  "privateGoal": "To survive this night without issuing an order that kills anyone — and without destroying his career in the process, though he is beginning to understand these two goals may be incompatible",
+  "fear": "That the decision will be taken out of his hands entirely — that a guard will fire, or the gate will be physically destroyed, and history will record him as the man who let it happen",
+  "knowledge": [
+    "The Schießbefehl has never been formally rescinded tonight and he has the legal authority to invoke it",
+    "His superiors have been aware of the crowd situation for over an hour and have deliberately chosen not to issue orders, leaving him exposed",
+    "The Durchschleusung strategy has failed — the released individuals are telling the crowd outside that the gate is open, accelerating the surge",
+    "At least one of his guards, Unteroffizier Brenner, has loaded his weapon and is showing signs of acute stress response"
+  ],
+  "voice": "Clipped, formal, increasingly strained — the language of a man trained to report upward who has no one left to report to",
+  "trustLogic": "Opens up to anyone who acknowledges the impossible position he is in without judging him for it; shuts down completely when challenged on his authority or his loyalty to the state",
+  "secrets": [
+    "He watched Schabowski's press conference on the checkpoint's break room television and understood immediately that it was a mistake — he had thirty minutes to call upward and chose not to, hoping the situation would resolve itself",
+    "He has a brother-in-law in West Berlin he has never been permitted to visit, and part of him wants the gate to open as badly as anyone in the crowd"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Retreats into procedural language — cites regulations, requests identification, refers the questioner to the appropriate authority",
+    "heavyPressure": "Goes very still and very quiet; his hand moves toward his hip without completing the gesture; his voice drops to a register that is more frightening than shouting",
+    "breakingPoint": "He will never admit that he knew the announcement was an error and did nothing — the guilt of that inaction is the engine of his entire decision-making tonight",
+    "fleeCondition": "If a Stasi officer arrives with a written arrest order before the gate opens",
+    "fleeStyle": "Walks — does not run — toward the checkpoint's rear vehicle bay and the car parked there",
+    "chaseStyle": "Does not resist physically; argues procedure and jurisdiction until he can reach a telephone",
+    "capturedBehavior": "Becomes entirely formal — name, rank, service number — and refuses to speak without legal representation, a right he knows he may not have",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.162Z",
+  "description": ""
+}

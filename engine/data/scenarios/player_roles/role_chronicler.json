@@ -1,0 +1,75 @@
+{
+  "id": "role_chronicler",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "The Chronicler",
+  "description": "You are an ARD camera operator on the western side of the Bornholmer bridge. Your lens is the world's eye tonight. You must hold your position, read the situation, and be live when the gate opens — if it opens.",
+  "startLocationId": "loc_ard_broadcast_position",
+  "startingKnowledge": [
+    "ARD has the only camera angle that captures both the gate and the death strip simultaneously — every other network is positioned to the south",
+    "The Liveschaltung authorization from Hamburg has not yet been cleared — you are recording but not broadcasting live",
+    "Your producer Ingrid Hartmann has filed a preliminary report describing the gate as 'expected to open within the hour' — if she is wrong, her credibility is finished and she knows it",
+    "You have an East Berlin press credential in your bag that would allow you to cross the checkpoint if it opens — you have not told anyone"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a professional witness — a person whose job is to see clearly and record accurately, who has developed the camera operator's discipline of separating observation from reaction, and who is now confronting a situation where that separation may be impossible. The prose should be precise and visual: compositions, light conditions, the specific details that distinguish real footage from performed footage. The camera is both his tool and his emotional buffer, and tonight the buffer is failing.",
+  "briefing": "You are crouched behind the camera on the bridge railing, your eye at the viewfinder, the eastern gate centered in the frame at the far end of forty meters of death strip. The fog has been condensing on your lens for the past six minutes and you need to wipe it, but wiping it means taking the camera off your shoulder, and you are not taking the camera off your shoulder because the situation has been changing every ninety seconds and you do not want to be looking at a lens cloth when it changes again. In your right ear, the radio earpiece is carrying three simultaneous feeds: Hamburg telling you the Liveschaltung authorization is pending, the AP wire reading crowd estimates that are already outdated, and Ingrid's voice from ten meters behind you saying 'hold position, hold position' in the tone she uses when she is managing her own fear as much as yours. You have been covering this Wall for eleven years. You have filmed vigils, escapes, funerals, and the construction of new sections of barrier. You know what this structure looks like when it is performing its function and you know what it looks like when it is not, and tonight, in the flat white light of the floodlamps, it looks like a thing that has already lost its argument with the people pressing against it. In your bag, under the spare tapes and the lens cloths, there is a press credential with your photograph and an East Berlin address and a stamp you obtained through channels you would not describe to Ingrid. You have not decided yet whether tonight is the night you use it. The amber light on the relay unit is still dark. Hamburg has not cleared the signal. The gate is still closed. You wipe the lens.",
+  "character_hooks": [
+    "My younger sister lives in East Berlin — I recognized her face in the crowd footage twenty minutes ago and I have not been able to look away from the monitor since.",
+    "I have been offered a position at a network in New York contingent on delivering a broadcast-quality recording of whatever happens here tonight — the offer expires at midnight.",
+    "I obtained the East Berlin press credential through a source inside the West Berlin Senat who told me, six months ago, that 'there will be a night when you will need to be on both sides of the bridge simultaneously' — I did not understand what he meant until tonight."
+  ],
+  "suggested_secret": "Weller's camera has been running continuously since 19:45 — he has footage of the Bornholmer approach before the crowd arrived, including a brief exchange between Oberst Raab and a Stasi driver that he has not reviewed and does not know he has.",
+  "opening": {
+    "narrative": "It is 20:00 and you have been at this position for thirty minutes, which means you were here before most of the crowd, which means you saw it build from nothing. The eastern gate is forty meters away through the fog and the death strip. The crowd on that side is in the hundreds and growing. On your side of the bridge, West Berliners are beginning to gather on the approach, drawn by the noise and the television reports — some of them have brought wine, which tells you something about what they expect to happen tonight. The relay unit behind you is dark. Hamburg has not cleared the signal. You are recording but not broadcasting, which means that everything you are capturing right now is history that only you can see.",
+    "npcMoments": [
+      {
+        "characterId": "char_westberlin_producer",
+        "moment": "Ingrid appears at your shoulder and says, without preamble: 'Hamburg says fifteen minutes for the authorization. I told them we may not have fifteen minutes. They said fifteen minutes.' She moves away before you can respond."
+      },
+      {
+        "characterId": "char_journalist",
+        "moment": "This is your own character's opening moment — you are both the Journalist and the camera operator tonight, the eye and the hand simultaneously."
+      }
+    ],
+    "choices": [
+      "Wipe the lens and reframe — accept the thirty-second gap in footage to ensure the image is clean when the moment comes",
+      "Radio Hamburg directly and push for immediate Liveschaltung authorization — go over Ingrid's head if necessary",
+      "Pan the camera slowly across the death strip and the watchtower — document the full geography of the checkpoint before the situation changes"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "ARD camera — loaded with tape",
+      "radio earpiece — connected to Hamburg feed",
+      "lens cloth",
+      "East Berlin press credential — concealed in bag",
+      "press identification — West Berlin ARD bureau"
+    ],
+    "flags": {
+      "liveschaltung_authorized": false,
+      "lens_clean": false,
+      "east_berlin_credential_used": false,
+      "breach_footage_captured": false
+    },
+    "suspicion": {
+      "char_westberlin_producer": 0,
+      "char_oberst_mielke": 1
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.178Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully captured the moment the barrier was lifted and broadcast the historic breach live to the world. However, in your scramble to maintain the camera position, your crew ignored a collapsing security fence on the western side, resulting in your field sound engineer being severely injured by the falling steel work. ",
+      "who_present": "The Border Commander, The Student Protester ",
+      "emotional_weight": " Professional Detachment—the numbing contrast between delivering a career-defining global broadcast and witnessing immediate, localized human trauma. ",
+      "closing_line_override": "The tape kept rolling as the world cheered, capturing the historical truth at a permanent personal cost. "
+    },
+    "failure": {
+      "what_happened": "Your broadcast equipment completely short-circuited or was confiscated during a sudden crowd surge, leaving you blind and silent just as the checkpoint security escalated. You were left stranded in the dark, unable to report or confirm the events as the gates were locked down by military reinforcements. ",
+      "who_present": "None (Isolated on the Western flank) ",
+      "emotional_weight": " Professional Failure—the agonizing realization of being a witness to a monumental historical event with empty hands and a dead microphone. ",
+      "closing_line_override": "The viewfinder went black, reducing the fall of the Wall to a series of distant, unrecorded shadows. "
+    }
+  }
+}

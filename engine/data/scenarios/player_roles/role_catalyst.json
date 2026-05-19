@@ -1,0 +1,73 @@
+{
+  "id": "role_catalyst",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "The Catalyst",
+  "description": "You are an East Berlin student who ran to the Bornholmer gate the moment Schabowski finished speaking. Your mother is on the other side. You are at the front of the crowd, and what you do in the next ninety minutes will determine whether this ends in a crossing or a catastrophe.",
+  "startLocationId": "loc_crowd_front_ranks",
+  "startingKnowledge": [
+    "Your mother crossed to West Berlin on a day visa three weeks ago and has been unable to return — you have not spoken to her since",
+    "You have attended Monday demonstrations in Leipzig and understand crowd psychology — you can feel a surge building before it starts",
+    "The young guard directly opposite you has been making eye contact with you for twenty minutes and appears as frightened as you are",
+    "You are three months pregnant and the physical compression at the front of the crowd is a genuine danger you have chosen not to retreat from"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a young woman at the physical and historical front line — pressed against cold steel, responsible for the people behind her without having asked for that responsibility, carrying a secret that changes the stakes of every physical decision she makes. The prose should be immediate and sensory: the pressure of bodies, the cold of the metal, the faces of the guards, the sound of the crowd as a physical force. Her intelligence is practical and instinctive, not analytical.",
+  "briefing": "You are pressed against the turnstile bar at the front of the crowd, the cold steel biting into your ribs through your wool coat, and you have been here for forty minutes. You can feel the Druckwelle behind you — the pressure wave of thousands of bodies — arriving in surges that are getting stronger and closer together, and you understand what this means because you have stood in crowds before, in Leipzig, in October, and you know the difference between a crowd that is gathering and a crowd that is becoming something else. The guard across the barrier is twenty-two years old and he has been looking at you for twenty minutes without quite looking at you, and you have been doing the same to him, and in this exchange of not-quite-eye-contact you have established something that is not trust but is the precondition of it. Your mother is somewhere on the other side of that gate. Three weeks ago she crossed on a day visa and the border closed behind her and she has not been able to come back and you have not heard her voice since, and the address she left with the neighbor — Wedding, western side — is the only thing you have been thinking about since you heard Schabowski say 'immediately, without delay' on the television and put on your coat and ran. You are also carrying something else, something no one here knows, something that makes every Druckwelle from behind a calculation rather than just a sensation. The crowd behind you is singing now. The guard's hand has moved to his weapon grip. You are at the exact point where your decision about what to do next will either hold this moment together or break it.",
+  "character_hooks": [
+    "I was a registered Stasi informant for eight months in my first year at university — I reported nothing of consequence, but the file exists, and I know a man named Raab who knows it exists.",
+    "My father is a Grenztruppen officer at a different checkpoint tonight — I do not know which one — and every guard's face I look at, I am looking for his.",
+    "I have my mother's West Berlin address memorized: Schönhauser Allee 14, second floor, the apartment with the red curtains — I have been repeating it to myself since I left the house, like a prayer or a password."
+  ],
+  "suggested_secret": "Anna is further along in her pregnancy than she has admitted even to herself — she is not three months along but closer to five, and the physical compression at the front of the crowd represents a danger she is consciously choosing to accept.",
+  "opening": {
+    "narrative": "It is 20:00 and you have been at the front of this crowd for forty minutes, which means you were one of the first to arrive, which means you heard Schabowski's words and moved before you thought. The crowd behind you has grown from dozens to hundreds and is still growing — you can hear it, feel it, the sound and pressure of it changing in quality as the numbers increase. The gate is closed. The guards are present. The floodlights are on. For now, the situation is what it has always been: East Germans at a closed gate, guards with weapons, the death strip between here and the lights of the West. But tonight something is different, and the difference is that twenty thousand people heard the same words you heard, and they are all walking toward this gate, and the gate has not been told what to do with them.",
+    "npcMoments": [
+      {
+        "characterId": "char_mueller",
+        "moment": "The guard in the ground-level booth — older than the others, quieter — processes an elderly man's documents and then, when the man is turned away, meets your eyes for a moment. He looks away first."
+      },
+      {
+        "characterId": "char_brenner",
+        "moment": "The young guard on the platform above the gate unslings his weapon and holds it across his chest. He is looking at the crowd, not at any individual. His jaw is set. He looks like someone who is trying very hard to remember his training."
+      }
+    ],
+    "choices": [
+      "Make sustained eye contact with the young guard — try to establish a human connection across the barrier before the crowd grows larger",
+      "Turn to the people immediately behind you and begin quietly managing the pressure — ask them to hold position, stop the surge from building",
+      "Call out to the guard in the booth — ask him directly, in a normal voice, what the procedure is for crossing tonight"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "wool coat",
+      "West Berlin address — memorized",
+      "student identification card — Humboldt University"
+    ],
+    "flags": {
+      "eye_contact_established_with_brenner": false,
+      "durchschleusung_offered": false,
+      "crossed_gate": false,
+      "mother_found": false
+    },
+    "suspicion": {
+      "char_brenner": 0,
+      "char_mueller": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.177Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "The gates were raised and you spilled across the bridge into West Berlin into a blur of champagne and cheering crowds. However, during your frantic push through the gate, you lost track of your younger brother who had marched with you, leaving you entirely isolated in a new world without knowing if he made it through safely. ",
+      "who_present": "The Border Commander, The Western Journalist",
+      "emotional_weight": " Fragmented Joy—the euphoric high of historical freedom shadowed by immediate, acute personal anxiety.",
+      "closing_line_override": "You stood beneath the flashing neon lights of the West, completely free and utterly alone."
+    },
+    "failure": {
+      "what_happened": "You were targeted by the border guards as an instigator during the \"Let-Off Valve\" phase. You were pulled through the pedestrian gate, dragged into a rear holding cell, and subjected to a brutal Stasi interrogation while the crowd outside was violently dispersed. ",
+      "who_present": "The Border Commander",
+      "emotional_weight": " Crushing Claustrophobia—the terror of being locked in the dark while history passes you by just outside the window. ",
+      "closing_line_override": " The heavy iron lock clicked shut, drowning out the sound of a world trying to break free. "
+    }
+  }
+}

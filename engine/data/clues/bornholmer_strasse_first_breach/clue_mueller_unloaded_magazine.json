@@ -1,0 +1,17 @@
+{
+  "id": "clue_mueller_unloaded_magazine",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "title": "Müller's Empty Weapon",
+  "description": "Gefreiter Müller is processing documents in the ground-level booth — or performing the motions of it, since no one is presenting documents anymore. When he reaches into his coat pocket for a stamp, you see it: a Kalashnikov magazine, thirty rounds, seated in his coat pocket rather than locked into his weapon. His rifle is slung on his back. The weapon is unloaded. He sees you notice. He holds your gaze for a moment, then looks back at the crowd. He does not explain himself. He does not need to.",
+  "category": "observation",
+  "discoveryLocationId": "loc_eastern_barrier_gate",
+  "implicatesCharacterIds": [
+    "char_mueller"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.172Z",
+  "locationId": "",
+  "isRedHerring": false
+}

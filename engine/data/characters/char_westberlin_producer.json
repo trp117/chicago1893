@@ -1,0 +1,34 @@
+{
+  "id": "char_westberlin_producer",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
+  ],
+  "name": "Ingrid Hartmann",
+  "role": "ARD field producer, West Berlin bureau, stationed on the western approach to Bornholmer bridge",
+  "publicFace": "A woman in her mid-forties in a long coat with a press badge and a clipboard, managing three separate radio feeds simultaneously with the calm of someone who has covered wars",
+  "privateGoal": "To get the Liveschaltung signal cleared by Hamburg before the gate opens — the network is competing with three other broadcasters and she needs the technical authorization before the moment arrives",
+  "fear": "That the moment will happen and her camera will not be live — that history will occur in the three seconds it takes Hamburg to patch through the authorization",
+  "knowledge": [
+    "She has been told by a source inside the West Berlin Senat that the Bundesrepublik government has been aware of the Schabowski error since 20:30 and has made a deliberate decision not to correct it publicly",
+    "She knows that Thomas Weller has an East Berlin press credential — she saw it in his bag six months ago and said nothing, but she is holding this knowledge",
+    "The other networks' camera positions are all to the south of the bridge — ARD has the best angle on the gate itself"
+  ],
+  "voice": "Fast and functional — speaks in half-sentences, assumes the listener will complete the thought, has no patience for anything that is not immediately actionable",
+  "trustLogic": "Trusts competence above everything else — demonstrate that you know what you are doing and she will give you everything she has; show uncertainty and she will work around you",
+  "secrets": [
+    "She has already filed a preliminary report with Hamburg describing the gate as 'expected to open within the hour' — if the gate does not open, her credibility with the network is finished"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Keeps moving — answers questions while walking, never stops to engage fully",
+    "heavyPressure": "Stops, turns, and gives the questioner her complete attention for exactly fifteen seconds — then makes a decision and acts on it",
+    "breakingPoint": "She will not reveal the Senat source — protecting sources is the only professional principle she holds absolutely",
+    "fleeCondition": "Never — she will not leave her position until the broadcast is filed",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Produces press credentials, invokes international press freedom protections, and immediately calls Hamburg on the radio",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.162Z",
+  "description": ""
+}

@@ -1,0 +1,17 @@
+{
+  "id": "clue_crowd_surge_pattern",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "title": "The Surge Pattern — Reading the Crowd",
+  "description": "From the front ranks, pressed against the turnstile, you begin to feel the rhythm of the crowd behind you. The Druckwelle comes in waves — each surge slightly stronger than the last, each recovery slightly shorter. You have been in enough demonstrations to know what this means: the crowd is not surging randomly. It is synchronizing. In approximately fifteen to twenty minutes, if nothing changes, the synchronization will produce a surge that the turnstile cannot absorb. The gate will not be pushed open — it will be pushed off its hinges. Anyone standing at the front when that happens will be crushed against the concrete frame.",
+  "category": "observation",
+  "discoveryLocationId": "loc_crowd_front_ranks",
+  "implicatesCharacterIds": [
+    "char_protester"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.176Z",
+  "locationId": "",
+  "isRedHerring": false
+}

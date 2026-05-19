@@ -1,0 +1,20 @@
+{
+  "id": "loc_bornholmer_bridge_western_approach",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "Bornholmer Bridge — Western Approach",
+  "description": "The western end of the Bornholmer Straße bridge, on the Bundesrepublik side — a gathering point for West Berliners who have come to watch, press crews setting up equipment, and West Berlin police officers who are present but uncertain how close to the border line they should allow crowds and press crews to gather. The bridge spans the Nordbahnhof railway cut; the eastern barrier is visible forty meters away across the death strip.",
+  "mood": "expectant, chaotic, electrically charged",
+  "linkedCharacterIds": [
+    "char_journalist",
+    "char_westberlin_producer"
+  ],
+  "atmosphericDetails": [
+    "The freezing November fog condensing on camera lenses and press credentials and the breath of thousands of West Berliners who have come outside to watch history",
+    "The crackle of radio earpieces carrying simultaneous feeds from Hamburg, the AP wire, and the West Berlin police frequency",
+    "The sudden dazzling burst of camera flashes as West Berliners begin climbing the outer concrete partitions to get a better view of the eastern gate"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.166Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

@@ -1,0 +1,161 @@
+{
+  "id": "bornholmer_strasse_first_breach_main_arc",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "The Gate That History Required",
+  "premise": "On the night of November 9, 1989, a bureaucratic error has set twenty thousand East Berliners in motion toward the Bornholmer Straße checkpoint. Three people — a border commander, a student protester, and a Western journalist — must navigate the next several hours as thousands of East Berliners — perhaps as many as twenty thousand — press against a gate that history will open, but that could just as easily become a massacre.",
+  "goal": "Reach the moment of the gate's opening without a lethal incident — and ensure that each perspective witnesses, enables, or survives the breach intact.",
+  "openingSituation": "It is 20:00. Schabowski's press conference ended forty minutes ago. The first arrivals are already at the gate. Jäger has placed his first call to his superiors and received no clear instruction. The Journalist's camera is rolling on the western approach. The Protester has just pushed through the outer edge of the gathering crowd and can see the floodlights ahead.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Echo Chamber",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        {
+          "id": "crowddensity_20",
+          "description": "Crowd_Density: 20 — the checkpoint is busy but manageable; guards are processing documents with visible unease"
+        },
+        {
+          "id": "commsstatus_operational",
+          "description": "Comms_Status: Operational — Jäger can reach his superiors but receives only evasion and contradictory signals"
+        },
+        {
+          "id": "aggressionlevel_passive",
+          "description": "Aggression_Level: Passive — the crowd is singing and chanting; there is joy mixed with anxiety; no one has pushed yet"
+        },
+        {
+          "id": "the_protester_arrives",
+          "description": "The Protester arrives and finds a position near the front ranks, making eye contact with a guard across the turnstile"
+        },
+        {
+          "id": "the_journalist_establishes",
+          "description": "The Journalist establishes position on the bridge approach and makes first radio contact with the West Berlin newsroom"
+        },
+        {
+          "id": "jger_reviews_the",
+          "description": "Jäger reviews the checkpoint's standing orders and realizes they contain no provision for a crowd of this size or composition"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Crush",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        {
+          "id": "crowddensity_75",
+          "description": "Crowd_Density: 75 — tens of thousands have arrived; the outer perimeter fence is bending under sustained pressure"
+        },
+        {
+          "id": "commsstatus_degraded",
+          "description": "Comms_Status: Degraded — Jäger's calls are going unanswered or ending in insults; the chain of command is functionally absent"
+        },
+        {
+          "id": "aggressionlevel_demanding",
+          "description": "Aggression_Level: Demanding — the crowd's chanting has become rhythmic and insistent; individuals at the front are shouting directly at guards"
+        },
+        {
+          "id": "jger_initiates_the",
+          "description": "Jäger initiates the Durchschleusung strategy — releasing a handful of people and revoking their citizenship — which enrages rather than disperses the crowd"
+        },
+        {
+          "id": "the_protester_must",
+          "description": "The Protester must decide whether to accept release through Durchschleusung or hold position in solidarity with those left behind"
+        },
+        {
+          "id": "the_journalist_captures",
+          "description": "The Journalist captures footage of the Durchschleusung procedure and broadcasts it — the newsroom demands they hold position regardless of personal risk"
+        },
+        {
+          "id": "a_grenztruppen_guard",
+          "description": "A Grenztruppen guard on the upper platform unslings his weapon; Jäger must intervene before the situation escalates to a firing incident"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Breach",
+      "minuteRange": [
+        15,
+        22
+      ],
+      "beats": [
+        {
+          "id": "crowddensity_100",
+          "description": "Crowd_Density: 100 — the outer barrier is physically failing; guards are being pressed back from their posts"
+        },
+        {
+          "id": "commsstatus_severed",
+          "description": "Comms_Status: Severed — Jäger's phone line to East Berlin command is dead; he is entirely alone in his authority"
+        },
+        {
+          "id": "aggressionlevel_flashpoint",
+          "description": "Aggression_Level: Flashpoint — the crowd is no longer chanting; it is a single organism pushing forward with the force of its own weight"
+        },
+        {
+          "id": "jger_makes_the",
+          "description": "Jäger makes the unilateral decision: he orders the gate opened, overriding all standing regulations without authorization from above"
+        },
+        {
+          "id": "the_gate_swings",
+          "description": "The gate swings open — the crowd pours through onto the Bornholmer bridge in a wave that cannot be stopped"
+        },
+        {
+          "id": "the_protester_is",
+          "description": "The Protester is carried through by the surge and finds themselves standing on the western side of the bridge for the first time in their life"
+        },
+        {
+          "id": "the_journalists_camera",
+          "description": "The Journalist's camera captures the exact moment the gate opens and the Liveschaltung goes live to networks across the world"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Reckoning",
+      "minuteRange": [
+        22,
+        30
+      ],
+      "beats": [
+        {
+          "id": "the_immediate_aftermath",
+          "description": "The immediate aftermath: the bridge is flooded with thousands of East Berliners; West Berliners have descended from their apartments with wine and flowers"
+        },
+        {
+          "id": "jger_stands_at",
+          "description": "Jäger stands at his post as his guards abandon their positions — he must decide whether to file a final Meldung or simply walk away"
+        },
+        {
+          "id": "the_protester_searches",
+          "description": "The Protester searches the western crowd for their separated family member — the outcome of this search is the personal resolution of the story"
+        },
+        {
+          "id": "the_journalist_files",
+          "description": "The Journalist files their broadcast and then faces a choice: cross back to the East to cover the story from inside, or remain on the western side"
+        },
+        {
+          "id": "stasi_officers_arrive",
+          "description": "Stasi officers arrive at the checkpoint to assess the situation — Jäger's decision to open the gate without orders may have immediate consequences for him personally"
+        },
+        {
+          "id": "the_players_final",
+          "description": "The players' final actions determine whether the breach is clean — a moment of pure human possibility — or shadowed by the costs each of them has paid to reach it"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.160Z",
+  "opening": ""
+}

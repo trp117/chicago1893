@@ -1,0 +1,20 @@
+{
+  "id": "loc_ard_broadcast_position",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "name": "ARD Broadcast Position",
+  "description": "A narrow section of the western approach where ARD's equipment van is parked — cables running to a camera position on the bridge railing, a portable monitor showing the live feed, and a radio relay unit connecting to the Hamburg transmission center. This is the point from which the world will watch the gate open.",
+  "mood": "tense, professional, world-historical",
+  "linkedCharacterIds": [
+    "char_journalist",
+    "char_westberlin_producer"
+  ],
+  "atmosphericDetails": [
+    "The portable monitor showing the camera's live feed — the eastern gate visible as a bright rectangle in the fog, the crowd a dark mass pressing against it",
+    "The radio relay unit's amber transmission light, currently dark — Hamburg has not yet cleared the Liveschaltung authorization",
+    "The sound of the radio earpiece: fragments of the Hamburg studio feed, the AP wire ticker, and the field producer's voice giving countdown estimates that keep being revised"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.165Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

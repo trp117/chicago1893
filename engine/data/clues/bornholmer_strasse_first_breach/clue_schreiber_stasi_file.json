@@ -1,0 +1,18 @@
+{
+  "id": "clue_schreiber_stasi_file",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "title": "The Informant File — Raab's Leverage",
+  "description": "In the Trabant queue, Oberst Raab pauses beside you and says, without looking at you, a name — Anna Schreiber — and a file number. He says nothing else. He walks on toward the command post. The name means nothing to you unless you are the Journalist or the Gatekeeper — but if you have spoken to Raab, or if you have been watching the crowd carefully, you understand what the file number means. There is a young woman at the front of that crowd who carries a secret that Raab can use. The question is whether he will use it to move her out of the way — or to keep her exactly where she is, as a pressure point against Jäger, who will not fire into a crowd that contains a registered informant whose file he has seen.",
+  "category": "testimony",
+  "discoveryLocationId": "loc_trabant_queue",
+  "implicatesCharacterIds": [
+    "char_oberst_mielke",
+    "char_protester"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.176Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,15 @@
+{
+  "id": "clue_abandoned_trabants",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "title": "The Abandoned Trabants — A Point of No Return",
+  "description": "Walking the Trabant queue, you count forty-seven vehicles left running and unattended. Their owners have joined the crowd at the gate. Some of the cars still have personal items on the seats — a child's toy, a packed suitcase visible through a rear window, a thermos of coffee still steaming on a dashboard. These people did not plan to come back. They heard Schabowski's words and they left their lives running in park and walked to the gate. Whatever the outcome tonight, this queue of idling Trabants represents a population that has already made its decision. The question is only whether the gate will be opened for them or against them.",
+  "category": "physical",
+  "discoveryLocationId": "loc_trabant_queue",
+  "implicatesCharacterIds": [],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-19T02:30:53.174Z",
+  "locationId": "",
+  "isRedHerring": false
+}
