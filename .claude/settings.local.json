@@ -26,7 +26,9 @@
       "Bash(curl -s http://localhost:3001/admin/dashboard)",
       "Bash(Get-ChildItem -Path \"D:\\\\chicago1893_v1\\\\chicago1893_v1\" -Directory)",
       "Bash(curl -s http://localhost:3000/admin/api/scenarios/dog_green_sector/full)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3001/api/stories\" -UseBasicParsing; $r.StatusCode; $r.Content | ConvertFrom-Json | ForEach-Object { Write-Output \"id=$\\($_.id\\) era=$\\($_.era\\) duration=$\\($_.duration\\)\" })",
+      "PowerShell(Start-Sleep -Seconds 4; $r = Invoke-WebRequest -Uri \"http://localhost:3001/test\" -UseBasicParsing; \"Status: $\\($r.StatusCode\\)\"; \"Has play-btn: $\\($r.Content.Contains\\('play-btn'\\)\\)\"; \"Has /api/stories: $\\($r.Content.Contains\\('/api/stories'\\)\\)\"; \"Has /admin/api/player-roles: $\\($r.Content.Contains\\('/admin/api/player-roles'\\)\\)\")"
     ]
   }
 }

@@ -239,42 +239,66 @@
         "name": "Harold Bride",
         "outcome": "survived",
         "historical_record": "Harold Bride remained at the wireless set transmitting distress calls until approximately 02:10 AM, when Captain Smith released him from duty. He was washed off the ship as it sank and clung to an overturned collapsible lifeboat (Collapsible B) alongside Second Officer Lightoller and others. He was rescued by RMS Carpathia with frostbitten feet. He subsequently testified before both the U.S. Senate Inquiry (April 1912) and the British Board of Trade Inquiry (May 1912). He gave a first-person account to The New York Times published April 19, 1912.",
-        "primary_source": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726; New York Times, April 19, 1912"
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726; New York Times, April 19, 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
       },
       {
         "character_id": "jack_phillips",
         "name": "Jack Phillips",
         "outcome": "died",
         "historical_record": "Jack Phillips continued transmitting distress signals until power failed at approximately 02:17 AM. He was last seen by Harold Bride attempting to reach Collapsible B. He did not survive. His body, if recovered, was never identified. He was 25 years old. Bride testified that Phillips was still at the key when Bride left the Marconi Room.",
-        "primary_source": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726"
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
       },
       {
         "character_id": "joseph_bell",
         "name": "Chief Engineer Joseph Bell",
         "outcome": "died",
         "historical_record": "Chief Engineer Joseph Bell and all 35 engineering officers remained at their posts in the engine and boiler rooms throughout the sinking, maintaining power and steam. None survived. Bell's body was never recovered. His actions were cited in the British Board of Trade Inquiry as exemplary. He was 51 years old at the time of his death.",
-        "primary_source": "British Board of Trade Inquiry, Report of the Court, 1912, Cmd. 6352; Eaton, John P. and Haas, Charles A., Titanic: Triumph and Tragedy, 1986"
+        "primary_source": {
+          "citation": "British Board of Trade Inquiry, Report of the Court, 1912, Cmd. 6352; Eaton, John P. and Haas, Charles A., Titanic: Triumph and Tragedy, 1986",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        }
       },
       {
         "character_id": "charles_lightoller",
         "name": "Second Officer Charles Lightoller",
         "outcome": "survived",
         "historical_record": "Charles Lightoller was the most senior surviving officer of RMS Titanic. He loaded and oversaw the lowering of all port-side lifeboats, enforcing a strict women-and-children-only policy. He was washed off the ship as it sank, was briefly sucked against a ventilation grate, and eventually reached Collapsible B, which he commanded. He was rescued by Carpathia. He was the primary witness at both the U.S. Senate Inquiry and the British Board of Trade Inquiry, where his testimony was extensive and at times contradicted by other witnesses. He later served in World War I and World War II, and died in 1952.",
-        "primary_source": "U.S. Senate Inquiry, Testimony of Charles Lightoller, April 19–20, 1912, 62nd Congress, 2nd Session, S. Doc. 726; British Board of Trade Inquiry, Days 12–13, May 1912"
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Charles Lightoller, April 19–20, 1912, 62nd Congress, 2nd Session, S. Doc. 726; British Board of Trade Inquiry, Days 12–13, May 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
       },
       {
         "character_id": "thomas_andrews",
         "name": "Thomas Andrews",
         "outcome": "died",
         "historical_record": "Thomas Andrews was seen by Steward John Stewart in the First Class Smoking Room at approximately 01:40 AM staring at a painting, but was later reliably spotted by multiple crew members on the Boat Deck frantically throwing deck chairs into the water as flotation devices and urging passengers into the final lifeboats before the ship's final plunge. He did not survive. His body was never recovered. He was 39 years old. Steward John Stewart and other crew members testified to seeing him in the Smoking Room in his final minutes. Andrews had informed Captain Smith of the flooding rate and the ship's fate approximately 20 to 25 minutes after the collision, following a physical inspection of the forward flooded spaces.",
-        "primary_source": "U.S. Senate Inquiry, Testimony of John Stewart (First Class Steward), 1912; Shan Bullock, Thomas Andrews, Shipbuilder, 1912"
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of John Stewart (First Class Steward), 1912; Shan Bullock, Thomas Andrews, Shipbuilder, 1912",
+          "url": "https://archive.org/details/thomasandrewsshi00bulkuoft",
+          "access_note": null
+        }
       },
       {
         "character_id": "margaret_brown",
         "name": "Margaret Brown",
         "outcome": "survived",
         "historical_record": "Margaret Brown was loaded into Lifeboat No. 6 at approximately 00:55 AM. Lifeboat No. 6 departed with approximately 28 persons aboard, against a capacity of 65. Brown repeatedly urged Quartermaster Robert Hichens, who commanded the boat, to return for survivors in the water; Hichens refused. Brown organized the women in the boat to row and maintain morale. She was rescued by Carpathia and helped organize relief efforts for survivors aboard that ship. She later testified before the U.S. Senate Inquiry. The popular characterization of her as 'the Unsinkable Molly Brown' was a later theatrical invention; she was known in her lifetime as Maggie Brown.",
-        "primary_source": "U.S. Senate Inquiry, Testimony of Margaret Brown, 1912, 62nd Congress, 2nd Session, S. Doc. 726"
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Margaret Brown, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
       }
     ],
     "immediate_outcome": {
@@ -419,7 +443,11 @@
         "fact_id": "titanic_sinking_time",
         "content": "RMS Titanic foundered at 2:20 AM ship's time on 15 April 1912.",
         "domain": "timing",
-        "source": "British Board of Trade Inquiry, 1912 (Cmd. 6352); US Senate Inquiry, 1912",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352); US Senate Inquiry, 1912",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -427,7 +455,11 @@
         "fact_id": "collision_time",
         "content": "Titanic struck the iceberg at 11:40 PM ship's time on 14 April 1912.",
         "domain": "timing",
-        "source": "British Board of Trade Inquiry, 1912; testimony of Fourth Officer Joseph Boxhall",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Fourth Officer Joseph Boxhall",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -435,7 +467,11 @@
         "fact_id": "titanic_position_at_sinking",
         "content": "Titanic's distress position, as calculated by Fourth Officer Boxhall and transmitted by wireless, was 41°46'N, 50°14'W.",
         "domain": "navigation",
-        "source": "US Senate Inquiry, 1912; testimony of Harold Bride and Joseph Boxhall",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride and Joseph Boxhall",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -443,7 +479,11 @@
         "fact_id": "carpathia_response_time",
         "content": "RMS Carpathia received Titanic's CQD distress call at 12:25 AM on 15 April 1912 and arrived at the position at approximately 4:10 AM, approximately 58 miles from her position when she received the call.",
         "domain": "timing",
-        "source": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron of Carpathia",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron of Carpathia",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -451,7 +491,11 @@
         "fact_id": "carpathia_speed",
         "content": "Carpathia increased speed from her service speed of approximately 14 knots to approximately 17 knots — her maximum — after receiving Titanic's distress signal.",
         "domain": "navigation",
-        "source": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -459,7 +503,11 @@
         "fact_id": "first_distress_signal_sent",
         "content": "Jack Phillips began transmitting the CQD distress call at approximately 12:15 AM on 15 April 1912, approximately 35 minutes after the collision.",
         "domain": "timing",
-        "source": "US Senate Inquiry, 1912; testimony of Harold Bride",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -467,7 +515,11 @@
         "fact_id": "sos_first_use",
         "content": "Harold Bride suggested to Jack Phillips that they transmit SOS in addition to CQD, as SOS was the newer international distress signal; Titanic was among the first ships to transmit SOS in a genuine distress situation.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; testimony of Harold Bride",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -475,7 +527,11 @@
         "fact_id": "total_souls_aboard",
         "content": "RMS Titanic carried 2,224 persons on her maiden voyage, comprising approximately 1,317 passengers and 908 crew.",
         "domain": "capacity",
-        "source": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -483,7 +539,11 @@
         "fact_id": "total_lifeboat_capacity",
         "content": "Titanic carried 20 lifeboats with a total certified capacity of 1,178 persons: 14 standard wooden lifeboats each certified for 65 persons, 2 emergency cutters each certified for 40 persons, and 4 Engelhardt collapsible boats each certified for 47 persons.",
         "domain": "capacity",
-        "source": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -491,7 +551,11 @@
         "fact_id": "total_survivors",
         "content": "710 persons survived the sinking of RMS Titanic; 1,514 persons perished.",
         "domain": "capacity",
-        "source": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -499,7 +563,11 @@
         "fact_id": "lifeboat_7_occupancy",
         "content": "Lifeboat No. 7, the first boat lowered from the starboard side at approximately 12:40 AM, carried approximately 28 persons against its certified capacity of 65.",
         "domain": "capacity",
-        "source": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -507,7 +575,11 @@
         "fact_id": "lifeboat_1_occupancy",
         "content": "Emergency cutter No. 1, certified for 40 persons, was lowered at approximately 1:10 AM carrying only 12 persons.",
         "domain": "capacity",
-        "source": "British Board of Trade Inquiry, 1912; testimony of Sir Cosmo Duff-Gordon",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Sir Cosmo Duff-Gordon",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -515,7 +587,11 @@
         "fact_id": "dynamo_power_maintained",
         "content": "Titanic's engineers maintained electrical power to the ship's systems, including the wireless room, until shortly before the ship foundered at 2:20 AM; the lights remained on until the final plunge.",
         "domain": "power",
-        "source": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; multiple survivor testimonies",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; multiple survivor testimonies",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -523,7 +599,11 @@
         "fact_id": "titanic_electrical_output",
         "content": "Titanic was equipped with four 400-kilowatt steam-driven dynamos located in the turbine room aft of the reciprocating engine room, providing ship's service power at 100 volts DC.",
         "domain": "power",
-        "source": "Harland and Wolff shipbuilding records; Titanic's electrical installation specifications as cited in the British Board of Trade Inquiry, 1912",
+        "source": {
+          "citation": "Harland and Wolff shipbuilding records; Titanic's electrical installation specifications as cited in the British Board of Trade Inquiry, 1912",
+          "url": null,
+          "access_note": "Harland and Wolff records not publicly available; specifications cited in British Board of Trade Inquiry (Cmd. 6352)"
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -531,7 +611,11 @@
         "fact_id": "marconi_transmitter_power",
         "content": "Titanic's Marconi wireless transmitter operated at 5 kilowatts and had a guaranteed working range of 250 miles, with an actual range under good conditions of up to 2,000 miles at night.",
         "domain": "power",
-        "source": "Marconi International Marine Communication Company equipment specifications; US Senate Inquiry, 1912",
+        "source": {
+          "citation": "Marconi International Marine Communication Company equipment specifications; US Senate Inquiry, 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -539,7 +623,11 @@
         "fact_id": "chief_engineer_bell_fate",
         "content": "Chief Engineer Joseph Bell remained at his post in the engine room and perished with the ship; he was last seen alive by surviving crew members at his station maintaining power.",
         "domain": "personnel",
-        "source": "British Board of Trade Inquiry, 1912; survivor testimonies of engine room crew",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; survivor testimonies of engine room crew",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -547,7 +635,11 @@
         "fact_id": "harold_bride_fate",
         "content": "Harold Bride survived the sinking; he remained in the Marconi room transmitting until power failed, was washed off the ship when it foundered, and was pulled onto Collapsible B with injured feet, later rescued by Carpathia.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; testimony of Harold Bride; New York Times interview, 19 April 1912",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride; New York Times interview, 19 April 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -555,7 +647,11 @@
         "fact_id": "jack_phillips_fate",
         "content": "Jack Phillips remained at the wireless key transmitting distress calls until power failed and did not survive; his body was never recovered.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; testimony of Harold Bride",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -563,7 +659,11 @@
         "fact_id": "lightoller_women_children_policy",
         "content": "Second Officer Charles Lightoller enforced a strict women-and-children-only policy on the port side, refusing to allow men to board even when boats were not full; he survived by clinging to overturned Collapsible B.",
         "domain": "personnel",
-        "source": "British Board of Trade Inquiry, 1912; testimony of Charles Lightoller; US Senate Inquiry, 1912",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Charles Lightoller; US Senate Inquiry, 1912",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -571,7 +671,11 @@
         "fact_id": "thomas_andrews_fate",
         "content": "Thomas Andrews was last seen alive by survivor John Stewart in the First Class Smoking Room at approximately 2:00 AM, standing alone with his arms folded, staring at a painting; he did not survive and his body was never recovered.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; testimony of steward John Stewart; British Board of Trade Inquiry, 1912",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of steward John Stewart; British Board of Trade Inquiry, 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -579,7 +683,11 @@
         "fact_id": "margaret_brown_lifeboat_6",
         "content": "Margaret Brown was placed in Lifeboat No. 6 at approximately 12:55 AM and, according to survivor accounts, took an oar and urged the boat's crew to return for survivors in the water after the ship sank.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; testimony of Quartermaster Robert Hichens and Margaret Brown",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; testimony of Quartermaster Robert Hichens and Margaret Brown",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -587,7 +695,11 @@
         "fact_id": "mesaba_warning_not_delivered",
         "content": "The ice warning transmitted by SS Mesaba at 9:40 PM on 14 April 1912, which described heavy pack ice and large icebergs in the latitude and longitude range directly ahead of Titanic, was received by the Marconi room but was never delivered to the bridge.",
         "domain": "personnel",
-        "source": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of Harold Bride",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of Harold Bride",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -595,7 +707,11 @@
         "fact_id": "boiler_room_6_flooding",
         "content": "Boiler Room No. 6 began flooding immediately after the collision at 11:40 PM; stoker Frederick Barrett testified that water burst through the ship's side at the forward end of the boiler room and the watertight door was closed by electric control from the bridge.",
         "domain": "flooding",
-        "source": "British Board of Trade Inquiry, 1912; testimony of Leading Stoker Frederick Barrett",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Leading Stoker Frederick Barrett",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -603,7 +719,11 @@
         "fact_id": "andrews_two_hour_estimate",
         "content": "Thomas Andrews informed Captain Smith shortly after midnight that the ship could remain afloat for approximately one to two hours based on his assessment of the flooding in the forward compartments.",
         "domain": "timing",
-        "source": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of multiple witnesses including steward Henry Etches",
+        "source": {
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of multiple witnesses including steward Henry Etches",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -611,7 +731,11 @@
         "fact_id": "welin_davit_capacity",
         "content": "Titanic was fitted with Welin double-acting davits, which were designed and tested to handle lifeboats loaded to full capacity; the davit system was capable of launching more boats than the ship actually carried.",
         "domain": "other",
-        "source": "British Board of Trade Inquiry, 1912; Welin Davit and Engineering Company specifications entered into evidence",
+        "source": {
+          "citation": "British Board of Trade Inquiry, 1912; Welin Davit and Engineering Company specifications entered into evidence",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       }

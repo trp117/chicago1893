@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "label": "generated",
+  "scenarioId": "test_pipeline_02",
+  "createdAt": "2026-05-19T18:27:16.565Z",
+  "pipeline_step": "generated",
+  "changes_applied": 0,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "test_pipeline_02",
+    "title": "Titanic: Two Hours to Dawn",
+    "synopsis": {
+      "working_title": "Titanic: Two Hours to Dawn",
+      "historical_anchor": {
+        "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+        "date_time": "April 15, 1912, 00:00 AM",
+        "fixed_outcome": "The RMS Titanic sinks, resulting in the loss of over 1,500 lives."
+      },
+      "shared_fact_ledger": [
+        {
+          "name": "The Titanic is sinking",
+          "description": "The ship has struck an iceberg and is rapidly taking on water, with its bow submerging."
+        },
+        {
+          "name": "Insufficient Lifeboats",
+          "description": "There are only enough lifeboats for approximately half of the people on board, leading to desperate choices."
+        },
+        {
+          "name": "Class Segregation",
+          "description": "Access to lifeboats and certain parts of the ship is heavily influenced by passenger class, with third-class passengers facing significant barriers."
+        },
+        {
+          "name": "Distress Calls",
+          "description": "Wireless operators are sending out CQD/SOS signals, but the nearest assisting ships are hours away."
+        }
+      ],
+      "perspectives": [
+        {
+          "role_name": "Frederick 'Fred' Bell",
+          "identity": "A diligent First Class Steward, accustomed to order and service.",
+          "tension": "Torn between his duty to assist wealthy passengers and his own survival, witnessing the unraveling of social order and the stark realities of class privilege.",
+          "decision_point": "Whether to follow orders to prioritize first-class passengers or help those in greater need, where to seek a lifeboat amidst the chaos."
+        },
+        {
+          "role_name": "Harold 'Harry' Cottam",
+          "identity": "A young, overwhelmed Junior Wireless Operator.",
+          "tension": "Battling technical failures and the sheer volume of distress messages, facing the grim reality that help may not arrive in time, and the isolation of his critical post.",
+          "decision_point": "Which ships to contact, what information to relay, when to abandon the wireless room as the power fails and the ship lists."
+        },
+        {
+          "role_name": "Eliza 'Lizzy' O'Connell",
+          "identity": "A young Irish immigrant traveling in Third Class, seeking a new life in America.",
+          "tension": "Confronting physical barriers and class discrimination preventing access to upper decks and lifeboats, fighting for her life and the lives of those she cares about amidst panic and misinformation.",
+          "decision_point": "How to navigate the labyrinthine lower decks, whether to follow rumors or try to force her way to the boat deck, and who to trust for guidance."
+        }
+      ],
+      "period_vocabulary": [
+        {
+          "term": "Wireless",
+          "meaning": "Early form of radio communication used for sending and receiving messages over long distances."
+        },
+        {
+          "term": "Steward",
+          "meaning": "A male attendant on a ship, responsible for serving passengers and maintaining cabins."
+        },
+        {
+          "term": "Bulkhead",
+          "meaning": "A dividing wall or barrier within the hull of a ship, often designed to be watertight to contain flooding."
+        },
+        {
+          "term": "Steerage",
+          "meaning": "The part of a ship providing the cheapest accommodation for passengers, typically in a shared dormitory setting, synonymous with Third Class."
+        },
+        {
+          "term": "CQD/SOS",
+          "meaning": "The international Morse code distress signals used by ships; CQD was an earlier signal, largely superseded by SOS."
+        }
+      ],
+      "tone": "Desperate, suspenseful, tragic, poignant, historically grounded.",
+      "session_length": "30 minutes"
+    },
+    "world": {
+      "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+      "date_time": "April 15, 1912, 00:00 AM",
+      "fixed_outcome": "The RMS Titanic sinks, resulting in the loss of over 1,500 lives."
+    },
+    "player_roles": [
+      {
+        "name": "Frederick 'Fred' Bell",
+        "description": "A diligent First Class Steward, accustomed to order and service.",
+        "partial": {},
+        "failure": {}
+      },
+      {
+        "name": "Harold 'Harry' Cottam",
+        "description": "A young, overwhelmed Junior Wireless Operator.",
+        "partial": {},
+        "failure": {}
+      },
+      {
+        "name": "Eliza 'Lizzy' O'Connell",
+        "description": "A young Irish immigrant traveling in Third Class, seeking a new life in America.",
+        "partial": {},
+        "failure": {}
+      }
+    ],
+    "epilogue": {},
+    "citations": [],
+    "createdAt": "2026-05-19T18:27:16.565Z"
+  }
+}

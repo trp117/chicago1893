@@ -1,0 +1,140 @@
+{
+  "version": 16,
+  "label": "published",
+  "scenarioId": "test_pipeline_01",
+  "createdAt": "2026-05-19T18:04:13.048Z",
+  "pipeline_step": "publish",
+  "changes_applied": 0,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "test_pipeline_01",
+    "title": "Titanic: Descent into Ice",
+    "synopsis": {
+      "working_title": "Titanic: Descent into Ice",
+      "historical_anchor": {
+        "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+        "date_time": "11:40 PM, April 14, 1912",
+        "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+      },
+      "shared_fact_ledger": [
+        {
+          "name": "Iceberg Collision",
+          "description": "The RMS Titanic struck an iceberg on its maiden voyage, causing critical damage to its hull."
+        },
+        {
+          "name": "Lifeboat Shortage",
+          "description": "The ship carries lifeboats for only about half of its total capacity, leading to a severe shortage."
+        },
+        {
+          "name": "Class Segregation",
+          "description": "Access to lifeboats and upper decks is heavily segregated by passenger class, with third-class passengers facing significant barriers."
+        }
+      ],
+      "perspectives": [
+        {
+          "role_name": "William 'Will' Carter",
+          "identity": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+          "tension": "Torn between his professional duty to assist privileged passengers and the primal instinct for self-preservation, witnessing the stark realities of class privilege and panic.",
+          "decision_point": "Whether to follow orders to maintain calm, help specific passengers he knows, or seek an advantage for his own survival amidst the chaos."
+        },
+        {
+          "role_name": "Arthur 'Art' Miller",
+          "identity": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+          "tension": "Overwhelmed by the urgency of sending SOS messages, facing equipment failures, and the growing realization that help may not arrive in time, all while battling exhaustion.",
+          "decision_point": "What messages to prioritize, when to abandon his post, and how to communicate the ship's dire situation to distant vessels."
+        },
+        {
+          "role_name": "Bridget O'Malley",
+          "identity": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+          "tension": "Facing severe barriers to accessing upper decks and lifeboats due to class restrictions, desperately trying to keep her brother safe and find a way to escape the sinking ship.",
+          "decision_point": "Whether to follow confusing and often discriminatory instructions, attempt to bypass locked gates and crew, or stay with her community in third class."
+        }
+      ],
+      "period_vocabulary": [
+        {
+          "term": "Wireless",
+          "meaning": "Early form of radio communication, used for sending telegraphic messages without wires."
+        },
+        {
+          "term": "Steward",
+          "meaning": "A male attendant on a ship, responsible for serving passengers, particularly in cabins and dining areas."
+        },
+        {
+          "term": "Steerage",
+          "meaning": "The lowest class of accommodation on a passenger ship, typically for immigrants or those with limited means (often referred to as Third Class on the Titanic)."
+        },
+        {
+          "term": "Bulkhead",
+          "meaning": "A dividing wall or barrier within the hull of a ship, designed to prevent water from spreading."
+        },
+        {
+          "term": "SOS",
+          "meaning": "The international Morse code distress signal, adopted in 1908."
+        }
+      ],
+      "tone": "Tragic, desperate, suspenseful, class-conscious, harrowing",
+      "session_length": "30 minutes"
+    },
+    "world": {
+      "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+      "date_time": "11:40 PM, April 14, 1912",
+      "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+    },
+    "player_roles": [
+      {
+        "name": "William 'Will' Carter",
+        "description": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+        "partial": {
+          "what_happened": "Will successfully guided a small group of first-class passengers, including a family he regularly served, to a partially filled lifeboat, ensuring their safe departure from the sinking ship before turning back to assist others or facing his own fate.",
+          "who_present": "William 'Will' Carter, specific first-class passengers",
+          "emotional_weight": "Bittersweet — A sense of duty fulfilled, but shadowed by the overwhelming tragedy and personal sacrifice.",
+          "closing_line": "Though the ship claimed him, the faces of those he saved would forever be his legacy in the icy depths."
+        },
+        "failure": {
+          "what_happened": "Overwhelmed by the escalating panic and the sheer number of desperate passengers, Will found himself unable to maintain order or effectively guide anyone to safety, ultimately succumbing to the chaos as the ship listed violently.",
+          "who_present": "William 'Will' Carter",
+          "emotional_weight": "Despair — A crushing realization of helplessness in the face of insurmountable disaster.",
+          "closing_line": "The last sound he heard was the roar of the ocean, a final, deafening testament to the ship's demise."
+        }
+      },
+      {
+        "name": "Arthur 'Art' Miller",
+        "description": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+        "partial": {
+          "what_happened": "Art, battling failing equipment and exhaustion, managed to transmit several clear SOS messages, including the ship's precise coordinates and dire situation, ensuring that the Carpathia and other vessels were accurately directed towards the disaster site, even as the power flickered and died.",
+          "who_present": "Arthur 'Art' Miller",
+          "emotional_weight": "Valiant — A profound sense of having completed a vital mission against impossible odds, despite personal peril.",
+          "closing_line": "His final message, a desperate plea for aid, echoed across the silent, star-strewn ocean, a beacon of hope for those who would follow."
+        },
+        "failure": {
+          "what_happened": "Despite his frantic efforts, Art's wireless equipment failed catastrophically after only a few garbled transmissions, leaving the Titanic's exact position and the full extent of its peril unclear to distant ships, severely hindering early rescue coordination.",
+          "who_present": "Arthur 'Art' Miller",
+          "emotional_weight": "Frustration — A bitter feeling of being thwarted by technology and fate at the most critical moment.",
+          "closing_line": "The silence of the dead wireless room was a colder echo than the ocean itself, sealing the ship's fate in darkness."
+        }
+      },
+      {
+        "name": "Bridget O'Malley",
+        "description": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+        "partial": {
+          "what_happened": "After navigating a maze of locked gates and panicked crowds, Bridget, with desperate resolve, managed to push her younger brother into a rapidly lowering lifeboat, but was either unable to secure a spot for herself or was separated in the ensuing chaos.",
+          "who_present": "Bridget O'Malley, her younger brother",
+          "emotional_weight": "Sacrificial — A heartbreaking triumph of love and selflessness amidst overwhelming despair.",
+          "closing_line": "The image of her brother's small, frightened face in the lifeboat was the last warmth she felt as the icy water embraced her."
+        },
+        "failure": {
+          "what_happened": "Despite her desperate attempts to find a way to the upper decks, Bridget and her younger brother remained trapped behind locked gates and confused instructions, ultimately swept away with the hundreds of others in steerage as the ship made its final plunge.",
+          "who_present": "Bridget O'Malley, her younger brother",
+          "emotional_weight": "Crushing — A profound sense of injustice and powerlessness against an unforgiving system and overwhelming disaster.",
+          "closing_line": "Their dreams of a new life in America dissolved into the freezing black waters, unheard and unseen."
+        }
+      }
+    ],
+    "epilogue": {},
+    "citations": [],
+    "createdAt": "2026-05-19T18:00:23.198Z"
+  }
+}

@@ -1324,12 +1324,15 @@ function collectEdits(containerEl, data) {
     const tf = data.scenario.technical_facts || {};
     const facts = [];
     tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
-      const fact_id    = row.querySelector('.tf-fact-id')?.value.trim()         || '';
-      const content    = row.querySelector('.tf-fact-content')?.value.trim()    || '';
-      const domain     = row.querySelector('.tf-fact-domain')?.value            || 'other';
-      const source     = row.querySelector('.tf-fact-source')?.value.trim()     || '';
-      const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()  || null;
-      const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim() || null;
+      const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()           || '';
+      const content     = row.querySelector('.tf-fact-content')?.value.trim()      || '';
+      const domain      = row.querySelector('.tf-fact-domain')?.value              || 'other';
+      const citVal      = row.querySelector('.tf-fact-citation')?.value.trim()     || '';
+      const urlVal      = row.querySelector('.tf-fact-url')?.value.trim()          || '';
+      const noteVal     = row.querySelector('.tf-fact-access-note')?.value.trim()  || '';
+      const source      = citVal ? { citation: citVal, url: urlVal || null, access_note: noteVal || null } : null;
+      const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()   || null;
+      const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim()  || null;
       if (fact_id || content) {
         facts.push({ fact_id, content, domain, source,
           valid_from: valid_from || null, valid_until: valid_until || null });
@@ -1346,13 +1349,16 @@ function collectEdits(containerEl, data) {
 
     const fates = [];
     epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
-      const character_id     = row.querySelector('.ep-char-id')?.value.trim()     || '';
-      const name             = row.querySelector('.ep-char-name')?.value.trim()   || '';
-      const outcome          = row.querySelector('.ep-char-outcome')?.value       || 'unknown';
-      const historical_record = row.querySelector('.ep-char-record')?.value.trim() || '';
-      const primary_source   = row.querySelector('.ep-char-source')?.value.trim() || null;
+      const character_id      = row.querySelector('.ep-char-id')?.value.trim()           || '';
+      const name              = row.querySelector('.ep-char-name')?.value.trim()         || '';
+      const outcome           = row.querySelector('.ep-char-outcome')?.value             || 'unknown';
+      const historical_record = row.querySelector('.ep-char-record')?.value.trim()       || '';
+      const citVal            = row.querySelector('.ep-char-citation')?.value.trim()     || '';
+      const urlVal            = row.querySelector('.ep-char-url')?.value.trim()          || '';
+      const noteVal           = row.querySelector('.ep-char-access-note')?.value.trim()  || '';
+      const primary_source    = citVal ? { citation: citVal, url: urlVal || null, access_note: noteVal || null } : null;
       if (character_id || name || historical_record) {
-        fates.push({ character_id, name, outcome, historical_record, primary_source: primary_source || null });
+        fates.push({ character_id, name, outcome, historical_record, primary_source });
       }
     });
 
@@ -1637,7 +1643,14 @@ function renderPlayerRolesSection(data) {
 // EPILOGUE DATA SECTION
 // ═══════════════════════════════════════════════════════════════
 
+function normSourceClient(val) {
+  if (!val) return { citation: '', url: null, access_note: null };
+  if (typeof val === 'string') return { citation: val, url: null, access_note: null };
+  return { citation: val.citation || '', url: val.url || null, access_note: val.access_note || null };
+}
+
 function renderEpilogueCharFateRow(f) {
+  const src = normSourceClient(f.primary_source);
   return `<div class="ep-fate-row" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative">
     <button type="button" class="remove-ep-fate-btn" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:18px;line-height:1;padding:0">×</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
@@ -1649,8 +1662,22 @@ function renderEpilogueCharFateRow(f) {
       <option value="died"     ${f.outcome === 'died'     ? 'selected' : ''}>died</option>
       <option value="unknown"  ${f.outcome === 'unknown'  ? 'selected' : ''}>unknown</option>
     </select>
-    <textarea class="ep-char-record" rows="2" placeholder="Historical record (1–3 sentences)" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;margin-bottom:6px">${esc(f.historical_record || '')}</textarea>
-    <input type="text" class="ep-char-source" placeholder="Primary source (optional)" value="${esc(f.primary_source || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    <textarea class="ep-char-record" rows="2" placeholder="Historical record (1–3 sentences)" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;margin-bottom:8px">${esc(f.historical_record || '')}</textarea>
+    <div style="margin-bottom:6px">
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Citation</div>
+      <textarea class="ep-char-citation" rows="2" placeholder="Author, Title, Publisher, Year. Or: Inquiry Name, Witness, Date." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(src.citation)}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:end">
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Source URL</div>
+        <input type="text" class="ep-char-url" placeholder="https:// or leave blank if not publicly available" value="${esc(src.url || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      </div>
+      <button type="button" class="ep-test-link-btn btn btn-secondary" style="padding:5px 10px;font-size:12px;white-space:nowrap">Test ↗</button>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Access Note</div>
+      <input type="text" class="ep-char-access-note" placeholder="e.g. Available via Internet Archive — or leave blank" value="${esc(src.access_note || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+    </div>
   </div>`;
 }
 
@@ -1686,6 +1713,7 @@ function renderEpilogueEchoRow(c) {
 
 function buildTfFactRow(f) {
   f = f || {};
+  const src = normSourceClient(f.source);
   const DOMAINS = ['power','flooding','timing','capacity','navigation','personnel','other'];
   const domainOptions = DOMAINS.map(d =>
     `<option value="${d}" ${(f.domain || '') === d ? 'selected' : ''}>${d}</option>`
@@ -1706,9 +1734,20 @@ function buildTfFactRow(f) {
       <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Content</div>
       <textarea class="tf-fact-content" rows="2" placeholder="The specific verified fact as a complete sentence." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(f.content || '')}</textarea>
     </div>
+    <div style="margin-bottom:6px">
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Citation</div>
+      <textarea class="tf-fact-citation" rows="2" placeholder="Author, Title, Publisher, Year. Or: Inquiry Name, Witness, Date." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(src.citation)}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:end">
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Source URL</div>
+        <input type="text" class="tf-fact-url" placeholder="https:// or leave blank if not publicly available" value="${esc(src.url || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      </div>
+      <button type="button" class="tf-test-link-btn btn btn-secondary" style="padding:5px 10px;font-size:12px;white-space:nowrap">Test ↗</button>
+    </div>
     <div style="margin-bottom:8px">
-      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Source</div>
-      <input type="text" class="tf-fact-source" placeholder="Primary source — inquiry, testimony, document" value="${esc(f.source || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Access Note</div>
+      <input type="text" class="tf-fact-access-note" placeholder="e.g. Available via Internet Archive — or leave blank" value="${esc(src.access_note || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
@@ -1755,6 +1794,7 @@ function renderTechnicalFactsSection(data) {
         ${reviewed ? '✓ Technical Facts Reviewed' : 'Mark Technical Facts Reviewed'}
       </button>
       <button type="button" id="download-tf-facts-btn" class="btn btn-secondary">↓ Download Facts (.txt)</button>
+      <button type="button" id="download-tf-facts-with-prompt-btn" class="btn btn-secondary">↓ Download with AI Prompt</button>
       ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Verify every fact against its source before marking as reviewed.</span>' : ''}
     </div>`;
 
@@ -1850,6 +1890,7 @@ function renderEpilogueSection(data) {
           ${reviewed ? '✓ Historical Data Reviewed' : 'Mark Historical Data Reviewed'}
         </button>
         <button type="button" id="download-epilogue-facts-btn" class="btn btn-secondary">↓ Download Facts (.txt)</button>
+        <button type="button" id="download-epilogue-facts-with-prompt-btn" class="btn btn-secondary">↓ Download with AI Prompt</button>
         ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Review all entries carefully before marking as reviewed.</span>' : ''}
       </div>`;
   }
@@ -1954,7 +1995,32 @@ async function handleManualSave(data, containerEl) {
 // ═══════════════════════════════════════════════════════════════
 // SCENARIO DOWNLOAD
 // ═══════════════════════════════════════════════════════════════
-function downloadScenarioDoc(data) {
+function downloadScenarioDocWithPrompt(data) {
+  const SCENARIO_REVIEW_PROMPT = `You are reviewing a complete interactive historical fiction scenario for accuracy and internal consistency. Check every section — opening scene, win/fail conditions, story arc beats, player roles, characters, locations, clues, period vocabulary, and epilogue data — against primary historical sources.
+
+For every correction needed, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [Opening Scene / Win Conditions / Story Arc / Player Roles / Characters / Locations / Clues / Period Vocabulary / Epilogue / Technical Facts]
+FIELD: [id or field name, e.g. char_brenner.publicFace or beat_3.description]
+CURRENT: [exact current text]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence explanation]
+SOURCE: [primary source citation]
+---END---
+
+If a section is fully accurate, write:
+---CONFIRMED: [section name]---
+
+Do not invent corrections. If you cannot verify something, write:
+---UNVERIFIED: [section or field name]---
+
+SCENARIO TO REVIEW:
+`;
+  downloadScenarioDoc(data, SCENARIO_REVIEW_PROMPT);
+}
+
+function downloadScenarioDoc(data, promptPrefix = '') {
   const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
   const L  = lines => lines.join('\n');
   const HR = '═'.repeat(60);
@@ -2164,7 +2230,8 @@ function downloadScenarioDoc(data) {
         out.push('');
         out.push(`${f.name || f.character_id} (${f.character_id}) — ${f.outcome}`);
         if (f.historical_record) out.push(indent(f.historical_record));
-        if (f.primary_source)    out.push(indent(`Source: ${f.primary_source}`));
+        const fSrc = f.primary_source?.citation || (typeof f.primary_source === 'string' ? f.primary_source : '');
+        if (fSrc) out.push(indent(`Source: ${fSrc}`));
       }
     }
     if (ep.immediate_outcome?.summary) {
@@ -2206,7 +2273,8 @@ function downloadScenarioDoc(data) {
     for (const f of tf.facts) {
       out.push(`[${f.fact_id || '?'}]${f.domain ? ` (${f.domain})` : ''}`);
       if (f.content) out.push(indent(f.content));
-      if (f.source)  out.push(indent(`Source: ${f.source}`));
+      const tfSrc = f.source?.citation || (typeof f.source === 'string' ? f.source : '');
+      if (tfSrc) out.push(indent(`Source: ${tfSrc}`));
       if (f.valid_from || f.valid_until) out.push(indent(`Valid: ${f.valid_from || '—'} → ${f.valid_until || '—'}`));
       out.push('');
     }
@@ -2236,8 +2304,9 @@ function downloadScenarioDoc(data) {
 
   out.push(''); out.push(HR); out.push('');
 
-  const filename = `${(scenario.id || scenario.title || 'scenario').replace(/\s+/g, '_')}_review.txt`;
-  const blob = new Blob([out.join('\n')], { type: 'text/plain' });
+  const suffix   = promptPrefix ? '_with_prompt' : '';
+  const filename = `${(scenario.id || scenario.title || 'scenario').replace(/\s+/g, '_')}_review${suffix}.txt`;
+  const blob = new Blob([promptPrefix + out.join('\n')], { type: 'text/plain' });
   const url  = URL.createObjectURL(blob);
   const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
   document.body.appendChild(a);
@@ -2253,8 +2322,9 @@ function renderPreview(data, autoSaved = false) {
   setTopbar(scenario.title || 'Generated Story', [
     { label: '▶ Play',        cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
     { label: '💾 Save',       cls: 'btn-primary',   action: () => handleManualSave(data, document.getElementById('preview-form')) },
-    { label: '↓ Download',    cls: 'btn-secondary', action: () => downloadScenarioDoc(data) },
-    { label: '+ New Story',   cls: 'btn-secondary', action: () => renderGenerator() },
+    { label: '↓ Download',             cls: 'btn-secondary', action: () => downloadScenarioDoc(data) },
+    { label: '↓ Download + AI Prompt', cls: 'btn-secondary', action: () => downloadScenarioDocWithPrompt(data) },
+    { label: '+ New Story',            cls: 'btn-secondary', action: () => renderGenerator() },
   ]);
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
   document.querySelector('.nav-link[data-view="generate"]')?.classList.add('active');
@@ -2298,6 +2368,11 @@ function renderPreview(data, autoSaved = false) {
         <button class="btn btn-secondary" id="preview-restart">+ New Story</button>
       </div>
     </div>`;
+
+  if (scenarioId) {
+    document.getElementById('content').insertAdjacentHTML('beforeend', buildAIPanel(scenarioId));
+    initAIPanel(scenarioId);
+  }
 
   const formEl = document.getElementById('preview-form');
   document.getElementById('preview-play').addEventListener('click', () => {
@@ -2381,6 +2456,11 @@ function renderPreview(data, autoSaved = false) {
   // ── Technical Facts — add/remove row delegation ─────────────────
   formEl.addEventListener('click', e => {
     if (e.target.closest('.remove-tf-fact-btn')) { e.target.closest('.tf-fact-row').remove(); return; }
+    if (e.target.closest('.tf-test-link-btn')) {
+      const url = e.target.closest('.tf-fact-row')?.querySelector('.tf-fact-url')?.value.trim();
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     if (e.target.closest('#add-tf-fact-btn')) {
       const list = formEl.querySelector('#tf-facts-list');
       if (list) {
@@ -2401,6 +2481,11 @@ function renderPreview(data, autoSaved = false) {
     if (e.target.closest('.remove-ep-frame-btn'))  { e.target.closest('.ep-frame-row').remove();  return; }
     if (e.target.closest('.remove-ep-thread-btn')) { e.target.closest('.ep-thread-row').remove(); return; }
     if (e.target.closest('.remove-ep-echo-btn'))   { e.target.closest('.ep-echo-row').remove();   return; }
+    if (e.target.closest('.ep-test-link-btn')) {
+      const url = e.target.closest('.ep-fate-row')?.querySelector('.ep-char-url')?.value.trim();
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
 
     if (e.target.closest('#add-ep-fate-btn')) {
       const div = document.createElement('div');
@@ -2466,11 +2551,11 @@ function renderPreview(data, autoSaved = false) {
       lines.push('=== CHARACTER FATES ===');
       lines.push('');
       epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
-        const name    = row.querySelector('.ep-char-name')?.value.trim()   || '(unnamed)';
-        const id      = row.querySelector('.ep-char-id')?.value.trim()     || '';
-        const outcome = row.querySelector('.ep-char-outcome')?.value       || '';
-        const record  = row.querySelector('.ep-char-record')?.value.trim() || '';
-        const source  = row.querySelector('.ep-char-source')?.value.trim() || '';
+        const name    = row.querySelector('.ep-char-name')?.value.trim()     || '(unnamed)';
+        const id      = row.querySelector('.ep-char-id')?.value.trim()       || '';
+        const outcome = row.querySelector('.ep-char-outcome')?.value         || '';
+        const record  = row.querySelector('.ep-char-record')?.value.trim()   || '';
+        const source  = row.querySelector('.ep-char-citation')?.value.trim() || '';
         lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
         if (record)  lines.push(record);
         if (source)  lines.push(`Source: ${source}`);
@@ -2533,6 +2618,87 @@ function renderPreview(data, autoSaved = false) {
       return;
     }
 
+    // Download epilogue facts with AI review prompt
+    if (e.target.closest('#download-epilogue-facts-with-prompt-btn')) {
+      const epDetails = formEl.querySelector('#epilogue-data-details');
+      if (!epDetails) return;
+      const EP_REVIEW_PROMPT = `Review the following historical epilogue data for this interactive historical fiction scenario. Check all character fates, key facts, historical frame entries, open threads, and choice echoes for historical accuracy and internal consistency.
+
+For every correction needed, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [Character Fates / Immediate Outcome / Historical Frame / Open Threads / Choice Echoes]
+FIELD: [character name or beat id or fact description]
+CURRENT: [exact current text]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence explanation]
+SOURCE: [primary source citation]
+---END---
+
+If a section is accurate, write:
+---CONFIRMED: [section name]---
+
+Do not invent corrections. If you cannot verify something, write:
+---UNVERIFIED: [section or field name]---
+
+EPILOGUE DATA TO REVIEW:
+`;
+      const lines = [];
+      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
+      lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
+      lines.push('');
+      lines.push('=== CHARACTER FATES ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
+        const name    = row.querySelector('.ep-char-name')?.value.trim()     || '(unnamed)';
+        const id      = row.querySelector('.ep-char-id')?.value.trim()       || '';
+        const outcome = row.querySelector('.ep-char-outcome')?.value         || '';
+        const record  = row.querySelector('.ep-char-record')?.value.trim()   || '';
+        const source  = row.querySelector('.ep-char-citation')?.value.trim() || '';
+        lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
+        if (record)  lines.push(record);
+        if (source)  lines.push(`Source: ${source}`);
+        lines.push('');
+      });
+      lines.push('=== IMMEDIATE OUTCOME ===');
+      lines.push('');
+      const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
+      if (ioSummary) { lines.push(ioSummary); lines.push(''); }
+      const facts = [...epDetails.querySelectorAll('.ep-fact-val')].map(el => el.value.trim()).filter(Boolean);
+      if (facts.length) { lines.push('Key Facts:'); facts.forEach(f => lines.push(`- ${f}`)); lines.push(''); }
+      lines.push('=== HISTORICAL FRAME ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-frame-val').forEach(el => {
+        const v = el.value.trim();
+        if (v) { lines.push(`- ${v}`); lines.push(''); }
+      });
+      lines.push('=== OPEN THREADS ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
+        const id     = row.querySelector('.ep-thread-id')?.value.trim()     || '';
+        const record = row.querySelector('.ep-thread-record')?.value.trim() || '';
+        if (id || record) { if (id) lines.push(`Thread: ${id}`); if (record) lines.push(record); lines.push(''); }
+      });
+      lines.push('=== CHOICE ECHOES ===');
+      lines.push('');
+      epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
+        const id     = row.querySelector('.ep-echo-beat-id')?.value.trim() || '';
+        const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
+        if (id || record) { if (id) lines.push(`Beat: ${id}`); if (record) lines.push(record); lines.push(''); }
+      });
+      const blob = new Blob([EP_REVIEW_PROMPT + lines.join('\n')], { type: 'text/plain' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), {
+        href:     url,
+        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_epilogue_facts_with_prompt.txt`,
+      });
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
     // Download technical facts as plain text
     if (e.target.closest('#download-tf-facts-btn')) {
       const tfDetails = formEl.querySelector('#tf-data-details');
@@ -2544,12 +2710,12 @@ function renderPreview(data, autoSaved = false) {
       lines.push('');
 
       tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
-        const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()         || '';
-        const content     = row.querySelector('.tf-fact-content')?.value.trim()    || '';
-        const domain      = row.querySelector('.tf-fact-domain')?.value            || '';
-        const source      = row.querySelector('.tf-fact-source')?.value.trim()     || '';
-        const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim() || '';
-        const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim() || '';
+        const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()           || '';
+        const content     = row.querySelector('.tf-fact-content')?.value.trim()      || '';
+        const domain      = row.querySelector('.tf-fact-domain')?.value              || '';
+        const source      = row.querySelector('.tf-fact-citation')?.value.trim()     || '';
+        const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()   || '';
+        const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim()  || '';
         if (!fact_id && !content) return;
         if (fact_id) lines.push(`[${fact_id}]${domain ? ` (${domain})` : ''}`);
         if (content) lines.push(content);
@@ -2563,6 +2729,62 @@ function renderPreview(data, autoSaved = false) {
       const a    = Object.assign(document.createElement('a'), {
         href:     url,
         download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_technical_facts.txt`,
+      });
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    // Download technical facts with AI review prompt
+    if (e.target.closest('#download-tf-facts-with-prompt-btn')) {
+      const tfDetails = formEl.querySelector('#tf-data-details');
+      if (!tfDetails) return;
+      const TF_REVIEW_PROMPT = `Review the following technical facts for this interactive historical fiction scenario. Check each fact for historical accuracy against primary sources.
+
+For every correction needed, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Technical Facts
+FIELD: [fact_id]
+CURRENT: [exact current text]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence explanation]
+SOURCE: [primary source citation]
+---END---
+
+If a fact is accurate, write:
+---CONFIRMED: [fact_id]---
+
+Do not invent corrections. If you cannot verify a fact, write:
+---UNVERIFIED: [fact_id]---
+
+TECHNICAL FACTS TO REVIEW:
+`;
+      const lines = [];
+      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
+      lines.push(`TECHNICAL FACTS — ${scenarioTitle}`);
+      lines.push('');
+      tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
+        const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()           || '';
+        const content     = row.querySelector('.tf-fact-content')?.value.trim()      || '';
+        const domain      = row.querySelector('.tf-fact-domain')?.value              || '';
+        const source      = row.querySelector('.tf-fact-citation')?.value.trim()     || '';
+        const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()   || '';
+        const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim()  || '';
+        if (!fact_id && !content) return;
+        if (fact_id) lines.push(`[${fact_id}]${domain ? ` (${domain})` : ''}`);
+        if (content) lines.push(content);
+        if (source)  lines.push(`Source: ${source}`);
+        if (valid_from || valid_until) lines.push(`Valid: ${valid_from || '—'} → ${valid_until || '—'}`);
+        lines.push('');
+      });
+      const blob = new Blob([TF_REVIEW_PROMPT + lines.join('\n')], { type: 'text/plain' });
+      const url  = URL.createObjectURL(blob);
+      const a    = Object.assign(document.createElement('a'), {
+        href:     url,
+        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_technical_facts_with_prompt.txt`,
       });
       document.body.appendChild(a);
       a.click();
@@ -2973,6 +3195,406 @@ document.querySelector('.nav-link[data-view="review"]')
 // INIT
 // ═══════════════════════════════════════════════════════════════
 renderDashboard();
+
+// ═══════════════════════════════════════════════════════════════
+// AI RESPONSE INJECTOR PANEL
+// ═══════════════════════════════════════════════════════════════
+function buildAIPanel(scenarioId) {
+  return `
+<div id='ai-panel' style='margin-top:32px;border-top:2px solid var(--accent);padding-top:24px'>
+  <h2 style='font-size:16px;font-weight:600;color:var(--accent);margin:0 0 16px'>AI Response Injector</h2>
+  <div style='display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border-color)'>
+    <button class='ai-tab active' data-tab='corrections' onclick='switchAITab(this)' style='padding:8px 20px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px'>Corrections</button>
+    <button class='ai-tab' data-tab='ending-notes' onclick='switchAITab(this)' style='padding:8px 20px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text-muted)'>Ending Notes</button>
+    <button class='ai-tab' data-tab='versions' onclick='switchAITab(this)' style='padding:8px 20px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text-muted)'>Version History</button>
+  </div>
+
+  <div id='ai-tab-corrections'>
+    <p style='font-size:12px;color:var(--text-muted);margin:0 0 8px'>Paste the full Gemini or ChatGPT correction response below. Use this prompt when asking for corrections:</p>
+    <div style='background:var(--bg-secondary,#f5f5f5);border:1px solid var(--border-color);border-radius:6px;padding:10px;margin-bottom:12px;position:relative'>
+      <pre id='correction-prompt-text' style='font-size:11px;color:var(--text-muted);white-space:pre-wrap;margin:0;line-height:1.5'>Review this for historical accuracy and consistency. For every correction needed, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [section name]
+FIELD: [field name or ID]
+CURRENT: [exact current text]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [citation if applicable]
+---END---
+
+If nothing needs correcting in a section, write:
+---CONFIRMED: [section name]---</pre>
+      <button onclick='copyPrompt("correction-prompt-text")' style='position:absolute;top:8px;right:8px;padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Copy</button>
+    </div>
+    <textarea id='corrections-paste' placeholder='Paste Gemini or ChatGPT response here...' style='width:100%;height:160px;padding:10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px'></textarea>
+    <button onclick='parseCorrections("${scenarioId}")' class='btn btn-primary' style='margin-bottom:16px'>Parse Corrections</button>
+    <div id='corrections-diff'></div>
+    <div id='corrections-actions' style='display:none;margin-top:12px'>
+      <div style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'>
+        <button onclick='acceptAllDiffs()' class='btn btn-success' style='font-size:12px'>Accept All</button>
+        <button onclick='rejectAllDiffs()' class='btn btn-danger' style='font-size:12px'>Reject All</button>
+        <span id='diff-summary-text' style='font-size:12px;color:var(--text-muted)'></span>
+      </div>
+      <button onclick='applyCorrections("${scenarioId}")' class='btn btn-primary' style='margin-top:10px'>Apply Accepted Changes</button>
+    </div>
+  </div>
+
+  <div id='ai-tab-ending-notes' style='display:none'>
+    <p style='font-size:12px;color:var(--text-muted);margin:0 0 8px'>Paste the Gemini Step 2 JSON response below. Use this prompt when requesting ending notes:</p>
+    <div style='background:var(--bg-secondary,#f5f5f5);border:1px solid var(--border-color);border-radius:6px;padding:10px;margin-bottom:12px;position:relative'>
+      <pre id='ending-prompt-text' style='font-size:11px;color:var(--text-muted);white-space:pre-wrap;margin:0;line-height:1.5'>Using the Step 2 system prompt, generate ending notes for all player roles in this scenario. Return valid JSON only — no prose before or after, no markdown backticks. Use this exact structure:
+
+{
+  ending_notes: [
+    {
+      role_name: exact role name,
+      briefing: exactly 5 sentences second person,
+      starting_knowledge: [fact1, fact2, fact3],
+      hook_1: immediate sensory trigger,
+      hook_2: secondary environmental threat,
+      hook_3: primary structural obstacle,
+      suggested_secret: one hidden liability,
+      access_level: staff or investigator or admin,
+      perspective: first-person sensory or third-person analytical,
+      partial: {
+        what_happened: narrative,
+        who_present: comma separated role names,
+        emotional_weight: label and description,
+        closing_line: one strong sentence
+      },
+      failure: {
+        what_happened: narrative,
+        who_present: comma separated role names,
+        emotional_weight: label and description,
+        closing_line: one strong sentence
+      }
+    }
+  ]
+}</pre>
+      <button onclick='copyPrompt("ending-prompt-text")' style='position:absolute;top:8px;right:8px;padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Copy</button>
+    </div>
+    <textarea id='ending-notes-paste' placeholder='Paste Gemini Step 2 JSON response here...' style='width:100%;height:160px;padding:10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px'></textarea>
+    <button onclick='parseEndingNotes("${scenarioId}")' class='btn btn-primary' style='margin-bottom:16px'>Parse & Preview</button>
+    <div id='ending-notes-preview'></div>
+    <div id='ending-notes-actions' style='display:none;margin-top:12px'>
+      <button onclick='applyEndingNotes("${scenarioId}")' class='btn btn-primary'>Apply to All Roles</button>
+    </div>
+  </div>
+
+  <div id='ai-tab-versions' style='display:none'>
+    <div id='version-history-list'><p style='color:var(--text-muted);font-size:13px'>Loading version history...</p></div>
+  </div>
+</div>`;
+}
+
+async function initAIPanel(scenarioId) {
+  window._aiPanelScenarioId = scenarioId;
+  window._aiDiffs = [];
+  window._aiEndingNotes = null;
+  loadVersionHistory(scenarioId);
+}
+
+function switchAITab(btn) {
+  document.querySelectorAll('.ai-tab').forEach(t => {
+    t.style.color = 'var(--text-muted)';
+    t.style.borderBottom = 'none';
+    t.classList.remove('active');
+  });
+  btn.style.color = 'var(--accent)';
+  btn.style.borderBottom = '2px solid var(--accent)';
+  btn.classList.add('active');
+  const tab = btn.dataset.tab;
+  document.getElementById('ai-tab-corrections').style.display = tab === 'corrections' ? '' : 'none';
+  document.getElementById('ai-tab-ending-notes').style.display = tab === 'ending-notes' ? '' : 'none';
+  document.getElementById('ai-tab-versions').style.display = tab === 'versions' ? '' : 'none';
+  if (tab === 'versions') loadVersionHistory(window._aiPanelScenarioId);
+}
+
+function copyPrompt(elementId) {
+  const text = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Prompt copied', 'success'));
+}
+
+function parseCorrections(scenarioId) {
+  const raw = document.getElementById('corrections-paste').value.trim();
+  if (!raw) return toast('Paste a response first', 'error');
+  const blocks = [];
+  const regex = /---CORRECTION---([\s\S]*?)---END---/g;
+  let match;
+  while ((match = regex.exec(raw)) !== null) {
+    const block = match[1].trim();
+    const get = (label) => {
+      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n[A-Z]+:|$)');
+      const m = block.match(re);
+      return m ? m[1].trim() : '';
+    };
+    blocks.push({
+      id: blocks.length,
+      section: get('SECTION'),
+      field: get('FIELD'),
+      current: get('CURRENT'),
+      replacewith: get('REPLACE WITH'),
+      reason: get('REASON'),
+      source: get('SOURCE'),
+      decision: 'pending'
+    });
+  }
+  const confirmed = [];
+  const confirmedRe = /---CONFIRMED:\s*([^-\n]+)---/g;
+  let cm;
+  while ((cm = confirmedRe.exec(raw)) !== null) confirmed.push(cm[1].trim());
+  if (blocks.length === 0 && confirmed.length === 0) return toast('No corrections or confirmations found — check the format', 'error');
+  window._aiDiffs = blocks;
+  renderDiffReviewer(blocks, confirmed);
+}
+
+function renderDiffReviewer(blocks, confirmed) {
+  const diff = document.getElementById('corrections-diff');
+  const actions = document.getElementById('corrections-actions');
+  let html = '';
+  if (confirmed.length) {
+    html += '<div style=margin-bottom:12px>' + confirmed.map(c =>
+      '<div style=padding:6px 10px;background:#f0faf0;border:1px solid #b8e0b8;border-radius:4px;font-size:12px;color:#2a7a2a;margin-bottom:4px>✓ Confirmed accurate: ' + c + '</div>'
+    ).join('') + '</div>';
+  }
+  if (blocks.length === 0) {
+    html += '<div style=padding:12px;background:#f0faf0;border:1px solid #b8e0b8;border-radius:6px;font-size:13px;color:#2a7a2a>No corrections needed — all sections confirmed accurate.</div>';
+    diff.innerHTML = html;
+    actions.style.display = 'none';
+    return;
+  }
+  html += blocks.map(b => `
+    <div id='diff-card-${b.id}' style='border:1px solid var(--border-color);border-radius:6px;margin-bottom:10px;overflow:hidden'>
+      <div style='padding:8px 12px;background:var(--bg-secondary,#f5f5f5);display:flex;align-items:center;justify-content:space-between;gap:8px'>
+        <span style='font-size:12px;font-family:monospace;color:var(--accent)'>${b.section}${b.field ? ' → ' + b.field : ''}</span>
+        <span id='diff-status-${b.id}' style='font-size:11px;color:var(--text-muted)'>pending</span>
+      </div>
+      <div style='padding:10px 12px'>
+        <div style='font-size:11px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px'>Current</div>
+        <div style='padding:6px 8px;background:#fff5f5;border-left:3px solid #e74c3c;border-radius:3px;font-size:12px;margin-bottom:8px;white-space:pre-wrap'>${escapeHtml(b.current)}</div>
+        <div style='font-size:11px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px'>Replace with</div>
+        <div style='padding:6px 8px;background:#f5fff5;border-left:3px solid #2ecc71;border-radius:3px;font-size:12px;margin-bottom:8px;white-space:pre-wrap'>${escapeHtml(b.replacewith)}</div>
+        ${b.reason ? '<div style=font-size:11px;color:var(--text-muted);font-style:italic;margin-bottom:6px>' + escapeHtml(b.reason) + '</div>' : ''}
+        ${b.source ? '<div style=font-size:11px;color:var(--text-muted);margin-bottom:8px>Source: ' + escapeHtml(b.source) + '</div>' : ''}
+        <div id='manual-editor-${b.id}' style='display:none;margin-bottom:8px'>
+          <textarea id='manual-text-${b.id}' style='width:100%;height:80px;padding:8px;border:1px solid var(--accent);border-radius:4px;font-size:12px;font-family:inherit;resize:vertical'>${escapeHtml(b.replacewith)}</textarea>
+          <button onclick='saveManualDiff(${b.id})' style='padding:4px 10px;font-size:11px;border:1px solid #2ecc71;border-radius:4px;background:#f5fff5;cursor:pointer;margin-top:4px'>Save Edit</button>
+          <button onclick='cancelManualDiff(${b.id})' style='padding:4px 10px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer;margin-top:4px;margin-left:4px'>Cancel</button>
+        </div>
+        <div style='display:flex;gap:6px'>
+          <button onclick='acceptDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid #2ecc71;border-radius:4px;background:#f5fff5;cursor:pointer'>✓ Accept</button>
+          <button onclick='rejectDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid #e74c3c;border-radius:4px;background:#fff5f5;cursor:pointer'>✕ Reject</button>
+          <button onclick='editDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>✎ Edit</button>
+        </div>
+      </div>
+    </div>`).join('');
+  diff.innerHTML = html;
+  actions.style.display = '';
+  updateDiffSummary();
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function acceptDiff(id) {
+  const d = window._aiDiffs.find(x => x.id === id);
+  if (d) d.decision = 'accepted';
+  document.getElementById('diff-card-' + id).style.borderColor = '#2ecc71';
+  document.getElementById('diff-status-' + id).textContent = '✓ accepted';
+  document.getElementById('diff-status-' + id).style.color = '#2ecc71';
+  updateDiffSummary();
+}
+
+function rejectDiff(id) {
+  const d = window._aiDiffs.find(x => x.id === id);
+  if (d) d.decision = 'rejected';
+  document.getElementById('diff-card-' + id).style.borderColor = '#e74c3c';
+  document.getElementById('diff-card-' + id).style.opacity = '0.5';
+  document.getElementById('diff-status-' + id).textContent = '✕ rejected';
+  document.getElementById('diff-status-' + id).style.color = '#e74c3c';
+  updateDiffSummary();
+}
+
+function editDiff(id) {
+  document.getElementById('manual-editor-' + id).style.display = '';
+}
+
+function cancelManualDiff(id) {
+  document.getElementById('manual-editor-' + id).style.display = 'none';
+}
+
+function saveManualDiff(id) {
+  const d = window._aiDiffs.find(x => x.id === id);
+  if (d) {
+    d.replacewith = document.getElementById('manual-text-' + id).value;
+    d.decision = 'edited';
+  }
+  document.getElementById('diff-card-' + id).style.borderColor = '#f39c12';
+  document.getElementById('diff-status-' + id).textContent = '✎ edited';
+  document.getElementById('diff-status-' + id).style.color = '#f39c12';
+  document.getElementById('manual-editor-' + id).style.display = 'none';
+  updateDiffSummary();
+}
+
+function acceptAllDiffs() {
+  window._aiDiffs.forEach(d => { if (d.decision === 'pending') acceptDiff(d.id); });
+}
+
+function rejectAllDiffs() {
+  window._aiDiffs.forEach(d => { if (d.decision === 'pending') rejectDiff(d.id); });
+}
+
+function updateDiffSummary() {
+  const total = window._aiDiffs.length;
+  const accepted = window._aiDiffs.filter(d => d.decision === 'accepted').length;
+  const rejected = window._aiDiffs.filter(d => d.decision === 'rejected').length;
+  const edited = window._aiDiffs.filter(d => d.decision === 'edited').length;
+  const pending = total - accepted - rejected - edited;
+  document.getElementById('diff-summary-text').textContent =
+    accepted + ' accepted · ' + rejected + ' rejected · ' + edited + ' edited · ' + pending + ' pending';
+}
+
+async function applyCorrections(scenarioId) {
+  const accepted = window._aiDiffs.filter(d => d.decision === 'accepted' || d.decision === 'edited');
+  if (accepted.length === 0) return toast('No accepted corrections to apply', 'error');
+  try {
+    const scenario = await apiFetch('GET', '/scenarios/' + scenarioId);
+    for (const d of accepted) {
+      applyFieldCorrection(scenario, d.field, d.replacewith);
+    }
+    await apiFetch('PUT', '/scenarios/' + scenarioId, scenario);
+    await apiFetch('POST', '/pipeline/snapshot/' + scenarioId, {
+      label: 'corrections_applied',
+      pipeline_step: 'manual_correction',
+      changes_applied: accepted.length
+    });
+    toast(accepted.length + ' correction(s) applied and saved', 'success');
+    document.getElementById('corrections-paste').value = '';
+    document.getElementById('corrections-diff').innerHTML = '';
+    document.getElementById('corrections-actions').style.display = 'none';
+    window._aiDiffs = [];
+    loadVersionHistory(scenarioId);
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+function applyFieldCorrection(scenario, fieldPath, value) {
+  if (!fieldPath) return;
+  const keys = fieldPath.split('.');
+  let obj = scenario;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (obj[keys[i]] === undefined) obj[keys[i]] = {};
+    obj = obj[keys[i]];
+  }
+  obj[keys[keys.length - 1]] = value;
+}
+
+function parseEndingNotes(scenarioId) {
+  const raw = document.getElementById('ending-notes-paste').value.trim();
+  if (!raw) return toast('Paste a response first', 'error');
+  try {
+    const clean = raw.replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
+    const data = JSON.parse(clean);
+    const notes = data.ending_notes || data;
+    if (!Array.isArray(notes) || notes.length === 0) return toast('No ending notes found in response', 'error');
+    window._aiEndingNotes = notes;
+    renderEndingNotesPreview(notes);
+  } catch (err) {
+    toast('Could not parse JSON — check the format: ' + err.message, 'error');
+  }
+}
+
+function renderEndingNotesPreview(notes) {
+  const preview = document.getElementById('ending-notes-preview');
+  const actions = document.getElementById('ending-notes-actions');
+  preview.innerHTML = notes.map(n => `
+    <div style='border:1px solid var(--accent);border-radius:6px;margin-bottom:10px;overflow:hidden'>
+      <div style='padding:8px 12px;background:var(--bg-secondary,#f5f5f5)'>
+        <span style='font-size:13px;font-weight:600;color:var(--accent)'>${escapeHtml(n.role_name)}</span>
+        ${n.access_level ? '<span style=margin-left:8px;font-size:11px;color:var(--text-muted)>' + n.access_level + '</span>' : ''}
+      </div>
+      <div style='padding:10px 12px;font-size:12px'>
+        ${n.briefing ? '<div style=margin-bottom:6px><strong>Briefing:</strong> ' + escapeHtml(n.briefing) + '</div>' : ''}
+        ${n.partial ? '<div style=padding:6px 8px;background:#f5fff5;border-left:3px solid #2ecc71;border-radius:3px;margin-bottom:6px><strong>Partial:</strong> ' + escapeHtml(n.partial.what_happened || '') + '<br><em>' + escapeHtml(n.partial.closing_line || '') + '</em></div>' : ''}
+        ${n.failure ? '<div style=padding:6px 8px;background:#fff5f5;border-left:3px solid #e74c3c;border-radius:3px><strong>Failure:</strong> ' + escapeHtml(n.failure.what_happened || '') + '<br><em>' + escapeHtml(n.failure.closing_line || '') + '</em></div>' : ''}
+      </div>
+    </div>`).join('');
+  actions.style.display = '';
+}
+
+async function applyEndingNotes(scenarioId) {
+  if (!window._aiEndingNotes) return toast('No ending notes parsed yet', 'error');
+  try {
+    await apiFetch('POST', '/pipeline/inject-ending-notes/' + scenarioId, {
+      ending_notes: window._aiEndingNotes
+    });
+    toast('Ending notes applied to all player roles', 'success');
+    document.getElementById('ending-notes-paste').value = '';
+    document.getElementById('ending-notes-preview').innerHTML = '';
+    document.getElementById('ending-notes-actions').style.display = 'none';
+    window._aiEndingNotes = null;
+    loadVersionHistory(scenarioId);
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+async function loadVersionHistory(scenarioId) {
+  if (!scenarioId) return;
+  try {
+    const data = await apiFetch('GET', '/pipeline/versions/' + scenarioId);
+    const versions = data.versions || [];
+    const list = document.getElementById('version-history-list');
+    if (!list) return;
+    if (versions.length === 0) {
+      list.innerHTML = '<p style=color:var(--text-muted);font-size:13px>No versions saved yet. Versions are created automatically when corrections are applied.</p>';
+      return;
+    }
+    list.innerHTML = [...versions].reverse().map(v => {
+      const date = new Date(v.createdAt).toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      return `<div style='display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color)'>
+        <div>
+          <span style='font-size:13px;font-weight:500'>v${v.version} — ${escapeHtml(v.label)}</span>
+          <span style='font-size:11px;color:var(--text-muted);margin-left:8px'>${date}</span>
+          ${v.changes_applied ? '<span style=font-size:11px;color:var(--text-muted);margin-left:6px>' + v.changes_applied + ' changes</span>' : ''}
+        </div>
+        <div style='display:flex;gap:6px'>
+          <button onclick='previewAdminVersion("${scenarioId}", ${v.version})' style='padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Preview</button>
+          <button onclick='restoreAdminVersion("${scenarioId}", ${v.version})' style='padding:3px 8px;font-size:11px;border:1px solid #e74c3c;border-radius:4px;background:#fff5f5;color:#e74c3c;cursor:pointer'>Restore</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    const list = document.getElementById('version-history-list');
+    if (list) list.innerHTML = '<p style=color:var(--text-muted);font-size:13px>Version history unavailable</p>';
+  }
+}
+
+async function previewAdminVersion(scenarioId, versionNumber) {
+  try {
+    const data = await apiFetch('GET', '/pipeline/versions/' + scenarioId + '/' + versionNumber);
+    const scenario = data.scenario || data;
+    const win = window.open('', '_blank', 'width=900,height=700');
+    win.document.write('<pre style=background:#1a2332;color:#e8eaf0;padding:20px;font-size:12px>' + escapeHtml(JSON.stringify(scenario, null, 2)) + '</pre>');
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+async function restoreAdminVersion(scenarioId, versionNumber) {
+  if (!confirm('Restore version ' + versionNumber + '? This will overwrite the current scenario. A backup will be saved automatically.')) return;
+  try {
+    await apiFetch('POST', '/pipeline/rollback/' + scenarioId + '/' + versionNumber, {});
+    toast('Restored to version ' + versionNumber, 'success');
+    loadVersionHistory(scenarioId);
+    renderForm('scenarios', scenarioId);
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
 </script>
 </body>
 </html>

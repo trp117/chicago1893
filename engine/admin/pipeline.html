@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Story Pipeline</title>
+<style>
+  :root {
+    --navy: #1a2332;
+    --navy-light: #243044;
+    --accent: #4a9eff;
+    --accent-dim: #2d6fb5;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --text: #e8eaf0;
+    --text-muted: #8892a4;
+    --border: #2d3d52;
+    --panel: #1e2b3c;
+    --panel-light: #243044;
+    --radius: 8px;
+    --font: system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy); color: var(--text); font-family: var(--font); font-size: 14px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Header */
+  .header { background: var(--navy-light); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .header h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn { padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel-light); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+  .btn:hover { background: var(--navy-light); border-color: var(--accent); }
+  .btn-primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-success { background: #1a5c35; border-color: var(--success); color: var(--success); }
+  .btn-success:hover { background: #216b3e; }
+  .btn-danger { background: #5c1a1a; border-color: var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: #6b2020; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Main layout — three columns */
+  .main { display: grid; grid-template-columns: 260px 1fr 280px; gap: 0; flex: 1; overflow: hidden; }
+
+  /* Left — pipeline steps */
+  .panel-steps { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .panel-title { padding: 14px 16px 10px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+
+  .step-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .step-item { padding: 10px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
+  .step-item:hover { background: var(--panel-light); }
+  .step-item.active { background: var(--panel-light); border-left-color: var(--accent); }
+  .step-item.complete { border-left-color: var(--success); }
+  .step-item.failed { border-left-color: var(--danger); }
+  .step-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; background: var(--navy); border: 1px solid var(--border); color: var(--text-muted); }
+  .step-icon.running { border-color: var(--accent); color: var(--accent); animation: pulse 1.5s infinite; }
+  .step-icon.complete { background: #1a5c35; border-color: var(--success); color: var(--success); }
+  .step-icon.awaiting { background: #5c4a1a; border-color: var(--warning); color: var(--warning); }
+  .step-icon.failed { background: #5c1a1a; border-color: var(--danger); color: var(--danger); }
+  .step-info { flex: 1; min-width: 0; }
+  .step-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .step-status { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .start-form { padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .start-form label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .start-form input, .start-form textarea { width: 100%; background: var(--navy); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 8px 10px; font-size: 13px; font-family: var(--font); resize: none; }
+  .start-form input:focus, .start-form textarea:focus { outline: none; border-color: var(--accent); }
+  .start-form textarea { height: 80px; margin-bottom: 8px; }
+  .start-form .field { margin-bottom: 8px; }
+
+  /* Centre — diff reviewer */
+  .panel-diff { display: flex; flex-direction: column; overflow: hidden; }
+  .diff-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--panel); }
+  .diff-title { font-size: 14px; font-weight: 600; }
+  .diff-meta { font-size: 12px; color: var(--text-muted); }
+  .diff-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+  .correction-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; transition: border-color 0.15s; }
+  .correction-card.accepted { border-color: var(--success); }
+  .correction-card.rejected { border-color: var(--danger); opacity: 0.6; }
+  .correction-card.edited { border-color: var(--warning); }
+  .correction-header { padding: 10px 14px; background: var(--panel-light); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .correction-path { font-size: 12px; font-family: monospace; color: var(--accent); }
+  .correction-badges { display: flex; gap: 6px; align-items: center; }
+  .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+  .badge-type { background: #1a3a5c; color: #7ab8ff; }
+  .badge-priority-critical { background: #5c1a1a; color: #ff7a7a; }
+  .badge-priority-high { background: #5c3a1a; color: #ffaa7a; }
+  .badge-priority-medium { background: #3a3a1a; color: #ffee7a; }
+  .badge-priority-low { background: #1a3a1a; color: #7aff7a; }
+  .badge-confidence { background: var(--navy); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .correction-body { padding: 12px 14px; }
+  .correction-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+  .correction-text { font-size: 13px; line-height: 1.5; padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; }
+  .correction-text.current { background: #3a1a1a; border-left: 3px solid var(--danger); }
+  .correction-text.suggested { background: #1a3a1a; border-left: 3px solid var(--success); }
+  .correction-text.manual { background: #3a3a1a; border-left: 3px solid var(--warning); }
+  .correction-reason { font-size: 12px; color: var(--text-muted); font-style: italic; margin-bottom: 10px; }
+  .correction-source { font-size: 11px; color: var(--text-muted); padding: 6px 10px; background: var(--navy); border-radius: 4px; margin-bottom: 10px; }
+
+  .manual-editor { display: none; margin-bottom: 10px; }
+  .manual-editor.open { display: block; }
+  .manual-editor textarea { width: 100%; background: var(--navy); border: 1px solid var(--warning); border-radius: var(--radius); color: var(--text); padding: 8px 10px; font-size: 13px; font-family: var(--font); resize: vertical; min-height: 80px; }
+  .manual-editor textarea:focus { outline: none; }
+
+  .correction-actions { display: flex; gap: 8px; }
+
+  .diff-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--panel); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .diff-summary { font-size: 13px; color: var(--text-muted); }
+  .diff-summary span { color: var(--text); font-weight: 500; }
+
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; }
+  .empty-state .icon { font-size: 48px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+
+  /* Right — version history */
+  .panel-versions { background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .version-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .version-item { padding: 10px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+  .version-item:hover { background: var(--panel-light); }
+  .version-item.current { background: var(--panel-light); border-left: 3px solid var(--accent); }
+  .version-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .version-label { font-size: 13px; font-weight: 500; }
+  .version-num { font-size: 11px; color: var(--accent); font-family: monospace; }
+  .version-meta { font-size: 11px; color: var(--text-muted); }
+  .version-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .version-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; }
+  .version-badge.live { background: #1a5c35; color: var(--success); }
+  .version-badge.restored { background: #1a3a5c; color: var(--accent); }
+
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 16px; border-radius: var(--radius); font-size: 13px; z-index: 1000; animation: slideIn 0.2s ease; }
+  .toast.success { background: #1a5c35; border: 1px solid var(--success); color: var(--success); }
+  .toast.error { background: #5c1a1a; border: 1px solid var(--danger); color: var(--danger); }
+  .toast.info { background: #1a3a5c; border: 1px solid var(--accent); color: var(--accent); }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class='header'>
+  <div style='display:flex;align-items:center;gap:12px'>
+    <a href='/admin' class='btn btn-sm'>← Admin</a>
+    <h1>Story Pipeline</h1>
+    <span id='scenario-badge' style='font-size:12px;color:var(--text-muted)'></span>
+  </div>
+  <div class='header-actions'>
+    <button class='btn btn-sm' onclick='loadVersionHistory()'>↺ Refresh History</button>
+    <button class='btn btn-sm btn-primary' id='btn-approve-step' onclick='approveCurrentStep()' disabled>✓ Approve Step</button>
+  </div>
+</div>
+
+<div class='main'>
+
+  <!-- LEFT: Pipeline Steps -->
+  <div class='panel-steps'>
+    <div class='panel-title'>Pipeline Steps</div>
+    <div class='step-list' id='step-list'>
+      <div class='step-item' data-step='synopsis'>
+        <div class='step-icon' id='icon-synopsis'>1</div>
+        <div class='step-info'>
+          <div class='step-name'>Gemini Synopsis</div>
+          <div class='step-status' id='status-synopsis'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='generated'>
+        <div class='step-icon' id='icon-generated'>2</div>
+        <div class='step-info'>
+          <div class='step-name'>Generate Scenario</div>
+          <div class='step-status' id='status-generated'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='epilogue_reviewed'>
+        <div class='step-icon' id='icon-epilogue_reviewed'>3</div>
+        <div class='step-info'>
+          <div class='step-name'>Gemini Epilogue Review</div>
+          <div class='step-status' id='status-epilogue_reviewed'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='scenario_reviewed'>
+        <div class='step-icon' id='icon-scenario_reviewed'>4</div>
+        <div class='step-info'>
+          <div class='step-name'>Gemini Full Review</div>
+          <div class='step-status' id='status-scenario_reviewed'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='gpt_reviewed'>
+        <div class='step-icon' id='icon-gpt_reviewed'>5</div>
+        <div class='step-info'>
+          <div class='step-name'>ChatGPT Review</div>
+          <div class='step-status' id='status-gpt_reviewed'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='ending_notes'>
+        <div class='step-icon' id='icon-ending_notes'>6</div>
+        <div class='step-info'>
+          <div class='step-name'>Ending Notes</div>
+          <div class='step-status' id='status-ending_notes'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='schema_fill'>
+        <div class='step-icon' id='icon-schema_fill'>7</div>
+        <div class='step-info'>
+          <div class='step-name'>Schema Cleanup</div>
+          <div class='step-status' id='status-schema_fill'>Waiting</div>
+        </div>
+      </div>
+      <div class='step-item' data-step='published'>
+        <div class='step-icon' id='icon-published'>8</div>
+        <div class='step-info'>
+          <div class='step-name'>Publish</div>
+          <div class='step-status' id='status-published'>Waiting</div>
+        </div>
+      </div>
+    </div>
+
+    <div class='start-form'>
+      <div class='field'>
+        <label>Scenario ID</label>
+        <input type='text' id='input-scenario-id' placeholder='e.g. berlin_wall_1989' />
+      </div>
+      <div class='field'>
+        <label>Story Idea</label>
+        <textarea id='input-story-idea' placeholder='Describe your story idea in 3-5 sentences...'></textarea>
+      </div>
+      <div class='field'>
+        <label>Session Length</label>
+        <select id='input-session-length' style='width:100%;background:var(--navy);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 10px;font-size:13px;'>
+          <option value='10'>10 minutes</option>
+          <option value='15'>15 minutes</option>
+          <option value='30' selected>30 minutes</option>
+          <option value='60'>60 minutes</option>
+        </select>
+      </div>
+      <button class='btn btn-primary' style='width:100%' onclick='startPipeline()' id='btn-start'>▶ Start Pipeline</button>
+    </div>
+  </div>
+
+  <!-- CENTRE: Diff Reviewer -->
+  <div class='panel-diff'>
+    <div class='diff-header'>
+      <div>
+        <div class='diff-title' id='diff-title'>Diff Reviewer</div>
+        <div class='diff-meta' id='diff-meta'>Start a pipeline or select a step to review corrections</div>
+      </div>
+      <div style='display:flex;gap:8px'>
+        <button class='btn btn-sm' onclick='acceptAllCorrections()' id='btn-accept-all' disabled>Accept All</button>
+        <button class='btn btn-sm btn-danger' onclick='rejectAllCorrections()' id='btn-reject-all' disabled>Reject All</button>
+      </div>
+    </div>
+    <div class='diff-body' id='diff-body'>
+      <div class='empty-state'>
+        <div class='icon'>⚡</div>
+        <p>Pipeline corrections will appear here</p>
+        <p style='font-size:12px'>Start a pipeline using the form on the left</p>
+      </div>
+    </div>
+    <div class='diff-footer'>
+      <div class='diff-summary' id='diff-summary'>No corrections loaded</div>
+      <div style='display:flex;gap:8px'>
+        <button class='btn btn-sm' onclick='openCompareModal()' id='btn-compare' disabled>Compare Versions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Version History -->
+  <div class='panel-versions'>
+    <div class='panel-title'>Version History</div>
+    <div class='version-list' id='version-list'>
+      <div style='padding:20px 16px;color:var(--text-muted);font-size:13px'>No versions yet</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  scenarioId: null,
+  pipeline: null,
+  currentStep: null,
+  corrections: [],
+  currentScenario: null,
+  pollInterval: null
+};
+
+// ============================================================
+// PIPELINE CONTROL
+// ============================================================
+async function startPipeline() {
+  const scenarioId = document.getElementById('input-scenario-id').value.trim();
+  const storyIdea = document.getElementById('input-story-idea').value.trim();
+  if (!scenarioId || !storyIdea) return showToast('Scenario ID and story idea are required', 'error');
+
+  state.scenarioId = scenarioId;
+  document.getElementById('scenario-badge').textContent = scenarioId;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-start').textContent = 'Running...';
+
+  try {
+    const sessionLength = parseInt(document.getElementById('input-session-length').value);
+    const res = await fetch('/admin/api/pipeline/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenarioId, storyIdea, sessionLength })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    showToast('Pipeline started', 'success');
+    startPolling();
+  } catch (err) {
+    showToast(err.message, 'error');
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-start').textContent = '▶ Start Pipeline';
+  }
+}
+
+function startPolling() {
+  if (state.pollInterval) clearInterval(state.pollInterval);
+  state.pollInterval = setInterval(pollStatus, 2000);
+}
+
+async function pollStatus() {
+  if (!state.scenarioId) return;
+  try {
+    const res = await fetch('/admin/api/pipeline/status/' + state.scenarioId);
+    if (!res.ok) return;
+    const data = await res.json();
+    state.pipeline = data;
+    updateStepUI(data);
+    if (data.status === 'complete' || data.status === 'failed') {
+      clearInterval(state.pollInterval);
+      if (data.status === 'complete') {
+        showToast('Pipeline complete — scenario ready to review', 'success');
+        loadVersionHistory();
+      } else {
+        showToast('Pipeline failed: ' + data.error, 'error');
+      }
+      document.getElementById('btn-start').disabled = false;
+      document.getElementById('btn-start').textContent = '▶ Start Pipeline';
+    }
+    const awaitingStep = findAwaitingStep(data);
+    if (awaitingStep && awaitingStep !== state.currentStep) {
+      state.currentStep = awaitingStep;
+      loadCorrections(awaitingStep, data.steps[awaitingStep]);
+      loadVersionHistory();
+    }
+  } catch (err) {
+    console.error('Poll error:', err);
+  }
+}
+
+function findAwaitingStep(pipeline) {
+  for (const [name, step] of Object.entries(pipeline.steps || {})) {
+    if (step.status === 'awaiting_approval') return name;
+  }
+  return null;
+}
+
+// ============================================================
+// STEP UI
+// ============================================================
+function updateStepUI(pipeline) {
+  const steps = pipeline.steps || {};
+  for (const [name, step] of Object.entries(steps)) {
+    const icon = document.getElementById('icon-' + name);
+    const status = document.getElementById('status-' + name);
+    const item = document.querySelector('[data-step=' + name + ']');
+    if (!icon || !status) continue;
+    icon.className = 'step-icon ' + step.status;
+    if (item) {
+      item.className = 'step-item';
+      if (step.status === 'awaiting_approval' || step.status === 'running') item.classList.add('active');
+      if (step.status === 'complete' || step.status === 'approved') item.classList.add('complete');
+      if (step.status === 'failed') item.classList.add('failed');
+    }
+    const labels = {
+      running: '⟳ Running...',
+      awaiting_approval: '⚠ Awaiting approval',
+      approved: '✓ Approved',
+      complete: '✓ Complete',
+      failed: '✕ Failed'
+    };
+    status.textContent = labels[step.status] || step.status;
+    if (step.status === 'running') icon.innerHTML = '<div class=spinner></div>';
+    else if (step.status === 'complete' || step.status === 'approved') icon.textContent = '✓';
+    else if (step.status === 'awaiting_approval') icon.textContent = '!';
+    else if (step.status === 'failed') icon.textContent = '✕';
+  }
+}
+
+// ============================================================
+// CORRECTIONS / DIFF REVIEWER
+// ============================================================
+function loadCorrections(stepName, stepData) {
+  if (stepName === 'synopsis') {
+    state.currentStep = stepName;
+    const synopsisText = typeof stepData.synopsis === 'string' ? stepData.synopsis : JSON.stringify(stepData.synopsis, null, 2);
+    document.getElementById('diff-title').textContent = 'Gemini Synopsis — Step 1';
+    document.getElementById('diff-meta').textContent = 'Review and edit before Claude generates the scenario';
+    const body = document.getElementById('diff-body');
+    body.innerHTML =
+      '<div style=margin-bottom:16px;padding:12px;background:var(--panel);border:1px solid var(--accent);border-radius:8px>' +
+      '<div style=font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px>Gemini Step 1 Output — Edit if needed before approving</div>' +
+      '<textarea id=synopsis-editor style=width:100%;background:var(--navy);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:10px;font-size:13px;font-family:var(--font);resize:vertical;min-height:400px;line-height:1.6>' + escHtml(synopsisText) + '</textarea>' +
+      '</div>' +
+      '<div style=padding:10px;background:var(--panel-light);border-radius:6px;font-size:12px;color:var(--text-muted)>' +
+      'This text will be passed directly to Claude as the story description — exactly as if you copied and pasted it from Gemini manually. Edit freely before approving.' +
+      '</div>';
+    document.getElementById('diff-summary').textContent = 'Review Gemini synopsis before generation';
+    document.getElementById('btn-approve-step').disabled = false;
+    document.getElementById('btn-accept-all').disabled = true;
+    document.getElementById('btn-reject-all').disabled = true;
+    return;
+  }
+  state.currentStep = stepName;
+  state.corrections = [];
+
+  const stepLabels = {
+    epilogue_reviewed: 'Gemini Epilogue Review',
+    scenario_reviewed: 'Gemini Full Scenario Review',
+    gpt_reviewed: 'ChatGPT Cross-Review',
+    ending_notes: 'Ending Notes'
+  };
+
+  document.getElementById('diff-title').textContent = stepLabels[stepName] || stepName;
+
+  let corrections = [];
+  let scenario = null;
+
+  if (stepName === 'ending_notes') {
+    scenario = stepData.scenario;
+    state.currentScenario = scenario;
+    renderEndingNotes(stepData.endingNotes, scenario);
+    document.getElementById('diff-meta').textContent = 'Review ending notes for all player roles';
+    document.getElementById('btn-approve-step').disabled = false;
+    document.getElementById('btn-accept-all').disabled = true;
+    document.getElementById('btn-reject-all').disabled = true;
+    return;
+  }
+
+  if (stepData.corrections) {
+    corrections = stepData.corrections.corrections || stepData.corrections || [];
+    scenario = stepData.scenario || (state.pipeline && state.pipeline.steps['generated'] && state.pipeline.steps['generated'].scenario);
+  }
+
+  state.currentScenario = scenario || {};
+  state.corrections = corrections.map((c, i) => ({ ...c, id: i, decision: 'pending' }));
+
+  renderCorrections();
+  document.getElementById('diff-meta').textContent = corrections.length + ' correction(s) found';
+  document.getElementById('btn-approve-step').disabled = false;
+  document.getElementById('btn-accept-all').disabled = corrections.length === 0;
+  document.getElementById('btn-reject-all').disabled = corrections.length === 0;
+  updateDiffSummary();
+}
+
+function renderCorrections() {
+  const body = document.getElementById('diff-body');
+  if (state.corrections.length === 0) {
+    body.innerHTML = '<div class=empty-state><div class=icon>✓</div><p>No corrections needed</p><p style=font-size:12px>This step passed review — click Approve Step to continue</p></div>';
+    return;
+  }
+  body.innerHTML = state.corrections.map(c => renderCorrectionCard(c)).join('');
+}
+
+function renderCorrectionCard(c) {
+  const priorityClass = c.priority ? 'badge-priority-' + c.priority : 'badge-priority-medium';
+  const typeLabel = c.type || c.section || 'correction';
+  return '<div class=correction-card id=card-' + c.id + ' data-id=' + c.id + '>' +
+    '<div class=correction-header>' +
+      '<span class=correction-path>' + (c.field_path || c.field || 'field') + '</span>' +
+      '<div class=correction-badges>' +
+        '<span class=\"badge badge-type\">' + typeLabel + '</span>' +
+        (c.priority ? '<span class=\"badge ' + priorityClass + '\">' + c.priority + '</span>' : '') +
+        (c.confidence ? '<span class=\"badge badge-confidence\">' + c.confidence + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class=correction-body>' +
+      '<div class=correction-label>Current</div>' +
+      '<div class=\"correction-text current\">' + escHtml(String(c.current_text || '')) + '</div>' +
+      '<div class=correction-label>Suggested</div>' +
+      '<div class=\"correction-text suggested\">' + escHtml(String(c.corrected_text || '')) + '</div>' +
+      (c.reason ? '<div class=correction-reason>' + escHtml(c.reason) + '</div>' : '') +
+      (c.source ? '<div class=correction-source>Source: ' + escHtml(c.source) + '</div>' : '') +
+      '<div class=\"manual-editor\" id=editor-' + c.id + '>' +
+        '<div class=correction-label>Your edit</div>' +
+        '<textarea id=manual-' + c.id + ' placeholder=Type your version here...>' + escHtml(String(c.corrected_text || '')) + '</textarea>' +
+        '<div style=display:flex;gap:6px;margin-top:6px>' +
+          '<button class=\"btn btn-sm btn-success\" onclick=saveManualEdit(' + c.id + ')>Save Edit</button>' +
+          '<button class=\"btn btn-sm\" onclick=cancelManualEdit(' + c.id + ')>Cancel</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class=correction-actions>' +
+        '<button class=\"btn btn-sm btn-success\" onclick=acceptCorrection(' + c.id + ')>✓ Accept</button>' +
+        '<button class=\"btn btn-sm btn-danger\" onclick=rejectCorrection(' + c.id + ')>✕ Reject</button>' +
+        '<button class=\"btn btn-sm\" onclick=editManually(' + c.id + ')>✎ Edit</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderEndingNotes(endingNotes, scenario) {
+  const body = document.getElementById('diff-body');
+  const notes = endingNotes.ending_notes || [];
+  if (notes.length === 0) {
+    body.innerHTML = '<div class=empty-state><div class=icon>!</div><p>No ending notes generated</p></div>';
+    return;
+  }
+  body.innerHTML = notes.map((note, i) => renderEndingNoteCard(note, i)).join('');
+}
+
+function renderEndingNoteCard(note, index) {
+  return '<div class=correction-card id=note-card-' + index + ' style=border-color:var(--accent)>' +
+    '<div class=correction-header>' +
+      '<span class=correction-path>' + escHtml(note.role_name) + '</span>' +
+      '<span class=\"badge badge-type\">ending notes</span>' +
+    '</div>' +
+    '<div class=correction-body>' +
+      '<div class=correction-label>Partial Success</div>' +
+      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>What happened:</strong> ' + escHtml(note.partial.what_happened || '') + '</div>' +
+      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>Who present:</strong> ' + escHtml(note.partial.who_present || '') + '</div>' +
+      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>Emotional weight:</strong> ' + escHtml(note.partial.emotional_weight || '') + '</div>' +
+      '<div class=\"correction-text suggested\" style=margin-bottom:10px><strong>Closing line:</strong> ' + escHtml(note.partial.closing_line || '') + '</div>' +
+      '<div class=correction-label>Failure</div>' +
+      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>What happened:</strong> ' + escHtml(note.failure.what_happened || '') + '</div>' +
+      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>Who present:</strong> ' + escHtml(note.failure.who_present || '') + '</div>' +
+      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>Emotional weight:</strong> ' + escHtml(note.failure.emotional_weight || '') + '</div>' +
+      '<div class=\"correction-text current\" style=margin-bottom:10px><strong>Closing line:</strong> ' + escHtml(note.failure.closing_line || '') + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ============================================================
+// CORRECTION ACTIONS
+// ============================================================
+function acceptCorrection(id) {
+  const c = state.corrections.find(x => x.id === id);
+  if (!c) return;
+  c.decision = 'accepted';
+  applyCorrection(c, c.corrected_text);
+  document.getElementById('card-' + id).className = 'correction-card accepted';
+  updateDiffSummary();
+}
+
+function rejectCorrection(id) {
+  const c = state.corrections.find(x => x.id === id);
+  if (!c) return;
+  c.decision = 'rejected';
+  document.getElementById('card-' + id).className = 'correction-card rejected';
+  updateDiffSummary();
+}
+
+function editManually(id) {
+  document.getElementById('editor-' + id).classList.add('open');
+}
+
+function cancelManualEdit(id) {
+  document.getElementById('editor-' + id).classList.remove('open');
+}
+
+function saveManualEdit(id) {
+  const c = state.corrections.find(x => x.id === id);
+  if (!c) return;
+  const val = document.getElementById('manual-' + id).value.trim();
+  if (!val) return;
+  c.decision = 'edited';
+  c.final_text = val;
+  applyCorrection(c, val);
+  document.getElementById('card-' + id).className = 'correction-card edited';
+  document.getElementById('editor-' + id).classList.remove('open');
+  updateDiffSummary();
+}
+
+function applyCorrection(correction, text) {
+  if (!state.currentScenario) return;
+  const path = (correction.field_path || '').split('.');
+  let obj = state.currentScenario;
+  for (let i = 0; i < path.length - 1; i++) {
+    if (obj[path[i]] === undefined) return;
+    obj = obj[path[i]];
+  }
+  const last = path[path.length - 1];
+  if (last && obj) obj[last] = text;
+}
+
+function acceptAllCorrections() {
+  state.corrections.forEach(c => { if (c.decision === 'pending') acceptCorrection(c.id); });
+}
+
+function rejectAllCorrections() {
+  state.corrections.forEach(c => { if (c.decision === 'pending') rejectCorrection(c.id); });
+}
+
+function updateDiffSummary() {
+  const total = state.corrections.length;
+  const accepted = state.corrections.filter(c => c.decision === 'accepted').length;
+  const rejected = state.corrections.filter(c => c.decision === 'rejected').length;
+  const edited = state.corrections.filter(c => c.decision === 'edited').length;
+  const pending = total - accepted - rejected - edited;
+  document.getElementById('diff-summary').innerHTML =
+    '<span>' + accepted + '</span> accepted · <span>' + rejected + '</span> rejected · <span>' + edited + '</span> edited · <span>' + pending + '</span> pending';
+}
+
+async function approveCurrentStep() {
+  if (!state.scenarioId || !state.currentStep) return;
+  if (state.currentStep === 'synopsis') {
+    const editor = document.getElementById('synopsis-editor');
+    const synopsisText = editor ? editor.value.trim() : '';
+    if (!synopsisText) return showToast('Synopsis cannot be empty', 'error');
+    try {
+      document.getElementById('btn-approve-step').disabled = true;
+      document.getElementById('btn-approve-step').textContent = 'Approving...';
+      const res = await fetch('/admin/api/pipeline/approve/' + state.scenarioId + '/synopsis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approvedSynopsis: synopsisText })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      showToast('Synopsis approved — Claude is generating the scenario', 'success');
+      state.currentStep = null;
+      document.getElementById('diff-body').innerHTML = '<div class=empty-state><div class=icon>⟳</div><p>Claude is generating the full scenario...</p><p style=font-size:12px>This may take 1-2 minutes</p></div>';
+      document.getElementById('diff-summary').textContent = 'Generation in progress';
+      document.getElementById('btn-approve-step').textContent = '✓ Approve Step';
+    } catch (err) {
+      showToast(err.message, 'error');
+      document.getElementById('btn-approve-step').disabled = false;
+      document.getElementById('btn-approve-step').textContent = '✓ Approve Step';
+    }
+    return;
+  }
+  const applied = state.corrections.filter(c => c.decision === 'accepted' || c.decision === 'edited').length;
+  const rejected = state.corrections.filter(c => c.decision === 'rejected').length;
+  const edited = state.corrections.filter(c => c.decision === 'edited').length;
+  const pending = state.corrections.filter(c => c.decision === 'pending').length;
+  if (pending > 0) {
+    if (!confirm(pending + ' correction(s) still pending. Approve step anyway? Pending corrections will be rejected.')) return;
+    state.corrections.filter(c => c.decision === 'pending').forEach(c => rejectCorrection(c.id));
+  }
+  try {
+    document.getElementById('btn-approve-step').disabled = true;
+    document.getElementById('btn-approve-step').textContent = 'Approving...';
+    const res = await fetch('/admin/api/pipeline/approve/' + state.scenarioId + '/' + state.currentStep, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        approvedScenario: state.currentScenario,
+        changesApplied: applied,
+        changesRejected: rejected,
+        manuallyEdited: edited > 0
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    showToast('Step approved — pipeline continuing', 'success');
+    state.currentStep = null;
+    state.corrections = [];
+    document.getElementById('diff-body').innerHTML = '<div class=empty-state><div class=icon>⟳</div><p>Waiting for next step...</p></div>';
+    document.getElementById('diff-summary').textContent = 'No corrections loaded';
+    document.getElementById('btn-approve-step').textContent = '✓ Approve Step';
+    loadVersionHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+    document.getElementById('btn-approve-step').disabled = false;
+    document.getElementById('btn-approve-step').textContent = '✓ Approve Step';
+  }
+}
+
+// ============================================================
+// VERSION HISTORY
+// ============================================================
+async function loadVersionHistory() {
+  if (!state.scenarioId) return;
+  try {
+    const res = await fetch('/admin/api/pipeline/versions/' + state.scenarioId);
+    const data = await res.json();
+    renderVersionHistory(data.versions || []);
+  } catch (err) {
+    console.error('Version history error:', err);
+  }
+}
+
+function renderVersionHistory(versions) {
+  const list = document.getElementById('version-list');
+  if (versions.length === 0) {
+    list.innerHTML = '<div style=padding:20px 16px;color:var(--text-muted);font-size:13px>No versions yet</div>';
+    return;
+  }
+  list.innerHTML = [...versions].reverse().map(v => {
+    const isLive = v.label === 'published';
+    const isRestored = v.restored_from !== null && v.restored_from !== undefined;
+    const date = new Date(v.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return '<div class=\"version-item' + (isLive ? ' current' : '') + '\">' +
+      '<div class=version-top>' +
+        '<span class=version-label>' + escHtml(v.label) + '</span>' +
+        '<span class=version-num>v' + v.version + '</span>' +
+      '</div>' +
+      '<div class=version-meta>' + date + ' · ' + v.pipeline_step + '</div>' +
+      (v.changes_applied > 0 ? '<div class=version-meta>' + v.changes_applied + ' changes applied</div>' : '') +
+      '<div style=display:flex;gap:4px;margin-top:4px;flex-wrap:wrap>' +
+        (isLive ? '<span class=\"version-badge live\">LIVE</span>' : '') +
+        (isRestored ? '<span class=\"version-badge restored\">restored from v' + v.restored_from + '</span>' : '') +
+      '</div>' +
+      '<div class=version-actions>' +
+        '<button class=\"btn btn-sm\" onclick=previewVersion(' + v.version + ')>Preview</button>' +
+        '<button class=\"btn btn-sm btn-danger\" onclick=rollbackTo(' + v.version + ')>Restore</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function rollbackTo(versionNumber) {
+  if (!confirm('Restore version ' + versionNumber + '? This will overwrite the current live scenario. A backup version will be saved automatically.')) return;
+  try {
+    const res = await fetch('/admin/api/pipeline/rollback/' + state.scenarioId + '/' + versionNumber, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    showToast('Restored to version ' + versionNumber, 'success');
+    loadVersionHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function previewVersion(versionNumber) {
+  try {
+    const res = await fetch('/admin/api/pipeline/versions/' + state.scenarioId + '/' + versionNumber);
+    const data = await res.json();
+    const win = window.open('', '_blank');
+    win.document.write('<pre style=background:#1a2332;color:#e8eaf0;padding:20px;font-size:12px;>' + escHtml(JSON.stringify(data.scenario, null, 2)) + '</pre>');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function openCompareModal() {
+  showToast('Compare feature — select two versions from the history panel', 'info');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type || 'info');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+</body>
+</html>

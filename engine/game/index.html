@@ -146,6 +146,14 @@ li { margin-bottom: 8px; }
 .closing-epilogue-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
 .closing-epilogue-text { font-size: 0.95rem; font-style: normal; color: #b8b4ae; line-height: 1.75; margin-bottom: 1.4em; }
 .closing-epilogue-sources { font-size: 0.75rem; color: #4a4540; font-style: italic; line-height: 1.6; }
+.closing-bibliography { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
+.closing-bibliography.visible { opacity: 1; }
+.closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-bibliography-list { list-style: none; padding: 0; margin: 0; }
+.closing-bibliography-item { font-size: 0.8rem; color: #7a7570; line-height: 1.7; margin-bottom: 0.8em; }
+.closing-bibliography-item a { color: #7a7570; text-decoration: underline; text-underline-offset: 2px; }
+.closing-bibliography-item a:hover { color: #d0b06a; }
+.closing-bibliography-access { display: block; font-size: 0.72rem; color: #4a4540; font-style: italic; margin-top: 2px; }
 .closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
 .closing-return.visible { opacity: 1; }
 .closing-return:hover { color: #d0b06a; }
@@ -572,6 +580,10 @@ li { margin-bottom: 8px; }
       <div class="closing-epilogue-label">Historical Record</div>
       <div id="closing-epilogue-text" class="closing-epilogue-text"></div>
       <div id="closing-epilogue-sources" class="closing-epilogue-sources"></div>
+    </div>
+    <div id="closing-bibliography" class="closing-bibliography">
+      <div class="closing-bibliography-label">Primary Sources</div>
+      <ul id="closing-bibliography-list" class="closing-bibliography-list"></ul>
     </div>
     <a id="closing-return" href="/" class="closing-return">&#8592; Return to Stories</a>
   </div>
@@ -1071,6 +1083,8 @@ function showClosingScreen(endState, sessionId) {
   const epilogueEl   = document.getElementById('closing-epilogue');
   const epTextEl     = document.getElementById('closing-epilogue-text');
   const epSourcesEl  = document.getElementById('closing-epilogue-sources');
+  const bibEl        = document.getElementById('closing-bibliography');
+  const bibListEl    = document.getElementById('closing-bibliography-list');
   const returnEl     = document.getElementById('closing-return');
 
   if (!overlay || !dotsEl || !proseEl || !aftermathEl || !epilogueEl || !returnEl) {
@@ -1087,7 +1101,7 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
   syncClosingNarrationBtn();
 
-  async function triggerClosingSequence(hasEpilogue) {
+  async function triggerClosingSequence(hasEpilogue, hasBibliography) {
     if (ttsEnabled) {
       await ttsClosingSpeak(proseEl.textContent);
       aftermathEl.classList.add('visible');
@@ -1097,12 +1111,17 @@ function showClosingScreen(endState, sessionId) {
         epilogueEl.classList.add('visible');
         await ttsClosingSpeak(epTextEl.textContent);
       }
+      if (hasBibliography && bibEl) {
+        await new Promise(r => setTimeout(r, 500));
+        bibEl.classList.add('visible');
+      }
       await new Promise(r => setTimeout(r, 500));
       returnEl.classList.add('visible');
     } else {
-      setTimeout(() => aftermathEl.classList.add('visible'),                  2500);
+      setTimeout(() => aftermathEl.classList.add('visible'), 2500);
       setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
-      setTimeout(() => returnEl.classList.add('visible'),                     hasEpilogue ? 8500 : 7000);
+      setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, hasEpilogue ? 10000 : 8000);
+      setTimeout(() => returnEl.classList.add('visible'), hasEpilogue ? (hasBibliography ? 12000 : 8500) : 7000);
     }
   }
 
@@ -1138,7 +1157,8 @@ function showClosingScreen(endState, sessionId) {
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
-            let hasEpilogue = false;
+            let hasEpilogue     = false;
+            let hasBibliography = false;
             if (evt.epilogue?.text) {
               hasEpilogue = true;
               epTextEl.textContent = evt.epilogue.text;
@@ -1146,11 +1166,21 @@ function showClosingScreen(endState, sessionId) {
                 epSourcesEl.textContent = 'Sources: ' + evt.epilogue.sources.join('; ');
               }
             }
-            triggerClosingSequence(hasEpilogue);
+            if (evt.bibliography?.length && bibEl && bibListEl) {
+              hasBibliography = true;
+              const escH = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+              bibListEl.innerHTML = evt.bibliography.map(src => {
+                const inner = src.url
+                  ? `<a href="${escH(src.url)}" target="_blank" rel="noopener noreferrer">${escH(src.citation)}</a>`
+                  : escH(src.citation) + (src.access_note ? `<span class="closing-bibliography-access">${escH(src.access_note)}</span>` : '');
+                return `<li class="closing-bibliography-item">${inner}</li>`;
+              }).join('');
+            }
+            triggerClosingSequence(hasEpilogue, hasBibliography);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             dotsEl.classList.add('hidden');
-            triggerClosingSequence(false);
+            triggerClosingSequence(false, false);
           }
         }
       }
@@ -1158,7 +1188,7 @@ function showClosingScreen(endState, sessionId) {
     .catch(() => {
       clearTimeout(timeoutId);
       dotsEl.classList.add('hidden');
-      triggerClosingSequence(false);
+      triggerClosingSequence(false, false);
     });
 }
 

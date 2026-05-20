@@ -4,6 +4,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { readdir, readFile, unlink, stat } from 'fs/promises';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import PipelineOrchestrator from '../services/PipelineOrchestrator.js';
+import VersionController from '../services/VersionController.js';
 
 let _anthropicClient = null;
 function getAnthropicClient(apiKey) {
@@ -1017,9 +1019,15 @@ Return ONLY valid JSON in this exact structure:
         const id = f.slice(0, -3);
         const filePath = join(TRANSCRIPTS_DIR, f);
         const [content, stats] = await Promise.all([readFile(filePath, 'utf8'), stat(filePath)]);
-        const scenario  = content.match(/^## Scenario:\s*(.+)$/m)?.[1]?.trim() || '—';
-        const character = content.match(/^## Character:\s*(.+)$/m)?.[1]?.trim() || '—';
-        const started   = content.match(/^## Date:\s*(.+)$/m)?.[1]?.trim() || null;
+        const scenario  = content.match(/^## Scenario:\s*(.+)$/m)?.[1]?.trim()
+                       || content.match(/^scenario:\s*(.+)$/m)?.[1]?.trim()
+                       || '—';
+        const character = content.match(/^## Character:\s*(.+)$/m)?.[1]?.trim()
+                       || content.match(/^character:\s*(.+)$/m)?.[1]?.trim()
+                       || '—';
+        const started   = content.match(/^## Date:\s*(.+)$/m)?.[1]?.trim()
+                       || content.match(/^started:\s*(.+)$/m)?.[1]?.trim()
+                       || null;
         const turns     = (content.match(/^\*\*Player:\*\*/gm) || []).length;
         const endMatch  = content.match(/^## Ending — (.+)$/m);
         const result    = endMatch ? endMatch[1].toLowerCase() : 'in-progress';
@@ -1422,5 +1430,172 @@ Return ONLY valid JSON in this exact structure:
   // ║  END TEMPORARY EXPORT ROUTE                                      ║
   // ╚══════════════════════════════════════════════════════════════════╝
 
+  // ============================================================
+  // PIPELINE ENDPOINTS
+  // ============================================================
+
+  // Start a new pipeline for a scenario
+  r.post('/pipeline/start', async (req, res) => {
+    try {
+      const { scenarioId, storyIdea, sessionLength = 30 } = req.body;
+      if (!scenarioId || !storyIdea) {
+        return res.status(400).json({ error: 'scenarioId and storyIdea are required' });
+      }
+      const state = await PipelineOrchestrator.startPipeline(scenarioId, storyIdea, sessionLength);
+      res.json({ success: true, state });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Get current pipeline status
+  r.get('/pipeline/status/:scenarioId', async (req, res) => {
+    try {
+      const state = PipelineOrchestrator.getStatus(req.params.scenarioId);
+      if (!state) return res.status(404).json({ error: 'No active pipeline for this scenario' });
+      res.json(state);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Approve a step with accepted/rejected/edited corrections
+  r.post('/pipeline/approve/:scenarioId/:stepName', async (req, res) => {
+    try {
+      const { scenarioId, stepName } = req.params;
+      const { approvedScenario, changesApplied, changesRejected, manuallyEdited } = req.body;
+      if (!approvedScenario && stepName !== 'synopsis') {
+        return res.status(400).json({ error: 'approvedScenario is required' });
+      }
+      const state = PipelineOrchestrator.getStatus(scenarioId);
+      if (!state) return res.status(404).json({ error: 'No active pipeline' });
+      const step = state.steps[stepName];
+      if (step) {
+        step.changes_applied = changesApplied || 0;
+        step.changes_rejected = changesRejected || 0;
+        step.manually_edited = manuallyEdited || false;
+      }
+      if (stepName === 'synopsis') {
+        const pipelineState = PipelineOrchestrator.getStatus(scenarioId);
+        if (pipelineState && pipelineState.steps['synopsis']) {
+          pipelineState.steps['synopsis'].approvedSynopsis = req.body.approvedSynopsis || req.body.approvedScenario;
+          pipelineState.steps['synopsis'].approvedAt = new Date().toISOString();
+          pipelineState.steps['synopsis'].status = 'approved';
+          await VersionController.saveVersion(scenarioId, { synopsis: pipelineState.steps['synopsis'].approvedSynopsis }, {
+            label: 'synopsis_approved',
+            pipeline_step: 'synopsis'
+          });
+        }
+      } else {
+        await PipelineOrchestrator.approveStep(scenarioId, stepName, approvedScenario);
+      }
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Get version history for a scenario
+  r.get('/pipeline/versions/:scenarioId', async (req, res) => {
+    try {
+      const history = await VersionController.getHistory(req.params.scenarioId);
+      res.json({ versions: history });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Roll back to a specific version
+  r.post('/pipeline/rollback/:scenarioId/:versionNumber', async (req, res) => {
+    try {
+      const { scenarioId, versionNumber } = req.params;
+      const restored = await VersionController.rollback(scenarioId, parseInt(versionNumber));
+      res.json({ success: true, restored });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Compare two versions
+  r.get('/pipeline/diff/:scenarioId/:versionA/:versionB', async (req, res) => {
+    try {
+      const { scenarioId, versionA, versionB } = req.params;
+      const diff = await VersionController.diff(scenarioId, parseInt(versionA), parseInt(versionB));
+      res.json({ diff });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Get a specific version
+  r.get('/pipeline/versions/:scenarioId/:versionNumber', async (req, res) => {
+    try {
+      const { scenarioId, versionNumber } = req.params;
+      const version = await VersionController.getVersion(scenarioId, parseInt(versionNumber));
+      res.json(version);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  r.post('/pipeline/snapshot/:scenarioId', async (req, res) => {
+    try {
+      const { scenarioId } = req.params;
+      const scenario = await repos.scenarios.findById(scenarioId);
+      if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
+      const version = await VersionController.saveVersion(scenarioId, scenario, {
+        label: req.body.label || 'manual_snapshot',
+        pipeline_step: req.body.pipeline_step || 'manual',
+        changes_applied: req.body.changes_applied || 0,
+        changes_rejected: req.body.changes_rejected || 0,
+        manually_edited: req.body.manually_edited || false
+      });
+      res.json({ success: true, version });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  r.post('/pipeline/inject-ending-notes/:scenarioId', async (req, res) => {
+    try {
+      const { scenarioId } = req.params;
+      const { ending_notes } = req.body;
+      if (!ending_notes || !Array.isArray(ending_notes)) {
+        return res.status(400).json({ error: 'ending_notes array is required' });
+      }
+      const scenario = await repos.scenarios.findById(scenarioId);
+      if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
+      const playerRoles = scenario.playerRoles || scenario.player_roles || [];
+      for (const note of ending_notes) {
+        const role = playerRoles.find(r => r.name === note.role_name);
+        if (role) {
+          if (note.partial) role.partial = note.partial;
+          if (note.failure) role.failure = note.failure;
+          if (note.briefing) role.briefing = note.briefing;
+          if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
+          if (note.hook_1) role.hook1 = note.hook_1;
+          if (note.hook_2) role.hook2 = note.hook_2;
+          if (note.hook_3) role.hook3 = note.hook_3;
+          if (note.suggested_secret) role.suggestedSecret = note.suggested_secret;
+          if (note.access_level) role.accessLevel = note.access_level;
+          if (note.perspective) role.perspective = note.perspective;
+          if (note.description) role.description = note.description;
+        }
+      }
+      if (scenario.playerRoles) scenario.playerRoles = playerRoles;
+      if (scenario.player_roles) scenario.player_roles = playerRoles;
+      await repos.scenarios.save(scenario);
+      await VersionController.saveVersion(scenarioId, scenario, {
+        label: 'ending_notes_injected',
+        pipeline_step: 'ending_notes',
+        changes_applied: ending_notes.length
+      });
+      res.json({ success: true, rolesUpdated: ending_notes.length });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  console.log('[admin] Pipeline routes registered');
   return r;
 }

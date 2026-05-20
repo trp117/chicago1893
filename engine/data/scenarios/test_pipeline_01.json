@@ -1,0 +1,303 @@
+{
+  "id": "test_pipeline_01",
+  "title": "Titanic: Descent into Ice",
+  "synopsis": {
+    "working_title": "Titanic: Descent into Ice",
+    "historical_anchor": {
+      "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+      "date_time": "11:40 PM, April 14, 1912",
+      "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+    },
+    "shared_fact_ledger": [
+      {
+        "name": "Iceberg Collision",
+        "description": "The RMS Titanic struck an iceberg on its maiden voyage, causing critical damage to its hull."
+      },
+      {
+        "name": "Lifeboat Shortage",
+        "description": "The ship carries lifeboats for only about half of its total capacity, leading to a severe shortage."
+      },
+      {
+        "name": "Class Segregation",
+        "description": "Access to lifeboats and upper decks is heavily segregated by passenger class, with third-class passengers facing significant barriers."
+      }
+    ],
+    "perspectives": [
+      {
+        "role_name": "William 'Will' Carter",
+        "identity": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+        "tension": "Torn between his professional duty to assist privileged passengers and the primal instinct for self-preservation, witnessing the stark realities of class privilege and panic.",
+        "decision_point": "Whether to follow orders to maintain calm, help specific passengers he knows, or seek an advantage for his own survival amidst the chaos."
+      },
+      {
+        "role_name": "Arthur 'Art' Miller",
+        "identity": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+        "tension": "Overwhelmed by the urgency of sending SOS messages, facing equipment failures, and the growing realization that help may not arrive in time, all while battling exhaustion.",
+        "decision_point": "What messages to prioritize, when to abandon his post, and how to communicate the ship's dire situation to distant vessels."
+      },
+      {
+        "role_name": "Bridget O'Malley",
+        "identity": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+        "tension": "Facing severe barriers to accessing upper decks and lifeboats due to class restrictions, desperately trying to keep her brother safe and find a way to escape the sinking ship.",
+        "decision_point": "Whether to follow confusing and often discriminatory instructions, attempt to bypass locked gates and crew, or stay with her community in third class."
+      }
+    ],
+    "period_vocabulary": [
+      {
+        "term": "Wireless",
+        "meaning": "Early form of radio communication, used for sending telegraphic messages without wires."
+      },
+      {
+        "term": "Steward",
+        "meaning": "A male attendant on a ship, responsible for serving passengers, particularly in cabins and dining areas."
+      },
+      {
+        "term": "Steerage",
+        "meaning": "The lowest class of accommodation on a passenger ship, typically for immigrants or those with limited means (often referred to as Third Class on the Titanic)."
+      },
+      {
+        "term": "Bulkhead",
+        "meaning": "A dividing wall or barrier within the hull of a ship, designed to prevent water from spreading."
+      },
+      {
+        "term": "SOS",
+        "meaning": "The international Morse code distress signal, adopted in 1908."
+      }
+    ],
+    "tone": "Tragic, desperate, suspenseful, class-conscious, harrowing",
+    "session_length": "30 minutes"
+  },
+  "world": {
+    "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+    "date_time": "11:40 PM, April 14, 1912",
+    "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+  },
+  "player_roles": [
+    {
+      "name": "William 'Will' Carter",
+      "description": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+      "partial": {
+        "what_happened": "Will successfully guided a small group of first-class passengers, including a family he regularly served, to a partially filled lifeboat, ensuring their safe departure from the sinking ship before turning back to assist others or facing his own fate.",
+        "who_present": "William 'Will' Carter, specific first-class passengers",
+        "emotional_weight": "Bittersweet — A sense of duty fulfilled, but shadowed by the overwhelming tragedy and personal sacrifice.",
+        "closing_line": "Though the ship claimed him, the faces of those he saved would forever be his legacy in the icy depths."
+      },
+      "failure": {
+        "what_happened": "Overwhelmed by the escalating panic and the sheer number of desperate passengers, Will found himself unable to maintain order or effectively guide anyone to safety, ultimately succumbing to the chaos as the ship listed violently.",
+        "who_present": "William 'Will' Carter",
+        "emotional_weight": "Despair — A crushing realization of helplessness in the face of insurmountable disaster.",
+        "closing_line": "The last sound he heard was the roar of the ocean, a final, deafening testament to the ship's demise."
+      }
+    },
+    {
+      "name": "Arthur 'Art' Miller",
+      "description": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+      "partial": {
+        "what_happened": "Art, battling failing equipment and exhaustion, managed to transmit several clear SOS messages, including the ship's precise coordinates and dire situation, ensuring that the Carpathia and other vessels were accurately directed towards the disaster site, even as the power flickered and died.",
+        "who_present": "Arthur 'Art' Miller",
+        "emotional_weight": "Valiant — A profound sense of having completed a vital mission against impossible odds, despite personal peril.",
+        "closing_line": "His final message, a desperate plea for aid, echoed across the silent, star-strewn ocean, a beacon of hope for those who would follow."
+      },
+      "failure": {
+        "what_happened": "Despite his frantic efforts, Art's wireless equipment failed catastrophically after only a few garbled transmissions, leaving the Titanic's exact position and the full extent of its peril unclear to distant ships, severely hindering early rescue coordination.",
+        "who_present": "Arthur 'Art' Miller",
+        "emotional_weight": "Frustration — A bitter feeling of being thwarted by technology and fate at the most critical moment.",
+        "closing_line": "The silence of the dead wireless room was a colder echo than the ocean itself, sealing the ship's fate in darkness."
+      }
+    },
+    {
+      "name": "Bridget O'Malley",
+      "description": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+      "partial": {
+        "what_happened": "After navigating a maze of locked gates and panicked crowds, Bridget, with desperate resolve, managed to push her younger brother into a rapidly lowering lifeboat, but was either unable to secure a spot for herself or was separated in the ensuing chaos.",
+        "who_present": "Bridget O'Malley, her younger brother",
+        "emotional_weight": "Sacrificial — A heartbreaking triumph of love and selflessness amidst overwhelming despair.",
+        "closing_line": "The image of her brother's small, frightened face in the lifeboat was the last warmth she felt as the icy water embraced her."
+      },
+      "failure": {
+        "what_happened": "Despite her desperate attempts to find a way to the upper decks, Bridget and her younger brother remained trapped behind locked gates and confused instructions, ultimately swept away with the hundreds of others in steerage as the ship made its final plunge.",
+        "who_present": "Bridget O'Malley, her younger brother",
+        "emotional_weight": "Crushing — A profound sense of injustice and powerlessness against an unforgiving system and overwhelming disaster.",
+        "closing_line": "Their dreams of a new life in America dissolved into the freezing black waters, unheard and unseen."
+      }
+    }
+  ],
+  "epilogue": {},
+  "citations": [],
+  "createdAt": "2026-05-19T18:00:23.198Z",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Stokehold Argot",
+        "context": "Used by firemen, trimmers, and greasers working the boiler rooms and engine spaces below decks, spoken during shifts and emergencies.",
+        "terms": [
+          {
+            "term": "black gang",
+            "meaning": "collective name for all stokehold workers — firemen, trimmers, and coal passers — so called for the coal dust permanently staining their skin"
+          },
+          {
+            "term": "devil's hole",
+            "meaning": "the deepest, hottest section of the boiler room nearest the furnace doors"
+          },
+          {
+            "term": "trimming the bunkers",
+            "meaning": "redistributing coal within the storage bunkers to maintain the ship's balance and feed the furnaces evenly"
+          },
+          {
+            "term": "slice bar",
+            "meaning": "the long iron rod used to break up clinker and stoke the furnace; also used as an informal measure of a man's worth in the stokehold"
+          },
+          {
+            "term": "draw the fires",
+            "meaning": "to rake out and extinguish the furnaces — a phrase carrying grave finality when spoken in a sinking context"
+          },
+          {
+            "term": "dead horse",
+            "meaning": "wages already spent or owed before a voyage begins; a man working off a dead horse is working for nothing until the debt clears"
+          },
+          {
+            "term": "clinker",
+            "meaning": "the fused ash and slag residue left after coal burns; clearing it is filthy, dangerous work and a constant task"
+          }
+        ]
+      },
+      {
+        "name": "Wireless Operators' Shorthand",
+        "context": "Used exclusively by Marconi wireless operators transmitting and receiving Morse communications, both in routine traffic and during the disaster.",
+        "terms": [
+          {
+            "term": "CQD",
+            "meaning": "the distress signal in use at the time — 'CQ' meaning all stations attend, 'D' meaning distress; the predecessor to SOS"
+          },
+          {
+            "term": "QRN",
+            "meaning": "shorthand indicating atmospheric interference or static disrupting a transmission"
+          },
+          {
+            "term": "OM",
+            "meaning": "'old man' — the standard Marconi operator's familiar address for any fellow wireless man, regardless of age"
+          },
+          {
+            "term": "working traffic",
+            "meaning": "processing the backlog of passenger Marconigrams — personal telegrams paid by first-class passengers — a commercial duty that often crowded out ice warnings"
+          },
+          {
+            "term": "jamming the ether",
+            "meaning": "when competing signals from multiple ships overlap and render transmissions unintelligible"
+          },
+          {
+            "term": "ice report",
+            "meaning": "a navigational warning transmitted ship-to-ship about field ice, bergs, or growlers in a given position; several were received and not relayed to the bridge"
+          },
+          {
+            "term": "signing off",
+            "meaning": "formally closing a wireless session; on the night of the sinking, operators famously refused to sign off"
+          }
+        ]
+      },
+      {
+        "name": "First-Class Society Register",
+        "context": "The formal and informal language of upper-class Edwardian passengers in the first-class saloons, staterooms, and promenade decks.",
+        "terms": [
+          {
+            "term": "the season",
+            "meaning": "the London and New York social calendar of balls, dinners, and engagements that defined the lives of the wealthy; crossing the Atlantic was often done in service of it"
+          },
+          {
+            "term": "cutting",
+            "meaning": "the deliberate social act of ignoring or refusing to acknowledge an acquaintance in public — a devastating Edwardian snub"
+          },
+          {
+            "term": "in trade",
+            "meaning": "a politely damning phrase indicating someone earned their money through commerce rather than inheritance — socially inferior regardless of wealth"
+          },
+          {
+            "term": "new money",
+            "meaning": "wealth recently acquired through industry or speculation, as opposed to inherited fortune; regarded with suspicion by established families"
+          },
+          {
+            "term": "one's people",
+            "meaning": "a person's family, lineage, and social connections — the first inquiry made when assessing a stranger's suitability"
+          },
+          {
+            "term": "making a crossing",
+            "meaning": "the fashionable act of transatlantic travel itself, implying leisure, means, and social purpose"
+          },
+          {
+            "term": "below the salt",
+            "meaning": "of inferior social standing; originally referring to seating placement at formal dinners, used broadly to dismiss anyone deemed unworthy of company"
+          }
+        ]
+      },
+      {
+        "name": "Deck Officers' Bridge Cant",
+        "context": "Technical and professional language used among the officers, quartermasters, and lookouts managing the navigation and operation of the vessel.",
+        "terms": [
+          {
+            "term": "dead reckoning",
+            "meaning": "calculating the ship's current position using last known position, speed, heading, and elapsed time — no external reference, subject to fatal error"
+          },
+          {
+            "term": "making revolutions",
+            "meaning": "running the engines at a set number of propeller turns per minute; pushing revolutions was the measure of a captain's ambition on a passage"
+          },
+          {
+            "term": "growler",
+            "meaning": "a low-lying, nearly submerged iceberg that sits barely above the waterline and is nearly invisible at night — more dangerous than a full berg"
+          },
+          {
+            "term": "the con",
+            "meaning": "command authority over the helm; to have the con is to be the officer currently directing the ship's course"
+          },
+          {
+            "term": "hard-a-starboard",
+            "meaning": "the helm order to turn the tiller fully to starboard, which in the tiller-steering convention of the era swung the bow to port — a source of lasting controversy"
+          },
+          {
+            "term": "sea room",
+            "meaning": "open, unobstructed water with sufficient distance to maneuver safely; losing sea room means options are running out"
+          },
+          {
+            "term": "standing orders",
+            "meaning": "the captain's written instructions governing conduct of the watch in his absence — the degree to which they addressed ice became a matter of inquiry"
+          }
+        ]
+      },
+      {
+        "name": "Steerage Vernacular",
+        "context": "The mixed-language working vocabulary of third-class passengers — largely immigrants — communicated across English, Irish, Scandinavian, and Eastern European tongues in the lower decks.",
+        "terms": [
+          {
+            "term": "the promised land",
+            "meaning": "America — spoken with genuine reverence or bitter irony depending on the speaker's experience and the moment"
+          },
+          {
+            "term": "steerage",
+            "meaning": "third-class passage, named for the aft lower decks near the steering gear where such passengers were historically housed; a word carrying shame and aspiration equally"
+          },
+          {
+            "term": "the muster",
+            "meaning": "the lifeboat assembly drill — never properly conducted before the sinking, leaving steerage passengers with no knowledge of where to go"
+          },
+          {
+            "term": "papers",
+            "meaning": "immigration documents, passage tickets, and identity records — the most precious possessions a steerage passenger carried, often sewn into clothing"
+          },
+          {
+            "term": "passage money",
+            "meaning": "the sum scraped together by families and communities to buy a single ticket — losing the ship meant losing everything that money represented"
+          },
+          {
+            "term": "the gate",
+            "meaning": "the physical barriers and locked grilles separating third-class areas from upper decks — their status during the sinking became a matter of bitter historical dispute"
+          },
+          {
+            "term": "going out",
+            "meaning": "emigrating permanently — not traveling, not visiting, but leaving everything behind with no expectation of return"
+          }
+        ]
+      }
+    ]
+  },
+  "updatedAt": "2026-05-19T18:19:20.442Z"
+}

@@ -1,0 +1,110 @@
+{
+  "version": 13,
+  "label": "gpt_reviewed_approved",
+  "scenarioId": "test_pipeline_01",
+  "createdAt": "2026-05-19T18:03:47.233Z",
+  "pipeline_step": "gpt_reviewed",
+  "changes_applied": 3,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "test_pipeline_01",
+    "title": "Titanic: Descent into Ice",
+    "synopsis": {
+      "working_title": "Titanic: Descent into Ice",
+      "historical_anchor": {
+        "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+        "date_time": "11:40 PM, April 14, 1912",
+        "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+      },
+      "shared_fact_ledger": [
+        {
+          "name": "Iceberg Collision",
+          "description": "The RMS Titanic struck an iceberg on its maiden voyage, causing critical damage to its hull."
+        },
+        {
+          "name": "Lifeboat Shortage",
+          "description": "The ship carries lifeboats for only about half of its total capacity, leading to a severe shortage."
+        },
+        {
+          "name": "Class Segregation",
+          "description": "Access to lifeboats and upper decks is heavily segregated by passenger class, with third-class passengers facing significant barriers."
+        }
+      ],
+      "perspectives": [
+        {
+          "role_name": "William 'Will' Carter",
+          "identity": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+          "tension": "Torn between his professional duty to assist privileged passengers and the primal instinct for self-preservation, witnessing the stark realities of class privilege and panic.",
+          "decision_point": "Whether to follow orders to maintain calm, help specific passengers he knows, or seek an advantage for his own survival amidst the chaos."
+        },
+        {
+          "role_name": "Arthur 'Art' Miller",
+          "identity": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+          "tension": "Overwhelmed by the urgency of sending SOS messages, facing equipment failures, and the growing realization that help may not arrive in time, all while battling exhaustion.",
+          "decision_point": "What messages to prioritize, when to abandon his post, and how to communicate the ship's dire situation to distant vessels."
+        },
+        {
+          "role_name": "Bridget O'Malley",
+          "identity": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+          "tension": "Facing severe barriers to accessing upper decks and lifeboats due to class restrictions, desperately trying to keep her brother safe and find a way to escape the sinking ship.",
+          "decision_point": "Whether to follow confusing and often discriminatory instructions, attempt to bypass locked gates and crew, or stay with her community in third class."
+        }
+      ],
+      "period_vocabulary": [
+        {
+          "term": "Wireless",
+          "meaning": "Early form of radio communication, used for sending telegraphic messages without wires."
+        },
+        {
+          "term": "Steward",
+          "meaning": "A male attendant on a ship, responsible for serving passengers, particularly in cabins and dining areas."
+        },
+        {
+          "term": "Steerage",
+          "meaning": "The lowest class of accommodation on a passenger ship, typically for immigrants or those with limited means (often referred to as Third Class on the Titanic)."
+        },
+        {
+          "term": "Bulkhead",
+          "meaning": "A dividing wall or barrier within the hull of a ship, designed to prevent water from spreading."
+        },
+        {
+          "term": "SOS",
+          "meaning": "The international Morse code distress signal, adopted in 1908."
+        }
+      ],
+      "tone": "Tragic, desperate, suspenseful, class-conscious, harrowing",
+      "session_length": "30 minutes"
+    },
+    "world": {
+      "location": "North Atlantic Ocean, approximately 400 miles south of Newfoundland",
+      "date_time": "11:40 PM, April 14, 1912",
+      "fixed_outcome": "The RMS Titanic sinks to the bottom of the North Atlantic, resulting in a catastrophic loss of life due to insufficient lifeboats and freezing waters."
+    },
+    "player_roles": [
+      {
+        "name": "William 'Will' Carter",
+        "description": "A diligent first-class steward, accustomed to serving the elite, now grappling with the breakdown of order.",
+        "partial": {},
+        "failure": {}
+      },
+      {
+        "name": "Arthur 'Art' Miller",
+        "description": "A junior wireless operator, responsible for transmitting crucial distress signals and receiving replies.",
+        "partial": {},
+        "failure": {}
+      },
+      {
+        "name": "Bridget O'Malley",
+        "description": "A young Irish immigrant in third class, traveling with her younger brother, hoping for a new life in America.",
+        "partial": {},
+        "failure": {}
+      }
+    ],
+    "epilogue": {},
+    "citations": [],
+    "createdAt": "2026-05-19T18:00:23.198Z"
+  }
+}

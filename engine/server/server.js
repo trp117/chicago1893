@@ -93,6 +93,7 @@ app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   H
 
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
 app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
+app.get('/admin/pipeline.html', (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
 app.get('/admin/*', (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
 
 const PORT = process.env.PORT || process.env.ENGINE_PORT || 3002;
