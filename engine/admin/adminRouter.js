@@ -1566,32 +1566,35 @@ Return ONLY valid JSON in this exact structure:
       }
       const scenario = await repos.scenarios.findById(scenarioId);
       if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
-      const playerRoles = scenario.playerRoles || scenario.player_roles || [];
+      const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
+      let updated = 0;
       for (const note of ending_notes) {
         const role = playerRoles.find(r => r.name === note.role_name);
         if (role) {
-          if (note.partial) role.partial = note.partial;
-          if (note.failure) role.failure = note.failure;
-          if (note.briefing) role.briefing = note.briefing;
+          if (note.briefing)          role.briefing          = note.briefing;
           if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
-          if (note.hook_1) role.hook1 = note.hook_1;
-          if (note.hook_2) role.hook2 = note.hook_2;
-          if (note.hook_3) role.hook3 = note.hook_3;
-          if (note.suggested_secret) role.suggestedSecret = note.suggested_secret;
-          if (note.access_level) role.accessLevel = note.access_level;
-          if (note.perspective) role.perspective = note.perspective;
-          if (note.description) role.description = note.description;
+          if (note.hook_1)            role.hook1             = note.hook_1;
+          if (note.hook_2)            role.hook2             = note.hook_2;
+          if (note.hook_3)            role.hook3             = note.hook_3;
+          if (note.suggested_secret)  role.suggestedSecret   = note.suggested_secret;
+          if (note.access_level)      role.accessLevel       = note.access_level;
+          if (note.perspective)       role.perspective       = note.perspective;
+          if (note.description)       role.description       = note.description;
+          if (note.partial || note.failure) {
+            role.ending_notes = role.ending_notes || {};
+            if (note.partial) role.ending_notes.partial = note.partial;
+            if (note.failure) role.ending_notes.failure = note.failure;
+          }
+          repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(role)));
+          updated++;
         }
       }
-      if (scenario.playerRoles) scenario.playerRoles = playerRoles;
-      if (scenario.player_roles) scenario.player_roles = playerRoles;
-      await repos.scenarios.save(scenario);
       await VersionController.saveVersion(scenarioId, scenario, {
         label: 'ending_notes_injected',
         pipeline_step: 'ending_notes',
-        changes_applied: ending_notes.length
+        changes_applied: updated
       });
-      res.json({ success: true, rolesUpdated: ending_notes.length });
+      res.json({ success: true, rolesUpdated: updated });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
