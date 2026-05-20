@@ -275,6 +275,32 @@ function buildEpilogueSummary(state, endResult) {
   };
 }
 
+function normSource(val) {
+  if (!val) return { citation: '', url: null, access_note: null };
+  if (typeof val === 'string') return { citation: val, url: null, access_note: null };
+  return { citation: val.citation || '', url: val.url || null, access_note: val.access_note || null };
+}
+
+function assembleBibliography(scenarioData, summary, sessionState) {
+  const interacted  = new Set(summary.interacted_characters);
+  const activeFacts = new Set(
+    (sessionState?.technicalFacts || [])
+      .filter(f => f.pre_seeded && (f.status === 'current' || f.status === 'stale'))
+      .map(f => f.fact_id)
+  );
+  const bibMap = new Map();
+  (scenarioData.epilogue?.character_fates || [])
+    .filter(f => interacted.has(f.character_id) && f.primary_source)
+    .forEach(f => { const s = normSource(f.primary_source); if (s.citation && !bibMap.has(s.citation)) bibMap.set(s.citation, s); });
+  (scenarioData.technical_facts?.facts || [])
+    .filter(f => activeFacts.has(f.fact_id) && f.source)
+    .forEach(f => { const s = normSource(f.source); if (s.citation && !bibMap.has(s.citation)) bibMap.set(s.citation, s); });
+  return [...bibMap.values()].sort((a, b) => {
+    if (!!a.url !== !!b.url) return a.url ? -1 : 1;
+    return a.citation.localeCompare(b.citation);
+  });
+}
+
 async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey) {
   const systemPrompt = [
     'You are writing the historical epilogue for a completed Living History session. This is not closing prose. It is historical record — a different register entirely: precise, unsentimental, a careful historian\'s final note. The closing prose has already been delivered. Do not repeat it or continue its style.',
@@ -557,10 +583,10 @@ export function createGameRouter(repos, config = {}) {
         ``,
       ].join('\n');
 
-      writeFile(
-        join(TRANSCRIPTS_DIR, `${sessionId}.md`),
-        transcriptHeader
-      ).catch(e => console.error('[TRANSCRIPT]', e.message));
+      const transcriptPath = join(TRANSCRIPTS_DIR, `${sessionId}.md`);
+      console.log('[TRANSCRIPT-START] writing — path:', transcriptPath, 'scenario:', scenarioId, 'role:', roleId);
+      await writeFile(transcriptPath, transcriptHeader)
+        .catch(e => console.error('[TRANSCRIPT-START ERROR]', e.message));
 
       sendSse(res, { type: 'done', output, nextState, sessionId });
       res.end();
@@ -869,7 +895,11 @@ export function createGameRouter(repos, config = {}) {
         }
       }
 
-      console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(output.npcMoments?.map(m => m.npc))} isEnding=${output.endState?.isEnding ?? false}`);
+      const npcNames = output.npcMoments?.map(m => {
+        const char = characters.find(c => c.id === m.npc);
+        return char?.name || m.npc;
+      });
+      console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(npcNames)} isEnding=${output.endState?.isEnding ?? false}`);
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 
@@ -1008,7 +1038,12 @@ export function createGameRouter(repos, config = {}) {
 
     // Resolve scenario and role for structured endings
     const scenarioMatch = transcript.match(/^##\s+Scenario:\s*(.+)$/m) || transcript.match(/^scenario:\s*(.+)$/m);
-    const scenarioId    = scenarioMatch?.[1]?.trim();
+    let scenarioId      = scenarioMatch?.[1]?.trim();
+    // Fallback: read scenarioId from session state if transcript header is absent
+    if (!scenarioId && sessionId) {
+      const sess = appData.getSession(sessionId);
+      scenarioId = sess?.scenarioId || null;
+    }
     const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
     const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
 
@@ -1082,30 +1117,61 @@ export function createGameRouter(repos, config = {}) {
       });
       const prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
 
-      // Generate historical epilogue if data block is ready and reviewed
+      // Generate historical epilogue and bibliography
+      console.log('[EPILOGUE-CLOSE] reached closing-prose route — sessionId:', sessionId);
       let epilogueResult = null;
+      let bibliography   = [];
+      const sessionState = sessionId ? appData.getSession(sessionId) : null;
+      console.log('[EPILOGUE-CLOSE] conditions — generated:', scenarioData?.epilogue?.generated, 'reviewed:', scenarioData?.epilogue?.reviewed);
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
+        const summary = buildEpilogueSummary(sessionState, endResult);
+        console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome);
+
         try {
-          const sessionState = sessionId ? repos.sessions.findById(sessionId) : null;
-          const summary      = buildEpilogueSummary(sessionState, endResult);
-          epilogueResult     = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey);
+          console.log('[EPILOGUE-CLOSE] calling epilogue API');
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey);
         } catch (e) {
           console.error('[EPILOGUE]', e.message);
         }
+        console.log('[EPILOGUE-CLOSE] epilogue API result — success:', !!epilogueResult, 'length:', epilogueResult?.text?.length);
+
+        try {
+          bibliography = assembleBibliography(scenarioData, summary, sessionState);
+        } catch (e) {
+          console.error('[BIBLIOGRAPHY]', e.message);
+        }
+        console.log('[EPILOGUE-CLOSE] bibliography assembled — entries:', bibliography?.length);
+
       } else if (scenarioData?.epilogue?.generated && !scenarioData?.epilogue?.reviewed) {
         console.warn(`[EPILOGUE] Skipped for session ${sessionId} — epilogue data not reviewed on scenario "${scenarioId}"`);
       }
 
-      sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult });
+      sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult, bibliography });
       res.end();
 
-      // Append closing prose and epilogue to the session transcript
+      // Write closing sections to the session transcript
       if (prose) {
         try {
+          const withResult = transcript.replace(/^## Result: .+$/m, `## Result: ${endResult || 'unknown'}`);
+          await writeFile(transcriptPath, withResult, 'utf8');
+
           const aftermath = scenarioData?.historical_aftermath || '';
           const lines = ['', '## Closing Prose', '', prose];
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
-          if (epilogueResult?.text) lines.push('', '## Historical Record', '', epilogueResult.text);
+          if (epilogueResult?.text) {
+            lines.push('', '---', '', '## Historical Record', '', epilogueResult.text);
+          }
+          if (bibliography?.length) {
+            lines.push('', '---', '', '## Primary Sources', '');
+            for (const src of bibliography) {
+              if (src.url) {
+                lines.push(`- [${src.citation}](${src.url})`);
+              } else {
+                lines.push(`- ${src.citation}`);
+                if (src.access_note) lines.push(`  *(${src.access_note})*`);
+              }
+            }
+          }
           lines.push('');
           await appendFile(transcriptPath, lines.join('\n'));
         } catch (e) {

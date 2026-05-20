@@ -94,6 +94,7 @@ textarea { width: 100%; resize: vertical; border-radius: 14px; border: 1px solid
 .mic-btn { position: absolute; bottom: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--panel-soft); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: border-color 0.15s, color 0.15s, background 0.15s; font-weight: normal; }
 .mic-btn:hover { border-color: var(--accent); color: var(--accent); }
 .mic-btn.listening { border-color: #c0392b; background: #2a1010; color: #e74c3c; animation: mic-pulse 1.2s ease-in-out infinite; }
+#free-input-restricted-label { text-align: center; color: var(--text-soft); font-size: 0.9rem; font-style: italic; padding: 10px 0 4px; }
 @keyframes mic-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.45); } 50% { box-shadow: 0 0 0 7px rgba(231,76,60,0); } }
 button { border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #1a150c; font-weight: bold; cursor: pointer; }
 ul { margin: 0; padding-left: 0; list-style: none; }
@@ -436,6 +437,7 @@ li { margin-bottom: 8px; }
           </button>
         </div>
       </div>
+      <p id="free-input-restricted-label" class="hidden">Choose an action below.</p>
       <form id="input-form" class="input-row">
         <div class="input-textarea-wrap">
           <textarea id="player-input" placeholder="What do you say or do?" rows="2"></textarea>
@@ -627,9 +629,15 @@ const arrowLeft  = document.querySelector('.choices-arrow--left');
 const arrowRight = document.querySelector('.choices-arrow--right');
 const formEl     = document.getElementById('input-form');
 const inputEl    = document.getElementById('player-input');
+const freeInputRestrictedLabel = document.getElementById('free-input-restricted-label');
 const choicesAreaWrapEl = document.getElementById('choices-area-wrap');
 const streamOptionsDots = document.getElementById('stream-options-dots');
 const submitBtn         = formEl.querySelector('button[type="submit"]');
+
+function applyFreeInputMode(allowed) {
+  formEl.classList.toggle('hidden', !allowed);
+  freeInputRestrictedLabel.classList.toggle('hidden', allowed);
+}
 
 const scrollHintEl = (() => {
   const wrap = document.createElement('div');
@@ -1821,6 +1829,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   if (!role) return;
 
   currentRoleId = roleId;
+  applyFreeInputMode(scenario.allow_free_input !== false);
 
   // Temporary local state so the sidebar is visible while /start is in flight
   gameState = buildClientInitialState(scenario, role);
@@ -1978,6 +1987,7 @@ function restartGame() {
   choicesAreaWrapEl.style.transition = '';
   streamOptionsDots.classList.add('hidden');
   submitBtn.disabled = false;
+  applyFreeInputMode(true);
 
   const bottomBar = document.querySelector('.bottom-bar');
   if (bottomBar) { bottomBar.style.transition = ''; bottomBar.style.opacity = ''; }

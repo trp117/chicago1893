@@ -1478,6 +1478,7 @@ function renderScenarioSection(data) {
     ${edField('Tone',              edInput('scenario.tone',             toneVal, 'data-type="csv"'), 'Comma-separated')}
     ${edField('Historical Realism', edInput('scenario.historicalRealism', s.historicalRealism))}
     ${edField('Structured Endings', `<select data-path="scenario.structured_endings_enabled"><option value="false"${!s.structured_endings_enabled ? ' selected' : ''}>Disabled</option><option value="true"${s.structured_endings_enabled ? ' selected' : ''}>Enabled — notes-guided prose for partial and failure endings</option></select>`, 'When enabled, partial and failure endings use per-role ending notes. Success always uses the transcript path.')}
+    ${edField('Free Text Input', `<select data-path="scenario.allow_free_input"><option value="true"${s.allow_free_input !== false ? ' selected' : ''}>Enabled — players can type their own actions</option><option value="false"${s.allow_free_input === false ? ' selected' : ''}>Restricted — players choose from suggestions only</option></select>`, 'When restricted, the text input and mic are hidden. Players see only the generated suggestion chips and a directional label. Use for educational contexts or guided play.')}
     ${edDetails('Introduction', intro.enabled ? 'enabled' : 'off', introBody, !!intro.enabled)}
   `);
 }
