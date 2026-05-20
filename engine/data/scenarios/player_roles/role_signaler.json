@@ -1,0 +1,69 @@
+{
+  "id": "role_signaler",
+  "scenarioId": "zero_hour_cantigny",
+  "name": "The Signaler",
+  "description": "You are the wire-layer advancing behind the assault wave, uncoiling copper telephone line across No Man's Land. You found the cut at Delta-7 — and what you found beside it tells you this was not an accident.",
+  "startLocationId": "loc_wire_splice_point",
+  "startingKnowledge": [
+    "The forward telephone line at reference Delta-7 was cleanly severed at a 45-degree angle within the last two hours.",
+    "A pair of Prussian-eagle stamped Feldzange wire cutters was left directly in the mud beside the severed junction.",
+    "A bootprint beside the wire cut matches an American officer's issue heel rather than standard enlisted trench boots."
+  ],
+  "accessLevel": "staff",
+  "perspective": "first-person sensory",
+  "briefing": "You are kneeling in the mud at the bottom of a shell crater in No Man's Land, forty meters behind the assault wave, with the two cut ends of the forward copper wire in your hands and a pair of German wire cutters lying in the clay eighteen inches from your left knee. The barrage is moving away from you to the northeast, its sound shifting from a physical impact in your chest to a continuous rolling thunder, and the smoke it leaves behind is settling into the crater field around you in slow gray drifts. You have been splicing wire under fire for fourteen months and you know what shrapnel does to copper line—it tears, it frays, it leaves oxidized ends that smell of heat. These ends are bright and the cut is at 45 degrees. Someone stood in this crater, probably before dawn, and made a deliberate, unhurried cut with a tool that was manufactured in Germany.",
+  "character_hooks": [
+    "The bright, unoxidized gleam of the twin copper strands lying separated in the gray Picardy clay.",
+    "The discovery of a single strand of high-grade khaki wool caught on the wire's raw end, matching officer-tier uniform fabric.",
+    "The failure of the lineman's test as you bite the line and find no current flowing back from the artillery direction post."
+  ],
+  "suggested_secret": "You deliberately delayed your advance into No Man's Land by twenty minutes due to acute shell shock, meaning you were entirely alone with the evidence and have no independent alibi for that period.",
+  "opening": {
+    "narrative": "It is 06:05 on the morning of May 28th, 1918. You are in a shell crater at grid reference Delta-7, forty meters behind the assault wave, holding the two ends of a severed copper telephone wire and a pair of German wire cutters. The barrage is moving away. The smoke is settling. Wire_Continuity is Severed. Nobody in Cantigny can call for fire support until you fix this — but what you are holding in your hands may be more important than the splice.",
+    "npcMoments": [
+      {
+        "characterId": "char_kowalski",
+        "action": "is already at the crater's edge, looking back toward the jump-off trench with an expression that is trying to decide whether to run back or push forward"
+      }
+    ],
+    "choices": [
+      "Splice the wire immediately and push forward to establish the forward station — the communication gap is the priority",
+      "Secure the German wire cutters as evidence and send a runner back to the artillery dugout before doing anything else",
+      "Move forward to find a witness who can confirm you found the cutters here, before anyone can claim you planted them"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "wire spool — 200 meters copper",
+      "splice kit — pliers, tape, bare wire",
+      "field telephone handset",
+      "German Feldzange wire cutters — found at Delta-7"
+    ],
+    "flags": {
+      "wire_spliced": false,
+      "evidence_secured": false,
+      "forward_station_established": false
+    },
+    "suspicion": {
+      "char_farrow": 0,
+      "char_renard": 0,
+      "char_voss": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:19:34.169Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully splice the main line at Delta-7 and restore Wire_Continuity to Operational, allowing the forward companies to call down defensive fire against the German infantry probes. However, you choose to conceal the officer's uniform thread and the wire cutters to avoid framing yourself, leaving the saboteur's broader intelligence network active within the division.",
+      "who_present": "The Doughboy, Private First Class Tadeusz Kowalski",
+      "emotional_weight": "Compromised Survival—the relief of saving the line accompanied by the lingering anxiety of a hidden truth that could catch up to you.",
+      "closing_line": "The line buzzed with life again, but the German cutters remained buried deep in your kit bag."
+    },
+    "failure": {
+      "what_happened": "While attempting to collect forensic evidence from the bootprint and the cut wire, a heavy shell fragments your backup reels and severs the line in multiple rear locations. Wire_Continuity remains Severed through the afternoon, leaving the forward battalion completely blind and unable to direct defensive fire.",
+      "who_present": "Private First Class Tadeusz Kowalski",
+      "emotional_weight": "Systemic Severance—the paralyzing realization that you were studying a crime scene while the network itself was dying around you.",
+      "closing_line": "The copper went cold in your hands, and the artillery behind the ridge fell silent."
+    }
+  }
+}

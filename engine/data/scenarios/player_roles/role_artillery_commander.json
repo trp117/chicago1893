@@ -1,0 +1,72 @@
+{
+  "id": "role_artillery_commander",
+  "scenarioId": "zero_hour_cantigny",
+  "name": "The Artillery Commander",
+  "description": "You command the guns that will make or break this assault. You control Barrage_Sync and hold the master fire tables — but someone has tampered with them, and every minute you spend investigating is a minute the barrage runs on corrupted data.",
+  "startLocationId": "loc_artillery_dugout",
+  "startingKnowledge": [
+    "The fire tables were signed and locked at 23:00, and they do not match the fragment the runner brought in from the forward area.",
+    "Lieutenant Farrow was the last officer with authorized access to the map-table case before the 03:00 stand-to.",
+    "Barrage_Sync initializes at 75 and drops rapidly if the batteries continue tracking the falsified timing tables."
+  ],
+  "accessLevel": "admin",
+  "perspective": "third-person analytical",
+  "briefing": "You are standing at the map table in the reinforced earth dugout, twelve feet below the surface of Picardy, with a fragment of printed fire table in your left hand and the master copy in your right, and the two documents do not agree. The barrage opened four minutes ago—you can feel it in the log beams above your head, a continuous low tremor like a train that never passes—and it opened on the schedule in your right hand, the one you signed at 23:00 last night, the one you locked in the steel-banded case. The fragment in your left hand came in with a runner from the wire party at 05:56: a torn page found in the mud near the forward staging area, and it shows barrage lifts advancing 200 meters ahead of your eastern-sector schedule. Either someone has a copy of your tables that does not exist, or someone has been inside your locked case. You know who had access, you know the timeline, and men are walking behind that curtain of steel right now, trusting you to know the answer.",
+  "character_hooks": [
+    "The sudden loss of synchronization on the eastern sector as battery salvos begin walking out of alignment.",
+    "The discovery that the seal on your steel-banded map-table case has been cleanly sheared with a sharp instrument.",
+    "An outgoing line call from your dugout logged by Corporal Beaumont to a French liaison number at 04:50."
+  ],
+  "suggested_secret": "McCormick discovered a minor calculation error in the original fire tables last night and requested a correction, but he never personally verified the revised page before locking it.",
+  "opening": {
+    "narrative": "It is 05:57 on the morning of May 28th, 1918. The barrage opened one minute ago, and the dugout shakes with each salvo from the battery above. A runner arrived sixty seconds before zero hour with a torn fragment of fire table that does not match the master copy on your map table. Lieutenant Farrow is present. Corporal Beaumont is at the telephone. The guns are firing. The men are moving. And someone has been inside your locked case.",
+    "npcMoments": [
+      {
+        "characterId": "char_farrow",
+        "action": "stands at the edge of the map table, watching McCormick compare the documents, his expression carefully neutral"
+      },
+      {
+        "characterId": "char_beaumont",
+        "action": "has his hand on the telephone handset and is watching McCormick's face with the focused attention of someone who intends to write this down"
+      }
+    ],
+    "choices": [
+      "Confront Farrow directly about the discrepancy between the two fire table versions",
+      "Order Beaumont to pull the telephone log for the last six hours before examining anything else",
+      "Send a runner to halt the eastern-sector guns while you verify which schedule is authentic"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "signed master fire tables",
+      "map-table case key",
+      "field telephone access"
+    ],
+    "flags": {
+      "farrow_confronted": false,
+      "barrage_halted": false,
+      "telephone_log_reviewed": false
+    },
+    "suspicion": {
+      "char_farrow": 0,
+      "char_renard": 0,
+      "char_voss": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:19:34.167Z",
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully identify the corrupted fire tables and manually override the firing data for the 5th Field Artillery, stabilizing the barrage sync before the infantry is completely exposed. However, your intense focus on the calculations delays the evacuation of the lower signal bunker during a retaliatory counter-battery stonk, resulting in the loss of critical log books and several operators.",
+      "who_present": "The Signaler, Corporal James Beaumont",
+      "emotional_weight": "Flawed Command—the profound professional validation of correcting a lethal trajectory, paid for with the lives of the operators under your roof.",
+      "closing_line": "The guns shifted their elevation just in time, but the smell of burnt insulation and turned clay inside the bunker stayed with you."
+    },
+    "failure": {
+      "what_happened": "You delay your intervention while attempting to verify the discrepancies with French division liaison staff. The eastern sector batteries continue tracking the falsified tables, causing the rolling barrage to lift 120 meters too early and walking shells directly into your own advancing infantry companies.",
+      "who_present": "Corporal James Beaumont, Lieutenant Gerald Farrow",
+      "emotional_weight": "Bureaucratic Paralysis—the devastating realization that an officer's technical hesitation can liquidate an entire infantry frontage.",
+      "closing_line": "The fire tables remained uncorrected, and the silence from the forward line became absolute."
+    }
+  }
+}
