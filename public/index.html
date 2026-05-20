@@ -3,1561 +3,544 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Project Limen — immersive historical fiction where you question witnesses, gather clues, and solve mysteries drawn from real events.">
-<meta property="og:title" content="Project Limen">
-<meta property="og:site_name" content="Project Limen">
-<meta property="og:url" content="https://projectlimen.com">
-<title>Project Limen</title>
+<meta name="description" content="Ledger 250 — 25 defining American crises across 250 years. History's outcomes are fixed. The human cost of reaching them is not.">
+<meta property="og:title" content="Ledger 250">
+<meta property="og:description" content="You cannot change what happened. You can only discover what it cost.">
+<meta property="og:url" content="https://ledger250.com">
+<title>Ledger 250</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
 <style>
-
-/* ── RESET & ROOT ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-:root {
-  --ink:        #0d0b08;
-  --parchment:  #f5f0e8;
-  --ash:        #3a3530;
-  --dark-ash:   #1e1b18;
-  --wire:       #2a2520;
-  --gold:       #c49a3c;
-  --gold-light: #e8c46a;
-  --pad-x: clamp(16px, 5vw, 64px);
-  --pad-y: clamp(48px, 8vw, 96px);
-  --gap: 2px;
-}
-
-body {
-  background: var(--ink);
-  color: var(--parchment);
-  font-family: 'Barlow', sans-serif;
-  font-weight: 300;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── GRAIN ── */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 9000;
-  opacity: 0.3;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
-}
-
-/* ─────────────────────────── NAV ── */
-.nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 200;
-  padding: 16px var(--pad-x);
-  display: flex; align-items: center; justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(13,11,8,0.96) 0%, transparent 100%);
-}
-.nav-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(16px, 2.5vw, 22px);
-  font-weight: 300; letter-spacing: 0.14em;
-  color: var(--gold-light); text-transform: uppercase; white-space: nowrap;
-}
-.nav-logo span { color: var(--parchment); opacity: 0.4; margin: 0 5px; }
-.nav-links { display: flex; gap: clamp(14px, 2.5vw, 32px); list-style: none; }
-.nav-links a {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px; font-weight: 500; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--parchment); opacity: 0.55;
-  text-decoration: none; transition: opacity 0.2s; white-space: nowrap;
-}
-.nav-links a:hover { opacity: 1; }
-.nav-cta { opacity: 0.9 !important; color: var(--gold-light) !important; }
-@media (max-width: 600px) { .nav-hide { display: none; } }
-
-/* ─────────────────────────── HERO ── */
-.hero {
-  position: relative; min-height: 100svh;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 0 var(--pad-x) clamp(52px, 9vh, 96px);
-  overflow: hidden;
-}
-.hero-bg {
-  position: absolute; inset: 0;
-  background: #0c0a22;
-}
-.hero-bg svg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-}
-.hero-content { position: relative; max-width: 860px; }
-.hero-rule {
-  width: 48px; height: 1px; background: var(--gold);
-  margin-bottom: 18px; opacity: 0;
-  animation: fadeUp 0.9s 0.2s forwards;
-}
-.hero-eyebrow {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.38em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
-  opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
-}
-.hero-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(44px, 9vw, 100px);
-  font-weight: 300; line-height: 0.94; letter-spacing: -0.01em;
-  color: var(--parchment); opacity: 0;
-  animation: fadeUp 0.9s 0.55s forwards;
-}
-.hero-title em { font-style: italic; color: var(--gold-light); }
-.hero-sub {
-  margin-top: clamp(16px, 3vw, 28px);
-  font-size: clamp(14px, 1.8vw, 16px); line-height: 1.65;
-  color: var(--parchment); opacity: 0; max-width: 500px;
-  animation: fadeUp 0.9s 0.75s forwards;
-}
-.hero-sub-inner { opacity: 0.72; }
-.hero-cta {
-  margin-top: clamp(24px, 4vw, 40px);
-  display: flex; flex-wrap: wrap; gap: 12px;
-  opacity: 0; animation: fadeUp 0.9s 0.95s forwards;
-}
-.hero-brand {
-  position: absolute;
-  top: clamp(100px, 22vh, 180px);
-  left: 0; right: 0;
-  text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(26px, 4.5vw, 52px);
-  font-weight: 300; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--gold-light);
-  opacity: 0; animation: fadeUp 0.9s 0.1s forwards;
-}
-.hero-tagline {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--parchment); opacity: 0.8;
-}
-.btn-primary {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px; font-weight: 600; letter-spacing: 0.28em;
-  text-transform: uppercase; color: var(--ink);
-  background: var(--gold); border: none;
-  padding: 13px 28px; cursor: pointer;
-  text-decoration: none; display: inline-block;
-  transition: background 0.2s, transform 0.15s;
-}
-.btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
-.btn-ghost {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px; font-weight: 500; letter-spacing: 0.28em;
-  text-transform: uppercase; color: var(--parchment);
-  background: transparent; border: 1px solid rgba(245,240,232,0.22);
-  padding: 13px 28px; cursor: pointer;
-  text-decoration: none; display: inline-block;
-  transition: border-color 0.2s, color 0.2s;
-}
-.btn-ghost:hover { border-color: var(--gold); color: var(--gold-light); }
-
-/* ─────────────────────────── SECTION CHROME ── */
-.section { padding: var(--pad-y) var(--pad-x); }
-.section--dark { background: var(--ink); }
-.section--mid  { background: #0f0d0a; }
-
-.section-header {
-  display: flex; align-items: flex-end;
-  justify-content: space-between; gap: 16px;
-  margin-bottom: clamp(22px, 4vw, 40px);
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(245,240,232,0.09);
-}
-.section-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.38em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
-}
-.section-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(22px, 3.5vw, 38px);
-  font-weight: 300; color: var(--parchment); line-height: 1.1;
-}
-.section-link {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.25em;
-  text-transform: uppercase; color: var(--gold);
-  text-decoration: none; opacity: 0.65; white-space: nowrap;
-  transition: opacity 0.2s; flex-shrink: 0;
-}
-.section-link:hover { opacity: 1; }
-
-/* ─────────────────────────── FEATURED GRID ──
-   Mobile:  single column stack
-   ≥600px:  2 cols, large card spans 2
-   ≥1024px: 3 cols, 1.55 / 1 / 1
-──────────────────────────────────────────── */
-.featured-grid {
-  display: grid;
-  gap: var(--gap);
-  grid-template-columns: 1fr;   /* mobile */
-}
-@media (min-width: 600px) {
-  .featured-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 320px;
-  }
-  .fc-large { grid-column: span 2; }
-}
-@media (min-width: 1024px) {
-  .featured-grid {
-    grid-template-columns: 1.55fr 1fr 1fr;
-    grid-auto-rows: 420px;
-  }
-  .fc-large { grid-column: span 1; }
-}
-
-.featured-card {
-  position: relative; overflow: hidden; cursor: pointer;
-  background: var(--dark-ash); height: 320px;
-}
-@media (min-width: 600px) { .featured-card { height: 320px; } }
-@media (min-width: 1024px) { .featured-card { height: 420px; } }
-
-.fc-bg {
-  position: absolute; inset: 0;
-  transition: transform 0.55s ease; z-index: 0;
-}
-.featured-card:hover .fc-bg { transform: scale(1.04); }
-
-/* featured card backgrounds — CSS gradient only, guaranteed visible */
-.bg-titanic {
-  background: linear-gradient(160deg, #2a4a88 0%, #183060 50%, #0c1e40 100%);
-}
-.bg-dday {
-  background: linear-gradient(160deg, #4a4818 0%, #323210 50%, #1e2008 100%);
-}
-.bg-engineer {
-  background: linear-gradient(160deg, #6a2c10 0%, #481c0a 50%, #2c1008 100%);
-}
-.bg-apollo {
-  background: linear-gradient(160deg, #0a0a1e 0%, #10103a 45%, #1a1a50 100%);
-}
-a.featured-card { display: block; text-decoration: none; color: inherit; }
-
-/* category card backgrounds — distinct gradient per era */
-.cat-img { position: absolute; inset: 0; z-index: 0; transition: transform 0.5s ease; }
-.cat-card:hover .cat-img { transform: scale(1.04); }
-.cat-card > div:last-child, .cat-card > div:first-child { position: relative; z-index: 1; }
-.cat-card .cat-overlay {
-  position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(to top, rgba(8,6,4,0.82) 0%, rgba(8,6,4,0.28) 55%, rgba(8,6,4,0.05) 100%);
-}
-.ci-wwii      { background: linear-gradient(145deg, #585e1e 0%, #383c10 100%); }
-.ci-maritime  { background: linear-gradient(180deg, #1e4070 0%, #0e2848 100%); }
-.ci-ancient   { background: linear-gradient(145deg, #685422 0%, #4a3c14 100%); }
-.ci-civilwar  { background: linear-gradient(145deg, #363c5e 0%, #20263e 100%); }
-.ci-space     { background: linear-gradient(180deg, #141438 0%, #0a0a24 100%); }
-.ci-sail      { background: linear-gradient(180deg, #1e3850 0%, #102030 100%); }
-.ci-renaissance { background: linear-gradient(145deg, #583e1a 0%, #3e2c10 100%); }
-.ci-ww1       { background: linear-gradient(145deg, #403820 0%, #2c2614 100%); }
-.ci-frontier  { background: linear-gradient(145deg, #364020 0%, #242c14 100%); }
-.ci-revolution { background: linear-gradient(145deg, #681c10 0%, #481008 100%); }
-
-.fc-inner {
-  position: relative; z-index: 1;
-  height: 100%;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: clamp(18px, 2.5vw, 28px);
-  background: linear-gradient(to top, rgba(8,6,4,0.88) 0%, rgba(8,6,4,0.25) 55%, transparent 100%);
-}
-@media (min-width: 600px) { .fc-inner { min-height: 0; } }
-
-.fc-tag {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.32em;
-  text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px;
-  display: flex; align-items: center; gap: 8px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
-}
-.fc-tag::before {
-  content: ''; display: inline-block; width: 14px; height: 1px;
-  background: var(--gold); flex-shrink: 0;
-}
-.fc-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 400; line-height: 1.15;
-  color: #ffffff; margin-bottom: 10px;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.95), 0 2px 16px rgba(0,0,0,0.8);
-}
-.fc-large .fc-title { font-size: clamp(20px, 2.8vw, 30px); }
-.fc-small .fc-title  { font-size: clamp(17px, 2vw, 22px); }
-.fc-desc {
-  font-size: 13px; line-height: 1.58;
-  color: #ffffff; opacity: 0.9;
-  margin-bottom: 16px; max-width: 380px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
-}
-.fc-small .fc-desc { display: none; }
-@media (min-width: 1024px) {
-  .fc-small .fc-desc { display: block; font-size: 12px; opacity: 0.65; }
-}
-.fc-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
-.meta-pill {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 500; letter-spacing: 0.2em;
-  text-transform: uppercase; padding: 3px 9px;
-  border: 1px solid rgba(196,154,60,0.3);
-  color: var(--gold-light); opacity: 0.75;
-}
-.meta-time {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; letter-spacing: 0.16em;
-  color: var(--parchment); opacity: 0.52;
-}
-.fc-play {
-  position: absolute; top: 16px; right: 16px; z-index: 2;
-  width: 34px; height: 34px;
-  border: 1px solid rgba(196,154,60,0.35);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.25s, background 0.25s;
-}
-.featured-card:hover .fc-play {
-  opacity: 1; background: rgba(196,154,60,0.12);
-  border-color: var(--gold);
-}
-.fc-play svg { fill: var(--gold-light); }
-
-/* ─────────────────────────── STORIES GRID ──
-   3-col → 2-col → 1-col
-──────────────────────────────────────────── */
-.stories-grid {
-  display: grid; gap: var(--gap);
-  grid-template-columns: 1fr;
-}
-@media (min-width: 520px) { .stories-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 900px) { .stories-grid { grid-template-columns: repeat(3, 1fr); } }
-
-.story-card {
-  background: #181512;
-  cursor: pointer; display: flex; flex-direction: column;
-  border-left: 2px solid transparent;
-  transition: background 0.22s, border-color 0.22s;
-  overflow: hidden;
-}
-.story-card:hover { background: #221e1a; border-left-color: var(--gold); }
-.story-card-img {
-  width: 100%; height: 140px;
-  background-size: cover; background-position: center;
-  filter: brightness(0.5) sepia(0.3);
-  transition: filter 0.3s, transform 0.5s;
-  flex-shrink: 0;
-}
-.story-card:hover .story-card-img { filter: brightness(0.6) sepia(0.2); transform: scale(1.03); }
-.story-card-body {
-  padding: clamp(16px, 2.2vw, 22px);
-  display: flex; flex-direction: column; flex: 1;
-}
-.story-era {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.32em;
-  text-transform: uppercase; color: var(--gold); opacity: 0.90; margin-bottom: 7px;
-}
-.story-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(17px, 2.2vw, 21px); font-weight: 400;
-  line-height: 1.22; color: var(--parchment); margin-bottom: 9px;
-}
-.story-desc {
-  font-size: 13px; line-height: 1.58;
-  color: var(--parchment); opacity: 0.82; margin-bottom: 14px; flex: 1;
-}
-.story-footer {
-  display: flex; align-items: center;
-  justify-content: space-between; gap: 8px;
-  padding-top: 12px; margin-top: auto;
-  border-top: 1px solid rgba(245,240,232,0.06);
-}
-.story-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-.story-arrow {
-  width: 26px; height: 26px;
-  border: 1px solid rgba(245,240,232,0.13);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; flex-shrink: 0; transition: opacity 0.2s;
-}
-.story-card:hover .story-arrow { opacity: 1; }
-
-
-
-/* ─────────────────────────── CATEGORIES ──
-   10 cards: 5-col → 4-col → 3-col → 2-col
-──────────────────────────────────────────── */
-.categories-grid {
-  display: grid; gap: var(--gap);
-  grid-template-columns: repeat(2, 1fr);           /* mobile */
-}
-@media (min-width: 600px)  { .categories-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 860px)  { .categories-grid { grid-template-columns: repeat(4, 1fr); } }
-@media (min-width: 1100px) { .categories-grid { grid-template-columns: repeat(5, 1fr); } }
-
-.cat-card {
-  background: #161310;
-  padding: clamp(18px, 2.2vw, 26px) clamp(14px, 1.8vw, 20px) clamp(16px, 2vw, 22px);
-  cursor: pointer;
-  display: flex; flex-direction: column; justify-content: space-between;
-  min-height: clamp(170px, 18vw, 210px);
-  position: relative; overflow: hidden;
-  transition: background 0.22s;
-}
-.cat-card:hover { background: #1e1a16; }
-.cat-card::after {
-  content: ''; position: absolute;
-  bottom: 0; left: 0; right: 0; height: 2px;
-  background: var(--gold);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform 0.3s ease;
-}
-.cat-card:hover::after { transform: scaleX(1); }
-.cat-number {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(32px, 4.5vw, 50px); font-weight: 300;
-  color: var(--parchment); opacity: 0.05;
-  line-height: 1; margin-bottom: 8px; letter-spacing: -0.02em;
-}
-.cat-icon {
-  font-size: clamp(18px, 2.2vw, 24px);
-  margin-bottom: 8px; display: block; opacity: 0.65; line-height: 1;
-}
-.cat-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(14px, 1.7vw, 17px); font-weight: 400;
-  color: #ffffff; line-height: 1.2; margin-bottom: 5px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
-}
-.cat-tagline {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(11px, 1.1vw, 12px); font-style: italic;
-  line-height: 1.5; color: #ffffff; opacity: 0.75;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.95);
-}
-.cat-count {
-  margin-top: 12px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--gold-light); opacity: 0.8;
-  transition: opacity 0.2s;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.95);
-}
-.cat-card:hover .cat-count { opacity: 1; }
-
-/* ─────────────────────────── STATEMENT ── */
-.statement {
-  padding: var(--pad-y) var(--pad-x);
-  background: #0a0807;
-  border-top: 1px solid rgba(245,240,232,0.06);
-  display: grid; grid-template-columns: 1fr;
-  gap: clamp(36px, 6vw, 80px);
-}
-@media (min-width: 800px) {
-  .statement { grid-template-columns: 1fr 1fr; align-items: center; }
-}
-.statement-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.38em;
-  text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
-}
-.statement-headline {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(30px, 4.5vw, 52px); font-weight: 300;
-  line-height: 1.08; color: var(--parchment); margin-bottom: 22px;
-}
-.statement-headline em { font-style: italic; color: var(--gold-light); }
-.statement-body {
-  font-size: clamp(13px, 1.5vw, 15px); line-height: 1.72;
-  color: var(--parchment); opacity: 0.65; max-width: 420px;
-}
-.stat-row {
-  display: flex; align-items: baseline; gap: 16px;
-  padding-bottom: 20px; margin-bottom: 20px;
-  border-bottom: 1px solid rgba(245,240,232,0.06);
-}
-.stat-row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-.stat-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(38px, 5vw, 56px); font-weight: 300;
-  color: var(--gold-light); line-height: 1;
-  min-width: clamp(72px, 9vw, 110px); flex-shrink: 0;
-}
-.stat-desc { font-size: clamp(12px, 1.3vw, 14px); line-height: 1.55; color: var(--parchment); opacity: 0.58; }
-.stat-desc strong {
-  display: block; font-weight: 400; color: var(--parchment); opacity: 0.8;
-  font-size: clamp(13px, 1.5vw, 15px); margin-bottom: 2px;
-}
-
-/* ─────────────────────────── FOOTER ── */
-footer {
-  background: var(--wire);
-  padding: clamp(24px, 3.5vw, 40px) var(--pad-x);
-  display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 10px;
-  border-top: 1px solid rgba(245,240,232,0.06);
-}
-.footer-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px; font-weight: 300; letter-spacing: 0.14em;
-  color: var(--gold-light); text-transform: uppercase; opacity: 0.80;
-}
-.footer-note {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--parchment); opacity: 0.38;
-}
-
-/* ─────────────────────────── REVEAL ── */
-.reveal {
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.reveal.visible { opacity: 1; transform: none; }
-.rd1 { transition-delay: 0.08s; }
-.rd2 { transition-delay: 0.16s; }
-.rd3 { transition-delay: 0.24s; }
-.rd4 { transition-delay: 0.32s; }
-
-/* ─────────────────────────── KEYFRAMES ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: none; }
-}
-@keyframes dotPulse {
-  0%, 80%, 100% { opacity: 0.12; transform: scale(0.8); }
-  40%            { opacity: 0.75; transform: scale(1); }
-}
-
-.dot-pulse {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--gold); display: inline-block;
-  animation: dotPulse 1.4s infinite;
-}
-
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --ink:#0d0b08;--parchment:#f5f0e8;--ash:#3a3530;--dark-ash:#1e1b18;--wire:#2a2520;
+  --gold:#c49a3c;--gold-light:#e8c46a;
+  --red-cost:#c0524a;--amber-cost:#b8832a;--green-cost:#5a8a4a;
+  --pad-x:clamp(16px,5vw,64px);--pad-y:clamp(48px,8vw,96px);--gap:2px;
+}
+body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(13,11,8,.96) 0%,transparent 100%)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;white-space:nowrap}
+.nav-links{display:flex;gap:clamp(14px,2.5vw,32px);list-style:none;align-items:center}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.20em;text-transform:uppercase;color:var(--parchment);opacity:.95;text-decoration:none;transition:opacity .2s;white-space:nowrap}
+.nav-links a:hover{opacity:1}
+.nav-cta{opacity:.9!important;color:var(--gold-light)!important}
+@media(max-width:600px){.nav-hide{display:none}}
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--pad-x) clamp(52px,9vh,96px);overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:#0c0a08}
+.hero-bg canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-content{position:relative;max-width:860px}
+.hero-rule{width:48px;height:1px;background:var(--gold);margin-bottom:18px;opacity:0;animation:fadeUp .9s .2s forwards}
+.hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;opacity:0;animation:fadeUp .9s .4s forwards}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(44px,9vw,100px);font-weight:300;line-height:.94;letter-spacing:-.01em;color:var(--parchment);opacity:0;animation:fadeUp .9s .55s forwards}
+.hero-title em{font-style:italic;color:var(--gold-light)}
+.hero-sub{margin-top:clamp(16px,3vw,28px);font-size:clamp(14px,1.8vw,16px);line-height:1.65;color:var(--parchment);opacity:0;max-width:520px;animation:fadeUp .9s .75s forwards}
+.hero-sub-inner{opacity:1}
+.hero-cta{margin-top:clamp(24px,4vw,40px);display:flex;flex-wrap:wrap;gap:12px;opacity:0;animation:fadeUp .9s .95s forwards}
+.hero-ledger{margin-top:clamp(36px,5vw,56px);display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(196,154,60,.18);opacity:0;animation:fadeUp .9s 1.1s forwards}
+.lc{padding:1rem 1.25rem;border-right:1px solid rgba(196,154,60,.12);background:rgba(22,18,12,.6)}
+.lc:last-child{border-right:none}
+.lc-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;margin-bottom:4px}
+.lc-val.r{color:var(--red-cost)}.lc-val.a{color:var(--amber-cost)}.lc-val.g{color:var(--green-cost)}
+.lc-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--parchment);opacity:.92;line-height:1.45}
+@media(max-width:600px){.hero-ledger{grid-template-columns:1fr 1fr}}
+.btn-primary{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);background:var(--gold);border:none;padding:13px 28px;cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s,transform .15s}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn-ghost{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--parchment);background:transparent;border:1px solid rgba(245,240,232,.22);padding:13px 28px;cursor:pointer;text-decoration:none;display:inline-block;transition:border-color .2s,color .2s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-light)}
+.section{padding:var(--pad-y) var(--pad-x)}
+.section--dark{background:var(--ink)}
+.section--mid{background:#0f0d0a}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:clamp(22px,4vw,40px);padding-bottom:14px;border-bottom:1px solid rgba(245,240,232,.09)}
+.section-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.5vw,38px);font-weight:300;color:var(--parchment);line-height:1.1}
+.section-link{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-decoration:none;opacity:1;white-space:nowrap;transition:opacity .2s;flex-shrink:0;cursor:pointer}
+.section-link:hover{opacity:1}
+.statement{padding:var(--pad-y) var(--pad-x);background:#0a0807;border-top:1px solid rgba(245,240,232,.06);display:grid;grid-template-columns:1fr;gap:clamp(36px,6vw,80px)}
+@media(min-width:800px){.statement{grid-template-columns:1fr 1fr;align-items:center}}
+.statement-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.statement-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4.5vw,52px);font-weight:300;line-height:1.08;color:var(--parchment);margin-bottom:22px}
+.statement-headline em{font-style:italic;color:var(--gold-light)}
+.statement-body{font-size:clamp(13px,1.5vw,15px);line-height:1.72;color:var(--parchment);opacity:.88;max-width:420px}
+.statement-body p{margin-bottom:1rem}
+.principle{padding:1.25rem 1.5rem;border-bottom:1px solid rgba(245,240,232,.07);background:#0f0d0a;transition:background .2s}
+.principle:first-child{border-top:1px solid rgba(245,240,232,.07)}
+.principle:hover{background:#141210}
+.principle-head{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.20em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.principle-body{font-size:13px;line-height:1.65;color:var(--parchment);opacity:1}
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(245,240,232,.06);border-bottom:1px solid rgba(245,240,232,.06)}
+@media(max-width:600px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+.stat-cell{padding:clamp(20px,3vw,36px) var(--pad-x);border-right:1px solid rgba(245,240,232,.06);background:#0a0807}
+.stat-cell:last-child{border-right:none}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,5vw,56px);font-weight:300;color:var(--gold-light);line-height:1;margin-bottom:6px}
+.stat-desc{font-size:clamp(13px,1.4vw,15px);line-height:1.55;color:var(--parchment);opacity:.92;font-family:'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.featured-grid{display:grid;gap:var(--gap);grid-template-columns:1fr}
+@media(min-width:600px){.featured-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:320px}.fc-large{grid-column:span 1}}
+@media(min-width:1024px){.featured-grid{grid-template-columns:1fr 1fr 1fr 1fr;grid-auto-rows:420px}.fc-large{grid-column:span 2}}
+.featured-card{position:relative;overflow:hidden;cursor:pointer;background:var(--dark-ash);height:320px;display:block;text-decoration:none;color:inherit}
+@media(min-width:600px){.featured-card{height:auto}}
+.fc-bg{position:absolute;inset:0;transition:transform .55s ease;z-index:0}
+.featured-card:hover .fc-bg{transform:scale(1.04)}
+.bg-apollo{background:linear-gradient(160deg,#0a0a1e,#10103a 45%,#1a1a50)}
+.bg-omaha{background:linear-gradient(160deg,#2a3010,#1a2008 50%,#0e1406)}
+.bg-civil{background:linear-gradient(160deg,#1a2a1a,#0e1a10 50%,#081008)}
+.bg-sub{background:linear-gradient(160deg,#10182a,#0a1020 50%,#060c18)}
+.bg-fire{background:linear-gradient(160deg,#3a1008,#280808 50%,#180408)}
+.fc-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,2.5vw,28px);background:linear-gradient(to top,rgba(8,6,4,.92) 0%,rgba(8,6,4,.3) 55%,transparent 100%)}
+.fc-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;display:flex;align-items:center;gap:8px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+.fc-tag::before{content:'';display:inline-block;width:14px;height:1px;background:var(--gold);flex-shrink:0}
+.fc-title{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15;color:#fff;margin-bottom:10px;text-shadow:0 1px 8px rgba(0,0,0,.95),0 2px 16px rgba(0,0,0,.8)}
+.fc-large .fc-title{font-size:clamp(20px,2.8vw,30px)}
+.fc-small .fc-title{font-size:clamp(17px,2vw,22px)}
+.fc-desc{font-size:13px;line-height:1.58;color:#fff;opacity:1;margin-bottom:12px;max-width:380px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+.fc-small .fc-desc{display:none}
+@media(min-width:1024px){.fc-small .fc-desc{display:block;font-size:13px;opacity:1}}
+.fc-cost{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:.95;margin-bottom:10px;font-style:italic;text-shadow:0 1px 4px rgba(0,0,0,.95)}
+.fc-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.meta-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid rgba(196,154,60,.4);color:var(--gold-light);opacity:1}
+.categories-grid{display:grid;gap:var(--gap);grid-template-columns:repeat(2,1fr)}
+@media(min-width:600px){.categories-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:860px){.categories-grid{grid-template-columns:repeat(5,1fr)}}
+.cat-card{background:#161310;padding:clamp(18px,2.2vw,26px) clamp(14px,1.8vw,20px) clamp(16px,2vw,22px);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(170px,18vw,210px);position:relative;overflow:hidden;transition:background .22s}
+.cat-card:hover{background:#1e1a16}
+.cat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.cat-card:hover::after{transform:scaleX(1)}
+.cat-space::after{background:#6a9fd8}.cat-civil::after{background:#5a8a5a}
+.cat-military::after{background:#c0524a}.cat-political::after{background:#7f77dd}.cat-labor::after{background:#b8832a}
+.cat-img{position:absolute;inset:0;z-index:0;transition:transform .5s ease;background-size:cover;background-position:center}
+.cat-card:hover .cat-img{transform:scale(1.04)}
+.cat-overlay{position:absolute;inset:0;z-index:0;background:linear-gradient(to top,rgba(8,6,4,.88) 0%,rgba(8,6,4,.4) 55%,rgba(8,6,4,.1) 100%)}
+.ci-space{background:linear-gradient(180deg,#0a0a24,#060618)}
+.ci-civil{background:linear-gradient(145deg,#0e1a10,#080e08)}
+.ci-military{background:linear-gradient(145deg,#281008,#180808)}
+.ci-political{background:linear-gradient(145deg,#14103a,#0a0828)}
+.ci-labor{background:linear-gradient(145deg,#281808,#180e04)}
+.cat-body{position:relative;z-index:1}
+.cat-number{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4.5vw,50px);font-weight:300;color:var(--parchment);opacity:.05;line-height:1;margin-bottom:8px}
+.cat-name{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.7vw,17px);font-weight:400;color:#fff;line-height:1.2;margin-bottom:5px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+.cat-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(11px,1.1vw,12px);font-style:italic;line-height:1.5;color:#fff;opacity:.9;text-shadow:0 1px 4px rgba(0,0,0,.95)}
+.cat-count{position:relative;z-index:1;margin-top:12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.20em;text-transform:uppercase;color:var(--gold-light);opacity:.95;transition:opacity .2s;text-shadow:0 1px 4px rgba(0,0,0,.95)}
+.cat-card:hover .cat-count{opacity:1}
+.stories-grid{display:grid;gap:var(--gap);grid-template-columns:1fr}
+@media(min-width:520px){.stories-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.stories-grid{grid-template-columns:repeat(3,1fr)}}
+.story-card{background:#181512;cursor:pointer;display:flex;flex-direction:column;border-left:2px solid transparent;transition:background .22s,border-color .22s;overflow:hidden}
+.story-card:hover{background:#221e1a;border-left-color:var(--gold)}
+.story-card-img{width:100%;height:140px;background-size:cover;background-position:center;filter:brightness(.5) sepia(.3);transition:filter .3s,transform .5s;flex-shrink:0}
+.story-card:hover .story-card-img{filter:brightness(.6) sepia(.2);transform:scale(1.03)}
+.story-card-body{padding:clamp(16px,2.2vw,22px);display:flex;flex-direction:column;flex:1}
+.story-era{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:1;margin-bottom:7px}
+.story-title{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.2vw,21px);font-weight:400;line-height:1.22;color:var(--parchment);margin-bottom:9px}
+.story-hook{font-size:13px;line-height:1.58;color:var(--parchment);opacity:.95;margin-bottom:10px;flex:1}
+.story-cost{font-size:13px;font-style:italic;color:var(--gold);opacity:.92;margin-bottom:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.08em}
+.story-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;margin-top:auto;border-top:1px solid rgba(245,240,232,.06)}
+.story-pills{display:flex;gap:6px;flex-wrap:wrap}
+.story-arrow{width:26px;height:26px;border:1px solid rgba(245,240,232,.13);display:flex;align-items:center;justify-content:center;opacity:0;flex-shrink:0;transition:opacity .2s}
+.story-card:hover .story-arrow{opacity:1}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,32px)}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:6px 16px;border:1px solid rgba(245,240,232,.2);background:transparent;color:var(--parchment);opacity:.92;cursor:pointer;transition:all .2s}
+.filter-btn:hover{opacity:.9;border-color:rgba(196,154,60,.4)}
+.filter-btn.active{background:rgba(196,154,60,.12);border-color:rgba(196,154,60,.4);color:var(--gold-light);opacity:1}
+.ledger-featured{background:#0f0d0a;border-top:1px solid rgba(245,240,232,.06)}
+.featured-hero-img{position:relative;width:100%;height:clamp(260px,38vw,480px);overflow:hidden;cursor:pointer}
+.featured-hero-img canvas{width:100%;height:100%;display:block}
+.featured-hero-img:hover .featured-hero-canvas{transform:scale(1.03);transition:transform .6s ease}
+.featured-hero-canvas{transition:transform .6s ease;position:absolute;inset:0;width:100%;height:100%}
+.featured-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,13,10,.95) 0%,rgba(15,13,10,.45) 40%,rgba(15,13,10,.1) 100%);pointer-events:none}
+.featured-hero-meta{position:absolute;bottom:0;left:0;right:0;padding:clamp(18px,3vw,36px) var(--pad-x);display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.featured-hero-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px}
+.featured-hero-tag::before{content:'';display:inline-block;width:20px;height:1px;background:var(--gold)}
+.featured-hero-play{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.20em;text-transform:uppercase;color:var(--ink);background:var(--gold);border:none;padding:10px 22px;cursor:pointer;text-decoration:none;transition:background .2s;display:inline-block}
+.featured-hero-play:hover{background:var(--gold-light)}
+.ledger-featured-body{padding:var(--pad-y) var(--pad-x);display:grid;grid-template-columns:1fr;gap:clamp(28px,4vw,56px)}
+@media(min-width:900px){.ledger-featured-body{grid-template-columns:1fr 1fr;align-items:start}}
+.ledger-panel{display:flex;flex-direction:column;gap:2px}
+.ledger-card{background:#161310;border:1px solid rgba(196,154,60,.14);padding:1.25rem 1.5rem}
+.lp-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;opacity:.95}
+.lp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(245,240,232,.05);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.05em}
+.lp-row:last-child{border-bottom:none}
+.lp-key{color:var(--parchment);opacity:.92}
+.lp-val{font-weight:600}
+.lp-val.r{color:var(--red-cost)}.lp-val.a{color:var(--amber-cost)}.lp-val.g{color:var(--green-cost)}
+.lp-note{margin-top:1rem;padding:.875rem 1rem;background:rgba(196,154,60,.05);border-left:2px solid rgba(196,154,60,.25);font-size:14px;line-height:1.65;color:var(--parchment);opacity:.95;font-style:italic}
+.persp-list{display:flex;flex-direction:column;gap:6px;margin:1rem 0}
+.persp-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(245,240,232,.1);font-size:15px;cursor:pointer;color:var(--parchment);transition:border-color .2s,background .2s;text-decoration:none}
+.persp-item:hover{border-color:rgba(196,154,60,.4);background:rgba(196,154,60,.05)}
+.persp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.persp-role{font-size:13px;color:var(--parchment);opacity:.88;margin-left:auto;letter-spacing:.04em}
+.how-grid{display:grid;gap:var(--gap);grid-template-columns:1fr}
+@media(min-width:520px){.how-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.how-grid{grid-template-columns:repeat(4,1fr)}}
+.how-card{background:#0f0d0a;padding:clamp(20px,2.5vw,32px);border-bottom:2px solid transparent;transition:background .2s,border-color .2s}
+.how-card:hover{background:#141210;border-bottom-color:var(--gold)}
+.how-num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--gold);opacity:.3;line-height:1;margin-bottom:12px}
+.how-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--parchment);margin-bottom:10px}
+.how-body{font-size:15px;line-height:1.65;color:var(--parchment);opacity:.95}
+.edu-bar{padding:clamp(20px,3vw,32px) var(--pad-x);background:#0a0807;border-top:1px solid rgba(245,240,232,.06);display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.edu-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.20em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.edu-pills{display:flex;gap:8px;flex-wrap:wrap}
+.edu-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(196,154,60,.3);color:var(--parchment);opacity:.92}
+footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid rgba(245,240,232,.06)}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;opacity:.8}
+.footer-note{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--parchment);opacity:.82}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:none}
+.rd1{transition-delay:.08s}.rd2{transition-delay:.16s}.rd3{transition-delay:.24s}.rd4{transition-delay:.32s}.rd5{transition-delay:.4s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-
-<!-- NAV -->
 <nav class="nav">
-  <div class="nav-logo">Project Limen</div>
+  <div class="nav-logo">Ledger 250</div>
   <ul class="nav-links">
-    <li class="nav-hide"><a href="#featured">Stories</a></li>
+    <li class="nav-hide"><a href="#scenarios">Scenarios</a></li>
     <li class="nav-hide"><a href="#categories">Categories</a></li>
-    <li class="nav-hide"><a href="#">Creators</a></li>
+    <li class="nav-hide"><a href="#educators">Educators</a></li>
+    <li><a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="nav-cta">Enter the ledger &rarr;</a></li>
   </ul>
 </nav>
-
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg">
-  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <!-- Sky gradient -->
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#0c0a22"/>
-        <stop offset="55%"  stop-color="#151230"/>
-        <stop offset="100%" stop-color="#1e1a3a"/>
-      </linearGradient>
-      <!-- Sea gradient -->
-      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#10102a"/>
-        <stop offset="100%" stop-color="#08081a"/>
-      </linearGradient>
-      <!-- Horizon glow -->
-      <radialGradient id="hglow" cx="55%" cy="56%" r="42%" gradientUnits="objectBoundingBox">
-        <stop offset="0%"  stop-color="#c49a3c" stop-opacity="0.42"/>
-        <stop offset="35%" stop-color="#8b5a2b" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-      </radialGradient>
-      <!-- Ship window glow -->
-      <radialGradient id="wglow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%"  stop-color="#e8c46a" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#c49a3c" stop-opacity="0"/>
-      </radialGradient>
-      <!-- Bottom fade for text legibility -->
-      <linearGradient id="botfade" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#06050a" stop-opacity="0"/>
-        <stop offset="65%"  stop-color="#06050a" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#06050a" stop-opacity="0.72"/>
-      </linearGradient>
-      <!-- Moon glow -->
-      <radialGradient id="moon" cx="50%" cy="50%" r="50%">
-        <stop offset="0%"  stop-color="#f5f0e8" stop-opacity="0.95"/>
-        <stop offset="35%" stop-color="#e8c46a" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-      </radialGradient>
-      <!-- Water reflection shimmer -->
-      <linearGradient id="reflectShip" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stop-color="#10102a" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="#08081a" stop-opacity="0.9"/>
-      </linearGradient>
-      <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="2.5" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <filter id="softglow" x="-60%" y="-60%" width="220%" height="220%">
-        <feGaussianBlur stdDeviation="6" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-
-    <!-- Sky -->
-    <rect width="1440" height="900" fill="url(#sky)"/>
-
-    <!-- Stars layer 1 — tiny -->
-    <g fill="#f5f0e8" opacity="0.80">
-      <circle cx="42"   cy="28"  r="0.7"/><circle cx="118"  cy="61"  r="0.5"/><circle cx="195"  cy="14"  r="0.8"/>
-      <circle cx="267"  cy="44"  r="0.6"/><circle cx="331"  cy="19"  r="0.5"/><circle cx="402"  cy="72"  r="0.7"/>
-      <circle cx="478"  cy="33"  r="0.6"/><circle cx="544"  cy="8"   r="0.8"/><circle cx="610"  cy="55"  r="0.5"/>
-      <circle cx="683"  cy="22"  r="0.7"/><circle cx="759"  cy="47"  r="0.6"/><circle cx="835"  cy="11"  r="0.8"/>
-      <circle cx="908"  cy="38"  r="0.5"/><circle cx="984"  cy="65"  r="0.7"/><circle cx="1049" cy="18"  r="0.6"/>
-      <circle cx="1118" cy="50"  r="0.8"/><circle cx="1192" cy="29"  r="0.5"/><circle cx="1265" cy="74"  r="0.7"/>
-      <circle cx="1338" cy="12"  r="0.6"/><circle cx="1402" cy="43"  r="0.8"/><circle cx="88"   cy="95"  r="0.5"/>
-      <circle cx="162"  cy="82"  r="0.7"/><circle cx="238"  cy="110" r="0.6"/><circle cx="312"  cy="88"  r="0.8"/>
-      <circle cx="388"  cy="122" r="0.5"/><circle cx="462"  cy="97"  r="0.7"/><circle cx="535"  cy="115" r="0.6"/>
-      <circle cx="606"  cy="84"  r="0.8"/><circle cx="675"  cy="107" r="0.5"/><circle cx="748"  cy="90"  r="0.7"/>
-      <circle cx="820"  cy="118" r="0.6"/><circle cx="894"  cy="79"  r="0.8"/><circle cx="966"  cy="103" r="0.5"/>
-      <circle cx="1040" cy="86"  r="0.7"/><circle cx="1112" cy="121" r="0.6"/><circle cx="1184" cy="93"  r="0.8"/>
-      <circle cx="1254" cy="108" r="0.5"/><circle cx="1326" cy="77"  r="0.7"/><circle cx="1395" cy="116" r="0.6"/>
-      <circle cx="55"   cy="148" r="0.5"/><circle cx="133"  cy="134" r="0.7"/><circle cx="210"  cy="158" r="0.6"/>
-      <circle cx="285"  cy="139" r="0.8"/><circle cx="357"  cy="162" r="0.5"/><circle cx="430"  cy="145" r="0.7"/>
-      <circle cx="502"  cy="172" r="0.6"/><circle cx="574"  cy="136" r="0.8"/><circle cx="645"  cy="155" r="0.5"/>
-      <circle cx="717"  cy="141" r="0.7"/><circle cx="790"  cy="168" r="0.6"/><circle cx="863"  cy="130" r="0.8"/>
-      <circle cx="935"  cy="152" r="0.5"/><circle cx="1008" cy="143" r="0.7"/><circle cx="1080" cy="165" r="0.6"/>
-      <circle cx="1155" cy="138" r="0.8"/><circle cx="1228" cy="158" r="0.5"/><circle cx="1300" cy="128" r="0.7"/>
-      <circle cx="1373" cy="170" r="0.6"/><circle cx="1430" cy="149" r="0.8"/>
-    </g>
-    <!-- Stars layer 2 — brighter -->
-    <g fill="#f5f0e8" opacity="1.0">
-      <circle cx="74"   cy="52"  r="1.1"/><circle cx="220"  cy="31"  r="1.3"/><circle cx="380"  cy="58"  r="1.0"/>
-      <circle cx="519"  cy="22"  r="1.2"/><circle cx="666"  cy="68"  r="1.1"/><circle cx="800"  cy="35"  r="1.3"/>
-      <circle cx="945"  cy="18"  r="1.0"/><circle cx="1085" cy="55"  r="1.2"/><circle cx="1230" cy="39"  r="1.1"/>
-      <circle cx="1380" cy="24"  r="1.3"/><circle cx="145"  cy="118" r="1.0"/><circle cx="290"  cy="96"  r="1.2"/>
-      <circle cx="450"  cy="130" r="1.1"/><circle cx="600"  cy="108" r="1.3"/><circle cx="740"  cy="125" r="1.0"/>
-      <circle cx="885"  cy="92"  r="1.2"/><circle cx="1025" cy="118" r="1.1"/><circle cx="1165" cy="99"  r="1.3"/>
-      <circle cx="1310" cy="133" r="1.0"/><circle cx="1415" cy="107" r="1.2"/>
-    </g>
-    <!-- Milky way faint band -->
-    <ellipse cx="720" cy="200" rx="580" ry="90" fill="#e8d89a" opacity="0.07"/>
-
-    <!-- Moon halo -->
-    <circle cx="1100" cy="95" r="70" fill="#e8c46a" opacity="0.09"/>
-    <circle cx="1100" cy="95" r="40" fill="#f5f0e8" opacity="0.14"/>
-    <!-- Moon disc -->
-    <circle cx="1100" cy="95" r="16" fill="url(#moon)"/>
-
-    <!-- Horizon atmospheric glow -->
-    <rect width="1440" height="900" fill="url(#hglow)"/>
-
-    <!-- ── TITANIC SILHOUETTE ── -->
-    <!-- Origin: waterline ~y=530, ship occupies roughly x=180–1320 -->
-
-    <!-- Hull (below waterline) -->
-    <path d="M 210 530 L 240 555 L 1200 555 L 1220 530 Z" fill="#04030a"/>
-
-    <!-- Main hull body -->
-    <path d="M 200 530 L 190 520 L 185 510 L 188 500 L 210 498
-             L 280 495 L 350 493 L 450 492 L 600 491 L 750 491
-             L 900 492 L 1050 493 L 1150 495 L 1210 498 L 1230 505
-             L 1240 515 L 1235 530 Z" fill="#05040b"/>
-
-    <!-- Superstructure — main body (upper decks A–D) -->
-    <path d="M 300 491 L 300 455 L 320 450 L 400 448 L 500 446
-             L 650 445 L 800 445 L 950 446 L 1080 448 L 1130 452
-             L 1145 458 L 1148 491 Z" fill="#04030a"/>
-
-    <!-- Boat deck (top deck) -->
-    <path d="M 330 455 L 330 432 L 350 428 L 440 426 L 550 425
-             L 700 424 L 850 424 L 980 426 L 1070 429 L 1090 434
-             L 1090 455 Z" fill="#03020a"/>
-
-    <!-- Bridge / wheelhouse -->
-    <path d="M 780 432 L 780 415 L 800 410 L 870 408 L 930 410
-             L 950 415 L 950 432 Z" fill="#03020a"/>
-    <!-- Bridge top -->
-    <path d="M 795 415 L 795 404 L 820 400 L 910 400 L 932 404
-             L 932 415 Z" fill="#02010a"/>
-
-    <!-- Officers quarters / forecastle extensions -->
-    <path d="M 330 432 L 330 418 L 360 414 L 440 412 L 520 412
-             L 520 432 Z" fill="#03020a"/>
-    <path d="M 980 432 L 980 420 L 1000 416 L 1060 414 L 1090 416
-             L 1090 432 Z" fill="#03020a"/>
-
-    <!-- Funnel 1 -->
-    <path d="M 455 426 L 462 360 L 480 355 L 498 360 L 505 426 Z" fill="#04030b"/>
-    <!-- Funnel top band -->
-    <rect x="460" y="355" width="42" height="10" rx="1" fill="#03020a"/>
-    <!-- Funnel cap smoke (very faint) -->
-    <ellipse cx="480" cy="348" rx="18" ry="6" fill="#0a0815" opacity="0.6"/>
-    <ellipse cx="475" cy="330" rx="14" ry="10" fill="#0a0815" opacity="0.35"/>
-    <ellipse cx="468" cy="310" rx="18" ry="14" fill="#0a0815" opacity="0.18"/>
-
-    <!-- Funnel 2 -->
-    <path d="M 555 425 L 562 362 L 578 357 L 596 362 L 603 425 Z" fill="#04030b"/>
-    <rect x="560" y="357" width="40" height="10" rx="1" fill="#03020a"/>
-    <ellipse cx="578" cy="350" rx="17" ry="6" fill="#0a0815" opacity="0.55"/>
-    <ellipse cx="574" cy="332" rx="13" ry="10" fill="#0a0815" opacity="0.3"/>
-
-    <!-- Funnel 3 -->
-    <path d="M 655 425 L 662 364 L 678 359 L 694 364 L 700 425 Z" fill="#04030b"/>
-    <rect x="660" y="359" width="38" height="10" rx="1" fill="#03020a"/>
-    <ellipse cx="677" cy="352" rx="16" ry="5" fill="#0a0815" opacity="0.5"/>
-
-    <!-- Funnel 4 (dummy — shorter, no smoke) -->
-    <path d="M 750 425 L 756 375 L 770 371 L 784 375 L 789 425 Z" fill="#04030b"/>
-    <rect x="754" y="371" width="36" height="9" rx="1" fill="#03020a"/>
-
-    <!-- Forward mast -->
-    <line x1="385" y1="428" x2="385" y2="310" stroke="#03020a" stroke-width="2.5"/>
-    <!-- Crow's nest -->
-    <rect x="378" y="330" width="14" height="10" rx="2" fill="#04030a"/>
-    <!-- Forward mast wireless stays -->
-    <line x1="385" y1="315" x2="480" y2="355" stroke="#05040c" stroke-width="1" opacity="0.7"/>
-    <line x1="385" y1="315" x2="295" y2="460" stroke="#05040c" stroke-width="1" opacity="0.6"/>
-
-    <!-- Aft mast -->
-    <line x1="1030" y1="428" x2="1030" y2="320" stroke="#03020a" stroke-width="2"/>
-    <!-- Wireless stays aft -->
-    <line x1="1030" y1="325" x2="750" y2="372" stroke="#05040c" stroke-width="1" opacity="0.65"/>
-    <line x1="1030" y1="325" x2="1100" y2="408" stroke="#05040c" stroke-width="1" opacity="0.6"/>
-
-    <!-- Davits / lifeboats (small bumps on boat deck) -->
-    <g fill="#04030a">
-      <rect x="360" y="420" width="8"  height="6" rx="1"/>
-      <rect x="390" y="420" width="8"  height="6" rx="1"/>
-      <rect x="420" y="420" width="8"  height="6" rx="1"/>
-      <rect x="530" y="420" width="8"  height="6" rx="1"/>
-      <rect x="560" y="420" width="8"  height="6" rx="1"/>
-      <rect x="820" y="420" width="8"  height="6" rx="1"/>
-      <rect x="850" y="420" width="8"  height="6" rx="1"/>
-      <rect x="990" y="420" width="8"  height="6" rx="1"/>
-      <rect x="1020" y="420" width="8" height="6" rx="1"/>
-      <rect x="1050" y="420" width="8" height="6" rx="1"/>
-    </g>
-
-    <!-- ── WINDOWS / PORTHOLES — gold amber glow ── -->
-
-    <!-- A Deck windows (superstructure top band) -->
-    <g filter="url(#glow)">
-      <g fill="#f0c84a" opacity="1.0">
-        <!-- Promenade A Deck row -->
-        <rect x="340" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="355" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="370" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="385" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="400" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="415" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="430" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="510" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="525" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="540" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="610" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="625" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="640" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="710" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="725" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="810" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="825" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="840" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="855" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="920" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="935" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="950" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="965" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1000" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1015" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1030" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1060" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1075" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1090" y="460" width="5" height="4" rx="0.5"/>
-        <rect x="1105" y="460" width="5" height="4" rx="0.5"/>
-      </g>
-    </g>
-
-    <!-- B Deck portholes -->
-    <g filter="url(#glow)">
-      <g fill="#e8b840" opacity="0.95">
-        <circle cx="305" cy="477" r="2.2"/>
-        <circle cx="320" cy="477" r="2.2"/>
-        <circle cx="335" cy="477" r="2.2"/>
-        <circle cx="350" cy="477" r="2.2"/>
-        <circle cx="370" cy="477" r="2.2"/>
-        <circle cx="385" cy="477" r="2.2"/>
-        <circle cx="400" cy="477" r="2.2"/>
-        <circle cx="415" cy="477" r="2.2"/>
-        <circle cx="435" cy="477" r="2.2"/>
-        <circle cx="455" cy="477" r="2.2"/>
-        <circle cx="510" cy="477" r="2.2"/>
-        <circle cx="526" cy="477" r="2.2"/>
-        <circle cx="542" cy="477" r="2.2"/>
-        <circle cx="608" cy="477" r="2.2"/>
-        <circle cx="624" cy="477" r="2.2"/>
-        <circle cx="640" cy="477" r="2.2"/>
-        <circle cx="656" cy="477" r="2.2"/>
-        <circle cx="712" cy="477" r="2.2"/>
-        <circle cx="728" cy="477" r="2.2"/>
-        <circle cx="744" cy="477" r="2.2"/>
-        <circle cx="810" cy="477" r="2.2"/>
-        <circle cx="826" cy="477" r="2.2"/>
-        <circle cx="842" cy="477" r="2.2"/>
-        <circle cx="858" cy="477" r="2.2"/>
-        <circle cx="920" cy="477" r="2.2"/>
-        <circle cx="936" cy="477" r="2.2"/>
-        <circle cx="952" cy="477" r="2.2"/>
-        <circle cx="968" cy="477" r="2.2"/>
-        <circle cx="1005" cy="477" r="2.2"/>
-        <circle cx="1021" cy="477" r="2.2"/>
-        <circle cx="1037" cy="477" r="2.2"/>
-        <circle cx="1068" cy="477" r="2.2"/>
-        <circle cx="1084" cy="477" r="2.2"/>
-        <circle cx="1100" cy="477" r="2.2"/>
-        <circle cx="1116" cy="477" r="2.2"/>
-        <circle cx="1132" cy="477" r="2.2"/>
-      </g>
-    </g>
-
-    <!-- C Deck portholes (more, smaller) -->
-    <g fill="#d4a040" opacity="0.88">
-      <circle cx="225" cy="494" r="1.8"/>
-      <circle cx="240" cy="494" r="1.8"/>
-      <circle cx="255" cy="494" r="1.8"/>
-      <circle cx="270" cy="494" r="1.8"/>
-      <circle cx="285" cy="494" r="1.8"/>
-      <circle cx="305" cy="494" r="1.8"/>
-      <circle cx="321" cy="494" r="1.8"/>
-      <circle cx="337" cy="494" r="1.8"/>
-      <circle cx="353" cy="494" r="1.8"/>
-      <circle cx="373" cy="494" r="1.8"/>
-      <circle cx="393" cy="494" r="1.8"/>
-      <circle cx="413" cy="494" r="1.8"/>
-      <circle cx="433" cy="494" r="1.8"/>
-      <circle cx="453" cy="494" r="1.8"/>
-      <circle cx="510" cy="494" r="1.8"/>
-      <circle cx="526" cy="494" r="1.8"/>
-      <circle cx="542" cy="494" r="1.8"/>
-      <circle cx="558" cy="494" r="1.8"/>
-      <circle cx="608" cy="494" r="1.8"/>
-      <circle cx="624" cy="494" r="1.8"/>
-      <circle cx="640" cy="494" r="1.8"/>
-      <circle cx="656" cy="494" r="1.8"/>
-      <circle cx="672" cy="494" r="1.8"/>
-      <circle cx="712" cy="494" r="1.8"/>
-      <circle cx="728" cy="494" r="1.8"/>
-      <circle cx="744" cy="494" r="1.8"/>
-      <circle cx="760" cy="494" r="1.8"/>
-      <circle cx="810" cy="494" r="1.8"/>
-      <circle cx="826" cy="494" r="1.8"/>
-      <circle cx="842" cy="494" r="1.8"/>
-      <circle cx="858" cy="494" r="1.8"/>
-      <circle cx="874" cy="494" r="1.8"/>
-      <circle cx="890" cy="494" r="1.8"/>
-      <circle cx="920" cy="494" r="1.8"/>
-      <circle cx="936" cy="494" r="1.8"/>
-      <circle cx="952" cy="494" r="1.8"/>
-      <circle cx="968" cy="494" r="1.8"/>
-      <circle cx="984" cy="494" r="1.8"/>
-      <circle cx="1000" cy="494" r="1.8"/>
-      <circle cx="1016" cy="494" r="1.8"/>
-      <circle cx="1032" cy="494" r="1.8"/>
-      <circle cx="1048" cy="494" r="1.8"/>
-      <circle cx="1064" cy="494" r="1.8"/>
-      <circle cx="1080" cy="494" r="1.8"/>
-      <circle cx="1096" cy="494" r="1.8"/>
-      <circle cx="1112" cy="494" r="1.8"/>
-      <circle cx="1130" cy="494" r="1.8"/>
-      <circle cx="1148" cy="494" r="1.8"/>
-      <circle cx="1168" cy="494" r="1.8"/>
-      <circle cx="1185" cy="494" r="1.8"/>
-      <circle cx="1202" cy="494" r="1.8"/>
-    </g>
-
-    <!-- Bridge windows (lit) -->
-    <g filter="url(#glow)" fill="#ffe07a" opacity="1.0">
-      <rect x="800" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="815" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="830" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="845" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="860" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="875" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="890" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="905" y="413" width="6" height="5" rx="0.5"/>
-      <rect x="920" y="413" width="6" height="5" rx="0.5"/>
-    </g>
-
-    <!-- ── SEA ── -->
-    <!-- Water body -->
-    <path d="M 0 530 L 0 900 L 1440 900 L 1440 530
-             C 1320 532 1200 534 1100 533 C 950 531 850 530 720 530
-             C 590 530 440 530 300 531 C 180 532 80 533 0 530 Z"
-          fill="url(#sea)"/>
-
-    <!-- Water surface sheen — subtle wave lines -->
-    <g stroke="#0e0c1e" stroke-width="0.8" opacity="0.5" fill="none">
-      <path d="M 0 538 Q 180 535 360 538 Q 540 541 720 538 Q 900 535 1080 538 Q 1260 541 1440 538"/>
-      <path d="M 0 548 Q 200 545 400 548 Q 600 551 800 548 Q 1000 545 1200 548 Q 1320 550 1440 548"/>
-      <path d="M 0 560 Q 240 557 480 560 Q 720 563 960 560 Q 1200 557 1440 560"/>
-      <path d="M 0 575 Q 200 572 400 575 Q 600 578 800 575 Q 1000 572 1200 575 Q 1320 577 1440 575"/>
-    </g>
-
-    <!-- Ship reflection (blurred, broken) -->
-    <g opacity="0.25" transform="scale(1,-1) translate(0,-1060)">
-      <!-- Inverted hull reflection -->
-      <path d="M 250 530 L 240 540 L 1200 540 L 1190 530 Z" fill="#05040c"/>
-      <!-- Reflection porthole shimmer -->
-      <g fill="#c49a3c">
-        <ellipse cx="370" cy="548" rx="8" ry="2"/>
-        <ellipse cx="480" cy="550" rx="6" ry="1.5"/>
-        <ellipse cx="580" cy="549" rx="8" ry="2"/>
-        <ellipse cx="680" cy="548" rx="6" ry="1.5"/>
-        <ellipse cx="780" cy="549" rx="8" ry="2"/>
-        <ellipse cx="880" cy="548" rx="6" ry="1.5"/>
-        <ellipse cx="980" cy="549" rx="8" ry="2"/>
-        <ellipse cx="1080" cy="550" rx="6" ry="1.5"/>
-      </g>
-    </g>
-    <!-- Fade the reflection with an overlay -->
-    <rect x="0" y="530" width="1440" height="100" fill="url(#reflectShip)"/>
-
-    <!-- Bottom legibility gradient -->
-    <rect width="1440" height="900" fill="url(#botfade)"/>
-
-  </svg>
-  </div>
-  <div class="hero-brand">
-    Project Limen
-    <div class="hero-tagline">The moment before history was made</div>
+    <canvas id="hero-canvas"></canvas>
+    <canvas id="hero-montage" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
   </div>
   <div class="hero-content">
     <div class="hero-rule"></div>
-    <p class="hero-eyebrow">Immersive Historical Fiction</p>
-    <h1 class="hero-title">You were <em>there.</em><br>Now decide.</h1>
-    <p class="hero-sub"><span class="hero-sub-inner">Step inside documented historical moments. Real people. Real decisions. Every scenario built from primary sources. Every choice carries the weight of what actually happened next.</span></p>
+    <p class="hero-eyebrow">America 1776 &ndash; 2026 &nbsp;&middot;&nbsp; The 250th Anniversary</p>
+    <h1 class="hero-title">You cannot change<br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
+    <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American crises across 250 years.</p></div>
     <div class="hero-cta">
-      <a href="#featured" class="btn-primary">Explore Stories</a>
-      <a href="#categories" class="btn-ghost">Browse Categories</a>
+      <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary">Begin with Apollo 13 &rarr;</a>
+      <a href="#scenarios" class="btn-ghost">Browse all scenarios</a>
+    </div>
+    <div class="hero-ledger">
+      <div class="lc"><div class="lc-val r">43.2 amp-hrs</div><div class="lc-label">Battery reserve at power-down</div></div>
+      <div class="lc"><div class="lc-val a">38&deg;F</div><div class="lc-label">Cabin temp at splashdown</div></div>
+      <div class="lc"><div class="lc-val a">72 hrs</div><div class="lc-label">Without adequate sleep</div></div>
+      <div class="lc"><div class="lc-val g">Survived</div><div class="lc-label">The outcome you already knew</div></div>
     </div>
   </div>
 </section>
-
-<!-- FEATURED -->
-<section class="section section--dark" id="featured">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-label">Featured</p>
-      <h2 class="section-title">Landmark Sessions</h2>
+<section class="statement" id="about">
+  <div class="reveal">
+    <p class="statement-label">The premise</p>
+    <h2 class="statement-headline">Other experiences ask:<br>can you change the past?<br><em>We ask something harder.</em></h2>
+    <div class="statement-body">
+      <p>Apollo 13 returns safely. John Lewis reaches the other side of the bridge. The Woolworth counter holds. You know this before you begin.</p>
+      <p>What you don&rsquo;t know is the margin. How close to blackout did Armstrong get before he fired the thrusters? How many times did Lewis nearly break his discipline before the troopers charged?</p>
+      <p>The ledger doesn&rsquo;t track whether you win. It tracks what winning actually cost the people who did it. That&rsquo;s the history they don&rsquo;t put in the textbook.</p>
     </div>
-    <!-- no public scenario listing route yet; update when /stories page exists -->
-    <a href="#" class="section-link">View All →</a>
   </div>
-
+  <div class="reveal rd2">
+    <div class="principle"><div class="principle-head">The macro-ledger is fixed</div><div class="principle-body">The crew of Apollo 13 survives. You cannot change this. The historical record is the record.</div></div>
+    <div class="principle"><div class="principle-head">The micro-ledger is yours</div><div class="principle-body">Your decisions determine the human cost of that survival &mdash; the physical toll, the psychological margin, the weight carried home.</div></div>
+    <div class="principle"><div class="principle-head">The shared fact ledger is real</div><div class="principle-body">Every number on screen comes from the historical record. NASA telemetry. Mission transcripts. Primary sources. Nothing is invented.</div></div>
+    <div class="principle"><div class="principle-head">The epilogue is the point</div><div class="principle-body">Every scenario closes with what the people in that room lived with afterward. Sourced. Documented. The part that usually gets left out.</div></div>
+  </div>
+</section>
+<div class="stats-strip">
+  <div class="stat-cell reveal rd1"><div class="stat-num">25</div><div class="stat-desc">Scenarios at launch</div></div>
+  <div class="stat-cell reveal rd2"><div class="stat-num">75</div><div class="stat-desc">Perspectives</div></div>
+  <div class="stat-cell reveal rd3"><div class="stat-num">250</div><div class="stat-desc">Years of the republic</div></div>
+  <div class="stat-cell reveal rd4"><div class="stat-num">0</div><div class="stat-desc">Rewritten outcomes</div></div>
+</div>
+<section class="ledger-featured" id="featured">
+  <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-hero-img reveal" style="display:block;text-decoration:none">
+    <canvas id="fc-hero-canvas" class="featured-hero-canvas"></canvas>
+    <div class="featured-hero-overlay"></div>
+    <div class="featured-hero-meta">
+      <div class="featured-hero-tag">Featured Scenario &nbsp;&middot;&nbsp; Apollo 13: Lifeboat &nbsp;&middot;&nbsp; April 13, 1970</div>
+      <span class="featured-hero-play">Enter the scenario &rarr;</span>
+    </div>
+  </a>
+  <div class="ledger-featured-body">
+    <div>
+      <p class="section-label reveal">Apollo 13: Lifeboat</p>
+      <h2 class="section-title reveal rd1" style="margin-bottom:1.5rem">You are Jack Swigert.<br>Main Bus B is gone.</h2>
+      <p style="font-size:15px;color:var(--parchment);opacity:.95;margin-bottom:1.5rem;font-family:'Barlow',sans-serif;line-height:1.65" class="reveal rd2">April 13, 1970 &nbsp;&middot;&nbsp; 200,000 miles from Earth &nbsp;&middot;&nbsp; The instrument panel is wet and the master alarm has gone silent.</p>
+      <blockquote style="border-left:2px solid var(--gold);padding-left:1.25rem;margin-bottom:1.75rem;font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--parchment);opacity:.95;line-height:1.65" class="reveal rd2">&ldquo;The instrument panel is wet. The master alarm cut out two minutes ago and the silence it left is worse.&rdquo;</blockquote>
+      <p class="section-label reveal rd2" style="margin-bottom:.75rem">Choose your position</p>
+      <div class="persp-list reveal rd3">
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=swigert';return false" class="persp-item"><div class="persp-dot" style="background:#6a9fd8"></div>Jack Swigert<span class="persp-role">Command Module Pilot</span></a>
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=lovell';return false" class="persp-item"><div class="persp-dot" style="background:#c9a84c"></div>Jim Lovell<span class="persp-role">Mission Commander</span></a>
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=kranz';return false" class="persp-item"><div class="persp-dot" style="background:#6a7a5a"></div>Gene Kranz<span class="persp-role">Flight Director, Houston</span></a>
+      </div>
+      <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary reveal rd4" style="display:inline-block">Enter the scenario &rarr;</a>
+    </div>
+    <div class="ledger-panel reveal rd2">
+      <div class="ledger-card">
+        <div class="lp-title">Shared fact ledger &mdash; live state</div>
+        <div class="lp-row"><span class="lp-key">Battery_Reserve</span><span class="lp-val r">43.2 amp-hrs &darr;</span></div>
+        <div class="lp-row"><span class="lp-key">Bus_A_Voltage</span><span class="lp-val r">25.5 V &darr;&darr;</span></div>
+        <div class="lp-row"><span class="lp-key">CO2_Partial_Pressure</span><span class="lp-val a">4.2 mmHg &uarr;</span></div>
+        <div class="lp-row"><span class="lp-key">LM_Aquarius</span><span class="lp-val g">Powering up</span></div>
+        <div class="lp-row"><span class="lp-key">Decision_Window</span><span class="lp-val r">04:08 remaining</span></div>
+        <div class="lp-note">Every number is drawn from NASA telemetry and mission transcripts. Your decisions are evaluated against historical margin &mdash; not survival, which is already guaranteed.</div>
+      </div>
+      <div class="ledger-card" style="margin-top:2px">
+        <div class="lp-title">What the ledger measures</div>
+        <div class="lp-row"><span class="lp-key">Crew_Physical_Margin</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">System_Stability_Cost</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">Psychological_Load</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">Historical_Divergence</span><span class="lp-val g">Within bounds</span></div>
+        <div class="lp-note">The scenario does not ask if you save the crew. It asks at what cost &mdash; and compares your path to the one Swigert actually walked.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--dark" id="scenarios">
+  <div class="section-header reveal">
+    <div><p class="section-label">Open Now</p><h2 class="section-title">Two scenarios open now</h2></div>
+    <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
+  </div>
   <div class="featured-grid">
-    <a class="featured-card fc-large reveal" href="/game?scenarioId=apollo_13_lifeboat">
-      <div class="fc-bg bg-apollo"></div>
-      <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-large" id="fc-card-apollo">
+      <div class="fc-bg bg-apollo" id="fc-apollo"></div>
       <div class="fc-inner">
-        <div class="fc-tag">Space Race — April 1970</div>
-        <h3 class="fc-title">Apollo 13:<br>Lifeboat</h3>
-        <p class="fc-desc">The explosion has happened. The mission is over. The crew has moved into the LM. Three men, four days, one trajectory — and no margin for error.</p>
-        <div class="fc-meta">
-          <span class="meta-pill">Historical</span>
-          <span class="meta-pill">Primary Sources</span>
-          <span class="meta-time">~30 min</span>
-        </div>
+        <p class="fc-tag">Space &middot; April 1970</p>
+        <h3 class="fc-title">Apollo 13: Lifeboat</h3>
+        <p class="fc-desc">Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.</p>
+        <p class="fc-cost">Cost tracked: battery reserve, crew physical margin</p>
+        <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
       </div>
     </a>
-
-    <a class="featured-card fc-small reveal rd1" href="/game?scenarioId=dog_green_sector">
-      <div class="fc-bg bg-dday"></div>
-      <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-large" id="fc-card-dgs">
+      <div class="fc-bg bg-omaha" id="fc-omaha"></div>
       <div class="fc-inner">
-        <div class="fc-tag">WW2 — June 1944</div>
-        <h3 class="fc-title">LCA Coxswain,<br>Dog Green Sector</h3>
-        <p class="fc-desc">You are LCA Coxswain, Dog Green Sector. The ramp drops. The gap in the wire is yours to find — if it exists at all.</p>
-        <div class="fc-meta">
-          <span class="meta-pill">Omaha Beach</span>
-          <span class="meta-pill">Primary Sources</span>
-          <span class="meta-time">~20 min</span>
-        </div>
+        <p class="fc-tag">World War II &middot; June 6, 1944</p>
+        <h3 class="fc-title">Dog Green Sector</h3>
+        <p class="fc-desc">The ramp drops. The gap in the wire is yours to find &mdash; if it exists at all. 300 yards of open water between you and the seawall.</p>
+        <p class="fc-cost">Cost tracked: physical survival margin, unit cohesion</p>
+        <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
       </div>
     </a>
-
-    <a class="featured-card fc-small reveal rd2" href="/game?scenarioId=titanic_final_hours">
-      <div class="fc-bg bg-titanic"></div>
-      <div class="fc-play"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0l9 5.5L0 11z"/></svg></div>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=woolworth_counter';return false" class="featured-card fc-small">
+      <div class="fc-bg bg-civil" id="fc-civil"></div>
       <div class="fc-inner">
-        <div class="fc-tag">Maritime — April 1912</div>
-        <h3 class="fc-title">The Marconi Room,<br>RMS Titanic</h3>
-        <p class="fc-desc">You are Junior Operator Harold Bride. The Mesaba warning is in your hand. The Bridge is twenty yards away. You have not moved.</p>
-        <div class="fc-meta">
-          <span class="meta-pill">Historical</span>
-          <span class="meta-pill">Primary Sources</span>
-          <span class="meta-time">~25 min</span>
-        </div>
+        <p class="fc-tag">Civil Rights &middot; Feb 1960</p>
+        <h3 class="fc-title">The Woolworth Counter</h3>
+        <p class="fc-desc">Sit still. Do not respond. Do not leave.</p>
+        <p class="fc-cost">Cost tracked: psychological discipline</p>
+        <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=b59_submarine';return false" class="featured-card fc-small">
+      <div class="fc-bg bg-sub" id="fc-sub"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Political Crisis &middot; Oct 1962</p>
+        <h3 class="fc-title">B-59: The Submarine</h3>
+        <p class="fc-desc">One officer can stop a nuclear launch. That officer is you.</p>
+        <p class="fc-cost">Cost tracked: command authority under exhaustion</p>
+        <div class="fc-meta"><span class="meta-pill">Vasili Arkhipov</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=triangle_shirtwaist';return false" class="featured-card fc-small">
+      <div class="fc-bg bg-fire" id="fc-fire"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Labor &amp; Society &middot; Mar 1911</p>
+        <h3 class="fc-title">Triangle Shirtwaist Fire</h3>
+        <p class="fc-desc">The door is locked from outside. The smoke is rising.</p>
+        <p class="fc-cost">Cost tracked: seconds to decision</p>
+        <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
       </div>
     </a>
   </div>
 </section>
-
-<!-- LIVE STORIES -->
-<section class="section section--mid">
+<section class="section section--mid" id="categories">
   <div class="section-header reveal">
-    <div>
-      <p class="section-label">From the Archive</p>
-      <h2 class="section-title">Available Now</h2>
-    </div>
-    <a href="https://chicago1893-production.up.railway.app/" target="_blank" class="section-link">Open Platform →</a>
-  </div>
-  <div class="stories-grid" id="stories-grid">
-    <div id="stories-loading" style="grid-column:1/-1;display:flex;gap:8px;justify-content:center;align-items:center;padding:48px 0;">
-      <span class="dot-pulse"></span>
-      <span class="dot-pulse" style="animation-delay:0.2s"></span>
-      <span class="dot-pulse" style="animation-delay:0.4s"></span>
-    </div>
-  </div>
-</section>
-
-<!-- CATEGORIES -->
-<section class="section section--dark" id="categories">
-  <div class="section-header reveal">
-    <div>
-      <p class="section-label">Browse</p>
-      <h2 class="section-title">By Historical Era</h2>
-    </div>
+    <div><p class="section-label">Browse</p><h2 class="section-title">By Category</h2></div>
   </div>
   <div class="categories-grid">
-    <div class="cat-card reveal rd1"><div class="cat-img ci-wwii"></div><div class="cat-overlay"></div><div><div class="cat-number">01</div><span class="cat-icon">⚔️</span><h3 class="cat-name">World War II</h3><p class="cat-tagline">The decisions were real. So were the people who made them.</p></div><div class="cat-count">3 Stories →</div></div>
-    <div class="cat-card reveal rd2"><div class="cat-img ci-maritime"></div><div class="cat-overlay"></div><div><div class="cat-number">02</div><span class="cat-icon">⚓</span><h3 class="cat-name">Maritime</h3><p class="cat-tagline">The sea does not negotiate.</p></div><div class="cat-count">4 Stories →</div></div>
-    <div class="cat-card reveal rd3"><div class="cat-img ci-ancient"></div><div class="cat-overlay"></div><div><div class="cat-number">03</div><span class="cat-icon">🏛️</span><h3 class="cat-name">Ancient World</h3><p class="cat-tagline">Power was always personal.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal rd4"><div class="cat-img ci-civilwar"></div><div class="cat-overlay"></div><div><div class="cat-number">04</div><span class="cat-icon">🔫</span><h3 class="cat-name">American Civil War</h3><p class="cat-tagline">A nation deciding what it was.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal"><div class="cat-img ci-space"></div><div class="cat-overlay"></div><div><div class="cat-number">05</div><span class="cat-icon">🚀</span><h3 class="cat-name">Space Race</h3><p class="cat-tagline">Twelve minutes to reentry. One frequency. No margin for error.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal rd1"><div class="cat-img ci-sail"></div><div class="cat-overlay"></div><div><div class="cat-number">06</div><span class="cat-icon">🧭</span><h3 class="cat-name">Age of Sail</h3><p class="cat-tagline">The chart ended here. Everything beyond it was yours to name.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal rd2"><div class="cat-img ci-renaissance"></div><div class="cat-overlay"></div><div><div class="cat-number">07</div><span class="cat-icon">🎨</span><h3 class="cat-name">Renaissance</h3><p class="cat-tagline">Ideas were the most dangerous weapons in the room.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal rd3"><div class="cat-img ci-ww1"></div><div class="cat-overlay"></div><div><div class="cat-number">08</div><span class="cat-icon">🪖</span><h3 class="cat-name">First World War</h3><p class="cat-tagline">Before the silence, there was this.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal rd4"><div class="cat-img ci-frontier"></div><div class="cat-overlay"></div><div><div class="cat-number">09</div><span class="cat-icon">🌵</span><h3 class="cat-name">American Frontier</h3><p class="cat-tagline">West was a direction before it was a destination.</p></div><div class="cat-count">Coming Soon →</div></div>
-    <div class="cat-card reveal"><div class="cat-img ci-revolution"></div><div class="cat-overlay"></div><div><div class="cat-number">10</div><span class="cat-icon">✊</span><h3 class="cat-name">Revolutions</h3><p class="cat-tagline">Someone had to be first to say it out loud.</p></div><div class="cat-count">Coming Soon →</div></div>
+    <div class="cat-card cat-space reveal rd1" onclick="filterTo('space')">
+      <div class="cat-img ci-space" id="ci-space"></div><div class="cat-overlay"></div>
+      <div class="cat-body"><div class="cat-number">01</div><h3 class="cat-name">Space exploration</h3><p class="cat-tagline">The margin between mission and catastrophe is thinner than you think.</p></div>
+      <div class="cat-count">3 Scenarios &rarr;</div>
+    </div>
+    <div class="cat-card cat-civil reveal rd2" onclick="filterTo('civil')">
+      <div class="cat-img ci-civil" id="ci-civil"></div><div class="cat-overlay"></div>
+      <div class="cat-body"><div class="cat-number">02</div><h3 class="cat-name">Civil rights</h3><p class="cat-tagline">Discipline in the face of violence is the hardest decision of all.</p></div>
+      <div class="cat-count">5 Scenarios &rarr;</div>
+    </div>
+    <div class="cat-card cat-military reveal rd3" onclick="filterTo('military')">
+      <div class="cat-img ci-military" id="ci-military"></div><div class="cat-overlay"></div>
+      <div class="cat-body"><div class="cat-number">03</div><h3 class="cat-name">Military</h3><p class="cat-tagline">From Dog Green Sector to Valley Forge. The cost was always paid by someone.</p></div>
+      <div class="cat-count">5 Scenarios &rarr;</div>
+    </div>
+    <div class="cat-card cat-political reveal rd4" onclick="filterTo('political')">
+      <div class="cat-img ci-political" id="ci-political"></div><div class="cat-overlay"></div>
+      <div class="cat-body"><div class="cat-number">04</div><h3 class="cat-name">Political crisis</h3><p class="cat-tagline">The decisions that almost ended everything &mdash; and the few who held the line.</p></div>
+      <div class="cat-count">5 Scenarios &rarr;</div>
+    </div>
+    <div class="cat-card cat-labor reveal rd5" onclick="filterTo('labor')">
+      <div class="cat-img ci-labor" id="ci-labor"></div><div class="cat-overlay"></div>
+      <div class="cat-body"><div class="cat-number">05</div><h3 class="cat-name">Labor &amp; society</h3><p class="cat-tagline">The frontier, the factory floor, the pandemic ward. Ordinary people, impossible stakes.</p></div>
+      <div class="cat-count">7 Scenarios &rarr;</div>
+    </div>
   </div>
 </section>
-
-<!-- STATEMENT -->
-<div class="statement">
-  <div class="reveal">
-    <p class="statement-label">The Standard</p>
-    <h2 class="statement-headline">Built from<br><em>primary sources.</em><br>Held to account.</h2>
-    <p class="statement-body">Every scenario is constructed from testimony, inquiry records, and documented historical evidence. Every named character is real. Every session is evaluated against an editorial standard before it publishes. Nothing here is invented for dramatic effect.</p>
+<section class="section section--dark" id="all-scenarios">
+  <div class="section-header reveal">
+    <div><p class="section-label">The Full Ledger</p><h2 class="section-title">25 moments &middot; 250 years</h2></div>
   </div>
-  <div class="reveal rd1">
-    <div class="stat-row"><div class="stat-num">100%</div><div class="stat-desc"><strong>Primary Source Verified</strong>Named characters, dates, and outcomes drawn from the historical record</div></div>
-    <div class="stat-row"><div class="stat-num">3</div><div class="stat-desc"><strong>Act Structure</strong>Every session builds toward a documented historical moment</div></div>
-    <div class="stat-row"><div class="stat-num">4</div><div class="stat-desc"><strong>Editorial Categories</strong>Each session reviewed for interiority, sensory precision, choice language, and attribution before publication</div></div>
+  <div class="filter-row reveal">
+    <button class="filter-btn active" onclick="filterStories('all',this)">All 25</button>
+    <button class="filter-btn" onclick="filterStories('space',this)">Space</button>
+    <button class="filter-btn" onclick="filterStories('civil',this)">Civil Rights</button>
+    <button class="filter-btn" onclick="filterStories('military',this)">Military</button>
+    <button class="filter-btn" onclick="filterStories('political',this)">Political Crisis</button>
+    <button class="filter-btn" onclick="filterStories('labor',this)">Labor &amp; Society</button>
+  </div>
+  <div class="stories-grid" id="stories-grid"></div>
+</section>
+<section class="section section--mid">
+  <div class="section-header reveal">
+    <div><p class="section-label">The mechanics</p><h2 class="section-title">How it works</h2></div>
+  </div>
+  <div class="how-grid">
+    <div class="how-card reveal rd1"><div class="how-num">01</div><div class="how-title">Choose your position</div><div class="how-body">Every scenario offers three perspectives on the same moment. The event is fixed. The seat you occupy changes everything you see.</div></div>
+    <div class="how-card reveal rd2"><div class="how-num">02</div><div class="how-title">Make real decisions</div><div class="how-body">A guardrailed AI keeps every choice inside the historical record. You cannot invent new options &mdash; only choose between the ones that actually existed.</div></div>
+    <div class="how-card reveal rd3"><div class="how-num">03</div><div class="how-title">The ledger tracks cost</div><div class="how-body">Not victory. Not survival. The ledger measures what your decisions cost &mdash; physically, psychologically, and tactically &mdash; against the historical record.</div></div>
+    <div class="how-card reveal rd4"><div class="how-num">04</div><div class="how-title">Read the epilogue</div><div class="how-body">Every scenario closes with what the people in that room carried for the rest of their lives. Primary sources included.</div></div>
+  </div>
+</section>
+<div class="edu-bar reveal" id="educators">
+  <div class="edu-label">For educators &amp; institutions</div>
+  <div class="edu-pills">
+    <span class="edu-pill">Free educator access</span>
+    <span class="edu-pill">Curriculum guides</span>
+    <span class="edu-pill">Primary source bibliography</span>
+    <span class="edu-pill">Classroom-safe guardrails</span>
+    <span class="edu-pill">Grades 8 &ndash; university</span>
   </div>
 </div>
-
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Project Limen</div>
-  <p class="footer-note">All scenarios verified against primary sources</p>
-  <p class="footer-note">© 2026 Project Limen</p>
+  <div class="footer-logo">Ledger 250</div>
+  <div class="footer-note">Launches July 4, 2026 &nbsp;&middot;&nbsp; ledger250.com</div>
+  <div class="footer-note">A project for America&rsquo;s 250th</div>
 </footer>
-
 <script>
-// REVEAL
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-}, { threshold: 0.07, rootMargin: '0px 0px -28px 0px' });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-</script>
-
-<script>
-// ── CANVAS PLACEHOLDER IMAGES ──
-// Draws atmospheric scene illustrations into each card background using Canvas 2D.
-// No network requests. Renders instantly in any browser.
-
-function makeCanvas(w, h, drawFn) {
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  drawFn(c.getContext('2d'), w, h);
-  return c.toDataURL('image/jpeg', 0.85);
-}
-
-function stars(ctx, w, h, n) {
-  for (let i = 0; i < n; i++) {
-    const x = Math.random()*w, y = Math.random()*h*0.7;
-    const r = Math.random()*1.5+0.3;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.6+0.2})`; ctx.fill();
-  }
-}
-
-function waves(ctx, w, h, baseY, color, count) {
-  for (let i = 0; i < count; i++) {
-    ctx.beginPath();
-    ctx.moveTo(0, baseY + i*6);
-    for (let x = 0; x <= w; x += 40) {
-      ctx.quadraticCurveTo(x+20, baseY+i*6 - 8 + Math.random()*6, x+40, baseY+i*6);
-    }
-    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.25; ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-}
-
-const scenes = {
-  'bg-titanic': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#1a3060'); sky.addColorStop(0.55,'#2e4e7a'); sky.addColorStop(1,'#1a3050');
-    ctx.fillStyle = sky; ctx.fillRect(0,0,w,h);
-    const moon = ctx.createRadialGradient(w*0.72,h*0.15,8,w*0.72,h*0.15,120);
-    moon.addColorStop(0,'rgba(220,235,255,0.55)'); moon.addColorStop(1,'rgba(220,235,255,0)');
-    ctx.fillStyle = moon; ctx.fillRect(0,0,w,h);
-    stars(ctx,w,h,150);
-    const sea = ctx.createLinearGradient(0,h*0.58,0,h);
-    sea.addColorStop(0,'#2a4870'); sea.addColorStop(1,'#1a3050');
-    ctx.fillStyle = sea; ctx.fillRect(0,h*0.58,w,h);
-    waves(ctx,w,h,h*0.62,'#5a90b0',6);
-    // Ship
-    ctx.fillStyle='#0e1e38'; ctx.globalAlpha=0.92;
-    ctx.fillRect(w*0.22,h*0.40,w*0.56,h*0.20);
-    [[0.32,0.20],[0.41,0.16],[0.51,0.17],[0.60,0.20]].forEach(([x,y]) => {
-      ctx.fillRect(w*x-9,h*y,17,h*0.22);
-    });
-    ctx.globalAlpha=1;
-    ctx.fillStyle='rgba(180,210,255,0.18)';
-    ctx.fillRect(w*0.60,h*0.58,w*0.18,h*0.42);
-  },
-
-  'bg-dday': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h*0.62);
-    sky.addColorStop(0,'#3a3818'); sky.addColorStop(0.5,'#4e4c22'); sky.addColorStop(1,'#5a5828');
-    ctx.fillStyle = sky; ctx.fillRect(0,0,w,h*0.62);
-    [0.15,0.38,0.58,0.75,0.90].forEach(x => {
-      const g = ctx.createRadialGradient(w*x,h*0.28,0,w*x,h*0.28,h*0.32);
-      g.addColorStop(0,'rgba(140,130,70,0.55)'); g.addColorStop(1,'rgba(140,130,70,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    const beach = ctx.createLinearGradient(0,h*0.60,0,h);
-    beach.addColorStop(0,'#4a4820'); beach.addColorStop(1,'#2e2c14');
-    ctx.fillStyle=beach; ctx.fillRect(0,h*0.60,w,h);
-    [0.10,0.25,0.42,0.58,0.74,0.88].forEach(x => {
-      ctx.strokeStyle='#2a2a10'; ctx.lineWidth=5; ctx.globalAlpha=0.9;
-      ctx.beginPath(); ctx.moveTo(w*x-14,h*0.72); ctx.lineTo(w*x+14,h*0.54); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(w*x+14,h*0.72); ctx.lineTo(w*x-14,h*0.54); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(w*x,h*0.74); ctx.lineTo(w*x,h*0.52); ctx.stroke();
-      ctx.globalAlpha=1;
-    });
-    ctx.fillStyle='#202010'; ctx.globalAlpha=0.85;
-    ctx.fillRect(w*0.06,h*0.46,w*0.20,h*0.12);
-    ctx.fillRect(w*0.52,h*0.48,w*0.18,h*0.11);
-    ctx.globalAlpha=1;
-  },
-
-  'bg-engineer': (ctx, w, h) => {
-    ctx.fillStyle='#2a1008'; ctx.fillRect(0,0,w,h);
-    [[0.25,0.5],[0.72,0.45]].forEach(([gx,gy]) => {
-      const g = ctx.createRadialGradient(w*gx,h*gy,10,w*gx,h*gy,160);
-      g.addColorStop(0,'rgba(240,120,30,0.55)'); g.addColorStop(1,'rgba(240,120,30,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    [[0.25,0.5,90],[0.72,0.45,110]].forEach(([cx,cy,r]) => {
-      for (let ri=r; ri>10; ri-=20) {
-        ctx.beginPath(); ctx.arc(w*cx,h*cy,ri,0,Math.PI*2);
-        ctx.strokeStyle=`rgba(220,110,30,${0.18+ri/r*0.55})`; ctx.lineWidth=ri>60?12:7; ctx.stroke();
-      }
-      ctx.beginPath(); ctx.arc(w*cx,h*cy,14,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,140,40,0.9)'; ctx.fill();
-    });
-    [0.70,0.76,0.82,0.88].forEach(y => {
-      ctx.fillStyle='rgba(180,80,20,0.6)'; ctx.fillRect(0,h*y,w,9);
-    });
-    [0.36,0.50].forEach(x => {
-      ctx.fillStyle='rgba(150,65,18,0.55)'; ctx.fillRect(w*x,h*0.08,11,h*0.82);
-    });
-  },
-
-  'bg-apollo': (ctx, w, h) => {
-    // Deep space background
-    ctx.fillStyle='#06060f'; ctx.fillRect(0,0,w,h);
-    // Stars
-    stars(ctx, w, h, 220);
-    // Earth limb glow bottom-left
-    const earthG = ctx.createRadialGradient(w*0.08, h*1.05, h*0.15, w*0.08, h*1.05, h*0.75);
-    earthG.addColorStop(0,'rgba(40,80,180,0.55)'); earthG.addColorStop(0.4,'rgba(20,50,120,0.25)'); earthG.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=earthG; ctx.fillRect(0,0,w,h);
-    // Subtle sunlight streak top-right
-    const sunG = ctx.createRadialGradient(w*0.88, h*0.08, 20, w*0.88, h*0.08, h*0.55);
-    sunG.addColorStop(0,'rgba(255,220,140,0.22)'); sunG.addColorStop(1,'rgba(255,220,140,0)');
-    ctx.fillStyle=sunG; ctx.fillRect(0,0,w,h);
-    // LM silhouette (boxy ascent stage + descent legs)
-    const cx=w*0.60, cy=h*0.42;
-    ctx.fillStyle='#0d0d1e'; ctx.globalAlpha=0.95;
-    // Ascent stage box
-    ctx.fillRect(cx-28, cy-24, 56, 44);
-    // Docking probe
-    ctx.fillRect(cx-3, cy-38, 6, 16);
-    // Descent stage wider base
-    ctx.fillRect(cx-38, cy+20, 76, 18);
-    // Landing legs
-    [[-38,-22],[38,-22],[-48,12],[48,12]].forEach(([dx,dy]) => {
-      ctx.beginPath(); ctx.moveTo(cx+dx*0.3, cy+20); ctx.lineTo(cx+dx, cy+38+dy*0.2);
-      ctx.strokeStyle='#0d0d1e'; ctx.lineWidth=3; ctx.stroke();
-    });
-    // Window
-    ctx.globalAlpha=1;
-    ctx.beginPath(); ctx.arc(cx+10, cy-8, 7, 0, Math.PI*2);
-    ctx.fillStyle='rgba(180,210,255,0.35)'; ctx.fill();
-    ctx.strokeStyle='rgba(180,210,255,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
-    // Foil thermal detail lines
-    ctx.globalAlpha=0.18;
-    [cy-22,cy-12,cy-2,cy+8,cy+18].forEach(y => {
-      ctx.fillStyle='#ffd080'; ctx.fillRect(cx-28,y,56,2);
-    });
-    ctx.globalAlpha=1;
-    // Mission text glow — subtle
-    const txtG = ctx.createRadialGradient(cx, cy, 0, cx, cy, 90);
-    txtG.addColorStop(0,'rgba(180,200,255,0.08)'); txtG.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=txtG; ctx.fillRect(0,0,w,h);
-  },
-
-  // ── CATEGORY CARDS ──
-  'ci-wwii': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#3a3c18'); sky.addColorStop(1,'#28300e');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    // Smoke
-    [0.2,0.5,0.8].forEach(x => {
-      const g = ctx.createRadialGradient(w*x,h*0.4,0,w*x,h*0.4,80);
-      g.addColorStop(0,'rgba(140,130,60,0.65)'); g.addColorStop(1,'rgba(140,130,60,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    ctx.fillStyle='#22280e'; ctx.fillRect(0,h*0.65,w,h);
-    // Silhouette figures
-    [0.15,0.3,0.5,0.65,0.8].forEach(x => {
-      ctx.fillStyle='rgba(15,18,8,0.9)';
-      ctx.fillRect(w*x-3,h*0.55,6,h*0.15);
-      ctx.beginPath(); ctx.arc(w*x,h*0.53,5,0,Math.PI*2);
-      ctx.fill();
-    });
-  },
-
-  'ci-maritime': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#1e3868'); sky.addColorStop(0.55,'#2e5080'); sky.addColorStop(1,'#1a3860');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    stars(ctx,w,h,60);
-    const moon = ctx.createRadialGradient(w*0.7,h*0.15,3,w*0.7,h*0.15,60);
-    moon.addColorStop(0,'rgba(180,210,255,0.3)'); moon.addColorStop(1,'rgba(180,210,255,0)');
-    ctx.fillStyle=moon; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle='#1a3860'; ctx.fillRect(0,h*0.55,w,h);
-    waves(ctx,w,h,h*0.58,'#4a80a0',5);
-    // Ship silhouette
-    ctx.fillStyle='#0e2040'; ctx.globalAlpha=0.85;
-    ctx.fillRect(w*0.3,h*0.42,w*0.4,h*0.15);
-    ctx.fillRect(w*0.43,h*0.3,8,h*0.14);
-    ctx.globalAlpha=1;
-  },
-
-  'ci-ancient': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#5a3c14'); sky.addColorStop(1,'#3a2808');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    const sun = ctx.createRadialGradient(w*0.65,h*0.2,5,w*0.65,h*0.2,100);
-    sun.addColorStop(0,'rgba(255,190,80,0.55)'); sun.addColorStop(1,'rgba(255,190,80,0)');
-    ctx.fillStyle=sun; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle='#302010'; ctx.fillRect(0,h*0.72,w,h);
-    // Columns
-    [0.15,0.3,0.5,0.65,0.82].forEach(x => {
-      ctx.fillStyle='rgba(180,140,50,0.85)';
-      ctx.fillRect(w*x-8,h*0.22,16,h*0.52);
-      ctx.fillRect(w*x-12,h*0.2,24,10);
-      ctx.fillRect(w*x-10,h*0.72,20,8);
-    });
-  },
-
-  'ci-civilwar': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#2a3050'); sky.addColorStop(1,'#1e2440');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    [0.25,0.55,0.80].forEach(x => {
-      const g = ctx.createRadialGradient(w*x,h*0.5,0,w*x,h*0.5,90);
-      g.addColorStop(0,'rgba(100,110,160,0.5)'); g.addColorStop(1,'rgba(100,110,160,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    ctx.fillStyle='#1e2030'; ctx.fillRect(0,h*0.68,w,h);
-    // Flag pole silhouette
-    ctx.fillStyle='rgba(70,80,120,0.85)';
-    ctx.fillRect(w*0.48,h*0.2,4,h*0.5);
-    ctx.fillRect(w*0.48,h*0.2,w*0.12,6);
-  },
-
-  'ci-space': (ctx, w, h) => {
-    ctx.fillStyle='#0e0e28'; ctx.fillRect(0,0,w,h);
-    stars(ctx,w,h,200);
-    // Planet
-    const planet = ctx.createRadialGradient(w*0.75,h*0.3,0,w*0.75,h*0.3,45);
-    planet.addColorStop(0,'rgba(100,120,220,0.8)'); planet.addColorStop(1,'rgba(100,120,220,0)');
-    ctx.fillStyle=planet; ctx.fillRect(0,0,w,h);
-    // Nebula
-    const neb = ctx.createRadialGradient(w*0.3,h*0.6,0,w*0.3,h*0.6,120);
-    neb.addColorStop(0,'rgba(150,60,150,0.35)'); neb.addColorStop(1,'rgba(150,60,150,0)');
-    ctx.fillStyle=neb; ctx.fillRect(0,0,w,h);
-  },
-
-  'ci-sail': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#283858'); sky.addColorStop(0.55,'#304858'); sky.addColorStop(1,'#283c50');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    stars(ctx,w,h,40);
-    ctx.fillStyle='#1e3048'; ctx.fillRect(0,h*0.58,w,h);
-    waves(ctx,w,h,h*0.6,'#5080a0',4);
-    // Tall ship silhouette
-    ctx.fillStyle='rgba(20,30,48,0.88)';
-    // Hull
-    ctx.fillRect(w*0.32,h*0.52,w*0.36,h*0.1);
-    // Mast
-    ctx.fillRect(w*0.49,h*0.15,5,h*0.38);
-    ctx.fillRect(w*0.36,h*0.25,5,h*0.28);
-    // Sails
-    ctx.beginPath(); ctx.moveTo(w*0.494,h*0.17); ctx.lineTo(w*0.494,h*0.42); ctx.lineTo(w*0.65,h*0.35); ctx.closePath();
-    ctx.fillStyle='rgba(30,48,70,0.75)'; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(w*0.494,h*0.17); ctx.lineTo(w*0.494,h*0.42); ctx.lineTo(w*0.34,h*0.35); ctx.closePath();
-    ctx.fill();
-  },
-
-  'ci-renaissance': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#5a3c14'); sky.addColorStop(1,'#3a2810');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    const light = ctx.createRadialGradient(w*0.5,0,0,w*0.5,0,h);
-    light.addColorStop(0,'rgba(255,190,80,0.45)'); light.addColorStop(1,'rgba(255,190,80,0)');
-    ctx.fillStyle=light; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle='#281c0a'; ctx.fillRect(0,h*0.85,w,h);
-    // Arched windows
-    [[0.2,0.15],[0.5,0.12],[0.8,0.15]].forEach(([x,topY]) => {
-      ctx.strokeStyle='rgba(220,170,60,0.8)'; ctx.lineWidth=9;
-      ctx.beginPath();
-      ctx.moveTo(w*x-22,h*0.85);
-      ctx.lineTo(w*x-22,h*topY+22);
-      ctx.arc(w*x,h*topY+22,22,Math.PI,0);
-      ctx.lineTo(w*x+22,h*0.85);
-      ctx.stroke();
-    });
-    // Floor line
-    ctx.fillStyle='rgba(180,130,40,0.65)';
-    ctx.fillRect(0,h*0.84,w,9);
-  },
-
-  'ci-ww1': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#343020'); sky.addColorStop(1,'#242018');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    [0.2,0.5,0.8].forEach(x => {
-      const g = ctx.createRadialGradient(w*x,h*0.35,0,w*x,h*0.35,70);
-      g.addColorStop(0,'rgba(120,110,60,0.55)'); g.addColorStop(1,'rgba(120,110,60,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    ctx.fillStyle='#2a2418'; ctx.fillRect(0,h*0.62,w,h);
-    // Trench line
-    ctx.fillStyle='rgba(60,55,30,0.88)';
-    ctx.fillRect(0,h*0.6,w,h*0.08);
-    // Barbed wire
-    ctx.strokeStyle='rgba(100,90,40,0.75)'; ctx.lineWidth=2.5;
-    [h*0.56,h*0.53].forEach(y => {
-      ctx.beginPath(); ctx.moveTo(0,y);
-      for (let x=0; x<w; x+=20) { ctx.lineTo(x+10,y-6); ctx.lineTo(x+20,y); }
-      ctx.stroke();
-    });
-  },
-
-  'ci-frontier': (ctx, w, h) => {
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0,'#343e18'); sky.addColorStop(0.6,'#404c1e'); sky.addColorStop(1,'#2c3414');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
-    const sun = ctx.createRadialGradient(w*0.68,h*0.22,0,w*0.68,h*0.22,80);
-    sun.addColorStop(0,'rgba(255,200,80,0.55)'); sun.addColorStop(1,'rgba(255,200,80,0)');
-    ctx.fillStyle=sun; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle='#242c10'; ctx.fillRect(0,h*0.65,w,h);
-    // Mountains
-    [[0.15,0.42],[0.35,0.3],[0.55,0.38],[0.75,0.28],[0.92,0.4]].forEach(([x,y]) => {
-      ctx.beginPath(); ctx.moveTo(w*(x-0.12),h*0.65); ctx.lineTo(w*x,h*y); ctx.lineTo(w*(x+0.12),h*0.65);
-      ctx.fillStyle='rgba(40,50,20,0.85)'; ctx.fill();
-    });
-  },
-
-  'ci-revolution': (ctx, w, h) => {
-    ctx.fillStyle='#3a100a'; ctx.fillRect(0,0,w,h);
-    // Fire glow from below
-    const fire = ctx.createRadialGradient(w*0.5,h,0,w*0.5,h,h*0.9);
-    fire.addColorStop(0,'rgba(255,100,20,0.85)'); fire.addColorStop(0.4,'rgba(200,50,10,0.55)'); fire.addColorStop(1,'rgba(200,50,10,0)');
-    ctx.fillStyle=fire; ctx.fillRect(0,0,w,h);
-    // Secondary fires
-    [[0.2,0.8],[0.8,0.75]].forEach(([x,y]) => {
-      const g = ctx.createRadialGradient(w*x,h*y,0,w*x,h*y,60);
-      g.addColorStop(0,'rgba(255,120,20,0.65)'); g.addColorStop(1,'rgba(255,120,20,0)');
-      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-    });
-    // Crowd silhouettes
-    ctx.fillStyle='rgba(25,8,4,0.88)';
-    ctx.fillRect(0,h*0.72,w,h);
-    for (let i=0; i<18; i++) {
-      const x = (i/(18-1))*w*0.9 + w*0.05;
-      const hh = h*0.06 + Math.random()*h*0.06;
-      ctx.fillRect(x-4,h*0.72-hh,8,hh);
-      ctx.beginPath(); ctx.arc(x,h*0.72-hh-6,5,0,Math.PI*2); ctx.fill();
-    }
-    // Flame shapes
-    [0.3,0.5,0.7].forEach(x => {
-      ctx.fillStyle='rgba(255,100,20,0.55)';
-      ctx.beginPath();
-      ctx.moveTo(w*x-15,h*0.72);
-      ctx.quadraticCurveTo(w*x-5,h*0.45,w*x,h*0.3);
-      ctx.quadraticCurveTo(w*x+5,h*0.45,w*x+15,h*0.72);
-      ctx.fill();
-    });
-  }
+const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+const STORIES=[
+  {id:'apollo_13_lifeboat',cat:'space',era:'Space Race',year:'Apr 13, 1970',title:'Apollo 13: Lifeboat',hook:'Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.',cost:'Battery reserve, crew physical margin',perspectives:['Jack Swigert','Jim Lovell','Gene Kranz'],scene:'ci-space'},
+  {id:'gemini8',cat:'space',era:'Space Race',year:'Mar 16, 1966',title:'Gemini 8: The Tumble',hook:'One revolution per second. Vision tunneling. Armstrong must fire the thrusters before the craft disintegrates.',cost:'G-force tolerance, abort window',perspectives:['Neil Armstrong','David Scott','Capcom'],scene:'ci-space'},
+  {id:'apollo11',cat:'space',era:'Space Race',year:'Jul 16, 1969',title:'Apollo 11: Launch Day',hook:'Hand on the abort handle. T-minus 10. The most powerful machine ever built groans beneath you.',cost:'Structural margin, abort decision threshold',perspectives:['Neil Armstrong','GUIDO Jack Garman','Pad safety engineer'],scene:'ci-space'},
+  {id:'woolworth',cat:'civil',era:'Civil Rights',year:'Feb 1, 1960',title:'The Woolworth Counter',hook:'Sit still. Do not respond. Do not leave. Every second of stillness is a political act.',cost:'Psychological discipline under provocation',perspectives:['Student activist','White waitress','Local officer'],scene:'ci-civil'},
+  {id:'anniston',cat:'civil',era:'Civil Rights',year:'May 14, 1961',title:'Anniston: The Firebombing',hook:'The bus is on fire. The doors are held shut from outside.',cost:'Smoke saturation, escape window',perspectives:['Freedom Rider','Undercover FBI agent','Highway Patrolman'],scene:'ci-civil'},
+  {id:'underground',cat:'civil',era:'Civil Rights',year:'1855',title:'The Underground Railroad',hook:'The conductor has not appeared. You have a folded scrap of paper with two words: Follow stars.',cost:'Detection risk, route margin',perspectives:['Freedom seeker','Harriet Tubman','US Marshal'],scene:'ci-civil'},
+  {id:'lorraine',cat:'civil',era:'Civil Rights',year:'Apr 4, 1968',title:'The Lorraine Motel',hook:'The shot was fired four seconds ago. You are kneeling on the concrete balcony.',cost:'Medical window, scene control',perspectives:['Andrew Young','First responding officer','Police dispatcher'],scene:'ci-civil'},
+  {id:'stonewall',cat:'civil',era:'Civil Rights',year:'Jun 28, 1969',title:'Stonewall: The Night Before the Moon',hook:'Something is different tonight. The crowd outside is not dispersing.',cost:'Crowd cohesion, personal threshold',perspectives:['Patron Ray','Beat cop','Village Voice reporter'],scene:'ci-civil'},
+  {id:'selma',cat:'civil',era:'Civil Rights',year:'Mar 7, 1965',title:'Edmund Pettus Bridge',hook:'He can see the troopers. He does not stop walking. 600 people are walking behind him.',cost:'Physical injury margin, march cohesion',perspectives:['John Lewis','Major John Cloud','NBC cameraman'],scene:'ci-civil'},
+  {id:'dog_green_sector',cat:'military',era:'World War II',year:'Jun 6, 1944',title:'Dog Green Sector',hook:'The ramp drops. The gap in the wire is yours to find — if it exists at all.',cost:'Physical survival margin, unit cohesion',perspectives:['LCA Coxswain','Army rifleman','Combat medic'],scene:'ci-military'},
+  {id:'hue',cat:'military',era:'Vietnam',year:'Feb 1968',title:'The Battle of Huế: The Citadel',hook:'House to house. Ancient stone walls. A sniper in every shadow.',cost:'Urban cover integrity, sniper exposure',perspectives:['Marine rifleman','NVA squad leader','Civilian in the cellar'],scene:'ci-military'},
+  {id:'gettysburg',cat:'military',era:'Civil War',year:'Jul 3, 1863',title:'Gettysburg: The Angle',hook:'12,500 men in parade-ground order. One mile away. The wall is all that stands between them and the Union rear.',cost:'Ammunition reserve, wall integrity',perspectives:['Union corporal','Confederate officer','Field surgeon'],scene:'ci-military'},
+  {id:'ammo_hill',cat:'military',era:'Six-Day War',year:'Jun 6, 1967',title:'Ammunition Hill: Jerusalem',hook:'The briefing said lightly fortified. The briefing was wrong.',cost:'Ammunition, trench visibility',perspectives:['Israeli paratrooper','Jordanian legionnaire','Combat medic'],scene:'ci-military'},
+  {id:'valley_forge',cat:'military',era:'Revolutionary War',year:'Dec 19, 1777',title:'Valley Forge: The Winter',hook:'No shoes. 14 degrees Fahrenheit. No barracks yet. The cold is not dramatic. It is relentless.',cost:'Body temperature, desertion threshold',perspectives:['Continental soldier','George Washington','Surgeon Waldo'],scene:'ci-military'},
+  {id:'b59',cat:'political',era:'Cold War',year:'Oct 27, 1962',title:'B-59: The Submarine',hook:'One officer can stop a nuclear launch. That officer is you. The temperature in the submarine is 120°F.',cost:'Command authority, oxygen, heat exhaustion',perspectives:['Vasili Arkhipov','Soviet sonar operator','USS Cony captain'],scene:'ci-political'},
+  {id:'blackout',cat:'political',era:'Cold War',year:'Nov 9, 1965',title:'The Northeast Blackout',hook:'30 million people. Total darkness. The grid is collapsing section by section on the board in front of you.',cost:'Grid stability, cascade window',perspectives:['Con Edison dispatcher','Subway conductor','Elevator operator'],scene:'ci-political'},
+  {id:'alcatraz',cat:'political',era:'Cold War',year:'Jun 11, 1962',title:'Alcatraz: The Escape',hook:'The dummy head is in his bunk. The guard’s footsteps are on the Broadway corridor floor.',cost:'Guard alert level, raft integrity',perspectives:['Frank Morris','Night guard','Coast Guard coxswain'],scene:'ci-political'},
+  {id:'tea_party',cat:'political',era:'Revolutionary War',year:'Dec 16, 1773',title:'The Boston Tea Party',hook:'342 chests. One hatchet. No going back.',cost:'Mob coordination, detection risk',perspectives:['Patriot on the wharf','Customs officer','Boston merchant'],scene:'ci-political'},
+  {id:'constitution',cat:'political',era:'Founding Era',year:'Jul 16, 1787',title:'The Constitutional Convention',hook:'The man carrying the tea cannot vote on the republic being designed in this room.',cost:'Compromise margin, moral cost tracking',perspectives:['Roger Sherman','James Madison','Caesar (enslaved)'],scene:'ci-political'},
+  {id:'triangle',cat:'labor',era:'Progressive Era',year:'Mar 25, 1911',title:'Triangle Shirtwaist Fire',hook:'The door is locked from the outside. The smoke is rising. You have 60 seconds.',cost:'Seconds to decision, escape window',perspectives:['Worker Rosie Freedman','Owner Isaac Harris','Firefighter'],scene:'ci-labor'},
+  {id:'pullman',cat:'labor',era:'Gilded Age',year:'Jul 4, 1894',title:'The Pullman Strike',hook:'Federal bayonets 50 yards away. Your family is in a company house that can be evicted tonight.',cost:'Picket cohesion, eviction threat',perspectives:['Pullman porter','Eugene Debs','Federal marshal'],scene:'ci-labor'},
+  {id:'flu1918',cat:'labor',era:'WWI Era',year:'Oct 1918',title:'1918 Influenza: Philadelphia',hook:'635 new cases this morning. 40 beds. The ward was designed for peacetime.',cost:'Ward capacity, triage load',perspectives:['Staff nurse','Health director Krusen','Morgue worker'],scene:'ci-labor'},
+  {id:'dustbowl',cat:'labor',era:'Great Depression',year:'Apr 14, 1935',title:'Dust Bowl: Black Sunday',hook:'8,000 feet tall. Moving at 60 miles per hour. You can see it on the northern horizon.',cost:'Static charge, visibility, topsoil loss',perspectives:['Farmer Earl','Dorothea Lange','Route 66 diner owner'],scene:'ci-labor'},
+  {id:'lewisclark',cat:'labor',era:'Frontier Era',year:'Aug 12, 1805',title:'Lewis & Clark: The Continental Divide',hook:'Her brother is likely in that camp. She is the negotiation. The expedition depends on what she says next.',cost:'Negotiation margin, trust threshold',perspectives:['Sacagawea','Meriwether Lewis','Chief Cameahwait'],scene:'ci-labor'},
+  {id:'mission_control',cat:'labor',era:'Space Race',year:'Jul 20, 1969',title:'Moon Landing: Mission Control',hook:'You are 24 years old. Your index card decides the first Moon landing. You wrote it yourself six months ago.',cost:'Abort window, decision confidence',perspectives:['Jack Garman','Gene Kranz','Walter Cronkite'],scene:'ci-labor'},
+];
+const CAT_COLORS={space:'#6a9fd8',civil:'#5a8a5a',military:'#c0524a',political:'#7f77dd',labor:'#b8832a'};
+function makeCanvas(w,h,painter){const c=document.createElement('canvas');c.width=w;c.height=h;painter(c.getContext('2d'),w,h);return c.toDataURL('image/jpeg',.85)}
+const SCENES={
+  'ci-space':(ctx,w,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#06061a');g.addColorStop(1,'#0a0a28');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.fillStyle='#f5f0e8';for(let i=0;i<80;i++){ctx.globalAlpha=Math.random()*.8+.1;ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*1.2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;const eg=ctx.createRadialGradient(w*.1,h*1.1,0,w*.1,h*1.1,h*.9);eg.addColorStop(0,'rgba(30,60,140,.55)');eg.addColorStop(1,'rgba(30,60,140,0)');ctx.fillStyle=eg;ctx.fillRect(0,0,w,h);const pg=ctx.createRadialGradient(w*.5,h*.7,0,w*.5,h*.7,w*.4);pg.addColorStop(0,'rgba(196,154,60,.18)');pg.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=pg;ctx.fillRect(0,0,w,h);},
+  'ci-civil':(ctx,w,h)=>{ctx.fillStyle='#0a0c08';ctx.fillRect(0,0,w,h);const wl=ctx.createLinearGradient(w,0,0,0);wl.addColorStop(0,'rgba(200,180,100,.22)');wl.addColorStop(.4,'rgba(200,180,100,.05)');wl.addColorStop(1,'rgba(200,180,100,0)');ctx.fillStyle=wl;ctx.fillRect(0,0,w,h);ctx.globalAlpha=.12;for(let i=0;i<6;i++){ctx.fillStyle='#8a7040';ctx.fillRect(0,h*.75+i*4,w,1)}ctx.globalAlpha=1;ctx.fillStyle='rgba(80,60,30,.3)';ctx.fillRect(0,h*.6,w,h*.15);ctx.fillStyle='rgba(196,154,60,.08)';ctx.fillRect(0,h*.58,w,2);},
+  'ci-military':(ctx,w,h)=>{const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#1a1e14');sky.addColorStop(.5,'#2a2e1e');sky.addColorStop(1,'#1e2010');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);ctx.fillStyle='rgba(180,180,160,.08)';ctx.fillRect(0,h*.3,w,h*.2);ctx.fillStyle='#0e1208';ctx.fillRect(0,h*.6,w,h);ctx.globalAlpha=.15;for(let i=0;i<5;i++){ctx.fillStyle='#a0a888';ctx.fillRect(0,h*.62+i*8,w,1)}ctx.globalAlpha=1;const sg=ctx.createRadialGradient(w*.6,h*.2,0,w*.6,h*.2,w*.35);sg.addColorStop(0,'rgba(60,60,50,.35)');sg.addColorStop(1,'rgba(60,60,50,0)');ctx.fillStyle=sg;ctx.fillRect(0,0,w,h);},
+  'ci-political':(ctx,w,h)=>{ctx.fillStyle='#060810';ctx.fillRect(0,0,w,h);const ig=ctx.createRadialGradient(w*.5,h*.4,0,w*.5,h*.4,w*.45);ig.addColorStop(0,'rgba(60,100,160,.3)');ig.addColorStop(1,'rgba(60,100,160,0)');ctx.fillStyle=ig;ctx.fillRect(0,0,w,h);ctx.globalAlpha=.2;[.2,.5,.8].forEach(x=>{ctx.fillStyle='#1a2030';ctx.fillRect(w*x-2,0,4,h)});ctx.globalAlpha=1;const wg=ctx.createRadialGradient(w*.15,h*.3,0,w*.15,h*.3,60);wg.addColorStop(0,'rgba(200,80,60,.4)');wg.addColorStop(1,'rgba(200,80,60,0)');ctx.fillStyle=wg;ctx.fillRect(0,0,w,h);},
+  'ci-labor':(ctx,w,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#1a0e06');g.addColorStop(1,'#0e0804');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.globalAlpha=.12;[.25,.5,.75].forEach(x=>{const sl=ctx.createLinearGradient(w*x,0,w*(x+.08),h);sl.addColorStop(0,'rgba(240,180,80,.8)');sl.addColorStop(1,'rgba(240,180,80,.1)');ctx.fillStyle=sl;ctx.beginPath();ctx.moveTo(w*x,0);ctx.lineTo(w*(x+.08),0);ctx.lineTo(w*(x+.12),h);ctx.lineTo(w*(x+.04),h);ctx.fill()});ctx.globalAlpha=1;ctx.fillStyle='rgba(220,180,100,.15)';for(let i=0;i<30;i++){ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,.8,0,Math.PI*2);ctx.fill()};},
 };
-
-// Draw into .fc-bg divs (featured cards) — className is on the fc-bg div itself
-function applyFeaturedImage(className, sceneKey) {
-  const el = document.querySelector('.fc-bg.' + className);
-  if (!el) return;
-  const uri = makeCanvas(800, 500, scenes[sceneKey]);
-  el.style.backgroundImage = `url(${uri})`;
-  el.style.backgroundSize = 'cover';
-  el.style.backgroundPosition = 'center';
+function drawFeaturedHero(){
+  const canvas=document.getElementById('fc-hero-canvas');if(!canvas)return;
+  const container=canvas.parentElement;
+  canvas.width=container.offsetWidth||1200;canvas.height=container.offsetHeight||420;
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  const bg=ctx.createLinearGradient(0,0,0,h);bg.addColorStop(0,'#04040e');bg.addColorStop(.6,'#080818');bg.addColorStop(1,'#0c0c20');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#f5f0e8';for(let i=0;i<120;i++){ctx.globalAlpha=Math.random()*.75+.1;const r=Math.random()*.9+.2;ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h*.55,r,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+  const eg=ctx.createRadialGradient(w*.08,h*1.15,0,w*.08,h*1.15,h*1.1);eg.addColorStop(0,'rgba(40,90,180,.65)');eg.addColorStop(.25,'rgba(20,60,120,.35)');eg.addColorStop(.5,'rgba(10,30,80,.12)');eg.addColorStop(1,'rgba(10,30,80,0)');ctx.fillStyle=eg;ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(80,160,220,.18)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(w*.08,h*1.15,h*.85,Math.PI*1.1,Math.PI*1.55);ctx.stroke();
+  const panel=ctx.createLinearGradient(0,h*.55,0,h);panel.addColorStop(0,'rgba(18,14,8,0)');panel.addColorStop(.25,'rgba(18,14,8,.7)');panel.addColorStop(1,'rgba(12,10,6,.96)');ctx.fillStyle=panel;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(22,16,10,.92)';ctx.fillRect(0,h*.72,w,h*.28);
+  const rowY=[h*.755,h*.795,h*.835,h*.875];rowY.forEach(y=>{for(let i=0;i<28;i++){const x=w*.12+i*(w*.76/28);ctx.fillStyle='rgba(40,32,22,.9)';ctx.fillRect(x,y,w*.76/32,12);ctx.strokeStyle='rgba(196,154,60,.12)';ctx.lineWidth=.5;ctx.strokeRect(x,y,w*.76/32,12);if(Math.random()<.15){ctx.fillStyle=Math.random()<.5?'rgba(192,82,74,.9)':'rgba(184,131,42,.9)';ctx.fillRect(x+2,y+3,w*.76/32-4,6);}}});
+  ctx.strokeStyle='rgba(196,200,220,.06)';ctx.lineWidth=1;for(let i=0;i<18;i++){const x=w*.1+Math.random()*w*.22;const startY=h*.6+Math.random()*h*.08;ctx.beginPath();ctx.moveTo(x,startY);ctx.lineTo(x+Math.random()*6-3,startY+Math.random()*h*.12+20);ctx.stroke();}
+  ctx.fillStyle='rgba(180,190,220,.1)';for(let i=0;i<35;i++){ctx.beginPath();ctx.arc(w*.08+Math.random()*w*.26,h*.62+Math.random()*h*.28,Math.random()*2.5+.5,0,Math.PI*2);ctx.fill();}
+  const ag=ctx.createRadialGradient(w*.82,h*.74,0,w*.82,h*.74,80);ag.addColorStop(0,'rgba(192,82,74,.55)');ag.addColorStop(.4,'rgba(192,82,74,.18)');ag.addColorStop(1,'rgba(192,82,74,0)');ctx.fillStyle=ag;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(192,82,74,.7)';ctx.fillRect(w*.76,h*.735,w*.1,h*.032);ctx.fillStyle='rgba(240,200,180,.9)';ctx.font=`${Math.round(h*.018)}px 'Barlow Condensed',Arial`;ctx.textAlign='center';ctx.fillText('MASTER ALARM',w*.81,h*.758);
+  ctx.fillStyle='rgba(240,230,200,.08)';const cw=w*.14,ch=h*.18,cx=w*.44,cy=h*.74;ctx.fillRect(cx,cy,cw,ch);ctx.strokeStyle='rgba(196,154,60,.15)';ctx.lineWidth=.5;ctx.strokeRect(cx,cy,cw,ch);ctx.fillStyle='rgba(240,230,200,.12)';ctx.fillRect(cx-4,cy-3,12,6);ctx.fillRect(cx+cw-8,cy-3,12,6);
+  ctx.fillStyle='rgba(20,14,8,.6)';ctx.font=`${Math.round(h*.012)}px 'Barlow Condensed',Arial`;ctx.textAlign='left';const steps=['1. AC BUS 1 — OFF','2. CRYO HTRS — OFF','3. FC PUMPS — OFF','4. INST SIGNAL — OFF','5. EPS MONITOR — OFF'];steps.forEach((s,i)=>{ctx.fillStyle=i===4?'rgba(192,82,74,.7)':'rgba(20,14,8,.7)';ctx.fillText(s,cx+8,cy+14+i*h*.032)});
+  const ig=ctx.createRadialGradient(w*.5,h*.8,0,w*.5,h*.8,w*.3);ig.addColorStop(0,'rgba(196,154,60,.12)');ig.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=ig;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(184,131,42,.85)';ctx.font=`bold ${Math.round(h*.028)}px 'Barlow Condensed',Arial`;ctx.textAlign='left';ctx.fillText('BUS A  25.5 V',w*.64,h*.77);ctx.fillStyle='rgba(192,82,74,.85)';ctx.fillText('BUS B  0.0 V',w*.64,h*.81);
+  const tv=ctx.createLinearGradient(0,0,0,h*.3);tv.addColorStop(0,'rgba(4,4,14,.4)');tv.addColorStop(1,'rgba(4,4,14,0)');ctx.fillStyle=tv;ctx.fillRect(0,0,w,h*.3);
 }
-
-// Draw into .cat-img divs (category cards)
-function applyCategoryImage(sceneKey) {
-  document.querySelectorAll('.cat-img.' + sceneKey).forEach(el => {
-    const uri = makeCanvas(400, 260, scenes[sceneKey]);
-    el.style.backgroundImage = `url(${uri})`;
-    el.style.backgroundSize = 'cover';
-    el.style.backgroundPosition = 'center';
-  });
+function drawHero(){
+  const canvas=document.getElementById('hero-canvas');if(!canvas)return;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#050402');sky.addColorStop(.7,'#080604');sky.addColorStop(1,'#0c0a07');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#f5f0e8';for(let i=0;i<220;i++){ctx.globalAlpha=Math.random()*.65+.08;ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h*.6,Math.random()*1.0+.2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+  const hg=ctx.createRadialGradient(w*.5,h*.58,0,w*.5,h*.58,w*.55);hg.addColorStop(0,'rgba(196,154,60,.10)');hg.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=hg;ctx.fillRect(0,0,w,h);
+  const bv=ctx.createLinearGradient(0,h*.18,0,h);bv.addColorStop(0,'rgba(5,4,2,0)');bv.addColorStop(.55,'rgba(5,4,2,.55)');bv.addColorStop(1,'rgba(5,4,2,.92)');ctx.fillStyle=bv;ctx.fillRect(0,0,w,h);
 }
-
-// Draw into .story-card-img divs
-function applyStoryImage(index, sceneKey) {
-  const imgs = document.querySelectorAll('.story-card-img');
-  if (!imgs[index]) return;
-  const uri = makeCanvas(600, 180, scenes[sceneKey]);
-  imgs[index].style.backgroundImage = `url(${uri})`;
-  imgs[index].style.backgroundSize = 'cover';
-  imgs[index].style.backgroundPosition = 'center';
+function drawHeroMontage(){
+  const mc=document.getElementById('hero-montage');if(!mc)return;
+  mc.width=window.innerWidth;mc.height=window.innerHeight;
+  const ctx=mc.getContext('2d'),w=mc.width,h=mc.height;
+  const scale=Math.min(w,h)*.0015;
+  const rH=h*.40*scale;const rW=13*scale;const rCx=w*.86;const rBase=h*.73;const rTop=rBase-rH;
+  const fl=ctx.createRadialGradient(rCx,rBase,0,rCx,rBase,rW*18);fl.addColorStop(0,'rgba(196,154,60,.13)');fl.addColorStop(.4,'rgba(196,154,60,.04)');fl.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=fl;ctx.fillRect(rCx-rW*18,rBase-rW*4,rW*36,rW*22);
+  ctx.fillStyle='rgba(255,190,50,.55)';ctx.beginPath();ctx.moveTo(rCx-rW*.7,rBase);ctx.lineTo(rCx,rBase+rW*5);ctx.lineTo(rCx+rW*.7,rBase);ctx.fill();
+  ctx.fillStyle='rgba(255,230,130,.45)';ctx.beginPath();ctx.moveTo(rCx-rW*.3,rBase);ctx.lineTo(rCx,rBase+rW*2.5);ctx.lineTo(rCx+rW*.3,rBase);ctx.fill();
+  ctx.fillStyle='rgba(80,65,45,.55)';ctx.fillRect(rCx-rW*5.5,rTop*.98,rW*.8,rBase-rTop*.98);
+  for(let i=0;i<6;i++){ctx.fillStyle='rgba(80,65,45,.35)';ctx.fillRect(rCx-rW*5.5,rTop*.98+i*((rBase-rTop*.98)/6),rW*.8,1);}
+  ctx.fillStyle='rgba(70,55,35,.45)';ctx.fillRect(rCx-rW*5.2,rTop+rH*.42,rW*4.9,rW*.55);
+  ctx.fillStyle='rgba(50,40,25,.5)';ctx.fillRect(rCx-rW*6,rBase,rW*12,rW*1.5);
+  ctx.fillStyle='rgba(220,210,195,.28)';ctx.fillRect(rCx-rW,rBase-rH*.44,rW*2,rH*.44);
+  ctx.fillStyle='rgba(30,20,10,.4)';ctx.fillRect(rCx-rW,rBase-rH*.44,rW*2,rW*.3);
+  const s2=rW*.88;ctx.fillStyle='rgba(210,200,185,.24)';ctx.fillRect(rCx-s2,rBase-rH*.68,s2*2,rH*.24);ctx.fillStyle='rgba(30,20,10,.35)';ctx.fillRect(rCx-s2,rBase-rH*.68,s2*2,rW*.25);
+  const s3=rW*.76;ctx.fillStyle='rgba(195,185,170,.2)';ctx.fillRect(rCx-s3,rBase-rH*.82,s3*2,rH*.14);ctx.fillStyle='rgba(30,20,10,.3)';ctx.fillRect(rCx-s3,rBase-rH*.82,s3*2,rW*.2);
+  const smW=rW*.65;ctx.fillStyle='rgba(180,170,155,.18)';ctx.beginPath();ctx.moveTo(rCx-smW,rBase-rH*.9);ctx.lineTo(rCx,rBase-rH*.955);ctx.lineTo(rCx+smW,rBase-rH*.9);ctx.fill();
+  ctx.fillStyle='rgba(60,50,35,.35)';ctx.fillRect(rCx-rW*.06,rTop,rW*.12,rH*.06);
+  const rv=ctx.createLinearGradient(w*.62,0,w,0);rv.addColorStop(0,'rgba(5,4,2,0)');rv.addColorStop(.55,'rgba(5,4,2,.25)');rv.addColorStop(1,'rgba(5,4,2,.82)');ctx.fillStyle=rv;ctx.fillRect(w*.62,0,w*.38,h);
+  const bv=ctx.createLinearGradient(0,h*.6,0,h);bv.addColorStop(0,'rgba(5,4,2,0)');bv.addColorStop(.6,'rgba(5,4,2,.65)');bv.addColorStop(1,'rgba(5,4,2,.95)');ctx.fillStyle=bv;ctx.fillRect(w*.58,0,w*.42,h);
 }
-
-window.addEventListener('DOMContentLoaded', async () => {
-  // Featured cards
-  applyFeaturedImage('bg-apollo',  'bg-apollo');
-  applyFeaturedImage('bg-dday',    'bg-dday');
-  applyFeaturedImage('bg-titanic', 'bg-titanic');
-
-  // Category cards
-  applyCategoryImage('ci-wwii');
-  applyCategoryImage('ci-maritime');
-  applyCategoryImage('ci-ancient');
-  applyCategoryImage('ci-civilwar');
-  applyCategoryImage('ci-space');
-  applyCategoryImage('ci-sail');
-  applyCategoryImage('ci-renaissance');
-  applyCategoryImage('ci-ww1');
-  applyCategoryImage('ci-frontier');
-  applyCategoryImage('ci-revolution');
-
-  // ── AVAILABLE NOW: dynamic fetch with static fallback ──
-  const STORY_SCENE = {
-    titanic_final_hours: 'ci-maritime',
-    dog_green_sector:    'ci-wwii',
-    apollo_13_lifeboat:  'ci-space',
-  };
-  const FALLBACK_HTML = `
-    <div class="story-card" onclick="location.href='/game?scenarioId=apollo_13_lifeboat'">
-      <div class="story-card-img" style="background:linear-gradient(160deg,#141428,#0a0a1c)"></div>
+function drawImages(){
+  Object.entries(SCENES).forEach(([key,painter])=>{const el=document.getElementById(key);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(400,220,painter)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';});
+  const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
+  Object.entries(fcMap).forEach(([id,p])=>{const el=document.getElementById(id);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(800,500,p)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'});
+}
+function renderGrid(cat){
+  const grid=document.getElementById('stories-grid');
+  const items=cat==='all'?STORIES:STORIES.filter(s=>s.cat===cat);
+  grid.innerHTML=items.map(s=>`
+    <div class="story-card" onclick="location.href=BASE_URL+'/game?scenarioId=${s.id}'">
+      <div class="story-card-img ${s.scene}" style="border-left:3px solid ${CAT_COLORS[s.cat]}"></div>
       <div class="story-card-body">
-        <p class="story-era">Space Race</p>
-        <h3 class="story-title">Apollo 13: Lifeboat</h3>
-        <p class="story-desc">The explosion has happened. The mission is over. Now you have to get them home.</p>
+        <p class="story-era">${s.era} &middot; ${s.year}</p>
+        <h3 class="story-title">${s.title}</h3>
+        <p class="story-hook">${s.hook}</p>
+        <p class="story-cost">Cost tracked: ${s.cost}</p>
         <div class="story-footer">
-          <div class="story-pills"><span class="meta-pill">April 1970</span><span class="meta-pill">Space Race</span></div>
+          <div class="story-pills">${s.perspectives.map(p=>`<span class="meta-pill">${p}</span>`).join('')}</div>
           <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
         </div>
       </div>
-    </div>
-    <div class="story-card" onclick="location.href='/game?scenarioId=dog_green_sector'">
-      <div class="story-card-img" style="background:linear-gradient(160deg,#2a2e10,#0e1006)"></div>
-      <div class="story-card-body">
-        <p class="story-era">World War II</p>
-        <h3 class="story-title">LCA Coxswain, Dog Green Sector</h3>
-        <p class="story-desc">The ramp drops. The gap in the wire is yours to find — if it exists at all.</p>
-        <div class="story-footer">
-          <div class="story-pills"><span class="meta-pill">June 1944</span><span class="meta-pill">Omaha Beach</span></div>
-          <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
-        </div>
-      </div>
-    </div>
-    <div class="story-card" onclick="location.href='/game?scenarioId=titanic_final_hours'">
-      <div class="story-card-img" style="background:linear-gradient(160deg,#1a3060,#061228)"></div>
-      <div class="story-card-body">
-        <p class="story-era">Maritime</p>
-        <h3 class="story-title">The Marconi Room, RMS Titanic</h3>
-        <p class="story-desc">You are Junior Operator Harold Bride. The warning is in your hand. The Bridge is twenty yards away.</p>
-        <div class="story-footer">
-          <div class="story-pills"><span class="meta-pill">April 1912</span><span class="meta-pill">Primary Sources</span></div>
-          <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
-        </div>
-      </div>
-    </div>`;
-
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function buildCard(s) {
-    const sceneKey = STORY_SCENE[s.id] || 'ci-maritime';
-    const desc = s.description ? s.description.slice(0, 140) + (s.description.length > 140 ? '…' : '') : '';
-    return `<div class="story-card" onclick="location.href='/game?scenarioId=${esc(s.id)}'">
-      <div class="story-card-img" data-scene="${esc(sceneKey)}"></div>
-      <div class="story-card-body">
-        <p class="story-era">${esc(s.era || '')}</p>
-        <h3 class="story-title">${esc(s.title || '')}</h3>
-        <p class="story-desc">${esc(desc)}</p>
-        <div class="story-footer">
-          <div class="story-pills">${s.duration ? `<span class="meta-pill">${esc(s.duration)}</span>` : ''}</div>
-          <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  const grid = document.getElementById('stories-grid');
-  try {
-    const resp = await fetch('/api/stories');
-    if (!resp.ok) throw new Error('fetch failed');
-    const stories = await resp.json();
-    if (!Array.isArray(stories) || stories.length === 0) throw new Error('empty');
-    const ORDER = ['apollo_13_lifeboat', 'dog_green_sector', 'titanic_final_hours'];
-    stories.sort((a, b) => {
-      const ai = ORDER.indexOf(a.id), bi = ORDER.indexOf(b.id);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-    });
-    grid.innerHTML = stories.map(buildCard).join('');
-    grid.querySelectorAll('.story-card-img[data-scene]').forEach(el => {
-      const key = el.dataset.scene;
-      if (scenes[key]) {
-        const uri = makeCanvas(600, 180, scenes[key]);
-        el.style.backgroundImage = `url(${uri})`;
-        el.style.backgroundSize  = 'cover';
-        el.style.backgroundPosition = 'center';
-      }
-    });
-  } catch {
-    grid.innerHTML = FALLBACK_HTML;
-    [['ci-maritime',0],['ci-wwii',1],['ci-space',2]].forEach(([key, i]) => applyStoryImage(i, key));
-  }
-});
+    </div>`).join('');
+  grid.querySelectorAll('.story-card-img').forEach(el=>{const key=[...el.classList].find(c=>c.startsWith('ci-'));if(key&&SCENES[key]){el.style.backgroundImage=`url(${makeCanvas(600,140,SCENES[key])})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}});
+}
+function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat)}
+function filterTo(cat){document.getElementById('all-scenarios').scrollIntoView({behavior:'smooth'});const btn=[...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.toLowerCase().includes(cat.slice(0,4)));if(btn)filterStories(cat,btn)}
+function initReveal(){const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))}
+window.addEventListener('DOMContentLoaded',()=>{drawHero();drawHeroMontage();drawFeaturedHero();drawImages();renderGrid('all');initReveal();});
+window.addEventListener('resize',()=>{drawHero();drawHeroMontage();drawFeaturedHero();});
 </script>
-
 </body>
 </html>
