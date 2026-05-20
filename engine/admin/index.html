@@ -3461,12 +3461,12 @@ async function applyCorrections(scenarioId) {
   const accepted = window._aiDiffs.filter(d => d.decision === 'accepted' || d.decision === 'edited');
   if (accepted.length === 0) return toast('No accepted corrections to apply', 'error');
   try {
-    const scenario = await apiFetch('GET', '/scenarios/' + scenarioId);
+    const data = await apiFetch('GET', '/scenarios/' + scenarioId + '/full');
     for (const d of accepted) {
-      applyFieldCorrection(scenario, d.field, d.replacewith);
+      applyFieldCorrection(data.scenario, d.field, d.replacewith);
     }
-    await apiFetch('PUT', '/scenarios/' + scenarioId, scenario);
-    await apiFetch('POST', '/pipeline/snapshot/' + scenarioId, {
+    await apiPost('/generate/save', data);
+    await apiPost('/pipeline/snapshot/' + scenarioId, {
       label: 'corrections_applied',
       pipeline_step: 'manual_correction',
       changes_applied: accepted.length
