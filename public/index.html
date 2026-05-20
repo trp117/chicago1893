@@ -78,8 +78,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,5vw,56px);font-weight:300;color:var(--gold-light);line-height:1;margin-bottom:6px}
 .stat-desc{font-size:clamp(13px,1.4vw,15px);line-height:1.55;color:var(--parchment);opacity:.92;font-family:'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
 .featured-grid{display:grid;gap:var(--gap);grid-template-columns:1fr}
-@media(min-width:600px){.featured-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:320px}.fc-large{grid-column:span 1}}
-@media(min-width:1024px){.featured-grid{grid-template-columns:1fr 1fr 1fr 1fr;grid-auto-rows:420px}.fc-large{grid-column:span 2}}
+@media(min-width:600px){.featured-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:320px}}
+@media(min-width:1024px){.featured-grid{grid-template-columns:repeat(3,1fr);grid-auto-rows:420px}}
+.fc-live .fc-title{font-size:clamp(18px,2.4vw,26px)}
+.fc-live .fc-desc{font-size:13px}
 .featured-card{position:relative;overflow:hidden;cursor:pointer;background:var(--dark-ash);height:320px;display:block;text-decoration:none;color:inherit}
 @media(min-width:600px){.featured-card{height:auto}}
 .fc-bg{position:absolute;inset:0;transition:transform .55s ease;z-index:0}
@@ -293,11 +295,11 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </section>
 <section class="section section--dark" id="scenarios">
   <div class="section-header reveal">
-    <div><p class="section-label">Open Now</p><h2 class="section-title">Two scenarios open now</h2></div>
+    <div><p class="section-label">Open Now</p><h2 class="section-title">Three scenarios open now</h2></div>
     <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
   </div>
   <div class="featured-grid">
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-large" id="fc-card-apollo">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live" id="fc-card-apollo">
       <div class="fc-bg bg-apollo" id="fc-apollo"></div>
       <div class="fc-inner">
         <p class="fc-tag">Space &middot; April 1970</p>
@@ -307,7 +309,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
       </div>
     </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-large" id="fc-card-dgs">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live" id="fc-card-dgs">
       <div class="fc-bg bg-omaha" id="fc-omaha"></div>
       <div class="fc-inner">
         <p class="fc-tag">World War II &middot; June 6, 1944</p>
@@ -315,6 +317,16 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <p class="fc-desc">The ramp drops. The gap in the wire is yours to find &mdash; if it exists at all. 300 yards of open water between you and the seawall.</p>
         <p class="fc-cost">Cost tracked: physical survival margin, unit cohesion</p>
         <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live" id="fc-card-sargasso">
+      <div class="fc-bg bg-sub" id="fc-sargasso"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Cuban Missile Crisis &middot; October 27, 1962</p>
+        <h3 class="fc-title">Sargasso Deep: The Three Keys</h3>
+        <p class="fc-desc">B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.</p>
+        <p class="fc-cost">Cost tracked: command authority, oxygen, heat exhaustion</p>
+        <div class="fc-meta"><span class="meta-pill">Hydroacoustic Officer</span><span class="meta-pill">Second-in-Command</span><span class="meta-pill">USS Cony captain</span></div>
       </div>
     </a>
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=woolworth_counter';return false" class="featured-card fc-small">
@@ -325,16 +337,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <p class="fc-desc">Sit still. Do not respond. Do not leave.</p>
         <p class="fc-cost">Cost tracked: psychological discipline</p>
         <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=b59_submarine';return false" class="featured-card fc-small">
-      <div class="fc-bg bg-sub" id="fc-sub"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">Political Crisis &middot; Oct 1962</p>
-        <h3 class="fc-title">B-59: The Submarine</h3>
-        <p class="fc-desc">One officer can stop a nuclear launch. That officer is you.</p>
-        <p class="fc-cost">Cost tracked: command authority under exhaustion</p>
-        <div class="fc-meta"><span class="meta-pill">Vasili Arkhipov</span></div>
       </div>
     </a>
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=triangle_shirtwaist';return false" class="featured-card fc-small">
@@ -372,7 +374,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <div class="cat-card cat-political reveal rd4" onclick="filterTo('political')">
       <div class="cat-img ci-political" id="ci-political"></div><div class="cat-overlay"></div>
       <div class="cat-body"><div class="cat-number">04</div><h3 class="cat-name">Political crisis</h3><p class="cat-tagline">The decisions that almost ended everything &mdash; and the few who held the line.</p></div>
-      <div class="cat-count">5 Scenarios &rarr;</div>
+      <div class="cat-count">6 Scenarios &rarr;</div>
     </div>
     <div class="cat-card cat-labor reveal rd5" onclick="filterTo('labor')">
       <div class="cat-img ci-labor" id="ci-labor"></div><div class="cat-overlay"></div>
@@ -438,6 +440,7 @@ const STORIES=[
   {id:'gettysburg',cat:'military',era:'Civil War',year:'Jul 3, 1863',title:'Gettysburg: The Angle',hook:'12,500 men in parade-ground order. One mile away. The wall is all that stands between them and the Union rear.',cost:'Ammunition reserve, wall integrity',perspectives:['Union corporal','Confederate officer','Field surgeon'],scene:'ci-military'},
   {id:'ammo_hill',cat:'military',era:'Six-Day War',year:'Jun 6, 1967',title:'Ammunition Hill: Jerusalem',hook:'The briefing said lightly fortified. The briefing was wrong.',cost:'Ammunition, trench visibility',perspectives:['Israeli paratrooper','Jordanian legionnaire','Combat medic'],scene:'ci-military'},
   {id:'valley_forge',cat:'military',era:'Revolutionary War',year:'Dec 19, 1777',title:'Valley Forge: The Winter',hook:'No shoes. 14 degrees Fahrenheit. No barracks yet. The cold is not dramatic. It is relentless.',cost:'Body temperature, desertion threshold',perspectives:['Continental soldier','George Washington','Surgeon Waldo'],scene:'ci-military'},
+  {id:'sargasso_deep_three_keys',cat:'political',era:'Cuban Missile Crisis',year:'Oct 27, 1962',title:'Sargasso Deep: The Three Keys',hook:'B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.',cost:'Command authority, oxygen, heat exhaustion',perspectives:['Hydroacoustic Officer','Second-in-Command','USS Cony captain'],scene:'ci-political'},
   {id:'b59',cat:'political',era:'Cold War',year:'Oct 27, 1962',title:'B-59: The Submarine',hook:'One officer can stop a nuclear launch. That officer is you. The temperature in the submarine is 120°F.',cost:'Command authority, oxygen, heat exhaustion',perspectives:['Vasili Arkhipov','Soviet sonar operator','USS Cony captain'],scene:'ci-political'},
   {id:'blackout',cat:'political',era:'Cold War',year:'Nov 9, 1965',title:'The Northeast Blackout',hook:'30 million people. Total darkness. The grid is collapsing section by section on the board in front of you.',cost:'Grid stability, cascade window',perspectives:['Con Edison dispatcher','Subway conductor','Elevator operator'],scene:'ci-political'},
   {id:'alcatraz',cat:'political',era:'Cold War',year:'Jun 11, 1962',title:'Alcatraz: The Escape',hook:'The dummy head is in his bunk. The guard’s footsteps are on the Broadway corridor floor.',cost:'Guard alert level, raft integrity',perspectives:['Frank Morris','Night guard','Coast Guard coxswain'],scene:'ci-political'},
@@ -514,7 +517,7 @@ function drawHeroMontage(){
 }
 function drawImages(){
   Object.entries(SCENES).forEach(([key,painter])=>{const el=document.getElementById(key);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(400,220,painter)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';});
-  const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
+  const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-sargasso':SCENES['ci-political'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
   Object.entries(fcMap).forEach(([id,p])=>{const el=document.getElementById(id);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(800,500,p)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'});
 }
 function renderGrid(cat){
