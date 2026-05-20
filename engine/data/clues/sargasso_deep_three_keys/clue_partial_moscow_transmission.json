@@ -1,0 +1,17 @@
+{
+  "id": "clue_partial_moscow_transmission",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "Partial Radio Intercept: Possible Moscow Broadcast",
+  "description": "In the radio room log, a single entry at 19:12: 'Emergency frequency, carrier wave detected, duration 40 seconds, encoded text fragments, classification: atmospheric interference.' Below it, in different handwriting — Volkov's — a single line added in pencil: 'Carrier wave modulation consistent with Moscow VLF transmitter. Not confirmed. Not reported.' The transmission was heard. It was not logged as a signal. If it was Moscow, it may have been the stand-down order. It will never be confirmed with the equipment aboard.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_b59_radio_room",
+  "implicatesCharacterIds": [
+    "char_sonar_analyst"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.807Z",
+  "locationId": "",
+  "isRedHerring": false
+}

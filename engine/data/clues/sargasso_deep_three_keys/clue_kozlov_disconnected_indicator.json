@@ -1,0 +1,17 @@
+{
+  "id": "clue_kozlov_disconnected_indicator",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "The Sabotaged Indicator Light",
+  "description": "Behind the launch console in the torpedo room, one of the three key-receptacle indicator lights has been carefully disconnected — the wire pulled from its terminal and tucked behind the panel housing. The console will show an incomplete circuit even after all three keys are turned, generating a fault code that will require manual diagnosis before the launch sequence can proceed. Someone bought time. The wire is still warm from the connection it used to hold.",
+  "category": "physical",
+  "discoveryLocationId": "loc_torpedo_room",
+  "implicatesCharacterIds": [
+    "char_chief_petty_officer_kozlov"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.809Z",
+  "locationId": "",
+  "isRedHerring": false
+}

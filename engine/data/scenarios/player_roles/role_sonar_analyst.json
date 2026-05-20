@@ -1,0 +1,54 @@
+{
+  "id": "role_sonar_analyst",
+  "scenarioId": "sargasso_deep_three_keys",
+  "name": "The Hydroacoustic Officer",
+  "description": "You are the eyes of a blind boat. You alone can read the difference between a signal and a killing blow — and right now, the officers making the decision that ends or saves the world are working without your data.",
+  "startLocationId": "loc_hydroacoustic_shack",
+  "startingKnowledge": [
+    "The acoustic signature of a Mk-84 signaling charge is definitively distinct from a lethal depth charge — you have the training and the data to prove it.",
+    "You have logged four surface contacts: USS Cony, USS Beale, USS Murray, and an unclassified fourth vessel. None of them have exhibited attack-run behavior.",
+    "The most recent detonation was 47 meters off the port quarter — inside the protocol minimum but well outside the kill envelope for any submarine at this depth.",
+    "You logged a possible Moscow VLF transmission forty minutes ago and classified it as interference. You are not certain that was the right call."
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from inside Volkov's sensory experience — the specific sounds in the headphones, the visual information on the cathode-ray trace, the physical difficulty of maintaining precision as oxygen drops and heat climbs. He is the most technically certain person on the boat and the least politically powerful, and that gap is the central tension of his role.",
+  "briefing": "You are sitting in the hydroacoustic shack with the Bakelite headphones pressing the ocean into your skull, and the cathode-ray trace in front of you is telling you something that no one in the conning tower knows yet. Three detonations. Same acoustic signature each time: the sharp, high crack of a signaling charge, not the low, rolling concussion of a weapon designed to kill. You have the data. You have the chart. You have six hours of pencil marks on the tracing table that constitute the most accurate picture of what is happening on the surface that anyone on this boat possesses. What you do not have is a way to make the officers thirty feet forward understand that the difference between a signal and a killing blow is not a matter of interpretation — it is a matter of physics, and the physics are on your side. The problem is that the oxygen has been dropping for three hours and you can feel it in the way your thoughts arrive slightly late, like a radio signal with a half-second delay. You logged something forty minutes ago that you called interference. You are no longer certain it was. The curtain behind you is the only thing separating this compartment from the passageway, and through it you can hear, faintly, the sound of the Captain's voice from the conning tower — the flat, deliberate cadence of a man giving an order that has not yet been refused.",
+  "character_hooks": [
+    "I was assigned to this boat as a disciplinary posting after a political infraction at the Leningrad naval academy, which means I have nothing left to lose by telling an officer something he does not want to hear.",
+    "I trained under the senior hydroacoustic instructor at the Sevastopol submarine school, who told me that the most dangerous moment in any crisis is when a man in authority decides that the data is wrong and he is right.",
+    "I have been tracking the fourth surface contact — the one I cannot classify — for two hours, and I believe it is not a warship. I think it is a civilian vessel that has wandered into the operational area, and if we fire, it will be the first thing destroyed."
+  ],
+  "suggested_secret": "Volkov is almost certain the possible Moscow transmission was real — the carrier wave modulation was too precise for atmospheric interference — but he classified it as noise because confirming it would have required him to report it to Savitsky first, and he did not trust what Savitsky would do with the information.",
+  "opening": {
+    "narrative": "It is 20:00 in the hydroacoustic shack. The cathode-ray trace is showing the aftermath of the third detonation — the spike has decayed to baseline, and the trace is clean. The tracing chart in front of you has three detonation events marked, each with bearing, estimated range, and acoustic classification. The classification reads the same for all three: SIGNALING. The headphones are still on. The ocean outside the hull is making its ordinary sounds — the distant machinery noise of the surface ships, the biological noise of the Sargasso, the rhythmic four-second pulse of the Cony's active sonar. You can hear, through the rubber curtain behind you, the sound of raised voices from the conning tower direction. Arkhipov needs this data. The question is whether you can get it to him before the command decision is made without it.",
+    "npcMoments": [
+      {
+        "characterId": "char_chief_petty_officer_kozlov",
+        "action": "Passes the curtain opening heading forward, pauses, looks at the tracing chart, and gives a single nod before continuing."
+      }
+    ],
+    "choices": [
+      "Remove the headphones and go directly to the conning tower with the tracing chart — the data is conclusive and Arkhipov needs it now.",
+      "Stay on the headphones and continue tracking — the fourth unclassified contact is behaving strangely and you need another five minutes of data.",
+      "Send Kozlov to the conning tower with a verbal summary of your findings while you remain on the acoustic watch."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "manual_tracing_chart",
+      "bakelite_headphones",
+      "pencil_log"
+    ],
+    "flags": {
+      "acoustic_report_delivered": false,
+      "moscow_transmission_disclosed": false,
+      "fourth_contact_classified": false
+    },
+    "suspicion": {
+      "char_savitsky": 3,
+      "char_captain_estocin": 2
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.810Z"
+}

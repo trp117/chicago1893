@@ -1,0 +1,35 @@
+{
+  "id": "char_captain_estocin",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Commander Paul Estocin",
+  "role": "Commanding Officer, USS Cony (DD-508)",
+  "publicFace": "A competent, decorated ASW officer who projects the calm efficiency of a man who has run dozens of submarine contacts and knows exactly what his orders say.",
+  "privateGoal": "To compel the submarine to surface without triggering a lethal response — he wants the contact, he wants the intelligence value, and he wants to go home with no one dead.",
+  "fear": "That the submarine is more desperate than his orders anticipated — that he is pressing a cornered animal that has teeth he has not been briefed about.",
+  "knowledge": [
+    "His explicit orders from CINCLANT authorize only Mk-84 signaling charges — any escalation to lethal munitions requires direct authorization from the task force commander.",
+    "The contact has been stationary for over two hours, which is tactically abnormal — a submarine that stops moving has either lost propulsion or is preparing to do something.",
+    "He does not know the B-59 is nuclear-armed. His intelligence brief described the Foxtrot class as conventionally armed patrol submarines."
+  ],
+  "voice": "The clipped, radio-procedure English of a naval officer who has spent twenty years making himself understood over static — short declarative sentences, no ambiguity, no subordinate clauses.",
+  "trustLogic": "Estocin responds to tactical logic and intelligence — give him information that changes the picture and he will update his assessment. He does not respond to appeals to caution alone.",
+  "secrets": [
+    "He dropped the third signaling charge closer than protocol specified because he was frustrated by the contact's silence — a deviation he has not logged and will not admit.",
+    "He has a standing personal order from the task force admiral to escalate to live depth charges if the contact attempts to break the perimeter — an order that contradicts his written CINCLANT authorization."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He states his orders clearly and asks what new information the questioner has that would change the tactical picture.",
+    "heavyPressure": "He invokes the chain of command — 'My orders come from CINCLANT. If you have a different set of orders, show them to me.'",
+    "breakingPoint": "He will not admit the unauthorized proximity of the third depth charge. That admission would constitute a violation of the rules of engagement.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "He requests to speak directly with the task force commander before saying anything further.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.795Z",
+  "description": ""
+}

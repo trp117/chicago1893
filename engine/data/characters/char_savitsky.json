@@ -1,0 +1,36 @@
+{
+  "id": "char_savitsky",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Captain Valentin Savitsky",
+  "role": "Commanding Officer, B-59",
+  "publicFace": "A decorated submarine commander projecting absolute authority — his voice is measured, his orders are clipped, his posture is the posture of a man who has never been wrong in front of his crew.",
+  "privateGoal": "To die a Soviet hero rather than surface in surrender and face the humiliation of capture or court-martial; he genuinely believes World War III has begun and that launching the torpedo is both his duty and his legacy.",
+  "fear": "That he will surface, be taken prisoner, and be photographed on the deck of an American destroyer — an image that would destroy his family's standing in Moscow.",
+  "knowledge": [
+    "The standing orders authorizing nuclear use without Moscow sanction are genuine and legally binding under current naval doctrine.",
+    "The B-59's battery reserves are critically low — the boat has perhaps four hours of propulsion remaining before battery death forces a surface or a permanent dive.",
+    "He has not slept in thirty-one hours and is experiencing what he believes is clarity but is in fact the focused tunnel vision of extreme exhaustion.",
+    "He knows Maslennikov will follow his order — he secured that agreement two hours ago in a private conversation in the captain's cabin."
+  ],
+  "voice": "Flat, deliberate, with the cadence of a man dictating to a stenographer — no wasted words, no inflection, no acknowledgment that the person he is speaking to has feelings.",
+  "trustLogic": "Savitsky responds only to formal authority and documented orders — personal appeals, emotional arguments, and tactical reasoning all read to him as insubordination. The only thing that can move him is a piece of paper with the right stamp, or a direct communication from Moscow.",
+  "secrets": [
+    "He received a partial radio transmission six hours ago that may have been a Moscow broadcast ordering the submarines to stand down — he chose to classify it as interference and did not log it.",
+    "His eldest son is a junior officer in the Soviet Air Force stationed in Cuba; he believes, incorrectly, that his son is already dead in the opening hours of a war that has not started."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He acknowledges the question with a single nod and restates his order in identical words, as if the questioner simply failed to hear him.",
+    "heavyPressure": "He goes very still, sets down whatever he is holding, and speaks in a lower register — the quiet is more threatening than shouting would be.",
+    "breakingPoint": "He will never admit he intercepted the Moscow transmission. That admission would invalidate his entire command logic and reduce the launch order to a crime.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "If physically restrained or formally relieved, he stops speaking entirely — he will not beg, will not negotiate, will not explain. He waits.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.793Z",
+  "description": ""
+}

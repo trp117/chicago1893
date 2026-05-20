@@ -1,0 +1,18 @@
+{
+  "id": "clue_cony_deck_log_third_charge",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "Deck Log Entry: Third Charge Proximity Deviation",
+  "description": "Lieutenant Commander Hayes's deck log entry for 19:47 reads: 'Third Mk-84 deployed, bearing 030 relative, estimated range to contact 47 meters. Note: minimum protocol distance is 60 meters. Deviation not logged in official drop record. Recommend review.' The entry is in Hayes's handwriting, initialed but not countersigned. Estocin does not know this entry exists. The third charge was dropped 13 meters inside the safety envelope — close enough that the crew of B-59 felt it as a physical blow.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_cony_sonar_shack",
+  "implicatesCharacterIds": [
+    "char_captain_estocin",
+    "char_lt_commander_hayes"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.806Z",
+  "locationId": "",
+  "isRedHerring": false
+}

@@ -1,0 +1,21 @@
+{
+  "id": "loc_conning_tower",
+  "scenarioId": "sargasso_deep_three_keys",
+  "name": "B-59 Conning Tower",
+  "description": "The nerve center of the submarine — a cramped, vertical cylinder of sweating steel barely wide enough for three men to stand without touching, lit by a single red emergency lamp bolted above the chart table. The air here is the worst on the boat: the heat from the ballast control panels and the press of bodies has pushed the temperature past 105°F, and every surface is slick with condensation.",
+  "mood": "claustrophobic, pressurized, red-lit, suffocating",
+  "linkedCharacterIds": [
+    "char_savitsky",
+    "char_arkhipov",
+    "char_maslennikov"
+  ],
+  "atmosphericDetails": [
+    "The chart table is bolted to the starboard bulkhead at chest height; Savitsky's parallel rulers and dividers are laid out with the precision of a man who needs order around him.",
+    "A brass key receptacle is mounted directly above the chart table — one of three distributed across the boat — its keyhole dark and waiting.",
+    "Condensation drips from the overhead pipe bundle at irregular intervals, landing on the chart paper with a sound like a slow clock."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.798Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

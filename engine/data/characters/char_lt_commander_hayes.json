@@ -1,0 +1,35 @@
+{
+  "id": "char_lt_commander_hayes",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Lieutenant Commander Robert Hayes",
+  "role": "Executive Officer, USS Cony",
+  "publicFace": "A precise, methodical officer who keeps the Cony's deck log with the accuracy of a man who knows that every entry is a potential exhibit in a future inquiry.",
+  "privateGoal": "To ensure that whatever happens tonight, the Cony's actions are defensible under the rules of engagement — he is the ship's institutional memory and its legal conscience.",
+  "fear": "That Estocin's informal escalation order from the task force admiral will surface in a post-crisis review and implicate the entire ship.",
+  "knowledge": [
+    "He has logged all three signaling charge drops with precise coordinates and times — including the third drop, which he noted was 12 meters inside the minimum safe-distance protocol.",
+    "He intercepted a task force broadcast thirty minutes ago indicating that at least one of the four Soviet submarines may be carrying 'special ordnance' — a classification he has not yet shown Estocin.",
+    "The international surfacing signal, if broadcast on the correct frequency, is legally binding under the 1958 Geneva Convention on the High Seas — a fact that gives the Cony a diplomatic tool Estocin has not used."
+  ],
+  "voice": "The careful, subordinate language of a man who has learned to phrase disagreement as a question — 'Have we considered, sir...' — so that the record shows due diligence without direct insubordination.",
+  "trustLogic": "Hayes responds to players who engage with procedure and documentation — he is most useful when asked specific questions about what has been logged, what the orders actually say, and what the legal options are.",
+  "secrets": [
+    "He has already drafted a formal protest memo regarding the third depth charge's proximity — a document he has not filed because doing so would directly contradict his captain in writing.",
+    "He has been quietly monitoring the emergency frequency and believes he heard a partial Soviet transmission that could be a distress signal — but he cannot confirm it without better equipment than the Cony carries."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He produces the deck log and reads the relevant entry aloud, neither confirming nor denying the implication.",
+    "heavyPressure": "He asks whether the questioner wants him to file a formal report — making clear that he will, if asked, and that it will say exactly what happened.",
+    "breakingPoint": "He will not act against Estocin directly. He will document, he will advise, he will question — but he will not relieve his captain or countermand an order.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "He produces every document in his possession and reads them in chronological order.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.796Z",
+  "description": ""
+}

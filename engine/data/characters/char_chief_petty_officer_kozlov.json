@@ -1,0 +1,35 @@
+{
+  "id": "char_chief_petty_officer_kozlov",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Chief Petty Officer Anatoly Kozlov",
+  "role": "Chief of the Boat — Senior Enlisted, B-59",
+  "publicFace": "A barrel-chested, thirty-year navy man who has served under four captains and treats the submarine's mechanical systems with the intimacy of a man who has repaired them with his bare hands in the dark.",
+  "privateGoal": "To keep the boat alive and the crew breathing long enough for someone with more rank than him to make the right decision — he has no political ambitions and no ideology, only the boat.",
+  "fear": "That the men in the torpedo room will follow Savitsky's order without waiting for the full launch sequence — that the weapon will be fired before the command chain has a chance to stop it.",
+  "knowledge": [
+    "The chemical oxygen regeneration canisters have approximately ninety minutes of capacity remaining at current consumption rates — after that, Cabin_Oxygen will drop below survivable thresholds.",
+    "The torpedo room crew has already physically moved the T-5 round into the launch tube — a step that is technically premature and was done without his authorization.",
+    "He knows every mechanical shortcut and workaround on this boat, including a manual override on the torpedo tube outer door that could delay a launch by four to six minutes without leaving evidence."
+  ],
+  "voice": "The slow, deliberate speech of a man who has learned that on a submarine, words travel through bulkheads — he speaks quietly and means everything he says.",
+  "trustLogic": "Kozlov trusts people who know the boat and distrust people who treat it as a political object — he will help anyone who is trying to keep the crew alive, regardless of rank.",
+  "secrets": [
+    "He has already quietly disconnected one of the three key-receptacle indicator lights in the torpedo room — meaning the launch console will show an incomplete circuit even after all three keys are turned, buying a few minutes of confusion.",
+    "He served with Arkhipov's brother on a previous deployment and owes the family a debt he has never discharged."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He answers questions with questions — 'What are you asking me to do?' — forcing the questioner to be explicit.",
+    "heavyPressure": "He goes to work on something mechanical, making clear that he is listening but will not be rushed.",
+    "breakingPoint": "He will not reveal the disconnected indicator light until he absolutely must — it is his last card.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "He tells the truth, completely, and accepts the consequences — he has been in the navy long enough to know that the truth told late is still better than the lie told on time.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.794Z",
+  "description": ""
+}

@@ -1,0 +1,18 @@
+{
+  "id": "clue_savitsky_launch_order",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "Savitsky's Personal Log: The Decision Already Made",
+  "description": "The handwritten log on Savitsky's fold-down desk. The final entry, dated today at 14:30 — ninety minutes before the first signaling charge — reads: 'Communications severed 41 hours. Surface forces in active attack posture. Standing orders authorize special weapon use. I have informed Maslennikov. He is in agreement. I am waiting only for the tactical moment. The flotilla chief will either comply or be relieved.' The decision was made before the depth charges began. The depth charges are not the cause — they are the justification Savitsky was waiting for.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_captains_cabin",
+  "implicatesCharacterIds": [
+    "char_savitsky",
+    "char_maslennikov"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.807Z",
+  "locationId": "",
+  "isRedHerring": false
+}

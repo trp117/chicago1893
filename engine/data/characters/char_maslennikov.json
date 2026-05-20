@@ -1,0 +1,35 @@
+{
+  "id": "char_maslennikov",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Political Officer Ivan Maslennikov",
+  "role": "Zampolit — Political Officer, B-59",
+  "publicFace": "A careful, watchful Party functionary who speaks in the cadences of official doctrine and never commits to a position before reading the room.",
+  "privateGoal": "To survive this patrol and return to Moscow with his career intact — he is not an ideologue but a bureaucrat, and bureaucrats calculate odds.",
+  "fear": "Being on the wrong side of history — whether that means being the man who prevented a necessary launch or the man who authorized an unauthorized war.",
+  "knowledge": [
+    "He has already privately agreed with Savitsky to turn his key — but the agreement was made two hours ago when the oxygen was higher and his thinking was clearer.",
+    "He is aware that Arkhipov's authority as flotilla chief technically equals the captain's, and that a formal objection from Arkhipov could create a legal ambiguity that would protect Maslennikov from post-war accountability.",
+    "He carries a sealed envelope from the Main Political Directorate of the Soviet Navy that he has not opened — its contents could clarify or complicate the launch authority question."
+  ],
+  "voice": "The smooth, recursive language of a committee report — he speaks in subordinate clauses, qualifications, and references to procedure, rarely using the first person singular.",
+  "trustLogic": "Maslennikov can be moved by evidence that the political calculus has shifted — specifically, any indication that Moscow is still functioning and would view an unauthorized launch as a liability rather than a heroic act.",
+  "secrets": [
+    "The sealed envelope contains a political directive from three days ago ordering all submarine commanders to avoid provocative action — Maslennikov has not opened it because he does not want to know what it says.",
+    "He turned his key not out of conviction but because he was afraid of Savitsky and wanted the decision to be over."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He responds with a procedural question — asking the source of the information, the chain of custody, whether the matter has been formally logged.",
+    "heavyPressure": "He retreats into the language of collective responsibility: 'These are not my decisions to make alone. The Captain has authority. The orders are clear.'",
+    "breakingPoint": "He will not admit he has not opened the envelope. Opening it now, in front of witnesses, would expose him to whatever it contains.",
+    "fleeCondition": "If directly accused of having already turned his key before the sequence was complete.",
+    "fleeStyle": "He moves toward the captain's cabin — the one space on the boat where he has a lock.",
+    "chaseStyle": "He argues procedure — insists that any confrontation must be formally logged before he will respond.",
+    "capturedBehavior": "He opens the envelope. Whatever it contains, he reads it aloud, because at that point the document is his only protection.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.797Z",
+  "description": ""
+}

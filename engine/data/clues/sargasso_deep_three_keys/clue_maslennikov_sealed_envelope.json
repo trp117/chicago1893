@@ -1,0 +1,17 @@
+{
+  "id": "clue_maslennikov_sealed_envelope",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "The Unopened Directive",
+  "description": "A sealed envelope in the captain's safe, bearing the frank of the Main Political Directorate of the Soviet Navy, dated October 24, 1962. Maslennikov has been carrying it since departure and has not opened it. The seal is intact. Whatever Moscow sent three days ago — before the crisis reached its peak — is still unread inside this boat.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_captains_cabin",
+  "implicatesCharacterIds": [
+    "char_maslennikov"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.809Z",
+  "locationId": "",
+  "isRedHerring": false
+}

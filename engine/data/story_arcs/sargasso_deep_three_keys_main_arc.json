@@ -1,0 +1,125 @@
+{
+  "id": "sargasso_deep_three_keys_main_arc",
+  "scenarioId": "sargasso_deep_three_keys",
+  "name": "The Three Keys",
+  "premise": "Aboard the crippled Soviet submarine B-59, a suffocating crew and a panicking captain are ninety minutes from arming a nuclear torpedo. Three people — a Soviet flotilla chief, his sonar analyst, and an American destroyer captain — each hold a piece of the information needed to stop it.",
+  "goal": "Prevent the nuclear launch sequence from completing by gathering and deploying the right evidence, holding the right authority, and making the right call before oxygen, temperature, or time runs out.",
+  "openingSituation": "16:00 ship's time. The USS Cony has established a firm sonar lock on B-59. The submarine has been submerged for sixteen hours on battery power. The first signaling depth charge has just detonated forty meters off the port bow. Captain Savitsky is at the conning tower chart table, and his voice has the flat, careful quality of a man holding something back.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Trap",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        {
+          "id": "the_uss_cony",
+          "description": "The USS Cony locks sonar contact on B-59 and begins a hold-down pattern; the Sonar Analyst logs the first active pings and reports escalating Sonar_Threat_Index to Arkhipov."
+        },
+        {
+          "id": "hulltemperature_climbs_past",
+          "description": "Hull_Temperature climbs past 91°F as battery drain accelerates; Arkhipov notes Savitsky's agitation at the chart table and begins assessing the political officer's loyalty."
+        },
+        {
+          "id": "the_cony_captain",
+          "description": "The Cony captain coordinates with USS Beale and USS Murray to seal the perimeter, realizing the contact has been stationary for too long — something is wrong below."
+        },
+        {
+          "id": "arkhipov_locates_the",
+          "description": "Arkhipov locates the Political Officer Maslennikov and takes his measure: will he follow orders or follow doctrine?"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Delirium",
+      "minuteRange": [
+        8,
+        18
+      ],
+      "beats": [
+        {
+          "id": "the_americans_begin",
+          "description": "The Americans begin dropping signaling charges; the first detonation throws men off their feet and shatters a gauge in the torpedo room — Savitsky interprets it as an attack."
+        },
+        {
+          "id": "cabinoxygen_drops_below",
+          "description": "Cabin_Oxygen drops below 60; the Sonar Analyst begins experiencing tunnel vision and must fight to maintain the accuracy of his tracking chart as the hull groans and shudders."
+        },
+        {
+          "id": "savitsky_calls_a",
+          "description": "Savitsky calls a command conference and presents the standing orders authorizing nuclear use — the document is real, the authority is real, and Maslennikov's hand moves toward his key."
+        },
+        {
+          "id": "the_cony_captain",
+          "description": "The Cony captain receives a report that the contact has gone completely silent — no propulsion, no machinery noise — and faces the choice of increasing pressure or pulling back."
+        },
+        {
+          "id": "arkhipov_intercepts_a",
+          "description": "Arkhipov intercepts a whispered conversation between two torpedo room ratings confirming the special weapon has already been physically moved to the launch tube."
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Zero Horizon",
+      "minuteRange": [
+        18,
+        26
+      ],
+      "beats": [
+        {
+          "id": "hulltemperature_hits_110f",
+          "description": "Hull_Temperature hits 110°F; a crewman collapses, and the ship's doctor reports that cognitive function across the crew is severely compromised — red light thinking is now the baseline."
+        },
+        {
+          "id": "savitsky_formally_orders",
+          "description": "Savitsky formally orders the nuclear launch sequence; Maslennikov turns his key; the sequence now requires only Arkhipov's key to complete arming."
+        },
+        {
+          "id": "the_sonar_analyst",
+          "description": "The Sonar Analyst delivers his final acoustic analysis — the detonation signatures are definitively Mk-84 signaling charges, not hull-crushing munitions — but must get this information to Arkhipov through a boat that is physically falling apart."
+        },
+        {
+          "id": "the_cony_captain",
+          "description": "The Cony captain, realizing the contact has gone completely silent and the hold-down has lasted too long, makes the unilateral decision to halt all depth charges and broadcast the international surfacing signal."
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Key That Holds",
+      "minuteRange": [
+        26,
+        30
+      ],
+      "beats": [
+        {
+          "id": "the_conning_tower",
+          "description": "The conning tower standoff: Arkhipov faces Savitsky directly, the sonar analyst's report in hand or memory, the Cony's broadcast audible on the emergency receiver — everything converges in this compartment."
+        },
+        {
+          "id": "savitsky_either_breaks",
+          "description": "Savitsky either breaks — accepting Arkhipov's argument and standing down — or attempts to relieve Arkhipov of command, forcing a physical confrontation over the key."
+        },
+        {
+          "id": "the_b59_surfaces",
+          "description": "The B-59 surfaces under the white flag protocol, or the launch sequence completes, or a third path is found — the outcome is determined by what the three player roles have built across the preceding acts."
+        },
+        {
+          "id": "final_log_entry",
+          "description": "Final log entry: the world does not end tonight. Or it does."
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.793Z",
+  "opening": ""
+}

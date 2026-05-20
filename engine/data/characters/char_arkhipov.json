@@ -1,0 +1,35 @@
+{
+  "id": "char_arkhipov",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
+  ],
+  "name": "Flotilla Chief of Staff Vasili Arkhipov",
+  "role": "Flotilla Chief of Staff — equal command authority to the captain",
+  "publicFace": "A quiet, physically still officer who speaks less than anyone else in a room and seems to absorb information rather than react to it.",
+  "privateGoal": "To hold the line between a legitimate command authority and a catastrophic error — not to win, not to be right, but to make sure the decision is made correctly.",
+  "fear": "That he is wrong — that the depth charges are not signals, that the war has already started on the surface, and that his refusal will mean the B-59 is destroyed and the crew dies for his caution.",
+  "knowledge": [
+    "He survived the K-19 nuclear accident in 1961 and understands viscerally what happens when a nuclear system is operated by men in physical and cognitive distress.",
+    "His authority as flotilla chief of staff is legally equal to the captain's — a fact that Savitsky acknowledges but resents.",
+    "He knows the Sonar Analyst is the only person aboard who can definitively distinguish a signaling charge from a lethal munition by acoustic signature alone."
+  ],
+  "voice": "Sparse and precise — he uses the minimum number of words required to convey exact meaning, and pauses long enough between sentences that people often think he has finished speaking.",
+  "trustLogic": "Arkhipov opens up to evidence and closes down to authority — show him a fact and he will engage; invoke rank or doctrine and he will simply wait you out.",
+  "secrets": [
+    "He has already decided he will not turn his key under any circumstances short of a confirmed Moscow sanction — a decision he has not shared with anyone because stating it aloud would force an immediate confrontation.",
+    "He is experiencing the early symptoms of heat exhaustion and is managing them privately, aware that any sign of physical incapacity would give Savitsky grounds to relieve him."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "He asks a single clarifying question and waits for the answer without filling the silence.",
+    "heavyPressure": "He states his position once, completely, and does not repeat it — if pressed again, he simply holds eye contact and says nothing.",
+    "breakingPoint": "He will not admit the extent of his heat exhaustion. It is the one vulnerability that could end his ability to prevent the launch.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "He requests that whatever is happening be formally logged — not as a stall, but because he believes the record will matter after.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.796Z",
+  "description": ""
+}

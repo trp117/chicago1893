@@ -1,0 +1,17 @@
+{
+  "id": "clue_oxygen_canister_count",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "Chief Kozlov's Oxygen Inventory",
+  "description": "A handwritten note in Kozlov's pocket, folded twice: 'KO2 canisters remaining: 7. Consumption rate at current crew density: 1 per 13 minutes. Time to critical threshold (Cabin_Oxygen below 20): approximately 91 minutes from 20:00.' The math is done in the margins, checked twice. Kozlov knows exactly how long the crew has before the oxygen situation makes rational decision-making impossible. He has not shared this calculation with the officers.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_b59_main_passageway",
+  "implicatesCharacterIds": [
+    "char_chief_petty_officer_kozlov"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.805Z",
+  "locationId": "",
+  "isRedHerring": false
+}

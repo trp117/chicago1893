@@ -1,0 +1,711 @@
+{
+  "version": 2,
+  "label": "corrections_applied",
+  "scenarioId": "sargasso_deep_three_keys",
+  "createdAt": "2026-05-20T19:37:59.815Z",
+  "pipeline_step": "manual_correction",
+  "changes_applied": 19,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "sargasso_deep_three_keys",
+    "version": "1.0.0",
+    "title": "Sargasso Deep: The Three Keys",
+    "description": "October 27, 1962. The Soviet submarine B-59 lies crippled and suffocating beneath the Sargasso Sea, hunted by an American destroyer task force. Three officers — a flotilla chief who must hold back his key, a sonar analyst who must read the difference between signals and death, and an American captain who must compel surrender without triggering catastrophe — have ninety minutes to prevent a nuclear launch that would end the world.",
+    "genre": [
+      "historical",
+      "thriller",
+      "crisis-simulation"
+    ],
+    "historicalRealism": "high",
+    "freedomLevel": "guided",
+    "sessionTargetMinutes": 30,
+    "storyArcIds": [
+      "sargasso_deep_three_keys_main_arc"
+    ],
+    "playerRoleIds": [
+      "role_arkhipov",
+      "role_sonar_analyst",
+      "role_cony_captain"
+    ],
+    "keyEvidenceClueIds": [
+      "clue_signaling_charge_pattern",
+      "clue_savitsky_launch_order"
+    ],
+    "systems": {
+      "timePerTurnDefault": 2,
+      "scales": {
+        "cabin_oxygen": {
+          "min": 1,
+          "max": 100,
+          "default": 72
+        },
+        "hull_temperature": {
+          "min": 60,
+          "max": 130,
+          "default": 91
+        },
+        "sonar_threat_index": {
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "labels": [
+            "passive",
+            "alert",
+            "incoming"
+          ]
+        },
+        "threat": {
+          "min": 0,
+          "max": 10,
+          "default": 3
+        },
+        "authorityTrust": {
+          "min": -3,
+          "max": 5,
+          "default": 1
+        }
+      },
+      "pressureEvents": [
+        "A signaling depth charge detonates close enough to buckle the deck plates — Cabin_Oxygen drops 6 points and Hull_Temperature rises 4 degrees as the crew stumbles.",
+        "Captain Savitsky orders a full battle-stations muster; every officer not at their post will be logged as insubordination. Arkhipov must respond within one turn.",
+        "The hydroacoustic shack loses contact with the surface formation for three minutes — Sonar_Threat_Index escalates to Incoming until the analyst re-establishes the track.",
+        "A crewman collapses from heat exhaustion in the torpedo room; the Political Officer demands the launch sequence be accelerated before more men die.",
+        "The USS Cony broadcasts an emergency surfacing signal on the international distress frequency — the B-59's radio operator intercepts it but cannot confirm whether Moscow has also received it.",
+        "Hull condensation shorts a secondary electrical panel; emergency lighting in the conning tower fails for ninety seconds, leaving officers in absolute darkness.",
+        "Savitsky produces written standing orders authorizing nuclear release if communications with Moscow are severed for more than 24 hours — the document is technically valid."
+      ]
+    },
+    "winConditions": [
+      "Arkhipov withholds his key and persuades or outlasts Savitsky, preventing the launch sequence from completing, and the B-59 surfaces under the white flag protocol.",
+      "The Sonar Analyst delivers a confirmed acoustic reading proving the depth charges are signaling munitions, giving Arkhipov the tactical evidence needed to override the Captain's order.",
+      "The USS Cony captain halts the depth-charge run and broadcasts a clear non-hostile surfacing invitation that reaches the B-59's radio room before the launch sequence locks."
+    ],
+    "failConditions": [
+      "All three key-holders — Savitsky, Maslennikov, and Arkhipov — turn their keys simultaneously, arming the nuclear torpedo. The launch cannot be recalled.",
+      "Cabin_Oxygen drops to 15 or below; the crew loses cognitive function and Savitsky's order goes unopposed.",
+      "Hull_Temperature reaches 130; a coolant pipe ruptures, disabling the torpedo room safeties and triggering an automatic arming sequence.",
+      "The USS Cony drops a live depth charge by error, causing structural hull damage that Savitsky interprets as a declaration of war."
+    ],
+    "partialSuccessExamples": [
+      "The B-59 surfaces but the nuclear torpedo is partially armed — a post-crisis standoff begins on the surface with both navies at battle stations.",
+      "Arkhipov prevents the launch but Savitsky relieves him of command; the boat surfaces under protest and the diplomatic fallout reshapes the chain of command.",
+      "The USS Cony captain halts the depth charges but too late — Savitsky has already ordered Maslennikov to turn his key; only Arkhipov's physical intervention stops the sequence."
+    ],
+    "introduction": {
+      "enabled": true,
+      "skippable": true,
+      "sections": [
+        {
+          "type": "world",
+          "text": "It is the fourteenth day of the Cuban Missile Crisis. President Kennedy has imposed a naval quarantine around Cuba; Soviet freighters carrying ballistic missiles have been turning back at the blockade line, and the world's two nuclear arsenals are held at DEFCON 2 — the highest alert short of active war. In Washington and Moscow, men who control thousands of warheads are negotiating by cable and back-channel, buying hours with words. What neither government fully knows is that four Soviet Foxtrot-class submarines have been dispatched from Murmansk with orders to support the Cuba operation, each carrying a single T-5 nuclear torpedo with a yield equivalent to Hiroshima. The submarines have been out of reliable radio contact with Moscow for days."
+        },
+        {
+          "type": "stakes",
+          "text": "The standing orders carried aboard each Foxtrot authorize the commanding officer to use the nuclear torpedo without explicit Kremlin approval if the submarine is attacked and communications are severed — provided all three senior officers turn their launch keys in unanimous agreement. Tonight, aboard B-59, that threshold is minutes away from being met. If the torpedo fires, the USS Randolph and her task force are destroyed; the United States, believing a nuclear first strike has begun, will retaliate against Soviet territory within the hour. The two men who can prevent this are not heads of state. They are a flotilla chief of staff with a brass key in his tunic pocket and a sonar operator who can tell the difference between a signal and a killing blow."
+        },
+        {
+          "type": "scene",
+          "text": "The Sargasso Sea tonight is a flat, black mirror — no wind, no swell, the Atlantic holding its breath. On the surface, the USS Cony's searchlight cuts white arcs through a thin Atlantic fog, her sonar dome pinging rhythmically into the deep water at four-second intervals. Sixty meters below, the B-59 has been running on battery power for nearly sixteen hours; the diesel engines cannot run submerged, and every hour of battery drain is an hour closer to the surface or to silence. Inside the pressure hull, the temperature has climbed past ninety degrees Fahrenheit and is still rising. The air smells of unwashed men, battery acid, and the faint copper tinge of overheated electrical insulation. Red emergency lamps cast everything in the color of a darkroom."
+        },
+        {
+          "type": "entry",
+          "text": "You are one of three people aboard or above this crisis who possess the specific knowledge, authority, or position to alter what is about to happen. The Captain of B-59 is already convinced that World War III has started on the surface. The Political Officer has stopped arguing with him. The first signaling depth charge detonated forty minutes ago; two more have followed, each one rattling the hull like a hammer on a bell jar, each one logged by a crew that cannot tell, from inside a steel tube at depth, whether the next one will be the charge that breaks them open. Somewhere in this boat — in the hydroacoustic shack, in the conning tower, in the sweat-soaked air of the torpedo room — the sequence that ends the world is being assembled, one decision at a time. You are standing at the exact point where it can still be stopped.",
+          "character_entries": {
+            "role_arkhipov": "Your back is against the port bulkhead and the steel is hot through your jacket — not warm, hot, the particular conducted heat of machinery that has been running past its tolerance for too long, and you have stopped noticing it the way you have stopped noticing the smell, which means your body has begun to economize. The red lamp above the chart table makes Savitsky's face look like something carved from the inside of a furnace. You have been watching him for twenty minutes. You know that stillness. You know it from the K-19, from men whose hands had already rehearsed the motion before their mouths caught up — and what you know, what Savitsky does not know you know, is that thirty feet aft of this compartment a man with Bakelite headphones is reading the ocean, and he logged the last detonation at forty-seven meters, and forty-seven meters is a signal, not a killing blow. The key in your left tunic pocket has not been touched. You have been precise about this. Maslennikov has stopped meeting your eyes. The air tastes of copper and bad decisions, and Savitsky has just looked up from the chart table and found your face, and you have perhaps one breath left before this becomes a conversation.",
+            "role_sonar_analyst": "The hydroacoustic shack is ninety-one degrees and shrinking. You have the Bakelite cups pressed so hard against your skull that the cartilage of your ears has gone numb, and through them the ocean is speaking in a language you have spent eleven years learning to read — the four-second metronome of the Cony's sonar dome, the distant turbine signature of the Murray holding station two thousand meters northeast, and underneath all of it the specific acoustic fingerprint, sharp and clean as a struck bell, of a Mk-84 signaling charge. Three times now. The cathode-ray trace in front of you does not lie: that crack-and-decay curve, that frequency envelope, belongs to a device designed to communicate, not to kill. You have the pencil marks on the tracing table. You have the physics. What you have is everything except thirty feet of passageway and enough oxygen in your blood to make your hands stop arriving slightly behind your intentions. Through the curtain you can hear the Captain's voice — measured, certain, the cadence of a decision already made — and you understand, with the particular clarity of a man who knows exactly what he knows, that the data on this table has not reached the conning tower. Your hand is already moving toward the curtain.",
+            "role_cony_captain": "Both hands on the windbreak rail, and the fog has come in so thick now that your own searchlight is just a white smear dissolving into nothing twenty yards off the bow. The sonar repeater ticks at your left elbow — bearing 210, stationary, the same bright smear it has been for two hours and fourteen minutes — and the four-second ping of the dome below your feet travels down through the hull and into the water and comes back with the same answer it has been giving you since 2100: still there, still down, still not moving. A submarine that won't move and won't surface is a problem that your briefing did not name. Your briefing gave you a Foxtrot-class contact, conventionally armed, likely to surface under sustained signaling pressure; your briefing did not give you this — the silence, the stillness, the particular quality of a contact that has stopped behaving like a vessel with options. Salt is on your lips. The deck plates vibrate faintly under your boots, the Cony's engines holding station against a current that wants to push you north, and somewhere aft of you the Mk-84 rack holds four more signaling charges and, in the locker beneath it, the other kind — the kind that require a call to the task force commander, a call you have not made, a call you are not certain you are ready to make, a call that would require you to explain why you believe the situation has changed when the only evidence you have is a silence that has lasted too long and a door that will not open. Your XO has been below for forty-three minutes. The contact has not moved. Your hand is already reaching for the radio handset, and you have not yet decided what you are going to say when someone answers."
+          }
+        }
+      ]
+    },
+    "period_vocabulary": {
+      "categories": [
+        {
+          "name": "Soviet Submarine Service",
+          "context": "Used by officers and enlisted crew of the Soviet Navy's submarine arm during operations, drills, and crisis communications aboard Foxtrot-class boats.",
+          "terms": [
+            {
+              "term": "Silovaya ustanovka",
+              "meaning": "The propulsion plant — specifically the diesel-electric drive system; used when reporting battery or engine status to the watch officer."
+            },
+            {
+              "term": "Akustik",
+              "meaning": "The hydroacoustic operator; the sonar specialist — the single most critical enlisted rating on a submerged boat."
+            },
+            {
+              "term": "Tsel",
+              "meaning": "Contact or target — used in the hydroacoustic shack to designate a tracked surface vessel without yet classifying its intent."
+            },
+            {
+              "term": "Glubin",
+              "meaning": "Depth, specifically ordered depth — 'Glubin sorok' means ordered to forty meters; used in diving commands from the conning tower."
+            },
+            {
+              "term": "Zampolit",
+              "meaning": "The political officer — the Party's representative aboard ship, whose approval is theoretically required for major command decisions and whose presence creates a second chain of authority parallel to the captain's."
+            },
+            {
+              "term": "Boevaya chast' pervaya",
+              "meaning": "Combat division one — the torpedo division; the department responsible for arming, maintaining, and firing all torpedo weapons including the T-5 nuclear round."
+            },
+            {
+              "term": "Vsplyt",
+              "meaning": "Surface — the order or act of bringing the submarine to the surface; carrying enormous tactical and political weight in this situation, as surfacing means surrender of the submerged position."
+            }
+          ]
+        },
+        {
+          "name": "U.S. Navy Anti-Submarine Warfare",
+          "context": "Used by officers and ratings aboard Fletcher-class destroyers conducting ASW operations during the Cuban quarantine, particularly in communications between the bridge, sonar shack, and depth-charge crews.",
+          "terms": [
+            {
+              "term": "Foxer",
+              "meaning": "Acoustic decoy gear towed behind a surface ship to confuse submarine torpedoes — the presence or absence of a foxer on a destroyer indicates its defensive posture."
+            },
+            {
+              "term": "Datum",
+              "meaning": "The last confirmed position of a submarine contact — the tactical reference point from which all search patterns radiate."
+            },
+            {
+              "term": "ASROC",
+              "meaning": "Anti-Submarine Rocket — a stand-off weapon capable of delivering a depth charge or homing torpedo to a datum without closing the surface ship; its use would be lethal, not signaling."
+            },
+            {
+              "term": "Signaling charge",
+              "meaning": "A hand-grenade-sized explosive canister — officially designated the Mk-84 — dropped to communicate with a submerged submarine using the international surfacing code; non-lethal at any depth a submarine can survive."
+            },
+            {
+              "term": "Hold-down",
+              "meaning": "The tactical maneuver of continuously pinging and circling a submerged contact to deny it the ability to surface, recharge, or maneuver — exhausting the submarine's battery and crew."
+            },
+            {
+              "term": "Snorkel datum",
+              "meaning": "A contact report based on visual or radar detection of a submarine's snorkel mast at periscope depth — the most vulnerable moment for a Foxtrot trying to recharge batteries."
+            },
+            {
+              "term": "Comms window",
+              "meaning": "A scheduled period when a submerged submarine is expected to copy a broadcast from its shore command — missing multiple comms windows is the operational indicator that a boat is in distress or has gone rogue."
+            }
+          ]
+        },
+        {
+          "name": "Cold War Nuclear Protocol",
+          "context": "Formal and informal language used by senior officers on both sides when discussing nuclear weapons authorization, chain-of-command procedures, and launch mechanics — spoken carefully, often in euphemism.",
+          "terms": [
+            {
+              "term": "Special weapon",
+              "meaning": "Euphemism for a nuclear-armed torpedo or warhead in Soviet naval communications — used to avoid explicit acknowledgment of nuclear capability on any channel that might be intercepted."
+            },
+            {
+              "term": "Three-key rule",
+              "meaning": "The B-59's internal protocol requiring the captain, political officer, and flotilla chief of staff to each physically turn a separate brass key to complete the arming sequence of the T-5 torpedo."
+            },
+            {
+              "term": "Sanction",
+              "meaning": "In Soviet nuclear doctrine, the explicit authorization from Moscow to use a special weapon — without sanction, the three-key rule is the only substitute authority."
+            },
+            {
+              "term": "Dead reckoning authority",
+              "meaning": "The informal term among B-59 officers for the standing orders permitting nuclear use when communications are severed and the boat is under attack — named for the navigational technique of estimating position without external reference."
+            },
+            {
+              "term": "Positive control",
+              "meaning": "The American doctrine requiring explicit presidential authorization before any nuclear weapon can be armed or fired — the U.S. task force operates under positive control; B-59 does not."
+            },
+            {
+              "term": "DEFCON",
+              "meaning": "Defense Condition — the U.S. readiness scale from 5 (peacetime) to 1 (nuclear war imminent); the task force is operating at DEFCON 2, meaning nuclear weapons are ready and waiting only for the launch order."
+            }
+          ]
+        },
+        {
+          "name": "Submarine Interior Argot",
+          "context": "Informal language used by enlisted men and junior officers aboard Soviet submarines to describe conditions, equipment states, and the psychological reality of extended submerged operations.",
+          "terms": [
+            {
+              "term": "The Tomb",
+              "meaning": "Crew slang for the submarine itself during a hold-down — when the boat cannot surface, cannot run diesels, and cannot communicate, it becomes indistinguishable from a sealed coffin."
+            },
+            {
+              "term": "Kislorod",
+              "meaning": "Oxygen — the word takes on near-religious significance during extended dives when the chemical oxygen regeneration canisters are running low and each breath is rationed."
+            },
+            {
+              "term": "Red light thinking",
+              "meaning": "The cognitive impairment caused by heat, oxygen deprivation, and exhaustion under emergency lighting — decisions made in this state are considered unreliable by experienced officers, though the men making them rarely know it."
+            },
+            {
+              "term": "Ping shadow",
+              "meaning": "The brief acoustic silence between active sonar pulses — experienced submariners learn to read the rhythm of an enemy's pinging to estimate his range and intent."
+            },
+            {
+              "term": "Battery death",
+              "meaning": "The point at which the submarine's electrical storage is too depleted to maintain propulsion, life support, and weapons systems simultaneously — forcing a choice between movement, survival, and combat readiness."
+            }
+          ]
+        }
+      ]
+    },
+    "createdAt": "2025-01-01T00:00:00Z",
+    "updatedAt": "2026-05-20T19:37:59.792Z",
+    "premise": "",
+    "playerGoal": "",
+    "openingSituation": "",
+    "tone": [],
+    "structured_endings_enabled": false,
+    "allow_free_input": true,
+    "beats_status": "not_generated",
+    "technical_facts": {
+      "generated": true,
+      "reviewed": true,
+      "facts": [
+        {
+          "fact_id": "b59_class_and_pennant",
+          "content": "B-59 was a Project 641 (NATO designation Foxtrot-class) diesel-electric submarine, hull number B-59, assigned to the 69th Torpedo Submarine Brigade of the Soviet Navy's Northern Fleet and deployed to the Caribbean as part of Operation Anadyr in October 1962.",
+          "domain": "other",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "b59_nuclear_torpedo_specification",
+          "content": "B-59 carried one T-5 nuclear torpedo (also designated the 53-58) fitted with a 15-kiloton nuclear warhead, assigned to Tube 1 of the forward torpedo room.",
+          "domain": "capacity",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; National Security Archive Briefing Book No. 399",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "launch_authorization_three_key_requirement",
+          "content": "Under the standing orders governing B-59's deployment, authorization to arm and fire the nuclear torpedo required the concurrent agreement of three officers: the commanding officer, the political officer (zampolit), and the flotilla chief of staff — all three keys had to be turned simultaneously.",
+          "domain": "other",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; Thomas Blanton and William Burr, National Security Archive",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "arkhipov_refusal_documented",
+          "content": "Flotilla Chief of Staff Vasili Arkhipov refused to authorize the launch of the nuclear torpedo, overriding Captain Savitsky's decision to fire; his refusal was the sole reason the weapon was not launched.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; Thomas Blanton, National Security Archive",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "arkhipov_k19_prior_service",
+          "content": "Vasili Arkhipov served as executive officer aboard the nuclear submarine K-19 during its reactor emergency of July 4, 1961, during which he helped prevent a mutiny and maintain crew order under conditions of acute radiation exposure and imminent catastrophe.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Peter Huchthausen, K-19: The Widowmaker (2002); National Security Archive",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "savitsky_belief_war_had_started",
+          "content": "Captain Valentin Savitsky stated during the command confrontation that he believed World War III had already begun and that the submarine was being attacked, and he ordered the nuclear torpedo prepared for firing.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Vadim Orlov (crew member, B-59) testimony reported in Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "b59_communications_blackout_duration",
+          "content": "B-59 had been out of communication with Moscow for approximately two days before the confrontation with US surface forces, leaving the crew without knowledge of the current state of the Cuban Missile Crisis negotiations.",
+          "domain": "timing",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "interior_temperature_documented",
+          "content": "Interior temperatures aboard B-59 during the hold-down by US surface forces reached approximately 45 degrees Celsius (113 degrees Fahrenheit) in some compartments due to battery operation, equipment heat, and inability to surface.",
+          "domain": "other",
+          "source": {
+            "citation": "Vadim Orlov testimony; Peter Huchthausen, October Fury (2002)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "co2_and_oxygen_conditions",
+          "content": "Carbon dioxide levels aboard B-59 rose to dangerous concentrations during the extended submerged period, causing crew members to experience headaches, disorientation, and impaired judgment; the crew was described as barely able to function.",
+          "domain": "other",
+          "source": {
+            "citation": "Vadim Orlov testimony reported in Savranskaya, Journal of Strategic Studies, 2005; Peter Huchthausen, October Fury (2002)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "us_signaling_charges_mk84",
+          "content": "US Navy surface forces used Mk-84 Practice Depth Charges (signaling grenades) to signal B-59 to surface; these devices were non-lethal and were used in accordance with a notice to Soviet naval attachés in Washington that such signals would be employed to order submarines to surface and identify themselves.",
+          "domain": "other",
+          "source": {
+            "citation": "US Navy message to Soviet Naval Attaché, Washington DC, October 1962, cited in James Blight and janet Lang, The Armageddon Letters (2012); National Security Archive",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "soviet_navy_not_informed_of_signal_protocol",
+          "content": "The US Navy's notification of the signaling charge protocol was delivered to the Soviet Naval Attaché in Washington, but there is no documented evidence that this notification was relayed to the submarines at sea before the charges were deployed.",
+          "domain": "other",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; James Blight, Back to the Brink (1989)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "uss_cony_dd508_identification",
+          "content": "USS Cony (DD-508) was a Gleaves-class destroyer assigned to the anti-submarine warfare task group operating under USS Randolph (CVS-15) during the naval quarantine of Cuba in October 1962.",
+          "domain": "other",
+          "source": {
+            "citation": "US Navy operational records, Cuban Missile Crisis quarantine force composition; Norman Polmar and John Moore, Cold War Submarines (2004)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "b59_surfacing_date_and_time",
+          "content": "B-59 surfaced on the night of October 27–28, 1962, after Arkhipov persuaded Savitsky to stand down; the submarine surfaced in the presence of US Navy surface vessels and was illuminated by their searchlights.",
+          "domain": "timing",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; National Security Archive Briefing Book No. 399",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "b59_battery_depletion_operational_constraint",
+          "content": "Foxtrot-class submarines of the Project 641 type carried three battery groups with a combined capacity sufficient for approximately 24 hours of submerged operation at low speed (2 knots); at higher speeds or with heavy electrical load, endurance was significantly reduced.",
+          "domain": "power",
+          "source": {
+            "citation": "Norman Polmar and John Moore, Cold War Submarines (2004); Soviet Navy Project 641 technical specifications",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "b59_crew_complement",
+          "content": "B-59 carried a crew of 78 officers and enlisted men during its October 1962 deployment.",
+          "domain": "capacity",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "october_27_black_saturday_context",
+          "content": "The confrontation aboard B-59 occurred on October 27, 1962 — the same day a U-2 reconnaissance aircraft was shot down over Cuba and a second U-2 strayed into Soviet airspace over Alaska, the day subsequently identified by historians as the most dangerous single day of the Cuban Missile Crisis.",
+          "domain": "timing",
+          "source": {
+            "citation": "Ernest May and Philip Zelikow, The Kennedy Tapes (1997); James Blight and janet Lang, The Armageddon Letters (2012)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "maslennikov_political_officer_authority",
+          "content": "The zampolit (political officer) aboard Soviet submarines held co-equal authority with the commanding officer specifically for the authorization of nuclear weapons use; both the captain and the zampolit were required to consent before the third key — held by the senior officer present — could complete the circuit.",
+          "domain": "other",
+          "source": {
+            "citation": "Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, 2005; National Security Archive",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "foxtrot_class_submerged_depth_operational",
+          "content": "Project 641 (Foxtrot-class) submarines had an operational diving depth of 240 meters (787 feet) and a maximum depth of 300 meters (984 feet); the test depth was 200 meters.",
+          "domain": "navigation",
+          "source": {
+            "citation": "Norman Polmar and John Moore, Cold War Submarines (2004); Soviet Navy Project 641 technical specifications",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "vadim_orlov_eyewitness_account",
+          "content": "Vadim Orlov, the intelligence officer (signals intelligence analyst) aboard B-59, provided the primary firsthand account of the events of October 27, 1962, including Savitsky's order to prepare the nuclear torpedo and Arkhipov's intervention, in testimony given at the Havana conference of October 2002.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Vadim Orlov, testimony at the 40th Anniversary Conference on the Cuban Missile Crisis, Havana, October 2002, reported in Savranskaya, Journal of Strategic Studies, 2005",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        }
+      ]
+    },
+    "epilogue": {
+      "generated": true,
+      "reviewed": false,
+      "character_fates": [
+        {
+          "character_id": "char_savitsky",
+          "name": "Valentin Grigorievich Savitsky",
+          "outcome": "survived",
+          "historical_record": "Savitsky surfaced B-59 on the night of 27 October 1962 after Arkhipov refused to authorize nuclear torpedo launch. He was not court-martialed. The Soviet Navy did not publicly acknowledge the incident during his lifetime. He continued his naval career and died in 1999. The full account of his actions aboard B-59 was not publicly confirmed by Russian sources until the 2002 Havana conference on the Cuban Missile Crisis.",
+          "primary_source": {
+            "citation": "Proceedings of the Havana Conference on the Cuban Missile Crisis, October 2002; Thomas Blanton and James Blight, eds., published accounts from National Security Archive.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "char_maslennikov",
+          "name": "Ivan Maslennikov",
+          "outcome": "survived",
+          "historical_record": "Maslennikov was the zampolit (political officer) aboard B-59 and held one of the two keys required to authorize nuclear torpedo launch under the standing orders carried by the Foxtrot submarines during Operation Anadyr. He agreed with Savitsky's assessment and indicated willingness to authorize launch. His subsequent career and personal fate after 1962 are not documented in available declassified sources. He was identified by name in accounts given by surviving crew members at the 2002 Havana conference.",
+          "primary_source": {
+            "citation": "National Security Archive, 'The Submarines of October,' NSA Electronic Briefing Book No. 75, compiled by William Burr and Thomas Blanton, 2002.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "char_arkhipov",
+          "name": "Vasili Alexandrovich Arkhipov",
+          "outcome": "survived",
+          "historical_record": "Arkhipov was Flotilla Chief of Staff embarked on B-59 and held equal authority to Savitsky under the authorization protocol for nuclear torpedo use, which required the agreement of the commanding officer, the political officer, and the flotilla commander. He refused to authorize launch, breaking the required unanimity. The submarine surfaced on 27 October 1962. Arkhipov was not publicly recognized for his actions during the Soviet period. He was promoted to Vice Admiral and later to Admiral. He died on 19 August 1998. His role was publicly confirmed at the 2002 Havana conference. Thomas Blanton of the National Security Archive stated in 2002 that Arkhipov 'saved the world.'",
+          "primary_source": {
+            "citation": "National Security Archive, NSA Electronic Briefing Book No. 75, 2002; Svetlana Savranskaya, 'New Sources on the Role of Soviet Submarines in the Cuban Missile Crisis,' Journal of Strategic Studies, Vol. 28, No. 2, April 2005.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "char_sonar_analyst",
+          "name": "Dmitri Volkov",
+          "outcome": "unknown",
+          "historical_record": "No individual identified as the hydroacoustic (sonar) officer or senior sonar rating of B-59 by the name Dmitri Volkov appears in declassified Soviet or Russian naval records, survivor testimony transcripts, or published scholarship on the incident. The crew of B-59 numbered approximately 78 men. Crew members other than Savitsky, Arkhipov, and Maslennikov are not individually documented in available primary sources. This character as named is not historically attested.",
+          "primary_source": null
+        },
+        {
+          "character_id": "char_captain_estocin",
+          "name": "Paul Henry Estocin",
+          "outcome": "died",
+          "historical_record": "Commander Paul Estocin commanded USS Cony (DD-508) during the Cuban Missile Crisis quarantine operations in October 1962, including the tracking and hold-down of B-59. He survived the crisis. He subsequently transitioned to naval aviation. On 26 April 1967, while flying an A-4E Skyhawk on a strike mission against the Hanoi thermal power plant during the Vietnam War, his aircraft was hit by a surface-to-air missile. He was posthumously awarded the Medal of Honor. His citation describes two separate strike missions on 20 and 26 April 1967. He was declared killed in action. His remains were not recovered.",
+          "primary_source": {
+            "citation": "Medal of Honor citation, Commander Paul Henry Estocin, USN, approved 1978; USS Paul F. Foster (DD-964) and USS Estocin (FFG-15) named in his honor.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "char_chief_petty_officer_kozlov",
+          "name": "Anatoly Kozlov",
+          "outcome": "unknown",
+          "historical_record": "No individual identified as Chief of the Boat or senior enlisted member of B-59 by the name Anatoly Kozlov appears in declassified records, survivor testimony, or published scholarship on the incident. Crew members of B-59 below officer rank are not individually documented in available primary sources. This character as named is not historically attested.",
+          "primary_source": null
+        },
+        {
+          "character_id": "char_lt_commander_hayes",
+          "name": "Robert Hayes",
+          "outcome": "unknown",
+          "historical_record": "No individual identified as Executive Officer of USS Cony (DD-508) by the name Robert Hayes during the October 1962 period appears in declassified Navy records or published scholarship consulted for this scenario. The officer complement of USS Cony during the Cuban Missile Crisis is not fully documented in available open sources. This character as named is not historically attested.",
+          "primary_source": null
+        }
+      ],
+      "immediate_outcome": {
+        "summary": "B-59 surfaced on the night of 27 October 1962 after Arkhipov refused to authorize the use of the nuclear-armed torpedo, denying the unanimity required under the authorization protocol. The submarine was escorted to the surface by USS Cony and other ASW vessels and subsequently returned to the Soviet Union. No nuclear weapon was used.",
+        "key_facts": [
+          "B-59 surfaced on 27 October 1962, the same day as the U-2 shootdown over Cuba and the peak of the missile crisis.",
+          "The T-5 nuclear torpedo aboard B-59 had a yield estimated at approximately 5 to 15 kilotons.",
+          "The authorization protocol required the agreement of three officers: the commanding officer, the political officer, and the embarked flotilla commander.",
+          "Savitsky and Maslennikov agreed to authorize launch; Arkhipov refused, preventing the required unanimity.",
+          "Interior temperatures aboard B-59 reportedly reached approximately 45 to 50 degrees Celsius (113 to 122 degrees Fahrenheit) in some compartments during the hold-down.",
+          "B-59 had been submerged and under ASW pressure for approximately two days before surfacing.",
+          "USS Cony (DD-508) was one of the primary ASW vessels conducting the hold-down operation.",
+          "The four Foxtrot submarines of the 69th Torpedo Submarine Brigade (B-4, B-36, B-59, B-130) each carried one nuclear-armed torpedo.",
+          "The incident was not publicly confirmed by Russian sources until the 2002 Havana conference on the Cuban Missile Crisis."
+        ]
+      },
+      "historical_frame": [
+        "27 October 1962 is the date on which B-59 surfaced; it is also the date a U-2 was shot down over Cuba by a Soviet SA-2 missile and a separate U-2 strayed into Soviet airspace over Alaska — making it the single most dangerous day of the Cuban Missile Crisis.",
+        "The four Soviet Foxtrot submarines operating near the quarantine line in October 1962 were not informed of the full diplomatic situation before departure and were operating under communications blackout; their commanding officers did not know whether war had begun.",
+        "The existence of nuclear torpedoes aboard the Foxtrot submarines was not known to United States naval commanders conducting the ASW hold-down operations in October 1962; this was confirmed by Robert McNamara at the 1992 Havana conference."
+      ],
+      "open_threads": [
+        {
+          "thread_id": "the_uss_cony",
+          "historical_record": "The precise sequence and timing of USS Cony's sonar contact and the internal reporting chain aboard B-59 are not fully documented. U.S. Navy ASW logs from the quarantine operations have been partially declassified, but the moment-by-moment sonar contact record for the B-59 hold-down has not been released in full. Soviet records of how and when the crew understood the nature of the ASW contact remain incomplete in open sources."
+        },
+        {
+          "thread_id": "hulltemperature_climbs_past",
+          "historical_record": "Specific internal temperature readings and their timing aboard B-59 during the hold-down are not documented in available primary sources. Survivor accounts given at the 1992 and 2002 Havana conferences describe extreme heat and deteriorating conditions but do not provide precise temperature logs or timestamps. The effect of heat and CO2 buildup on crew decision-making during the crisis period has been discussed by scholars but cannot be reconstructed with precision from available records."
+        },
+        {
+          "thread_id": "the_cony_captain",
+          "historical_record": "Whether Commander Estocin or other U.S. surface commanders suspected the contact was in distress or facing a critical internal situation is not documented in declassified records. U.S. commanders did not know the submarine carried a nuclear weapon. The decision-making process aboard USS Cony and the coordination with USS Beale and USS Murray during the hold-down has not been reconstructed from primary sources in available scholarship."
+        },
+        {
+          "thread_id": "arkhipov_locates_the",
+          "historical_record": "The internal dynamics between Arkhipov and Maslennikov aboard B-59 are not documented beyond the basic fact that Maslennikov agreed with Savitsky and Arkhipov refused. No transcript, log, or contemporaneous record of their interactions survives in available open sources. Accounts of the confrontation derive from survivor testimony given decades after the event, primarily at the 2002 Havana conference."
+        },
+        {
+          "thread_id": "the_americans_begin",
+          "historical_record": "The United States Navy used PDC (Practice Depth Charges), also described as signaling grenades or hand grenades, to signal the submarines to surface, in accordance with a notice to mariners procedure communicated to the Soviet government on 23 October 1962. Whether this notice was received and understood by the crews of the Foxtrot submarines before the charges were dropped is disputed. Savitsky reportedly believed the charges were an attack. The exact number, timing, and effect of the signaling charges on B-59 are not fully documented in available records."
+        },
+        {
+          "thread_id": "cabinoxygen_drops_below",
+          "historical_record": "Specific oxygen level readings and their effect on individual crew members aboard B-59 are not documented in available primary sources. Survivor accounts confirm that conditions were severely degraded, with CO2 scrubbers failing and crew members losing consciousness, but precise measurements and their timing are not recorded in open sources."
+        },
+        {
+          "thread_id": "savitsky_calls_a",
+          "historical_record": "The exact content of the standing orders carried by the Foxtrot submarine commanders regarding nuclear torpedo use remains partially classified or undisclosed by Russian authorities. It is confirmed that the authorization protocol required the agreement of the commanding officer, the political officer, and the embarked flotilla commander. Whether the orders explicitly authorized independent use in the event of war or attack, or required contact with Moscow, has been described differently in different accounts and has not been resolved by a single authoritative primary source in open literature."
+        },
+        {
+          "thread_id": "arkhipov_intercepts_a",
+          "historical_record": "Whether the nuclear torpedo aboard B-59 was physically moved to or loaded into a launch tube during the crisis period is not confirmed in available primary sources. The physical state of the weapon during the hold-down is not documented in declassified records. This specific detail is not attested in survivor testimony available in open sources."
+        },
+        {
+          "thread_id": "hulltemperature_hits_110f",
+          "historical_record": "Survivor accounts confirm that crew members lost consciousness during the hold-down and that the ship's medical officer was involved in managing casualties from heat and CO2 exposure. Specific temperature figures of 110 degrees Fahrenheit or equivalent are cited in some secondary accounts but are not sourced to a contemporaneous ship's log or medical record in available open sources. The precise peak temperature reached and the number of crew members incapacitated are not established by a single verified primary source."
+        }
+      ],
+      "choice_echoes": [
+        {
+          "beat_id": "the_uss_cony",
+          "historical_record": "USS Cony (DD-508) was one of the U.S. Navy ASW vessels that detected and conducted hold-down operations against B-59 during the quarantine. U.S. forces used active sonar and coordinated ASW tactics to force the submarine to the surface. The hold-down lasted approximately two days. The crew of B-59 was aware they were being tracked by active sonar."
+        },
+        {
+          "beat_id": "hulltemperature_climbs_past",
+          "historical_record": "Survivor accounts confirm that interior temperatures aboard B-59 reached extreme levels during the hold-down as the submarine ran on battery power with ventilation systems degraded. Crew members experienced heat exhaustion and loss of consciousness. The precise temperature at any given point in the timeline is not documented in available primary sources."
+        },
+        {
+          "beat_id": "the_cony_captain",
+          "historical_record": "USS Cony coordinated with other ASW vessels including USS Beale and USS Murray during the quarantine operations. The U.S. surface force maintained a perimeter around the contact. U.S. commanders did not know the submarine carried a nuclear weapon and did not know the crew was approaching a decision point on nuclear use."
+        },
+        {
+          "beat_id": "arkhipov_locates_the",
+          "historical_record": "Arkhipov was embarked on B-59 as Flotilla Chief of Staff. His authority was equal to Savitsky's under the nuclear authorization protocol. Maslennikov as zampolit held the second required authorization. The confrontation between these three officers is confirmed by survivor testimony at the 2002 Havana conference, though the details of their interactions are not documented in contemporaneous records."
+        },
+        {
+          "beat_id": "the_americans_begin",
+          "historical_record": "The United States Navy dropped signaling charges (PDCs) near B-59 to signal it to surface, consistent with the procedure communicated to the Soviet government on 23 October 1962. Savitsky reportedly interpreted the detonations as an attack. This interpretation contributed to his decision to seek authorization for nuclear torpedo launch. The signaling charge procedure and Savitsky's reaction to it are confirmed in accounts from the 2002 Havana conference."
+        },
+        {
+          "beat_id": "cabinoxygen_drops_below",
+          "historical_record": "Survivor accounts confirm that CO2 levels rose to dangerous levels aboard B-59 during the hold-down, that CO2 scrubbers were failing or exhausted, and that crew members lost consciousness. The sonar tracking function would have been maintained by crew members operating under severe physiological stress. Specific oxygen percentage readings are not documented in available primary sources."
+        },
+        {
+          "beat_id": "savitsky_calls_a",
+          "historical_record": "Savitsky convened a command conference and presented the case for nuclear torpedo launch, citing the standing orders and the belief that war had begun. Maslennikov agreed. Arkhipov refused. The refusal broke the required unanimity and prevented launch. This sequence is confirmed by survivor testimony at the 2002 Havana conference and is the central documented fact of the B-59 incident."
+        },
+        {
+          "beat_id": "arkhipov_intercepts_a",
+          "historical_record": "The physical state of the nuclear torpedo during the hold-down — whether it was moved, prepared, or loaded — is not confirmed in available primary sources. The weapon's existence aboard B-59 is confirmed. Its handling during the crisis period is not documented in open sources."
+        },
+        {
+          "beat_id": "hulltemperature_hits_110f",
+          "historical_record": "Survivor accounts confirm that crew members collapsed from heat and CO2 exposure during the hold-down and that the ship's medical officer treated casualties. The crew's cognitive function was severely impaired by the time of the command conference. Specific temperature figures and the precise number of incapacitated crew members are not established by verified primary sources in open literature."
+        }
+      ]
+    },
+    "review_checklist": {
+      "beat_count": {
+        "checked": false,
+        "notes": ""
+      },
+      "sequence_check": {
+        "checked": false,
+        "notes": ""
+      },
+      "path_independence": {
+        "checked": false,
+        "notes": ""
+      },
+      "final_beat_spec": {
+        "checked": false,
+        "notes": ""
+      },
+      "tense_attribution": {
+        "checked": false,
+        "notes": ""
+      },
+      "reviewer_summary": {
+        "checked": false,
+        "notes": ""
+      },
+      "manual_playthrough": {
+        "checked": false,
+        "notes": ""
+      }
+    },
+    "opening_premise": "Three officers — a flotilla chief who must hold back his key, a sonar analyst who must read the difference between signals and death, and an American captain who must compel surrender without triggering catastrophe — have several hours to prevent a nuclear launch that could trigger global nuclear war.",
+    "three_key_rule_description": "provided the commanding officer, political officer, and embarked flotilla chief each concur in authorizing release of the special weapon.",
+    "hulltemperature_130f": "Hull_Temperature reaches catastrophic levels; crew coordination collapses, electrical systems begin failing unpredictably, and launch safeguards can no longer be reliably monitored.",
+    "pressureevent_depthcharge_buckles": "A signaling depth charge detonates close enough to violently rattle the hull and throw crewmen off balance",
+    "pressureevent_oxygen_threshold": "Cabin_Oxygen falls to critically low levels; heat exhaustion, elevated CO2, and oxygen depletion severely impair crew judgment and coordination.",
+    "opening_situation": "Evening, 27 October 1962. USS Cony and accompanying destroyers have maintained intermittent sonar contact with B-59 for hours as the submarine attempts to evade and preserve battery power.",
+    "act3_maslennikov_turns_key": "Maslennikov formally agrees with Savitsky's launch authorization; Arkhipov's refusal now becomes the final barrier preventing release of the nuclear torpedo.",
+    "role_surface_hunter_name": "The Surface Commander",
+    "char_savitsky_private_goal": "To avoid surfacing under apparent American coercion while preserving both his command authority and the survival of his crew under what he believes may already be wartime conditions.",
+    "char_savitsky_secret_transmission": "He believes communications with Moscow may have been missed or misunderstood during prolonged submerged operations, but no reliable confirmation has reached the command compartment.",
+    "char_estocin_depthcharge_secret": "He authorized increasingly aggressive signaling pressure because the submarine's prolonged silence suggested a potentially dangerous or disabled contact.",
+    "char_maslennikov_unopened_envelope": "The sealed envelope contains political guidance from naval authorities issued before the crisis peaked; Maslennikov has delayed opening it because he fears it may complicate the chain-of-command situation aboard the boat.",
+    "loc_conning_tower_key_receptacle": "The standing orders binder and launch authorization procedures are secured near the chart table, where command discussions over the special weapon now dominate the compartment.",
+    "clue_signaling_charge_pattern": "This matches the expected acoustic profile of a Mk-84 signaling charge",
+    "clue_savitsky_launch_order": "The entry suggests Savitsky had already begun considering nuclear release authority before the signaling charges intensified the crisis atmosphere aboard the submarine.",
+    "three_key_rule": "Three-key rule: The authorization protocol aboard B-59 requiring concurrence from the commanding officer, political officer, and flotilla chief before the T-5 nuclear torpedo could be armed and launched.",
+    "dead_reckoning_authority": "Dead reckoning authority: Informal crew slang for operating under standing orders without current communication from higher command.",
+    "maslennikov_two_keys": "held one of the required command authorizations necessary for nuclear torpedo release",
+    "keyfacts_three_officers": "Available historical testimony indicates that authorization for nuclear torpedo release aboard B-59 required concurrence from the commanding officer, political officer, and embarked flotilla chief Vasili Arkhipov."
+  }
+}

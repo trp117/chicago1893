@@ -1,0 +1,20 @@
+{
+  "id": "clue_signaling_charge_pattern",
+  "scenarioId": "sargasso_deep_three_keys",
+  "title": "Acoustic Signature: Signaling Charges Confirmed",
+  "description": "Volkov's manual tracing chart shows three distinct detonation events. Each produces the same acoustic profile: a sharp, high-frequency crack at 2,400–2,800 Hz with a decay time under 0.8 seconds and no measurable pressure wave precursor. This is the textbook signature of a Mk-84 signaling charge — a round designed to be heard, not to kill. A lethal depth charge produces a low-frequency concussion below 800 Hz with a pressure wave that arrives before the sound. These are not attacks. These are someone trying to talk to us.",
+  "category": "physical",
+  "discoveryLocationId": "loc_hydroacoustic_shack",
+  "implicatesCharacterIds": [
+    "char_sonar_analyst",
+    "char_captain_estocin"
+  ],
+  "unlocks": [
+    "clue_savitsky_launch_order"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.804Z",
+  "locationId": "",
+  "isRedHerring": false
+}

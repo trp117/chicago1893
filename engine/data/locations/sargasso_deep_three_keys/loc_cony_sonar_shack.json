@@ -1,0 +1,19 @@
+{
+  "id": "loc_cony_sonar_shack",
+  "scenarioId": "sargasso_deep_three_keys",
+  "name": "USS Cony Sonar Shack",
+  "description": "A below-decks compartment directly beneath the bridge, housing the SQS-4 sonar console and its operator. The room is cooled by the ship's air conditioning — a luxury that seems obscene given what is happening sixty meters below the hull — and lit by the blue-white glow of the sonar display.",
+  "mood": "clinical, focused, cold, informational",
+  "linkedCharacterIds": [
+    "char_lt_commander_hayes"
+  ],
+  "atmosphericDetails": [
+    "The SQS-4 display shows the contact in crisp, high-resolution detail — the submarine's exact bearing, estimated depth, and the absence of any propulsion noise for the last ninety minutes.",
+    "A paper printout from the sonar recorder is accumulating on the deck — a continuous strip of acoustic data that constitutes the most complete record of the B-59's behavior tonight.",
+    "A second display, smaller and to the left, shows the task force's own depth-charge detonations as brief, bright spikes — each one labeled by time and bearing."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.803Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}
