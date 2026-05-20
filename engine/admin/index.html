@@ -3326,7 +3326,7 @@ function parseCorrections(scenarioId) {
   while ((match = regex.exec(raw)) !== null) {
     const block = match[1].trim();
     const get = (label) => {
-      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n[A-Z]+:|$)');
+      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z ]*:|$)');
       const m = block.match(re);
       return m ? m[1].trim() : '';
     };
@@ -3573,11 +3573,8 @@ async function applyEndingNotes(scenarioId) {
       ending_notes: window._aiEndingNotes
     });
     toast('Ending notes applied to all player roles', 'success');
-    document.getElementById('ending-notes-paste').value = '';
-    document.getElementById('ending-notes-preview').innerHTML = '';
-    document.getElementById('ending-notes-actions').style.display = 'none';
     window._aiEndingNotes = null;
-    loadVersionHistory(scenarioId);
+    renderScenarioEditor(scenarioId);
   } catch (err) {
     toast(err.message, 'error');
   }
