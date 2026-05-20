@@ -61,19 +61,19 @@
       "German mortar barrage severs the forward wire line at grid reference 7-Charlie, dropping Wire_Continuity to Intermittent",
       "A runner arrives at the artillery dugout with a crumpled message: the second wave reports shells falling short by 80 meters — Barrage_Sync drops 15 points",
       "A German counter-attack probe reaches the eastern rubble line of Cantigny; Trench_Consolidation must reach 60 or the position risks being overrun",
-      "Gas alarm — yellow-cross mustard shells — forces all personnel into masks, slowing every action for one full turn",
+      "Gas alarm — possible gas shells reported near the eastern sector",
       "A French liaison officer arrives demanding to know why the 155mm howitzers have gone silent for four minutes"
     ]
   },
   "winConditions": [
-    "Identify and confront the saboteur before the German counter-barrage peaks at 18:00",
+    "Identify and confront the saboteur before the German counter-barrage reaches full intensity later in the afternoon",
     "Restore Wire_Continuity to Operational and synchronize Barrage_Sync above 70 before the final German counter-attack",
     "Secure a signed confession or two key-evidence clues sufficient to present to Colonel Ely before the climax"
   ],
   "failConditions": [
     "Barrage_Sync drops below 30 — friendly artillery falls on advancing infantry, causing catastrophic casualties",
     "Wire_Continuity remains Severed through Act III — the forward position cannot call for fire support and is overrun",
-    "Time expires at 18:00 with no accusation made and Trench_Consolidation below 50",
+    "Time expires by late afternoon with no accusation made and Trench_Consolidation below 50",
     "The saboteur escapes the forward area during the German counter-barrage"
   ],
   "partialSuccessExamples": [
@@ -87,7 +87,7 @@
     "sections": [
       {
         "type": "world",
-        "text": "It is the spring of 1918, and the war that was supposed to end by Christmas of 1914 has consumed four years, four empires, and somewhere between fifteen and seventeen million lives. The Western Front is a scar two hundred and fifty miles long, running from the English Channel to the Swiss border, held in place by mud, wire, and the institutional inertia of armies too large to maneuver and too committed to stop. The American Expeditionary Forces — 1.2 million men under General John Pershing — have been in France since the summer of 1917, drilling in rear areas while Allied commanders lobbied furiously to feed them into depleted French and British formations as individual replacements. Pershing refused. The AEF would fight as an independent army, or it would not fight at all. The village of Cantigny, a cluster of stone farmhouses and fortified cellars on a low ridge above the Avre River valley, is where that argument will be settled in blood."
+        "text": "It is the spring of 1918, and the war that was supposed to end by Christmas of 1914 has consumed four years, four empires, and somewhere between fifteen and seventeen million lives. The Western Front is roughly four hundred miles from the English Channel to the Swiss frontier, held in place by mud, wire, and the institutional inertia of armies too large to maneuver and too committed to stop. The American Expeditionary Forces — more than one million men under General John Pershing by the spring of 1918 — have been in France since the summer of 1917, drilling in rear areas while Allied commanders lobbied furiously to feed them into depleted French and British formations as individual replacements. Pershing refused. The AEF would fight as an independent army, or it would not fight at all. The village of Cantigny, a cluster of stone farmhouses and fortified cellars on a low ridge above the Avre River valley, is where that argument will be settled in blood."
       },
       {
         "type": "stakes",
@@ -95,15 +95,15 @@
       },
       {
         "type": "scene",
-        "text": "It is 05:45 on the morning of May 28th, and the sky above the Picardy plain is the color of wet concrete. A ground fog, thick with the residue of last night's gas discharge and the sweet-rotten smell of churned French farmland, lies in the hollows between the communication trenches. The temperature is perhaps eight degrees Celsius, and every wool uniform within a kilometer of the jump-off line is soaked through from the knees down. Somewhere to the northeast, a single German 77mm field gun fires a ranging shot — the crack of the discharge, then the long whisper of the shell, then the flat thump of impact in the mud two hundred meters behind the forward trench — and then silence again, a silence so complete you can hear the copper wire humming in the morning damp."
+        "text": "It is 05:45 on the morning of May 28th, and the sky above the Picardy plain is the color of wet concrete. A ground fog, thick with lingering smoke residue and the sweet-rotten smell of churned French farmland, lies in the hollows between the communication trenches. The temperature is perhaps eight degrees Celsius, and every wool uniform within a kilometer of the jump-off line is soaked through from the knees down. Somewhere to the northeast, a single German 77mm field gun fires a ranging shot — the crack of the discharge, then the long whisper of the shell, then the flat thump of impact in the mud two hundred meters behind the forward trench — and then silence again, a silence so complete you can hear the copper wire humming in the morning damp."
       },
       {
         "type": "entry",
-        "text": "You have been awake since 03:00. Your hands know their tasks by feel — the map, the telephone handset, the rifle bolt, the wire spool — because your eyes have been working in near-darkness for two hours and the light is only now beginning to separate the horizon from the sky. The men around you are not speaking. They are checking equipment they have already checked three times, and the checking is not really about the equipment. In eleven minutes, 216 French 75mm guns and 48 heavy howitzers will open fire simultaneously, and the creeping curtain of steel will begin its slow walk toward Cantigny, and you will have to move with it or be left behind. The question that nobody has yet thought to ask — the question that will matter more than any other before this day is done — is whether the fire tables those guns are working from are the ones that were issued last night, or the ones that someone replaced them with before dawn.",
+        "text": "You have been awake since 03:00. Your hands know their tasks by feel — the map, the telephone handset, the rifle bolt, the wire spool — because your eyes have been working in near-darkness for two hours and the light is only now beginning to separate the horizon from the sky. The men around you are not speaking. They are checking equipment they have already checked three times, and the checking is not really about the equipment. In eleven minutes, a combined American and French artillery force of field guns, heavy howitzers, trench mortars, and supporting batteries will open fire simultaneously, and the creeping curtain of steel will begin its slow walk toward Cantigny, and you will have to move with it or be left behind. The question that nobody has yet thought to ask — the question that will matter more than any other before this day is done — is whether the fire tables those guns are working from are the ones that were issued last night, or the ones that someone replaced them with before dawn.",
         "character_entries": {
-          "role_artillery_commander": "",
-          "role_doughboy": "",
-          "role_signaler": ""
+          "role_artillery_commander": "Twelve feet of Picardy clay and timber above your head, and the barrage is in your sternum like a second heartbeat — not sound anymore, just pressure, the guns having long since crossed the threshold where individual reports resolve into continuous physical fact. The fragment is in your left hand. The master copy is in your right. You have read them both three times and the numbers have not changed. Eastern sector, lifts seven through eleven: two hundred meters ahead of what you signed at 23:00, what you locked, what you initialed across the hasp in your own hand. The math is not complicated. The math is the problem. Barrage_Sync is at seventy-five and falling, which means the shells are walking forward on a schedule that should not exist outside this case, and the men of the assault wave are walking behind them, trusting the curtain of steel to be exactly where your tables say it is — except your tables and the fragment in your left hand are not the same document. Farrow is three feet to your left, watching you the way a man watches a fuse. He was the last officer at this table before the 03:00 stand-to. You know the access log. You know the timeline. The telephone handset is on its hook, and one call stops the eastern guns entirely, which may save the men behind the barrage or may strip them of their only cover at the moment they crest the ridge — and you do not yet know which. Your hand is already moving.",
+          "role_doughboy": "Your left hand knows the sandbag better than your right hand knows your rifle — you have been gripping the same fistful of grit and burlap for four minutes now, long enough that the cold has moved from your palm into the tendons, and you have stopped noticing it the way you have stopped noticing the smell. The barrage is everything. It fills the cavity behind your sternum and replaces thought with something older and simpler, and the men on either side of you have gone very still in the way that men go still when there is nothing left to check. You can see perhaps thirty meters through the smoke — a broken fence post, a length of wire that lies too flat and too clean in the mud, cut rather than shredded, and you know the difference because you have seen both. Sergeant Voss is four men to your left and he is not looking at you. He has not looked at you since you told him about the eastern barrage, since you watched the shells lift off that corridor of ground like a curtain drawn back by a hand that knew exactly where the door was. The whistle is in your breast pocket. Somewhere in the smoke ahead, the cellars are waiting, and whatever is in them has had, by your rough calculation, an extra forty seconds of warning. Your right hand tightens on the receiver.",
+          "role_signaler": "Forty meters behind the assault wave, in the bottom of a shell crater that smells of sulfur and standing water and something older and sweeter beneath both, you are kneeling in clay the color and consistency of liver, holding two ends of copper wire that should not look the way they look. The barrage has moved northeast — you can feel the difference in your sternum, the way you can feel a door close in another room — and the smoke it has left behind is settling around you in slow gray curtains, the kind of quiet that arrives after catastrophic noise and feels, briefly, like peace. It is not peace. The cut surfaces in your hands are bright. Not oxidized, not frayed, not heat-blackened the way fourteen months of shrapnel damage has trained your fingers to expect — bright, the specific brightness of fresh copper exposed to morning air within the last two hours, sliced at forty-five degrees by something manufactured for exactly this purpose. The wire cutters are six inches from your left knee. A Prussian eagle is stamped into the handle. You have been holding them long enough to understand that someone was in this crater before dawn, unhurried, deliberate, and gone, and you have not put them down because putting them down would mean deciding what to do next. Ahead of you, through the smoke, the men of the assault wave are moving into Cantigny, moving into a gap in the barrage that no forward station can report because the forward station cannot speak, because the wire that gives it a voice is in your hands in two pieces, and behind you the jump-off trench is full of people who do not know what you are holding. The wire will take ninety seconds to splice. The cutters will take an explanation nobody has time for. You cannot do both at once, and the men are already moving, and your hands have not yet decided which thing they are going to do."
         }
       }
     ]
@@ -170,7 +170,7 @@
           },
           {
             "term": "potato masher",
-            "meaning": "The German Model 1917 stick grenade, identifiable by its wooden handle; found in cleared bunkers and much preferred to the American Mk I"
+            "meaning": "The German Model 1917 stick grenade, identifiable by its wooden handle; widely regarded by Allied soldiers as mechanically reliable and effective in trench fighting"
           },
           {
             "term": "stonk",
@@ -204,7 +204,7 @@
           },
           {
             "term": "lineman's test",
-            "meaning": "Biting the bare copper wire to feel the faint electrical tingle confirming current is flowing; dangerous but faster than using instruments"
+            "meaning": "Biting the bare copper wire to feel the faint electrical tingle confirming current is flowing; crude, risky, and occasionally practiced in field conditions when proper testing equipment was unavailable"
           },
           {
             "term": "runner",
@@ -245,7 +245,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T21:45:51.806Z",
+  "updatedAt": "2026-05-20T22:30:37.391Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -295,7 +295,7 @@
       },
       {
         "fact_id": "barrage_lift_schedule",
-        "content": "The rolling barrage supporting the 28th Infantry's assault was planned to advance in lifts of 100 meters every two minutes, moving on a northeast axis toward Cantigny village.",
+        "content": "The rolling barrage supporting the 28th Infantry's assault was planned to advance in planned to advance in timed lifts coordinated closely ahead of the infantry assault, moving on a northeast axis toward Cantigny village.",
         "domain": "other",
         "source": {
           "citation": "1st Division Field Orders No. 18, Annex C (Artillery); AEF GHQ Artillery Instructions",
@@ -562,7 +562,7 @@
       }
     ],
     "immediate_outcome": {
-      "summary": "The 28th Infantry Regiment, 1st Division, AEF, attacked and captured the village of Cantigny, France, on 28 May 1918, securing it against seven German counterattacks over the following 72 hours. It was the first offensive operation conducted by American forces in the First World War and was held at the cost of approximately 1,067 American casualties. The village remained in American hands when the regiment was relieved.",
+      "summary": "The 28th Infantry Regiment, 1st Division, AEF, attacked and captured the village of Cantigny, France, on 28 May 1918, securing it against multiple German counterattacks, commonly cited as seven major assaults, over the following 72 hours. It was the first major independent offensive operation conducted by American forces in the First World War and was held at the cost of approximately 1,067 American casualties. The village remained in American hands when the regiment was relieved.",
       "key_facts": [
         "Date of assault: 28 May 1918, H-Hour at 06:45 local time",
         "Unit conducting the assault: 28th Infantry Regiment, 1st Division, AEF, commanded by Colonel Hanson Ely",
@@ -718,5 +718,7 @@
   "linemans_test": "crude, risky, and occasionally practiced in field conditions when proper testing equipment was unavailable",
   "first_offensive_operation": "It was the first major independent offensive operation conducted by American forces in the First World War",
   "seven_counterattacks": "securing it against multiple German counterattacks, commonly cited as seven major assaults",
-  "barrage_lift_schedule": "planned to advance in timed lifts coordinated closely ahead of the infantry assault"
+  "barrage_lift_schedule": "planned to advance in timed lifts coordinated closely ahead of the infantry assault",
+  "[artillery_preparation_start]": "The American artillery preparation barrage opened at 04:45 on 28 May 1918, exactly two hours before the infantry assault.",
+  "[5th_field_artillery_gun_type]": "The 5th Field Artillery Regiment, 1st Division, AEF, was equipped with French 155mm Schneider howitzers (Canon de 155 C modèle 1917 Schneider) as the heavy artillery component of the division during the Cantigny operation."
 }

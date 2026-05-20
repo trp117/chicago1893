@@ -3462,16 +3462,32 @@ async function applyCorrections(scenarioId) {
   if (accepted.length === 0) return toast('No accepted corrections to apply', 'error');
   try {
     const data = await apiFetch('GET', '/scenarios/' + scenarioId + '/full');
+    let applied = 0, missed = 0;
     for (const d of accepted) {
-      applyFieldCorrection(data.scenario, d.field, d.replacewith);
+      if (!d.current) {
+        console.warn('[IMPORT] skipped — no CURRENT text for field: ' + d.field);
+        missed++;
+        continue;
+      }
+      const count = applyFieldCorrection(data, d.current, d.replacewith);
+      if (count === 0) {
+        console.warn('[IMPORT] not applied — CURRENT text not found: ' + d.current.slice(0, 60));
+        missed++;
+      } else {
+        if (count > 1) console.warn('[IMPORT] applied to ' + count + ' locations for: ' + d.current.slice(0, 60));
+        applied++;
+      }
     }
     await apiPost('/generate/save', data);
     await apiPost('/pipeline/snapshot/' + scenarioId, {
       label: 'corrections_applied',
       pipeline_step: 'manual_correction',
-      changes_applied: accepted.length
+      changes_applied: applied
     });
-    toast(accepted.length + ' correction(s) applied and saved', 'success');
+    const msg = missed > 0
+      ? applied + ' correction(s) applied, ' + missed + ' not found (check console)'
+      : applied + ' correction(s) applied and saved';
+    toast(msg, missed > 0 ? 'warning' : 'success');
     window._aiDiffs = [];
     renderScenarioEditor(scenarioId);
   } catch (err) {
@@ -3479,15 +3495,42 @@ async function applyCorrections(scenarioId) {
   }
 }
 
-function applyFieldCorrection(scenario, fieldPath, value) {
-  if (!fieldPath) return;
-  const keys = fieldPath.split('.');
-  let obj = scenario;
-  for (let i = 0; i < keys.length - 1; i++) {
-    if (obj[keys[i]] === undefined) obj[keys[i]] = {};
-    obj = obj[keys[i]];
+function applyFieldCorrection(obj, current, replacewith) {
+  if (!current) return 0;
+  const normalizeWs = s => s.replace(/\s+/g, ' ').trim();
+  const normCurrent = normalizeWs(current);
+  let count = 0;
+
+  function visit(node) {
+    if (Array.isArray(node)) {
+      node.forEach((item, i) => {
+        if (typeof item === 'string') {
+          if (normalizeWs(item).includes(normCurrent)) {
+            const escaped = normCurrent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            node[i] = node[i].replace(new RegExp(escaped), replacewith);
+            count++;
+          }
+        } else if (item && typeof item === 'object') {
+          visit(item);
+        }
+      });
+    } else if (node && typeof node === 'object') {
+      for (const k of Object.keys(node)) {
+        if (typeof node[k] === 'string') {
+          if (normalizeWs(node[k]).includes(normCurrent)) {
+            const escaped = normCurrent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            node[k] = node[k].replace(new RegExp(escaped), replacewith);
+            count++;
+          }
+        } else if (node[k] && typeof node[k] === 'object') {
+          visit(node[k]);
+        }
+      }
+    }
   }
-  obj[keys[keys.length - 1]] = value;
+
+  visit(obj);
+  return count;
 }
 
 function parseEndingNotes(scenarioId) {
