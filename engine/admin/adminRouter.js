@@ -1552,6 +1552,7 @@ Return ONLY valid JSON in this exact structure:
       });
       res.json({ success: true, version });
     } catch (err) {
+      console.error('[snapshot route error]', err);
       res.status(500).json({ error: err.message });
     }
   });
