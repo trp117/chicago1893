@@ -186,12 +186,6 @@ li { margin-bottom: 8px; }
 .role-card.selected { border-color: var(--accent); background: rgba(208,176,106,0.08); }
 .role-card-name { font-weight: bold; font-size: 0.95rem; color: var(--accent); }
 .role-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
-.style-selector { margin-top: 16px; text-align: center; }
-.style-label { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-.style-btns { display: flex; gap: 8px; justify-content: center; }
-.style-btn { padding: 7px 20px; font-size: 0.88rem; background: transparent; border: 1px solid #444; border-radius: 4px; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
-.style-btn:hover { border-color: var(--accent); color: var(--accent); }
-.style-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(208,176,106,0.08); }
 .begin-btn { margin-top: 8px; padding: 14px 36px; font-size: 1rem; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #1a150c; font-weight: bold; cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s, border-color 0.15s; }
 .begin-btn:hover { background: #e0c070; border-color: #e0c070; }
 .begin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -305,7 +299,6 @@ li { margin-bottom: 8px; }
   .role-overlay-inner:has(.role-card.selected) .role-setup-text,
   .role-overlay-inner:has(.role-card.selected) .role-objective,
   .role-overlay-inner:has(.role-card.selected) .role-instruction { display: none; }
-  .style-selector { margin-top: 4px; }
   .briefing-overlay { padding: 12px; }
   .briefing-inner { height: calc(100dvh - 24px); }
   .input-section-label { padding: 6px 14px 0; }
@@ -514,14 +507,6 @@ li { margin-bottom: 8px; }
     </div>
     <p class="role-instruction">Select your role to begin.</p>
     <div class="role-cards" id="role-cards"></div>
-    <div class="style-selector">
-      <p class="style-label">Narrative Style</p>
-      <div class="style-btns">
-        <button type="button" class="style-btn selected" data-style="focused">Focused</button>
-        <button type="button" class="style-btn" data-style="cinematic">Cinematic</button>
-      </div>
-      <p style="margin:5px 0 0;font-size:0.75rem;color:#6a6050;text-align:center">Focused = faster&nbsp;|&nbsp;Cinematic = more descriptive</p>
-    </div>
     <button type="button" id="role-begin-btn" class="begin-btn" disabled>Enter</button>
     <button type="button" id="overlay-drive-btn" class="overlay-drive-btn">&#128663; Drive</button>
   </div>
@@ -1501,7 +1486,7 @@ function showRoleSelection() {
   beginBtn.disabled = true;
 
   let selectedRoleId = null;
-  let selectedStyle  = 'focused';
+  let selectedStyle  = 'immersive';
 
   for (const role of scenario.playerRoleOptions || []) {
     const card = document.createElement('button');
@@ -1516,14 +1501,6 @@ function showRoleSelection() {
     });
     roleCardsEl.appendChild(card);
   }
-
-  roleOverlay.querySelectorAll('.style-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedStyle = btn.dataset.style;
-      roleOverlay.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    });
-  });
 
   beginBtn.addEventListener('click', () => {
     if (!selectedRoleId) return;
