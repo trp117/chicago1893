@@ -226,7 +226,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T03:42:17.728Z",
+  "updatedAt": "2026-05-20T15:53:30.893Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -692,5 +692,6 @@
         "valid_until": null
       }
     ]
-  }
+  },
+  "allow_free_input": false
 }
