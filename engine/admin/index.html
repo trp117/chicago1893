@@ -3472,11 +3472,8 @@ async function applyCorrections(scenarioId) {
       changes_applied: accepted.length
     });
     toast(accepted.length + ' correction(s) applied and saved', 'success');
-    document.getElementById('corrections-paste').value = '';
-    document.getElementById('corrections-diff').innerHTML = '';
-    document.getElementById('corrections-actions').style.display = 'none';
     window._aiDiffs = [];
-    loadVersionHistory(scenarioId);
+    renderScenarioEditor(scenarioId);
   } catch (err) {
     toast(err.message, 'error');
   }

@@ -1,0 +1,722 @@
+{
+  "id": "zero_hour_cantigny",
+  "version": "1.0.0",
+  "title": "The Zero Hour at Cantigny",
+  "description": "May 28, 1918. The American 1st Division prepares to seize the German-held village of Cantigny in the AEF's first major offensive. But as the creeping barrage begins, evidence emerges that someone has sabotaged the forward wire network and falsified the artillery timing tables — and if the culprit is not exposed before the German counter-barrage falls, the men holding the heights will be slaughtered.",
+  "genre": [
+    "historical",
+    "mystery",
+    "military-thriller"
+  ],
+  "historicalRealism": "high",
+  "freedomLevel": "guided",
+  "sessionTargetMinutes": 30,
+  "storyArcIds": [
+    "zero_hour_cantigny_main_arc"
+  ],
+  "playerRoleIds": [
+    "role_artillery_commander",
+    "role_doughboy",
+    "role_signaler"
+  ],
+  "keyEvidenceClueIds": [
+    "clue_falsified_fire_tables",
+    "clue_cut_wire_splice"
+  ],
+  "systems": {
+    "timePerTurnDefault": 2,
+    "scales": {
+      "barrage_sync": {
+        "min": 0,
+        "max": 100,
+        "default": 75
+      },
+      "trench_consolidation": {
+        "min": 0,
+        "max": 100,
+        "default": 40
+      },
+      "wire_continuity": {
+        "min": 0,
+        "max": 2,
+        "default": 2,
+        "labels": [
+          "severed",
+          "intermittent",
+          "operational"
+        ]
+      },
+      "threat": {
+        "min": 0,
+        "max": 10,
+        "default": 1
+      },
+      "authorityTrust": {
+        "min": -3,
+        "max": 5,
+        "default": 1
+      }
+    },
+    "pressureEvents": [
+      "German mortar barrage severs the forward wire line at grid reference 7-Charlie, dropping Wire_Continuity to Intermittent",
+      "A runner arrives at the artillery dugout with a crumpled message: the second wave reports shells falling short by 80 meters — Barrage_Sync drops 15 points",
+      "A German counter-attack probe reaches the eastern rubble line of Cantigny; Trench_Consolidation must reach 60 or the position risks being overrun",
+      "Gas alarm — yellow-cross mustard shells — forces all personnel into masks, slowing every action for one full turn",
+      "A French liaison officer arrives demanding to know why the 155mm howitzers have gone silent for four minutes"
+    ]
+  },
+  "winConditions": [
+    "Identify and confront the saboteur before the German counter-barrage peaks at 18:00",
+    "Restore Wire_Continuity to Operational and synchronize Barrage_Sync above 70 before the final German counter-attack",
+    "Secure a signed confession or two key-evidence clues sufficient to present to Colonel Ely before the climax"
+  ],
+  "failConditions": [
+    "Barrage_Sync drops below 30 — friendly artillery falls on advancing infantry, causing catastrophic casualties",
+    "Wire_Continuity remains Severed through Act III — the forward position cannot call for fire support and is overrun",
+    "Time expires at 18:00 with no accusation made and Trench_Consolidation below 50",
+    "The saboteur escapes the forward area during the German counter-barrage"
+  ],
+  "partialSuccessExamples": [
+    "The village is held but the saboteur escapes in the confusion — the AEF wins the battle but a German intelligence asset survives",
+    "The saboteur is identified but not captured; Barrage_Sync recovers to 65 — the assault succeeds with heavier-than-necessary casualties",
+    "Wire_Continuity is restored but the falsified fire tables are never recovered — the artillery commander cannot fully account for the timing discrepancy in his after-action report"
+  ],
+  "introduction": {
+    "enabled": true,
+    "skippable": true,
+    "sections": [
+      {
+        "type": "world",
+        "text": "It is the spring of 1918, and the war that was supposed to end by Christmas of 1914 has consumed four years, four empires, and somewhere between fifteen and seventeen million lives. The Western Front is a scar two hundred and fifty miles long, running from the English Channel to the Swiss border, held in place by mud, wire, and the institutional inertia of armies too large to maneuver and too committed to stop. The American Expeditionary Forces — 1.2 million men under General John Pershing — have been in France since the summer of 1917, drilling in rear areas while Allied commanders lobbied furiously to feed them into depleted French and British formations as individual replacements. Pershing refused. The AEF would fight as an independent army, or it would not fight at all. The village of Cantigny, a cluster of stone farmhouses and fortified cellars on a low ridge above the Avre River valley, is where that argument will be settled in blood."
+      },
+      {
+        "type": "stakes",
+        "text": "The French High Command has watched the American divisions with a mixture of desperate hope and professional skepticism — these men are brave, they acknowledge, but they have never taken an objective under coordinated fire, never held ground against a German counter-attack, never proved they can execute the intricate mechanical choreography of modern industrial warfare. If the 1st Division fails at Cantigny, Pershing's argument for American operational independence collapses, and a million doughboys become replacements for exhausted Allied units. If they succeed, the psychological calculus of the entire war shifts: Germany must now account for a fresh, fully committed army that will only grow larger. The margin for error, in other words, is not tactical — it is civilizational. And someone inside the American lines has chosen this morning to make that margin smaller."
+      },
+      {
+        "type": "scene",
+        "text": "It is 05:45 on the morning of May 28th, and the sky above the Picardy plain is the color of wet concrete. A ground fog, thick with the residue of last night's gas discharge and the sweet-rotten smell of churned French farmland, lies in the hollows between the communication trenches. The temperature is perhaps eight degrees Celsius, and every wool uniform within a kilometer of the jump-off line is soaked through from the knees down. Somewhere to the northeast, a single German 77mm field gun fires a ranging shot — the crack of the discharge, then the long whisper of the shell, then the flat thump of impact in the mud two hundred meters behind the forward trench — and then silence again, a silence so complete you can hear the copper wire humming in the morning damp."
+      },
+      {
+        "type": "entry",
+        "text": "You have been awake since 03:00. Your hands know their tasks by feel — the map, the telephone handset, the rifle bolt, the wire spool — because your eyes have been working in near-darkness for two hours and the light is only now beginning to separate the horizon from the sky. The men around you are not speaking. They are checking equipment they have already checked three times, and the checking is not really about the equipment. In eleven minutes, 216 French 75mm guns and 48 heavy howitzers will open fire simultaneously, and the creeping curtain of steel will begin its slow walk toward Cantigny, and you will have to move with it or be left behind. The question that nobody has yet thought to ask — the question that will matter more than any other before this day is done — is whether the fire tables those guns are working from are the ones that were issued last night, or the ones that someone replaced them with before dawn.",
+        "character_entries": {
+          "role_artillery_commander": "",
+          "role_doughboy": "",
+          "role_signaler": ""
+        }
+      }
+    ]
+  },
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Artillery Trade Language",
+        "context": "Used by gun crews, fire direction officers, and forward observers of the AEF Field Artillery in technical coordination and informal conversation.",
+        "terms": [
+          {
+            "term": "creeping barrage",
+            "meaning": "A curtain of artillery fire that advances in timed lifts ahead of the infantry, ideally keeping enemy heads down until the last moment before assault troops arrive"
+          },
+          {
+            "term": "fire tables",
+            "meaning": "Printed schedules specifying exact gun elevations, powder charges, and lift times for each phase of the barrage — the master document controlling all artillery action"
+          },
+          {
+            "term": "counter-battery",
+            "meaning": "Artillery fire directed specifically at enemy gun positions rather than infantry; the duel of big guns behind the lines"
+          },
+          {
+            "term": "registration",
+            "meaning": "Pre-attack ranging shots fired to confirm a gun is accurately laid on its target; leaves a smoke signature the enemy can read"
+          },
+          {
+            "term": "French 75",
+            "meaning": "The Canon de 75 modèle 1897, a light field gun capable of fifteen aimed rounds per minute; the backbone of Allied mobile artillery"
+          },
+          {
+            "term": "short round",
+            "meaning": "A shell that falls behind its intended target, typically among friendly troops; the artilleryman's most feared error"
+          },
+          {
+            "term": "lift",
+            "meaning": "The moment a barrage advances to the next target line, creating a window of roughly two minutes when infantry must sprint forward"
+          }
+        ]
+      },
+      {
+        "name": "Infantry Trench Argot",
+        "context": "Spoken by enlisted men and junior officers of the 28th Infantry Regiment in the forward trenches, drawn from a mix of American vernacular and adopted British and French slang.",
+        "terms": [
+          {
+            "term": "doughboy",
+            "meaning": "An American infantryman; origin disputed, but universally used by 1918 as a term of identity rather than insult"
+          },
+          {
+            "term": "over the top",
+            "meaning": "The act of climbing out of the trench parapet to begin an assault across No Man's Land"
+          },
+          {
+            "term": "jump-off trench",
+            "meaning": "The forward-most trench from which an assault begins; dug or improved the night before an attack"
+          },
+          {
+            "term": "salient",
+            "meaning": "A section of the front line that protrudes into enemy territory, exposed on three sides; both a tactical advantage and a death trap"
+          },
+          {
+            "term": "Chauchat",
+            "meaning": "The French-designed CSRG automatic rifle issued to AEF squads; notorious for jamming in mud but capable of suppressive fire"
+          },
+          {
+            "term": "potato masher",
+            "meaning": "The German Model 1917 stick grenade, identifiable by its wooden handle; found in cleared bunkers and much preferred to the American Mk I"
+          },
+          {
+            "term": "stonk",
+            "meaning": "A concentrated mortar or artillery bombardment on a fixed point; adopted from British usage"
+          },
+          {
+            "term": "going west",
+            "meaning": "Dying; a soldier killed in action has 'gone west,' a phrase used with flat affect to avoid sentiment"
+          }
+        ]
+      },
+      {
+        "name": "Signals Corps Procedure",
+        "context": "Used by wire-layers, telephone operators, and runners of the AEF Signal Corps when coordinating communications under fire.",
+        "terms": [
+          {
+            "term": "wire party",
+            "meaning": "A small team tasked with laying, maintaining, or repairing physical copper telephone wire across the battlefield"
+          },
+          {
+            "term": "splice",
+            "meaning": "A field repair joining two broken ends of wire; done by hand, often under fire, using only pliers, bare wire, and tape"
+          },
+          {
+            "term": "forward station",
+            "meaning": "A temporary telephone post established inside or just behind captured objectives to relay fire corrections back to the artillery"
+          },
+          {
+            "term": "buzzer",
+            "meaning": "A field telephone operating on a simple DC circuit; the primary means of voice communication between front and rear"
+          },
+          {
+            "term": "lineman's test",
+            "meaning": "Biting the bare copper wire to feel the faint electrical tingle confirming current is flowing; dangerous but faster than using instruments"
+          },
+          {
+            "term": "runner",
+            "meaning": "A soldier tasked with physically carrying written messages between positions when wire is cut; the most dangerous non-combat role in the assault"
+          },
+          {
+            "term": "pyrotechnic signal",
+            "meaning": "A colored flare fired from a pistol to communicate pre-arranged messages — red for 'barrage too close,' green for 'objective reached' — when wire is severed"
+          }
+        ]
+      },
+      {
+        "name": "Staff and Command Shorthand",
+        "context": "Used by field-grade officers, French liaison personnel, and intelligence staff in written orders, verbal briefings, and map-board discussions.",
+        "terms": [
+          {
+            "term": "zero hour",
+            "meaning": "The precise moment an assault begins; all timing in the operation is calculated forward and backward from this fixed point"
+          },
+          {
+            "term": "consolidation",
+            "meaning": "The work of fortifying a captured position — reversing parapets, digging new fire trenches, establishing machine-gun posts — before the enemy counter-attacks"
+          },
+          {
+            "term": "liaison",
+            "meaning": "An officer attached from one national army to another to coordinate operations; French liaison officers were embedded at every AEF division"
+          },
+          {
+            "term": "O.P.",
+            "meaning": "Observation Post; a forward position, often in a ruined building or shell crater, from which an officer directs artillery fire by telephone or flare"
+          },
+          {
+            "term": "after-action",
+            "meaning": "A formal written report submitted within 24 hours of an engagement detailing what happened, what went wrong, and who is responsible"
+          }
+        ]
+      }
+    ]
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T21:45:51.806Z",
+  "premise": "",
+  "playerGoal": "",
+  "openingSituation": "",
+  "tone": [],
+  "structured_endings_enabled": false,
+  "allow_free_input": true,
+  "beats_status": "not_generated",
+  "technical_facts": {
+    "generated": true,
+    "reviewed": true,
+    "facts": [
+      {
+        "fact_id": "battle_of_cantigny_date",
+        "content": "The Battle of Cantigny was fought on 28 May 1918, making it the first major American offensive operation of World War I.",
+        "domain": "timing",
+        "source": {
+          "citation": "U.S. Army Center of Military History, 'The United States Army in the World War 1917–1919,' Vol. 4; AEF General Orders",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "assault_zero_hour",
+        "content": "Zero Hour for the 28th Infantry Regiment's assault on Cantigny was set at 06:45 on 28 May 1918.",
+        "domain": "timing",
+        "source": {
+          "citation": "1st Division Field Orders No. 18, 26 May 1918; U.S. Army Center of Military History, Cantigny operational records",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "artillery_preparation_start",
+        "content": "The American artillery preparation barrage opened at 05:45 on 28 May 1918, one hour before the infantry assault.",
+        "domain": "timing",
+        "source": {
+          "citation": "1st Division Artillery Brigade After-Action Report, May 1918; Marshall, George C., 'Memoirs of My Services in the World War'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "barrage_lift_schedule",
+        "content": "The rolling barrage supporting the 28th Infantry's assault was planned to advance in lifts of 100 meters every two minutes, moving on a northeast axis toward Cantigny village.",
+        "domain": "other",
+        "source": {
+          "citation": "1st Division Field Orders No. 18, Annex C (Artillery); AEF GHQ Artillery Instructions",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "28th_infantry_assault_frontage",
+        "content": "The 28th Infantry Regiment attacked on a frontage of approximately 1,600 meters with three battalions in the assault.",
+        "domain": "capacity",
+        "source": {
+          "citation": "1st Division Field Orders No. 18, 26 May 1918; Huidekoper, Frederic Louis, 'The History of the 33rd Division'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "french_artillery_support_count",
+        "content": "French forces provided 12 batteries of 75mm guns, 4 batteries of 155mm howitzers, and additional heavy artillery in support of the Cantigny assault, supplementing American organic artillery.",
+        "domain": "capacity",
+        "source": {
+          "citation": "1st Division After-Action Report, Cantigny, June 1918; Pershing, John J., 'My Experiences in the World War,' Vol. 2",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "colonel_hanson_ely_command",
+        "content": "Colonel Hanson E. Ely commanded the 28th Infantry Regiment, 1st Division, AEF during the Battle of Cantigny on 28 May 1918.",
+        "domain": "personnel",
+        "source": {
+          "citation": "1st Division Field Orders No. 18; U.S. Army Center of Military History biographical records; Ely's own after-action report",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "colonel_mccormick_artillery_role",
+        "content": "Colonel Robert R. McCormick commanded the 1st Battalion, 5th Field Artillery Regiment, 1st Division, AEF and participated in the Cantigny operation; he later wrote about the battle in his memoir 'The Army of 1918.'",
+        "domain": "personnel",
+        "source": {
+          "citation": "McCormick, Robert R., 'The Army of 1918'; 5th Field Artillery Regiment records, National Archives RG 120",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "german_counterattack_timing",
+        "content": "German forces launched the first of seven counterattacks against Cantigny beginning in the afternoon of 28 May 1918, with the heaviest artillery bombardment falling between approximately 17:00 and 19:00.",
+        "domain": "timing",
+        "source": {
+          "citation": "1st Division After-Action Report, Cantigny, June 1918; Bullard, Robert L., 'Personalities and Reminiscences of the War'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "german_artillery_caliber_counterbarrage",
+        "content": "German counterbarrage fire at Cantigny included 150mm howitzer rounds (fired by German 18th Army artillery), which inflicted the majority of American casualties during the consolidation phase.",
+        "domain": "other",
+        "source": {
+          "citation": "1st Division After-Action Report, Cantigny, June 1918; German 18th Army operational records cited in Grotelueschen, Mark E., 'The AEF Way of War'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "feldfunkgeraet_16_description",
+        "content": "The German Feldfunkgerät 16 (Field Radio Set 16) was a compact spark-transmitter field radio set used by German Army signal units from 1916 onward, capable of Morse code transmission over short tactical distances.",
+        "domain": "other",
+        "source": {
+          "citation": "Nalder, R.F.H., 'The Royal Corps of Signals'; German Army signal equipment records, Bundesarchiv-Militärarchiv",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "aef_signal_corps_wire_type",
+        "content": "AEF Signal Corps forward telephone lines used twisted-pair copper wire, typically No. 20 gauge, laid by hand reels in communication trenches and across No Man's Land during offensive operations.",
+        "domain": "other",
+        "source": {
+          "citation": "U.S. Army Signal Corps, 'Manual of Field Communications,' 1917; AEF GHQ Signal Corps Technical Instructions",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "cantigny_village_distance_from_lines",
+        "content": "The village of Cantigny lay approximately 1.6 kilometers (one mile) forward of the American front-line positions held by the 28th Infantry Regiment prior to the assault.",
+        "domain": "navigation",
+        "source": {
+          "citation": "1st Division operational maps, May 1918, National Archives RG 120; U.S. Army Center of Military History, Cantigny study",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "28th_infantry_assault_duration",
+        "content": "The 28th Infantry Regiment secured the village of Cantigny within approximately 45 minutes of Zero Hour, completing the initial assault phase by roughly 07:30 on 28 May 1918.",
+        "domain": "timing",
+        "source": {
+          "citation": "1st Division After-Action Report, Cantigny, June 1918; Marshall, George C., 'Memoirs of My Services in the World War'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "american_casualties_cantigny",
+        "content": "The 1st Division suffered approximately 1,067 total casualties at Cantigny over 28–31 May 1918, including killed, wounded, and missing, with the majority occurring during the German counterattacks and counterbarrage.",
+        "domain": "capacity",
+        "source": {
+          "citation": "1st Division After-Action Report, Cantigny, June 1918; U.S. Army Center of Military History, 'United States Army in the World War 1917–1919,' Vol. 4",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "french_liaison_attachment_1st_division",
+        "content": "French Army liaison officers were formally attached to 1st Division headquarters and subordinate regimental headquarters throughout the Cantigny operation to coordinate combined artillery and infantry actions.",
+        "domain": "personnel",
+        "source": {
+          "citation": "1st Division Field Orders No. 18; Pershing, John J., 'My Experiences in the World War,' Vol. 2; AEF GHQ liaison records, National Archives RG 120",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "aef_pyrotechnic_signal_codes",
+        "content": "AEF infantry units used pre-arranged pyrotechnic signal codes during the Cantigny operation to communicate assault progress to artillery observers; signal codes were issued in written orders prior to Zero Hour and were classified.",
+        "domain": "other",
+        "source": {
+          "citation": "1st Division Field Orders No. 18, Annex D (Signals); AEF GHQ Signal Instructions for Infantry, 1918",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "5th_field_artillery_gun_type",
+        "content": "The 5th Field Artillery Regiment, 1st Division, was equipped with the French 75mm field gun (Canon de 75 modèle 1897) during the Cantigny operation.",
+        "domain": "other",
+        "source": {
+          "citation": "5th Field Artillery Regiment records, National Archives RG 120; Johnson, Douglas V., and Hillman, Rolfe L., 'Soissons 1918'",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "aef_grid_reference_system",
+        "content": "AEF units operating in France used the French military grid system (quadrillage kilométrique) overlaid on 1:20,000 scale maps, with grid squares designated by letter-number combinations, during the Cantigny operation.",
+        "domain": "navigation",
+        "source": {
+          "citation": "AEF GHQ, 'Instructions for the Use of Maps,' 1917; U.S. Army Engineer School map records, National Archives RG 77",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "german_occupation_cantigny_church",
+        "content": "The church and elevated structures of Cantigny village had been used by German forces as observation posts prior to the American assault on 28 May 1918, and were known to American intelligence as likely OP locations.",
+        "domain": "other",
+        "source": {
+          "citation": "1st Division G-2 Intelligence Summary, 27 May 1918, National Archives RG 120; U.S. Army Center of Military History, Cantigny study",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      }
+    ]
+  },
+  "epilogue": {
+    "generated": true,
+    "reviewed": true,
+    "character_fates": [
+      {
+        "character_id": "char_mccormick",
+        "name": "Colonel Robert R. McCormick",
+        "outcome": "survived",
+        "historical_record": "Robert Rutherford McCormick commanded the 1st Battalion, 5th Field Artillery, AEF at Cantigny on 28 May 1918. He survived the battle and the war, was promoted, and returned to the United States where he resumed leadership of the Chicago Tribune, which he had co-inherited before the war. He served as editor and publisher of the Tribune until his death on 1 April 1955. His role at Cantigny became a point of personal pride he referenced publicly for decades.",
+        "primary_source": {
+          "citation": "Smith, Richard Norton. The Colonel: The Life and Legend of Robert R. McCormick. Houghton Mifflin, 1997.",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_ely",
+        "name": "Colonel Hanson Ely",
+        "outcome": "survived",
+        "historical_record": "Hanson Edward Ely commanded the 28th Infantry Regiment at Cantigny and led the assault on 28 May 1918. He was widely credited with the regiment's success in taking and holding the village against repeated German counterattacks. He was subsequently promoted to Brigadier General and later Major General. He served as Commandant of the Army War College from 1927 to 1930 and died on 13 November 1958.",
+        "primary_source": {
+          "citation": "American Battle Monuments Commission. 1st Division: Summary of Operations in the World War. U.S. Government Printing Office, 1944.",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_farrow",
+        "name": "Lieutenant Gerald Farrow",
+        "outcome": "unknown",
+        "historical_record": "Lieutenant Gerald Farrow, as written in this scenario, is a fictional character. No officer of this name serving as adjutant of the 1st Battalion, 5th Field Artillery at Cantigny appears in available AEF records, regimental histories, or the National Archives Record Group 120 holdings for the 1st Division. His outcome cannot be documented because he does not correspond to a verified historical individual.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_renard",
+        "name": "Captain Henri Renard",
+        "outcome": "unknown",
+        "historical_record": "Captain Henri Renard, as written in this scenario, is a fictional character. French liaison officers were attached to the 1st Division during the Cantigny operation — the division had trained under French tutelage in the Picardy sector — but no officer named Henri Renard in a liaison capacity at 1st Division HQ appears in available French or American archival records for this period. His outcome cannot be documented.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_voss",
+        "name": "Sergeant Emil Voss",
+        "outcome": "unknown",
+        "historical_record": "Sergeant Emil Voss, as written in this scenario, is a fictional character. No individual of this name serving as a platoon sergeant in Company C, 28th Infantry Regiment at Cantigny is documented in available regimental records, casualty lists, or the 1st Division's operational summaries held at the National Archives. His outcome cannot be documented.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_kowalski",
+        "name": "Private First Class Tadeusz Kowalski",
+        "outcome": "unknown",
+        "historical_record": "Private First Class Tadeusz Kowalski, as written in this scenario, is a fictional character. Signal Corps wire-laying personnel were attached to the 28th Infantry for the Cantigny operation and suffered casualties during the assault and subsequent counterattacks, but no individual of this name appears in available Signal Corps detachment records or 1st Division casualty documentation for 28 May 1918. His outcome cannot be documented.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_beaumont",
+        "name": "Corporal James Beaumont",
+        "outcome": "unknown",
+        "historical_record": "Corporal James Beaumont, as written in this scenario, is a fictional character. Artillery fire direction telephone operators served with the 5th Field Artillery at Cantigny, and the regiment's records note communications difficulties during the battle, but no individual named James Beaumont in this role appears in available 5th Field Artillery records or 1st Division documentation. His outcome cannot be documented.",
+        "primary_source": null
+      }
+    ],
+    "immediate_outcome": {
+      "summary": "The 28th Infantry Regiment, 1st Division, AEF, attacked and captured the village of Cantigny, France, on 28 May 1918, securing it against seven German counterattacks over the following 72 hours. It was the first offensive operation conducted by American forces in the First World War and was held at the cost of approximately 1,067 American casualties. The village remained in American hands when the regiment was relieved.",
+      "key_facts": [
+        "Date of assault: 28 May 1918, H-Hour at 06:45 local time",
+        "Unit conducting the assault: 28th Infantry Regiment, 1st Division, AEF, commanded by Colonel Hanson Ely",
+        "Artillery support included elements of the 5th Field Artillery Brigade, 1st Division, reinforced by French heavy artillery batteries",
+        "The preparatory barrage began at 05:45 and a rolling barrage preceded the infantry advance",
+        "Cantigny was taken in approximately 45 minutes of fighting",
+        "The 1st Division repulsed seven German counterattacks between 28 May and 30 May 1918",
+        "American casualties for the Cantigny operation: approximately 1,067 killed, wounded, and missing",
+        "German prisoners taken: approximately 250",
+        "The 1st Division was relieved from the Cantigny sector on 4 July 1918"
+      ]
+    },
+    "historical_frame": [
+      "Cantigny was the first offensive operation planned and executed independently by United States Army forces in the First World War; prior American combat had been defensive or conducted in support of Allied units.",
+      "The battle coincided with the opening of the German Aisne Offensive (Operation Blücher-Yorck) on 27 May 1918, which created pressure on Allied high command to redeploy American forces; the 1st Division held its position and completed the Cantigny operation regardless.",
+      "The 5th Field Artillery Regiment, which provided direct artillery support at Cantigny, fired approximately 14,000 rounds during the operation according to 1st Division after-action records."
+    ],
+    "open_threads": [
+      {
+        "thread_id": "the_discrepancy_between",
+        "historical_record": "No documented case of falsified artillery fire tables at Cantigny exists in the historical record. Post-battle after-action reports and the 1st Division's operational summary do note coordination difficulties between American and French artillery units, attributed to differences in procedure and communication rather than sabotage. The question of how fire table discrepancies would have been adjudicated under combat conditions was never raised at any formal inquiry because no such incident was recorded."
+      },
+      {
+        "thread_id": "the_barrage_opens",
+        "historical_record": "The preparatory barrage at Cantigny began at approximately 05:45 on 28 May 1918. The rolling barrage that preceded the infantry advance was coordinated with French artillery assets. Post-battle reports noted that the rolling barrage was generally effective but that some infantry units experienced difficulty maintaining the prescribed distance behind the barrage line. The precise timing and any deviations from the fire plan are documented in 1st Division Artillery after-action records held at the National Archives (Record Group 120), though the granular detail of shell-fall accuracy relative to planned coordinates has not been the subject of published historical dispute."
+      },
+      {
+        "thread_id": "the_signaler_advances",
+        "historical_record": "Signal Corps personnel did advance with or immediately behind the assault waves at Cantigny to lay forward wire communications. The 1st Division's signal detachments suffered casualties during the assault and the subsequent German counterattacks. Wire communications were repeatedly disrupted during the 72-hour defense of the village, a problem documented in the division's after-action reports, though the specific causes in each instance were attributed to shellfire rather than deliberate cutting."
+      },
+      {
+        "thread_id": "first_contact_with",
+        "historical_record": "No documented account of a non-commissioned officer in the 28th Infantry being evasive about pre-dawn movements at Cantigny exists in the historical record. The scenario's beat is fictional. Sergeant-level accounts of the Cantigny assault are sparse in the primary record; most surviving testimony comes from officer-level after-action reports and a small number of published memoirs."
+      },
+      {
+        "thread_id": "the_forward_wire",
+        "historical_record": "Wire communications at Cantigny were disrupted multiple times during the battle. The 1st Division's after-action reports attribute wire failures to German artillery fire. No inquiry or report documents a case of wire being deliberately cut by a saboteur during the Cantigny operation. The distinction between shrapnel damage and a clean cut as an investigative question was never raised in any documented historical source relating to this battle."
+      },
+      {
+        "thread_id": "the_doughboy_clears",
+        "historical_record": "American infantry did clear fortified positions, cellars, and dugouts in Cantigny during and after the assault on 28 May 1918. German field communications equipment was captured during the operation. No specific documented account of a hidden German field radio with pre-arranged coordinates being discovered in a Cantigny cellar exists in published histories or available primary sources. The broader question of German pre-registered artillery coordinates for Cantigny is historically significant: German artillery did shell the captured village with notable accuracy during the counterattacks, which historians have attributed to the Germans' prior occupation and registration of the position rather than to active signaling from within American lines."
+      },
+      {
+        "thread_id": "corporal_dreher_is",
+        "historical_record": "Corporal Dreher is a fictional character not present in the historical record of the Cantigny operation. No inquiry, court-martial, or documented witness account relating to a soldier of this name near a wire-cutting location at Cantigny exists in available AEF records."
+      },
+      {
+        "thread_id": "mccormick_must_decide",
+        "historical_record": "Colonel Robert R. McCormick commanded the 1st Battalion, 5th Field Artillery at Cantigny. No documented account of McCormick being presented with a decision to halt the barrage due to corrupted fire tables exists in the historical record. McCormick's own accounts of the battle, and the regimental history of the 5th Field Artillery, describe the artillery support as proceeding according to plan. The question of what authority a battalion artillery commander would have had to unilaterally halt a coordinated barrage under AEF doctrine in May 1918 is answerable from AEF Field Service Regulations but was never raised as a live question in the context of Cantigny."
+      },
+      {
+        "thread_id": "german_150mm_howitzers",
+        "historical_record": "German artillery, including heavy calibers, did shell Cantigny village with considerable accuracy after its capture on 28 May 1918. Historians including Robert H. Ferrell and the authors of the American Battle Monuments Commission summary attribute this accuracy to the fact that German forces had occupied and registered the village themselves before the American assault, giving their artillery pre-plotted coordinates. No historical inquiry has concluded that German accuracy during the Cantigny counterattacks was the result of active signaling from within American lines. This question — whether German fire accuracy reflected pre-registration or active observation — has not been a subject of formal historical dispute but is noted in several operational analyses."
+      },
+      {
+        "thread_id": "the_saboteur_attempts",
+        "historical_record": "No documented case of a saboteur fleeing toward German lines under cover of the counter-barrage at Cantigny exists in the historical record. No espionage or sabotage case connected to the Cantigny operation appears in available AEF Judge Advocate General records, Military Intelligence Division files, or published histories of the 1st Division. The scenario's saboteur characters are fictional."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "the_discrepancy_between",
+        "historical_record": "No falsification of artillery fire tables occurred at Cantigny according to any available historical source. The 1st Division's artillery coordination involved American and French batteries operating from a unified fire plan developed in the weeks preceding the assault. After-action reports note procedural friction between American and French artillery staffs but attribute this to doctrinal differences, not sabotage. The authentic fire plan for Cantigny was developed under the supervision of Brigadier General Charles P. Summerall, commanding the 1st Field Artillery Brigade."
+      },
+      {
+        "beat_id": "the_barrage_opens",
+        "historical_record": "The Cantigny preparatory barrage began at approximately 05:45 on 28 May 1918. The rolling barrage lifted and advanced on a timed schedule ahead of the infantry. The 1st Division's after-action report states that the barrage was 'generally effective' and that the infantry followed it closely. Some accounts note that smoke and dust reduced visibility but that the barrage's timing was maintained. No documented deviation of 120 meters or any other specific distance from the planned barrage line due to table error appears in the historical record."
+      },
+      {
+        "beat_id": "the_signaler_advances",
+        "historical_record": "Signal Corps personnel attached to the 28th Infantry advanced with the assault to maintain wire communications forward. The 1st Division's signal officer's report for the Cantigny operation documents that wire lines were established to forward positions but were repeatedly cut by German shellfire during the counterattack phase. Personnel laying wire in No Man's Land and across the captured ground were exposed to both German fire and the residual effects of gas shelling, which had been employed in the sector in preceding days."
+      },
+      {
+        "beat_id": "first_contact_with",
+        "historical_record": "The 28th Infantry's assault companies crossed the line of departure at H-Hour, 06:45, on 28 May 1918. Jump-off trenches were occupied before dawn. The regiment's after-action report and Colonel Ely's account describe the pre-assault period as orderly, with units in position on schedule. No documented account of suspicious or evasive behavior by any non-commissioned officer in the jump-off trenches before the assault appears in available primary sources."
+      },
+      {
+        "beat_id": "the_forward_wire",
+        "historical_record": "Wire communications were disrupted multiple times during the Cantigny operation. The 1st Division signal officer's report attributes all documented wire failures to German artillery fire. No after-action report, inquiry, or memoir account describes a wire cut being identified as deliberate sabotage rather than combat damage at Cantigny. Wire repair under fire was a continuous task for Signal Corps personnel throughout the 72-hour defense of the village."
+      },
+      {
+        "beat_id": "the_doughboy_clears",
+        "historical_record": "American infantry cleared Cantigny's buildings, cellars, and fortified positions during and after the assault on 28 May 1918. German equipment, documents, and materiel were captured. The village had been a German strongpoint and contained prepared defensive positions. No specific primary source documents the discovery of a hidden German field radio with pre-arranged coordinates in a Cantigny cellar. German artillery's accuracy against the captured village is documented and is attributed by historians to prior registration of the position during German occupation."
+      },
+      {
+        "beat_id": "corporal_dreher_is",
+        "historical_record": "Corporal Dreher is a fictional character. No individual of this name appears in available 1st Division, 28th Infantry Regiment, or 5th Field Artillery records for the Cantigny operation. No witness accounts, alibi investigations, or disciplinary proceedings relating to a soldier of this name at Cantigny exist in the historical record."
+      },
+      {
+        "beat_id": "mccormick_must_decide",
+        "historical_record": "Colonel Robert R. McCormick commanded the 1st Battalion, 5th Field Artillery during the Cantigny operation. His battalion's guns fired in support of the assault and the subsequent defense. McCormick's published and archival accounts of Cantigny describe the artillery mission as executed according to plan. No documented instance of McCormick being required to decide whether to halt the barrage due to a fire table problem appears in any available source. Under AEF doctrine in May 1918, a decision to halt a coordinated barrage would have required authorization above battalion level."
+      },
+      {
+        "beat_id": "german_150mm_howitzers",
+        "historical_record": "German artillery shelled Cantigny village intensively after its capture, beginning on the afternoon of 28 May 1918 and continuing through the counterattack phase. The 1st Division's after-action reports and the American Battle Monuments Commission summary document significant American casualties from German artillery fire during this period. Historians attribute the accuracy of German fire to pre-registered coordinates from the period of German occupation of the village. German 150mm howitzers (the 15 cm sFH 02 and 13 were standard German heavy field howitzers of this period) were among the calibers employed against the position."
+      },
+      {
+        "beat_id": "the_saboteur_attempts",
+        "historical_record": "No saboteur flight toward German lines under cover of the counter-barrage at Cantigny is documented in any historical source. The counter-barrage and counterattacks against Cantigny were conducted by German infantry and artillery units from outside the American perimeter. No espionage or sabotage case arising from the Cantigny operation appears in AEF Military Intelligence Division records, Judge Advocate General case files, or published histories of the 1st Division or the AEF."
+      }
+    ]
+  },
+  "review_checklist": {
+    "beat_count": {
+      "checked": false,
+      "notes": ""
+    },
+    "sequence_check": {
+      "checked": false,
+      "notes": ""
+    },
+    "path_independence": {
+      "checked": false,
+      "notes": ""
+    },
+    "final_beat_spec": {
+      "checked": false,
+      "notes": ""
+    },
+    "tense_attribution": {
+      "checked": false,
+      "notes": ""
+    },
+    "reviewer_summary": {
+      "checked": false,
+      "notes": ""
+    },
+    "manual_playthrough": {
+      "checked": false,
+      "notes": ""
+    }
+  },
+  "western_front_length": "The Western Front stretches roughly four hundred miles from the English Channel to the Swiss frontier",
+  "aef_strength": "The American Expeditionary Forces — more than one million men under General John Pershing by the spring of 1918",
+  "gas_discharge_reference": "thick with lingering smoke residue and the sweet-rotten smell of churned French farmland",
+  "artillery_count": "a combined American and French artillery force of field guns, heavy howitzers, trench mortars, and supporting batteries",
+  "german_counter_barrage_peaks": "before the German counter-barrage reaches full intensity later in the afternoon",
+  "time_expires": "Time expires by late afternoon with no accusation made",
+  "yellow_cross_shells": "Gas alarm — possible gas shells reported near the eastern sector",
+  "opening_situation_timing": "Shortly before the infantry assault begins",
+  "barrage_opens_time": "The rolling barrage intensifies ahead of the infantry assault",
+  "barrage_gap_certainty": "leaving what appears to be an uneven gap in the barrage coverage near the eastern sector",
+  "service_duration": "You have spent months splicing wire under fire",
+  "mccormick_role": "Senior artillery officer serving with the 5th Field Artillery Regiment during the Cantigny operation",
+  "mccormick_newsroom_metaphor": "He runs his dugout with the rigid discipline of both a professional officer and a newspaper executive accustomed to controlling information",
+  "renard_pyrotechnic_signal": "He believes a pre-arranged visual signal from the village may already have alerted German observers that the assault communications were disrupted",
+  "voss_service_record": "a solid service record since entering federal service",
+  "pickelhaube_reference": "a German steel helmet and scattered equipment lie abandoned near the cellar wall",
+  "church_shell_hits": "The village church has been heavily damaged by repeated shellfire during the bombardment",
+  "german_radio_model": "a compact German field communications set",
+  "green_flare_signal": "The flare may have been part of a pre-arranged signaling system, though its exact meaning cannot be independently verified",
+  "potato_masher_preference": "widely regarded by Allied soldiers as mechanically reliable and effective in trench fighting",
+  "linemans_test": "crude, risky, and occasionally practiced in field conditions when proper testing equipment was unavailable",
+  "first_offensive_operation": "It was the first major independent offensive operation conducted by American forces in the First World War",
+  "seven_counterattacks": "securing it against multiple German counterattacks, commonly cited as seven major assaults",
+  "barrage_lift_schedule": "planned to advance in timed lifts coordinated closely ahead of the infantry assault"
+}
