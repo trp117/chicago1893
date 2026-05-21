@@ -19,7 +19,7 @@
   ],
   "suggested_secret": "McCormick discovered a minor calculation error in the original fire tables last night and requested a correction, but he never personally verified the revised page before locking it.",
   "opening": {
-    "narrative": "It is 05:57 on the morning of May 28th, 1918. The barrage opened one minute ago, and the dugout shakes with each salvo from the battery above. A runner arrived sixty seconds before zero hour with a torn fragment of fire table that does not match the master copy on your map table. Lieutenant Farrow is present. Corporal Beaumont is at the telephone. The guns are firing. The men are moving. And someone has been inside your locked case.",
+    "narrative": "It is 05:57 on the morning of May 28th, 1918. The barrage has already been firing for several minutes, and the dugout shakes with each salvo from the battery above. A runner arrived sixty seconds before zero hour with a torn fragment of fire table that does not match the master copy on your map table. Lieutenant Farrow is present. Corporal Beaumont is at the telephone. The guns are firing. The men are moving. And someone has been inside your locked case.",
     "npcMoments": [
       {
         "characterId": "char_farrow",
@@ -54,19 +54,21 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:19:34.167Z",
+  "updatedAt": "2026-05-20T23:57:44.106Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully identify the corrupted fire tables and manually override the firing data for the 5th Field Artillery, stabilizing the barrage sync before the infantry is completely exposed. However, your intense focus on the calculations delays the evacuation of the lower signal bunker during a retaliatory counter-battery stonk, resulting in the loss of critical log books and several operators.",
       "who_present": "The Signaler, Corporal James Beaumont",
       "emotional_weight": "Flawed Command—the profound professional validation of correcting a lethal trajectory, paid for with the lives of the operators under your roof.",
-      "closing_line": "The guns shifted their elevation just in time, but the smell of burnt insulation and turned clay inside the bunker stayed with you."
+      "closing_line": "The guns shifted their elevation just in time, but the smell of burnt insulation and turned clay inside the bunker stayed with you.",
+      "closing_line_override": ""
     },
     "failure": {
       "what_happened": "You delay your intervention while attempting to verify the discrepancies with French division liaison staff. The eastern sector batteries continue tracking the falsified tables, causing the rolling barrage to lift 120 meters too early and walking shells directly into your own advancing infantry companies.",
       "who_present": "Corporal James Beaumont, Lieutenant Gerald Farrow",
       "emotional_weight": "Bureaucratic Paralysis—the devastating realization that an officer's technical hesitation can liquidate an entire infantry frontage.",
-      "closing_line": "The fire tables remained uncorrected, and the silence from the forward line became absolute."
+      "closing_line": "The fire tables remained uncorrected, and the silence from the forward line became absolute.",
+      "closing_line_override": ""
     }
   }
 }

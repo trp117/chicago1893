@@ -1,0 +1,20 @@
+{
+  "id": "clue_german_cellar_radio",
+  "scenarioId": "zero_hour_cantigny",
+  "title": "German Field Radio in the Fortified Cellar",
+  "description": "In the cleared German cellar on Rue du Moulin, a compact German field radio — a compact German field communications set — sits on a shelf with its handset off the hook. It is warm to the touch. A slip of paper beside it carries a six-digit grid reference in pencil — coordinates that, when checked against the artillery map, correspond precisely to the gap in coverage created by the falsified fire tables. The grid reference is written in a hand that is not German.",
+  "category": "physical",
+  "discoveryLocationId": "loc_fortified_cellar",
+  "implicatesCharacterIds": [
+    "char_renard",
+    "char_farrow"
+  ],
+  "unlocks": [
+    "clue_hand_map_of_artillery"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.101Z",
+  "locationId": "",
+  "isRedHerring": false
+}

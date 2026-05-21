@@ -1,0 +1,34 @@
+{
+  "id": "char_voss",
+  "scenarioIds": [
+    "zero_hour_cantigny"
+  ],
+  "name": "Sergeant Emil Voss",
+  "role": "Platoon Sergeant, Company C, 28th Infantry Regiment",
+  "publicFace": "A stocky, German-American NCO from Milwaukee who has been with the regiment since training. He is loud, competent, and deeply resented by some of his men for the casual brutality of his discipline. His German surname makes him an obvious suspect — which is exactly why he is not the saboteur.",
+  "privateGoal": "To get his men through this assault alive and to avoid being blamed for anything that goes wrong, because he knows his background makes him a convenient scapegoat.",
+  "fear": "That his German heritage will be used to frame him for the sabotage regardless of the evidence",
+  "knowledge": [
+    "He saw Lieutenant Farrow moving toward the forward wire party's staging area at approximately 04:00 — an hour before Farrow claims he was in the dugout",
+    "He found a pair of wire cuttings — clean diagonal cuts, not shrapnel tears — near the splice point at 05:15 but said nothing because he feared implication",
+    "He knows the men in his platoon are exhausted and two of them have been sharing a bottle of cognac since midnight"
+  ],
+  "voice": "Flat Midwestern vowels. Speaks in complete sentences but without decoration. Answers the question asked and nothing more unless pressed.",
+  "trustLogic": "Opens up only when convinced the questioner is genuinely trying to find the truth rather than confirm a predetermined conclusion. A player who acknowledges his difficult position will get his full knowledge.",
+  "secrets": [
+    "He has a brother currently serving in the German Army — a fact he has concealed from the Army since enlistment"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Crosses his arms and gives minimal answers, watching the questioner's face carefully",
+    "heavyPressure": "Becomes quietly furious and invokes his service record — years of service with no serious disciplinary actions on record",
+    "breakingPoint": "He will not reveal his brother's service without direct, private pressure and a credible guarantee of protection",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Sits down, puts his hands flat on his knees, and waits. He has been waiting for this conversation his whole deployment.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.094Z",
+  "description": ""
+}

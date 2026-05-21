@@ -1,0 +1,34 @@
+{
+  "id": "char_ely",
+  "scenarioIds": [
+    "zero_hour_cantigny"
+  ],
+  "name": "Colonel Hanson Ely",
+  "role": "Commanding Officer, 28th Infantry Regiment, AEF",
+  "publicFace": "A blocky, red-faced West Pointer who communicates primarily through controlled fury and monosyllables. His men fear him more than they fear the Germans, which is precisely the effect he cultivates.",
+  "privateGoal": "To take Cantigny, hold it against everything the Germans throw, and write his name into the history of the United States Army. He will accept casualties. He will not accept failure.",
+  "fear": "That his regiment will be the unit that proved the AEF cannot fight — that his name will appear in French dispatches as a cautionary example.",
+  "knowledge": [
+    "He received a verbal report at 05:30 that a wire-layer had found an anomaly in the forward line — he dismissed it as pre-battle nerves",
+    "He knows Sergeant Voss by reputation as a competent but morally flexible NCO who has twice been reduced in rank for conduct unbecoming",
+    "He has the authority to arrest any officer or enlisted man in the forward area without referral to higher command"
+  ],
+  "voice": "Short declarative sentences. Profanity used as punctuation. Never asks a question he does not already know the answer to.",
+  "trustLogic": "Responds to demonstrated competence under pressure. A player who brings him two solid pieces of evidence and a clear chain of custody will get his full attention and authority. Bring him rumor and he will throw you out of his command post.",
+  "secrets": [
+    "He received a written warning from G-2 intelligence three days ago suggesting a possible German intelligence asset in the forward signal detachment — he filed it without acting on it because he did not want the assault delayed"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Stares. Does not speak until the questioner finishes, then asks one precise counter-question",
+    "heavyPressure": "Stands up. Physically advances. Voice drops to a near-whisper that is more frightening than shouting",
+    "breakingPoint": "He will never admit he suppressed the G-2 warning",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Immovable. Will simply repeat his rank and demand to speak to Pershing personally",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.090Z",
+  "description": ""
+}

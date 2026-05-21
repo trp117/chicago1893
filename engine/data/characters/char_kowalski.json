@@ -1,0 +1,34 @@
+{
+  "id": "char_kowalski",
+  "scenarioIds": [
+    "zero_hour_cantigny"
+  ],
+  "name": "Private First Class Tadeusz Kowalski",
+  "role": "Forward Wire-Layer, Signal Corps detachment, 28th Infantry",
+  "publicFace": "A wiry, quick-moving Polish-American from Pittsburgh who talks constantly when he is nervous, which is always. He is the best wire-splicer in the detachment and he knows it, and he will tell you so.",
+  "privateGoal": "To establish the forward station in Cantigny, send the 'objective reached' signal, and get back to the rear with his hands still attached to his wrists.",
+  "fear": "That the wire will stay severed and men will die because he could not fix it fast enough",
+  "knowledge": [
+    "He found the cut in the forward wire at 05:40 and recognized immediately that it was not shrapnel damage — the cut is too clean, at a 45-degree angle, characteristic of wire cutters rather than fragmentation",
+    "He saw a French officer near the wire staging area the previous evening but did not think it significant at the time",
+    "He knows the exact location of every splice point between the jump-off trench and the village — he laid the original line himself"
+  ],
+  "voice": "Rapid, run-on sentences. Mixes Polish exclamations into English when stressed. Demonstrates rather than explains — reaches for the physical object to show you what he means.",
+  "trustLogic": "Trusts anyone who treats the wire as seriously as he does. Distrusts officers on principle but will override that instinct for anyone who clearly needs his specific knowledge.",
+  "secrets": [
+    "He deliberately slowed his wire-laying pace by twenty minutes this morning because he was afraid — and that delay may have cost the forward station its window to transmit"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Talks faster. Produces the physical evidence from his kit bag to prove his point.",
+    "heavyPressure": "Goes quiet. Stares at the wire spool. Then says exactly what he saw, in exact sequence, because he cannot stand imprecision.",
+    "breakingPoint": "He will not admit the deliberate delay without significant trust established first",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Immediately produces every piece of physical evidence he has been carrying and lays it out in chronological order",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.093Z",
+  "description": ""
+}

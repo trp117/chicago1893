@@ -1,0 +1,19 @@
+{
+  "id": "clue_renard_church_signal",
+  "scenarioId": "zero_hour_cantigny",
+  "title": "The Church Tower Flare Witness",
+  "description": "Two soldiers from Company B independently report seeing a green pyrotechnic flare fired from the Cantigny church tower at approximately 06:00 — before American troops had reached the church. The meaning of the flare is unclear, though several soldiers later speculated it may have been some form of pre-arranged signal. The flare was fired from inside the tower, not from the ground, and required someone to have been inside the church before the assault wave arrived.",
+  "category": "testimony",
+  "discoveryLocationId": "loc_church_ruins",
+  "implicatesCharacterIds": [
+    "char_renard"
+  ],
+  "unlocks": [
+    "clue_church_dead_drop"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.102Z",
+  "locationId": "",
+  "isRedHerring": false
+}

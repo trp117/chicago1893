@@ -51,19 +51,21 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:19:34.169Z",
+  "updatedAt": "2026-05-20T23:57:44.107Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully splice the main line at Delta-7 and restore Wire_Continuity to Operational, allowing the forward companies to call down defensive fire against the German infantry probes. However, you choose to conceal the officer's uniform thread and the wire cutters to avoid framing yourself, leaving the saboteur's broader intelligence network active within the division.",
       "who_present": "The Doughboy, Private First Class Tadeusz Kowalski",
       "emotional_weight": "Compromised Survival—the relief of saving the line accompanied by the lingering anxiety of a hidden truth that could catch up to you.",
-      "closing_line": "The line buzzed with life again, but the German cutters remained buried deep in your kit bag."
+      "closing_line": "The line buzzed with life again, but the German cutters remained buried deep in your kit bag.",
+      "closing_line_override": ""
     },
     "failure": {
       "what_happened": "While attempting to collect forensic evidence from the bootprint and the cut wire, a heavy shell fragments your backup reels and severs the line in multiple rear locations. Wire_Continuity remains Severed through the afternoon, leaving the forward battalion completely blind and unable to direct defensive fire.",
       "who_present": "Private First Class Tadeusz Kowalski",
       "emotional_weight": "Systemic Severance—the paralyzing realization that you were studying a crime scene while the network itself was dying around you.",
-      "closing_line": "The copper went cold in your hands, and the artillery behind the ridge fell silent."
+      "closing_line": "The copper went cold in your hands, and the artillery behind the ridge fell silent.",
+      "closing_line_override": ""
     }
   }
 }

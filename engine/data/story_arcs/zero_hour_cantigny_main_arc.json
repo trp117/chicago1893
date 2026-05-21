@@ -1,0 +1,121 @@
+{
+  "id": "zero_hour_cantigny_main_arc",
+  "scenarioId": "zero_hour_cantigny",
+  "name": "The Zero Hour at Cantigny",
+  "premise": "On the morning of America's first major offensive of the Great War, a saboteur embedded within the 1st Division has falsified the artillery fire tables and deliberately cut the forward wire, threatening to turn a historic victory into a catastrophic friendly-fire massacre. The players must identify and expose the saboteur while simultaneously keeping the assault alive.",
+  "goal": "Identify the saboteur, recover or reconstruct the authentic fire tables, restore wire communications, and present sufficient evidence to Colonel Hanson Ely before the German counterattacks fully develop later in the afternoon.",
+  "openingSituation": "At approximately 05:56, shortly after the preparatory barrage has begun, a wire-layer's runner arrives at the artillery dugout with a torn page — a fragment of fire table that does not match the master copy on McCormick's map table. Someone has substituted a falsified schedule. The barrage is about to begin on corrupted data.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Creeping Curtain",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        {
+          "id": "the_discrepancy_between",
+          "description": "The discrepancy between the two fire table fragments is discovered — players must determine which version is authentic and who had access to the originals"
+        },
+        {
+          "id": "the_barrage_opens",
+          "description": "The barrage intensifies across the Cantigny sector as discrepancies in the eastern firing schedule begin creating dangerous gaps in coverage"
+        },
+        {
+          "id": "the_signaler_advances",
+          "description": "The Signaler advances into No Man's Land uncoiling wire; the Doughboy goes over the top into smoke and gas residue"
+        },
+        {
+          "id": "first_contact_with",
+          "description": "First contact with Sergeant Voss at the jump-off trench — he is evasive about his movements before dawn"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "Ruin Cleansing",
+      "minuteRange": [
+        8,
+        16
+      ],
+      "beats": [
+        {
+          "id": "the_forward_wire",
+          "description": "The forward wire is found cut at a specific splice point — not shrapnel damage, but a clean diagonal cut made with wire-cutters"
+        },
+        {
+          "id": "the_doughboy_clears",
+          "description": "The Doughboy clears a fortified cellar and discovers a hidden German field radio and a set of written coordinates — evidence of pre-arranged signaling"
+        },
+        {
+          "id": "corporal_dreher_is",
+          "description": "Corporal Dreher is observed near the cut wire location by two independent witnesses; his alibi involves Lieutenant Farrow"
+        },
+        {
+          "id": "mccormick_must_decide",
+          "description": "McCormick must decide whether to halt the barrage and risk the assault or continue on corrupted tables — the choice has consequences for Barrage_Sync"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Counter-Barrage",
+      "minuteRange": [
+        16,
+        24
+      ],
+      "beats": [
+        {
+          "id": "german_150mm_howitzers",
+          "description": "German 150mm howitzers open up on the captured village with uncanny accuracy — the coordinates from the cellar radio match the impact pattern"
+        },
+        {
+          "id": "the_saboteur_attempts",
+          "description": "The saboteur attempts to flee toward the German lines using the smoke cover of the counter-barrage"
+        },
+        {
+          "id": "trenchconsolidation_becomes_critical",
+          "description": "Trench_Consolidation becomes critical — if it falls below 50, the forward position cannot hold without immediate artillery support"
+        },
+        {
+          "id": "lieutenant_farrows_alibi",
+          "description": "Lieutenant Farrow's alibi collapses under questioning; the connection between Farrow and Dreher is exposed"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "Hold the Heights",
+      "minuteRange": [
+        24,
+        30
+      ],
+      "beats": [
+        {
+          "id": "the_players_must",
+          "description": "The players must present their evidence to Colonel Ely before the final German infantry probe at 18:00"
+        },
+        {
+          "id": "the_saboteur_cornered",
+          "description": "The saboteur, cornered, makes a final attempt to destroy the remaining wire equipment or tamper with the consolidation orders"
+        },
+        {
+          "id": "wirecontinuity_must_be",
+          "description": "Wire_Continuity must be restored to Operational for the artillery to provide final defensive fire"
+        },
+        {
+          "id": "the_accusation_is",
+          "description": "The accusation is made — the outcome depends on the state of all three shared fact ledger scales and the quality of evidence presented"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.089Z",
+  "opening": ""
+}

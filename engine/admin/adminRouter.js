@@ -1571,12 +1571,12 @@ Return ONLY valid JSON in this exact structure:
       for (const note of ending_notes) {
         const role = playerRoles.find(r => r.name === note.role_name);
         if (role) {
-          if (note.briefing)          role.briefing          = note.briefing;
+          if (note.briefing)           role.briefing          = note.briefing;
           if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
-          if (note.hook_1)            role.hook1             = note.hook_1;
-          if (note.hook_2)            role.hook2             = note.hook_2;
-          if (note.hook_3)            role.hook3             = note.hook_3;
-          if (note.suggested_secret)  role.suggestedSecret   = note.suggested_secret;
+          if (note.hook_1 || note.hook_2 || note.hook_3) {
+            role.character_hooks = [note.hook_1, note.hook_2, note.hook_3].filter(h => h);
+          }
+          if (note.suggested_secret)  role.suggested_secret  = note.suggested_secret;
           if (note.access_level)      role.accessLevel       = note.access_level;
           if (note.perspective)       role.perspective       = note.perspective;
           if (note.description)       role.description       = note.description;

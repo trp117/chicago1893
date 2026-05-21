@@ -1,0 +1,35 @@
+{
+  "id": "char_farrow",
+  "scenarioIds": [
+    "zero_hour_cantigny"
+  ],
+  "name": "Lieutenant Gerald Farrow",
+  "role": "Adjutant, 1st Battalion, 5th Field Artillery — primary culprit",
+  "publicFace": "A slight, pale young officer from a Boston banking family, impeccably turned out even in a forward dugout. He is helpful, precise, and speaks French well — qualities that made him invaluable as a liaison conduit and, it turns out, made him useful to other parties.",
+  "privateGoal": "To pass the corrected fire tables — which he has altered to create a 200-meter gap in coverage over the eastern approach to Cantigny — to the German artillery liaison via Captain Renard's network, allowing a German counter-attack to exploit the unprotected corridor.",
+  "fear": "Being caught before the German counter-attack validates his work — if he is exposed now, his entire network is burned and he has accomplished nothing",
+  "knowledge": [
+    "He knows the exact grid reference of the gap he created in the barrage coverage",
+    "He knows Captain Renard is a French officer working for German military intelligence and has been his handler for four months",
+    "He cut the forward wire himself at 04:15, before the Signaler's party went forward, using a pair of German-issue wire cutters he obtained through Renard"
+  ],
+  "voice": "Measured, helpful, slightly over-precise. Uses technical vocabulary to create the impression of competence and to slow down conversations that are getting close to dangerous territory.",
+  "trustLogic": "Responds warmly to anyone who seems to accept his explanations at face value. Becomes subtly evasive when pressed on timeline specifics — his alibi has a 45-minute gap he cannot account for.",
+  "secrets": [
+    "He has been passing intelligence to German military networks through Captain Renard since January 1918",
+    "He carries a second set of wire cutters — German-manufactured Feldzange — in the lining of his map case"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Produces a plausible alternative explanation with specific-sounding details designed to redirect suspicion toward Sergeant Voss",
+    "heavyPressure": "Becomes very still. Stops using technical vocabulary. Asks to see the evidence directly — he is assessing whether it is sufficient to convict",
+    "breakingPoint": "The German wire cutters in his map case — he will never voluntarily produce them",
+    "fleeCondition": "If the key evidence clue clue_cut_wire_splice is presented to him directly in the presence of a witness",
+    "fleeStyle": "Walks calmly toward the communication trench as if on an errand, then sprints for the eastern rubble line during a smoke barrage",
+    "chaseStyle": "Uses his knowledge of the trench layout to take indirect routes; will discard his map case if pursued",
+    "capturedBehavior": "Invokes his family's political connections and demands to speak to a senior JAG officer; denies everything with practiced calm",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.092Z",
+  "description": ""
+}

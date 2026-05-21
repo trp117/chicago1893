@@ -55,19 +55,21 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:19:34.168Z",
+  "updatedAt": "2026-05-20T23:57:44.107Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You go over the top and successfully secure the fortified cellar along the Rue du Moulin, recovering a German field radio and a list of target coordinates that match the ambush pattern. You capture the saboteur at the village edge, but your right flank takes severe casualties due to the premature lift in the eastern sector barrage data.",
       "who_present": "The Signaler, Sergeant Emil Voss",
       "emotional_weight": "Haunted Victory—the raw, tactical achievement of taking the village ridge while surrounded by the bodies of the platoon that walked into the open gap.",
-      "closing_line": "You held the stone ruins of Cantigny, but the price of the ground was tallied in the faces of the men on your right."
+      "closing_line": "You held the stone ruins of Cantigny, but the price of the ground was tallied in the faces of the men on your right.",
+      "closing_line_override": ""
     },
     "failure": {
       "what_happened": "You walk directly into the unprotected corridor on the eastern flank where the barrage lifted early. Pinned down by pre-registered machine-gun fire from the heights and cut off from the wire network, your assault squad is completely isolated and overrun during the first German counter-attack probe.",
       "who_present": "Sergeant Emil Voss",
       "emotional_weight": "Tactical Exposure—the weightless terror of finding yourself in an empty corridor where the friendly iron was supposed to be.",
-      "closing_line": "The smoke cleared too soon, exposing your position to the heights before the line could move."
+      "closing_line": "The smoke cleared too soon, exposing your position to the heights before the line could move.",
+      "closing_line_override": ""
     }
   }
 }

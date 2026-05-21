@@ -1,0 +1,20 @@
+{
+  "id": "loc_cantigny_rubble_line",
+  "scenarioId": "zero_hour_cantigny",
+  "name": "Western Rubble Line, Cantigny Village",
+  "description": "The shattered western face of Cantigny — stone farmhouse walls reduced to waist-height, roof timbers collapsed across doorways, a cart overturned in what was once a village lane. The barrage has moved past here; this ground belongs to the Americans now, but it does not feel that way.",
+  "mood": "violent, acrid, disorienting, contested",
+  "linkedCharacterIds": [
+    "char_voss",
+    "char_renard"
+  ],
+  "atmosphericDetails": [
+    "Cordite smoke lies in the rubble at knee height, shifting with each concussion from the continuing barrage to the northeast",
+    "A German field-gray coat lies across a broken wall, its owner nowhere visible; a stick grenade with the pin still in it rests beside it",
+    "The sound here is layered — the distant thunder of the continuing barrage, the closer crack of small-arms fire in the village interior, and underneath it all, someone shouting in German from a cellar"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.098Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

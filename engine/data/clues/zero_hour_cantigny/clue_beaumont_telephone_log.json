@@ -1,0 +1,20 @@
+{
+  "id": "clue_beaumont_telephone_log",
+  "scenarioId": "zero_hour_cantigny",
+  "title": "Beaumont's Telephone Log",
+  "description": "Corporal Beaumont's handwritten telephone log for the night of May 27th–28th shows every call in and out of the artillery dugout. At 04:50, there is an entry in Beaumont's precise hand: 'Lt. Farrow — outgoing — French liaison coordination — 4 minutes — language: French.' The call is logged to a French Army exchange number. Beaumont has circled this entry in pencil and written a single word in the margin: 'odd.'",
+  "category": "documentary",
+  "discoveryLocationId": "loc_artillery_dugout",
+  "implicatesCharacterIds": [
+    "char_farrow",
+    "char_renard"
+  ],
+  "unlocks": [
+    "clue_renard_church_signal"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.100Z",
+  "locationId": "",
+  "isRedHerring": false
+}

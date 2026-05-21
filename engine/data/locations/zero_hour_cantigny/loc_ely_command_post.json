@@ -1,0 +1,20 @@
+{
+  "id": "loc_ely_command_post",
+  "scenarioId": "zero_hour_cantigny",
+  "name": "Colonel Ely's Forward Command Post",
+  "description": "A captured German dugout on the reverse slope of the Cantigny ridge, reinforced with American engineering and now serving as the 28th Infantry's forward headquarters. It smells of fresh-turned earth and the previous occupants' tobacco.",
+  "mood": "authoritative, pressured, decisive, loud",
+  "linkedCharacterIds": [
+    "char_ely",
+    "char_renard"
+  ],
+  "atmosphericDetails": [
+    "Ely's operations map is pinned to the earthen wall with bayonets; unit positions are marked in grease pencil, some of them already out of date",
+    "A runner arrives every four minutes — you can set a watch by it — delivering handwritten messages that Ely reads, folds, and pockets without expression",
+    "The sound of the German counter-barrage is clearly audible here; each impact causes a fine rain of dirt from the ceiling beams"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.095Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

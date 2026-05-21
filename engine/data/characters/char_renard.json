@@ -1,0 +1,35 @@
+{
+  "id": "char_renard",
+  "scenarioIds": [
+    "zero_hour_cantigny"
+  ],
+  "name": "Captain Henri Renard",
+  "role": "French Army Liaison Officer, attached 1st Division HQ — secondary culprit",
+  "publicFace": "A courteous, slightly world-weary French artillery officer who has been embedded with the AEF since March. He speaks excellent English, carries a battered copy of Stendhal, and is regarded by the Americans as a reliable professional.",
+  "privateGoal": "To ensure Farrow's altered fire tables reach the German 18th Army's counter-battery planners through a dead-drop in the ruins of Cantigny's church cellar — a drop he arranged before the assault began.",
+  "fear": "That the dead-drop in the church cellar will be discovered by the Doughboy's clearing teams before the German counter-attack retrieves it",
+  "knowledge": [
+    "He knows the precise location of the dead-drop — a loose stone behind the church sacristy's water basin",
+    "He knows Farrow's real name is not on any German intelligence list — Farrow came to him, not the other way around",
+    "He has a legitimate French Army identity that will protect him from immediate arrest — any accusation against him requires French Army concurrence"
+  ],
+  "voice": "Formal, slightly archaic English with occasional French idiom. Expresses opinions as aesthetic judgments rather than arguments. Creates distance through politeness.",
+  "trustLogic": "Responds to appeals to shared professional expertise — treat him as a fellow artillerist and he will talk at length. Press him on his movements and he retreats behind diplomatic immunity.",
+  "secrets": [
+    "He is not ideologically motivated — he is being blackmailed by German intelligence over a debt scandal from 1915",
+    "He believes a pre-arranged visual signal from the village may already have alerted German observers that the communications disruption succeeded"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Expresses polite confusion and suggests the questioner speak to his French Army superior for clarification",
+    "heavyPressure": "Invokes the Franco-American alliance and suggests that accusations against French officers require formal diplomatic channels",
+    "breakingPoint": "Evidence connecting him to the church dead-drop — he has no cover story for that",
+    "fleeCondition": "If the dead-drop location is mentioned specifically in his presence",
+    "fleeStyle": "Invokes a 'liaison emergency' and attempts to requisition a motorcycle courier to reach French lines",
+    "chaseStyle": "Uses his French uniform and language to confuse American MPs; attempts to reach French sector",
+    "capturedBehavior": "Immediately and completely cooperates — he was always looking for a way out of the blackmail and will trade everything he knows about the German network",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.090Z",
+  "description": ""
+}
