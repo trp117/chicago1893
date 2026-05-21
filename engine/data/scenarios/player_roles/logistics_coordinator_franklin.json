@@ -1,0 +1,49 @@
+{
+  "id": "logistics_coordinator_franklin",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "The Logistics Coordinator — Franklin McCain",
+  "description": "You are the largest of the four, and you know it, and so does everyone in this store. The question of what to do with your body — your hands, your posture, the space you occupy — is a strategic problem as much as a personal one.",
+  "startLocationId": "lunch_counter_main",
+  "startingKnowledge": [
+    "You know the precise number of stools on the long arm of the counter — fourteen — and you have been mentally tracking which ones are occupied by non-participants",
+    "You know that Ezell's hands are steady but that David, at the far end, touched his coat pocket twice in the first two minutes — a tell you recognized from the training sessions",
+    "You know that the floor walker has made two passes already and slowed each time — he is measuring something, and you believe he is measuring you specifically"
+  ],
+  "accessLevel": "staff",
+  "perspective": "First person present tense, tactical and physical — the narrative should register the spatial awareness of someone who has been trained to think about bodies in space and who is acutely conscious of how his own body is being read",
+  "briefing": "You are seated two stools from the left end of the long arm of the counter, your wool overcoat still on because taking it off would require movement and movement is not permitted right now, and the coat is damp from the February air outside and the store's heat is building inside it and the discomfort is something you are choosing to hold. You are the biggest of the four — you know this the way you always know it in a white commercial space, as a fact about how you are being perceived before you have done anything — and the floor walker's second pass slowed at your position specifically, and you tracked it. What you know that the others cannot see from their positions: the male patron in the brown jacket who has been standing in the aisle for four minutes is not shopping, he is watching, and he is watching you, and the woman next to him has said something twice that you cannot hear but that has made him take a half-step closer to the counter each time. Your hands are folded in your lap right now. The textbooks are in your bag. The counter in front of you is open and bare, and the question of whether to fill it — to spread your books flat on the laminate and make your presence legible as a student, a person with a purpose, a person who belongs here — or to keep your hands still and offer nothing that can be misread, is sitting in front of you as clearly as the empty stool space itself.",
+  "character_hooks": [
+    "I have a letter in my coat pocket from my mother telling me to be careful, and I read it this morning, and I am not going to read it again.",
+    "I know the brown-jacketed man in the aisle — he works at the same plant as my uncle — and I do not know if that makes this better or worse.",
+    "I told myself before I came in that if anyone touched me I would stand up slowly and say my name and my college and nothing else, and I have been rehearsing it since I sat down."
+  ],
+  "suggested_secret": "Franklin has already decided that if the sit-in succeeds today, he will organize the second wave himself — he has a list of twelve names in his head, students who said they would come if the first action held.",
+  "opening": {
+    "narrative": "It is 4:32 PM, and you are seated at the Woolworth's lunch counter on South Elm Street, your coat still on, your hands folded in your lap, your textbooks in the bag at your feet. Ezell has spoken the words. The waitress has gone. The counter is bare. The floor walker is behind you and the patron in the brown jacket is in the aisle and the room is doing the thing rooms do when something has happened that nobody knows how to process yet — continuing, loudly, in all directions at once. You are tracking four things simultaneously: David's hands at the far end, the floor walker's pace, the patron in the aisle, and the open laminate surface in front of you that is either an anchor waiting to be set or a provocation waiting to be made.",
+    "npcMoments": [],
+    "choices": [
+      "Spread your textbooks flat on the counter surface — anchor your space, establish your student identity, make removal a more complicated proposition",
+      "Keep your hands folded tightly in your lap — signal total non-aggression, offer nothing that can be misread, hold the discipline at maximum",
+      "Turn your head slightly toward the patron in the brown jacket — not a confrontation, but an acknowledgment that you have seen him and are not afraid of being seen"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "wool overcoat, damp at the collar",
+      "canvas bag containing two textbooks and a spiral notebook",
+      "folded handkerchief in left breast pocket"
+    ],
+    "flags": {
+      "textbooks_placed": false,
+      "hands_folded": true,
+      "patron_acknowledged": false
+    },
+    "suspicion": {
+      "harris_mackintosh": 15,
+      "ruth_carver": 25,
+      "sergeant_dale_pruitt": 10
+    }
+  },
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.372Z"
+}

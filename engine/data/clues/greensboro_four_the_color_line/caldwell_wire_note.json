@@ -1,0 +1,17 @@
+{
+  "id": "caldwell_wire_note",
+  "scenarioId": "greensboro_four_the_color_line",
+  "title": "Caldwell's Preliminary Wire Note",
+  "description": "On the glass surface of the candy display case, Caldwell has left his notepad open for a moment while he moves to a better vantage point. The top of the visible page reads: 'Four A&T students — orderly, no incident — counter refused service, students remain seated — 4:47 PM.' Three words are underlined: 'no incident.' The framing is already set. The story is already being written as a success.",
+  "category": "documentary",
+  "discoveryLocationId": "candy_counter_display",
+  "implicatesCharacterIds": [
+    "james_caldwell"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.365Z",
+  "locationId": "",
+  "isRedHerring": false
+}

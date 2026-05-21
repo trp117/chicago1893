@@ -1,0 +1,35 @@
+{
+  "id": "james_caldwell",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
+  ],
+  "name": "James Caldwell",
+  "role": "Reporter, Carolina Peacemaker (Greensboro's Black-owned weekly newspaper)",
+  "publicFace": "A lean man in his early thirties in a pressed gray suit, carrying a reporter's notepad in his breast pocket and moving through the store with the practiced invisibility of a Black professional in a white commercial space",
+  "privateGoal": "Get the story — the full, accurate, unambiguous story — and get it to the wire before the white dailies can frame it first",
+  "fear": "That something will happen that the white press can use to characterize the students as provocateurs, and that his account will be dismissed as partisan",
+  "knowledge": [
+    "He was tipped off about today's action by a contact at A&T College two days ago and has been here since 4:15 PM",
+    "He has already written the first three paragraphs of his story in his head and they depend entirely on the students maintaining their discipline through closing",
+    "He knows that the Associated Press stringer in Greensboro has been contacted and may arrive before 5:30 PM"
+  ],
+  "voice": "Precise, economical, the voice of a man who has learned that every word he writes will be read against him by someone looking for a reason to dismiss it",
+  "trustLogic": "He opens to anyone who gives him a direct, on-the-record account; he is professionally skeptical of anyone whose account is too convenient",
+  "secrets": [
+    "He was at the Woolworth's counter himself as a child and was refused service — he has never written about this and does not intend to",
+    "He has already sent a preliminary note to the AP stringer that the action is 'proceeding without incident' — a characterization he will have to retract if anything goes wrong"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Identifies himself by name and publication and asks a single, precise question",
+    "heavyPressure": "Produces his press card and states that he is there in a professional capacity and that anything said to him may be published",
+    "breakingPoint": "He will not spike the story regardless of who asks him to",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "States his name, his publication, and that he is covering a matter of public interest",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.357Z",
+  "description": ""
+}

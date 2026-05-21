@@ -1,0 +1,121 @@
+{
+  "id": "greensboro_four_the_color_line_main_arc",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "The Color Line",
+  "premise": "Four Black students from A&T College occupy the segregated lunch counter at Greensboro's F.W. Woolworth's and ask to be served. The store refuses to serve them and refuses to remove them by force. The next ninety minutes will test whether disciplined non-violence can hold against accumulating social, institutional, and personal pressure.",
+  "goal": "Hold the lunch counter stools through store closing at approximately 5:30 PM with Disciplined_Stillness_Pct above 70, Crowd_Agitation_Index below the critical threshold, and no physical retaliation — preserving the moral integrity of the protest and ensuring it reaches the press as an unambiguous act of peaceful defiance.",
+  "openingSituation": "Ezell Blair Jr. has just asked the waitress for a cup of coffee. She has walked away without responding. The store manager has looked up from the office stairs. The floor walker nearest the counter has slowed his pace. The four students are seated. The counter in front of them is bare. It is 4:32 PM.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Request",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        {
+          "id": "ezell_speaks_the",
+          "description": "Ezell speaks the words — a request for coffee, delivered quietly and directly to the waitress — and the silence that follows becomes the opening condition of the protest"
+        },
+        {
+          "id": "the_floor_walker",
+          "description": "The floor walker makes his first pass behind the stools, clocking each student's posture and the textbooks visible in their bags"
+        },
+        {
+          "id": "the_white_woman",
+          "description": "The white woman patron near the candy display stops shopping and turns to watch; she is the first civilian witness and her response will shape the crowd's early formation"
+        },
+        {
+          "id": "store_manager_harris",
+          "description": "Store manager Harris Mackintosh descends two steps from the office stairs and makes eye contact with Ezell — the first direct authority confrontation of the session"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Pressure Builds",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        {
+          "id": "a_second_waitress",
+          "description": "A second waitress places a 'Counter Closed' card in front of Seat 3 — the students must decide whether to move it, ignore it, or use their textbooks to anchor their space"
+        },
+        {
+          "id": "the_woman_behind",
+          "description": "The woman behind the stools, Ruth Carver, begins speaking audibly to a companion about calling the police; Crowd_Agitation_Index climbs"
+        },
+        {
+          "id": "joseph_mcneil_identifies",
+          "description": "Joseph McNeil identifies the store supervisor on the wall telephone and must decide whether to pass a warning down the line or maintain absolute silence"
+        },
+        {
+          "id": "franklin_mccains_physical",
+          "description": "Franklin McCain's physical size draws a comment from a male patron near the aisle — the first direct verbal provocation — and Disciplined_Stillness_Pct is tested"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Witnesses Arrive",
+      "minuteRange": [
+        15,
+        23
+      ],
+      "beats": [
+        {
+          "id": "an_offduty_greensboro",
+          "description": "A Greensboro police officer enters the store and observes the situation without immediate intervention, notices the counter situation, and must decide whether to intervene officially or observe"
+        },
+        {
+          "id": "a_young_white",
+          "description": "A young white Woolworth's employee appears visibly uncomfortable with the situation, and one student notices a small gesture that could be interpreted as sympathy — an ambiguous gesture that both management and the crowd notice"
+        },
+        {
+          "id": "the_carolina_peacemaker",
+          "description": "The Carolina Peacemaker stringer, James Caldwell, arrives with a small notepad and positions himself near the toy display — his presence raises the stakes for every actor in the room"
+        },
+        {
+          "id": "harris_mackintosh_makes",
+          "description": "Harris Mackintosh makes a second telephone call; the students can now hear him through the office door, and the word 'headquarters' is audible"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The Closing Hour",
+      "minuteRange": [
+        23,
+        30
+      ],
+      "beats": [
+        {
+          "id": "a_storewide_announcement",
+          "description": "A store-wide announcement crackles over the intercom: the lunch counter is closing early for maintenance — management's final non-violent removal attempt"
+        },
+        {
+          "id": "ruth_carver_makes",
+          "description": "Ruth Carver makes a decision: she either confronts the students directly, leaves the store, or — in the best outcome — makes a statement to Caldwell that affirms their conduct"
+        },
+        {
+          "id": "the_students_must",
+          "description": "The students must hold their positions through the intercom announcement and any final floor walker pressure without breaking the discipline"
+        },
+        {
+          "id": "at_600_pm",
+          "description": "At approximately 5:30 PM the store closes; the students rise, gather their books, and walk out through the front doors — the sit-in has held, and Caldwell's notes are already moving toward the wire"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.355Z",
+  "opening": ""
+}

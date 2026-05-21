@@ -1,0 +1,21 @@
+{
+  "id": "store_main_aisle",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "Main Sales Floor Aisle",
+  "description": "The central aisle of the store running from the front glass doors to the back stock room, lined on both sides with low display fixtures carrying housewares, notions, and seasonal goods — currently occupied by a growing cluster of white onlookers who have stopped shopping to watch the counter.",
+  "mood": "volatile, public, performative",
+  "linkedCharacterIds": [
+    "sergeant_dale_pruitt",
+    "james_caldwell"
+  ],
+  "atmosphericDetails": [
+    "The click of the cash registers near the front — still running, still processing transactions, the ordinary world continuing alongside the extraordinary one",
+    "The smell of roasted peanuts from the candy counter display mixing with floor wax",
+    "The sound of a child asking a parent what is happening and receiving no answer",
+    "Sergeant Pruitt's civilian shoes on the tile — the particular sound of someone moving with authority while pretending not to"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.361Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

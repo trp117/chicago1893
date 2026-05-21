@@ -1,0 +1,17 @@
+{
+  "id": "david_richmond_paper",
+  "scenarioId": "greensboro_four_the_color_line",
+  "title": "The Handwritten Conduct Rules",
+  "description": "A folded piece of paper has slipped partially from the left pocket of the student at Seat 4 — David Richmond — and the edge of it is visible. The handwriting is careful, deliberate, the letters slightly larger than necessary, as if written by someone who needed the act of writing to make the words real. You can read the top line: 'Do not strike back or curse if abused.' Below it, partially obscured by the fold: 'Do not laugh out.' This is not a protest manual. This is a personal document. Someone wrote these rules out for himself.",
+  "category": "physical",
+  "discoveryLocationId": "lunch_counter_corner",
+  "implicatesCharacterIds": [
+    "david_richmond"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.369Z",
+  "locationId": "",
+  "isRedHerring": false
+}

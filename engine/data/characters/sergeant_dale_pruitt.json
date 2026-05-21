@@ -1,0 +1,34 @@
+{
+  "id": "sergeant_dale_pruitt",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
+  ],
+  "name": "Sergeant Dale Pruitt",
+  "role": "Off-duty Greensboro Police Department officer",
+  "publicFace": "A Greensboro police officer whose specific appearance and attire are not documented in surviving historical records — who carries the habit of authority in the way he stands and the way he scans a room",
+  "privateGoal": "He wants to leave the store without having to make a decision that will follow him",
+  "fear": "That if he does nothing and something violent happens, it will be on his record; that if he intervenes on behalf of the students, it will end his career",
+  "knowledge": [
+    "He was briefed this morning that the department had received a call about possible student action at Woolworth's but was told it was not a departmental priority",
+    "He knows that the chief has privately told precinct commanders that arresting non-violent students would generate national press coverage the city does not want"
+  ],
+  "voice": "Laconic, deliberate, the voice of a man who has learned that saying less is almost always safer than saying more",
+  "trustLogic": "He opens slightly to anyone who acknowledges his genuine dilemma without demanding he take a side; he closes to anyone who tries to recruit him as either an enforcer or a witness",
+  "secrets": [
+    "He has a son enrolled at A&T College and has not told his precinct colleagues",
+    "He already made a quiet decision when he walked in the door: he will not arrest anyone today regardless of what management requests"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "States that he is off-duty and that any official police matter should be directed to the non-emergency line",
+    "heavyPressure": "Produces his badge and identifies himself, then restates that he is not on active duty — a move that simultaneously asserts authority and declines to use it",
+    "breakingPoint": "He will not file a false incident report or provide a statement that mischaracterizes the students' conduct",
+    "fleeCondition": "If Mackintosh formally requests that he take official action",
+    "fleeStyle": "Completes his purchase and exits through the front door at a measured pace",
+    "chaseStyle": "Does not engage outside the store",
+    "capturedBehavior": "States that he observed no violation of law during his time in the store",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.359Z",
+  "description": ""
+}

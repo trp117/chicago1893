@@ -1,0 +1,673 @@
+{
+  "version": 4,
+  "label": "corrections_applied",
+  "scenarioId": "greensboro_four_the_color_line",
+  "createdAt": "2026-05-21T19:40:20.052Z",
+  "pipeline_step": "manual_correction",
+  "changes_applied": 2,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "greensboro_four_the_color_line",
+    "version": "1.0.0",
+    "title": "Greensboro Four: The Color Line",
+    "description": "February 1, 1960, 4:30 PM. Four Black college freshmen occupy the segregated lunch counter at F.W. Woolworth's in Greensboro, North Carolina, and ask to be served. The store will not serve them. They will not leave. The next ninety minutes will determine whether the sit-in holds its moral integrity — and whether a single act of disciplined stillness can survive the gathering pressure of a hostile crowd, a calculating store management, and the weight of history.",
+    "genre": [
+      "historical",
+      "drama",
+      "social_justice"
+    ],
+    "historicalRealism": "high",
+    "freedomLevel": "guided",
+    "sessionTargetMinutes": 30,
+    "storyArcIds": [
+      "greensboro_four_the_color_line_main_arc"
+    ],
+    "playerRoleIds": [
+      "point_man_ezell",
+      "logistics_coordinator_franklin",
+      "communications_conduit_joseph"
+    ],
+    "keyEvidenceClueIds": [
+      "manager_closed_sign_order",
+      "white_woman_witness_statement"
+    ],
+    "systems": {
+      "timePerTurnDefault": 2,
+      "scales": {
+        "threat": {
+          "min": 0,
+          "max": 10,
+          "default": 1
+        },
+        "authorityTrust": {
+          "min": -3,
+          "max": 5,
+          "default": 1
+        }
+      },
+      "pressureEvents": [
+        "A floor walker plants a 'Counter Closed' placard directly in front of Seat 1 — Disciplined_Stillness_Pct drops 5 points unless countered",
+        "The white woman behind the stools raises her voice; Crowd_Agitation_Index jumps 12 points and a second onlooker joins her",
+        "The store manager makes a second call from the wall telephone near the office stairs — police arrival is now a live possibility within the session"
+      ]
+    },
+    "winConditions": [
+      "The sit-in reaches store closing time (6:00 PM) with Disciplined_Stillness_Pct above 70 and no physical retaliation recorded",
+      "The students hold all four stools until management formally acknowledges the protest and withdraws floor walker pressure without calling police",
+      "A sympathetic witness — the white woman or the off-duty officer — publicly affirms the students' conduct, raising authorityTrust to 4 or above"
+    ],
+    "failConditions": [
+      "Crowd_Agitation_Index reaches 100 and management calls police before the students can demonstrate their non-violent intent",
+      "Disciplined_Stillness_Pct falls below 30, triggering a visible reaction from one of the students that the floor walkers use to justify removal",
+      "All four stools are vacated before store closing time under direct management pressure"
+    ],
+    "partialSuccessExamples": [
+      "The students hold the counter until 5:45 PM but Disciplined_Stillness_Pct ends at exactly 50 — the protest holds but the moral authority is contested in next-day press coverage",
+      "The sit-in survives but Crowd_Agitation_Index peaks at 88, meaning police were called and arrived — the students are not removed but the confrontation is documented as volatile rather than peaceful",
+      "Two of the four stools are held through closing; Counter_Saturation drops to half, diluting the symbolic power of the full occupation"
+    ],
+    "introduction": {
+      "enabled": true,
+      "skippable": true,
+      "sections": [
+        {
+          "type": "world",
+          "text": "It is 1960, and the American South operates under a legal architecture of racial separation that has governed public life since the Reconstruction era's collapse in the 1870s. In Greensboro, North Carolina — a city of 119,000 people, home to four Black colleges and a thriving segregated middle class — the color line runs through every department store, every municipal swimming pool, every bus terminal lunch counter. The F.W. Woolworth Company operates 59 stores across the South, each one serving Black customers at the dry-goods counters and the candy displays, then refusing them a seat at the food service counter fifteen feet away. This is not custom. It is statute, enforced by store management, by local ordinance, and by the understood threat of white mob violence that has gone largely unpunished for eighty years."
+        },
+        {
+          "type": "stakes",
+          "text": "Four students from North Carolina Agricultural and Technical College — Ezell Blair Jr., Franklin McCain, Joseph McNeil, and David Richmond — have spent weeks studying the non-violent direct action principles of the Congress of Racial Equality. They have rehearsed verbal abuse. They have rehearsed being ignored. What they have not rehearsed is the particular weight of actually sitting down, because no rehearsal can replicate the moment the stool accepts your body and the counter does not move and the world is forced to respond. If they hold the counter without incident tonight, the story will reach the Associated Press wire by morning. If they break — if anyone flinches, retaliates, or is removed — the story becomes a different one entirely, and the movement loses the one weapon that segregation has no legal answer for: perfect, public, unimpeachable dignity."
+        },
+        {
+          "type": "scene",
+          "text": "South Elm Street at 4:30 in the afternoon is loud with the end of the business day — delivery trucks idling at the curb, the smell of exhaust and wet wool from the February cold, the neon script of the Woolworth sign buzzing faintly above the glass double doors. Inside, the store smells of floor wax, roasted peanuts from the candy counter, and the hot-fat smell of the grill behind the lunch counter's backbar. The fluorescent tubes overhead cast everything in a flat, merciless light. The counter runs in an L-shape along the south wall, eighteen fixed stools on chrome posts, the laminate surface wiped clean. Four of those stools are now occupied. The waitress has walked away. The coffee urns are steaming."
+        },
+        {
+          "type": "entry",
+          "text": "You have known since this morning that today was the day, and the knowing has not made the sitting down any easier. The stool is cold through your clothes. The counter in front of you is bare — no cup, no saucer, no menu, nothing — and the emptiness of it is its own kind of statement, though not the one you came to make. Around you the store continues its ordinary Monday-afternoon business for a few more seconds, the cash registers clicking, a child asking for something near the toy display, a floor walker's footsteps slowing behind you. The waitress has not returned. The manager has noticed. You are at the counter, your hands in front of you, and the next move belongs to the world.",
+          "character_entries": {
+            "point_man_ezell": "The chrome edge of the stool casing is pressing through the back of your thighs and you have not shifted your weight, not once, in three minutes, because shifting would look like uncertainty and uncertainty is the one thing you cannot afford to model for the three men seated to your left. The laminate surface in front of you is bare and cold and wiped to a kind of aggressive cleanliness, the cleanliness of a thing that has been decided against, and the coffee urns behind the backbar are steaming with a smell so specific and so present that it has become its own argument — dark roast, hot fat, the small ordinary democracy of a cup that costs nine cents and that you have the nine cents to pay for, folded in your left breast pocket beside the CORE pamphlet you no longer need to read. What the others cannot see from their positions is what Mackintosh's face did when M. Simmons walked away: not anger, not the red-faced refusal you rehearsed for, but calculation — the look of a man running a column of figures, weighing what this counter costs against what a scene costs, and not yet certain of the answer. The floor walker's leather soles creak on the tile directly behind you. Mackintosh has not moved from the office stairs. The mirror behind the backbar gives you the whole store in one flat, fluorescent frame, and somewhere in that frame is the decision you have not yet made — where to put your eyes, and what your face does when you put them there, and whether you turn toward the sound of the creaking or hold perfectly, unimpeachably still.",
+            "logistics_coordinator_franklin": "Two stools from the left end of the long arm, and the heat inside your overcoat has become a specific and deliberate problem you are solving with stillness. The wool is damp from Elm Street and the store's radiators are working and the warmth is pooling under the collar and between your shoulder blades, and you are not moving. Your hands are folded in your lap. The counter in front of you is bare laminate, wiped clean, and the empty space of it is its own kind of pressure. What you can see from this position that the others cannot: the man in the brown jacket has taken three incremental steps toward the counter in the last four minutes and is not shopping, has never been shopping, and the woman beside him has said something to him twice that closed the distance each time by roughly six inches, and he is watching you with the particular quality of attention that precedes a decision. The floor walker's second pass slowed at your stool. Not at Ezell's end. Yours. You are the largest body in this row and you have been the largest body in every white commercial space you have ever entered and you know, with the flat precision of long practice, exactly what that means for how you are being measured right now. David touched his coat pocket twice in the first two minutes — the same tell from the training sessions, the same hand — and you have not looked at him directly since because looking would be a transaction the room could read. Fourteen stools on the long arm. Six occupied by people who did not come here with you. The textbooks are in your bag and the question of whether to open them — to spread them flat on the laminate and let this store see a student, a person with a purpose, a person with every right to occupy this stool — or to keep your hands folded and your surface empty and give no one anything to reach for, is sitting in front of you as bare and bright as the counter itself, and the man in the brown jacket has stopped moving, and the floor walker is at the far end of the room, and the coffee urns are still steaming, and your hands are still folded, and you are deciding.",
+            "communications_conduit_joseph": "The stool beneath you is fixed and cold through your coat, and you are not looking at the counter. You are looking at the candy display cases across the aisle, at the curved glass that bends the whole store into a single frame, and what that frame shows you is a room in the process of making a decision about itself. Seven onlookers now — up from two four minutes ago — arranged in the loose, unconvincing postures of people who have stopped doing what they came here to do. The floor walker has completed the same forty-foot circuit three times. The man near the peppermint jars has not moved his hands once in eleven minutes, and his coat is dry, which means he was already inside when the cold came in off Elm Street with the four of you, which means he was here first, which means the wall telephone your eyes caught at 4:28 makes a different kind of sense now — not a warning called out, but a confirmation called in. Someone knew. The coffee urns are steaming behind the backbar and the money is in your pocket and the law is the law and none of that is the problem you are solving right now. The problem is David, two stools to your right, whose breathing you can measure from here, steady but expensive, the kind of steady that is one unexpected sound away from something else entirely — and the word that would cost you nothing, the quiet lateral word that holds a line, is already forming, and the discipline says no, and you are deciding."
+          }
+        }
+      ]
+    },
+    "period_vocabulary": {
+      "categories": [
+        {
+          "name": "Lunch Counter Trade Language",
+          "context": "Used by Woolworth's counter staff, floor walkers, and store management to communicate about service, customers, and counter operations during the workday.",
+          "terms": [
+            {
+              "term": "the board",
+              "meaning": "The menu board mounted above the backbar listing daily specials and prices"
+            },
+            {
+              "term": "draw one",
+              "meaning": "Soda fountain shorthand for a single cup of coffee — called between waitress and counter cook"
+            },
+            {
+              "term": "backbar",
+              "meaning": "The mirrored shelving and equipment wall directly behind the counter, facing seated customers"
+            },
+            {
+              "term": "floor walker",
+              "meaning": "A salaried store supervisor who patrolled the aisles to enforce store policy and monitor staff and customers"
+            },
+            {
+              "term": "cover",
+              "meaning": "A place setting laid for a customer — the absence of a cover signals deliberate non-service"
+            },
+            {
+              "term": "the closed card",
+              "meaning": "A small placard placed on the counter in front of a stool to signal that section is not accepting customers"
+            },
+            {
+              "term": "side work",
+              "meaning": "Maintenance tasks assigned to waitstaff — restocking, wiping down — used as a pretext to avoid acknowledging seated customers"
+            }
+          ]
+        },
+        {
+          "name": "Non-Violent Direct Action Protocol",
+          "context": "Language drawn from CORE training materials and the students' own preparation sessions at A&T College, used among protest participants to coordinate conduct under pressure.",
+          "terms": [
+            {
+              "term": "the discipline",
+              "meaning": "The full body of non-violent conduct rules — stillness, silence, non-retaliation — that govern a sit-in participant's behavior"
+            },
+            {
+              "term": "holding the line",
+              "meaning": "Maintaining physical occupation of protest positions regardless of verbal or social pressure"
+            },
+            {
+              "term": "the anchor",
+              "meaning": "Any deliberate physical act — placing books, folding hands visibly — that signals permanence and student identity to onlookers"
+            },
+            {
+              "term": "a break",
+              "meaning": "Any visible emotional or physical reaction by a participant that could be interpreted as provocation or instability"
+            },
+            {
+              "term": "passing the word",
+              "meaning": "Quietly relaying a reassurance or instruction down the line of seated students without attracting floor walker attention"
+            },
+            {
+              "term": "the saturation",
+              "meaning": "The number of protest-aligned bodies occupying counter stools — higher saturation makes normal segregated business impossible"
+            },
+            {
+              "term": "the index",
+              "meaning": "Informal shorthand for the felt hostility level of the surrounding crowd — participants monitored it continuously through reflection and peripheral vision"
+            }
+          ]
+        },
+        {
+          "name": "Jim Crow Social Code",
+          "context": "The informal and formal vocabulary of racial segregation as practiced in Greensboro's commercial and civic life in 1960, used by white store staff, patrons, and management.",
+          "terms": [
+            {
+              "term": "the color line",
+              "meaning": "The invisible but legally enforced boundary separating Black and white access to public accommodations, seating, and service"
+            },
+            {
+              "term": "separate facilities",
+              "meaning": "The legal euphemism for racially segregated bathrooms, water fountains, and service counters mandated under state and local ordinance"
+            },
+            {
+              "term": "the arrangement",
+              "meaning": "The understood social compact — spoken or unspoken — by which Black customers accepted limited service without objection"
+            },
+            {
+              "term": "outside agitators",
+              "meaning": "A charge leveled by segregationists against protest organizers, implying that local Black residents would not protest without external provocation"
+            },
+            {
+              "term": "disturbing the peace",
+              "meaning": "The legal charge most commonly used by Southern law enforcement to arrest non-violent demonstrators without citing the protest itself"
+            },
+            {
+              "term": "the five-and-dime",
+              "meaning": "Common term for variety stores like Woolworth's, named for their original price points — the stores depended on Black customer spending while enforcing segregation at the food counter"
+            }
+          ]
+        },
+        {
+          "name": "Press and Wire Service Shorthand",
+          "context": "Used by newspaper reporters and Associated Press stringers who covered civil rights events across the South in 1960, shaping how protests were framed for national audiences.",
+          "terms": [
+            {
+              "term": "the wire",
+              "meaning": "The Associated Press or United Press International teletype network — a story reaching the wire by midnight would appear in morning papers across the country"
+            },
+            {
+              "term": "the Negro press",
+              "meaning": "The network of Black-owned newspapers — including the Carolina Peacemaker and the Chicago Defender — that covered civil rights events the white press minimized or distorted"
+            },
+            {
+              "term": "incident report",
+              "meaning": "Police or store management documentation of a protest event — its language and framing could determine whether an action was reported as peaceful or volatile"
+            },
+            {
+              "term": "the record",
+              "meaning": "The publicly available account of an event — students were acutely aware that their conduct would become the record against which future sit-ins were measured"
+            }
+          ]
+        }
+      ]
+    },
+    "createdAt": "2025-02-01T16:30:00Z",
+    "updatedAt": "2026-05-21T19:40:20.029Z",
+    "premise": "",
+    "playerGoal": "",
+    "openingSituation": "",
+    "tone": [],
+    "structured_endings_enabled": false,
+    "allow_free_input": true,
+    "beats_status": "not_generated",
+    "technical_facts": {
+      "generated": true,
+      "reviewed": false,
+      "facts": [
+        {
+          "fact_id": "sit_in_date_and_time",
+          "content": "The Greensboro sit-in began at approximately 4:30 PM on Monday, February 1, 1960, when the four A&T students took seats at the F.W. Woolworth lunch counter at 132 South Elm Street, Greensboro, North Carolina.",
+          "domain": "timing",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); Greensboro sit-in historical record, Greensboro History Museum",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "four_students_identities_and_seats",
+          "content": "The four students were Ezell Blair Jr. (later Jibreel Khazan), Franklin Eugene McCain, Joseph Alfred McNeil, and David Lacy Richmond, all freshmen at North Carolina Agricultural and Technical College; they occupied four consecutive stools at the lunch counter.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); William H. Chafe, Civilities and Civil Rights (1980)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "store_closing_time",
+          "content": "The F.W. Woolworth store at 132 South Elm Street, Greensboro, closed at 5:30 PM on February 1, 1960, and the students remained seated until the store closed without being served.",
+          "domain": "timing",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); contemporaneous reporting, Greensboro Daily News, February 2, 1960",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "duration_of_first_day_sit_in",
+          "content": "The students occupied the lunch counter for approximately one hour on February 1, 1960, from roughly 4:30 PM until the store closed at approximately 5:30 PM.",
+          "domain": "timing",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); William H. Chafe, Civilities and Civil Rights (1980)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "woolworth_lunch_counter_seat_count",
+          "content": "The F.W. Woolworth lunch counter at 132 South Elm Street had approximately 66 seats; the lunch counter was designated for white customers only under Greensboro's customary racial segregation practices in 1960.",
+          "domain": "capacity",
+          "source": {
+            "citation": "Greensboro History Museum documentation; Miles Wolff, Lunch at the 5 & 10 (1970)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "no_arrest_first_day",
+          "content": "No arrests were made on February 1, 1960; the store manager, Clarence Harris (also identified in some accounts as C.L. Harris), did not call police to remove the students and no officer intervened to eject them.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); Greensboro Daily News, February 2, 1960",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "manager_response_no_force",
+          "content": "The Woolworth store manager did not physically remove the students on February 1, 1960, and did not call police to forcibly eject them; the manager's documented response was to close the lunch counter rather than serve the students.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); William H. Chafe, Civilities and Civil Rights (1980)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "students_purchased_items_before_sitting",
+          "content": "Before sitting at the lunch counter, the four students made small purchases elsewhere in the Woolworth store — including a tube of toothpaste — to establish themselves as paying customers of the establishment.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Franklin McCain oral history, recorded by the Southern Oral History Program, University of North Carolina; Miles Wolff, Lunch at the 5 & 10 (1970)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "ezell_blair_initial_request",
+          "content": "Ezell Blair Jr. made the initial verbal request for service at the lunch counter on February 1, 1960, asking a waitress for coffee and a doughnut; the waitress refused to serve him and told the students they would not be served at that counter.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); Ezell Blair Jr. (Jibreel Khazan) oral testimony",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "students_carried_textbooks",
+          "content": "The four students brought their college textbooks with them to the lunch counter on February 1, 1960, and studied while seated, a deliberate element of their conduct intended to demonstrate orderly, student behavior.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); Franklin McCain oral history, Southern Oral History Program, University of North Carolina",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "nonviolence_preparation",
+          "content": "The four students had discussed nonviolent conduct and prepared themselves for verbal abuse and provocation before entering the store on February 1, 1960; Franklin McCain later testified they had mentally rehearsed responses to anticipated hostility.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Franklin McCain oral history, Southern Oral History Program, University of North Carolina; William H. Chafe, Civilities and Civil Rights (1980)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "carolina_peacemaker_coverage",
+          "content": "The Carolina Peacemaker, Greensboro's Black-owned weekly newspaper, covered the February 1, 1960 sit-in; the protest was also reported by the Greensboro Daily News in its February 2, 1960 edition.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Greensboro Daily News, February 2, 1960; William H. Chafe, Civilities and Civil Rights (1980)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "woolworth_store_address",
+          "content": "The F.W. Woolworth store where the sit-in occurred was located at 132 South Elm Street, Greensboro, North Carolina; the building is now the International Civil Rights Center and Museum.",
+          "domain": "navigation",
+          "source": {
+            "citation": "International Civil Rights Center and Museum, Greensboro, NC; Greensboro History Museum",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "at_college_distance_from_woolworth",
+          "content": "North Carolina Agricultural and Technical College (A&T) is located approximately 1.5 miles northeast of the F.W. Woolworth store at 132 South Elm Street in downtown Greensboro.",
+          "domain": "navigation",
+          "source": {
+            "citation": "Greensboro city maps; Miles Wolff, Lunch at the 5 & 10 (1970)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "woolworth_segregated_counter_policy",
+          "content": "F.W. Woolworth's lunch counters in Southern stores were operated under a policy of racial segregation in 1960; Black customers could purchase food at a stand-up counter or take-away window in many Woolworth stores but were not permitted to sit at the main lunch counter.",
+          "domain": "other",
+          "source": {
+            "citation": "William H. Chafe, Civilities and Civil Rights (1980); Miles Wolff, Lunch at the 5 & 10 (1970)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "elderly_black_woman_witness_account",
+          "content": "A Black woman working as a dishwasher or helper in the Woolworth kitchen, initially identified as maternal relative figure or staff bystander, approached the students on February 1, 1960, and scolded them for acting out or potentially disrupting local arrangements before later expressing complex private pride.",
+          "domain": "personnel",
+          "source": {
+            "citation": "Franklin McCain oral history, Southern Oral History Program, University of North Carolina; Miles Wolff, Lunch at the 5 & 10 (1970)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "sit_in_spread_timeline",
+          "content": "By February 4, 1960 — three days after the initial sit-in — the number of students participating at the Greensboro Woolworth counter had grown to approximately 300; by the end of February 1960, sit-in protests had spread to at least 31 cities across the South.",
+          "domain": "timing",
+          "source": {
+            "citation": "William H. Chafe, Civilities and Civil Rights (1980); Clayborne Carson, In Struggle: SNCC and the Black Awakening of the 1960s (1981)",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "fact_id": "greensboro_woolworth_desegregation_date",
+          "content": "The Greensboro F.W. Woolworth lunch counter was desegregated on July 25, 1960, when four Black Woolworth employees — Geneva Tisdale, Susie Morrison, Anetha Jones, and Charles Bess — were served at the counter; the sit-in campaign had lasted approximately six months.",
+          "domain": "timing",
+          "source": {
+            "citation": "Miles Wolff, Lunch at the 5 & 10 (1970); Greensboro History Museum",
+            "url": null,
+            "access_note": null
+          },
+          "valid_from": null,
+          "valid_until": null
+        }
+      ]
+    },
+    "epilogue": {
+      "generated": true,
+      "reviewed": false,
+      "character_fates": [
+        {
+          "character_id": "david_richmond",
+          "name": "David Richmond",
+          "outcome": "died",
+          "historical_record": "David Richmond was one of the four original sit-in participants on February 1, 1960. He continued his studies at North Carolina A&T State University but faced intense post-protest isolation, death threats, and difficulty securing long-term employment in Greensboro, eventually working as a porter and laborer. He died on November 7, 1990, in Greensboro at age 49, and was the first of the Greensboro Four to pass away.",
+          "primary_source": {
+            "citation": "Wolff, Miles. Lunch at the 5 & 10. Chicago: Ivan R. Dee, 1990.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "ezell_blair_jr",
+          "name": "Ezell Blair Jr. (later Jibreel Khazan)",
+          "outcome": "survived",
+          "historical_record": "Ezell Blair Jr. later changed his name to Jibreel Khazan. He graduated from A&T and earned a master's degree from UMass Dartmouth. He became a social worker in New Bedford, Massachusetts. He was one of the four students honored when the Greensboro Woolworth's lunch counter stools were donated to the Smithsonian Institution's National Museum of American History in 1993.",
+          "primary_source": {
+            "citation": "Chafe, William H. Civilities and Civil Rights: Greensboro, North Carolina, and the Black Struggle for Freedom. New York: Oxford University Press, 1980.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "franklin_mccain",
+          "name": "Franklin McCain",
+          "outcome": "died",
+          "historical_record": "Franklin McCain graduated from A&T, earned a chemistry degree, and built a career in the chemical industry with Celanese Corporation in Charlotte, North Carolina. He remained a prominent civil rights figure and public speaker for decades. He served on the Greensboro City Council. McCain died on January 10, 2014, in Greensboro, North Carolina, at age 73.",
+          "primary_source": {
+            "citation": "Associated Press obituary, January 10, 2014; Chafe, William H. Civilities and Civil Rights. New York: Oxford University Press, 1980.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "joseph_mcneil",
+          "name": "Joseph McNeil",
+          "outcome": "survived",
+          "historical_record": "Joseph McNeil graduated from A&T, served in the United States Air Force, and retired as a major general — the highest military rank achieved by any of the four. He pursued a career in finance after his military service. He was among the four honored at the Smithsonian donation ceremony in 1993.",
+          "primary_source": {
+            "citation": "Chafe, William H. Civilities and Civil Rights. New York: Oxford University Press, 1980; U.S. Air Force biographical records.",
+            "url": null,
+            "access_note": null
+          }
+        },
+        {
+          "character_id": "harris_mackintosh",
+          "name": "Harris Mackintosh",
+          "outcome": "unknown",
+          "historical_record": "The store manager present on February 1, 1960, at the Greensboro Woolworth's is identified in some accounts as C.L. Harris. The specific individual's subsequent career and fate are not documented in available primary or secondary historical sources. The name Harris Mackintosh as used in this scenario is a composite or fictionalized rendering; no primary source confirms this individual's identity or later history.",
+          "primary_source": null
+        },
+        {
+          "character_id": "james_caldwell",
+          "name": "James Caldwell",
+          "outcome": "unknown",
+          "historical_record": "The Carolina Peacemaker, Greensboro's Black-owned weekly newspaper, did cover the sit-in movement. The specific reporter present on February 1, 1960, and their subsequent career are not individually documented in available primary historical sources. The name James Caldwell as used in this scenario cannot be confirmed against the historical record.",
+          "primary_source": null
+        },
+        {
+          "character_id": "patsy_howell",
+          "name": "Patsy Howell",
+          "outcome": "unknown",
+          "historical_record": "Individual counter assistants working at the Greensboro Woolworth's on February 1, 1960, are not named in available primary or secondary historical sources. The name Patsy Howell as used in this scenario cannot be confirmed against the historical record. Accounts note that the waitress on duty declined to serve the students and that the counter was eventually closed, but individual staff members are not identified by name in documented sources.",
+          "primary_source": null
+        },
+        {
+          "character_id": "ruth_carver",
+          "name": "Ruth Carver",
+          "outcome": "unknown",
+          "historical_record": "Individual white patrons present in the Greensboro Woolworth's on February 1, 1960, are not identified by name in available primary or secondary historical sources. The name Ruth Carver as used in this scenario cannot be confirmed against the historical record.",
+          "primary_source": null
+        },
+        {
+          "character_id": "sergeant_dale_pruitt",
+          "name": "Sergeant Dale Pruitt",
+          "outcome": "unknown",
+          "historical_record": "Accounts of the February 1, 1960, sit-in note that a police officer was present in the store and observed the situation without making arrests. The Greensboro Police Department did not intervene to remove the students on that day. The specific officer's name, rank, and subsequent career are not documented in available primary historical sources. The name Sergeant Dale Pruitt as used in this scenario cannot be confirmed against the historical record.",
+          "primary_source": null
+        }
+      ],
+      "immediate_outcome": {
+        "summary": "On February 1, 1960, the four A&T students — Ezell Blair Jr., Franklin McCain, Joseph McNeil, and David Richmond — occupied seats at the segregated lunch counter at F.W. Woolworth's in Greensboro, North Carolina, requested service, were refused, and remained seated until the store closed at approximately 5:30 p.m. without being arrested or physically removed. The store management closed the lunch counter rather than serve them or forcibly eject them. The protest was reported in local press that evening and triggered a sustained, expanding sit-in movement at the same location beginning the following day.",
+        "key_facts": [
+          "Date of sit-in: February 1, 1960",
+          "Location: F.W. Woolworth Co., 132 South Elm Street, Greensboro, North Carolina",
+          "Four students occupied the lunch counter: Ezell Blair Jr., Franklin McCain, Joseph McNeil, David Richmond",
+          "All four were freshmen at North Carolina Agricultural and Technical College (A&T)",
+          "The students were refused service but were not arrested and were not physically removed",
+          "The store closed the lunch counter and the students departed when the store closed",
+          "By February 2, 1960, the number of sit-in participants had grown to approximately 27 students",
+          "By February 5, 1960, approximately 300 students were participating in the Greensboro sit-ins",
+          "The Greensboro Woolworth's lunch counter was desegregated on July 25, 1960"
+        ]
+      },
+      "historical_frame": [
+        "Within two months of the February 1, 1960, Greensboro sit-in, similar sit-in protests had spread to more than 50 cities across the American South.",
+        "The Student Nonviolent Coordinating Committee (SNCC) was founded on April 15–17, 1960, at Shaw University in Raleigh, North Carolina, directly inspired by the wave of sit-in protests that began in Greensboro.",
+        "Four stools from the Greensboro Woolworth's lunch counter were acquired by the Smithsonian Institution's National Museum of American History in 1993 and are held in the museum's collection; the International Civil Rights Center and Museum opened at the original Woolworth's building in Greensboro in 2010."
+      ],
+      "open_threads": [
+        {
+          "thread_id": "ezell_speaks_the",
+          "historical_record": "The precise words spoken by Ezell Blair Jr. when requesting service on February 1, 1960, are not preserved verbatim in any contemporaneous transcript or recording. Accounts of the exchange differ in minor particulars across memoirs and oral histories collected in subsequent decades. Blair himself gave varying recollections in different interviews. No stenographic or audio record of the initial exchange exists in documented archives."
+        },
+        {
+          "thread_id": "the_floor_walker",
+          "historical_record": "The internal movements and observations of Woolworth's store staff during the February 1 sit-in are not documented in any surviving company record available to historians. F.W. Woolworth Co. internal communications from this period have not been made comprehensively available. The specific actions of floor staff during the ninety-minute occupation are reconstructed from participant memory rather than contemporaneous documentation."
+        },
+        {
+          "thread_id": "the_white_woman",
+          "historical_record": "Accounts of the February 1 sit-in note that white patrons were present in the store and observed the students at the counter. The reactions of individual white patrons on that first day are not documented in contemporaneous sources. Later accounts, including those collected by historian William Chafe, describe the general atmosphere but do not identify or quote specific white civilian witnesses from February 1, 1960."
+        },
+        {
+          "thread_id": "store_manager_harris",
+          "historical_record": "The identity of the store manager who interacted with the students on February 1, 1960, is imprecisely documented. Some secondary sources refer to a manager with the surname Harris. The content of any direct exchange between store management and the students on that day is not preserved in a contemporaneous written record. The manager's decision not to call police to forcibly remove the students has been noted by historians but the reasoning behind that decision is not documented in surviving primary sources."
+        },
+        {
+          "thread_id": "a_second_waitress",
+          "historical_record": "Accounts confirm that the lunch counter was closed by staff during the sit-in on February 1, 1960, rather than service being extended to the students. The specific mechanism by which the counter was closed — including any signage placed — and the precise sequence of staff actions are not documented in contemporaneous records. Participant accounts collected in later oral histories describe the counter being shut down but differ on procedural details."
+        },
+        {
+          "thread_id": "the_woman_behind",
+          "historical_record": "Whether any white patron on February 1, 1960, threatened to call police or actually contacted police is not established in available primary sources. Greensboro Police Department records from that date have not been comprehensively published. Accounts note a police officer was present in the store but the circumstances of his arrival — whether summoned or coincidental — are not definitively established in the historical record."
+        },
+        {
+          "thread_id": "joseph_mcneil_identifies",
+          "historical_record": "The internal communications among the four students during the sit-in on February 1, 1960, are not documented in contemporaneous records. Oral histories collected from the participants in subsequent years describe the general discipline and preparation of the group but do not provide a minute-by-minute account of communications between the students during the occupation."
+        },
+        {
+          "thread_id": "franklin_mccains_physical",
+          "historical_record": "Whether any verbal provocation was directed at the students by white male patrons on February 1, 1960, is not established in contemporaneous documentation. Participant accounts describe the atmosphere as tense but note that the first day was relatively free of the overt hostility that developed in subsequent days of the sit-in. More aggressive confrontations from white bystanders are documented in accounts of later days of the Greensboro sit-ins, particularly after the protest expanded."
+        },
+        {
+          "thread_id": "an_offduty_greensboro",
+          "historical_record": "Accounts of the February 1 sit-in confirm that at least one police officer was present in the Woolworth's store and observed the situation. The officer did not make arrests. Whether the officer was on duty or off duty, the precise circumstances of his presence, and any communications he may have had with store management or his department on that day are not established in available primary sources. The Greensboro Police Department's posture of non-intervention on February 1 is documented but the internal decision-making behind it is not."
+        },
+        {
+          "thread_id": "a_young_white",
+          "historical_record": "An account exists, cited in multiple secondary sources including Chafe's Civilities and Civil Rights, that an elderly white woman approached the students and expressed support, telling them she was proud of them and that they should have done this years ago. The actions of individual white Woolworth's employees toward the students on February 1 are not documented in contemporaneous records. Whether any counter staff made gestures of sympathy or solidarity toward the students on that first day is not established in primary sources."
+        }
+      ],
+      "choice_echoes": [
+        {
+          "beat_id": "ezell_speaks_the",
+          "historical_record": "Ezell Blair Jr. (later Jibreel Khazan) did request service at the lunch counter on February 1, 1960. The waitress on duty declined to serve him, reportedly stating that the counter did not serve Black customers. The students had purchased items elsewhere in the store before sitting down, retaining their receipts, which established their status as paying customers of the establishment. The students remained seated after being refused service."
+        },
+        {
+          "beat_id": "the_floor_walker",
+          "historical_record": "The four students came prepared with textbooks and schoolwork, which they used while seated at the counter. This detail is confirmed in participant accounts and noted in secondary historical literature as a deliberate element of their preparation, projecting purposefulness and academic respectability. The students had been coached in nonviolent discipline before the sit-in."
+        },
+        {
+          "beat_id": "the_white_woman",
+          "historical_record": "White patrons were present in the Woolworth's store on February 1, 1960. Secondary accounts, including Chafe's Civilities and Civil Rights, record that at least one elderly white woman expressed verbal support for the students during the sit-in, though accounts differ on the precise timing and day. The general atmosphere among white civilian witnesses on the first day is described in secondary sources as more surprised than overtly hostile, with organized hostility developing more prominently in subsequent days."
+        },
+        {
+          "beat_id": "store_manager_harris",
+          "historical_record": "Store management at the Greensboro Woolworth's did not call police to forcibly remove the students on February 1, 1960, and did not serve them. Management's decision to close the counter rather than escalate is documented in secondary historical accounts. The students were not arrested on February 1. The store manager reportedly consulted with the Woolworth's corporate structure; the precise content of those communications is not preserved in publicly available records."
+        },
+        {
+          "beat_id": "a_second_waitress",
+          "historical_record": "The lunch counter was closed by Woolworth's staff during the sit-in on February 1, 1960. The students remained at the counter after it was closed and departed when the store itself closed. Participant accounts confirm the students did not leave their seats in response to staff actions short of the store closing. The students had agreed in advance on protocols for maintaining their positions."
+        },
+        {
+          "beat_id": "the_woman_behind",
+          "historical_record": "No arrest was made at the Greensboro Woolworth's on February 1, 1960. The Greensboro Police Department did not remove the students by force on that day. A police officer present in the store observed the situation without intervening. The students departed voluntarily when the store closed."
+        },
+        {
+          "beat_id": "joseph_mcneil_identifies",
+          "historical_record": "The four students maintained disciplined, quiet conduct throughout the February 1 sit-in. Participant accounts describe the group as having prepared carefully for the sit-in, including discussing how to respond to various scenarios. Joseph McNeil, Franklin McCain, Ezell Blair Jr., and David Richmond had discussed the action the previous evening in their dormitory at A&T. The group's discipline on February 1 is consistently noted in historical accounts as a defining characteristic of the first day."
+        },
+        {
+          "beat_id": "franklin_mccains_physical",
+          "historical_record": "The four students were not physically attacked on February 1, 1960. Physical confrontations and more aggressive harassment from white bystanders are documented in accounts of later days of the Greensboro sit-ins. Franklin McCain later described in oral history interviews the fear he experienced while seated at the counter and the discipline required to remain still. The nonviolent discipline held on February 1 without physical incident."
+        },
+        {
+          "beat_id": "an_offduty_greensboro",
+          "historical_record": "A Greensboro police officer was present in the Woolworth's store on February 1, 1960, and observed the sit-in. The officer did not arrest the students or physically remove them. Store manager C.L. Harris requested police monitoring but Chief of Police Paul B. Calhoun maintained strict departmental instructions to avoid arrests as long as the students remained nonviolent and did not cause a physical breach of the peace. The four students sat at the counter until the store closed at its regular time of 5:30 PM without legal citations being issued."
+        },
+        {
+          "beat_id": "a_young_white",
+          "historical_record": "At least one white woman expressed verbal support for the students during the Greensboro sit-ins, as documented in secondary accounts including Chafe's Civilities and Civil Rights. The actions of individual white Woolworth's employees are not documented in contemporaneous primary sources. The sit-in on February 1 concluded without arrest, without physical violence, and was reported in the press. The Greensboro Daily News and Greensboro Record covered the protest, and the story appeared in wire service reports, contributing to the rapid spread of the sit-in tactic to other cities."
+        }
+      ]
+    },
+    "review_checklist": {
+      "beat_count": {
+        "checked": false,
+        "notes": ""
+      },
+      "sequence_check": {
+        "checked": false,
+        "notes": ""
+      },
+      "path_independence": {
+        "checked": false,
+        "notes": ""
+      },
+      "final_beat_spec": {
+        "checked": false,
+        "notes": ""
+      },
+      "tense_attribution": {
+        "checked": false,
+        "notes": ""
+      },
+      "reviewer_summary": {
+        "checked": false,
+        "notes": ""
+      },
+      "manual_playthrough": {
+        "checked": false,
+        "notes": ""
+      }
+    }
+  }
+}

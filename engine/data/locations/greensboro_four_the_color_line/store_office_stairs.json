@@ -1,0 +1,19 @@
+{
+  "id": "store_office_stairs",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "Office Stairwell and Wall Telephone",
+  "description": "A narrow half-flight of stairs ascending to the mezzanine management office, with a black wall-mounted telephone handset on a bracket at the landing — the nerve center of Mackintosh's communication with police and corporate headquarters.",
+  "mood": "administrative, anxious, surveillant",
+  "linkedCharacterIds": [
+    "harris_mackintosh"
+  ],
+  "atmosphericDetails": [
+    "The faint sound of Mackintosh's voice through the office door — controlled, low, the word 'headquarters' audible once",
+    "The smell of cigarette smoke from the ashtray on the landing — someone has been up here recently and recently left",
+    "The telephone handset still slightly warm from the last call"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.362Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

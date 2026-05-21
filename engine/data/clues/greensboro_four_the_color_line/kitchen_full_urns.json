@@ -1,0 +1,18 @@
+{
+  "id": "kitchen_full_urns",
+  "scenarioId": "greensboro_four_the_color_line",
+  "title": "The Full Coffee Urns",
+  "description": "Through the pass-through window, the two stainless steel coffee urns behind the counter are visibly full — the indicator windows dark with liquid, the burner lights active. The grill surface is clean and hot. The supply line is intact. There is no mechanical, logistical, or inventory reason that service cannot be provided to the students at the counter. The refusal is not a matter of capacity. It is a matter of choice.",
+  "category": "observation",
+  "discoveryLocationId": "counter_kitchen_passthrough",
+  "implicatesCharacterIds": [
+    "harris_mackintosh",
+    "patsy_howell"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.368Z",
+  "locationId": "",
+  "isRedHerring": false
+}

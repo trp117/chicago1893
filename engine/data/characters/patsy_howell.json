@@ -1,0 +1,34 @@
+{
+  "id": "patsy_howell",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
+  ],
+  "name": "Patsy Howell",
+  "role": "Counter assistant, F.W. Woolworth Co., Greensboro",
+  "publicFace": "A young white woman of about twenty in the pale-blue Woolworth's uniform, who moves behind the counter with the practiced efficiency of someone who has been doing this job since high school",
+  "privateGoal": "She wants to keep her job, but she is also the person who placed the napkin in front of one of the students — an act she has not yet decided how to explain",
+  "fear": "That Mackintosh saw what she did and is deciding right now whether to fire her",
+  "knowledge": [
+    "She knows the coffee urns are full and the grill is operational — there is no mechanical reason service cannot be provided",
+    "She has heard Mackintosh's telephone conversations through the office door and knows he has not yet called the police directly"
+  ],
+  "voice": "Quick, slightly breathless, the voice of someone managing multiple demands simultaneously and trying not to let any of them show on her face",
+  "trustLogic": "She responds to anyone who makes her feel that her small act of decency has been noticed and will not be weaponized against her; she shuts down if she feels she is being asked to go further than she has already gone",
+  "secrets": [
+    "She placed the napkin deliberately, not accidentally — it was a conscious act she made in the three seconds Mackintosh had his back turned",
+    "She is engaged to a man who works at the Cone Mills plant and has told him nothing about what happened today"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Keeps moving, keeps performing side work, avoids eye contact with both the students and Mackintosh",
+    "heavyPressure": "Says quietly that she was just doing her job and that she did not mean anything by it",
+    "breakingPoint": "She will not directly contradict Mackintosh's account of events in front of him",
+    "fleeCondition": "If Mackintosh calls her name from the office stairs",
+    "fleeStyle": "Moves immediately to the back kitchen area and does not re-emerge until the floor walker retrieves her",
+    "chaseStyle": "Keeps her head down and does not respond",
+    "capturedBehavior": "Says she cannot talk right now and that she has tables to clear",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.358Z",
+  "description": ""
+}

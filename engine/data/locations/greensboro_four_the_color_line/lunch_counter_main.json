@@ -1,0 +1,23 @@
+{
+  "id": "lunch_counter_main",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "The Lunch Counter — Long Arm",
+  "description": "The long horizontal section of the L-shaped counter, fourteen fixed stools on chrome posts bolted to the black-and-white checkerboard tile floor, the laminate surface wiped to a cold shine under fluorescent light. This is where Ezell, Franklin, and Joseph are seated — the section most visible from the store's main aisle.",
+  "mood": "tense, exposed, historically charged, fluorescent-bright",
+  "linkedCharacterIds": [
+    "harris_mackintosh",
+    "patsy_howell",
+    "ruth_carver"
+  ],
+  "atmosphericDetails": [
+    "The smell of hot coffee from the urns behind the backbar — present, roasted, inaccessible",
+    "The sound of the grill ticking as it cools in the kitchen area behind the pass-through window",
+    "The chrome edge of the stool casing pressing cold through clothing — a physical fact that anchors every second of sitting here",
+    "The mirrored backbar reflecting the entire store behind the students — a surveillance surface that works in both directions",
+    "The bare laminate in front of each occupied stool where a cover should be but is not"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.364Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

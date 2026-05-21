@@ -1,0 +1,49 @@
+{
+  "id": "communications_conduit_joseph",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "The Communications Conduit — Joseph McNeil",
+  "description": "You are the one watching the room — in the glass cases, in the mirror, in the peripheral movement of people who think they are not being observed. You know more about what is happening in this store right now than anyone else at the counter.",
+  "startLocationId": "lunch_counter_main",
+  "startingKnowledge": [
+    "You saw the store supervisor pick up the wall telephone at 4:28 PM — before the students even sat down — which means someone tipped off management that this was coming",
+    "You have been tracking the crowd formation in the glass display cases across the aisle and have counted seven onlookers in the last four minutes, up from two",
+    "You know that the man near the candy display has been there since before the students arrived and has not picked up a single item — he is not a customer"
+  ],
+  "accessLevel": "staff",
+  "perspective": "First person present tense, observational and strategic — the narrative should register the intelligence-gathering quality of this character's attention, the way he processes the room as a system of signals rather than a collection of individuals",
+  "briefing": "You are seated at the lunch counter watching the store in the curved reflection of the glass candy display cases across the aisle, and what you see there is a room that is reorganizing itself around what has just happened — people who were shopping are no longer shopping, people who were moving have slowed or stopped, and the floor walker's route has become a tighter orbit around the four occupied stools. You saw the supervisor on the wall telephone at 4:28 PM, which is one minute before you sat down, and that fact has been sitting in your chest since then like a stone, because it means the information got out before you arrived and someone in the management chain was already preparing a response. The man near the candy display has not touched a single item in eleven minutes. You know what a reporter looks like when he is trying not to look like a reporter. The coffee urns are steaming behind the backbar and the smell of it is specific and present and the money to pay for it is in your pocket and the law says you cannot have it and you are not going to move. David is to your right, at the corner, and you can hear his breathing from here — it is controlled but it is costing him — and the question of whether to pass him a quiet word, a lateral reassurance that costs nothing and holds the line, or to remain in the absolute silence that the discipline requires and trust that he will hold without it, is the decision that is yours alone right now.",
+  "character_hooks": [
+    "I am the one who told the Carolina Peacemaker that today was the day, and I have not told Ezell or Franklin, and I can see the reporter from here.",
+    "I have been on this bus route every day for three months and I know the schedule of every Greensboro Police Department patrol car that passes this block, and none of them are due for forty minutes.",
+    "I wrote a letter last night that I addressed to my parents and left on my dormitory desk, and I told myself it was just in case, and I have been thinking about it since I sat down."
+  ],
+  "suggested_secret": "Joseph recognized the store supervisor's voice on the telephone — it was the same voice he heard at the A&T administrative office last week, asking questions about student organizing activity on campus.",
+  "opening": {
+    "narrative": "It is 4:33 PM, and you are seated at the Woolworth's lunch counter, watching the store in the glass of the candy display cases, and the room is a system of moving parts that you are tracking with the full attention of someone who has been preparing for this for weeks. Ezell has spoken. The waitress has gone. The supervisor was on the telephone before you sat down. The reporter is at the candy case. David's breathing is audible from your right. The discipline requires silence. The discipline also requires that the line hold.",
+    "npcMoments": [],
+    "choices": [
+      "Pass a quiet coded reassurance to David — a single low word, a lateral signal that you are here and the line is holding — accepting the risk that the floor walker will interpret it as incitement",
+      "Remain in absolute, unmoving silence — trust the discipline, trust David, offer nothing to the floor walkers that can be used against the protest",
+      "Shift your gaze deliberately to the candy display cases — make it clear to the reporter that you have seen him, that you know he is there, without breaking your seated position or speaking"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "bus transfer ticket, dated today — the same route that refused him service last month",
+      "small spiral notepad with the non-violent conduct rules written in the back cover",
+      "exact change for a cup of coffee — thirty-five cents — in his right coat pocket"
+    ],
+    "flags": {
+      "supervisor_telephone_observed": true,
+      "reporter_identified": true,
+      "word_passed_to_david": false
+    },
+    "suspicion": {
+      "harris_mackintosh": 20,
+      "sergeant_dale_pruitt": 15,
+      "james_caldwell": 5
+    }
+  },
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.371Z"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "patsy_napkin_gesture",
+  "scenarioId": "greensboro_four_the_color_line",
+  "title": "The Napkin",
+  "description": "One of the students notices that a paper napkin has appeared near the occupied stools, though whether it was placed intentionally or accidentally is unclear — not by the student sitting there, and not by accident. The fold is precise, the placement deliberate. It is not a cover. It is not service. But it is an acknowledgment, made by someone behind the counter, that a person is sitting here and that person's presence has been registered.",
+  "category": "physical",
+  "discoveryLocationId": "lunch_counter_main",
+  "implicatesCharacterIds": [
+    "patsy_howell"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.370Z",
+  "locationId": "",
+  "isRedHerring": false
+}

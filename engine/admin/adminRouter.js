@@ -869,40 +869,60 @@ export function createAdminRouter(repos, config = {}) {
     const genTrace = langfuse?.trace({ name: 'story-generate', input: { playTimeMinutes, tokenBudget: toks } });
     const genSpan  = genTrace?.generation({ name: 'generate', model: 'claude-sonnet-4-6', modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
 
-    const timeoutMs = Math.max(600_000, toks * 30);  // streaming: per-chunk timeout with headroom
+    // streaming is required by the SDK for long requests; timeout covers time-to-first-chunk
+    const timeoutMs = 120_000;
     let text = '';
-    try {
-      const stream = getAnthropicClient(anthropicApiKey).messages.stream(
-        { model: 'claude-sonnet-4-6', max_tokens: toks, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
-        { timeout: timeoutMs, maxRetries: 0 }
-      );
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const stream = getAnthropicClient(anthropicApiKey).messages.stream(
+          { model: 'claude-sonnet-4-6', max_tokens: toks, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+          { timeout: timeoutMs, maxRetries: 0 }
+        );
 
-      for await (const chunk of stream) {
-        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-          text += chunk.delta.text;
+        text = '';
+        for await (const chunk of stream) {
+          if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+            text += chunk.delta.text;
+          }
         }
-      }
 
-      const finalMsg = await stream.finalMessage();
-      genSpan?.end({ output: `${text.length} chars`, usage: { input: finalMsg.usage?.input_tokens, output: finalMsg.usage?.output_tokens }, metadata: { stop_reason: finalMsg.stop_reason } });
-      console.log(`[GENERATE] stream complete stop_reason=${finalMsg.stop_reason} chars=${text.length} input_tokens=${finalMsg.usage?.input_tokens} output_tokens=${finalMsg.usage?.output_tokens}`);
+        const finalMsg = await stream.finalMessage();
+        genSpan?.end({ output: `${text.length} chars`, usage: { input: finalMsg.usage?.input_tokens, output: finalMsg.usage?.output_tokens }, metadata: { stop_reason: finalMsg.stop_reason } });
+        console.log(`[GENERATE] stream complete stop_reason=${finalMsg.stop_reason} chars=${text.length} input_tokens=${finalMsg.usage?.input_tokens} output_tokens=${finalMsg.usage?.output_tokens}`);
 
-      if (finalMsg.stop_reason === 'max_tokens') {
-        console.error(`[GENERATE ERROR] Truncated at max_tokens — ${text.length} chars, budget was ${toks}`);
-        genTrace?.update({ tags: ['truncated'] });
-        return res.status(500).json({ error: 'Scenario generation failed — response truncated.', lastChars: text.slice(-500) });
-      }
+        if (finalMsg.stop_reason === 'max_tokens') {
+          console.error(`[GENERATE ERROR] Truncated at max_tokens — ${text.length} chars, budget was ${toks}`);
+          genTrace?.update({ tags: ['truncated'] });
+          return res.status(500).json({ error: 'Scenario generation failed — response truncated.', lastChars: text.slice(-500) });
+        }
 
-      if (!text) {
-        genTrace?.update({ tags: ['no-text'] });
-        return res.status(500).json({ error: 'No response from Claude.' });
+        if (!text) {
+          genTrace?.update({ tags: ['no-text'] });
+          return res.status(500).json({ error: 'No response from Claude.' });
+        }
+
+        lastErr = null;
+        break; // success
+      } catch (err) {
+        lastErr = err;
+        const isTransient = err?.message === 'terminated' || err?.cause?.message === 'terminated' || err?.code === 'ECONNRESET';
+        console.error(`[GENERATE ERROR] attempt=${attempt} name=${err?.name} status=${err?.status} code=${err?.code} message=${err.message}`);
+        if (err?.cause) console.error(`[GENERATE ERROR] cause:`, err.cause);
+        if (isTransient && attempt < 3) {
+          console.log(`[GENERATE] retrying after transient error (attempt ${attempt}/3)...`);
+          await new Promise(r => setTimeout(r, 2000 * attempt));
+          continue;
+        }
+        const isTimeout = err?.status === 408 || err?.code === 'ETIMEDOUT' || err?.message?.toLowerCase().includes('timeout') || err?.name === 'APITimeoutError';
+        genSpan?.end({ metadata: { error: isTimeout ? 'timeout' : err.message } });
+        genTrace?.update({ tags: [isTimeout ? 'timeout' : 'error'] });
+        return res.status(500).json({ error: isTimeout ? 'Generation timed out — try a shorter play time.' : err.message });
       }
-    } catch (err) {
-      const isTimeout = err?.status === 408 || err?.code === 'ETIMEDOUT' || err?.message?.toLowerCase().includes('timeout') || err?.name === 'APITimeoutError';
-      genSpan?.end({ metadata: { error: isTimeout ? 'timeout' : err.message } });
-      genTrace?.update({ tags: [isTimeout ? 'timeout' : 'error'] });
-      console.error(`[GENERATE ERROR] ${isTimeout ? `timeout after ${timeoutMs / 1000}s` : err.message}`);
-      return res.status(500).json({ error: isTimeout ? 'Generation timed out — try a shorter play time.' : err.message });
+    }
+    if (lastErr) {
+      genTrace?.update({ tags: ['error'] });
+      return res.status(500).json({ error: lastErr.message });
     }
 
     const generated = extractAndValidateJson(text);

@@ -1,0 +1,20 @@
+{
+  "id": "candy_counter_display",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "Candy Counter and Display Cases",
+  "description": "The glass-topped candy and novelty display cases running parallel to the lunch counter across the aisle — the reflection surface Joseph McNeil is using to monitor the crowd, and the position from which Caldwell has been observing since 4:15 PM.",
+  "mood": "observational, reflective, covert",
+  "linkedCharacterIds": [
+    "james_caldwell",
+    "ruth_carver"
+  ],
+  "atmosphericDetails": [
+    "The glass case surface reflecting the lunch counter in a slightly curved, fish-eye distortion — every movement at the stools visible from here without turning",
+    "The smell of chocolate and wax paper from the candy display",
+    "Caldwell's notepad open on the glass case surface, his handwriting small and tight"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.360Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

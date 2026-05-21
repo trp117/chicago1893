@@ -1,0 +1,20 @@
+{
+  "id": "white_woman_witness_statement",
+  "scenarioId": "greensboro_four_the_color_line",
+  "title": "Ruth Carver's Unsolicited Observation",
+  "description": "Ruth Carver, standing behind the stools and initially the most vocal civilian presence in the store, pauses her conversation with her companion and says — not to anyone in particular, her voice dropping to something almost private — 'They haven't done a single thing wrong.' She does not repeat it. She does not look at the students when she says it. But Caldwell's pencil moves. This is an unsolicited, on-the-record observation from a white civilian witness that the students' conduct has been unimpeachable — the single most useful piece of testimony the protest could generate.",
+  "category": "testimony",
+  "discoveryLocationId": "lunch_counter_corner",
+  "implicatesCharacterIds": [
+    "ruth_carver",
+    "james_caldwell"
+  ],
+  "unlocks": [
+    "caldwell_wire_note"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.367Z",
+  "locationId": "",
+  "isRedHerring": false
+}

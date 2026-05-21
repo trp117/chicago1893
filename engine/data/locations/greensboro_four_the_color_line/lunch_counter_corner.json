@@ -1,0 +1,20 @@
+{
+  "id": "lunch_counter_corner",
+  "scenarioId": "greensboro_four_the_color_line",
+  "name": "The Lunch Counter — Corner and Short Arm",
+  "description": "The L-bend and its four short-arm stools, where David Richmond sits at the terminal stool nearest the store's south wall — the position most isolated from the others and most exposed to the crowd assembling in the adjacent candy-counter aisle.",
+  "mood": "isolated, pressured, watched",
+  "linkedCharacterIds": [
+    "david_richmond",
+    "ruth_carver"
+  ],
+  "atmosphericDetails": [
+    "The wall at David's left shoulder — close enough to feel the faint warmth of the steam pipe running behind it",
+    "The sound of Ruth Carver's shopping bag handle creaking as she shifts her weight behind the stool",
+    "The 'Counter Closed' placard placed face-down on the short-arm section by a floor walker who has not yet decided whether to stand it upright"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-21T19:48:07.364Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}
