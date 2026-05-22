@@ -10,7 +10,7 @@
     "A French army liaison officer was seen inspecting the forward communication trench line during the late watch."
   ],
   "accessLevel": "investigator",
-  "perspective": "first-person sensory",
+  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from ground level — physical, sensory, immediate. What the body registers before the mind names it.",
   "briefing": "You are standing on the fire-step of the jump-off trench with your left hand on the cold, gritty sandbag at the top of the parapet and your right hand on the receiver of your Springfield, and the barrage sounds like the sky is being torn in half. The men on either side of you have stopped checking their equipment; they are just waiting. You have been a runner and a squad leader long enough to know when something is wrong with a barrage, and something is wrong with this one—on the eastern side, the shell impacts are lifting too fast, leaving a corridor of unworked ground between the smoke curtain and the village edge that should not be there. You mentioned it to Sergeant Voss four minutes ago and he went quiet in a way that meant he had already noticed. The whistle is in your breast pocket, and in approximately ninety seconds, someone will blow it.",
   "character_hooks": [
     "The visual gap in the rolling smoke curtain as the shell line lifts prematurely from the eastern approach.",

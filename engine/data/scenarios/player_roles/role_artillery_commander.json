@@ -10,7 +10,7 @@
     "Barrage_Sync initializes at 75 and drops rapidly if the batteries continue tracking the falsified timing tables."
   ],
   "accessLevel": "admin",
-  "perspective": "third-person analytical",
+  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from the perspective of a man who processes the battle through mathematics and map coordinates — distances, trajectories, timing. The analytical register stays. The third person does not.",
   "briefing": "You are standing at the map table in the reinforced earth dugout, twelve feet below the surface of Picardy, with a fragment of printed fire table in your left hand and the master copy in your right, and the two documents do not agree. The barrage opened four minutes ago—you can feel it in the log beams above your head, a continuous low tremor like a train that never passes—and it opened on the schedule in your right hand, the one you signed at 23:00 last night, the one you locked in the steel-banded case. The fragment in your left hand came in with a runner from the wire party at 05:56: a torn page found in the mud near the forward staging area, and it shows barrage lifts advancing 200 meters ahead of your eastern-sector schedule. Either someone has a copy of your tables that does not exist, or someone has been inside your locked case. You know who had access, you know the timeline, and men are walking behind that curtain of steel right now, trusting you to know the answer.",
   "character_hooks": [
     "The sudden loss of synchronization on the eastern sector as battery salvos begin walking out of alignment.",
