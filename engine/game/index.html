@@ -177,6 +177,8 @@ li { margin-bottom: 8px; }
 .role-card { display: flex; flex-direction: column; gap: 5px; text-align: left; width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel); color: var(--text); cursor: pointer; font-family: Georgia, serif; font-weight: normal; transition: border-color 0.15s, background 0.15s; }
 .role-card:hover { border-color: var(--accent); background: var(--panel-soft); }
 .role-card.selected { border-color: var(--accent); background: rgba(208,176,106,0.08); }
+.role-setup-text { width: 100%; margin: 4px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.role-setup-text p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.7; }
 .role-card-name { font-weight: bold; font-size: 0.95rem; color: var(--accent); }
 .role-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
 .role-instruction { margin: 10px 0 4px; font-size: 0.8rem; color: var(--muted); text-align: center; }
@@ -478,6 +480,7 @@ li { margin-bottom: 8px; }
     <a href="/" class="back-link overlay-back-link">&#8592; Stories</a>
     <h2 id="overlay-title">Investigation</h2>
     <p class="role-intro" id="overlay-tagline"></p>
+    <div class="role-setup-text" id="overlay-desc"></div>
     <p class="role-instruction">Select your role to begin.</p>
     <div class="role-cards" id="role-cards"></div>
     <div class="style-selector">
