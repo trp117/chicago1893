@@ -1,0 +1,20 @@
+{
+  "id": "loc_lower_office",
+  "scenarioId": "artesian_height_1892",
+  "name": "The Tower Lower Office and Calaboose",
+  "description": "The ground-floor interior of the tower, divided between a white oak desk and filing area for the Night Marshal's municipal duties and the iron-barred jail cell occupying the rear third of the space.",
+  "mood": "official, eerie, watchful",
+  "linkedCharacterIds": [
+    "char_wickerson",
+    "char_alderman_voss"
+  ],
+  "atmosphericDetails": [
+    "The scent of new white oak and wet mortar mingles with the faint mineral smell of the rising water in the bore — a combination that belongs to no other place on earth.",
+    "The iron cell bars cast long parallel shadows across the flagstone floor when the desk lamp is lit.",
+    "The strongbox beneath the desk is closed but not locked — its hasp is bent slightly, as if it was opened in a hurry and the lock was not properly re-engaged."
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.853Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

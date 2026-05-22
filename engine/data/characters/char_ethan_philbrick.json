@@ -1,0 +1,38 @@
+{
+  "id": "char_ethan_philbrick",
+  "scenarioIds": [
+    "artesian_height_1892"
+  ],
+  "name": "Ethan Philbrick",
+  "role": "Local Engineer, Village Infrastructure Liaison",
+  "publicFace": "A younger man — thirty-one — who served as the village's on-site representative during construction and has been the daily point of contact between the Williams firm and the board. Competent, earnest, and visibly exhausted.",
+  "privateGoal": "To get the project certified and finished so he can move on to the next commission — he has been offered a position with a Joliet waterworks firm and has already accepted it privately.",
+  "fear": "That the project's failure will be attributed to his liaison work and will follow him to the new position before he can establish himself there.",
+  "knowledge": [
+    "He is the one who noticed that the spoil-sample logbook was missing pages — he flagged it to no one because he assumed it was a clerical error.",
+    "He has a complete copy of the daily bore log in his own field notebook, including the original Well_Drill_Torque baseline reading of 41.",
+    "He knows that Silas Greer was hired three weeks ago through Voss's recommendation rather than through the regular crew agency — he thought nothing of it at the time."
+  ],
+  "voice": "Quick, slightly over-explanatory — the voice of someone who has spent two years justifying technical decisions to non-technical board members and has developed the habit of pre-empting objections.",
+  "trustLogic": "Opens up readily to anyone who treats him as a fellow professional. Becomes guarded if he senses that his liaison role is being scrutinized rather than the engineering.",
+  "secrets": [
+    "He has already sent his letter of acceptance to the Joliet firm — dated two weeks ago, before the current crisis — and is terrified that Benezette will find out before the project closes.",
+    "He is the one who first noticed the brake collar had been adjusted, but he assumed it was a legitimate equipment correction and logged it without comment."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Immediately produces his field notebook and offers to walk through the relevant entries in detail.",
+    "heavyPressure": "Becomes defensive about the liaison role specifically — insists that his job was coordination, not oversight, and that the engineering decisions were Williams's responsibility.",
+    "breakingPoint": "He will not voluntarily disclose the Joliet position or the acceptance letter. He will produce the bore log copy immediately if asked.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Not applicable — Philbrick is cooperative when approached correctly and does not require capture.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.846Z",
+  "description": "",
+  "character_type": "real",
+  "represents": "",
+  "fact_checked": false
+}

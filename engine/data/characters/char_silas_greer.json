@@ -1,0 +1,38 @@
+{
+  "id": "char_silas_greer",
+  "scenarioIds": [
+    "artesian_height_1892"
+  ],
+  "name": "Silas Greer",
+  "role": "Night Laborer, Construction Site",
+  "publicFace": "A lean, quiet man in his thirties who has been on the crew for three weeks, described by the foreman as a reliable hand with no particular specialty. He is rarely seen speaking to anyone.",
+  "privateGoal": "To collect his five dollars from Voss, stay invisible, and be gone on the morning CBQ freight run before anyone connects him to the tampered equipment.",
+  "fear": "Being put in the calaboose — he has a prior vagrancy record in DuPage County and knows a sworn complaint would mean remand.",
+  "knowledge": [
+    "He tightened the brake collar on the rotary table between midnight and 2 AM using a pipe wrench he returned to the tool crib.",
+    "He left the lower office door unlocked as instructed but did not enter the office himself — he does not know about the torn logbook pages.",
+    "He saw Edgar Williams at the site after midnight, which surprised him because he thought only Voss's people were supposed to be there."
+  ],
+  "voice": "Minimal, careful, always watching the nearest exit — answers in the fewest words that will satisfy the question.",
+  "trustLogic": "Opens up only if convinced that Voss has already implicated him — at that point, he will trade everything he knows for a guarantee that the vagrancy record stays out of the sworn complaint.",
+  "secrets": [
+    "He still has three of the five dollars on him — Voss paid him two dollars up front and owes him three more, which he has not yet collected.",
+    "He recognized Edgar Williams at the site because he had seen him before, at a hardware supply house in Chicago where Voss also had an account."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Says he was checking the equipment as part of his night rounds and that the foreman can confirm his assignment.",
+    "heavyPressure": "Goes completely silent, looks at the ground, and waits — he has been questioned by law enforcement before and knows that talking is the mistake.",
+    "breakingPoint": "He will never name Voss unless he believes Voss has already named him. Then he will give everything.",
+    "fleeCondition": "If the Night Marshal moves to place him under remand without first hearing his offer to trade information.",
+    "fleeStyle": "Runs — directly toward the CBQ freight yard, knowing the terrain and the gaps in the perimeter fence.",
+    "chaseStyle": "Fast, low, uses the debris piles and open trenches as obstacles — he has clearly thought about this route.",
+    "capturedBehavior": "Immediately offers the information about Edgar Williams at the site in exchange for the vagrancy record being kept out of the complaint.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.848Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

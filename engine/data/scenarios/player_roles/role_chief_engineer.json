@@ -1,0 +1,70 @@
+{
+  "id": "role_chief_engineer",
+  "scenarioId": "artesian_height_1892",
+  "name": "The Chief Engineer",
+  "description": "You are Benezette Williams — master civil engineer, designer of the tower, and the man whose survey promised water at depth. The drill is jammed, the numbers are wrong, and someone has been inside your cabinet.",
+  "startLocationId": "loc_drill_platform",
+  "startingKnowledge": [
+    "The original Well_Drill_Torque baseline reading was 41, meaning the current level of 62 represents mechanical interference rather than unmapped geology.",
+    "The true project expenditure to date is exactly $71,340.22, directly contradicting the inflated figures appearing on the falsified cost certificate.",
+    "The St. Peter Sandstone aquifer is believed to lie deeper than the original public estimate submitted to the village board, requiring an extra 80 feet of drilling beyond the original public estimate submitted to the village board."
+  ],
+  "accessLevel": "admin",
+  "perspective": "third-person analytical",
+  "briefing": "You are standing on the high timber drill platform with the torque gauge six inches from your face, and the needle is sitting at 62 in the casting gas-lamp light. You have been watching this number for four hours with the absolute certainty that the baseline measurement has been artificially adjusted. Below you, through the tower's limestone courses, the pump room is cold and the boiler has not reached operating pressure, completely violating the timeline your project staff filed this morning. Your blueprint sheet is pinned to the frame beside the gauge, its graphite lines already blurring in the damp Cook County night air. The village board's bond committee is scheduled to meet within the next several days, and you must leverage your quantitative calculations to expose the fraud before they freeze your entire lifework.",
+  "character_hooks": [
+    "The small weld seam on the gauge face showing where the instrument casing was recently opened and reclosed.",
+    "The deep grey rock dust coating your personal field notebook as the idling rotary table begins to shudder.",
+    "The arrival of Alderman Corey Voss at the perimeter gate carrying a copy of the fraudulent cost certificate."
+  ],
+  "suggested_secret": "You chose to conceal the unmapped shale fault at 1,800 feet from the village board for three weeks, believing the drill string could handle the tension without additional public appropriations.",
+  "opening": {
+    "narrative": "The drill platform is quiet except for the wind and the distant chip of stone chisels from the Block A perimeter. The rotary table has not turned in four hours. The torque gauge needle sits at 62, and the gas lamp throws your shadow long across the limestone face of the tower. Below you, the village is dark except for the CBQ freight lamp two blocks south and the light in the lower office window. Someone has been inside your cabinet tonight. You do not yet know what they took — but you know the cabinet latch was warm when you touched it an hour ago, and you have not been in that room since before dawn.",
+    "npcMoments": [],
+    "choices": [
+      "Examine the brake collar adjustment bolt in direct lantern light for signs of recent tampering.",
+      "Descend to the draughtsmen's cabinet and inventory the bore log binder against your field notes.",
+      "Send word to Ethan Philbrick to meet you on the platform immediately and bring his field notebook."
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "field blueprint (damp, graphite)",
+      "pocket watch",
+      "steel measuring caliper",
+      "personal field notebook with original torque baseline entry"
+    ],
+    "flags": {
+      "knows_baseline_was_altered": true,
+      "has_confronted_edgar": false,
+      "bore_log_inventoried": false
+    },
+    "suspicion": {
+      "char_edgar_williams": 0,
+      "char_alderman_voss": 0,
+      "char_silas_greer": 0
+    }
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.861Z",
+  "context_sentence": "You are Benezette Williams, the civil engineer contracted by the Village of Western Springs to design and oversee construction of a combined waterworks and standpipe tower, whose 1892 artesian well project at a depth exceeding 1,800 feet was intended to secure the village's water independence ahead of Chicago's expanding annexation pressure.",
+  "character_type": "real",
+  "represents": "",
+  "fact_checked": false,
+  "ending_notes": {
+    "partial": {
+      "what_happened": "You successfully clear the rotary table brake collar and reduce Well_Drill_Torque to safe levels, allowing the string to pierce the St. Peter Sandstone aquifer on schedule. However, your fixation on tracking the mechanical baseline delays your financial accounting before the board, leaving the bond manipulation conspiracy unexposed and allowing the outside utility advocates to escape legal censure.",
+      "who_present": "The Plant Engineer",
+      "emotional_weight": "Compromised Professionalism—the hollow satisfaction of hitting a major engineering milestone while your financial architecture remains permanently ruined.",
+      "closing_line": "The artesian water surged into the stone reservoir, but the ledger sheets on your desk remained stained with unanswered questions.",
+      "closing_line_override": ""
+    },
+    "failure": {
+      "what_happened": "You delay adjusting the torque parameters while trying to reconcile the data against the missing log pages. The excessive torsional resistance forces the wrought iron drill string beyond its yield point, fracturing a critical tool joint at 1,800 feet and permanently burying the bit inside the unmapped shale fault.",
+      "who_present": "The Plant Engineer, The Night Marshal",
+      "emotional_weight": "Torsional Fatigue—the numbing shock of watching an entire infrastructure project structurally disintegrate due to an uncorrected mechanical leverage.",
+      "closing_line": "A sharp, metallic crack echoed up the borehole casing, signaling the permanent loss of the well.",
+      "closing_line_override": ""
+    }
+  }
+}

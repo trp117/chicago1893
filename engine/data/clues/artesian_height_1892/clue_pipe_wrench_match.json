@@ -1,0 +1,17 @@
+{
+  "id": "clue_pipe_wrench_match",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Pipe Wrench in the Boiler House",
+  "description": "The pipe wrench left on the boiler house floor has its jaws set to a diameter that matches the brake collar adjustment bolt on the drill platform exactly. The wrench handle carries a smear of the same grey rock dust that coats the drill platform — it was used up there before being brought down here. This is the same tool used to tighten the brake collar and, apparently, to attempt an adjustment on the boiler's steam admission valve.",
+  "category": "physical",
+  "discoveryLocationId": "loc_boiler_house",
+  "implicatesCharacterIds": [
+    "char_silas_greer"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.858Z",
+  "locationId": "",
+  "isRedHerring": false
+}

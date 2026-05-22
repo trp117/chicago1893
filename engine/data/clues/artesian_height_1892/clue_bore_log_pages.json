@@ -1,0 +1,18 @@
+{
+  "id": "clue_bore_log_pages",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Torn Bore Log Pages",
+  "description": "Behind the water closet in the lower office, you find three pages torn from the official bore log — the entries covering the three days during which the shale fault was first identified in the core samples. The handwriting is Ethan Philbrick's, and the entries clearly show that the fault was detected and that the drill program was adjusted accordingly. If these pages had remained in the binder, they would have proved the geological bind was anticipated — and that the current torque reading is not evidence of an engineering failure.",
+  "category": "physical",
+  "discoveryLocationId": "loc_lower_office",
+  "implicatesCharacterIds": [
+    "char_alderman_voss",
+    "char_edgar_williams"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.860Z",
+  "locationId": "",
+  "isRedHerring": false
+}

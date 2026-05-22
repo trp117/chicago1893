@@ -1,0 +1,20 @@
+{
+  "id": "loc_tower_summit",
+  "scenarioId": "artesian_height_1892",
+  "name": "The Tower Summit and Iron Tank Chamber",
+  "description": "The interior upper level of the stone tower, where the iron water tank sits in its limestone housing, the Tank_Hydrostatic_Load gauge mounted on the iron inspection hatch frame — currently reading zero, waiting for the first water.",
+  "mood": "anticipatory, vast, structural",
+  "linkedCharacterIds": [
+    "char_benezette_williams",
+    "char_wickerson"
+  ],
+  "atmosphericDetails": [
+    "The structural iron bands of the tank produce a low, resonant moan as the stone around them settles under the evening temperature drop — a sound that carries down through the entire tower.",
+    "The view from the summit inspection hatch takes in the entire village grid and, to the east, the faint orange glow of Chicago's gas lighting on the horizon.",
+    "The iron tank smells of linseed oil and new metal — it was painted inside three weeks ago and the smell has not fully dissipated."
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.854Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

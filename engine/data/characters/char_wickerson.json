@@ -1,0 +1,38 @@
+{
+  "id": "char_wickerson",
+  "scenarioIds": [
+    "artesian_height_1892"
+  ],
+  "name": "President Aldous Wickerson",
+  "role": "Village President, Western Springs",
+  "publicFace": "A veteran village official who backed the waterworks project against significant board opposition who ran a dry-goods business before politics and has the habit of listening longer than most people are comfortable with before speaking. He backed this project against significant board opposition and has not wavered.",
+  "privateGoal": "To see the tower completed and the bond issue closed cleanly — he is not interested in who is to blame for the difficulties, only in whether the water will flow and whether the village will remain solvent.",
+  "fear": "That the project will fail publicly and that the failure will be used to argue that Western Springs cannot manage its own affairs — a political wound he believes would never fully heal.",
+  "knowledge": [
+    "He has seen the falsified cost certificate and is deeply suspicious of it, but he lacks the engineering knowledge to disprove it on his own.",
+    "He knows that Voss has been in private communication with outside financial interests but has no proof of what was discussed.",
+    "He has the authority to delay the bond committee vote by forty-eight hours on his own executive order — he will use this if presented with credible evidence of fraud."
+  ],
+  "voice": "Deliberate, dry, occasionally sardonic — he asks questions rather than making statements, and the questions are usually the ones nobody else thought to ask.",
+  "trustLogic": "Trusts physical evidence and engineering data above testimony. Will act decisively once convinced, but will not act on suspicion alone.",
+  "secrets": [
+    "He privately approached a Chicago attorney three weeks ago to ask about the legal process for annexation resistance — he wanted to understand the enemy's playbook, not join it.",
+    "He has a personal stake in the tower's success: his own well went dry in the drought of 1887, and he has been buying water from a Chicago carter ever since."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Listens. Asks one clarifying question. Listens again.",
+    "heavyPressure": "Points out, with precision, the gap between what the speaker is asserting and what they can actually demonstrate.",
+    "breakingPoint": "He will not delay the bond vote without documented evidence — he cannot afford to be seen as using executive authority to protect the project from legitimate scrutiny.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Not applicable — Wickerson does not flee and does not need to be captured. He is the authority.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.847Z",
+  "description": "",
+  "character_type": "composite",
+  "represents": "",
+  "fact_checked": false
+}

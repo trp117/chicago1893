@@ -1,0 +1,17 @@
+{
+  "id": "clue_wooden_shim",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Carved Wooden Shim",
+  "description": "Wedged into the seat of the coal-feed valve in the pump room, you find a small piece of carved white oak — roughly two inches long, shaped to fit the valve gap precisely. This is not a random offcut; the shim has been deliberately shaped to hold the valve open at a specific angle, one that would cause the Boiler_Steam_Pressure to spike toward the relief valve threshold over the course of two to three hours of operation. The oak matches the grain of the white oak desk furniture in the lower office.",
+  "category": "physical",
+  "discoveryLocationId": "loc_pump_room",
+  "implicatesCharacterIds": [
+    "char_silas_greer"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.856Z",
+  "locationId": "",
+  "isRedHerring": false
+}

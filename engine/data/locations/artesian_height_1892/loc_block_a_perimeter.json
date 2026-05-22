@@ -1,0 +1,20 @@
+{
+  "id": "loc_block_a_perimeter",
+  "scenarioId": "artesian_height_1892",
+  "name": "The Block A Perimeter",
+  "description": "The construction fence line along the northwest corner of Chestnut and Central, where stone cutters are still working the last of the limestone blocks by lantern light and the open trenches for the water-main connections run parallel to the street.",
+  "mood": "exposed, active, dangerous",
+  "linkedCharacterIds": [
+    "char_silas_greer",
+    "char_ethan_philbrick"
+  ],
+  "atmosphericDetails": [
+    "The rhythmic chip-and-ring of stone chisels against limestone carries clearly in the night air — three cutters still working, none of them speaking.",
+    "The open trench along the east side of the perimeter is three feet deep and unsupported — the soil here is sandy fill over clay and the walls are showing stress cracks.",
+    "A gas lantern on a stake at the perimeter gate is guttering — someone has not trimmed its wick recently, and the light it throws is unreliable."
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.849Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

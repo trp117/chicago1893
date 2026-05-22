@@ -1,0 +1,121 @@
+{
+  "id": "artesian_height_1892_main_arc",
+  "scenarioId": "artesian_height_1892",
+  "name": "Strike or Snap",
+  "premise": "With the village's first artesian well bound at 1,800 feet and a falsified cost ledger circulating toward the bond committee, someone inside the project is engineering its failure — and the three people best positioned to stop it are each holding one piece of the truth the others don't have.",
+  "goal": "Identify and expose the saboteur manipulating the project's financial records and engineering tolerances, certify the pressure test before the bond vote, and bring the well to the St. Peter Sandstone aquifer without destroying the drill string.",
+  "openingSituation": "The drill bit is bound in difficult subsurface formation conditions at approximately 1,800 feet. The Well_Drill_Torque gauge reads 62 — dangerously close to the 78 threshold above which the wrought-iron string will begin to fatigue. A forged cost certificate has already been delivered to one member of the bond committee. The pump room is cold and the boiler has not yet been fired to operating pressure. The Night Marshal has just discovered that the tower's lower-level door was left unlocked overnight — and the spoil-sample logbook is missing three pages.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "The Bound String",
+      "minuteRange": [
+        0,
+        8
+      ],
+      "beats": [
+        {
+          "id": "the_chief_engineer",
+          "description": "The Chief Engineer examines the drill torque readings and realizes the spike pattern is not geological — the torque readings suggest mechanical interference rather than purely geological resistance."
+        },
+        {
+          "id": "the_pump_operator",
+          "description": "The Pump Operator discovers that the main steam admission valve has been partially closed from the outside, meaning the boiler was never going to reach operating pressure on its own — this was not an oversight."
+        },
+        {
+          "id": "the_night_marshal",
+          "description": "The Night Marshal finds three torn pages from the spoil-sample logbook stuffed behind the water closet in the lower office, the handwriting on them not matching any crew member's known signature."
+        },
+        {
+          "id": "all_three_perspectives",
+          "description": "All three perspectives receive their first shared data point: the Well_Drill_Torque gauge was manually reset sometime between midnight and 4 AM — a fact only visible if you know what the original baseline reading was."
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Ledger and the Liar",
+      "minuteRange": [
+        8,
+        16
+      ],
+      "beats": [
+        {
+          "id": "the_chief_engineer",
+          "description": "The Chief Engineer confronts Alderman Corey Voss, who is carrying a copy of the falsified cost certificate and refuses to say where he obtained it — his suspicion score rises sharply when pressed on the bond committee meeting time."
+        },
+        {
+          "id": "the_pump_operator",
+          "description": "The Pump Operator, firing the boiler toward operating pressure, notices that the coal-feed valve has been wedged open with a carved wooden shim — a deliberate act, not mechanical failure — and recovers the shim as physical evidence."
+        },
+        {
+          "id": "the_night_marshal",
+          "description": "The Night Marshal questions a CBQ fireman who has been observing activity near the construction site overnight, who has been watching the site for two nights and saw a man in a wool coat enter the lower door after midnight — a description that matches someone already in the player's encounter list."
+        },
+        {
+          "id": "the_pressure_event",
+          "description": "The pressure event at minute 8 fires: the Block A trench collapse pulls the Night Marshal toward the perimeter, creating a window during which the saboteur may move freely inside the tower."
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "Pressure and Proof",
+      "minuteRange": [
+        16,
+        24
+      ],
+      "beats": [
+        {
+          "id": "the_well_breaks",
+          "description": "The well breaks through the shale fault — but only if Well_Drill_Torque was reduced to below 70 before the brake collar was corrected; if the string was pushed above 78, it snaps here and the fail condition triggers."
+        },
+        {
+          "id": "the_boilersteampressure_spike",
+          "description": "The Boiler_Steam_Pressure spike pressure event fires at minute 16: the Pump Operator must identify the wedged valve, correct it, and hold pressure between 60 and 85 PSI while the first water begins rising in the bore."
+        },
+        {
+          "id": "the_chief_engineer",
+          "description": "The Chief Engineer finds the tampered torque log in the draughtsmen's cabinet — the key evidence that ties the false readings to a specific hand — and must decide whether to confront the suspect directly or bring the Night Marshal."
+        },
+        {
+          "id": "village_president_wickerson",
+          "description": "Village President Wickerson arrives at the tower base at minute 24 and demands a public accounting; the players must decide collectively how much to reveal before the evidence is fully assembled."
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "The First Water",
+      "minuteRange": [
+        24,
+        30
+      ],
+      "beats": [
+        {
+          "id": "the_forged_bond",
+          "description": "The forged bond petition — the second key evidence — surfaces either in Alderman Voss's coat pocket or in the lower office strongbox, depending on which player recovered it and whether the Night Marshal secured the room after the trench collapse."
+        },
+        {
+          "id": "the_saboteur_cornered",
+          "description": "The saboteur, cornered by converging evidence from all three perspectives, makes a final move: either attempting to destroy the torque log, tamper with the safety relief valve, or flee toward the CBQ rail line."
+        },
+        {
+          "id": "the_tankhydrostaticload_begins",
+          "description": "The Tank_Hydrostatic_Load begins rising as the first artesian water reaches the surface — the players have a narrow window to certify the pressure test while simultaneously making the formal accusation."
+        },
+        {
+          "id": "final_resolution_the",
+          "description": "Final resolution: the board vote is called in the presence of Wickerson and the bond committee; the players' accumulated evidence either holds the bond issue open or fails to prevent the freeze — the well's water rises regardless, but the village's future hangs on what the players have proven."
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.842Z",
+  "opening": ""
+}

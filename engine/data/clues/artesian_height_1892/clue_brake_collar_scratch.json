@@ -1,0 +1,20 @@
+{
+  "id": "clue_brake_collar_scratch",
+  "scenarioId": "artesian_height_1892",
+  "title": "Fresh Scratch on the Brake Collar",
+  "description": "In direct lantern light, the adjustment bolt on the rotary table's brake collar shows a fresh scratch pattern consistent with a pipe wrench jaw — the metal is bright and unoxidized, meaning this was done within the last twelve hours. The collar appears to have been adjusted beyond its normal operating position, which would artificially elevate the torque reading on the gauge by approximately 20 points.",
+  "category": "physical",
+  "discoveryLocationId": "loc_drill_platform",
+  "implicatesCharacterIds": [
+    "char_silas_greer",
+    "char_alderman_voss"
+  ],
+  "unlocks": [
+    "clue_pipe_wrench_match"
+  ],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.854Z",
+  "locationId": "",
+  "isRedHerring": false
+}

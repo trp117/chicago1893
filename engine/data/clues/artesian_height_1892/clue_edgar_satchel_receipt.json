@@ -1,0 +1,18 @@
+{
+  "id": "clue_edgar_satchel_receipt",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Retainer Receipt in Edgar's Satchel",
+  "description": "If Edgar Williams's document satchel is searched — either by his consent under pressure or by the Night Marshal acting on a sworn complaint — you find, folded inside the lining, a receipt for $200 from a Chicago financial agency account registered to H. Stede, dated six days ago. The receipt bears Edgar Williams's signature and the notation 'retainer re: W.S. bond tranche.' It is not a crime in itself, but it places Edgar in a financial relationship with an outside interest at the precise moment the falsified cost certificate was circulating.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_draughtsmen_cabinet",
+  "implicatesCharacterIds": [
+    "char_edgar_williams",
+    "char_alderman_voss"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.859Z",
+  "locationId": "",
+  "isRedHerring": false
+}

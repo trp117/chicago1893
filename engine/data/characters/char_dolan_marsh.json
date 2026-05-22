@@ -1,0 +1,38 @@
+{
+  "id": "char_dolan_marsh",
+  "scenarioIds": [
+    "artesian_height_1892"
+  ],
+  "name": "Dolan Marsh",
+  "role": "CBQ Railroad Fireman, Witness",
+  "publicFace": "A broad, soot-stained man of forty-five who has been idling a freight consist two blocks south of the tower for two nights running, waiting on a track clearance that keeps getting pushed back. He is bored, observant, and has nothing to lose by talking.",
+  "privateGoal": "To get his consist moving and get home to his family in Naperville — he has no stake in the tower project except as a source of entertainment during a long delay.",
+  "fear": "Being drawn into a legal proceeding that will delay his consist further and require him to appear before a justice of the peace on his own time.",
+  "knowledge": [
+    "He saw a man in a dark wool coat enter the tower's lower door at approximately 1:15 AM — the man was carrying a document satchel and did not look like a laborer.",
+    "He saw a second figure, lean and quick, working near the drill platform at around 2 AM — this figure left before dawn without speaking to anyone.",
+    "He has been watching the construction lights every night and can give approximate times for when the gas lanterns were extinguished and relit — a timeline that contradicts the crew's official night-watch log."
+  ],
+  "voice": "Flat, matter-of-fact, mildly amused by the situation — the voice of a man who has seen a great deal from locomotive cabs and finds most human drama unsurprising.",
+  "trustLogic": "Responds well to directness and to anyone who acknowledges that his time is being wasted. Will not cooperate if he feels he is being treated as a suspect rather than a witness.",
+  "secrets": [
+    "He recognized the man in the wool coat because he has seen him before on the CBQ platform at the Western Springs depot — a well-dressed man who takes the early Chicago train on Thursdays.",
+    "He told the railroad bull on duty about what he saw but the bull told him to keep his nose in the cab — he is mildly resentful about this and willing to talk to someone who will actually listen."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Leans against the locomotive and talks freely — he has been wanting to tell someone.",
+    "heavyPressure": "Crosses his arms and says he will need to hear from the railroad bull before he gives a sworn statement.",
+    "breakingPoint": "He will not appear voluntarily before the justice of the peace without a formal subpoena — he is not afraid, he simply has a consist to move.",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Not applicable.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.845Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

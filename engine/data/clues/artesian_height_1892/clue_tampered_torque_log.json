@@ -1,0 +1,20 @@
+{
+  "id": "clue_tampered_torque_log",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Altered Torque Log",
+  "description": "Inside the draughtsmen's field cabinet, tucked behind the main bore log binder, you find a single loose sheet — a daily torque reading summary in Ethan Philbrick's hand, with the original baseline figure of 41 clearly visible. Over it, in a different hand and different ink, someone has written 62 and underlined it twice. The alteration is not subtle; whoever did this was not trying to be undetectable. They were trying to be fast.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_draughtsmen_cabinet",
+  "implicatesCharacterIds": [
+    "char_alderman_voss",
+    "char_edgar_williams"
+  ],
+  "unlocks": [
+    "clue_bore_log_pages"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.856Z",
+  "locationId": "",
+  "isRedHerring": false
+}

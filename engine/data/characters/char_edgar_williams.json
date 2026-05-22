@@ -1,0 +1,38 @@
+{
+  "id": "char_edgar_williams",
+  "scenarioIds": [
+    "artesian_height_1892"
+  ],
+  "name": "Edgar Williams",
+  "role": "Partner, Williams and Williams; project business manager",
+  "publicFace": "Benezette's younger brother and financial partner — affable, well-dressed for a construction site, and always carrying a leather document satchel. He handles the bond paperwork so Benezette doesn't have to.",
+  "privateGoal": "To quietly sell the remaining bond tranche to the Chicago utility agent before the project completes, privately benefiting from a potential financial arrangement tied to the bond issue without Benezette ever knowing the source.",
+  "fear": "That Benezette will discover the approach from the Chicago utility agent and understand immediately what Edgar has been considering.",
+  "knowledge": [
+    "He received the approach from Chicago utility agent Harlan Stede six days ago and has not refused it.",
+    "He knows the falsified cost certificate exists because he was shown a draft of it by Alderman Voss — he did not create it, but he did not report it.",
+    "He has the signed original of the special assessment roll locked in his satchel, which would immediately disprove the falsified figures if produced."
+  ],
+  "voice": "Warm, slightly too smooth — the voice of a man who has learned to make disagreement sound like agreement until the moment it matters.",
+  "trustLogic": "Responds well to appeals to family loyalty and to any suggestion that Benezette's reputation is at stake. Shuts down when financial specifics are requested directly.",
+  "secrets": [
+    "He has already accepted $200 from Harlan Stede as a retainer against the bond transaction — the money is in his coat lining.",
+    "He is the one who told Stede the exact depth at which the drill was currently working, information that only someone with access to the daily bore log would have."
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Laughs, deflects with a fraternal anecdote about Benezette, and changes the subject to the tower's architectural merits.",
+    "heavyPressure": "Produces the document satchel and begins shuffling papers, buying time, insisting that everything is in order and that he would be happy to clarify once he has had a chance to review.",
+    "breakingPoint": "He will never voluntarily admit the $200 retainer or the information leak to Stede. He will confess the rest if cornered with the signed assessment roll.",
+    "fleeCondition": "If the Night Marshal produces a sworn complaint or if Benezette directly accuses him in front of Wickerson.",
+    "fleeStyle": "Walks briskly toward the CBQ rail line, satchel under his arm, claiming he has a late train to catch.",
+    "chaseStyle": "Does not run — walks fast and talks faster, insisting there has been a misunderstanding and that he will return in the morning to sort it out.",
+    "capturedBehavior": "Sits down heavily, sets the satchel on his knees, and begins negotiating — offering the signed assessment roll in exchange for the Night Marshal not filing the sworn complaint until morning.",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.845Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

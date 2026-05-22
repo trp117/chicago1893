@@ -1,0 +1,18 @@
+{
+  "id": "clue_marsh_testimony",
+  "scenarioId": "artesian_height_1892",
+  "title": "The Fireman's Account",
+  "description": "Dolan Marsh, leaning out of the locomotive cab, describes two figures he observed at the construction site after midnight: a well-dressed man carrying a document satchel who entered the lower office door at approximately 1:15 AM, and a lean, quick figure who worked near the drill platform around 2 AM and left before dawn. He can give you the time the lower office light went out — 1:47 AM — and confirms that the perimeter gate was not locked when the second figure left.",
+  "category": "testimony",
+  "discoveryLocationId": "loc_cbq_freight_yard",
+  "implicatesCharacterIds": [
+    "char_edgar_williams",
+    "char_silas_greer"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.857Z",
+  "locationId": "",
+  "isRedHerring": false
+}
