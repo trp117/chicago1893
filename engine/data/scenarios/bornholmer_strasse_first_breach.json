@@ -216,7 +216,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-19T02:51:13.205Z",
+  "updatedAt": "2026-05-22T18:14:55.964Z",
   "epilogue": {
     "generated": true,
     "reviewed": true,
@@ -225,8 +225,12 @@
         "character_id": "char_jaeger",
         "name": "Harald Jäger",
         "outcome": "survived",
-        "historical_record": "Harald Jäger was the real Stasi lieutenant colonel commanding the Bornholmer Straße passport control unit (PASS) on the night of November 9, 1989. Facing a crowd he estimated at tens of thousands and receiving no usable orders from superiors, he made the unilateral decision at approximately 23:30 to open the checkpoint to unrestricted passage. He was subsequently dismissed from the Stasi and faced professional and legal proceedings. He gave extensive interviews in later decades and his account is the primary first-person record of the checkpoint's opening. He was alive and giving interviews as late as 2019.",
-        "primary_source": "Jäger's own testimony, documented in Hans-Hermann Hertle, 'The Fall of the Wall: The Unintended Self-Dissolution of East Germany's Ruling Regime,' Cold War International History Project Bulletin, Issue 12/13 (2001), pp. 131–164."
+        "historical_record": "Harald Jäger was the real Stasi lieutenant colonel commanding the Bornholmer Straße passport control unit (PASS) on the night of November 9, 1989. Facing a crowd he estimated at tens of thousands and receiving no usable orders from superiors, he made the unilateral decision at approximately 23:30 to open the checkpoint to unrestricted passage. He was subsequently dismissed from the Stasi and faced professional and legal proceedings.Following German reunification, Jäger was honorably discharged from the border troops. He worked as a small business owner and security consultant, co-authored an autobiographical account of the night, and lived in retirement near Berlin until his death. He was alive and giving interviews as late as 2019.",
+        "primary_source": {
+          "citation": "Jäger's own testimony, documented in Hans-Hermann Hertle, 'The Fall of the Wall: The Unintended Self-Dissolution of East Germany's Ruling Regime,' Cold War International History Project Bulletin, Issue 12/13 (2001), pp. 131–164.",
+          "url": null,
+          "access_note": "Harald Jäger, Am Bornholmer Übergang (2002); Mary Elise Sarotte, The Collapse: The Accidental Opening of the Berlin Wall (2014)."
+        }
       },
       {
         "character_id": "char_protester",
@@ -351,7 +355,11 @@
         "fact_id": "schabowski_press_conference_time",
         "content": "Günter Schabowski announced the new travel regulations at a live televised press conference that concluded at approximately 19:00 on November 9, 1989; the pivotal, improvised exchange clarifying that the rules took effect immediately occurred at 18:57.",
         "domain": "timing",
-        "source": "Schabowski press conference transcript, ZDF/ARD broadcast record, November 9, 1989",
+        "source": {
+          "citation": "Schabowski press conference transcript, ZDF/ARD broadcast record, November 9, 1989",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -359,7 +367,11 @@
         "fact_id": "bornholmer_gate_opening_time",
         "content": "Harald Jäger ordered the Bornholmer Straße checkpoint barrier opened at approximately 23:30 on November 9, 1989, making it the first Berlin Wall crossing point to open that night.",
         "domain": "timing",
-        "source": "Harald Jäger testimony, documented in Michael Sontheimer and Dirk Kurbjuweit, Der Grenzfall (2009); confirmed in BStU archive records",
+        "source": {
+          "citation": "Harald Jäger testimony, documented in Michael Sontheimer and Dirk Kurbjuweit, Der Grenzfall (2009); confirmed in BStU archive records",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -367,7 +379,11 @@
         "fact_id": "jaeger_rank_and_role",
         "content": "Harald Jäger held the rank of Oberstleutnant (Lieutenant Colonel) in the Stasi and served as duty officer commanding the passport control unit (Passkontrolleinheit) at Bornholmer Straße on the night of November 9, 1989.",
         "domain": "personnel",
-        "source": "BStU (Bundesbeauftragte für die Stasi-Unterlagen) personnel records; Jäger's own memoir account published in Der Spiegel, 2009",
+        "source": {
+          "citation": "BStU (Bundesbeauftragte für die Stasi-Unterlagen) personnel records; Jäger's own memoir account published in Der Spiegel, 2009",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -375,7 +391,11 @@
         "fact_id": "jaeger_durchschleusung_strategy",
         "content": "Jäger implemented a Durchschleusung (venting/sluicing) strategy beginning at approximately 21:30, processing small numbers of aggressive protesters through the checkpoint while simultaneously stamping their identity documents with a specific code (Ausreisestempel) that effectively revoked their East German citizenship, expelling them permanently without the right of legal return.",
         "domain": "personnel",
-        "source": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+        "source": {
+          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -383,7 +403,11 @@
         "fact_id": "crowd_size_bornholmer",
         "content": "The crowd at Bornholmer Straße checkpoint reached an estimated 20,000 people by approximately 23:00 on November 9, 1989.",
         "domain": "capacity",
-        "source": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous ARD and ZDF broadcast reports",
+        "source": {
+          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous ARD and ZDF broadcast reports",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -391,7 +415,11 @@
         "fact_id": "schabowski_immediate_effect_statement",
         "content": "When asked by journalists when the new travel regulations would take effect, Schabowski consulted his notes at 18:57 on November 9, 1989, and replied: 'Das tritt nach meiner Kenntnis... ist das sofort, unverzüglich' — 'To my knowledge... this takes effect right away, immediately'.",
         "domain": "timing",
-        "source": "Schabowski press conference transcript; documented in Hans-Hermann Hertle, Der Fall der Mauer (1996)",
+        "source": {
+          "citation": "Schabowski press conference transcript; documented in Hans-Hermann Hertle, Der Fall der Mauer (1996)",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -399,7 +427,11 @@
         "fact_id": "travel_regulation_intended_date",
         "content": "The Politbüro travel regulation announced by Schabowski was drafted to take effect on November 10, 1989, following publication in the Gesetzblatt (official legal gazette), not on the evening of November 9.",
         "domain": "other",
-        "source": "Original Politbüro draft regulation text; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and BStU archive materials",
+        "source": {
+          "citation": "Original Politbüro draft regulation text; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and BStU archive materials",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -407,7 +439,11 @@
         "fact_id": "schabowski_not_briefed",
         "content": "Schabowski had not attended the Politbüro session at which the travel regulation was finalized and was handed the note by Egon Krenz immediately before the press conference, without being briefed on its implementation conditions.",
         "domain": "personnel",
-        "source": "Schabowski's own account; documented in Hans-Hermann Hertle and Kathrin Elsner, Mein 9. November (1999)",
+        "source": {
+          "citation": "Schabowski's own account; documented in Hans-Hermann Hertle and Kathrin Elsner, Mein 9. November (1999)",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -415,7 +451,11 @@
         "fact_id": "bornholmer_checkpoint_structure",
         "content": "The Bornholmer Straße checkpoint (Grenzübergangsstelle Bornholmer Straße) carried vehicle and pedestrian traffic over the Bösebrücke bridge and was one of the busiest urban crossing points between East and West Berlin, processing thousands of travelers daily under normal operations.",
         "domain": "capacity",
-        "source": "BStU checkpoint operational records; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+        "source": {
+          "citation": "BStU checkpoint operational records; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -423,7 +463,11 @@
         "fact_id": "ard_broadcast_bornholmer",
         "content": "ARD television broadcast live footage from Bornholmer Straße on the night of November 9, 1989, with the opening of the checkpoint captured on camera and transmitted to West German audiences.",
         "domain": "personnel",
-        "source": "ARD broadcast archive, November 9–10, 1989; documented in contemporaneous broadcast logs",
+        "source": {
+          "citation": "ARD broadcast archive, November 9–10, 1989; documented in contemporaneous broadcast logs",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -431,7 +475,11 @@
         "fact_id": "grenztruppen_weapons_standard",
         "content": "Grenztruppen (GDR Border Troops) guards at Berlin Wall checkpoints in 1989 were standardly armed with the AK-47 variant Kalaschnikow MPi-KMS-72 and carried loaded magazines; the Schießbefehl (order to shoot) remained formally in effect on November 9, 1989, though it had been de-emphasized in practice since early 1989.",
         "domain": "other",
-        "source": "Grenztruppen operational regulations; documented in Hope M. Harrison, Driving the Soviets Up the Wall (2003); BStU records on Schießbefehl",
+        "source": {
+          "citation": "Grenztruppen operational regulations; documented in Hope M. Harrison, Driving the Soviets Up the Wall (2003); BStU records on Schießbefehl",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -439,7 +487,11 @@
         "fact_id": "schiesbefehl_formal_status",
         "content": "The Schießbefehl — the standing order authorizing border guards to use lethal force against unauthorized crossing attempts — was never formally rescinded before the night of November 9, 1989; it remained technically in force throughout the events at Bornholmer Straße.",
         "domain": "other",
-        "source": "BStU archive; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996); confirmed in post-unification legal proceedings against border guards",
+        "source": {
+          "citation": "BStU archive; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996); confirmed in post-unification legal proceedings against border guards",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -447,7 +499,11 @@
         "fact_id": "jaeger_superior_contact_attempts",
         "content": "Harald Jäger made repeated telephone calls to superior officers throughout the evening of November 9, 1989, seeking orders on how to handle the crowd; he received no actionable instructions from any superior during the critical period between approximately 20:00 and 23:30.",
         "domain": "personnel",
-        "source": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and Der Spiegel interview, November 2009",
+        "source": {
+          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and Der Spiegel interview, November 2009",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -455,7 +511,11 @@
         "fact_id": "first_crowds_arrive_bornholmer",
         "content": "The first curious East Berliners began arriving at the Bornholmer Straße checkpoint within roughly thirty minutes of Schabowski's press conference, with the crowd size expanding exponentially after 21:00 as West German evening television news updates widely reported that the borders were open.",
         "domain": "timing",
-        "source": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous witness accounts compiled in BStU records",
+        "source": {
+          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous witness accounts compiled in BStU records",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -463,7 +523,11 @@
         "fact_id": "bornholmer_geographic_position",
         "content": "The Bornholmer Straße checkpoint is located at approximately 52°33′N 13°24′E, in the Prenzlauer Berg district of East Berlin, crossing into the Wedding district of West Berlin via the Bösebrücke bridge over the long-distance and S-Bahn railway yards.",
         "domain": "navigation",
-        "source": "Berlin city cartographic records; documented in contemporaneous checkpoint operational maps held in BStU archive",
+        "source": {
+          "citation": "Berlin city cartographic records; documented in contemporaneous checkpoint operational maps held in BStU archive",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -471,7 +535,11 @@
         "fact_id": "humboldt_university_location",
         "content": "Humboldt-Universität zu Berlin is located on Unter den Linden 6, in the Mitte district of East Berlin, approximately 4.5 kilometers by road from the Bornholmer Straße checkpoint.",
         "domain": "navigation",
-        "source": "Berlin city records; Humboldt-Universität institutional records",
+        "source": {
+          "citation": "Berlin city records; Humboldt-Universität institutional records",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -479,7 +547,11 @@
         "fact_id": "passkontrolleinheit_stasi_control",
         "content": "he passport control units (Passkontrolleinheiten, PKE) at all Berlin Wall checkpoints were staffed by undercover Stasi officers under Ministry for State Security command, making them distinct from and superior in administrative decisions to the Grenztruppen soldiers who provided the outer perimeter guard security; [cite_start]Jäger's unit reported strictly through Stasi lines of command.",
         "domain": "other",
-        "source": "BStU organizational records; documented in Daniela Münkel, ed., Staatssicherheit und Gesellschaft (2008)",
+        "source": {
+          "citation": "BStU organizational records; documented in Daniela Münkel, ed., Staatssicherheit und Gesellschaft (2008)",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
@@ -487,7 +559,11 @@
         "fact_id": "west_german_tv_broadcast_reach",
         "content": "West German ARD and ZDF television signals were receivable by the majority of East Berlin households in 1989; Schabowski's press conference was broadcast live on West German television and was watched by large numbers of East Berlin residents on the evening of November 9, 1989.",
         "domain": "other",
-        "source": "Documented in Hans-Hermann Hertle, Der Fall der Mauer (1996); contemporaneous viewer surveys and witness testimony compiled in BStU records",
+        "source": {
+          "citation": "Documented in Hans-Hermann Hertle, Der Fall der Mauer (1996); contemporaneous viewer surveys and witness testimony compiled in BStU records",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       }
@@ -522,5 +598,6 @@
       "checked": false,
       "notes": ""
     }
-  }
+  },
+  "allow_free_input": true
 }

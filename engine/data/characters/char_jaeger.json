@@ -31,8 +31,9 @@
     "strikeFirst": null
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-19T02:51:13.209Z",
+  "updatedAt": "2026-05-22T18:14:55.968Z",
   "description": "",
   "character_type": "real",
-  "fact_checked": false
+  "fact_checked": false,
+  "represents": ""
 }
