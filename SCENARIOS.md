@@ -153,3 +153,58 @@ they exist only in the player role file — not in the character roster.
 The `hannah_cross.json` character file is kept with `"scenarioIds": []` as a
 reference of the character's backstory. It is not loaded into any scenario's
 NPC roster.
+
+---
+
+## Character type declarations
+
+Every player role and NPC that appears in a Historical Record or epilogue
+requires three fields:
+
+```json
+"character_type": "real",
+"represents": "...",
+"fact_checked": false
+```
+
+### character_type
+
+One of three values:
+
+- `"real"` — A documented historical person. The Historical Record must state 
+  their verified post-event fate only. No invented biography.
+- `"fictional"` — An invented character. The Historical Record must state the 
+  category of real person they represent — never biography specific to the 
+  fictional character.
+- `"composite"` — Based on real people but not a specific individual. Treat 
+  the same as `"fictional"` in the Historical Record.
+
+### represents
+
+Required for `fictional` and `composite` characters. States what category of 
+real person this character represents. The field is used verbatim in Historical 
+Record generation.
+
+Write it as a complete phrase: *who* + *where* + *when*. 
+
+**Wrong:** `"A soldier at Cantigny"`  
+**Right:** `"Enlisted men of the 28th Infantry Regiment's Company C who participated in the initial assault wave at Cantigny on May 28, 1918"`
+
+Leave blank for `real` characters (they represent themselves).
+
+### fact_checked
+
+`false` by default. Set to `true` after a human has verified the 
+`character_type` and `represents` assignments against the historical record.
+
+Use Admin → scenario edit → **Character Declarations** to export all 
+character assignments as a formatted block. Paste into an external AI for 
+batch verification, then mark each character verified in the admin UI.
+
+### Health check behavior
+
+- Player role missing `character_type`: blocking error (red)
+- Fictional/composite role missing `represents`: blocking error (red)
+- NPC in epilogue missing `character_type`: blocking error (red, Tier 1)
+- Any named NPC missing `character_type`: yellow warning (Tier 2)
+- Any character with `fact_checked: false`: yellow warning

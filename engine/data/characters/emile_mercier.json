@@ -1,6 +1,8 @@
 {
   "id": "emile_mercier",
-  "scenarioIds": ["chicago_1893_v1"],
+  "scenarioIds": [
+    "chicago_1893_v1"
+  ],
   "name": "Émile Mercier",
   "role": "French electrical consultant attached to an overseas exhibit",
   "publicFace": "Elegant, clever, amused, cosmopolitan",
@@ -31,5 +33,8 @@
     "capturedBehavior": "Denies everything. Demands the French consul. Remains cold and controlled even when cornered."
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
+  "fact_checked": false
 }

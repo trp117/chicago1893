@@ -1,6 +1,8 @@
 {
   "id": "daniel_burnham",
-  "scenarioIds": ["chicago_1893_v1"],
+  "scenarioIds": [
+    "chicago_1893_v1"
+  ],
   "name": "Daniel Burnham",
   "role": "Director of Works and the player's superior",
   "publicFace": "Controlled, visionary, exhausted, commanding",
@@ -25,5 +27,7 @@
     "breakingPoint": "Will not tolerate theatrics or unsupported accusations. Authority is his only weapon and he uses it absolutely."
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "character_type": "real",
+  "fact_checked": false
 }

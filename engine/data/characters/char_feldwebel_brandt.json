@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T17:04:30.405Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "German Feldwebel commanding beach defense positions at Omaha Beach on June 6, 1944",
+  "fact_checked": false
 }

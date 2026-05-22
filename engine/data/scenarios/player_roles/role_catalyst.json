@@ -70,5 +70,8 @@
       "closing_line_override": " The heavy iron lock clicked shut, drowning out the sound of a world trying to break free. "
     }
   },
-  "context_sentence": "You are an unnamed East Berlin student standing at the front of the crowd at the Bornholmer Straße checkpoint on the night of November 9, 1989 — the first border crossing point to open, at 11:30 PM, when Harald Jäger ordered his guards to stand down and let the people through."
+  "context_sentence": "You are an unnamed East Berlin student standing at the front of the crowd at the Bornholmer Straße checkpoint on the night of November 9, 1989 — the first border crossing point to open, at 11:30 PM, when Harald Jäger ordered his guards to stand down and let the people through.",
+  "character_type": "fictional",
+  "represents": "East Berlin students and civilians who pressed against the Bornholmer Straße checkpoint on the night of November 9, 1989",
+  "fact_checked": false
 }

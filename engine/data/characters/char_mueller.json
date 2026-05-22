@@ -30,5 +30,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-19T02:51:13.208Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Grenztruppen Gefreiter conscripts present when Jäger ordered the gate opened on November 9, 1989",
+  "fact_checked": false
 }

@@ -73,5 +73,8 @@
   "is_player_character": false,
   "identity_note": null,
   "aliases": [],
-  "context_sentence": "You are Jack Swigert, the Command Module Pilot who replaced Ken Mattingly just three days before launch after a measles exposure scare, and on April 13, 1970, at 55 hours and 54 minutes into the mission, you are the astronaut who performed the routine tank-stir procedure that triggered the explosion."
+  "context_sentence": "You are Jack Swigert, the Command Module Pilot who replaced Ken Mattingly just three days before launch after a measles exposure scare, and on April 13, 1970, at 55 hours and 54 minutes into the mission, you are the astronaut who performed the routine tank-stir procedure that triggered the explosion.",
+  "character_type": "real",
+  "historical_record_note": "Jack Swigert, Command Module Pilot. A last-minute replacement for Ken Mattingly. Survived. Later elected to Congress from Colorado but died of cancer before taking his seat in 1983.",
+  "fact_checked": false
 }

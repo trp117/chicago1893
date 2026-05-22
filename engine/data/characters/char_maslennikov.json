@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T19:37:59.797Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Zampolit (political officers) aboard Soviet Foxtrot-class submarines during the Cuban Missile Crisis, October 1962",
+  "fact_checked": false
 }

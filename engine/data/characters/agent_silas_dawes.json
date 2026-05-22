@@ -31,5 +31,8 @@
     "strikeFirst": null
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.438Z"
+  "updatedAt": "2026-04-29T00:08:14.438Z",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Sons of Liberty intelligence network, 1773-1775",
+  "fact_checked": false
 }

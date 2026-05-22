@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-02-01T16:30:00Z",
   "updatedAt": "2026-05-22T01:22:04.348Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Greensboro sit-in, February 1960",
+  "fact_checked": false
 }

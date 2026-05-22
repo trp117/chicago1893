@@ -32,5 +32,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-08T17:48:26.456Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Women who served as Underground Railroad station keepers in northern Ohio during the 1850s",
+  "fact_checked": false
 }

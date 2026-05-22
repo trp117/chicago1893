@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-08T17:48:26.459Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
+  "fact_checked": false
 }

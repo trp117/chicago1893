@@ -51,5 +51,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-22T01:48:41.139Z",
-  "context_sentence": "You are the hydroacoustic officer aboard B-59, one of four Soviet Foxtrot-class submarines operating without radio contact in the Caribbean during the Cuban Missile Crisis, and on October 27, 1962, your vessel received the depth charges dropped by USS Beale as a signal — not an attack."
+  "context_sentence": "You are the hydroacoustic officer aboard B-59, one of four Soviet Foxtrot-class submarines operating without radio contact in the Caribbean during the Cuban Missile Crisis, and on October 27, 1962, your vessel received the depth charges dropped by USS Beale as a signal — not an attack.",
+  "character_type": "fictional",
+  "represents": "Soviet hydroacoustic officers aboard Foxtrot-class submarines during the naval quarantine of Cuba, October 1962",
+  "fact_checked": false
 }

@@ -1,6 +1,8 @@
 {
   "id": "clara_hale",
-  "scenarioIds": ["chicago_1893_v1"],
+  "scenarioIds": [
+    "chicago_1893_v1"
+  ],
   "name": "Clara Hale",
   "role": "Journalist with unofficial access to fair gossip and city politics",
   "publicFace": "Bright, observant, sharper than she first appears",
@@ -26,5 +28,8 @@
     "capturedBehavior": "N/A — not a conspirator. Treating her as one makes her a permanent enemy with a printing press."
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
+  "fact_checked": false
 }

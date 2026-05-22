@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.090Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "French army liaison officers attached to American units during the Battle of Cantigny, May 1918",
+  "fact_checked": false
 }

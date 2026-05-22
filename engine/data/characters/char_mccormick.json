@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.091Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Artillery officers of the 5th Field Artillery, 1st Division, who coordinated fire support at Cantigny on May 28, 1918",
+  "fact_checked": false
 }

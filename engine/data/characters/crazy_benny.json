@@ -20,5 +20,8 @@
   },
   "id": "crazy_benny",
   "updatedAt": "2026-04-28T17:56:43.293Z",
-  "createdAt": "2026-04-28T17:56:43.293Z"
+  "createdAt": "2026-04-28T17:56:43.293Z",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
+  "fact_checked": false
 }

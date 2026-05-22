@@ -61,5 +61,8 @@
       "closing_line_override": "The dispatch arrived. Nathaniel Gill did not."
     }
   },
-  "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War."
+  "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War.",
+  "character_type": "fictional",
+  "represents": "Young men who carried dispatches through occupied Boston on the night of April 18-19, 1775",
+  "fact_checked": false
 }

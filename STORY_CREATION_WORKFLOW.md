@@ -92,6 +92,42 @@ in this world. Organized by category. Include:
 This document is what you paste into the story generation engine. 
 The quality of this document determines the quality of the scenario.
 
+### 1.4 Declare character types before generating
+
+Every player role and NPC that will appear in a Historical Record 
+or epilogue must have a `character_type` declaration before the 
+scenario is considered complete. Do this before you generate 
+ending notes.
+
+**Three types:**
+
+- `real` — A documented historical person. The Historical Record 
+  must state their verified post-event fate. Never invent biography.
+- `fictional` — An invented character. The Historical Record must 
+  state the category of real person they represent — never invented 
+  biography for the character specifically.
+- `composite` — Based on real people but not a specific individual. 
+  Treat the same as fictional in the Historical Record.
+
+**Required fields:**
+
+| Field | Required for | Example |
+|-------|-------------|---------|
+| `character_type` | all roles and NPCs | `"real"` |
+| `represents` | fictional and composite only | `"Grenztruppen enlisted personnel stationed at Bornholmer Straße on the night of November 9, 1989"` |
+| `fact_checked` | all | `false` until a human has verified the assignment |
+
+**The test:** If you cannot write a single sentence stating what 
+real category of person a fictional character represents, the 
+character's historical anchoring is not clear enough. Rewrite 
+the `represents` field until it is specific enough to look up.
+
+**Workflow:** After declaring all character types, use Admin → 
+scenario edit → Character Declarations section to export a 
+formatted block. Paste it into an external AI with the prompt 
+"Verify each assignment is correct and flag any errors." Then 
+mark `fact_checked: true` on verified characters in the admin UI.
+
 ---
 
 ## Phase 2 — Story Generation

@@ -171,9 +171,10 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 
 /* ── Health indicator ────────────────────────────────────────── */
 .health-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; cursor: help; transition: background .3s; }
-.health-dot.checking     { background: var(--warn); animation: hpulse .9s ease-in-out infinite; }
-.health-dot.healthy      { background: var(--success); }
-.health-dot.needs-repair { background: var(--danger); }
+.health-dot.checking      { background: var(--warn); animation: hpulse .9s ease-in-out infinite; }
+.health-dot.healthy       { background: var(--success); }
+.health-dot.has-warnings  { background: var(--warn); }
+.health-dot.needs-repair  { background: var(--danger); }
 @keyframes hpulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
 .repair-btn { display: none; }
 
@@ -308,6 +309,19 @@ const ENTITIES = {
         { key: 'aggressionProfile.fleeStyle',     label: 'Flee Style',              type: 'textarea', help: 'How they escape. e.g. "Calculated — heads for exits, uses crowd as cover"' },
         { key: 'aggressionProfile.chaseStyle',    label: 'Chase Style',             type: 'textarea', help: 'How they behave when being chased. Leave blank if they never flee.' },
         { key: 'aggressionProfile.capturedBehavior', label: 'If Captured',          type: 'textarea', help: 'What they do if caught. Leave blank for non-conspirators.' },
+      ]},
+      { title: 'Historical Record', fields: [
+        { key: 'character_type', label: 'Character Type', type: 'select', options: [
+          { value: '',           label: '— not declared —' },
+          { value: 'real',       label: 'real — documented historical person' },
+          { value: 'fictional',  label: 'fictional — invented character' },
+          { value: 'composite',  label: 'composite — based on real people, not a specific individual' },
+        ], help: 'Required for Historical Record generation.' },
+        { key: 'represents', label: 'Represents', type: 'textarea', help: 'Required for fictional/composite. What category of real person this character represents — used in the Historical Record.' },
+        { key: 'fact_checked', label: 'Fact Checked', type: 'select', bool: true, options: [
+          { value: 'false', label: 'No — needs review' },
+          { value: 'true',  label: 'Yes — verified against historical record' },
+        ], help: 'Has the real vs fictional declaration been verified against the historical record?' },
       ]},
     ],
   },
@@ -524,7 +538,12 @@ function buildField(field, item, related) {
     if (field.source && related[field.source]) {
       return buildSelectField(field.key, related[field.source], value);
     }
-    return buildSelectField(field.key, field.options || [], value);
+    const opts = (field.options || []).map(o => {
+      const v = typeof o === 'string' ? o : (o.value !== undefined ? o.value : o.id);
+      const l = typeof o === 'string' ? o : (o.label || o.name || o.title || o.id || String(v));
+      return `<option value="${v}"${String(value) === String(v) ? ' selected' : ''}>${l}</option>`;
+    }).join('');
+    return `<select name="${field.key}" id="${id}">${opts}</select>`;
   }
   if (field.type === 'checkboxes') {
     const items = related[field.source] || [];
@@ -658,6 +677,9 @@ function extractFormData(cfg, formEl, existingItem) {
         const items = [...formEl.querySelectorAll(`[data-list="${field.key}"]`)]
           .map(el => el.value.trim()).filter(Boolean);
         setDeep(data, field.key, items);
+      } else if (field.type === 'select' && field.bool) {
+        const el = formEl.querySelector(`[name="${field.key}"]`);
+        if (el) setDeep(data, field.key, el.value === 'true');
       } else {
         const el = formEl.querySelector(`[name="${field.key}"]`);
         if (el) setDeep(data, field.key, el.value.trim());
@@ -1550,6 +1572,39 @@ function renderArcSection(data) {
   `);
 }
 
+async function renderCharacterDeclarationsSection(scenarioId, container) {
+  let res;
+  try { res = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/character-declarations`); }
+  catch { return; }
+  const { text, stats } = res;
+  const s = stats || {};
+  const undeclared = (s.undeclaredRoles || 0) + (s.undeclaredNpcs || 0);
+  const unchecked  = (s.uncheckedRoles  || 0) + (s.uncheckedNpcs  || 0);
+  const badgeHtml  = undeclared
+    ? `<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;font-weight:600">${undeclared} undeclared</span>`
+    : `<span style="font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-weight:600">All declared</span>`;
+  const uncheckedBadge = unchecked
+    ? `<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;font-weight:600">${unchecked} unverified</span>`
+    : '';
+  const sectionHtml = edSection('Character Declarations', `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      ${badgeHtml}${uncheckedBadge ? ' ' + uncheckedBadge : ''}
+      <span style="font-size:12px;color:var(--text-muted)">${(s.playerRoles||0) + (s.npcs||0)} total characters</span>
+    </div>
+    <p class="help-text" style="margin-bottom:12px">Paste this block into an external AI (Gemini, ChatGPT) to verify real vs fictional assignments against the historical record. Then mark <em>Fact Checked</em> on each character.</p>
+    <div style="position:relative">
+      <textarea id="char-declarations-text" readonly style="font-family:monospace;font-size:11px;white-space:pre;background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:12px;width:100%;box-sizing:border-box;resize:vertical;min-height:200px">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+      <button type="button" id="copy-declarations-btn" class="btn btn-secondary btn-sm" style="position:absolute;top:8px;right:8px;font-size:11px">Copy</button>
+    </div>
+  `);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = sectionHtml;
+  container.appendChild(wrap);
+  wrap.querySelector('#copy-declarations-btn')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard', 'success'));
+  });
+}
+
 function renderCharactersSection(data) {
   const chars = data.characters || [];
   const html = chars.map((c, i) => {
@@ -1566,6 +1621,9 @@ function renderCharactersSection(data) {
       ${edField('Trust Logic',        edTextarea(`characters.${i}.trustLogic`,     c.trustLogic,   2))}
       ${edField('Secrets',            edTextarea(`characters.${i}.secrets`,        secretsVal,     3, 'data-type="array"'), 'One per line')}
       ${edField('Aggression Profile', edTextarea(`characters.${i}.aggressionProfile`, aggrVal,    2, 'data-type="json"'))}
+      ${edField('Character Type', `<select data-path="characters.${i}.character_type"><option value=""${!c.character_type ? ' selected' : ''}>— not declared —</option><option value="real"${c.character_type === 'real' ? ' selected' : ''}>real — documented historical person</option><option value="fictional"${c.character_type === 'fictional' ? ' selected' : ''}>fictional — invented character</option><option value="composite"${c.character_type === 'composite' ? ' selected' : ''}>composite — based on real people</option></select>`, 'Required for Historical Record generation.')}
+      ${edField('Represents',         edTextarea(`characters.${i}.represents`, c.represents, 2), 'Required for fictional/composite — what category of real person this character represents')}
+      ${edField('Fact Checked', `<select data-path="characters.${i}.fact_checked"><option value="false"${c.fact_checked !== true ? ' selected' : ''}>No — needs review</option><option value="true"${c.fact_checked === true ? ' selected' : ''}>Yes — verified</option></select>`, 'Has the real vs fictional declaration been verified?')}
     `, i === 0);
   }).join('');
   return edSection('Characters', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');
@@ -1619,6 +1677,9 @@ function renderPlayerRolesSection(data) {
       ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}
       ${hooksHtml}
       ${edField('Suggested Secret',   edTextarea(`playerRoles.${i}.suggested_secret`,  r.suggested_secret,  2), 'One thing nobody in the story knows')}
+      ${edField('Character Type', `<select data-path="playerRoles.${i}.character_type"><option value=""${!r.character_type ? ' selected' : ''}>— not declared —</option><option value="real"${r.character_type === 'real' ? ' selected' : ''}>real — documented historical person</option><option value="fictional"${r.character_type === 'fictional' ? ' selected' : ''}>fictional — invented character</option><option value="composite"${r.character_type === 'composite' ? ' selected' : ''}>composite — based on real people</option></select>`, 'Required for Historical Record generation.')}
+      ${edField('Represents',         edTextarea(`playerRoles.${i}.represents`, r.represents, 2), 'Required for fictional/composite — what category of real person this role represents')}
+      ${edField('Fact Checked', `<select data-path="playerRoles.${i}.fact_checked"><option value="false"${r.fact_checked !== true ? ' selected' : ''}>No — needs review</option><option value="true"${r.fact_checked === true ? ' selected' : ''}>Yes — verified</option></select>`, 'Has the real vs fictional declaration been verified?')}
       ${edDetails('Ending Notes', 'partial + failure', `
         <p class="help-text" style="margin-bottom:12px">Used when <em>Structured Endings</em> is enabled on the scenario. Notes guide the closing prose for partial and failure outcomes — success always uses the transcript.</p>
         <div style="margin-bottom:18px">
@@ -2358,6 +2419,7 @@ function renderPreview(data, autoSaved = false) {
       ${renderLocationsSection(data)}
       ${renderCluesSection(data)}
       ${renderPlayerRolesSection(data)}
+      <div id="char-declarations-mount"></div>
       ${renderPublicationReview(data)}
       ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
@@ -2374,6 +2436,8 @@ function renderPreview(data, autoSaved = false) {
   if (scenarioId) {
     document.getElementById('content').insertAdjacentHTML('beforeend', buildAIPanel(scenarioId));
     initAIPanel(scenarioId);
+    const declMount = document.getElementById('char-declarations-mount');
+    if (declMount) renderCharacterDeclarationsSection(scenarioId, declMount);
   }
 
   const formEl = document.getElementById('preview-form');
@@ -3147,14 +3211,17 @@ async function checkScenarioHealth(scenarioId) {
   try {
     const health = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/health`);
     if (!dot) return;
-    if (health.healthy) {
-      dot.className = 'health-dot healthy';
-      dot.title = 'All required fields present';
-    } else {
+    if (!health.healthy) {
       dot.className = 'health-dot needs-repair';
       dot.title = `Missing: ${health.missing.join(' · ')}`;
       const repairBtn = card.querySelector('.repair-btn');
       if (repairBtn) repairBtn.style.display = 'inline-flex';
+    } else if (health.warnings?.length) {
+      dot.className = 'health-dot has-warnings';
+      dot.title = `Warnings: ${health.warnings.join(' · ')}`;
+    } else {
+      dot.className = 'health-dot healthy';
+      dot.title = 'All required fields present';
     }
   } catch {
     if (dot) { dot.className = 'health-dot'; dot.style.background = 'var(--border)'; dot.title = 'Health check unavailable'; }

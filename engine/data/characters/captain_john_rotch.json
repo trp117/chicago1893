@@ -31,5 +31,8 @@
     "strikeFirst": null
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.437Z"
+  "updatedAt": "2026-04-29T00:08:14.437Z",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify relationship to Francis Rotch (documented owner of the Dartmouth tea ship)",
+  "fact_checked": false
 }

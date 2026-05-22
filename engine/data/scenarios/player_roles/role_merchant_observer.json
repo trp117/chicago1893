@@ -42,5 +42,8 @@
     ""
   ],
   "suggested_secret": "",
-  "context_sentence": "You are John Andrews, a Boston merchant and prolific letter-writer whose correspondence in the winter of 1773 would become one of the most detailed firsthand accounts of the Tea Party's events, placing you among the few educated observers who watched that night from the edges rather than the waterfront."
+  "context_sentence": "You are John Andrews, a Boston merchant and prolific letter-writer whose correspondence in the winter of 1773 would become one of the most detailed firsthand accounts of the Tea Party's events, placing you among the few educated observers who watched that night from the edges rather than the waterfront.",
+  "character_type": "fictional",
+  "represents": "Boston merchants sympathetic to the patriot cause who were present at or near the waterfront on the night of December 16, 1773",
+  "fact_checked": false
 }

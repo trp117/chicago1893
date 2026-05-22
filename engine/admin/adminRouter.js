@@ -114,8 +114,13 @@ function validateGeneratedScenario(generated) {
 }
 
 // Validates a scenario + its separately-loaded player roles (stored format).
-function validateStoredScenario(scenario, playerRoles) {
+// Returns { errors: string[], warnings: string[] }
+// errors   = blocking (red) — scenario cannot be considered complete
+// warnings = non-blocking (yellow) — require human review before publication
+function validateStoredScenario(scenario, playerRoles, characters = []) {
   const errors = [];
+  const warnings = [];
+
   if (!playerRoles || playerRoles.length === 0) errors.push('No playerRoles defined');
   (playerRoles || []).forEach(role => {
     if (getBriefingText(role.briefing).length < 50)
@@ -135,7 +140,55 @@ function validateStoredScenario(scenario, playerRoles) {
       errors.push(`Missing context sentence for ${role.name} — click Repair to generate`);
   });
 
-  return errors;
+  // ── Character type declarations ────────────────────────────────────────────
+  // Player roles: missing character_type is blocking (red)
+  (playerRoles || []).forEach(role => {
+    if (!role.character_type) {
+      errors.push(
+        `Role "${role.name}" missing character_type (real/fictional/composite) — required for Historical Record`
+      );
+    }
+    if ((role.character_type === 'fictional' || role.character_type === 'composite') && !role.represents) {
+      errors.push(
+        `Role "${role.name}" is ${role.character_type} but missing "represents" field — required for Historical Record generation`
+      );
+    }
+    // fact_checked: false on any role is a yellow warning
+    if (role.character_type && role.fact_checked === false) {
+      warnings.push(
+        `Role "${role.name}" has character_type "${role.character_type}" but fact_checked is false — human verification required before publication`
+      );
+    }
+  });
+
+  // NPC characters: Tier 1 (in epilogue) = blocking; Tier 2 (other named) = warning
+  const epilogueCharacterIds = new Set(
+    (scenario?.epilogue?.character_fates || []).map(f => f.character_id).filter(Boolean)
+  );
+
+  characters.forEach(char => {
+    const inEpilogue = epilogueCharacterIds.has(char.id);
+    if (!char.character_type) {
+      if (inEpilogue) {
+        errors.push(
+          `NPC "${char.name}" appears in Historical Record but missing character_type — blocking (Tier 1)`
+        );
+      } else {
+        warnings.push(
+          `NPC "${char.name}" missing character_type (real/fictional/composite) — yellow warning (Tier 2)`
+        );
+      }
+    } else {
+      // fact_checked: false is always a yellow warning
+      if (char.fact_checked === false) {
+        warnings.push(
+          `NPC "${char.name}" has character_type "${char.character_type}" but fact_checked is false — needs verification`
+        );
+      }
+    }
+  });
+
+  return { errors, warnings };
 }
 
 // Calls the Anthropic API to write a briefing for a single role.
@@ -663,8 +716,9 @@ export function createAdminRouter(repos, config = {}) {
   r.get('/scenarios/:id/health', (req, res) => {
     const scenario = repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
-    const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
-    const missing = validateStoredScenario(scenario, playerRoles);
+    const playerRoles  = repos.scenarios.findPlayerRoles(req.params.id);
+    const characters   = repos.characters.findAll().filter(c => c.scenarioIds?.includes(req.params.id));
+    const { errors: missing, warnings } = validateStoredScenario(scenario, playerRoles, characters);
     const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
     const roles = playerRoles.map(role => ({
       id:                role.id,
@@ -673,11 +727,14 @@ export function createAdminRouter(repos, config = {}) {
       hasDescription:    !!role.description,
       hasEntryParagraph: !!(entrySection?.character_entries?.[role.id]?.trim().length >= 50),
       hasContextSentence: !!(role.context_sentence?.trim().length >= 10),
+      hasCharacterType:  !!role.character_type,
+      factChecked:       role.fact_checked === true,
     }));
     res.json({
       scenarioId: req.params.id,
       healthy: missing.length === 0,
       missing,
+      warnings,
       roles,
       hasPeriodVocabulary: !!(scenario.period_vocabulary?.categories?.length),
     });
@@ -777,7 +834,7 @@ export function createAdminRouter(repos, config = {}) {
     }
 
     const updatedRoles = repos.scenarios.findPlayerRoles(req.params.id);
-    const remaining    = validateStoredScenario(scenario, updatedRoles);
+    const { errors: remaining } = validateStoredScenario(scenario, updatedRoles);
     res.json({ success: errors.length === 0, repairs, errors, remaining });
   });
   r.get('/locations',      (req, res) => res.json(
@@ -1304,8 +1361,34 @@ Return ONLY valid JSON in this exact structure:
     const systemPrompt = [
       'You are generating the historical epilogue data block for an immersive historical fiction scenario. Your output will be used to generate personalized epilogue text for players after they complete a session. Every fact you produce must be historically accurate and verifiable. Do not invent, approximate, or editorialize.',
       '',
+      '══ HISTORICAL RECORD STANDARD ══',
+      '',
+      'Each character in this scenario has a declared character_type. Apply the correct standard for each:',
+      '',
+      'FOR REAL HISTORICAL FIGURES (character_type = "real"):',
+      'Cover their actual verified post-event fate. What happened to them after this event. What they did next.',
+      'How history records them. Be specific — names, dates, outcomes.',
+      'Never invent or speculate. If uncertain of a fact, omit it rather than guess.',
+      '',
+      'FOR FICTIONAL CHARACTERS (character_type = "fictional" or "composite"):',
+      'Do not invent a post-event biography for this character. They are not a real person and have no verifiable fate.',
+      'Instead write about the category of person they represented (given in the "represents" field):',
+      '- What happened to people like them historically',
+      '- What the group they represented contributed or suffered',
+      '- What the historical record says about people in their position',
+      '',
+      'WRONG example for a fictional Underground Railroad conductor:',
+      '"Elias Cole continued his work as a conductor and moved 47 more people to freedom before retiring in 1862."',
+      'RIGHT example:',
+      '"The conductors of the Underground Railroad moved an estimated 100,000 people to freedom between 1830 and 1865. Most of their names were never recorded in any document that survived."',
+      '',
+      'FOR ALL HISTORICAL RECORDS:',
+      '- Tone is the last paragraph of a history book — factual, outside the story, neither triumphant nor tragic. Just the record.',
+      '- Include the broader historical aftermath of the event itself — what happened, what it meant, how history resolved it.',
+      '- Everything stated must be verifiable. If uncertain, omit.',
+      '',
       'Generate the following:',
-      'character_fates: For every named character in the scenario, provide their historical outcome after the event depicted — what actually happened to them in the days, months, and years that followed. Include a primary source reference where one exists. If the outcome is not documented, set outcome to "unknown" and say so honestly in historical_record.',
+      'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters.',
       'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of strings.',
       'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements.',
       'open_threads: For each essential beat in the scenario, consider whether that beat corresponds to a historical question that was raised at inquiry, disputed, or never satisfactorily resolved. If so, include an entry with the beat\'s id as thread_id and the historical record of that open question.',
@@ -1325,7 +1408,12 @@ Return ONLY valid JSON in this exact structure:
       world  ? `WORLD CONTEXT:\n${world}`  : '',
       stakes ? `STAKES / GOAL:\n${stakes}` : '',
       characters.length
-        ? `NAMED CHARACTERS:\n${characters.map(c => `- ${c.character_id || c.id}: ${c.name} (${c.role || c.publicFace || ''})`).join('\n')}`
+        ? `NAMED CHARACTERS:\n${characters.map(c => {
+            const typeLabel = c.character_type
+              ? `type: ${c.character_type}${(c.character_type === 'fictional' || c.character_type === 'composite') && c.represents ? ` — represents: ${c.represents}` : ''}`
+              : 'type: NOT DECLARED';
+            return `- ${c.character_id || c.id}: ${c.name} (${c.role || c.publicFace || ''}) [${typeLabel}]`;
+          }).join('\n')}`
         : '',
       essential_beats.length
         ? `ESSENTIAL BEATS (use each beat id as thread_id in open_threads and beat_id in choice_echoes):\n${essential_beats.map(b => `- id: ${b.id}, description: ${b.description}`).join('\n')}`
@@ -1490,6 +1578,82 @@ Return ONLY valid JSON in this exact structure:
     } finally {
       res.end();
     }
+  });
+
+  // ── Character Declarations Export ────────────────────────────────────────────
+  // Returns a plain-text block formatted for pasting into an external AI
+  // fact-checking system. Lists every player role and NPC with their declared
+  // character_type, represents field, and fact_checked status.
+  r.get('/scenarios/:id/character-declarations', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+
+    const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
+    const characters  = repos.characters.findAll().filter(c => c.scenarioIds?.includes(req.params.id));
+
+    const hr = '='.repeat(60);
+    const lines = [
+      `CHARACTER DECLARATIONS — ${scenario.title}`,
+      `Scenario ID: ${req.params.id}`,
+      `Generated: ${new Date().toISOString()}`,
+      '',
+      'Paste this block into an external AI fact-checking system.',
+      'Each declaration must be independently verified against the historical record.',
+      hr,
+      '',
+      'PLAYER ROLES:',
+      '',
+    ];
+
+    playerRoles.forEach(role => {
+      lines.push(`CHARACTER: ${role.name}`);
+      lines.push(`DECLARED TYPE: ${role.character_type || 'NOT DECLARED'}`);
+      if (role.character_type !== 'real' && role.represents) {
+        lines.push(`REPRESENTS: ${role.represents}`);
+      }
+      if (role.historical_record_note) {
+        lines.push(`NOTE: ${role.historical_record_note}`);
+      }
+      lines.push(`FACT CHECKED: ${role.fact_checked === true ? 'yes' : 'no — needs review'}`);
+      lines.push('');
+    });
+
+    lines.push('NPC CHARACTERS:');
+    lines.push('');
+
+    characters.forEach(char => {
+      lines.push(`CHARACTER: ${char.name}`);
+      lines.push(`DECLARED TYPE: ${char.character_type || 'NOT DECLARED'}`);
+      if (char.character_type !== 'real' && char.represents) {
+        lines.push(`REPRESENTS: ${char.represents}`);
+      }
+      lines.push(`FACT CHECKED: ${char.fact_checked === true ? 'yes' : 'no — needs review'}`);
+      lines.push('');
+    });
+
+    const uncheckedRoles  = playerRoles.filter(r => r.fact_checked !== true).length;
+    const uncheckedChars  = characters.filter(c => c.fact_checked !== true).length;
+    const undeclaredRoles = playerRoles.filter(r => !r.character_type).length;
+    const undeclaredChars = characters.filter(c => !c.character_type).length;
+
+    lines.push(hr);
+    lines.push(`SUMMARY: ${playerRoles.length} player roles, ${characters.length} NPCs`);
+    lines.push(`Undeclared: ${undeclaredRoles} roles, ${undeclaredChars} NPCs`);
+    lines.push(`Unverified: ${uncheckedRoles} roles, ${uncheckedChars} NPCs`);
+
+    res.json({
+      scenarioId:    req.params.id,
+      scenarioTitle: scenario.title,
+      text:          lines.join('\n'),
+      stats: {
+        playerRoles:    playerRoles.length,
+        npcs:           characters.length,
+        undeclaredRoles,
+        undeclaredNpcs: undeclaredChars,
+        uncheckedRoles,
+        uncheckedNpcs:  uncheckedChars,
+      },
+    });
   });
 
   // ╔══════════════════════════════════════════════════════════════════╗

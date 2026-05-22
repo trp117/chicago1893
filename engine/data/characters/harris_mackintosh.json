@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-02-01T16:30:00Z",
   "updatedAt": "2026-05-22T01:22:04.347Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "F.W. Woolworth store managers in the American South who confronted sit-in protesters at segregated lunch counters in 1960",
+  "fact_checked": false
 }

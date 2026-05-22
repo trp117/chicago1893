@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.092Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Lieutenants of the 28th Infantry Regiment who were present during the artillery coordination phase at Cantigny on May 28, 1918",
+  "fact_checked": false
 }

@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-10T03:09:06.909Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from colonial Boston, 1774-1776",
+  "fact_checked": false
 }

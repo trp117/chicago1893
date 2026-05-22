@@ -71,5 +71,8 @@
       "closing_line_override": "The telephone receiver dangled from its cord, buzzing with a dial tone over the screams outside. "
     }
   },
-  "context_sentence": "You are Harald Jäger, the Stasi passport control commander at Bornholmer Straße who, on the night of November 9, 1989, made the unilateral decision to open the checkpoint gates at 11:30 PM — the first breach in the Berlin Wall, and the one that made all the others inevitable."
+  "context_sentence": "You are Harald Jäger, the Stasi passport control commander at Bornholmer Straße who, on the night of November 9, 1989, made the unilateral decision to open the checkpoint gates at 11:30 PM — the first breach in the Berlin Wall, and the one that made all the others inevitable.",
+  "character_type": "real",
+  "historical_record_note": "Harald Jäger, Stasi Oberstleutnant commanding the Bornholmer Straße passport control unit. Made the unilateral decision to open the checkpoint at approximately 23:30 on November 9, 1989. Primary source on the opening night.",
+  "fact_checked": false
 }

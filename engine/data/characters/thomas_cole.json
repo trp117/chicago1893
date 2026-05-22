@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.478Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Telegraph operators who used their access to the wire to assist the Underground Railroad, 1850-1860",
+  "fact_checked": false
 }

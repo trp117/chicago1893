@@ -32,5 +32,7 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-19T02:51:13.209Z",
-  "description": ""
+  "description": "",
+  "character_type": "real",
+  "fact_checked": false
 }

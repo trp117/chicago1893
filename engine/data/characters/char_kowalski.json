@@ -30,5 +30,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.093Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Enlisted Signal Corps personnel of the 1st Division who advanced with the wire teams at Cantigny on May 28, 1918",
+  "fact_checked": false
 }

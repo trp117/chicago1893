@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.476Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network, 1850-1860",
+  "fact_checked": false
 }

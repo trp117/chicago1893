@@ -31,5 +31,8 @@
   },
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-19T02:51:13.210Z",
-  "description": ""
+  "description": "",
+  "character_type": "fictional",
+  "represents": "Stasi district command officers contacted by Jäger during the night of November 9, 1989 who failed to issue orders",
+  "fact_checked": false
 }

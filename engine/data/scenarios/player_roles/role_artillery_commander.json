@@ -71,5 +71,8 @@
       "closing_line_override": ""
     }
   },
-  "context_sentence": "You are the artillery commander responsible for synchronizing the rolling barrage that preceded the 28th Infantry Regiment's assault on Cantigny on May 28, 1918 — the first offensive operation conducted independently by American forces in the First World War."
+  "context_sentence": "You are the artillery commander responsible for synchronizing the rolling barrage that preceded the 28th Infantry Regiment's assault on Cantigny on May 28, 1918 — the first offensive operation conducted independently by American forces in the First World War.",
+  "character_type": "fictional",
+  "represents": "Artillery officers of the 5th Field Artillery, 1st Division, who directed the rolling barrage at Cantigny on May 28, 1918",
+  "fact_checked": false
 }
