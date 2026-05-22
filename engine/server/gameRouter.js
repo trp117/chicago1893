@@ -391,6 +391,7 @@ export function createGameRouter(repos, config = {}) {
       const playerRoleOptions = playerRoles.map(r => ({
         id:               r.id,
         name:             r.name,
+        real_name:        r.real_name || null,
         description:      r.description || '',
         accessLevel:      r.accessLevel || 'staff',
         startLocation:    r.startLocationId || r.startLocation,
@@ -401,6 +402,7 @@ export function createGameRouter(repos, config = {}) {
         briefing:         r.briefing || null,
         character_hooks:  r.character_hooks || [],
         suggested_secret: r.suggested_secret || null,
+        context_sentence: r.context_sentence || null,
       }));
 
       res.json({

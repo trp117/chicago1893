@@ -52,7 +52,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T15:53:30.913Z",
+  "updatedAt": "2026-05-22T01:45:27.126Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully navigated the \"Free Return Trajectory\" and guided the crew through the narrow re-entry corridor. However, the extreme freezing conditions caused severe exposure for the crew, and a system delay forced a brutal, hard splashdown far from the recovery ship.",
@@ -71,5 +71,6 @@
   "cover_name": null,
   "is_player_character": false,
   "identity_note": null,
-  "aliases": []
+  "aliases": [],
+  "context_sentence": "You are Jim Lovell, commander of Apollo 13 and the most traveled astronaut in history with 572 hours in space, whose mission to the Fra Mauro Highlands was aborted on April 13, 1970, after an oxygen tank exploded 200,000 miles from Earth."
 }

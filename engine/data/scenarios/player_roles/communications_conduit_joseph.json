@@ -2,6 +2,7 @@
   "id": "communications_conduit_joseph",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "The Communications Conduit — Joseph McNeil",
+  "real_name": "Joseph McNeil",
   "description": "You are the one watching the room — in the glass cases, in the mirror, in the peripheral movement of people who think they are not being observed. You know more about what is happening in this store right now than anyone else at the counter.",
   "startLocationId": "lunch_counter_main",
   "startingKnowledge": [
@@ -45,5 +46,6 @@
     }
   },
   "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-21T19:48:07.371Z"
+  "updatedAt": "2026-05-22T01:42:46.029Z",
+  "context_sentence": "You are Joseph McNeil, one of the four North Carolina A&T freshmen who sat down at the whites-only Woolworth's lunch counter in Greensboro on February 1, 1960, and whose act of deliberate, coordinated civil disobedience would trigger sit-in protests across more than fifty American cities within weeks."
 }

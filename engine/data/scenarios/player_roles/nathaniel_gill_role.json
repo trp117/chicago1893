@@ -52,7 +52,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.927Z",
+  "updatedAt": "2026-05-22T01:48:38.732Z",
   "ending_notes": {
     "failure": {
       "what_happened": "Nathaniel is shot by a soldier on the street before reaching the Green Dragon. A patriot sympathizer nearby finds him. Nathaniel passes the dispatch as he is dying and asks the person to deliver it to Thomas Wren.",
@@ -60,5 +60,6 @@
       "emotional_weight": "He asks the stranger to tell his father he loves him. He is not afraid. He is sorry he will not see Benjamin's face when he finds out what his son did tonight.",
       "closing_line_override": "The dispatch arrived. Nathaniel Gill did not."
     }
-  }
+  },
+  "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War."
 }

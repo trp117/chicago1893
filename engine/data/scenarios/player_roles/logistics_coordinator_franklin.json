@@ -2,6 +2,7 @@
   "id": "logistics_coordinator_franklin",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "The Logistics Coordinator — Franklin McCain",
+  "real_name": "Franklin McCain",
   "description": "You are the largest of the four, and you know it, and so does everyone in this store. The question of what to do with your body — your hands, your posture, the space you occupy — is a strategic problem as much as a personal one.",
   "startLocationId": "lunch_counter_main",
   "startingKnowledge": [
@@ -45,5 +46,6 @@
     }
   },
   "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-21T19:48:07.372Z"
+  "updatedAt": "2026-05-22T01:42:48.446Z",
+  "context_sentence": "You are Franklin McCain, one of the Greensboro Four — four freshmen from North Carolina Agricultural and Technical College — who on February 1, 1960, sat down at the whites-only lunch counter at F.W. Woolworth's and requested service, an act that directly ignited the national sit-in movement."
 }

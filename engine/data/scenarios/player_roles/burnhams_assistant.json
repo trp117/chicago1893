@@ -18,7 +18,10 @@
   "opening": {
     "narrative": "Chicago, May 1893. The White City rises from the lakefront mud, its plaster palaces gleaming in the morning haze — ten thousand workers still swarming Jackson Park in the final days before the Exposition opens. But beneath the spectacle, something is wrong. A tension moves through the corridors of the Administration Building that has nothing to do with last-minute preparations.\n\nYou are assistant to Daniel Burnham, Director of Works. When he needs eyes he can trust, he sends for you.\n\nThis morning, a shipping manifest crossed your desk: electrical equipment, diverted from its declared route. The signature authorizing the change does not match any name on Burnham's staff.\n\nBurnham's office door stands open. He is at his desk, jaw set, a telegraph slip folded in his hand. He looks up.",
     "npcMoments": [
-      { "characterId": "daniel_burnham", "text": "'Shut the door. Tell me what you found in those papers.'" }
+      {
+        "characterId": "daniel_burnham",
+        "text": "'Shut the door. Tell me what you found in those papers.'"
+      }
     ],
     "choices": [
       "Show Burnham the mismatched signature on the manifest",
@@ -27,7 +30,11 @@
     ]
   },
   "roleInitialState": {
-    "inventory": ["notebook", "fair credential", "shipping memorandum"],
+    "inventory": [
+      "notebook",
+      "fair credential",
+      "shipping memorandum"
+    ],
     "flags": {
       "heardFrenchConversation": false,
       "manifestDiscrepancyFound": true,
@@ -42,5 +49,6 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2026-05-22T01:47:30.567Z",
+  "context_sentence": "\"You are a senior administrative aide to Daniel Burnham, Director of Works for the 1893 World's Columbian Exposition, whose 690-acre fairground on the Chicago lakefront required coordinating more than 40,000 workers and an unprecedented network of electrical infrastructure to bring the White City to life on schedule.\""
 }

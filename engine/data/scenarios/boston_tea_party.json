@@ -56,7 +56,7 @@
     "The player identifies the spy but possesses only circumstantial clues — the spy is expelled from the group but escapes prosecution, and the tea party proceeds under heightened risk."
   ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.766Z",
+  "updatedAt": "2026-05-22T01:46:40.303Z",
   "premise": "",
   "playerGoal": "",
   "openingSituation": "",
@@ -79,7 +79,184 @@
       },
       {
         "type": "entry",
-        "text": ""
+        "text": "",
+        "character_entries": {
+          "role_merchant_observer": "The cold comes off the harbor in layers tonight — brine and tar and something sharper underneath, the particular smell of consequence. You stand at the upper window of Hutchinson's counting house, a borrowed vantage point secured through a favor you will repay later and think about never, watching the torchlight move along Griffin's Wharf below like a slow fire that has not yet decided what to burn. Your ledger instincts are running even now: you count the figures, estimate the crowd, note who stands nearest the gangplanks and who hangs back. Dillworth is down there somewhere, and that is the thing that will not leave you alone. A man whose accounts have been quietly swelling for three months despite every public complaint about ruin, a man who last week recited ship manifests with the fluency of someone who had read them privately and at leisure. You have said nothing to Adams yet. You have been waiting to be certain, which is perhaps another way of saying you have been waiting to be brave. The torches are moving toward the Dartmouth now. Your hand rests on the window latch."
+        }
+      }
+    ]
+  },
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Sons of Liberty Operational Codes",
+        "context": "Used by patriot organizers such as Samuel Adams, Dr. Joseph Warren, and Paul Revere when coordinating clandestine actions, passing intelligence, or speaking near untrusted ears.",
+        "terms": [
+          {
+            "term": "the body of the people",
+            "meaning": "The assembled Sons of Liberty acting in collective authority, invoked to legitimize a decision or action without naming individual conspirators."
+          },
+          {
+            "term": "the affair",
+            "meaning": "The tea destruction plan itself; spoken obliquely in letters and tavern conversation to avoid explicit incrimination."
+          },
+          {
+            "term": "Mohawks",
+            "meaning": "The disguised raiders who will board the ships; also used as a watchword to confirm a man is part of the night's action."
+          },
+          {
+            "term": "the resolves",
+            "meaning": "The agreed-upon terms of the operation — timing, roles, and conduct — treated as binding orders among the inner circle."
+          },
+          {
+            "term": "a friend to the country",
+            "meaning": "A trusted patriot sympathizer; used to vouch for a stranger's loyalty without stating his affiliation openly."
+          },
+          {
+            "term": "intelligence",
+            "meaning": "Any piece of information about Crown troop movements, informants, or official plans; treated as a commodity of the highest value."
+          },
+          {
+            "term": "the express",
+            "meaning": "An urgent mounted message, or the rider who carries it; synonymous with Revere's role and used to signal that word must travel fast."
+          }
+        ]
+      },
+      {
+        "name": "Boston Dockworkers' Argot",
+        "context": "Used by laborers like Elias Croft along the Long Wharf and Griffin's Wharf when handling cargo, speaking of the ships, or concealing their nighttime loyalties from overseers and customs men.",
+        "terms": [
+          {
+            "term": "the chest",
+            "meaning": "A single crate of East India Company tea; dock hands count them by the chest and know their weight and markings by rote."
+          },
+          {
+            "term": "the Dartmouth",
+            "meaning": "The lead tea ship moored at Griffin's Wharf; used by name as a landmark and a symbol of the night's target."
+          },
+          {
+            "term": "tide work",
+            "meaning": "Labor timed to the harbor tide; used as cover to explain why men are gathering at the wharf after dark."
+          },
+          {
+            "term": "the tidesman",
+            "meaning": "A customs officer posted aboard ship to prevent smuggling; a man to be watched, avoided, or neutralized before the action begins."
+          },
+          {
+            "term": "to break bulk",
+            "meaning": "To open a cargo hold and begin unloading; among conspirators, a coded signal that the operation has commenced."
+          },
+          {
+            "term": "the consignees",
+            "meaning": "The loyalist merchants appointed to receive and sell the tea; despised figures on the docks, seen as agents of Parliament's extortion."
+          },
+          {
+            "term": "a gang",
+            "meaning": "A crew of dock laborers working under a single foreman; the natural social unit into which the raiding parties are organized."
+          },
+          {
+            "term": "the wharf rats",
+            "meaning": "Informal term for the regular dock laborers who know every plank, rope, and shadow of Griffin's Wharf — trusted insiders by night."
+          }
+        ]
+      },
+      {
+        "name": "Crown Loyalist and Military Parlance",
+        "context": "Used by British officers, customs officials, and loyalist informants when discussing the political situation, suspected seditionists, or plans to intercept the patriots — language that marks a speaker's allegiance to the Crown.",
+        "terms": [
+          {
+            "term": "the rabble",
+            "meaning": "Contemptuous loyalist term for the Sons of Liberty and their supporters; signals a speaker's alignment with Crown authority."
+          },
+          {
+            "term": "sedition",
+            "meaning": "Any act or speech deemed treasonous against Parliament or the King; the charge loyalists threaten to level against the conspirators."
+          },
+          {
+            "term": "His Majesty's revenue",
+            "meaning": "The tea tax and its proceeds; invoking this phrase signals a speaker is defending Parliamentary law rather than colonial grievance."
+          },
+          {
+            "term": "the Castle",
+            "meaning": "Castle William, the British garrison on an island in Boston Harbor; the fallback stronghold and symbol of Crown military presence."
+          },
+          {
+            "term": "a disaffected person",
+            "meaning": "Official euphemism for a known or suspected patriot sympathizer; used in dispatches and warrants to identify targets for surveillance."
+          },
+          {
+            "term": "informer",
+            "meaning": "A loyalist spy or turncoat embedded among the Sons of Liberty; the word the patriots fear most and the Crown values most."
+          },
+          {
+            "term": "the Act",
+            "meaning": "The Tea Act of 1773; loyalists cite it as lawful authority while patriots cite it as tyranny — the same two words carrying opposite moral weight."
+          }
+        ]
+      },
+      {
+        "name": "Patriot Tavern Slang",
+        "context": "Used in establishments such as the Green Dragon Tavern by ordinary Boston citizens, tradesmen, and junior Sons of Liberty members when speaking freely among presumed allies, toasting, or passing rumors.",
+        "terms": [
+          {
+            "term": "liberty water",
+            "meaning": "Any drink other than taxed tea; a pointed toast to colonial defiance served in place of the offending commodity."
+          },
+          {
+            "term": "a Tory",
+            "meaning": "A loyalist or Crown sympathizer; spoken with contempt in patriot company, and used to accuse anyone whose loyalty is suspect."
+          },
+          {
+            "term": "the tree",
+            "meaning": "The Liberty Tree on Essex Street; shorthand for the patriot movement's gathering point and its spirit of organized resistance."
+          },
+          {
+            "term": "to be out tonight",
+            "meaning": "Tavern euphemism for participating in the evening's action; men confirm their role by saying they 'expect to be out' without elaborating."
+          },
+          {
+            "term": "a warm man",
+            "meaning": "A wealthy merchant or citizen of means; used to distinguish men like Thomas Dillworth who have property to lose and whose loyalty may waver."
+          },
+          {
+            "term": "to nose about",
+            "meaning": "To snoop or gather information suspiciously; accusing a man of nosing about is the first step toward naming him an informer."
+          },
+          {
+            "term": "the meeting",
+            "meaning": "The mass public assembly at Old South Meeting House; the legitimate political cover under which the evening's true plan is being finalized."
+          }
+        ]
+      },
+      {
+        "name": "Merchant and Counting-House Trade Language",
+        "context": "Used by figures like Thomas Dillworth when discussing commerce, cargo, and finances — a vocabulary that can mask conspiratorial dealings inside the ordinary language of legitimate trade.",
+        "terms": [
+          {
+            "term": "the Company",
+            "meaning": "The East India Company; spoken with resentment by colonial merchants who see its monopoly as Parliament's weapon against their livelihoods."
+          },
+          {
+            "term": "invoice price",
+            "meaning": "The declared value of a cargo for customs purposes; manipulating it is standard smuggling practice and a point of common ground between merchants and patriots."
+          },
+          {
+            "term": "on consignment",
+            "meaning": "Goods held for sale on behalf of another party; the tea sits on consignment, and refusing to accept it is the legal argument patriots use to justify their action."
+          },
+          {
+            "term": "a venture",
+            "meaning": "A speculative trade investment; used metaphorically among the conspirators to describe the night's operation as a calculated risk with enormous stakes."
+          },
+          {
+            "term": "the duty",
+            "meaning": "The Townshend tax of threepence per pound on tea; the specific grievance that makes every chest aboard the Dartmouth a political object."
+          },
+          {
+            "term": "a factor",
+            "meaning": "A merchant's agent who buys and sells on his behalf; a man in this role moves between factions and is naturally suspected of carrying intelligence to both sides."
+          }
+        ]
       }
     ]
   }

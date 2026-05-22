@@ -55,7 +55,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.107Z",
+  "updatedAt": "2026-05-22T01:49:06.707Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You go over the top and successfully secure the fortified cellar along the Rue du Moulin, recovering a German field radio and a list of target coordinates that match the ambush pattern. You capture the saboteur at the village edge, but your right flank takes severe casualties due to the premature lift in the eastern sector barrage data.",
@@ -71,5 +71,6 @@
       "closing_line": "The smoke cleared too soon, exposing your position to the heights before the line could move.",
       "closing_line_override": ""
     }
-  }
+  },
+  "context_sentence": "You are Corporal Daniel Marsh, a squad leader in the 28th Infantry Regiment, 1st Division, United States Army, one of approximately 3,500 American soldiers who stepped off at 6:45 a.m. on May 28, 1918, in the first independent American offensive operation of the First World War."
 }

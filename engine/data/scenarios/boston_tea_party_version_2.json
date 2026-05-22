@@ -56,5 +56,171 @@
     "The player correctly names the spy but possesses only one key evidence clue — the spy is expelled from the Sons of Liberty but escapes prosecution, and the tea party proceeds under a cloud of uncertainty."
   ],
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.434Z"
+  "updatedAt": "2026-05-22T01:47:27.314Z",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Sons of Liberty Codes",
+        "context": "Used by Patriots and Sons of Liberty members when speaking in guarded company or passing messages through trusted hands at meeting houses and taverns.",
+        "terms": [
+          {
+            "term": "the Mohawks are ready",
+            "meaning": "The disguised raiders are assembled and prepared to board the tea ships"
+          },
+          {
+            "term": "a friend to the cause",
+            "meaning": "A trusted Patriot sympathizer whose loyalty has been vouched for"
+          },
+          {
+            "term": "the body",
+            "meaning": "The mass public meeting of colonists convened to decide the fate of the tea, held at Old South Meeting House"
+          },
+          {
+            "term": "consignee",
+            "meaning": "A merchant appointed to receive and sell the taxed tea — used contemptuously as a synonym for Crown collaborator"
+          },
+          {
+            "term": "the liberty tree",
+            "meaning": "A rallying point and symbol; to be summoned 'to the tree' means an urgent assembly of Sons of Liberty is called"
+          },
+          {
+            "term": "a squeaking wheel",
+            "meaning": "A suspected informer or loose-tongued member whose words have reached the wrong ears"
+          },
+          {
+            "term": "the twenty-day clause",
+            "meaning": "The legal deadline by which the Dartmouth must clear customs or the Crown may seize both ship and cargo — the ticking clock forcing the Patriots' hand"
+          }
+        ]
+      },
+      {
+        "name": "Customs House Cant",
+        "context": "Employed by royal customs officers, tide waiters, and Crown agents such as Agent Silas Dawes when conducting official business or communicating covertly with informants.",
+        "terms": [
+          {
+            "term": "tide waiter",
+            "meaning": "A customs officer stationed aboard a ship at anchor to prevent unlawful unloading before official inspection"
+          },
+          {
+            "term": "entry",
+            "meaning": "The formal declaration of a ship's cargo at the customs house — without it, no goods may legally land"
+          },
+          {
+            "term": "a docket cleared",
+            "meaning": "Official paperwork completed allowing a vessel to depart; the Patriots were desperate to prevent this and force a standoff"
+          },
+          {
+            "term": "informer's bond",
+            "meaning": "A secret agreement by which a Crown informant is promised a share of seized goods or monetary reward in exchange for intelligence"
+          },
+          {
+            "term": "His Majesty's pleasure",
+            "meaning": "A veiled threat implying arrest, imprisonment, or worse at the Crown's discretion"
+          },
+          {
+            "term": "the seizure writ",
+            "meaning": "A legal instrument allowing customs officers to confiscate contraband or an uncleared vessel — feared by merchants and smugglers alike"
+          },
+          {
+            "term": "a general warrant",
+            "meaning": "A broad search authority despised by colonists as it allowed officers to search any premises without naming a specific target"
+          }
+        ]
+      },
+      {
+        "name": "Dockworkers' and Mariners' Argot",
+        "context": "Spoken by sailors, longshoremen, and wharf hands at Griffin's Wharf and along the waterfront, including those employed aboard the Dartmouth under Captain Rotch.",
+        "terms": [
+          {
+            "term": "the Dartmouth's riding at single anchor",
+            "meaning": "The tea ship is moored alone and lightly secured — vulnerable to boarding"
+          },
+          {
+            "term": "chests below",
+            "meaning": "The 342 casks of East India Company tea stored in the ship's hold, the object of the night's action"
+          },
+          {
+            "term": "make fast",
+            "meaning": "To secure lines or hatches; used as slang among dockhands for keeping a secret tight"
+          },
+          {
+            "term": "the fog's thick enough to hide a regiment",
+            "meaning": "A common waterfront expression indicating conditions ideal for clandestine movement along the wharves"
+          },
+          {
+            "term": "a King's man on the quarterdeck",
+            "meaning": "A Crown loyalist or customs officer stationed aboard a vessel, watching for unauthorized activity"
+          },
+          {
+            "term": "heave and be done",
+            "meaning": "Dockworker shorthand for dumping cargo overboard quickly — repurposed that night for the tea destruction itself"
+          }
+        ]
+      },
+      {
+        "name": "Tavern and Street Slang",
+        "context": "Common vernacular of Boston tradesmen, apprentices, and tavern-goers heard nightly at the Green Dragon Tavern under Margaret Cole's roof, where rumor and sedition flow as freely as ale.",
+        "terms": [
+          {
+            "term": "a dish of tea",
+            "meaning": "A sardonic toast or coded phrase among Patriots referencing the night's planned destruction; said with a knowing look among conspirators"
+          },
+          {
+            "term": "a tory bird",
+            "meaning": "A loyalist sympathizer or Crown informant suspected of roosting among Patriot company"
+          },
+          {
+            "term": "flip",
+            "meaning": "A popular hot tavern drink of beer, rum, and molasses — the currency of conversation and bribery at the Green Dragon"
+          },
+          {
+            "term": "the broad way gossip",
+            "meaning": "Street-level rumor circulating through Boston's market district, often carrying a kernel of dangerous truth"
+          },
+          {
+            "term": "a night errand",
+            "meaning": "A discreet after-dark mission whose true purpose is not spoken aloud in public company"
+          },
+          {
+            "term": "to cry roast meat",
+            "meaning": "Period expression for boasting or speaking too openly about a secret plan — a fatal indiscretion"
+          },
+          {
+            "term": "a long face at the wharf",
+            "meaning": "Local slang for someone behaving suspiciously nervous near the docks, possibly guilty of betrayal or forewarning the authorities"
+          }
+        ]
+      },
+      {
+        "name": "Congregationalist and Pulpit Rhetoric",
+        "context": "The elevated moral and scriptural language used by Reverend Ezra Willard and other clergy when addressing their congregations or justifying — or condemning — Patriot actions in private counsel.",
+        "terms": [
+          {
+            "term": "a covenant people",
+            "meaning": "New England's self-conception as a community bound to God and to one another by sacred obligation — invoked to justify resistance to unjust authority"
+          },
+          {
+            "term": "the sin of Achan",
+            "meaning": "Biblical reference to a traitor hidden within a righteous community whose concealed guilt brings ruin on all — used to describe the suspected informer"
+          },
+          {
+            "term": "a tender conscience",
+            "meaning": "A person whose moral scruples prevent them from fully committing to a dangerous cause; Willard's own self-description"
+          },
+          {
+            "term": "providential deliverance",
+            "meaning": "The belief that God would intervene to protect the Patriot cause if it was righteous — a comfort and a justification for bold action"
+          },
+          {
+            "term": "a man of Belial",
+            "meaning": "A scriptural epithet for a treacherous or worthless person; the harshest clerical condemnation applicable to an informer"
+          },
+          {
+            "term": "the fast day sermon",
+            "meaning": "A politically charged religious address delivered on days of fasting and prayer, often serving as thinly veiled Patriot propaganda from the pulpit"
+          }
+        ]
+      }
+    ]
+  }
 }

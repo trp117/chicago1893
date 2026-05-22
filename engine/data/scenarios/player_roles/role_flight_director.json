@@ -53,10 +53,11 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T15:53:30.912Z",
+  "updatedAt": "2026-05-22T01:45:24.602Z",
   "real_name": null,
   "cover_name": null,
   "is_player_character": false,
   "identity_note": null,
-  "aliases": []
+  "aliases": [],
+  "context_sentence": "You are Gene Kranz, Flight Director of NASA's White Team, the man responsible for returning the crew of Apollo 13 to Earth after an oxygen tank explosion on April 13, 1970 crippled the Command Module 200,000 miles from home and forced three astronauts to survive in a lunar module designed for two."
 }

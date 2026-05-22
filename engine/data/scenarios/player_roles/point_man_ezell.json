@@ -2,6 +2,7 @@
   "id": "point_man_ezell",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "The Point Man — Ezell Blair Jr.",
+  "real_name": "Ezell Blair Jr.",
   "description": "You spoke the words. You asked for the coffee. Now the silence that followed has become a physical environment, and every person in this store is waiting to see what you do next.",
   "startLocationId": "lunch_counter_main",
   "startingKnowledge": [
@@ -45,5 +46,6 @@
     }
   },
   "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-21T19:48:07.373Z"
+  "updatedAt": "2026-05-22T01:42:51.082Z",
+  "context_sentence": "You are Ezell Blair Jr., one of the four North Carolina A&T freshmen who walked into F.W. Woolworth's on South Elm Street on February 1, 1960, and whose spoken request for service at the segregated lunch counter initiated the sit-in movement that would spread to fifty-four cities within two months."
 }

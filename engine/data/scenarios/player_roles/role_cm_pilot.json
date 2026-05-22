@@ -53,7 +53,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T15:53:30.911Z",
+  "updatedAt": "2026-05-22T01:45:22.031Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
@@ -72,5 +72,6 @@
   "cover_name": null,
   "is_player_character": false,
   "identity_note": null,
-  "aliases": []
+  "aliases": [],
+  "context_sentence": "You are Jack Swigert, the Command Module Pilot who replaced Ken Mattingly just three days before launch after a measles exposure scare, and on April 13, 1970, at 55 hours and 54 minutes into the mission, you are the astronaut who performed the routine tank-stir procedure that triggered the explosion."
 }

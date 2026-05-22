@@ -45,7 +45,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.066Z",
+  "updatedAt": "2026-05-22T01:49:01.202Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully transmitted the final SOS, and the Carpathia acknowledged your position. You stayed at your post until the power flickered out, but you were unable to reach a lifeboat in time and had to jump into the freezing water.",
@@ -59,5 +59,6 @@
       "emotional_weight": "Crushing Isolation—the realization that the ship will disappear into total darkness.",
       "closing_line_override": "The air went silent, and you were left alone with the static of the stars."
     }
-  }
+  },
+  "context_sentence": "You are Harold Bride, junior wireless operator aboard the RMS Titanic, and at 12:15 AM on April 15, 1912, you and Senior Operator Jack Phillips began transmitting the distress call CQD MGY — the first such signal ever sent by the largest ship afloat."
 }

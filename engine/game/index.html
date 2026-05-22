@@ -173,48 +173,25 @@ li { margin-bottom: 8px; }
 .role-overlay-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 480px; }
 .role-overlay-inner h2 { margin: 0; font-size: 1.8rem; color: var(--accent); letter-spacing: 0.04em; text-align: center; }
 .role-intro { margin: 0; color: var(--muted); font-style: italic; font-size: 0.9rem; text-align: center; }
-.role-setup-text { width: 100%; margin: 14px 0 0; display: flex; flex-direction: column; gap: 8px; }
-.role-setup-text p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
-.role-objective { width: 100%; margin: 14px 0 6px; padding: 12px 14px; border-left: 2px solid var(--accent); background: rgba(208,176,106,0.05); display: flex; flex-direction: column; gap: 6px; }
-.role-objective p { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.55; }
-.role-objective-label { font-size: 0.75rem !important; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent) !important; font-weight: bold; }
-.role-objective-note { font-style: italic; font-size: 0.82rem !important; color: #7a7060 !important; }
-.role-instruction { margin: 10px 0 4px; font-size: 0.8rem; color: var(--muted); text-align: center; }
 .role-cards { display: flex; flex-direction: column; gap: 10px; width: 100%; margin: 4px 0; min-height: 60px; }
 .role-card { display: flex; flex-direction: column; gap: 5px; text-align: left; width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel); color: var(--text); cursor: pointer; font-family: Georgia, serif; font-weight: normal; transition: border-color 0.15s, background 0.15s; }
 .role-card:hover { border-color: var(--accent); background: var(--panel-soft); }
 .role-card.selected { border-color: var(--accent); background: rgba(208,176,106,0.08); }
 .role-card-name { font-weight: bold; font-size: 0.95rem; color: var(--accent); }
 .role-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.45; }
-.begin-btn { margin-top: 8px; padding: 14px 36px; font-size: 1rem; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #1a150c; font-weight: bold; cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s, border-color 0.15s; }
-.begin-btn:hover { background: #e0c070; border-color: #e0c070; }
-.begin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.overlay-drive-btn { margin-top: 8px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; padding: 6px 18px; border-radius: 20px; cursor: pointer; font-family: Georgia, serif; transition: border-color 0.15s, color 0.15s; }
-.overlay-drive-btn:hover, .overlay-drive-btn.active { border-color: var(--accent); color: var(--accent); }
+.role-instruction { margin: 10px 0 4px; font-size: 0.8rem; color: var(--muted); text-align: center; }
 .style-selector { margin-top: 16px; text-align: center; }
 .style-label { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .style-btns { display: flex; gap: 8px; justify-content: center; }
 .style-btn { padding: 7px 20px; font-size: 0.88rem; background: transparent; border: 1px solid #444; border-radius: 4px; color: var(--muted); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
 .style-btn:hover { border-color: var(--accent); color: var(--accent); }
 .style-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(208,176,106,0.08); }
+.begin-btn { margin-top: 8px; padding: 14px 36px; font-size: 1rem; border-radius: 14px; border: 1px solid var(--accent); background: var(--accent); color: #1a150c; font-weight: bold; cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s, border-color 0.15s; }
+.begin-btn:hover { background: #e0c070; border-color: #e0c070; }
+.begin-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.intro-role-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0; }
 .error-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 16px; text-align: center; padding: 24px; }
 .error-page h1 { color: var(--accent); margin: 0; }
-.briefing-overlay { position: fixed; inset: 0; z-index: 220; background: rgba(8,6,4,0.98); backdrop-filter: blur(8px); display: flex; align-items: flex-start; justify-content: center; padding: 20px 16px; }
-.briefing-overlay.hidden { display: none; }
-.briefing-inner { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 480px; height: calc(100dvh - 40px); overflow: hidden; background: var(--panel); border: 1px solid var(--accent); border-radius: 10px; padding: 20px; }
-.briefing-role-name { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
-.briefing-lines { display: flex; flex-direction: column; gap: 20px; }
-.briefing-line { display: flex; flex-direction: column; gap: 5px; }
-.briefing-line-label { font-size: 0.68rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); opacity: 0.7; }
-.briefing-line p { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; }
-.briefing-text { margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-.briefing-input-wrap { width: 100%; }
-.briefing-input-label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
-.briefing-input-optional { opacity: 0.7; }
-.briefing-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: Georgia, serif; padding: 10px 12px; font-size: 0.88rem; resize: none; }
-.briefing-input:focus { outline: none; border-color: var(--accent); box-shadow: none; }
-.briefing-header { display: flex; align-items: center; justify-content: space-between; }
-.briefing-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
 .error-page p { color: var(--muted); margin: 0; }
 /* ── Introduction overlay ────────────────────────────────────────────────── */
 .intro-overlay { position: fixed; inset: 0; z-index: 215; background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; overflow: hidden; }
@@ -302,11 +279,7 @@ li { margin-bottom: 8px; }
   .role-card { padding: 10px 14px; }
   .role-card-desc { display: none; }
   .role-card.selected .role-card-desc { display: block; }
-  .role-overlay-inner:has(.role-card.selected) .role-setup-text,
-  .role-overlay-inner:has(.role-card.selected) .role-objective,
   .role-overlay-inner:has(.role-card.selected) .role-instruction { display: none; }
-  .briefing-overlay { padding: 12px; }
-  .briefing-inner { height: calc(100dvh - 24px); }
   .input-section-label { padding: 6px 14px 0; }
   .choices-label.visible { margin: 6px 14px 0; }
   .choices { flex-direction: column; flex-wrap: nowrap; overflow-x: visible; padding: 6px 14px 8px; }
@@ -414,7 +387,7 @@ li { margin-bottom: 8px; }
         </div>
         <div class="hero-controls">
           <button type="button" id="new-game-btn" class="new-game-btn">Begin Again</button>
-          <button type="button" id="driving-btn" class="driving-btn" aria-label="Enable driving mode" title="Driving mode">Drive</button>
+          <button type="button" id="driving-btn" class="driving-btn" aria-label="Enable driving mode" title="Driving mode" style="display:none">Drive</button>
           <button type="button" id="notes-btn" class="notes-btn">Notes</button>
           <button type="button" id="tts-toggle" class="tts-toggle" aria-label="Enable read-aloud" title="Read aloud: off"></button>
         </div>
@@ -505,12 +478,6 @@ li { margin-bottom: 8px; }
     <a href="/" class="back-link overlay-back-link">&#8592; Stories</a>
     <h2 id="overlay-title">Investigation</h2>
     <p class="role-intro" id="overlay-tagline"></p>
-    <div class="role-setup-text" id="overlay-desc"></div>
-    <div class="role-objective" id="overlay-objective" style="display:none">
-      <p class="role-objective-label">Your Objective</p>
-      <p id="overlay-goal"></p>
-      <p class="role-objective-note">Every decision adds to what you know — or closes doors.</p>
-    </div>
     <p class="role-instruction">Select your role to begin.</p>
     <div class="role-cards" id="role-cards"></div>
     <div class="style-selector">
@@ -522,28 +489,9 @@ li { margin-bottom: 8px; }
       <p style="margin:5px 0 0;font-size:0.75rem;color:#6a6050;text-align:center">Focused = faster&nbsp;|&nbsp;Cinematic = more descriptive</p>
     </div>
     <button type="button" id="role-begin-btn" class="begin-btn" disabled>Enter</button>
-    <button type="button" id="overlay-drive-btn" class="overlay-drive-btn">&#128663; Drive</button>
   </div>
 </div>
 
-<div id="briefing-overlay" class="briefing-overlay hidden" role="dialog" aria-modal="true" aria-label="Character briefing">
-  <div class="briefing-inner">
-    <div class="briefing-header">
-      <a href="/" class="back-link overlay-back-link">&#8592; Stories</a>
-      <button type="button" id="briefing-tts-btn" class="tts-toggle" aria-label="Disable read-aloud" title="Read aloud: on"></button>
-    </div>
-    <div class="briefing-role-name" id="briefing-role-name"></div>
-    <p class="briefing-text" id="briefing-text"></p>
-    <div class="briefing-input-wrap">
-      <label class="briefing-input-label" for="briefing-addition">Anything else you are carrying into tonight? <span class="briefing-input-optional">(optional)</span></label>
-      <textarea id="briefing-addition" class="briefing-input" rows="2" placeholder="One line. Or skip it."></textarea>
-    </div>
-    <div class="briefing-actions">
-      <button type="button" id="briefing-begin-btn" class="begin-btn">Continue</button>
-      <button type="button" id="briefing-skip-btn" class="overlay-drive-btn">Skip</button>
-    </div>
-  </div>
-</div>
 
 <div id="intro-overlay" class="intro-overlay hidden" role="dialog" aria-modal="true" aria-label="Story introduction">
   <div class="intro-inner">
@@ -553,7 +501,7 @@ li { margin-bottom: 8px; }
     </div>
     <div id="intro-sections" class="intro-sections"></div>
     <div class="intro-footer">
-      <button type="button" id="intro-begin-btn" class="intro-begin-btn">Begin</button>
+      <button type="button" id="intro-begin-btn" class="intro-begin-btn">Continue</button>
       <button type="button" id="intro-skip-btn" class="intro-skip-btn">Skip introduction</button>
     </div>
   </div>
@@ -1470,11 +1418,16 @@ async function loadGame() {
 
 // ── Role selection ────────────────────────────────────────────────────────────
 
+function getCardDisplayName(role) {
+  if (role.real_name && role.real_name.trim().length > 0) return role.real_name.trim();
+  if (role.display_name) return role.display_name;
+  return role.name || role.id;
+}
+
 function showRoleSelection() {
   const roleOverlay = document.getElementById('role-overlay');
   const roleCardsEl = document.getElementById('role-cards');
 
-  // Populate scenario info
   const overlayTitleEl = document.getElementById('overlay-title');
   const overlayTagline = document.getElementById('overlay-tagline');
   const overlayDesc    = document.getElementById('overlay-desc');
@@ -1492,7 +1445,6 @@ function showRoleSelection() {
     if (overlayObj) overlayObj.style.display = 'flex';
   }
 
-  // Role cards
   roleCardsEl.innerHTML = '';
   const oldBeginBtn = document.getElementById('role-begin-btn');
   const beginBtn = oldBeginBtn.cloneNode(true);
@@ -1506,7 +1458,7 @@ function showRoleSelection() {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'role-card';
-    card.innerHTML = `<span class="role-card-name">${role.name}</span><span class="role-card-desc">${role.description || ''}</span>`;
+    card.innerHTML = `<span class="role-card-name">${getCardDisplayName(role)}</span><span class="role-card-desc">${role.description || ''}</span>`;
     card.addEventListener('click', () => {
       selectedRoleId = role.id;
       beginBtn.disabled = false;
@@ -1533,9 +1485,8 @@ function showRoleSelection() {
     updateTtsToggleUI();
     updateTtsBarUI();
     roleOverlay.classList.add('hidden');
-    const role  = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
+    const role = (scenario.playerRoleOptions || []).find(r => r.id === selectedRoleId);
 
-    // Compute briefing context once so pre-warm and showBriefing use the same values
     const hooks      = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
     const hookIndex  = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
     const activeHook = hookIndex >= 0 ? hooks[hookIndex] : null;
@@ -1543,7 +1494,6 @@ function showRoleSelection() {
       ? role.briefing.trim() : (role.description || '');
     const characterContext = activeHook ? `${baseBriefing} ${activeHook}` : baseBriefing;
 
-    // Fire /start immediately — intro + briefing screens give Claude time to respond
     warmStart = {
       roleId: selectedRoleId,
       style: selectedStyle,
@@ -1563,34 +1513,38 @@ function showRoleSelection() {
       }),
     };
 
-    showBriefing(role, selectedStyle, activeHook, characterContext);
+    showIntro3A(scenario, role, activeHook, characterContext);
   });
 }
 
-// ── Introduction screen ───────────────────────────────────────────────────────
+// ── Introduction screens ──────────────────────────────────────────────────────
 
-function showIntroduction(scenario, role, style, activeHook, characterContext, playerAddition) {
+function showIntro3A(scenario, role, activeHook, characterContext) {
   const overlay    = document.getElementById('intro-overlay');
   const titleEl    = document.getElementById('intro-title');
   const sectionsEl = document.getElementById('intro-sections');
+  const skipBtn    = document.getElementById('intro-skip-btn');
 
+  const worldSections = (scenario.introduction?.sections || []).filter(
+    s => !s.character_entries && s.text?.trim()
+  );
+
+  if (!worldSections.length) {
+    showIntro3B(scenario, role, activeHook, characterContext);
+    return;
+  }
+
+  titleEl.className = 'intro-header-title';
   titleEl.textContent = scenario.title || '';
 
-  const texts = [];
   const paragraphs = [];
-  for (const section of (scenario.introduction?.sections || [])) {
-    let text;
-    if (section.character_entries) {
-      text = section.character_entries[role?.id] || Object.values(section.character_entries)[0] || '';
-    } else {
-      text = section.text || '';
-    }
-    if (!text.trim()) continue;
+  const texts = [];
+  for (const section of worldSections) {
     const p = document.createElement('p');
     p.className = 'intro-section';
-    p.textContent = text;
+    p.textContent = section.text;
     paragraphs.push(p);
-    texts.push(text);
+    texts.push(section.text);
   }
 
   function revealText() {
@@ -1601,23 +1555,23 @@ function showIntroduction(scenario, role, style, activeHook, characterContext, p
 
   sectionsEl.innerHTML = '';
   sectionsEl.scrollTop = 0;
+  skipBtn.style.display = 'none';
   overlay.classList.remove('hidden');
 
-  // ── TTS ───────────────────────────────────────────────────────────────────────
   const oldTtsBtn = document.getElementById('intro-tts-btn');
   const ttsBtnEl  = oldTtsBtn.cloneNode(false);
   oldTtsBtn.replaceWith(ttsBtnEl);
 
-  function syncIntroTtsBtn() {
+  function syncTtsBtn() {
     ttsBtnEl.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
     ttsBtnEl.classList.toggle('active', ttsEnabled);
     const label = ttsEnabled ? 'Mute narration' : 'Unmute narration';
     ttsBtnEl.title = label;
     ttsBtnEl.setAttribute('aria-label', label);
   }
-  syncIntroTtsBtn();
+  syncTtsBtn();
 
-  function startIntroTeleprompter() {
+  function startTeleprompter() {
     cancelAnimationFrame(teleprompterRafId);
     if (!audioEl || !audioEl.duration || !isFinite(audioEl.duration)) return;
     const scrollDist = sectionsEl.scrollHeight - sectionsEl.clientHeight;
@@ -1631,9 +1585,8 @@ function showIntroduction(scenario, role, style, activeHook, characterContext, p
     teleprompterRafId = requestAnimationFrame(tick);
   }
 
-  async function loadAndPlayIntro() {
+  async function loadAndPlay() {
     if (!texts.length || !audioUnlocked || !ttsEnabled) { revealText(); return; }
-    // Show loading dots while audio fetches
     sectionsEl.innerHTML = '<div class="intro-loading"><span></span><span></span><span></span></div>';
     try {
       ttsStop();
@@ -1651,43 +1604,164 @@ function showIntroduction(scenario, role, style, activeHook, characterContext, p
       audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; };
       audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; revealText(); ttsSpeakFallback(texts.join('\n\n')); };
       currentAudio = audioEl;
-      // Wait until audio is ready to play
       if (audioEl.readyState < 2) {
         await new Promise(res => audioEl.addEventListener('canplay', res, { once: true }));
       }
-      // Reveal text and start audio together
       revealText();
       try { await audioEl.play(); } catch {}
-      startIntroTeleprompter();
+      startTeleprompter();
     } catch (e) {
-      console.warn('[TTS] intro load failed', e);
+      console.warn('[TTS] intro 3A load failed', e);
       revealText();
     }
   }
 
-  loadAndPlayIntro();
+  loadAndPlay();
 
   ttsBtnEl.addEventListener('click', () => {
     setTtsEnabled(!ttsEnabled);
     if (!ttsEnabled) {
       ttsStop();
-      // If still on loading dots, reveal text immediately
       if (sectionsEl.querySelector('.intro-loading')) revealText();
     } else {
-      loadAndPlayIntro();
+      loadAndPlay();
     }
-    syncIntroTtsBtn();
+    syncTtsBtn();
     updateTtsToggleUI();
     updateTtsBarUI();
   });
 
-  // ── Navigation ────────────────────────────────────────────────────────────────
+  const oldBegin = document.getElementById('intro-begin-btn');
+  const newBegin = oldBegin.cloneNode(true);
+  oldBegin.replaceWith(newBegin);
+  newBegin.addEventListener('click', () => {
+    ttsStop();
+    showIntro3B(scenario, role, activeHook, characterContext);
+  });
+}
+
+function showIntro3B(scenario, role, activeHook, characterContext) {
+  const overlay    = document.getElementById('intro-overlay');
+  const titleEl    = document.getElementById('intro-title');
+  const sectionsEl = document.getElementById('intro-sections');
+
+  titleEl.className = 'intro-role-header';
+  titleEl.textContent = role.name;
+
+  const paragraphs = [];
+  const texts = [];
+
+  if (role.context_sentence?.trim()) {
+    const p = document.createElement('p');
+    p.className = 'intro-section';
+    p.textContent = role.context_sentence.trim();
+    paragraphs.push(p);
+    texts.push(role.context_sentence.trim());
+  }
+
+  for (const section of (scenario.introduction?.sections || [])) {
+    if (!section.character_entries) continue;
+    const text = section.character_entries[role.id] || Object.values(section.character_entries)[0] || '';
+    if (!text.trim()) continue;
+    const p = document.createElement('p');
+    p.className = 'intro-section';
+    p.textContent = text;
+    paragraphs.push(p);
+    texts.push(text);
+  }
+
+  function revealText() {
+    sectionsEl.innerHTML = '';
+    for (const p of paragraphs) sectionsEl.appendChild(p);
+    sectionsEl.scrollTop = 0;
+  }
+
+  sectionsEl.innerHTML = '';
+  sectionsEl.scrollTop = 0;
+
+  const skipBtn = document.getElementById('intro-skip-btn');
+  skipBtn.style.display = '';
+  overlay.classList.remove('hidden');
+
+  const oldTtsBtn = document.getElementById('intro-tts-btn');
+  const ttsBtnEl  = oldTtsBtn.cloneNode(false);
+  oldTtsBtn.replaceWith(ttsBtnEl);
+
+  function syncTtsBtn() {
+    ttsBtnEl.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+    ttsBtnEl.classList.toggle('active', ttsEnabled);
+    const label = ttsEnabled ? 'Mute narration' : 'Unmute narration';
+    ttsBtnEl.title = label;
+    ttsBtnEl.setAttribute('aria-label', label);
+  }
+  syncTtsBtn();
+
+  function startTeleprompter() {
+    cancelAnimationFrame(teleprompterRafId);
+    if (!audioEl || !audioEl.duration || !isFinite(audioEl.duration)) return;
+    const scrollDist = sectionsEl.scrollHeight - sectionsEl.clientHeight;
+    if (scrollDist <= 0) return;
+    const dur = audioEl.duration;
+    function tick() {
+      if (!audioEl || audioEl.paused || audioEl.ended) { teleprompterRafId = null; return; }
+      sectionsEl.scrollTop = (audioEl.currentTime / dur) * scrollDist;
+      teleprompterRafId = requestAnimationFrame(tick);
+    }
+    teleprompterRafId = requestAnimationFrame(tick);
+  }
+
+  async function loadAndPlay() {
+    if (!texts.length || !audioUnlocked || !ttsEnabled) { revealText(); return; }
+    sectionsEl.innerHTML = '<div class="intro-loading"><span></span><span></span><span></span></div>';
+    try {
+      ttsStop();
+      const body = { text: texts.join('\n\n') };
+      if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
+      const resp = await fetch(`${API_BASE}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) { revealText(); ttsSpeakFallback(texts.join('\n\n')); return; }
+      const blob = await resp.blob();
+      const url  = URL.createObjectURL(blob);
+      audioEl.src = url;
+      audioEl.playbackRate = 1.0;
+      audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; };
+      audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; revealText(); ttsSpeakFallback(texts.join('\n\n')); };
+      currentAudio = audioEl;
+      if (audioEl.readyState < 2) {
+        await new Promise(res => audioEl.addEventListener('canplay', res, { once: true }));
+      }
+      revealText();
+      try { await audioEl.play(); } catch {}
+      startTeleprompter();
+    } catch (e) {
+      console.warn('[TTS] intro 3B load failed', e);
+      revealText();
+    }
+  }
+
+  loadAndPlay();
+
+  ttsBtnEl.addEventListener('click', () => {
+    setTtsEnabled(!ttsEnabled);
+    if (!ttsEnabled) {
+      ttsStop();
+      if (sectionsEl.querySelector('.intro-loading')) revealText();
+    } else {
+      loadAndPlay();
+    }
+    syncTtsBtn();
+    updateTtsToggleUI();
+    updateTtsBarUI();
+  });
+
   function proceed() {
     ttsStop();
     overlay.classList.add('hidden');
-    startGame(role.id, style, {
+    startGame(role.id, 'focused', {
       character_context: characterContext,
-      player_addition:   playerAddition || '',
+      player_addition:   null,
       active_hook:       activeHook,
     });
   }
@@ -1701,90 +1775,6 @@ function showIntroduction(scenario, role, style, activeHook, characterContext, p
   const newSkip = oldSkip.cloneNode(true);
   oldSkip.replaceWith(newSkip);
   newSkip.addEventListener('click', proceed);
-}
-
-// ── Briefing screen ───────────────────────────────────────────────────────────
-
-function showBriefing(role, style, activeHook, fullBriefing) {
-  const overlay    = document.getElementById('briefing-overlay');
-  const additionEl = document.getElementById('briefing-addition');
-
-  // Use precomputed values from role selection (same hook used for pre-warm); compute if absent
-  if (activeHook === undefined) {
-    const hooks = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
-    const idx   = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
-    activeHook  = idx >= 0 ? hooks[idx] : null;
-  }
-  if (!fullBriefing) {
-    const base = typeof role.briefing === 'string' && role.briefing.trim()
-      ? role.briefing.trim() : (role.description || '');
-    fullBriefing = activeHook ? `${base} ${activeHook}` : base;
-  }
-
-  document.getElementById('briefing-role-name').textContent = role.name;
-  document.getElementById('briefing-text').textContent      = fullBriefing;
-
-  if (additionEl) additionEl.value = '';
-  overlay.classList.remove('hidden');
-
-  // ── Briefing TTS toggle ───────────────────────────────────────────────────
-  // Clone to remove any prior event listeners from a previous briefing call
-  const oldTtsBtn = document.getElementById('briefing-tts-btn');
-  const ttsBtn    = oldTtsBtn.cloneNode(false);
-  oldTtsBtn.replaceWith(ttsBtn);
-
-  function syncBriefingTtsBtn() {
-    ttsBtn.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
-    ttsBtn.classList.toggle('active', ttsEnabled);
-    ttsBtn.setAttribute('aria-label', ttsEnabled ? 'Disable read-aloud' : 'Enable read-aloud');
-    ttsBtn.title = ttsEnabled ? 'Read aloud: on' : 'Read aloud: off';
-  }
-  syncBriefingTtsBtn();
-
-  ttsBtn.addEventListener('click', () => {
-    setTtsEnabled(!ttsEnabled);
-    if (!ttsEnabled) {
-      ttsStop();
-    } else if (audioUnlocked && fullBriefing) {
-      ttsSpeak(fullBriefing);
-    }
-    syncBriefingTtsBtn();
-    updateTtsToggleUI();
-    updateTtsBarUI();
-  });
-
-  // Read briefing aloud on open
-  if (ttsEnabled && audioUnlocked && fullBriefing) {
-    ttsSpeak(fullBriefing);
-  }
-
-  function beginWith(playerAddition) {
-    ttsStop();
-    overlay.classList.add('hidden');
-    const intro = scenario?.introduction;
-    const hasIntro = intro?.enabled && (intro.sections || []).some(
-      s => s.text?.trim() || Object.values(s.character_entries || {}).some(v => v?.trim())
-    );
-    if (hasIntro) {
-      showIntroduction(scenario, role, style, activeHook, fullBriefing, playerAddition);
-    } else {
-      startGame(role.id, style, {
-        character_context: fullBriefing,
-        player_addition:   playerAddition,
-        active_hook:       activeHook,
-      });
-    }
-  }
-
-  const oldBegin = document.getElementById('briefing-begin-btn');
-  const newBegin = oldBegin.cloneNode(true);
-  oldBegin.replaceWith(newBegin);
-  newBegin.addEventListener('click', () => beginWith(additionEl?.value?.trim() || ''));
-
-  const oldSkip = document.getElementById('briefing-skip-btn');
-  const newSkip = oldSkip.cloneNode(true);
-  oldSkip.replaceWith(newSkip);
-  newSkip.addEventListener('click', () => beginWith(''));
 }
 
 // ── Client-side initial state builder ────────────────────────────────────────

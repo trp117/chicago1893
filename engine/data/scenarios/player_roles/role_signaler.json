@@ -51,7 +51,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.107Z",
+  "updatedAt": "2026-05-22T01:49:09.072Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully splice the main line at Delta-7 and restore Wire_Continuity to Operational, allowing the forward companies to call down defensive fire against the German infantry probes. However, you choose to conceal the officer's uniform thread and the wire cutters to avoid framing yourself, leaving the saboteur's broader intelligence network active within the division.",
@@ -67,5 +67,6 @@
       "closing_line": "The copper went cold in your hands, and the artillery behind the ridge fell silent.",
       "closing_line_override": ""
     }
-  }
+  },
+  "context_sentence": "You are a Signal Corps lineman of the 1st Division, American Expeditionary Forces, one of the wire teams that advanced behind the assault infantry at Cantigny on May 28, 1918 — the first offensive operation conducted by American forces in the First World War."
 }

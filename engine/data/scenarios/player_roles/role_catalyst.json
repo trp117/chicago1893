@@ -55,7 +55,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-19T02:51:13.224Z",
+  "updatedAt": "2026-05-22T01:45:29.955Z",
   "ending_notes": {
     "partial": {
       "what_happened": "The gates were raised and you spilled across the bridge into West Berlin into a blur of champagne and cheering crowds. However, during your frantic push through the gate, you lost track of your younger brother who had marched with you, leaving you entirely isolated in a new world without knowing if he made it through safely. ",
@@ -69,5 +69,6 @@
       "emotional_weight": " Crushing Claustrophobia—the terror of being locked in the dark while history passes you by just outside the window. ",
       "closing_line_override": " The heavy iron lock clicked shut, drowning out the sound of a world trying to break free. "
     }
-  }
+  },
+  "context_sentence": "You are an unnamed East Berlin student standing at the front of the crowd at the Bornholmer Straße checkpoint on the night of November 9, 1989 — the first border crossing point to open, at 11:30 PM, when Harald Jäger ordered his guards to stand down and let the people through."
 }

@@ -26,7 +26,11 @@
     ]
   },
   "roleInitialState": {
-    "inventory": ["telegraph warning", "transfer order", "fair credential"],
+    "inventory": [
+      "telegraph warning",
+      "transfer order",
+      "fair credential"
+    ],
     "flags": {
       "heardFrenchConversation": false,
       "manifestDiscrepancyFound": true,
@@ -40,5 +44,6 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z"
+  "updatedAt": "2026-05-22T01:47:33.086Z",
+  "context_sentence": "You are Daniel Burnham, the Director of Works for the 1893 World's Columbian Exposition in Chicago, the man who coordinated hundreds of architects, engineers, and laborers to construct the White City — a 690-acre fairground built on reclaimed swampland along Lake Michigan — in under three years."
 }

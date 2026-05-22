@@ -131,6 +131,8 @@ function validateStoredScenario(scenario, playerRoles) {
     const entry = entrySection?.character_entries?.[role.id];
     if (!entry || entry.trim().length < 50)
       errors.push(`Missing entry paragraph for ${role.name} — click Repair to generate`);
+    if (!role.context_sentence || role.context_sentence.trim().length < 10)
+      errors.push(`Missing context sentence for ${role.name} — click Repair to generate`);
   });
 
   return errors;
@@ -227,6 +229,50 @@ async function generateCharacterEntry(scenario, role, allRoles, anthropicApiKey)
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
     { model: 'claude-sonnet-4-6', max_tokens: 500, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
     { timeout: 60_000 }
+  );
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  return text;
+}
+
+async function generateContextSentence(scenario, role, anthropicApiKey) {
+  const introText = (scenario.introduction?.sections || [])
+    .filter(s => s.type !== 'entry')
+    .map(s => s.text || '').filter(Boolean).join('\n\n');
+
+  const content = `Write a single context sentence for a character in an immersive historical fiction experience.
+
+SCENARIO: ${scenario.title}
+SETTING: ${scenario.setting || ''}
+HISTORICAL CONTEXT:
+${introText.slice(0, 600)}
+
+CHARACTER NAME: ${role.name}
+CHARACTER DESCRIPTION: ${role.description || ''}
+CHARACTER BRIEFING: ${getBriefingText(role.briefing) || ''}
+
+Write ONE sentence only. Second person.
+
+This sentence must ground the player in the historical record — who they are in history, not how they think or feel. The entry prose handles psychology. This sentence handles identity and historical placement.
+
+PATTERN: "You are [name], [their specific role in the historical event], [one specific historical fact that places them in the record]."
+
+CORRECT examples:
+"You are Joseph McNeil, one of the four Black college freshmen who sat down at the segregated lunch counter at F.W. Woolworth's in Greensboro on February 1, 1960, and asked to be served."
+
+"You are Elias Cole, a conductor of twenty years on the Underground Railroad, and tonight you are responsible for moving seven people — including two children — north through the Ohio bottomland toward Canada."
+
+WRONG — do not write psychological description:
+"You are the one who reads rooms the way others read faces."
+
+WRONG — do not write poetic or impressionistic language:
+"Tonight the room is telling you something history will never record."
+
+Maximum 50 words. One sentence. Factual. Historical. Grounding. No preamble. No explanation. Just the sentence.`;
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: 'claude-sonnet-4-6', max_tokens: 120, temperature: 0.7, messages: [{ role: 'user', content }] },
+    { timeout: 30_000 }
   );
   const text = msg.content[0]?.text?.trim();
   if (!text) throw new Error('No text returned from Anthropic');
@@ -621,11 +667,12 @@ export function createAdminRouter(repos, config = {}) {
     const missing = validateStoredScenario(scenario, playerRoles);
     const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
     const roles = playerRoles.map(role => ({
-      id:               role.id,
-      name:             role.name,
-      hasBriefing:      getBriefingText(role.briefing).length >= 50,
-      hasDescription:   !!role.description,
+      id:                role.id,
+      name:              role.name,
+      hasBriefing:       getBriefingText(role.briefing).length >= 50,
+      hasDescription:    !!role.description,
       hasEntryParagraph: !!(entrySection?.character_entries?.[role.id]?.trim().length >= 50),
+      hasContextSentence: !!(role.context_sentence?.trim().length >= 10),
     }));
     res.json({
       scenarioId: req.params.id,
@@ -683,6 +730,23 @@ export function createAdminRouter(repos, config = {}) {
           }
         }
         repos.scenarios.save(scenario);
+      }
+    }
+
+    // Repair missing context sentences
+    const updatedRolesForContext = repos.scenarios.findPlayerRoles(req.params.id);
+    const missingContextSentences = updatedRolesForContext.filter(
+      role => !role.context_sentence || role.context_sentence.trim().length < 10
+    );
+    for (const role of missingContextSentences) {
+      try {
+        const contextSentence = await generateContextSentence(scenario, role, anthropicApiKey);
+        repos.scenarios.savePlayerRole({ ...role, context_sentence: contextSentence });
+        repairs.push(`Generated context sentence for ${role.name}`);
+        console.log(`[REPAIR] ${req.params.id} — context_sentence written for "${role.name}"`);
+      } catch (err) {
+        errors.push(`Failed to generate context sentence for ${role.name}: ${err.message}`);
+        console.error(`[REPAIR ERROR] context_sentence ${role.name}: ${err.message}`);
       }
     }
 

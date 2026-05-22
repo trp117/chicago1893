@@ -1616,6 +1616,7 @@ function renderPlayerRolesSection(data) {
       ${edField('Perspective',        edTextarea(`playerRoles.${i}.perspective`,       r.perspective,       2))}
       ${edField('Starting Knowledge', edTextarea(`playerRoles.${i}.startingKnowledge`, knowledgeVal,        3, 'data-type="array"'), 'One per line')}
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
+      ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}
       ${hooksHtml}
       ${edField('Suggested Secret',   edTextarea(`playerRoles.${i}.suggested_secret`,  r.suggested_secret,  2), 'One thing nobody in the story knows')}
       ${edDetails('Ending Notes', 'partial + failure', `

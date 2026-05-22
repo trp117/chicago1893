@@ -54,7 +54,7 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.106Z",
+  "updatedAt": "2026-05-22T01:49:03.166Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully identify the corrupted fire tables and manually override the firing data for the 5th Field Artillery, stabilizing the barrage sync before the infantry is completely exposed. However, your intense focus on the calculations delays the evacuation of the lower signal bunker during a retaliatory counter-battery stonk, resulting in the loss of critical log books and several operators.",
@@ -70,5 +70,6 @@
       "closing_line": "The fire tables remained uncorrected, and the silence from the forward line became absolute.",
       "closing_line_override": ""
     }
-  }
+  },
+  "context_sentence": "You are the artillery commander responsible for synchronizing the rolling barrage that preceded the 28th Infantry Regiment's assault on Cantigny on May 28, 1918 — the first offensive operation conducted independently by American forces in the First World War."
 }

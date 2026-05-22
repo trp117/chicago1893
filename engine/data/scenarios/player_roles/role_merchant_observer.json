@@ -10,7 +10,7 @@
     "You were present when Dillworth volunteered detailed information about the ships' manifests at a meeting last week — information he should not have had."
   ],
   "accessLevel": "staff",
-  "briefing": "[object Object]",
+  "briefing": "You stand at the corner of Milk Street and Hutchinson, collar turned against the December cold, close enough to Griffin's Wharf to smell the salt and tar but far enough that no constable can place you among the crowd. The Dartmouth sits low in the water and you know something tonight's shouting patriots do not: her manifest is wrong. You reviewed the East India Company's shipping ledgers last Tuesday at Dillworth's counting house — a professional courtesy, he called it, two merchants examining the numbers together — and the declared weight of the tea does not match the warehouse receipts you glimpsed folded beneath his blotter. Someone has been skimming duties before the Crown ever sees them, and the question burning in your chest is not whether that someone is Dillworth, but who above Dillworth made it possible. Samuel Adams asked you to watch and listen tonight, but watching and listening is not what your mind is doing. Your mind is following the money. The crowd noise swells from the direction of the wharf, torchlight flickering orange across the rooftops, and somewhere in the darkness between you and that counting house door is the answer. You take one breath. You choose your direction.",
   "perspective": "Write from the perspective of an educated merchant who moves between the patriot and commercial worlds with equal ease. This player has natural credibility with Dillworth and can approach him without triggering immediate suspicion. They also have enough social standing to gain access to Warren and Adams, though they are not part of the inner circle. The narrative should emphasize the player's commercial instincts — following the money, reading contracts, noticing financial irregularities. This player is the most natural candidate to investigate Dillworth's counting house without arousing suspicion.",
   "opening": {
     "narrative": "The Green Dragon Tavern is quieter than you have ever seen it — the regulars are all at the meeting house, and the fire in the hearth is burning low, casting the room in amber and shadow. Paul Revere is standing near the hearth with a mug he has not touched, his eyes moving between the door and the window with the rhythm of a man expecting bad news. He spots you and waves you over: 'Adams asked me to keep you close tonight. He thinks the spy is someone with money and connections — your kind of person.' The words sting a little, but he is not wrong.",
@@ -35,11 +35,12 @@
     }
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.779Z",
+  "updatedAt": "2026-05-22T01:45:56.733Z",
   "character_hooks": [
     "",
     "",
     ""
   ],
-  "suggested_secret": ""
+  "suggested_secret": "",
+  "context_sentence": "You are John Andrews, a Boston merchant and prolific letter-writer whose correspondence in the winter of 1773 would become one of the most detailed firsthand accounts of the Tea Party's events, placing you among the few educated observers who watched that night from the edges rather than the waterfront."
 }
