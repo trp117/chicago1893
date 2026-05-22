@@ -1529,7 +1529,7 @@ function showIntro3A(scenario, role, activeHook, characterContext) {
   const skipBtn    = document.getElementById('intro-skip-btn');
 
   const worldSections = (scenario.introduction?.sections || []).filter(
-    s => !s.character_entries && s.text?.trim()
+    s => !s.character_entries && s.text?.trim() && s.type !== 'scene'
   );
 
   if (!worldSections.length) {
@@ -1556,9 +1556,19 @@ function showIntro3A(scenario, role, activeHook, characterContext) {
     sectionsEl.scrollTop = 0;
   }
 
+  function proceed() {
+    ttsStop();
+    overlay.classList.add('hidden');
+    startGame(role.id, 'focused', {
+      character_context: characterContext,
+      player_addition:   null,
+      active_hook:       activeHook,
+    });
+  }
+
   sectionsEl.innerHTML = '';
   sectionsEl.scrollTop = 0;
-  skipBtn.style.display = 'none';
+  skipBtn.style.display = '';
   overlay.classList.remove('hidden');
 
   const oldTtsBtn = document.getElementById('intro-tts-btn');
@@ -1641,9 +1651,135 @@ function showIntro3A(scenario, role, activeHook, characterContext) {
     ttsStop();
     showIntro3B(scenario, role, activeHook, characterContext);
   });
+
+  const oldSkipA = document.getElementById('intro-skip-btn');
+  const newSkipA = oldSkipA.cloneNode(true);
+  oldSkipA.replaceWith(newSkipA);
+  newSkipA.addEventListener('click', proceed);
 }
 
 function showIntro3B(scenario, role, activeHook, characterContext) {
+  const overlay    = document.getElementById('intro-overlay');
+  const titleEl    = document.getElementById('intro-title');
+  const sectionsEl = document.getElementById('intro-sections');
+  const skipBtn    = document.getElementById('intro-skip-btn');
+
+  const sceneSections = (scenario.introduction?.sections || []).filter(
+    s => !s.character_entries && s.text?.trim() && s.type === 'scene'
+  );
+
+  if (!sceneSections.length) {
+    showIntro3C(scenario, role, activeHook, characterContext);
+    return;
+  }
+
+  titleEl.className = 'intro-header-title';
+  titleEl.textContent = scenario.title || '';
+
+  const paragraphs = [];
+  const texts = [];
+  for (const section of sceneSections) {
+    const p = document.createElement('p');
+    p.className = 'intro-section';
+    p.textContent = section.text;
+    paragraphs.push(p);
+    texts.push(section.text);
+  }
+
+  function revealText() {
+    sectionsEl.innerHTML = '';
+    for (const p of paragraphs) sectionsEl.appendChild(p);
+    sectionsEl.scrollTop = 0;
+  }
+
+  sectionsEl.innerHTML = '';
+  sectionsEl.scrollTop = 0;
+  skipBtn.style.display = 'none';
+  overlay.classList.remove('hidden');
+
+  const oldTtsBtn = document.getElementById('intro-tts-btn');
+  const ttsBtnEl  = oldTtsBtn.cloneNode(false);
+  oldTtsBtn.replaceWith(ttsBtnEl);
+
+  function syncTtsBtn() {
+    ttsBtnEl.innerHTML = ttsEnabled ? SVG_SPEAKER_ON : SVG_SPEAKER_OFF;
+    ttsBtnEl.classList.toggle('active', ttsEnabled);
+    const label = ttsEnabled ? 'Mute narration' : 'Unmute narration';
+    ttsBtnEl.title = label;
+    ttsBtnEl.setAttribute('aria-label', label);
+  }
+  syncTtsBtn();
+
+  function startTeleprompter() {
+    cancelAnimationFrame(teleprompterRafId);
+    if (!audioEl || !audioEl.duration || !isFinite(audioEl.duration)) return;
+    const scrollDist = sectionsEl.scrollHeight - sectionsEl.clientHeight;
+    if (scrollDist <= 0) return;
+    const dur = audioEl.duration;
+    function tick() {
+      if (!audioEl || audioEl.paused || audioEl.ended) { teleprompterRafId = null; return; }
+      sectionsEl.scrollTop = (audioEl.currentTime / dur) * scrollDist;
+      teleprompterRafId = requestAnimationFrame(tick);
+    }
+    teleprompterRafId = requestAnimationFrame(tick);
+  }
+
+  async function loadAndPlay() {
+    if (!texts.length || !audioUnlocked || !ttsEnabled) { revealText(); return; }
+    sectionsEl.innerHTML = '<div class="intro-loading"><span></span><span></span><span></span></div>';
+    try {
+      ttsStop();
+      const body = { text: texts.join('\n\n') };
+      if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
+      const resp = await fetch(`${API_BASE}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) { revealText(); ttsSpeakFallback(texts.join('\n\n')); return; }
+      const blob = await resp.blob();
+      const url  = URL.createObjectURL(blob);
+      audioEl.src = url;
+      audioEl.playbackRate = 1.0;
+      audioEl.onended = () => { URL.revokeObjectURL(url); currentAudio = null; };
+      audioEl.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; revealText(); ttsSpeakFallback(texts.join('\n\n')); };
+      currentAudio = audioEl;
+      if (audioEl.readyState < 2) {
+        await new Promise(res => audioEl.addEventListener('canplay', res, { once: true }));
+      }
+      revealText();
+      try { await audioEl.play(); } catch {}
+      startTeleprompter();
+    } catch (e) {
+      console.warn('[TTS] intro 3B load failed', e);
+      revealText();
+    }
+  }
+
+  loadAndPlay();
+
+  ttsBtnEl.addEventListener('click', () => {
+    setTtsEnabled(!ttsEnabled);
+    if (!ttsEnabled) {
+      ttsStop();
+      if (sectionsEl.querySelector('.intro-loading')) revealText();
+    } else {
+      loadAndPlay();
+    }
+    syncTtsBtn();
+    updateTtsToggleUI();
+    updateTtsBarUI();
+  });
+
+  const oldBegin = document.getElementById('intro-begin-btn');
+  const newBegin = oldBegin.cloneNode(true);
+  oldBegin.replaceWith(newBegin);
+  newBegin.addEventListener('click', () => {
+    ttsStop();
+    showIntro3C(scenario, role, activeHook, characterContext);
+  });
+}
+
+function showIntro3C(scenario, role, activeHook, characterContext) {
   const overlay    = document.getElementById('intro-overlay');
   const titleEl    = document.getElementById('intro-title');
   const sectionsEl = document.getElementById('intro-sections');
@@ -1739,7 +1875,7 @@ function showIntro3B(scenario, role, activeHook, characterContext) {
       try { await audioEl.play(); } catch {}
       startTeleprompter();
     } catch (e) {
-      console.warn('[TTS] intro 3B load failed', e);
+      console.warn('[TTS] intro 3C load failed', e);
       revealText();
     }
   }
