@@ -50,7 +50,7 @@ export function getArcPosition(minutesRemaining, totalMinutes) {
 }
 
 export function buildNarrativeStyleRules(scenario = {}) {
-  // Builds two narrative style rules injected into every scene generation call:
+  // Builds narrative style rules injected into every scene generation call:
   //
   // 1. SENSORY OPENING RULE — ensures physical and period detail is woven
   //    into narrative rather than fired as a standalone descriptive block.
@@ -59,7 +59,10 @@ export function buildNarrativeStyleRules(scenario = {}) {
   //    body and immediate experience. Prevents the scene generation from
   //    stepping back to explain, summarize, or editorialize.
   //
-  // Both rules apply globally to every story and every character.
+  // 3. MOVEMENT AND TRANSITION RULE — when the player moves to a new
+  //    location, the scene opens in motion, not at the destination.
+  //
+  // All rules apply globally to every story and every character.
   // Inserted at {{SENSORY_OPENING_RULE}} in game_system_prompt.md (line 144)
   // and via buildSystemPromptLegacy() for all scenarios.
   let rules = [
@@ -152,6 +155,31 @@ export function buildNarrativeStyleRules(scenario = {}) {
     'THE TEST: If a sentence could be removed and the scene would still be fully understood from the physical action alone — remove it. If a sentence explains something the action already shows — remove it. Every sentence that remains should be doing work that no other sentence is doing.',
     '',
     'THE STANDARD: The reader should be inside a body in the scene, not reading about one.',
+    '',
+    '---',
+    '',
+    '## MOVEMENT AND TRANSITION RULE',
+    '',
+    'When the player\'s choice involves moving from one location to another, open the resulting scene in motion — not at the destination.',
+    '',
+    'The first paragraph narrates the physical experience of moving through space. What the character passes. What changes in the sensory environment as they move. What they notice in transit. The character arrives at the destination by the end of the opening paragraph, not the beginning.',
+    '',
+    'WRONG — instant arrival:',
+    'Player chooses to find Greer in the construction yard.',
+    'Next scene opens: "Greer is standing at the far end of the yard when you find him."',
+    '',
+    'RIGHT — in motion:',
+    'Player chooses to find Greer in the construction yard.',
+    'Next scene opens with the player moving through the interior — what they pass, what changes, what they notice. They emerge into the yard and find Greer by the end of the first paragraph.',
+    '',
+    'Scale the transition to the distance traveled:',
+    '- Crossing a room or stepping through a door: one or two sentences',
+    '- Moving between locations in the same building: three to four sentences',
+    '- Moving between separate locations or outside: a full paragraph',
+    '',
+    'This rule does not apply to choices that involve dialogue, observation, or action within the current location. It applies only when the player\'s choice explicitly involves physical movement to a new place.',
+    '',
+    'Never open a scene already at a destination the player has just chosen to travel to. The journey is part of the experience.',
     '',
     '---',
     '',
