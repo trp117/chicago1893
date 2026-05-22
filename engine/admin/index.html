@@ -1494,6 +1494,7 @@ function renderScenarioSection(data) {
   return edSection('Scenario', `
     ${edField('Title',             edInput('scenario.title',             s.title))}
     ${edField('Scenario ID',       edInput('scenario.id',               s.id),              'snake_case slug — used in URLs')}
+    ${edField('Description',        edTextarea('scenario.description',    s.description,      3), 'Shown on the role selection screen — one paragraph summarising the situation and stakes')}
     ${edField('Premise',           edTextarea('scenario.premise',        s.premise,          2))}
     ${edField('Player Goal',       edTextarea('scenario.playerGoal',     s.playerGoal,       2))}
     ${edField('Opening Situation', edTextarea('scenario.openingSituation', s.openingSituation, 2))}
