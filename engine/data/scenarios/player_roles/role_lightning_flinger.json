@@ -51,5 +51,6 @@
   "context_sentence": "You are Caleb Morse, night telegraph operator at the Sandusky junction on the New York and Erie line in October 1856, one of an estimated three hundred sympathetic railroad and telegraph employees who used their positions along the northern corridor to obstruct enforcement of the Fugitive Slave Act of 1850.",
   "character_type": "fictional",
   "represents": "Telegraph operators who used their wire access to support Underground Railroad networks in Ohio during the 1850s",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The last message on the tape has not been answered."
 }

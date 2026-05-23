@@ -53,5 +53,6 @@
   "context_sentence": "\"You are a senior administrative aide to Daniel Burnham, Director of Works for the 1893 World's Columbian Exposition, whose 690-acre fairground on the Chicago lakefront required coordinating more than 40,000 workers and an unprecedented network of electrical infrastructure to bring the White City to life on schedule.\"",
   "character_type": "fictional",
   "represents": "Administrative staff working under Daniel Burnham at the World's Columbian Exposition, Chicago, 1893",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The blueprints on the drafting table are still pinned down."
 }
