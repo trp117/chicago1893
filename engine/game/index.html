@@ -224,6 +224,11 @@ li { margin-bottom: 8px; }
 .intro-scene-divider { border: none; border-top: 1px solid rgba(58,52,41,0.6); margin: 8px 0 32px; }
 .intro-char-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 24px; opacity: 0; animation: intro-fade 0.7s ease forwards; }
 .intro-bridge-sentence { font-style: italic; }
+.scroll-reveal { animation: none; opacity: 0; }
+.intro-paragraph { animation: intro-fade 0.7s ease forwards; }
+.bridge-sentence { font-style: italic; }
+.context-sentence {}
+.entry-paragraph {}
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
   .sidebar { display: none; }
@@ -1536,7 +1541,7 @@ function showRoleSelection() {
 
 // Shared TTS+teleprompter helper used by both intro screens
 function _buildIntroScreen({ overlay, titleEl, sectionsEl, skipBtn, titleClass, titleText,
-                              buildContent, onContinue, showSkip, logTag }) {
+                              buildContent, onContinue, showSkip, logTag, onReveal }) {
   titleEl.className = titleClass;
   titleEl.textContent = titleText;
 
@@ -1546,6 +1551,7 @@ function _buildIntroScreen({ overlay, titleEl, sectionsEl, skipBtn, titleClass, 
     sectionsEl.innerHTML = '';
     for (const el of paragraphs) sectionsEl.appendChild(el);
     sectionsEl.scrollTop = 0;
+    if (onReveal) onReveal(paragraphs);
   }
 
   sectionsEl.innerHTML = '';
@@ -1694,7 +1700,7 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
   const bridgeSentence = (role.bridge_sentence || '').replace(/^\[DRAFT\]\s*/i, '').trim();
   const charTexts = [];
   if (bridgeSentence) charTexts.push({ text: bridgeSentence, isBridge: true });
-  if (role.context_sentence?.trim()) charTexts.push({ text: role.context_sentence.trim() });
+  if (role.context_sentence?.trim()) charTexts.push({ text: role.context_sentence.trim(), isContext: true });
   for (const section of (scenario.introduction?.sections || [])) {
     if (!section.character_entries) continue;
     const text = section.character_entries[role.id] || Object.values(section.character_entries)[0] || '';
@@ -1703,10 +1709,10 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
 
   function buildContent() {
     const paragraphs = [], texts = [];
-    charTexts.forEach(({ text, isBridge }, idx) => {
+    charTexts.forEach(({ text, isBridge, isContext }, idx) => {
       const p = document.createElement('p');
-      p.className = isBridge ? 'intro-section intro-bridge-sentence' : 'intro-section';
-      p.style.animationDelay = `${0.1 + idx * 0.5}s`;
+      const semantic = isBridge ? 'bridge-sentence' : isContext ? 'context-sentence' : 'entry-paragraph';
+      p.className = `intro-section scroll-reveal ${semantic}`;
       p.textContent = text;
       paragraphs.push(p);
       texts.push(text);
@@ -1725,12 +1731,27 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
 
   if (!charTexts.length) { onContinue(); return; }
 
+  let _sceneObserver = null;
+  function onReveal(paragraphs) {
+    if (_sceneObserver) _sceneObserver.disconnect();
+    _sceneObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('intro-paragraph');
+          _sceneObserver.unobserve(e.target);
+        }
+      });
+    }, { root: sectionsEl, threshold: 0.1 });
+    paragraphs.forEach(p => _sceneObserver.observe(p));
+  }
+
   _buildIntroScreen({
     overlay, titleEl, sectionsEl, skipBtn,
     titleClass: 'intro-role-header',
     titleText:  role.name,
     buildContent,
     onContinue,
+    onReveal,
     showSkip: true,
     logTag: 'intro-scene',
   });
