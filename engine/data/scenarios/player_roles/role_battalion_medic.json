@@ -63,5 +63,6 @@
   "context_sentence": "You are the battalion medic attached to the 116th Infantry Regiment, 29th Infantry Division, one of the first wave of American soldiers to reach Dog Green Sector of Omaha Beach on the morning of June 6, 1944 — a stretch of coastline the U.S. Army's own after-action reports would later describe as the single deadliest killing ground of the entire Normandy invasion.",
   "character_type": "fictional",
   "represents": "Battalion aid men of the 116th Infantry Regiment at Omaha Beach on June 6, 1944",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The tide is at your elbows now."
 }

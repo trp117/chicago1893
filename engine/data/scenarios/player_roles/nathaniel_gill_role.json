@@ -64,5 +64,6 @@
   "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War.",
   "character_type": "fictional",
   "represents": "Young men who carried dispatches through occupied Boston on the night of April 18-19, 1775",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The dispatch is on the composing table."
 }

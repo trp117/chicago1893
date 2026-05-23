@@ -1645,8 +1645,9 @@ function showWorldIntro() {
   const sectionsEl = document.getElementById('intro-sections');
   const skipBtn    = document.getElementById('intro-skip-btn');
 
+  // Screen 2 shows world + stakes + scene — all non-character-entry sections
   const worldSections = (scenario.introduction?.sections || []).filter(
-    s => !s.character_entries && s.text?.trim() && s.type !== 'scene'
+    s => !s.character_entries && s.text?.trim()
   );
 
   function buildContent() {
@@ -1681,63 +1682,34 @@ function showWorldIntro() {
   });
 }
 
-// Screen 3 — Scene + Character entry combined (shown after role selection)
+// Screen 3 — Character entry only (bridge sentence + context sentence + entry prose)
 function showIntroScene(scenario, role, activeHook, characterContext) {
   const overlay    = document.getElementById('intro-overlay');
   const titleEl    = document.getElementById('intro-title');
   const sectionsEl = document.getElementById('intro-sections');
   const skipBtn    = document.getElementById('intro-skip-btn');
 
-  const sceneSections = (scenario.introduction?.sections || []).filter(
-    s => !s.character_entries && s.text?.trim() && s.type === 'scene'
-  );
-
-  // Collect character entry text
+  // Collect character entry texts in order: bridge → context → entry
+  const bridgeSentence = (role.bridge_sentence || '').replace(/^\[DRAFT\]\s*/i, '').trim();
   const charTexts = [];
-  if (role.context_sentence?.trim()) charTexts.push(role.context_sentence.trim());
+  if (bridgeSentence) charTexts.push({ text: bridgeSentence, isBridge: true });
+  if (role.context_sentence?.trim()) charTexts.push({ text: role.context_sentence.trim() });
   for (const section of (scenario.introduction?.sections || [])) {
     if (!section.character_entries) continue;
     const text = section.character_entries[role.id] || Object.values(section.character_entries)[0] || '';
-    if (text.trim()) charTexts.push(text.trim());
+    if (text.trim()) charTexts.push({ text: text.trim() });
   }
 
   function buildContent() {
     const paragraphs = [], texts = [];
-    let delayIndex = 0;
-
-    for (const section of sceneSections) {
+    charTexts.forEach(({ text }, idx) => {
       const p = document.createElement('p');
       p.className = 'intro-section';
-      p.style.animationDelay = `${0.1 + delayIndex * 0.5}s`;
-      p.textContent = section.text;
-      paragraphs.push(p);
-      texts.push(section.text);
-      delayIndex++;
-    }
-
-    if (sceneSections.length && charTexts.length) {
-      const hr = document.createElement('hr');
-      hr.className = 'intro-scene-divider';
-      paragraphs.push(hr);
-
-      const nameEl = document.createElement('p');
-      nameEl.className = 'intro-char-header';
-      nameEl.style.animationDelay = `${0.1 + delayIndex * 0.5}s`;
-      nameEl.textContent = role.name;
-      paragraphs.push(nameEl);
-      delayIndex++;
-    }
-
-    for (const text of charTexts) {
-      const p = document.createElement('p');
-      p.className = 'intro-section';
-      p.style.animationDelay = `${0.1 + delayIndex * 0.5}s`;
+      p.style.animationDelay = `${0.1 + idx * 0.5}s`;
       p.textContent = text;
       paragraphs.push(p);
       texts.push(text);
-      delayIndex++;
-    }
-
+    });
     return { paragraphs, texts };
   }
 
@@ -1750,13 +1722,12 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
     });
   }
 
-  const hasContent = sceneSections.length || charTexts.length;
-  if (!hasContent) { onContinue(); return; }
+  if (!charTexts.length) { onContinue(); return; }
 
   _buildIntroScreen({
     overlay, titleEl, sectionsEl, skipBtn,
-    titleClass: 'intro-header-title',
-    titleText:  '',
+    titleClass: 'intro-role-header',
+    titleText:  role.name,
     buildContent,
     onContinue,
     showSkip: true,

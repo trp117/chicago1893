@@ -64,5 +64,6 @@
   "context_sentence": "You are a sergeant with the 2nd Ranger Battalion, the only man on this stretch of Dog Green Sector carrying a Bangalore torpedo on the morning of June 6, 1944, when the 116th Infantry Regiment suffered more casualties in the first fifteen minutes at Omaha Beach than any other unit in the invasion.",
   "character_type": "fictional",
   "represents": "Sergeants of the 2nd Ranger Battalion at Dog Green Sector on June 6, 1944",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The MG-42 has been running the same arc for six minutes."
 }

@@ -85,5 +85,6 @@
   "context_sentence": "You are Hannah Cross, one of the unnamed women who carried intelligence for the Patriot networks operating inside occupied Boston during the months before Lexington and Concord, moving dispatches through a city of sixteen thousand people living under the garrison command of General Thomas Gage.",
   "character_type": "fictional",
   "represents": "Couriers and message carriers in the Sons of Liberty network, 1774-1776",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "The sealed packet is inside your coat."
 }

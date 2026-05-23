@@ -160,6 +160,12 @@ function validateStoredScenario(scenario, playerRoles, characters = []) {
         `Role "${role.name}" has character_type "${role.character_type}" but fact_checked is false — human verification required before publication`
       );
     }
+    // bridge_sentence [DRAFT] prefix = yellow warning (needs author review)
+    if (role.bridge_sentence?.startsWith('[DRAFT]')) {
+      warnings.push(
+        `Role "${role.name}" bridge_sentence is a draft — remove [DRAFT] prefix after author review`
+      );
+    }
   });
 
   // NPC characters: Tier 1 (in epilogue) = blocking; Tier 2 (other named) = warning
@@ -331,6 +337,58 @@ Maximum 50 words. One sentence. Factual. Historical. Grounding. No preamble. No 
   const text = msg.content[0]?.text?.trim();
   if (!text) throw new Error('No text returned from Anthropic');
   return text;
+}
+
+async function generateBridgeSentence(scenario, role, anthropicApiKey) {
+  const sceneSection = (scenario.introduction?.sections || []).find(s => s.type === 'scene');
+  const sceneParagraph = sceneSection?.text?.trim() || '';
+  if (!sceneParagraph) throw new Error('No scene paragraph found in scenario introduction');
+
+  const content = `Write a single bridge sentence for a player role in an immersive historical fiction experience.
+
+SCENARIO: ${scenario.title}
+
+SCENE PARAGRAPH (what the player just read on the previous screen):
+${sceneParagraph}
+
+CHARACTER: ${role.name}
+CHARACTER DESCRIPTION: ${role.description || ''}
+CHARACTER BRIEFING: ${getBriefingText(role.briefing) || ''}
+
+Write ONE sentence only. 15 words or fewer.
+
+This sentence is the first thing the player reads AS this specific character. It picks up ONE physical detail from the scene paragraph above — a detail that this particular character would be most immediately aware of given their position and role. It drops them into the present moment of the character without repeating or summarising the scene.
+
+RULES:
+- One sentence. 15 words or fewer. No exceptions.
+- Pick ONE specific physical detail from the scene paragraph.
+- Present tense.
+- Do not name the character.
+- Do not summarise the situation.
+- Do not repeat the scene paragraph.
+- Specific and physical — not emotional, not contextual.
+
+CORRECT examples (study the pattern):
+"The master alarm stopped screaming forty seconds ago." (Jack Swigert, Apollo 13)
+"The waitress has walked away." (Joseph McNeil, Greensboro sit-in)
+"The barn window is dark." (Elias Cole, Underground Railroad)
+"The tide is at your elbows now." (Battalion Medic, D-Day)
+
+WRONG examples:
+"The situation is desperate and time is running out." (too vague, summarises)
+"You are standing at the threshold of history." (poetic, not physical)
+"The room is full of tension as everyone waits." (emotional, not specific)
+
+Write only the sentence. No preamble, no explanation, no quotation marks.`;
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: 'claude-sonnet-4-6', max_tokens: 60, temperature: 0.7, messages: [{ role: 'user', content }] },
+    { timeout: 30_000 }
+  );
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  // Strip any accidentally added quotes
+  return text.replace(/^["']|["']$/g, '').trim();
 }
 
 async function generatePeriodVocabulary(scenario, characters, anthropicApiKey) {
@@ -724,12 +782,14 @@ export function createAdminRouter(repos, config = {}) {
     const roles = playerRoles.map(role => ({
       id:                role.id,
       name:              role.name,
-      hasBriefing:       getBriefingText(role.briefing).length >= 50,
-      hasDescription:    !!role.description,
-      hasEntryParagraph: !!(entrySection?.character_entries?.[role.id]?.trim().length >= 50),
+      hasBriefing:        getBriefingText(role.briefing).length >= 50,
+      hasDescription:     !!role.description,
+      hasEntryParagraph:  !!(entrySection?.character_entries?.[role.id]?.trim().length >= 50),
       hasContextSentence: !!(role.context_sentence?.trim().length >= 10),
-      hasCharacterType:  !!role.character_type,
-      factChecked:       role.fact_checked === true,
+      hasBridgeSentence:  !!(role.bridge_sentence?.trim().length > 0),
+      draftBridgeSentence: !!(role.bridge_sentence?.startsWith('[DRAFT]')),
+      hasCharacterType:   !!role.character_type,
+      factChecked:        role.fact_checked === true,
     }));
     res.json({
       scenarioId: req.params.id,
@@ -838,6 +898,27 @@ export function createAdminRouter(repos, config = {}) {
     const { errors: remaining } = validateStoredScenario(scenario, updatedRoles);
     res.json({ success: errors.length === 0, repairs, errors, remaining });
   });
+
+  // Generate a bridge sentence draft for a single player role
+  r.post('/scenarios/:id/roles/:roleId/generate-bridge-sentence', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const roles = repos.scenarios.findPlayerRoles(req.params.id);
+    const role   = roles.find(r => r.id === req.params.roleId);
+    if (!role) return notFound(res);
+    try {
+      const sentence = await generateBridgeSentence(scenario, role, anthropicApiKey);
+      const draft    = `[DRAFT] ${sentence}`;
+      repos.scenarios.savePlayerRole({ ...role, bridge_sentence: draft });
+      console.log(`[BRIDGE] ${req.params.id} — bridge_sentence draft written for "${role.name}": ${draft}`);
+      res.json({ roleId: role.id, bridge_sentence: draft });
+    } catch (err) {
+      console.error(`[BRIDGE ERROR] ${role.name}: ${err.message}`);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.get('/locations',      (req, res) => res.json(
     req.query.scenarioId ? repos.locations.findByScenario(req.query.scenarioId) : repos.locations.findAll()
   ));

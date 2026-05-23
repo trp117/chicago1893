@@ -208,3 +208,38 @@ batch verification, then mark each character verified in the admin UI.
 - NPC in epilogue missing `character_type`: blocking error (red, Tier 1)
 - Any named NPC missing `character_type`: yellow warning (Tier 2)
 - Any character with `fact_checked: false`: yellow warning
+
+---
+
+## bridge_sentence (optional, recommended)
+
+A single sentence — 15 words or fewer — that appears at the top of the
+character entry screen (Screen 3) before the context sentence and entry prose.
+
+```json
+{
+  "bridge_sentence": "The master alarm stopped screaming forty seconds ago."
+}
+```
+
+**Purpose:** reactivates one specific physical detail from the scene paragraph
+the player just read on Screen 2, dropping them into the character's immediate
+present without repeating the scene.
+
+Written by the author. Not generated. One physical detail. Present tense.
+No explanation. The bridge sentence should be the first thing the player reads
+as this character. It should feel like walking through a door.
+
+**WRONG:** `"The situation is desperate and time is running out."` (vague, summarises)  
+**WRONG:** `"Houston has just received the news about the oxygen tank."` (context, not physical)  
+**RIGHT:** `"The master alarm stopped screaming forty seconds ago."` (specific, physical, immediate)
+
+### Generation
+
+Use Admin → role edit → **Generate draft** button to generate a `[DRAFT]` bridge
+sentence via AI. The draft is saved with a `[DRAFT]` prefix. Remove the prefix
+after author review to clear the warning.
+
+### Health check behavior
+
+- `bridge_sentence` containing `[DRAFT]` prefix: yellow warning (needs author review)

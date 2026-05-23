@@ -62,5 +62,6 @@
   "context_sentence": "You are the coxswain of LCA-551, a Royal Navy or Combined Operations rating responsible for delivering one of the first assault waves of the 116th Infantry Regiment to Dog Green Sector, Omaha Beach, on the morning of June 6, 1944, as part of the largest amphibious invasion in recorded history.",
   "character_type": "fictional",
   "represents": "Coast Guard and Navy coxswains who piloted landing craft at Omaha Beach on June 6, 1944",
-  "fact_checked": false
+  "fact_checked": false,
+  "bridge_sentence": "Sixty yards out and the hull is grinding."
 }

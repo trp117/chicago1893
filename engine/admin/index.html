@@ -1697,6 +1697,18 @@ function renderPlayerRolesSection(data) {
       ${edField('Starting Knowledge', edTextarea(`playerRoles.${i}.startingKnowledge`, knowledgeVal,        3, 'data-type="array"'), 'One per line')}
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
       ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}
+      ${(() => {
+          const isDraft = r.bridge_sentence?.startsWith('[DRAFT]');
+          const hint = isDraft
+            ? '<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:6px">DRAFT — needs review</span>'
+            : '';
+          const helpText = 'One sentence, ≤15 words. One physical detail from the scene paragraph. Not a summary. Remove [DRAFT] prefix after author review.';
+          return edField('Bridge Sentence' + hint, `
+            <div style="display:flex;gap:6px;align-items:flex-start">
+              <input type="text" data-path="playerRoles.${i}.bridge_sentence" value="${(r.bridge_sentence||'').replace(/"/g,'&quot;')}" placeholder="e.g. The master alarm stopped screaming forty seconds ago." style="flex:1">
+              <button type="button" class="btn btn-secondary btn-sm generate-bridge-btn" data-role-id="${r.id}" data-role-index="${i}" style="white-space:nowrap;flex-shrink:0">Generate draft</button>
+            </div>`, helpText);
+        })()}
       ${hooksHtml}
       ${edField('Suggested Secret',   edTextarea(`playerRoles.${i}.suggested_secret`,  r.suggested_secret,  2), 'One thing nobody in the story knows')}
       ${edField('Character Type', `<select data-path="playerRoles.${i}.character_type"><option value=""${!r.character_type ? ' selected' : ''}>— not declared —</option><option value="real"${r.character_type === 'real' ? ' selected' : ''}>real — documented historical person</option><option value="fictional"${r.character_type === 'fictional' ? ' selected' : ''}>fictional — invented character</option><option value="composite"${r.character_type === 'composite' ? ' selected' : ''}>composite — based on real people</option></select>`, 'Required for Historical Record generation.')}
@@ -2522,6 +2534,33 @@ function renderPreview(data, autoSaved = false) {
     () => handleManualSave(data, formEl));
   document.getElementById('preview-restart').addEventListener('click',
     () => renderGenerator());
+
+  // ── Bridge Sentence — generate draft ───────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.generate-bridge-btn');
+    if (!btn) return;
+    const roleId    = btn.dataset.roleId;
+    const roleIndex = btn.dataset.roleIndex;
+    if (!roleId || !scenarioId) return;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+    try {
+      const result = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/generate-bridge-sentence`, {});
+      // Write the draft value into the input field
+      const input = formEl.querySelector(`[data-path="playerRoles.${roleIndex}.bridge_sentence"]`);
+      if (input) {
+        input.value = result.bridge_sentence;
+        input.dispatchEvent(new Event('input'));
+      }
+      toast('Bridge sentence draft generated — review before saving', 'warn');
+    } catch (err) {
+      toast(`Error: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
 
   // ── Beat count indicator ────────────────────────────────────────
   function updateBeatCount() {
