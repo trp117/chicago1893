@@ -224,11 +224,14 @@ li { margin-bottom: 8px; }
 .intro-scene-divider { border: none; border-top: 1px solid rgba(58,52,41,0.6); margin: 8px 0 32px; }
 .intro-char-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 24px; opacity: 0; animation: intro-fade 0.7s ease forwards; }
 .intro-bridge-sentence { font-style: italic; }
-.scroll-reveal { animation: none; opacity: 0; }
-.intro-paragraph { animation: intro-fade 0.7s ease forwards; }
 .bridge-sentence { font-style: italic; }
 .context-sentence {}
 .entry-paragraph {}
+.intro-paragraph.fade-in { opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease, transform 0.4s ease; animation: none !important; }
+.intro-paragraph.fade-in.visible { opacity: 1; transform: translateY(0); }
+@media (max-width: 640px) {
+  .intro-content { max-width: 88%; margin: 0 auto; line-height: 1.75; font-size: 16px; }
+}
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
   .sidebar { display: none; }
@@ -1539,6 +1542,35 @@ function showRoleSelection() {
 
 // ── Introduction screens ──────────────────────────────────────────────────────
 
+function initProgressiveReveal(sectionsEl) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { root: sectionsEl, threshold: 0.1 });
+  sectionsEl.querySelectorAll('.intro-paragraph').forEach(p => {
+    p.classList.add('fade-in');
+    observer.observe(p);
+  });
+}
+
+function initScrollContinue(sectionsEl, continueBtn) {
+  continueBtn.style.opacity = '0';
+  continueBtn.style.pointerEvents = 'none';
+  continueBtn.style.transition = 'opacity 0.4s ease';
+  function checkScroll() {
+    const scrollBottom = sectionsEl.scrollTop + sectionsEl.clientHeight;
+    const contentBottom = sectionsEl.scrollHeight - 100;
+    if (scrollBottom >= contentBottom) {
+      continueBtn.style.opacity = '1';
+      continueBtn.style.pointerEvents = 'auto';
+      sectionsEl.removeEventListener('scroll', checkScroll);
+    }
+  }
+  sectionsEl.addEventListener('scroll', checkScroll);
+  checkScroll();
+}
+
 // Shared TTS+teleprompter helper used by both intro screens
 function _buildIntroScreen({ overlay, titleEl, sectionsEl, skipBtn, titleClass, titleText,
                               buildContent, onContinue, showSkip, logTag, onReveal }) {
@@ -1661,7 +1693,7 @@ function showWorldIntro() {
     const paragraphs = [], texts = [];
     for (const section of worldSections) {
       const p = document.createElement('p');
-      p.className = 'intro-section';
+      p.className = 'intro-section intro-paragraph';
       p.textContent = section.text;
       paragraphs.push(p);
       texts.push(section.text);
@@ -1678,12 +1710,21 @@ function showWorldIntro() {
 
   if (!worldSections.length) { onContinue(); return; }
 
+  function onReveal() {
+    if (window.innerWidth >= 640) return;
+    initProgressiveReveal(sectionsEl);
+    requestAnimationFrame(() => {
+      initScrollContinue(sectionsEl, document.getElementById('intro-begin-btn'));
+    });
+  }
+
   _buildIntroScreen({
     overlay, titleEl, sectionsEl, skipBtn,
     titleClass: 'intro-header-title',
     titleText:  scenario.title || '',
     buildContent,
     onContinue,
+    onReveal,
     showSkip: false,
     logTag: 'world-intro',
   });
@@ -1709,10 +1750,12 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
 
   function buildContent() {
     const paragraphs = [], texts = [];
-    charTexts.forEach(({ text, isBridge, isContext }, idx) => {
+    charTexts.forEach(({ text, isBridge, isContext }) => {
       const p = document.createElement('p');
       const semantic = isBridge ? 'bridge-sentence' : isContext ? 'context-sentence' : 'entry-paragraph';
-      p.className = `intro-section scroll-reveal ${semantic}`;
+      p.className = `intro-section ${semantic}`;
+      p.style.opacity = '1';
+      p.style.animation = 'none';
       p.textContent = text;
       paragraphs.push(p);
       texts.push(text);
@@ -1731,27 +1774,12 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
 
   if (!charTexts.length) { onContinue(); return; }
 
-  let _sceneObserver = null;
-  function onReveal(paragraphs) {
-    if (_sceneObserver) _sceneObserver.disconnect();
-    _sceneObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('intro-paragraph');
-          _sceneObserver.unobserve(e.target);
-        }
-      });
-    }, { root: sectionsEl, threshold: 0.1 });
-    paragraphs.forEach(p => _sceneObserver.observe(p));
-  }
-
   _buildIntroScreen({
     overlay, titleEl, sectionsEl, skipBtn,
     titleClass: 'intro-role-header',
     titleText:  role.name,
     buildContent,
     onContinue,
-    onReveal,
     showSkip: true,
     logTag: 'intro-scene',
   });
