@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Langfuse } from 'langfuse';
 import Anthropic from '@anthropic-ai/sdk';
 import { readdir, readFile, unlink, stat } from 'fs/promises';
+import { readFileSync, readdirSync, writeFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import PipelineOrchestrator from '../services/PipelineOrchestrator.js';
@@ -1654,6 +1655,136 @@ Return ONLY valid JSON in this exact structure:
         uncheckedNpcs:  uncheckedChars,
       },
     });
+  });
+
+  // ── Name Cascade ──────────────────────────────────────────────────────────
+  // Collects all files belonging to a scenario and searches / replaces a name
+  // across them. Two endpoints:
+  //   GET  /scenarios/:id/name-search?oldName=...  → occurrences list (read-only)
+  //   POST /scenarios/:id/name-cascade             → { oldName, newName } replace
+
+  function getScenarioFilePaths(scenarioId) {
+    const paths = [];
+    const dataRoot = join(_dir, '../data');
+
+    // Root scenario JSON
+    paths.push(join(dataRoot, 'scenarios', `${scenarioId}.json`));
+
+    // Main arc JSON
+    paths.push(join(dataRoot, 'story_arcs', `${scenarioId}_main_arc.json`));
+
+    // Player role files — roles store scenarioId on themselves, not in root scenario JSON
+    const roleDir = join(dataRoot, 'scenarios', 'player_roles');
+    try {
+      const roleFiles = readdirSync(roleDir).filter(f => f.endsWith('.json'));
+      roleFiles.forEach(f => {
+        const fPath = join(roleDir, f);
+        try {
+          const r = JSON.parse(readFileSync(fPath, 'utf8'));
+          if (r.scenarioId === scenarioId) paths.push(fPath);
+        } catch {}
+      });
+    } catch {}
+
+    // NPC character files for this scenario
+    const charDir = join(dataRoot, 'characters');
+    try {
+      const charFiles = readdirSync(charDir).filter(f => f.endsWith('.json'));
+      charFiles.forEach(f => {
+        const fPath = join(charDir, f);
+        try {
+          const c = JSON.parse(readFileSync(fPath, 'utf8'));
+          if (Array.isArray(c.scenarioIds) && c.scenarioIds.includes(scenarioId)) {
+            paths.push(fPath);
+          }
+        } catch {}
+      });
+    } catch {}
+
+    // Clue files
+    const clueDir = join(dataRoot, 'clues', scenarioId);
+    try {
+      const clueFiles = readdirSync(clueDir).filter(f => f.endsWith('.json'));
+      clueFiles.forEach(f => paths.push(join(clueDir, f)));
+    } catch {}
+
+    // Location files
+    const locDir = join(dataRoot, 'locations', scenarioId);
+    try {
+      const locFiles = readdirSync(locDir).filter(f => f.endsWith('.json'));
+      locFiles.forEach(f => paths.push(join(locDir, f)));
+    } catch {}
+
+    return paths;
+  }
+
+  r.get('/scenarios/:id/name-search', (req, res) => {
+    const { oldName } = req.query;
+    if (!oldName || !oldName.trim()) return badRequest(res, 'oldName query param required');
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+
+    const needle = oldName.trim();
+    const files = getScenarioFilePaths(req.params.id);
+    const results = [];
+
+    for (const fPath of files) {
+      try {
+        const content = readFileSync(fPath, 'utf8');
+        if (!content.includes(needle)) continue;
+        const lines = content.split('\n');
+        const hits = [];
+        lines.forEach((line, idx) => {
+          if (line.includes(needle)) {
+            hits.push({ lineNumber: idx + 1, text: line.trim() });
+          }
+        });
+        if (hits.length) {
+          // Relative path from data root for display
+          const dataRoot = join(_dir, '../data');
+          const rel = fPath.startsWith(dataRoot)
+            ? fPath.slice(dataRoot.length).replace(/\\/g, '/').replace(/^\//, '')
+            : fPath;
+          results.push({ file: rel, hits });
+        }
+      } catch {}
+    }
+
+    const totalHits = results.reduce((n, r) => n + r.hits.length, 0);
+    res.json({ needle, fileCount: results.length, totalHits, results });
+  });
+
+  r.post('/scenarios/:id/name-cascade', async (req, res) => {
+    const { oldName, newName } = req.body || {};
+    if (!oldName || !oldName.trim()) return badRequest(res, 'oldName required');
+    if (!newName || !newName.trim()) return badRequest(res, 'newName required');
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+
+    const needle = oldName.trim();
+    const replacement = newName.trim();
+    const files = getScenarioFilePaths(req.params.id);
+    const report = [];
+
+    for (const fPath of files) {
+      try {
+        const content = readFileSync(fPath, 'utf8');
+        if (!content.includes(needle)) continue;
+        const updated = content.split(needle).join(replacement);
+        const count = (content.match(new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+        writeFileSync(fPath, updated, 'utf8');
+        const dataRoot = join(_dir, '../data');
+        const rel = fPath.startsWith(dataRoot)
+          ? fPath.slice(dataRoot.length).replace(/\\/g, '/').replace(/^\//, '')
+          : fPath;
+        report.push({ file: rel, replacements: count });
+      } catch (err) {
+        report.push({ file: fPath, error: err.message });
+      }
+    }
+
+    const totalReplacements = report.reduce((n, r) => n + (r.replacements || 0), 0);
+    res.json({ oldName: needle, newName: replacement, filesChanged: report.length, totalReplacements, report });
   });
 
   // ╔══════════════════════════════════════════════════════════════════╗

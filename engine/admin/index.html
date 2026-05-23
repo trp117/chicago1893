@@ -1606,6 +1606,27 @@ async function renderCharacterDeclarationsSection(scenarioId, container) {
   });
 }
 
+function renderNameCascadeSection(scenarioId) {
+  return edSection('Name Cascade', `
+    <p class="help-text" style="margin-bottom:14px">Find and replace a character name across <em>all</em> files linked to this scenario — root JSON, arc, player roles, NPCs, clues, and locations. Search first to review every occurrence before applying.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-muted)">Current name</label>
+        <input id="nc-old-name" type="text" placeholder="e.g. Wickerson" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-muted)">New name</label>
+        <input id="nc-new-name" type="text" placeholder="e.g. T.C. Hill" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button type="button" id="nc-search-btn" class="btn btn-secondary btn-sm" data-scenario-id="${scenarioId}">Search</button>
+      <button type="button" id="nc-apply-btn" class="btn btn-sm" data-scenario-id="${scenarioId}" style="background:#dc2626;color:#fff;border-color:#dc2626;display:none">Apply replacement</button>
+    </div>
+    <div id="nc-results" style="font-size:12px;font-family:monospace;background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:12px;display:none;white-space:pre-wrap;max-height:400px;overflow-y:auto"></div>
+  `);
+}
+
 function renderCharactersSection(data) {
   const chars = data.characters || [];
   const html = chars.map((c, i) => {
@@ -2421,6 +2442,7 @@ function renderPreview(data, autoSaved = false) {
       ${renderCluesSection(data)}
       ${renderPlayerRolesSection(data)}
       <div id="char-declarations-mount"></div>
+      ${renderNameCascadeSection(scenarioId || '')}
       ${renderPublicationReview(data)}
       ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
@@ -2439,6 +2461,56 @@ function renderPreview(data, autoSaved = false) {
     initAIPanel(scenarioId);
     const declMount = document.getElementById('char-declarations-mount');
     if (declMount) renderCharacterDeclarationsSection(scenarioId, declMount);
+
+    // ── Name Cascade ──────────────────────────────────────────────
+    document.getElementById('nc-search-btn')?.addEventListener('click', async () => {
+      const oldName = document.getElementById('nc-old-name')?.value?.trim();
+      if (!oldName) { toast('Enter a name to search for', 'warn'); return; }
+      const resultsEl = document.getElementById('nc-results');
+      const applyBtn  = document.getElementById('nc-apply-btn');
+      resultsEl.textContent = 'Searching…';
+      resultsEl.style.display = 'block';
+      applyBtn.style.display  = 'none';
+      try {
+        const data = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/name-search?oldName=${encodeURIComponent(oldName)}`);
+        if (!data.results?.length) {
+          resultsEl.textContent = `No occurrences of "${oldName}" found.`;
+          return;
+        }
+        const lines = [`Found ${data.totalHits} occurrence(s) in ${data.fileCount} file(s):\n`];
+        for (const r of data.results) {
+          lines.push(`── ${r.file}`);
+          for (const h of r.hits) {
+            lines.push(`   [L${h.lineNumber}] ${h.text}`);
+          }
+          lines.push('');
+        }
+        resultsEl.textContent = lines.join('\n');
+        applyBtn.style.display = 'inline-flex';
+      } catch (err) {
+        resultsEl.textContent = `Error: ${err.message}`;
+      }
+    });
+
+    document.getElementById('nc-apply-btn')?.addEventListener('click', async () => {
+      const oldName = document.getElementById('nc-old-name')?.value?.trim();
+      const newName = document.getElementById('nc-new-name')?.value?.trim();
+      if (!oldName || !newName) { toast('Both names required', 'warn'); return; }
+      if (!confirm(`Replace all occurrences of "${oldName}" with "${newName}" in every file linked to this scenario?\n\nThis cannot be undone.`)) return;
+      try {
+        const data = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/name-cascade`, { oldName, newName });
+        const lines = [`Replaced "${oldName}" → "${newName}"\n${data.totalReplacements} replacement(s) in ${data.filesChanged} file(s):\n`];
+        for (const r of data.report) {
+          if (r.error) lines.push(`  ✗ ${r.file}: ${r.error}`);
+          else lines.push(`  ✓ ${r.file}: ${r.replacements} replacement(s)`);
+        }
+        document.getElementById('nc-results').textContent = lines.join('\n');
+        document.getElementById('nc-apply-btn').style.display = 'none';
+        toast(`Replaced "${oldName}" → "${newName}" (${data.totalReplacements} occurrences)`, 'success');
+      } catch (err) {
+        toast(`Error: ${err.message}`, 'error');
+      }
+    });
   }
 
   const formEl = document.getElementById('preview-form');
