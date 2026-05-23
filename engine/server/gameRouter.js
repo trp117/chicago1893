@@ -403,6 +403,7 @@ export function createGameRouter(repos, config = {}) {
         character_hooks:  r.character_hooks || [],
         suggested_secret: r.suggested_secret || null,
         context_sentence: r.context_sentence || null,
+        bridge_sentence:  r.bridge_sentence  || null,
       }));
 
       res.json({

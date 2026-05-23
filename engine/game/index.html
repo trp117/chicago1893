@@ -223,6 +223,7 @@ li { margin-bottom: 8px; }
 .intro-skip-btn:hover { color: var(--text); }
 .intro-scene-divider { border: none; border-top: 1px solid rgba(58,52,41,0.6); margin: 8px 0 32px; }
 .intro-char-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 24px; opacity: 0; animation: intro-fade 0.7s ease forwards; }
+.intro-bridge-sentence { font-style: italic; }
 @media (max-width: 980px) {
   .app-shell { grid-template-columns: 1fr; }
   .sidebar { display: none; }
@@ -1702,9 +1703,9 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
 
   function buildContent() {
     const paragraphs = [], texts = [];
-    charTexts.forEach(({ text }, idx) => {
+    charTexts.forEach(({ text, isBridge }, idx) => {
       const p = document.createElement('p');
-      p.className = 'intro-section';
+      p.className = isBridge ? 'intro-section intro-bridge-sentence' : 'intro-section';
       p.style.animationDelay = `${0.1 + idx * 0.5}s`;
       p.textContent = text;
       paragraphs.push(p);
