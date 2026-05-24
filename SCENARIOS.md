@@ -341,3 +341,22 @@ Use Admin → role edit → **Generate context sentence** button to generate a d
 ### Health check behavior
 
 - Empty `context_sentence`: yellow warning
+
+---
+
+## Entry paragraph benchmark — Singing Wires: Elias Cole
+
+The following `briefing` is the quality benchmark for the entry paragraph field. It is included alongside the context sentence benchmarks because it demonstrates what the standard looks like at the prose level — the same three registers (mechanical crisis, moral stillness, physical survival) condensed into a single character at a single threshold.
+
+What makes this paragraph the benchmark:
+- Opens with a body in a specific physical position, not an identity
+- The character's situational knowledge is shown through what he perceives, not explained
+- The threat is embedded in sensory detail (the wire's pitch, the unlit lantern)
+- The player inherits a decision already formed — they are at the threshold, not approaching it
+- The final sentence is the last breath before the first choice
+
+```
+You are standing in the Huron River bottomland with your back against an elm tree and seven people within arm's reach in the dark, the two children pressed against their mother's side and quiet in the way that children learn to be quiet when quiet means survival. The telegraph wire runs along the road thirty yards to your left, and it is singing tonight — a low, tuneless chord in the northeast wind that you have come to read the way other men read weather. Something in the wire's pitch has changed in the last hour, or you have told yourself it has, which amounts to the same thing when you are responsible for seven lives and the shore is still a mile and a half north. You received a warning twenty minutes ago from a gandy dancer's boy on a fast horse — the sheriff is coming, or someone is coming, and the boy did not know more than that. What you know that no one else in this story knows is that the last three groups you moved were watched from inside the network, and that the watching came from someone who knew the departure times exactly. You have said nothing because you had no proof. Tonight you have seven people including two children who are asleep on their feet, a shore road that may be watched, and a barn that may or may not be safe to enter. The lantern in the Voss barn window is not lit, which means either the station is secure and waiting for your signal, or it means something has already gone wrong. You are standing at the edge of the tree line looking at the dark shape of the barn, and you must decide in the next sixty seconds whether to move your passengers forward or take the long way around through the rail yard ballast toward the waterfront path.
+```
+
+*Scenario: Singing Wires. Role: Elias Cole — The Conductor. Field: `briefing`.*

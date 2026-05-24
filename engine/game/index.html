@@ -62,9 +62,7 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 @keyframes dot-pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
 .scene-error { color: #e07060; }
 .bottom-bar { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
-.npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-label { display: none; padding: 0; margin: 0; height: 0; }
-.choices-label.visible { display: block; border-top: 1px solid var(--border); margin: 8px 28px 0; height: 0; }
-.choices-area-wrap { transition: opacity 250ms ease; }
+.npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-area-wrap { transition: opacity 250ms ease; }
 .choices-area-wrap.hidden { display: none; }
 .stream-options-dots { display: flex; gap: 5px; padding: 12px 28px 8px; }
 .stream-options-dots.hidden { display: none; }
@@ -246,8 +244,6 @@ li { margin-bottom: 8px; }
   /* Collapsible choices on mobile */
   .choices-wrap.mobile-collapsed .choices { display: none !important; }
   .choices-wrap.mobile-collapsed .choices-arrow { display: none !important; }
-  #choices-label.visible { cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
-  #choices-label.visible::after { content: attr(data-arrow); font-size: 0.65rem; opacity: 0.7; }
   /* Intro overlay mobile */
   .intro-header { padding: 18px 18px 14px; }
   .intro-sections { padding: 28px 18px 16px; }
@@ -286,7 +282,6 @@ li { margin-bottom: 8px; }
   .role-card.selected .role-card-desc { display: block; }
   .role-overlay-inner:has(.role-card.selected) .role-instruction { display: none; }
   .input-section-label { padding: 6px 14px 0; }
-  .choices-label.visible { margin: 6px 14px 0; }
   .choices { flex-direction: column; flex-wrap: nowrap; overflow-x: visible; padding: 6px 14px 8px; }
   .choices-arrow { display: none !important; }
   .choice-btn { flex: none; width: 100%; border-radius: 8px; }
@@ -528,7 +523,6 @@ li { margin-bottom: 8px; }
       </form>
       <div id="stream-options-dots" class="stream-options-dots hidden"><span></span><span></span><span></span></div>
       <div id="choices-area-wrap" class="choices-area-wrap">
-        <p id="choices-label" class="choices-label"></p>
         <div class="choices-wrap">
           <button type="button" class="choices-arrow choices-arrow--left" aria-hidden="true" tabindex="-1">&#8249;</button>
           <section id="choices" class="choices"></section>
@@ -926,27 +920,11 @@ function renderChoices(choices = []) {
   choicesEl.scrollLeft = 0;
   requestAnimationFrame(syncArrows);
 
-  const labelEl = document.getElementById('choices-label');
-  if (labelEl) {
-    labelEl.classList.toggle('visible', choices.length > 0);
-    labelEl.dataset.arrow = '';
-    document.querySelector('.choices-wrap')?.classList.remove('mobile-collapsed');
-  }
 }
 
 choicesEl.addEventListener('scroll', syncArrows, { passive: true });
 if (arrowLeft)  arrowLeft.addEventListener('click',  () => choicesEl.scrollBy({ left: -choicesEl.clientWidth * 0.85, behavior: 'smooth' }));
 if (arrowRight) arrowRight.addEventListener('click', () => choicesEl.scrollBy({ left:  choicesEl.clientWidth * 0.85, behavior: 'smooth' }));
-
-// Tap choices label on mobile to expand/collapse
-document.getElementById('choices-label')?.addEventListener('click', () => {
-  if (!isMobileDevice()) return;
-  const wrap = document.querySelector('.choices-wrap');
-  const label = document.getElementById('choices-label');
-  if (!wrap) return;
-  const nowCollapsed = wrap.classList.toggle('mobile-collapsed');
-  if (label) label.dataset.arrow = nowCollapsed ? ' ▾' : ' ▲';
-});
 
 // ── Narrative rendering ───────────────────────────────────────────────────────
 
