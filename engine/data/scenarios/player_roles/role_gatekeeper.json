@@ -2,6 +2,7 @@
   "id": "role_gatekeeper",
   "scenarioId": "bornholmer_strasse_first_breach",
   "name": "The Gatekeeper",
+  "real_name": "Harald Jäger",
   "description": "You are the Stasi border control commander at Bornholmer Straße. You have a weapon, standing orders you cannot execute, and a chain of command that has gone silent. The decision that history requires is yours alone.",
   "startLocationId": "loc_checkpoint_command_post",
   "startingKnowledge": [

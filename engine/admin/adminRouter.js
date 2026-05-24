@@ -166,6 +166,11 @@ function validateStoredScenario(scenario, playerRoles, characters = []) {
         `Role "${role.name}" bridge_sentence is a draft — remove [DRAFT] prefix after author review`
       );
     }
+    if (role.entry_paragraph_flags?.length > 0) {
+      warnings.push(
+        `Role "${role.name}" entry paragraph has ${role.entry_paragraph_flags.length} going-wide flag(s) — review before publishing`
+      );
+    }
   });
 
   // NPC characters: Tier 1 (in epilogue) = blocking; Tier 2 (other named) = warning
@@ -350,19 +355,31 @@ Maximum 20 words. One clause describing identity. One clause describing immediat
 
 function detectGoingWide(text) {
   const patterns = [
-    /in the way that/gi,
-    /the kind of \w+ that/gi,
-    /the sort of \w+ that/gi,
-    /you (understand|realize|know) that/gi,
-    /which means/gi,
-    /that is to say/gi,
-    /in other words/gi,
+    { pattern: /in the way that/gi,                              label: 'pattern explanation' },
+    { pattern: /the kind of .{1,30} that/gi,                    label: 'pattern explanation' },
+    { pattern: /the sort of .{1,30} that/gi,                    label: 'pattern explanation' },
+    { pattern: /you (understand|realize|know) that/gi,          label: 'narrator intrusion' },
+    { pattern: /which means/gi,                                  label: 'explanation' },
+    { pattern: /that is to say/gi,                               label: 'explanation' },
+    { pattern: /in other words/gi,                               label: 'explanation' },
+    { pattern: /the (particular|specific) .{1,30} of (a|an|the)/gi, label: 'going wide' },
+    { pattern: /as if .{1,40} had/gi,                           label: 'simile explanation' },
   ];
+
   const flags = [];
-  for (const pattern of patterns) {
+  patterns.forEach(({ pattern, label }) => {
     const matches = text.match(pattern);
-    if (matches) flags.push(`Possible going-wide: "${matches[0]}" — review this sentence`);
-  }
+    if (matches) {
+      matches.forEach(match => {
+        flags.push({
+          pattern: label,
+          text: match,
+          message: `Possible going-wide (${label}): "${match}" — review this sentence`
+        });
+      });
+    }
+  });
+
   return flags;
 }
 
@@ -869,7 +886,7 @@ export function createAdminRouter(repos, config = {}) {
             entrySection.character_entries[role.id] = entryParagraph;
 
             const wideFlags = detectGoingWide(entryParagraph);
-            repos.scenarios.savePlayerRole({ ...role, entry_paragraph_flags: wideFlags });
+            repos.scenarios.savePlayerRole({ ...role, entry_paragraph_flags: wideFlags.map(f => f.message) });
             if (wideFlags.length > 0) {
               repairs.push(`Generated entry paragraph for ${role.name} — ${wideFlags.length} going-wide pattern(s) detected. Review before publishing.`);
               console.warn(`[REPAIR] ${req.params.id} — entry for "${role.name}" flagged: ${wideFlags.join('; ')}`);
