@@ -20,8 +20,7 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d, #161616); color: var(--text); }
-.app-shell { display: grid; grid-template-columns: 320px 1fr; height: 100vh; height: 100dvh; overflow: hidden; }
-.sidebar { padding: 20px; border-right: 1px solid var(--border); background: rgba(17,17,17,0.95); overflow-y: auto; }
+.app-shell { display: grid; grid-template-columns: 1fr; height: 100vh; height: 100dvh; overflow: hidden; }
 .main-column { display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 .hero { padding: 16px 28px 12px; border-bottom: 1px solid var(--border); }
 .back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); text-decoration: none; margin-bottom: 8px; transition: color 0.15s; font-family: system-ui, sans-serif; }
@@ -32,10 +31,6 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .header-title-stack { display: flex; flex-direction: column; gap: 2px; }
 .header-subtitle { margin: 0; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; font-style: italic; font-family: system-ui, sans-serif; }
 .hero-controls { display: flex; align-items: center; gap: 8px; }
-.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
-.panel h2 { margin-top: 0; font-size: 1rem; color: var(--accent); }
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 .story-feed { flex: 1; padding: 24px 28px; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--border) transparent; transition: opacity 0.2s ease; }
 .story-feed::-webkit-scrollbar { width: 4px; }
 .story-feed::-webkit-scrollbar-track { background: transparent; }
@@ -65,8 +60,6 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot-pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
-.time-decision { display: flex; flex-direction: column; gap: 8px; padding: 4px 0 8px; }
-.time-decision-label { font-size: 0.8rem; font-style: italic; color: #e07060; margin: 0 0 4px; letter-spacing: 0.02em; }
 .scene-error { color: #e07060; }
 .bottom-bar { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
 .npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-label { display: none; padding: 0; margin: 0; height: 0; }
@@ -235,8 +228,6 @@ li { margin-bottom: 8px; }
   .intro-content { max-width: 88%; margin: 0 auto; line-height: 1.75; font-size: 16px; }
 }
 @media (max-width: 980px) {
-  .app-shell { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
   .hero { padding: 10px 14px 6px; }
   .hero h1 { font-size: 1.3rem; }
   .back-link { margin-bottom: 5px; }
@@ -489,17 +480,6 @@ li { margin-bottom: 8px; }
 <body>
 
 <div class="app-shell">
-  <aside class="sidebar">
-    <div class="panel">
-      <h2>Case File</h2>
-      <div id="objective"></div>
-    </div>
-    <div class="panel stat-grid">
-      <div><span class="label">Location</span><div id="location"></div></div>
-      <div><span class="label">Threat</span><div id="threat"></div></div>
-    </div>
-  </aside>
-
   <main class="main-column">
     <header class="hero">
       <a href="/" class="back-link">&#8592; Stories</a>
@@ -536,7 +516,7 @@ li { margin-bottom: 8px; }
       <p id="free-input-restricted-label" class="hidden">Choose an action below.</p>
       <form id="input-form" class="input-row">
         <div class="input-textarea-wrap">
-          <textarea id="player-input" placeholder="What do you say or do?" rows="2"></textarea>
+          <textarea id="player-input" placeholder="Your move." rows="2"></textarea>
           <button type="button" id="mic-btn" class="mic-btn" aria-label="Start voice input" title="Voice input">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
               <rect x="5" y="1" width="6" height="9" rx="3"/>
@@ -631,10 +611,10 @@ li { margin-bottom: 8px; }
   </div>
 </div>
 
-<div id="notes-overlay" class="notes-overlay hidden" role="dialog" aria-modal="true" aria-label="Case notes">
+<div id="notes-overlay" class="notes-overlay hidden" role="dialog" aria-modal="true" aria-label="Session notes">
   <div class="notes-panel">
     <div class="notes-panel-header">
-      <h2>Case Notes</h2>
+      <h2>Session Notes</h2>
       <button type="button" id="notes-close" class="notes-close" aria-label="Close notes">&times;</button>
     </div>
     <div id="notes-content" class="notes-content"></div>
@@ -900,7 +880,7 @@ function updateChaseUI() {
   const isChasing = !!gameState?.chaseState?.active;
   document.body.classList.toggle('chase-active', isChasing);
   if (inputEl && !inputEl.disabled) {
-    inputEl.placeholder = isChasing ? 'What do you do?' : 'What do you say or do?';
+    inputEl.placeholder = 'Your move.';
   }
 }
 
@@ -922,11 +902,6 @@ function updateCandleIndicator(minutesRemaining, totalMinutes) {
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 function renderSidebar() {
-  document.getElementById('objective').textContent = scenario.goal || '';
-  const _loc = locationsList.find(l => l.id === gameState.location);
-  document.getElementById('location').textContent = _loc ? _loc.name : prettifyId(gameState.location);
-  document.getElementById('threat').textContent   = String(gameState.threat);
-
   const sub = document.getElementById('header-subtitle');
   if (sub) {
     const t = timeToPeriodString(gameState.remainingMinutes, scenario?.sessionTargetMinutes);
@@ -1281,65 +1256,6 @@ function showClosingScreen(endState, sessionId) {
     });
 }
 
-// ── Time decision ─────────────────────────────────────────────────────────────
-
-function showTimeDecision() {
-  renderChoices([]);
-  const panel = document.createElement('div');
-  panel.className = 'time-decision';
-
-  const label = document.createElement('p');
-  label.className = 'time-decision-label';
-  label.textContent = 'Time has run out.';
-  panel.appendChild(label);
-
-  const extendBtn = document.createElement('button');
-  extendBtn.type = 'button';
-  extendBtn.className = 'choice-btn';
-  extendBtn.textContent = 'Push on — extend the investigation (+5 minutes, harder conditions)';
-  extendBtn.addEventListener('click', () => {
-    gameState.remainingMinutes = 5;
-    gameState.extensionUsed = true;
-    gameState.timeExpired = false;
-    gameState.flags = gameState.flags || {};
-    gameState.flags.overtime = true;
-
-    const overtimeEl = document.createElement('div');
-    overtimeEl.className = 'feed-entry';
-    const sceneEl = document.createElement('div');
-    sceneEl.className = 'scene-card';
-    sceneEl.innerHTML = `<p><span class="line"><em>*Five minutes. There is no more room for error.*</em></span></p>`;
-    overtimeEl.appendChild(sceneEl);
-    feedAppend(overtimeEl);
-    feedScrollTop(overtimeEl);
-
-    renderSidebar();
-    updateChaseUI();
-    inputEl.disabled = false;
-    formEl.querySelector('button[type="submit"]').disabled = false;
-    renderChoices(lastChoices);
-  });
-
-  const concludeBtn = document.createElement('button');
-  concludeBtn.type = 'button';
-  concludeBtn.className = 'choice-btn';
-  concludeBtn.textContent = 'Make your final accusation — name the suspect and state your case';
-  concludeBtn.addEventListener('click', () => {
-    gameState.finalAccusation = true;
-    choicesEl.innerHTML = '';
-    inputEl.disabled = false;
-    formEl.querySelector('button[type="submit"]').disabled = false;
-    inputEl.placeholder = 'Name your suspect and state your case…';
-    inputEl.focus();
-  });
-
-  panel.appendChild(extendBtn);
-  panel.appendChild(concludeBtn);
-  choicesEl.appendChild(panel);
-  inputEl.disabled = true;
-  formEl.querySelector('button[type="submit"]').disabled = true;
-}
-
 // ── Turn submission ───────────────────────────────────────────────────────────
 
 let submitting = false;
@@ -1353,9 +1269,8 @@ function buildAssistantHistoryContent(output) {
 
 async function submitTurn(playerInput, { isChoice = false } = {}) {
   if (!playerInput?.trim() || submitting) return;
-  if (gameState?.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
-    gameState.timeExpired = true;
-    showTimeDecision();
+  if (gameState?.remainingMinutes <= 0) {
+    triggerClosingSequence(false, false);
     return;
   }
   submitting = true;
@@ -1486,9 +1401,8 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     showScrollHint();
     submitBtn.disabled = false;
 
-    if (gameState.remainingMinutes <= 0 && !gameState.extensionUsed && !gameState.finalAccusation) {
-      gameState.timeExpired = true;
-      showTimeDecision();
+    if (gameState.remainingMinutes <= 0) {
+      triggerClosingSequence(false, false);
     } else if (output?.endState?.isEnding) {
       try {
         formEl.querySelector('button[type="submit"]').disabled = true;
@@ -2585,28 +2499,32 @@ async function fetchNotes() {
 
 function renderNotes(notes) {
   const sections = [];
-  if (notes.clues?.length) {
-    sections.push(`<section class="notes-section"><h3>What You Know</h3><ul>${notes.clues.map(c => `<li><strong>${c.title}</strong> — ${c.significance}</li>`).join('')}</ul></section>`);
+
+  // WHAT YOU KNOW — role's starting knowledge
+  const knowledge = gameState?.playerStartingKnowledge || [];
+  if (knowledge.length) {
+    sections.push(`<section class="notes-section"><h3>What You Know</h3><ul>${
+      knowledge.map(k => `<li>${k}</li>`).join('')
+    }</ul></section>`);
   }
-  if (notes.suspicions?.length) {
-    sections.push(`<section class="notes-section"><h3>Suspicions</h3><ul>${notes.suspicions.map(s =>
-      `<li><span class="suspicion-badge suspicion--${s.level}">${s.level}</span> <strong>${s.name}</strong> — ${s.reasoning}</li>`
-    ).join('')}</ul></section>`);
+
+  // WHERE YOU ARE — current location
+  const loc = locationsList.find(l => l.id === gameState?.location);
+  if (loc) {
+    const desc = loc.description ? `<p style="font-size:0.85rem;color:var(--muted);margin:4px 0 0;font-style:italic">${loc.description}</p>` : '';
+    sections.push(`<section class="notes-section"><h3>Where You Are</h3><p style="font-size:0.9rem;margin:0"><strong>${loc.name}</strong></p>${desc}</section>`);
   }
+
+  // IMPRESSIONS — people encountered
   if (notes.characterImpressions?.length) {
-    sections.push(`<section class="notes-section"><h3>Impressions</h3><ul>${notes.characterImpressions.map(c =>
-      `<li><strong>${c.name}</strong> — ${c.impression}</li>`
-    ).join('')}</ul></section>`);
+    sections.push(`<section class="notes-section"><h3>Impressions</h3><ul>${
+      notes.characterImpressions.map(c => `<li><strong>${c.name}</strong> — ${c.impression}</li>`).join('')
+    }</ul></section>`);
   }
-  if (notes.openQuestions?.length) {
-    sections.push(`<section class="notes-section"><h3>Open Questions</h3><ul>${notes.openQuestions.map(q => `<li>${q}</li>`).join('')}</ul></section>`);
-  }
-  if (notes.nextLeads?.length) {
-    sections.push(`<section class="notes-section"><h3>Next Leads</h3><ul>${notes.nextLeads.map(l => `<li>${l}</li>`).join('')}</ul></section>`);
-  }
+
   notesContentEl.innerHTML = sections.length
     ? sections.join('')
-    : '<p class="notes-empty">Nothing to report yet. Keep investigating.</p>';
+    : '<p class="notes-empty">Nothing noted yet.</p>';
 }
 
 document.getElementById('new-game-btn').addEventListener('click', restartGame);
