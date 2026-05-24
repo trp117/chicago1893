@@ -2133,35 +2133,65 @@ Return ONLY valid JSON in this exact structure:
     if (!scenario) return notFound(res);
 
     const existingTerms = (scenario.glossary || []).map(g => g.term.toLowerCase());
-    const introText = (scenario.introduction?.sections || []).map(s => s.text || '').filter(Boolean).join('\n\n');
-    const vocabTerms = (scenario.period_vocabulary?.categories || [])
-      .flatMap(c => c.terms || []).map(t => t.term).join(', ');
-    const exclusionNote = existingTerms.length
-      ? `\n\nDo not suggest these terms — they are already in the glossary: ${existingTerms.join(', ')}`
+
+    // Technical facts — highest-priority source
+    const rawFacts = (scenario.technical_facts?.facts || []).map(f => f.content || '').filter(Boolean);
+    const techFactsText = rawFacts.length
+      ? `TECHNICAL FACTS (verified historical and technical data — primary source for glossary terms):\n${rawFacts.join('\n')}`
       : '';
 
-    const prompt = `You are building a player-facing glossary for a historical immersion game set during: ${scenario.title || scenario.id}.
+    // Introduction prose
+    const introText = (scenario.introduction?.sections || []).map(s => s.text || '').filter(Boolean).join('\n\n');
 
-Scenario context:
-${introText || '(no introduction text available)'}
+    // Period vocabulary labels (avoid duplicating)
+    const vocabTerms = (scenario.period_vocabulary?.categories || [])
+      .flatMap(c => c.terms || []).map(t => t.term).join(', ');
+    const periodVocabText = vocabTerms ? `Period vocabulary already defined (do not duplicate): ${vocabTerms}` : '';
 
-${vocabTerms ? `Period vocabulary already defined (do not duplicate): ${vocabTerms}` : ''}
-${exclusionNote}
+    const contextText = [techFactsText, introText, periodVocabText]
+      .filter(Boolean).join('\n\n').slice(0, 4000);
 
-Identify 10-15 terms a general reader might not know: military jargon, period equipment, historical proper nouns, technical terminology, period slang.
+    const prompt = `You are building a player-facing glossary for a historical immersive fiction experience set in: ${scenario.setting || scenario.title || 'historical setting'}.
 
-For each term provide:
-- "term": exactly as it would appear in narrative prose
-- "definition": one to two sentences, historically accurate, accessible to a modern reader
-- "reason": one brief phrase explaining why this term needs definition
+Read the following content and extract terms that need defining for a general reader — prioritize in this order:
 
-Return ONLY valid JSON: { "suggestions": [ { "term": "...", "definition": "...", "reason": "..." } ] }`;
+1. TECHNICAL TERMS from the Technical Facts section — spacecraft systems, military equipment, medical terminology, engineering specifications, period-specific procedures. Extract specific named things: systems, components, procedures, equipment.
+
+2. JARGON AND PERIOD PROCEDURE from period vocabulary — terms that sound familiar but have specific historical meanings.
+
+3. HISTORICAL AND LEGAL TERMS from the introduction — acts, organizations, legal frameworks that shaped the moment.
+
+CONTENT:
+${contextText}
+
+ALREADY IN GLOSSARY (do not suggest these):
+${existingTerms.join(', ') || 'none'}
+
+For each term write a definition in the voice of someone who knows this world giving a reader one quick, specific fact before sending them back into the story. One to two sentences. Period-accurate. Not a dictionary definition.
+
+WRONG: "The fuel cell is an electrochemical device that converts..."
+RIGHT: "One of three units that generated all of Odyssey's electricity — when all three died, the Command Module had 45 amp-hours left."
+
+Return JSON only:
+{
+  "suggestions": [
+    {
+      "term": "exact term as it appears in prose",
+      "definition": "one to two sentence period-specific definition",
+      "source_type": "technical",
+      "reason": "why a general reader might not know this"
+    }
+  ]
+}
+
+source_type must be one of: "technical", "jargon", "historical".
+Maximum 20 suggestions. Prioritize technical terms — aim for at least 10 from the Technical Facts section if available. Skip terms a general reader clearly knows.`;
 
     try {
       const client = getAnthropicClient(anthropicApiKey);
       const msg = await client.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2500,
+        max_tokens: 3500,
         messages: [{ role: 'user', content: prompt }],
       });
       const raw = msg.content[0]?.text?.trim() || '{}';
