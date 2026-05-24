@@ -1739,6 +1739,12 @@ function bindIntroPanelToggle(panelEl) {
   });
 }
 
+function getScenarioTagline(sc, arc) {
+  const premise = sc.premise?.trim() || arc?.premise?.trim() || '';
+  if (premise.length > 20) return premise;
+  return sc.tagline?.trim() || sc.setting?.trim() || '';
+}
+
 function renderStreamlinedScreen1() {
   const roleOverlay    = document.getElementById('role-overlay');
   const roleCardsEl    = document.getElementById('role-cards');
@@ -1753,12 +1759,7 @@ function renderStreamlinedScreen1() {
 
   if (overlayTitleEl) overlayTitleEl.textContent = scenario.title || 'Investigation';
 
-  // Date from scenario.setting; premise = first sentence of premise or description
-  const premiseRaw = (scenario.premise && scenario.premise.trim()) || scenario.description || '';
-  const premiseSentence = premiseRaw.match(/^[^.!?]*[.!?]/)?.[0]?.trim() || premiseRaw;
-  const settingDate = scenario.setting || '';
-  const taglineText = [settingDate, premiseSentence].filter(Boolean).join(' — ');
-  if (overlayTagline) overlayTagline.textContent = taglineText;
+  if (overlayTagline) overlayTagline.textContent = getScenarioTagline(scenario);
 
   // No multi-paragraph description on this screen — tagline carries the premise
   if (overlayDesc) overlayDesc.innerHTML = '';
