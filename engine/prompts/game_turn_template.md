@@ -39,6 +39,8 @@ Player input:
 
 ⚠️ NPC_UPDATES REQUIRED: For every NPC who appears in this scene, include their id in npc_updates with trust_delta, aggression_mode, and last_interaction. This is mandatory — do not omit npc_updates if any NPC is present.
 
+⚠️ DIALOGUE ATTRIBUTION: Use the character's `name` field for all dialogue tags in the narrative (e.g., "Lovell:" not "char_jim_lovell:"). The `id` field belongs in system output fields (npc_updates, npcMoments) only — never in narrative prose.
+
 {{SENSORY_OPENING_CHECK}}
 
 {{NPC_INTRO_INSTRUCTION}}
