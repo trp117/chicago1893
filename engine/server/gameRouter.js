@@ -496,7 +496,10 @@ export function createGameRouter(repos, config = {}) {
       }
 
       // Pass approved glossary terms to the client
-      initialState.glossary = (scenario.glossary || []).filter(g => g.approved !== false);
+      initialState.glossary = (scenario.glossary || []).filter(g =>
+        g.term?.trim() && g.definition?.trim()
+      );
+      console.log(`[GLOSSARY] scenario=${scenarioId} total=${(scenario.glossary || []).length} passed=${initialState.glossary.length} terms=[${initialState.glossary.map(g => g.term).join(', ')}]`);
 
       // Attach briefing context from the briefing screen
       if (character_context)   initialState.character_context = character_context;
