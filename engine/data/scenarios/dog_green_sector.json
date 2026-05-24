@@ -610,5 +610,6 @@
       }
     ]
   },
-  "allow_free_input": true
+  "allow_free_input": true,
+  "setting": "Omaha Beach, Normandy, 1944"
 }

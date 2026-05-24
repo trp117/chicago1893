@@ -599,5 +599,6 @@
       "notes": ""
     }
   },
-  "allow_free_input": true
+  "allow_free_input": true,
+  "setting": "Berlin, Germany, 1989"
 }

@@ -693,5 +693,6 @@
       }
     ]
   },
-  "allow_free_input": false
+  "allow_free_input": false,
+  "setting": "200,000 miles from Earth, April 1970"
 }

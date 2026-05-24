@@ -762,5 +762,6 @@
   },
   "the_saboteur_attempts": {
     "description": "Operational data registries confirm that the German counter-offensive at Cantigny on 28-30 May 1918 consisted exclusively of conventional infantry assaults by the German 82nd Reserve Division and pre-registered artillery bombardments; no clandestine sabotage operations or cross-perimeter espionage exploitations occurred within the 28th Infantry Regiment's defensive zone."
-  }
+  },
+  "setting": "Cantigny, France, 1918"
 }
