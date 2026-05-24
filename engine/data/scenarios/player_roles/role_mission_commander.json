@@ -52,7 +52,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:45:27.126Z",
+  "updatedAt": "2026-05-24T03:08:53.161Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully navigated the \"Free Return Trajectory\" and guided the crew through the narrow re-entry corridor. However, the extreme freezing conditions caused severe exposure for the crew, and a system delay forced a brutal, hard splashdown far from the recovery ship.",
@@ -72,9 +72,10 @@
   "is_player_character": false,
   "identity_note": null,
   "aliases": [],
-  "context_sentence": "You are Jim Lovell, commander of Apollo 13 and the most traveled astronaut in history with 572 hours in space, whose mission to the Fra Mauro Highlands was aborted on April 13, 1970, after an oxygen tank exploded 200,000 miles from Earth.",
+  "context_sentence": "You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands.",
   "character_type": "real",
   "historical_record_note": "Jim Lovell, Commander of Apollo 13. Survived the mission. Became the first person to fly to the Moon twice without landing. Later commanded the crew of Apollo 13 in the 1995 film.",
   "fact_checked": false,
-  "bridge_sentence": "Main Bus B is gone."
+  "bridge_sentence": "Main Bus B is gone.",
+  "represents": ""
 }

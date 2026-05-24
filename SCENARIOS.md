@@ -243,3 +243,101 @@ after author review to clear the warning.
 ### Health check behavior
 
 - `bridge_sentence` containing `[DRAFT]` prefix: yellow warning (needs author review)
+
+---
+
+## context_sentence (required)
+
+A single sentence — 20 words or fewer — that appears on the character entry screen (Screen 3) immediately below the bridge sentence and before the entry prose. This is the first moment the player understands who they are.
+
+```json
+{
+  "context_sentence": "You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands."
+}
+```
+
+**Purpose:** places the player in an identity and an immediate physical or moral situation simultaneously. It is not a biography. It is not backstory. It is the character's situation in this specific second.
+
+**Pattern:** `You are [name], [their role in this moment], and [what is happening to them right now].`
+
+One clause: identity. One clause: immediate situation. Nothing else.
+
+### What this sentence must NOT do
+
+- Name historical facts about the character's life ("the most traveled astronaut in history")
+- Explain what led to this moment ("who replaced Ken Mattingly three days before launch")
+- Reference events outside the immediate present ("after the oxygen tank explosion")
+- Summarize themes ("facing an impossible choice")
+
+### Benchmark set — nine sentences across three historical registers
+
+Every correct context sentence should be evaluable against this set. The three registers — mechanical crisis, moral stillness, physical survival — demonstrate what the standard looks like when the historical moment changes completely.
+
+---
+
+#### Mechanical crisis — Apollo 13: Lifeboat
+
+```
+"You are Jack Swigert, the Command Module Pilot, and you are systematically killing your own ship before it kills you."
+```
+*Identity: his role aboard the spacecraft. Situation: the controlled power-down — an action that is its own kind of violence.*
+
+```
+"You are Gene Kranz, Flight Director, and the loop is waiting for an answer you don't have yet."
+```
+*Identity: his position in Mission Control. Situation: the open comm loop — twenty engineers waiting in silence.*
+
+```
+"You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands."
+```
+*Identity: his rank and mission. Situation: a single physical gesture — the cold, the hesitation, the weight of what he is about to say.*
+
+---
+
+#### Moral stillness — Greensboro Four: The Color Line
+
+```
+"You are Joseph McNeil, seated at the Woolworth's lunch counter, and the floor walker is tightening his orbit around your stool."
+```
+*Identity: his name and physical location. Situation: a body in space being circled — the floor walker's route has become surveillance.*
+
+```
+"You are Franklin McCain, the largest body at this counter, and the man in the brown jacket has just taken another half-step closer."
+```
+*Identity: his physical presence as its own fact. Situation: a distance closing — the threat is measured in increments.*
+
+```
+"You are Ezell Blair Jr., the one who asked for the coffee, and no one has answered you."
+```
+*Identity: the act that started everything. Situation: the silence that answered it — still ongoing, still unresolved.*
+
+---
+
+#### Physical survival — Dog Green: The Longest Morning
+
+```
+"You are the Coxswain of LCA-551, and the ramp is dropping right now into water you know is too deep."
+```
+*Identity: his vessel and function. Situation: an irreversible mechanical action — the ramp drops whether he is ready or not.*
+
+```
+"You are the Ranger Sergeant, and the tide is at your waist with the Bangalore across your knees and fifty yards of open sand ahead."
+```
+*Identity: his rank and unit. Situation: a body in water holding a tool, with a specific distance between him and the objective.*
+
+```
+"You are the Battalion Medic, and the man dying in your hands is not the man you need to reach."
+```
+*Identity: his role. Situation: a triage choice already made — the wrong man is in his hands and the right one is somewhere else.*
+
+---
+
+**What the benchmark set demonstrates:** the second clause is always a physical or situational fact, never an emotion or a theme. "The ramp is dropping" is an action underway. "No one has answered you" is a condition, not a feeling. "Tightening his orbit" is movement in space. The sentence never tells the player what to feel — it places them in a body, at a specific moment, with something already happening.
+
+### Generation
+
+Use Admin → role edit → **Generate context sentence** button to generate a draft via AI. Review against this benchmark set before publishing. The generated sentence should pass the same test: one identity clause, one immediate-situation clause, no biography, no history.
+
+### Health check behavior
+
+- Empty `context_sentence`: yellow warning

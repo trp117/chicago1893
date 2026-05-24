@@ -45,7 +45,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:47:38.319Z",
+  "updatedAt": "2026-05-24T03:20:06.239Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You reached the shingle and saved the Sergeant, but your medical supplies are exhausted. You had to leave men in the \"wash\" to focus on those who could still fight. The breach is open, but you are haunted by the faces of those you couldn't reach.",
@@ -60,7 +60,7 @@
       "closing_line_override": "You were a witness to the carnage, but the red cross on your helmet was just a hollow promise."
     }
   },
-  "context_sentence": "You are the battalion medic attached to the 116th Infantry Regiment, 29th Infantry Division, one of the first wave of American soldiers to reach Dog Green Sector of Omaha Beach on the morning of June 6, 1944 — a stretch of coastline the U.S. Army's own after-action reports would later describe as the single deadliest killing ground of the entire Normandy invasion.",
+  "context_sentence": "You are the Battalion Medic, and the man dying in your hands is not the man you need to reach.",
   "character_type": "fictional",
   "represents": "Battalion aid men of the 116th Infantry Regiment at Omaha Beach on June 6, 1944",
   "fact_checked": false,

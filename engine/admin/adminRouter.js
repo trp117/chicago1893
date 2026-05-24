@@ -313,22 +313,31 @@ CHARACTER BRIEFING: ${getBriefingText(role.briefing) || ''}
 
 Write ONE sentence only. Second person.
 
-This sentence must ground the player in the historical record — who they are in history, not how they think or feel. The entry prose handles psychology. This sentence handles identity and historical placement.
+CRITICAL — this sentence must place the character in their immediate physical situation. It must not be a biography.
 
-PATTERN: "You are [name], [their specific role in the historical event], [one specific historical fact that places them in the record]."
+The sentence must answer: who are you and what is happening to you RIGHT NOW. Not who you are in history. Not what led to this moment. What is happening in your immediate situation in this specific second.
 
-CORRECT examples:
-"You are Joseph McNeil, one of the four Black college freshmen who sat down at the segregated lunch counter at F.W. Woolworth's in Greensboro on February 1, 1960, and asked to be served."
+WRONG — biographical (do not write this):
+"You are Jim Lovell, commander of Apollo 13 and the most traveled astronaut in history with 572 hours in space, whose mission to the Fra Mauro Highlands was aborted on April 13, 1970, after an oxygen tank exploded."
 
-"You are Elias Cole, a conductor of twenty years on the Underground Railroad, and tonight you are responsible for moving seven people — including two children — north through the Ohio bottomland toward Canada."
+WRONG — too much history (do not write this):
+"You are Jack Swigert, who replaced Ken Mattingly three days before launch after a measles exposure scare and is now the Command Module Pilot on humanity's most dangerous spaceflight."
 
-WRONG — do not write psychological description:
+WRONG — psychological or poetic (do not write this):
 "You are the one who reads rooms the way others read faces."
 
-WRONG — do not write poetic or impressionistic language:
-"Tonight the room is telling you something history will never record."
+RIGHT — immediate placement (write this style):
+"You are Jim Lovell, Mission Commander of Apollo 13, and your spacecraft is dying around you."
 
-Maximum 50 words. One sentence. Factual. Historical. Grounding. No preamble. No explanation. Just the sentence.`;
+RIGHT — immediate placement (write this style):
+"You are Jack Swigert, the Command Module Pilot, and you have four minutes of power left."
+
+RIGHT — immediate placement (write this style):
+"You are Joseph McNeil, one of the four students who sat down at the Woolworth's lunch counter, and the white manager is walking toward you."
+
+PATTERN: "You are [name], [their role in this moment], and [what is happening to them right now]."
+
+Maximum 20 words. One clause describing identity. One clause describing immediate situation. Nothing else. No preamble. No explanation. Just the sentence.`;
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
     { model: 'claude-sonnet-4-6', max_tokens: 120, temperature: 0.7, messages: [{ role: 'user', content }] },
@@ -337,6 +346,24 @@ Maximum 50 words. One sentence. Factual. Historical. Grounding. No preamble. No 
   const text = msg.content[0]?.text?.trim();
   if (!text) throw new Error('No text returned from Anthropic');
   return text;
+}
+
+function detectGoingWide(text) {
+  const patterns = [
+    /in the way that/gi,
+    /the kind of \w+ that/gi,
+    /the sort of \w+ that/gi,
+    /you (understand|realize|know) that/gi,
+    /which means/gi,
+    /that is to say/gi,
+    /in other words/gi,
+  ];
+  const flags = [];
+  for (const pattern of patterns) {
+    const matches = text.match(pattern);
+    if (matches) flags.push(`Possible going-wide: "${matches[0]}" — review this sentence`);
+  }
+  return flags;
 }
 
 async function generateBridgeSentence(scenario, role, anthropicApiKey) {
@@ -840,8 +867,16 @@ export function createAdminRouter(repos, config = {}) {
             const entryParagraph = await generateCharacterEntry(scenario, role, playerRoles, anthropicApiKey);
             if (!entrySection.character_entries) entrySection.character_entries = {};
             entrySection.character_entries[role.id] = entryParagraph;
-            repairs.push(`Generated entry paragraph for ${role.name}`);
-            console.log(`[REPAIR] ${req.params.id} — entry written for "${role.name}" (${entryParagraph.length} chars)`);
+
+            const wideFlags = detectGoingWide(entryParagraph);
+            repos.scenarios.savePlayerRole({ ...role, entry_paragraph_flags: wideFlags });
+            if (wideFlags.length > 0) {
+              repairs.push(`Generated entry paragraph for ${role.name} — ${wideFlags.length} going-wide pattern(s) detected. Review before publishing.`);
+              console.warn(`[REPAIR] ${req.params.id} — entry for "${role.name}" flagged: ${wideFlags.join('; ')}`);
+            } else {
+              repairs.push(`Generated entry paragraph for ${role.name}`);
+              console.log(`[REPAIR] ${req.params.id} — entry written for "${role.name}" (${entryParagraph.length} chars)`);
+            }
           } catch (err) {
             errors.push(`Failed to generate entry for ${role.name}: ${err.message}`);
             console.error(`[REPAIR ERROR] entry ${role.name}: ${err.message}`);

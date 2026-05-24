@@ -301,13 +301,18 @@ function assembleBibliography(scenarioData, summary, sessionState) {
   });
 }
 
-async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey) {
+async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote) {
+  const playerNoteRule = playerHistoricalNote
+    ? 'Layer 0 — The player character: the PLAYER CHARACTER NOTE below is verified fact about the person the player portrayed. Include it. It appears after the character\'s own session ends — do not omit it.'
+    : '';
+
   const systemPrompt = [
     'You are writing the historical epilogue for a completed Living History session. This is not closing prose. It is historical record — a different register entirely: precise, unsentimental, a careful historian\'s final note. The closing prose has already been delivered. Do not repeat it or continue its style.',
     '',
     'You have two inputs: the session summary showing what this specific player did, and the scenario\'s verified historical facts. Select and sequence the relevant facts into an epilogue of 150 to 250 words.',
     '',
     'Follow the concentric circle rule:',
+    playerNoteRule,
     'Layer 1 — The room: what happened to the named characters this player interacted with directly. Cover every character whose character_id appears in the session summary\'s interacted_characters list. Do not omit any.',
     'Layer 2 — The immediate event: the verified outcome from immediate_outcome.',
     'Layer 3 — The larger frame: maximum two facts from historical_frame that connect to what this player actually did. Do not reach beyond this.',
@@ -316,13 +321,17 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     'Open with the player\'s last significant action or the immediate consequence of the session\'s closing moment. Do not open with a general historical statement.',
     'Include open_threads entries only when the matching thread_id appears in the session\'s resolved_threads.',
     'Include choice_echoes entries only when the matching beat_id appears in the session\'s completed_beats.',
-    'Do not invent, extrapolate, or editorialize. Every fact must come from the epilogue data block provided.',
+    'Do not invent, extrapolate, or editorialize. Every fact must come from the epilogue data block or the player character note.',
     'Register: historian\'s record. Precise. Clean. Unsentimental. No literary reach. No interiority.',
     'Last sentence: a verified historical fact. Not a meaning-statement. A fact.',
     'Length: 150 to 250 words exactly.',
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
-  const userContent = [
+  const userParts = [];
+  if (playerHistoricalNote) {
+    userParts.push(`PLAYER CHARACTER NOTE:\n${playerHistoricalNote}`, '');
+  }
+  userParts.push(
     'SESSION SUMMARY:',
     JSON.stringify(sessionSummary, null, 2),
     '',
@@ -331,7 +340,8 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     '',
     'CLOSING PROSE (do not repeat or continue its style):',
     closingProse,
-  ].join('\n');
+  );
+  const userContent = userParts.join('\n');
 
   const signal = AbortSignal.timeout(30000);
   const resp   = await fetch(ANTHROPIC_URL, {
@@ -423,6 +433,7 @@ export function createGameRouter(repos, config = {}) {
       const {
         scenarioId, roleId, narrativeStyle, sessionId: clientSessionId,
         character_context, player_addition, active_hook, ttsEnabled,
+        onboardingFlow,
       } = req.body;
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
@@ -470,6 +481,7 @@ export function createGameRouter(repos, config = {}) {
       if (player_addition)     initialState.player_addition   = player_addition;
       if (active_hook)         initialState.active_hook       = active_hook;
       if (ttsEnabled !== undefined) initialState.ttsEnabled   = ttsEnabled;
+      if (onboardingFlow)      initialState.onboardingFlow    = onboardingFlow;
 
       // Persist session so promptBuilder can read it; saveSession seeds npc_states on first save
       const sessionId = clientSessionId || randomUUID();
@@ -484,6 +496,27 @@ export function createGameRouter(repos, config = {}) {
       const openingChoicesText = (role.opening?.choices || [])
         .map(c => `- ${c.text || c}`)
         .join('\n');
+
+      // When the streamlined onboarding is active the player has not seen the world/stakes
+      // screens — inject that context into Turn 1 prose so the world reveals itself naturally.
+      const worldContextBlock = onboardingFlow === 'streamlined'
+        ? (() => {
+            const introSections = scenario.introduction?.sections || [];
+            const worldText  = introSections.find(s => s.type === 'world')?.text  || '';
+            const stakesText = introSections.find(s => s.type === 'stakes')?.text || '';
+            if (!worldText && !stakesText) return '';
+            return [
+              '',
+              'WORLD INTRODUCTION — weave this into the opening prose of this first turn.',
+              'Do not reproduce it verbatim. Use it to ground the player in the historical moment.',
+              'The player has not read this context yet — it should feel like the world revealing itself, not like a history lesson.',
+              worldText  ? `WORLD: ${worldText}`   : '',
+              stakesText ? `STAKES: ${stakesText}` : '',
+              '',
+              'The player has not read any world introduction. The opening scene must establish the historical moment through 2-3 specific details woven into the prose — the year, the political context, the specific stakes of tonight. Not as a block. As details the character would be aware of. These must feel like the world pressing in on the character\'s immediate reality, not like narration added from outside.',
+            ].filter(Boolean).join('\n');
+          })()
+        : '';
 
       const openingInput = [
         '[GAME_START] Render the opening scene.',
@@ -500,6 +533,7 @@ export function createGameRouter(repos, config = {}) {
         `- Return location: "${initialState.location}"`,
         '- Apply all NPC intro rules: weave introAnchor descriptions into prose before any NPC speaks.',
         '- Do NOT set endState.isEnding: true.',
+        worldContextBlock,
       ].join('\n');
 
       const prompt = composeTurnPrompt(initialState, openingInput, gameData);
@@ -733,7 +767,9 @@ export function createGameRouter(repos, config = {}) {
       const npcPresent = Array.isArray(output.npcMoments) && output.npcMoments.length > 0;
       if (npcPresent && !hasSpeech(output.narrative)) {
         traceTags.push('has-retry', 'silent-npc');
-        const npcName = output.npcMoments[0]?.npc?.replace(/_/g, ' ') || 'the NPC';
+        const firstNpcId = output.npcMoments[0]?.npc;
+        const firstNpcChar = firstNpcId ? characters.find(c => c.id === firstNpcId) : null;
+        const npcName = firstNpcChar?.name || firstNpcId?.replace(/_/g, ' ') || 'the NPC';
         console.log(`[RETRY] silent-npc — ${npcName}`);
         const retryMessages = [
           ...baseMessages,
@@ -1132,7 +1168,7 @@ export function createGameRouter(repos, config = {}) {
 
         try {
           console.log('[EPILOGUE-CLOSE] calling epilogue API');
-          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey);
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey, role?.historical_record_note || null);
         } catch (e) {
           console.error('[EPILOGUE]', e.message);
         }

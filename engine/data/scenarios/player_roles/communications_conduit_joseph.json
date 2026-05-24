@@ -46,10 +46,11 @@
     }
   },
   "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-22T01:42:46.029Z",
-  "context_sentence": "You are Joseph McNeil, one of the four North Carolina A&T freshmen who sat down at the whites-only Woolworth's lunch counter in Greensboro on February 1, 1960, and whose act of deliberate, coordinated civil disobedience would trigger sit-in protests across more than fifty American cities within weeks.",
+  "updatedAt": "2026-05-24T03:30:00.389Z",
+  "context_sentence": "You are Joseph McNeil, seated at the Woolworth's lunch counter, and the floor walker is tightening his orbit around your stool.",
   "character_type": "real",
   "historical_record_note": "Joseph McNeil. His experience being refused service at a Greensboro bus terminal lunch counter in January 1960 was the immediate catalyst for the sit-in. Later became a USAF Brigadier General.",
   "fact_checked": false,
-  "bridge_sentence": "The waitress has walked away."
+  "bridge_sentence": "The waitress has walked away.",
+  "represents": ""
 }

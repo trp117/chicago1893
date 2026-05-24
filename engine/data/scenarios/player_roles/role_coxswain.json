@@ -44,7 +44,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:47:41.001Z",
+  "updatedAt": "2026-05-24T03:20:07.537Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully landed the craft, but grounded it on a sandbar. The men had to wade through neck-deep water under enfilade fire, losing half their heavy equipment. You managed to back the LCA off the beach, but the hull is riddled with holes and the engine is seizing.",
@@ -59,7 +59,7 @@
       "closing_line_override": "The cold Atlantic rushed in to meet the fire, and then there was only the sound of the waves."
     }
   },
-  "context_sentence": "You are the coxswain of LCA-551, a Royal Navy or Combined Operations rating responsible for delivering one of the first assault waves of the 116th Infantry Regiment to Dog Green Sector, Omaha Beach, on the morning of June 6, 1944, as part of the largest amphibious invasion in recorded history.",
+  "context_sentence": "You are the Coxswain of LCA-551, and the ramp is dropping right now into water you know is too deep.",
   "character_type": "fictional",
   "represents": "Coast Guard and Navy coxswains who piloted landing craft at Omaha Beach on June 6, 1944",
   "fact_checked": false,

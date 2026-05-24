@@ -53,7 +53,7 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:45:22.031Z",
+  "updatedAt": "2026-05-24T03:08:53.159Z",
   "ending_notes": {
     "partial": {
       "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
@@ -73,9 +73,10 @@
   "is_player_character": false,
   "identity_note": null,
   "aliases": [],
-  "context_sentence": "You are Jack Swigert, the Command Module Pilot who replaced Ken Mattingly just three days before launch after a measles exposure scare, and on April 13, 1970, at 55 hours and 54 minutes into the mission, you are the astronaut who performed the routine tank-stir procedure that triggered the explosion.",
+  "context_sentence": "You are Jack Swigert, the Command Module Pilot, and you are systematically killing your own ship before it kills you.",
   "character_type": "real",
-  "historical_record_note": "Jack Swigert, Command Module Pilot. A last-minute replacement for Ken Mattingly. Survived. Later elected to Congress from Colorado but died of cancer before taking his seat in 1983.",
+  "historical_record_note": "Jack Swigert left NASA in 1977. In November 1982 he was elected to the United States House of Representatives from Colorado's 6th congressional district. He died of bone cancer on December 27, 1982, before he could be sworn in. He was 51 years old.",
   "fact_checked": false,
-  "bridge_sentence": "The master alarm stopped screaming forty seconds ago."
+  "bridge_sentence": "The master alarm stopped screaming forty seconds ago.",
+  "represents": ""
 }

@@ -226,7 +226,9 @@ li { margin-bottom: 8px; }
 .intro-bridge-sentence { font-style: italic; }
 .bridge-sentence { font-style: italic; }
 .context-sentence {}
-.entry-paragraph {}
+.entry-paragraph { font-size: 14.5px; line-height: 1.75; color: var(--text); margin-bottom: 0; }
+.streamlined-screen2-content { padding-bottom: 0; }
+.intro-begin-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border); padding-bottom: 1rem; }
 .intro-paragraph.fade-in { opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease, transform 0.4s ease; animation: none !important; }
 .intro-paragraph.fade-in.visible { opacity: 1; transform: translateY(0); }
 @media (max-width: 640px) {
@@ -374,6 +376,113 @@ li { margin-bottom: 8px; }
   background: transparent; border: 1px solid var(--border);
   color: var(--muted); font-size: 0.9rem; font-family: Georgia, serif; cursor: pointer;
 }
+  /* ── Streamlined onboarding (USE_STREAMLINED_ONBOARDING) ── */
+  .sl-onboard .role-intro { display: block; }
+  .sl-onboard .role-card-desc { display: block; }
+  .sl-onboard .role-instruction { display: none; }
+  /* ── Streamlined intro/style zones ── */
+  .sl-onboard .style-selector { display: none; }
+  .intro-zone {
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    padding: 10px 0;
+    margin: 1.25rem 0 0;
+    text-align: center;
+  }
+  .intro-panel-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    transition: color 0.15s ease;
+    font-family: system-ui, sans-serif;
+  }
+  .intro-panel-toggle:hover { color: #C9A84C; }
+  .intro-panel-arrow { font-size: 10px; color: inherit; }
+  .intro-panel-content {
+    text-align: left;
+    padding-top: 1rem;
+    margin-top: 0.75rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .intro-panel-text { font-size: 13.5px; line-height: 1.75; color: var(--text); margin-bottom: 1.25rem; }
+  .intro-panel-close {
+    background: none; border: none;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer; padding: 0;
+    letter-spacing: 0.06em; font-family: system-ui, sans-serif;
+  }
+  .intro-panel-close:hover { color: var(--text); }
+  .style-zone { display: flex; justify-content: center; padding: 10px 0 1rem; }
+  .narrative-style-options { display: flex; gap: 6px; }
+  .ns-btn {
+    font-size: 11px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: system-ui, sans-serif;
+  }
+  .ns-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .ns-btn:hover:not(.active) { color: var(--text); border-color: var(--muted); }
+  .role-section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.6rem 2px;
+  }
+  /* ── Intro panel listen button ── */
+  .intro-listen-bar {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 0.5px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  .intro-listen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--muted);
+    transition: all 0.15s ease;
+    font-family: system-ui, sans-serif;
+  }
+  .intro-listen-btn:hover { color: var(--text); border-color: var(--muted); }
+  .intro-listen-icon { font-size: 12px; }
+  .intro-listen-label { font-size: 11px; letter-spacing: 0.04em; }
+  .intro-listen-btn.narration-muted { opacity: 0.4; cursor: default; }
+  .intro-listen-btn.intro-listen-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    min-width: 80px;
+    justify-content: center;
+  }
+  .intro-listen-btn.intro-listen-loading::after {
+    content: '\B7\B7\B7';
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    animation: intro-dots 1.2s infinite;
+  }
+  @keyframes intro-dots {
+    0%   { opacity: 0.3; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
   </style>
 </head>
 <body>
@@ -563,6 +672,11 @@ const API_BASE    = '/game/api';
 const worldIntroKey = `world-intro-shown-${SCENARIO_ID}`;
 function hasSeenWorldIntro()  { return sessionStorage.getItem(worldIntroKey) === 'true'; }
 function markWorldIntroSeen() { sessionStorage.setItem(worldIntroKey, 'true'); }
+
+// ONBOARDING EXPERIMENT
+// Set to true for two-screen flow, false for original flow
+// Rollback: change this one line back to false
+const USE_STREAMLINED_ONBOARDING = true;
 
 if (!SCENARIO_ID) {
   document.body.innerHTML = `<div class="error-page"><h1>No scenario selected</h1><p>Open this page with <code>?scenarioId=your_id</code> in the URL, or go back to the <a href="/" style="color:var(--accent)">admin panel</a> and use the Play button.</p></div>`;
@@ -1428,11 +1542,15 @@ async function loadGame() {
     document.title = scenario.title || 'Investigation';
     if (titleEl) titleEl.textContent = scenario.title || 'Investigation';
 
-    if (!hasSeenWorldIntro()) {
-      document.getElementById('role-overlay').classList.add('hidden');
-      showWorldIntro();
+    if (USE_STREAMLINED_ONBOARDING) {
+      renderStreamlinedScreen1();
     } else {
-      showRoleSelection();
+      if (!hasSeenWorldIntro()) {
+        document.getElementById('role-overlay').classList.add('hidden');
+        showWorldIntro();
+      } else {
+        showRoleSelection();
+      }
     }
   } catch (err) {
     document.body.innerHTML = `<div class="error-page"><h1>Failed to load scenario</h1><p>${err.message}</p><p><a href="/" style="color:var(--accent)">Back to admin panel</a></p></div>`;
@@ -1540,6 +1658,435 @@ function showRoleSelection() {
   });
 }
 
+// ── Streamlined onboarding (USE_STREAMLINED_ONBOARDING) ──────────────────────
+// Screen 1: title + setting + premise sentence + role cards (tap-to-advance)
+// Screen 2: character entry (bridge → context → entry prose) + Begin button
+// Both functions are only reachable when USE_STREAMLINED_ONBOARDING === true.
+// Original showWorldIntro / showRoleSelection / showIntroScene are untouched.
+
+function buildIntroPanelEl(scenario) {
+  const sections = scenario.introduction?.sections || [];
+  const world  = sections.find(s => s.type === 'world')?.text  || '';
+  const stakes = sections.find(s => s.type === 'stakes')?.text || '';
+  const scene  = sections.find(s => s.type === 'scene')?.text  || '';
+  if (!world && !stakes && !scene) return null;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'intro-panel-wrap';
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'intro-panel-toggle';
+  toggle.setAttribute('aria-expanded', 'false');
+
+  const titleRow = document.createElement('div');
+  titleRow.className = 'intro-panel-toggle-title';
+  const arrowSpan = document.createElement('span');
+  arrowSpan.className = 'intro-panel-arrow';
+  arrowSpan.textContent = '↓';
+  titleRow.append('Read the full historical introduction', arrowSpan);
+
+  const subLine = document.createElement('div');
+  subLine.className = 'intro-panel-toggle-sub';
+  subLine.textContent = 'Historical context, stakes, and the physical world before you choose your role.';
+
+  toggle.appendChild(titleRow);
+  toggle.appendChild(subLine);
+
+  const content = document.createElement('div');
+  content.className = 'intro-panel-content';
+  content.hidden = true;
+
+  for (const txt of [world, stakes, scene].filter(Boolean)) {
+    const p = document.createElement('p');
+    p.className = 'intro-panel-text';
+    p.textContent = txt;
+    content.appendChild(p);
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'intro-panel-close';
+  closeBtn.textContent = 'Close ↑';
+  content.appendChild(closeBtn);
+
+  wrap.appendChild(toggle);
+  wrap.appendChild(content);
+  return wrap;
+}
+
+function bindIntroPanelToggle(panelEl) {
+  const toggle  = panelEl.querySelector('.intro-panel-toggle');
+  const content = panelEl.querySelector('.intro-panel-content');
+  const close   = panelEl.querySelector('.intro-panel-close');
+  const arrow   = panelEl.querySelector('.intro-panel-arrow');
+  if (!toggle || !content) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpen = !content.hidden;
+    content.hidden = isOpen;
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    if (arrow) arrow.textContent = isOpen ? '↓' : '↑';
+    if (!isOpen) content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  close?.addEventListener('click', () => {
+    content.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    if (arrow) arrow.textContent = '↓';
+    toggle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function renderStreamlinedScreen1() {
+  const roleOverlay    = document.getElementById('role-overlay');
+  const roleCardsEl    = document.getElementById('role-cards');
+  const overlayTitleEl = document.getElementById('overlay-title');
+  const overlayTagline = document.getElementById('overlay-tagline');
+  const overlayDesc    = document.getElementById('overlay-desc');
+  const overlayObj     = document.getElementById('overlay-objective');
+  const beginBtn       = document.getElementById('role-begin-btn');
+
+  // CSS class enables tagline + always-visible card descriptions on mobile
+  roleOverlay.classList.add('sl-onboard');
+
+  if (overlayTitleEl) overlayTitleEl.textContent = scenario.title || 'Investigation';
+
+  // Date from scenario.setting; premise = first sentence of premise or description
+  const premiseRaw = (scenario.premise && scenario.premise.trim()) || scenario.description || '';
+  const premiseSentence = premiseRaw.match(/^[^.!?]*[.!?]/)?.[0]?.trim() || premiseRaw;
+  const settingDate = scenario.setting || '';
+  const taglineText = [settingDate, premiseSentence].filter(Boolean).join(' — ');
+  if (overlayTagline) overlayTagline.textContent = taglineText;
+
+  // No multi-paragraph description on this screen — tagline carries the premise
+  if (overlayDesc) overlayDesc.innerHTML = '';
+  if (overlayObj) overlayObj.style.display = 'none';
+
+  // No Enter button — tapping a role card is the action that advances
+  if (beginBtn) beginBtn.style.display = 'none';
+
+  // Remove intro zone / style zone / section label left from a previous call (e.g., restart)
+  roleOverlay.querySelectorAll('.intro-zone, .style-zone, .role-section-label').forEach(el => el.remove());
+
+  // Gather intro section texts
+  const introSections = scenario.introduction?.sections || [];
+  const worldText  = introSections.find(s => s.type === 'world')?.text  || '';
+  const stakesText = introSections.find(s => s.type === 'stakes')?.text || '';
+  const sceneText  = introSections.find(s => s.type === 'scene')?.text  || '';
+  const hasIntro = !!(worldText || stakesText || sceneText);
+
+  // Introduction zone — ruled, centered link, panel expands inside
+  if (hasIntro) {
+    const introZone = document.createElement('div');
+    introZone.className = 'intro-zone';
+
+    const introToggle = document.createElement('button');
+    introToggle.type = 'button';
+    introToggle.className = 'intro-panel-toggle';
+    introToggle.setAttribute('aria-expanded', 'false');
+    introToggle.appendChild(document.createTextNode('Read the full historical introduction '));
+    const arrow = document.createElement('span');
+    arrow.className = 'intro-panel-arrow';
+    arrow.textContent = '↓';
+    introToggle.appendChild(arrow);
+    introZone.appendChild(introToggle);
+
+    const introContent = document.createElement('div');
+    introContent.className = 'intro-panel-content';
+    introContent.hidden = true;
+
+    const introNarrationText = [worldText, stakesText, sceneText].filter(Boolean).join(' ');
+
+    // Prose paragraphs first
+    for (const txt of [worldText, stakesText, sceneText].filter(Boolean)) {
+      const p = document.createElement('p');
+      p.className = 'intro-panel-text';
+      p.textContent = txt;
+      introContent.appendChild(p);
+    }
+
+    // Listen button at bottom, above Close
+    const listenBar  = document.createElement('div');
+    listenBar.className = 'intro-listen-bar';
+    const listenBtn  = document.createElement('button');
+    listenBtn.type   = 'button';
+    listenBtn.className = 'intro-listen-btn';
+    listenBtn.setAttribute('aria-label', 'Listen to historical introduction');
+    const listenIcon  = document.createElement('span');
+    listenIcon.className = 'intro-listen-icon';
+    listenIcon.textContent = '🔊';
+    const listenLabel = document.createElement('span');
+    listenLabel.className = 'intro-listen-label';
+    listenLabel.textContent = 'Listen';
+    listenBtn.appendChild(listenIcon);
+    listenBtn.appendChild(listenLabel);
+    listenBar.appendChild(listenBtn);
+    introContent.appendChild(listenBar);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'intro-panel-close';
+    closeBtn.textContent = 'Close ↑';
+    introContent.appendChild(closeBtn);
+    introZone.appendChild(introContent);
+
+    // Listen button state
+    let isNarrating = false;
+    let loadingCheckInterval = null;
+    let loadingTimeoutId = null;
+
+    const cancelLoading = () => {
+      if (loadingCheckInterval) { clearInterval(loadingCheckInterval); loadingCheckInterval = null; }
+      if (loadingTimeoutId)     { clearTimeout(loadingTimeoutId);     loadingTimeoutId     = null; }
+    };
+
+    const resetListenBtn = () => {
+      isNarrating = false;
+      cancelLoading();
+      listenBtn.classList.remove('intro-listen-loading');
+      listenBtn.disabled = false;
+      listenIcon.textContent = '🔊';
+      listenLabel.textContent = 'Listen';
+    };
+
+    listenBtn.addEventListener('click', () => {
+      if (isNarrating) {
+        ttsStop();
+        resetListenBtn();
+        return;
+      }
+      // Initialize audio element if not yet unlocked (Listen tap is a user gesture)
+      if (!audioEl) {
+        audioUnlocked = true;
+        audioEl = new Audio();
+        audioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQAAAAA=';
+        audioEl.play().catch(() => {});
+        updateTtsToggleUI();
+        updateTtsBarUI();
+      }
+
+      // Show loading state immediately
+      listenIcon.textContent = '';
+      listenLabel.textContent = '';
+      listenBtn.classList.add('intro-listen-loading');
+      listenBtn.disabled = true;
+
+      // Start narration (bypasses ttsEnabled check)
+      const wasEnabled = ttsEnabled;
+      if (!wasEnabled) setTtsEnabled(true);
+      ttsSpeak(introNarrationText, null).finally(() => {
+        if (!wasEnabled) setTtsEnabled(false);
+      });
+
+      // Poll until audio element is playing
+      loadingCheckInterval = setInterval(() => {
+        if (audioEl && !audioEl.paused) {
+          cancelLoading();
+          listenBtn.classList.remove('intro-listen-loading');
+          listenBtn.disabled = false;
+          listenIcon.textContent = '⏹';
+          listenLabel.textContent = 'Stop';
+          isNarrating = true;
+          // Reset when audio ends naturally
+          audioEl.addEventListener('ended', function onEnd() {
+            if (isNarrating) resetListenBtn();
+            audioEl?.removeEventListener('ended', onEnd);
+          });
+        }
+      }, 100);
+
+      // Safety timeout — reset if audio never starts within 8 seconds
+      loadingTimeoutId = setTimeout(() => {
+        cancelLoading();
+        if (!isNarrating) resetListenBtn();
+      }, 8000);
+    });
+
+    introToggle.addEventListener('click', () => {
+      const isOpen = !introContent.hidden;
+      introContent.hidden = isOpen;
+      introToggle.setAttribute('aria-expanded', String(!isOpen));
+      arrow.textContent = isOpen ? '↓' : '↑';
+      if (!isOpen) {
+        // Scroll to bottom of panel so Listen + Close are immediately visible
+        setTimeout(() => {
+          closeBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
+      }
+    });
+    closeBtn.addEventListener('click', () => {
+      ttsStop();
+      resetListenBtn();
+      introContent.hidden = true;
+      introToggle.setAttribute('aria-expanded', 'false');
+      arrow.textContent = '↓';
+      introToggle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    roleCardsEl.insertAdjacentElement('beforebegin', introZone);
+  }
+
+  // Style zone — centered pill buttons, outside the ruled zone
+  const styleZone = document.createElement('div');
+  styleZone.className = 'style-zone';
+  const styleOptions = document.createElement('div');
+  styleOptions.className = 'narrative-style-options';
+  for (const { value, label } of [{ value: 'focused', label: 'Focused' }, { value: 'cinematic', label: 'Cinematic' }]) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ns-btn' + (value === 'focused' ? ' active' : '');
+    btn.dataset.style = value;
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      styleOptions.querySelectorAll('.ns-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+    styleOptions.appendChild(btn);
+  }
+  styleZone.appendChild(styleOptions);
+  roleCardsEl.insertAdjacentElement('beforebegin', styleZone);
+
+  // Section label sits directly above the first role card
+  const sectionLabel = document.createElement('p');
+  sectionLabel.className = 'role-section-label';
+  sectionLabel.textContent = 'Select a role to begin.';
+  roleCardsEl.insertAdjacentElement('beforebegin', sectionLabel);
+  roleCardsEl.innerHTML = '';
+  for (const role of scenario.playerRoleOptions || []) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'role-card';
+    card.innerHTML = `<span class="role-card-name">${getCardDisplayName(role)}</span><span class="role-card-desc">${role.description || ''}</span>`;
+    card.addEventListener('click', () => {
+      ttsStop(); // stop any intro panel narration in progress
+      audioUnlocked = true;
+      audioEl = new Audio();
+      audioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQAAAAA=';
+      audioEl.play().catch(() => {});
+      updateTtsToggleUI();
+      updateTtsBarUI();
+      roleOverlay.classList.add('hidden');
+
+      const selectedStyle = document.querySelector('.ns-btn.active')?.dataset.style || 'focused';
+      const hooks        = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
+      const hookIndex    = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
+      const activeHook   = hookIndex >= 0 ? hooks[hookIndex] : null;
+      const baseBriefing = typeof role.briefing === 'string' && role.briefing.trim()
+        ? role.briefing.trim() : (role.description || '');
+      const characterContext = activeHook ? `${baseBriefing} ${activeHook}` : baseBriefing;
+
+      // Pre-warm /start the moment a role is tapped — same pattern as original flow
+      warmStart = {
+        roleId: role.id,
+        style:  selectedStyle,
+        activeHook,
+        characterContext,
+        promise: fetch(`${API_BASE}/start`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            scenarioId:        scenario.id,
+            roleId:            role.id,
+            narrativeStyle:    selectedStyle,
+            character_context: characterContext,
+            player_addition:   null,
+            active_hook:       activeHook,
+            ttsEnabled,
+            onboardingFlow:    'streamlined',
+          }),
+        }),
+      };
+
+      renderStreamlinedScreen2(role, selectedStyle, activeHook, characterContext);
+    });
+    roleCardsEl.appendChild(card);
+  }
+
+  roleOverlay.classList.remove('hidden');
+}
+
+function buildCharacterHeader(role) {
+  const realName = role.real_name?.trim() || null;
+  const fullName  = role.name?.trim() || role.display_name?.trim() || '';
+
+  if (realName) {
+    // Strip the embedded real name from the combined role.name string
+    const parts = fullName.split(/\s*[—–]\s*/);
+    const roleTitle = parts.find(p => p.trim().toLowerCase() !== realName.toLowerCase())?.trim() || fullName;
+    return `${realName} — ${roleTitle}`;
+  }
+
+  // No explicit real_name — if role.name is "ROLE — REAL NAME", reverse it
+  const dashMatch = fullName.match(/^(.+?)\s*[—–]\s*(.+)$/);
+  if (dashMatch) return `${dashMatch[2].trim()} — ${dashMatch[1].trim()}`;
+
+  // Pure role title, no real name
+  return fullName;
+}
+
+function renderStreamlinedScreen2(role, narrativeStyle, activeHook, characterContext) {
+  const overlay    = document.getElementById('intro-overlay');
+  const titleEl    = document.getElementById('intro-title');
+  const sectionsEl = document.getElementById('intro-sections');
+  const skipBtn    = document.getElementById('intro-skip-btn');
+
+  // Label the action button "Enter" instead of "Continue"
+  const beginBtnEl = document.getElementById('intro-begin-btn');
+  if (beginBtnEl) beginBtnEl.textContent = 'Enter';
+
+  // Tighten Screen 2 layout: remove section bottom padding, apply ruled separator to footer
+  sectionsEl.classList.add('streamlined-screen2-content');
+  const footerEl = document.getElementById('intro-overlay').querySelector('.intro-footer');
+  if (footerEl) footerEl.classList.add('intro-begin-actions');
+
+  // Collect character texts: bridge → context → entry (same logic as showIntroScene)
+  const bridgeSentence = (role.bridge_sentence || '').replace(/^\[DRAFT\]\s*/i, '').trim();
+  const charTexts = [];
+  if (bridgeSentence) charTexts.push({ text: bridgeSentence, isBridge: true });
+  if (role.context_sentence?.trim()) charTexts.push({ text: role.context_sentence.trim(), isContext: true });
+  for (const section of (scenario.introduction?.sections || [])) {
+    if (!section.character_entries) continue;
+    const text = section.character_entries[role.id] || Object.values(section.character_entries)[0] || '';
+    if (text.trim()) charTexts.push({ text: text.trim() });
+  }
+
+  function buildContent() {
+    const paragraphs = [], texts = [];
+    charTexts.forEach(({ text, isBridge, isContext }) => {
+      const p = document.createElement('p');
+      const semantic = isBridge ? 'bridge-sentence' : isContext ? 'context-sentence' : 'entry-paragraph';
+      p.className = `intro-section ${semantic}`;
+      p.style.opacity = '1';
+      p.style.animation = 'none';
+      p.textContent = text;
+      paragraphs.push(p);
+      texts.push(text);
+    });
+    return { paragraphs, texts };
+  }
+
+  function onContinue() {
+    overlay.classList.add('hidden');
+    startGame(role.id, narrativeStyle, {
+      character_context: characterContext,
+      player_addition:   null,
+      active_hook:       activeHook,
+    });
+  }
+
+  if (!charTexts.length) { onContinue(); return; }
+
+  _buildIntroScreen({
+    overlay, titleEl, sectionsEl, skipBtn,
+    titleClass: 'intro-role-header',
+    titleText:  buildCharacterHeader(role),
+    buildContent,
+    onContinue,
+    showSkip: false,
+    logTag:   'streamlined-screen2',
+  });
+}
+
 // ── Introduction screens ──────────────────────────────────────────────────────
 
 function initProgressiveReveal(sectionsEl) {
@@ -1576,6 +2123,10 @@ function _buildIntroScreen({ overlay, titleEl, sectionsEl, skipBtn, titleClass, 
                               buildContent, onContinue, showSkip, logTag, onReveal }) {
   titleEl.className = titleClass;
   titleEl.textContent = titleText;
+
+  // Reset screen-specific classes added by renderStreamlinedScreen2
+  sectionsEl.classList.remove('streamlined-screen2-content');
+  overlay.querySelector('.intro-footer')?.classList.remove('intro-begin-actions');
 
   const { paragraphs, texts } = buildContent();
 
@@ -1777,7 +2328,7 @@ function showIntroScene(scenario, role, activeHook, characterContext) {
   _buildIntroScreen({
     overlay, titleEl, sectionsEl, skipBtn,
     titleClass: 'intro-role-header',
-    titleText:  role.name,
+    titleText:  buildCharacterHeader(role),
     buildContent,
     onContinue,
     showSkip: true,
@@ -1832,6 +2383,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   // Temporary local state so the sidebar is visible while /start is in flight
   gameState = buildClientInitialState(scenario, role);
   gameState.narrativeStyle = narrativeStyle || 'focused';
+  gameState.onboardingFlow = USE_STREAMLINED_ONBOARDING ? 'streamlined' : 'standard';
 
   sessionId = crypto.randomUUID();
   conversationHistory = [];
@@ -1883,6 +2435,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
             player_addition:   briefingContext.player_addition   || null,
             active_hook:       briefingContext.active_hook       || null,
             ttsEnabled,
+            onboardingFlow:    USE_STREAMLINED_ONBOARDING ? 'streamlined' : 'standard',
           }),
         });
     warmStart = null;
@@ -1990,8 +2543,12 @@ function restartGame() {
   const bottomBar = document.querySelector('.bottom-bar');
   if (bottomBar) { bottomBar.style.transition = ''; bottomBar.style.opacity = ''; }
 
-  document.getElementById('role-overlay').classList.remove('hidden');
-  showRoleSelection();
+  if (USE_STREAMLINED_ONBOARDING) {
+    renderStreamlinedScreen1();
+  } else {
+    document.getElementById('role-overlay').classList.remove('hidden');
+    showRoleSelection();
+  }
 }
 
 // ── Notes ─────────────────────────────────────────────────────────────────────

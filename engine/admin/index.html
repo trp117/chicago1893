@@ -1698,6 +1698,15 @@ function renderPlayerRolesSection(data) {
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
       ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}
       ${(() => {
+          const flags = Array.isArray(r.entry_paragraph_flags) ? r.entry_paragraph_flags : [];
+          if (!flags.length) return '';
+          const items = flags.map(f => `<li>${f.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</li>`).join('');
+          return `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:10px 14px;margin:4px 0 0">
+            <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px">⚠ Going-wide pattern detected in entry paragraph — review before publishing</div>
+            <ul style="margin:0;padding-left:18px;font-size:12px;color:#78350f">${items}</ul>
+          </div>`;
+        })()}
+      ${(() => {
           const isDraft = r.bridge_sentence?.startsWith('[DRAFT]');
           const hint = isDraft
             ? '<span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:6px">DRAFT — needs review</span>'
@@ -3323,11 +3332,10 @@ async function checkScenarioHealth(scenarioId) {
   try {
     const health = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/health`);
     if (!dot) return;
+    const repairBtn = card.querySelector('.repair-btn');
     if (!health.healthy) {
       dot.className = 'health-dot needs-repair';
       dot.title = `Missing: ${health.missing.join(' · ')}`;
-      const repairBtn = card.querySelector('.repair-btn');
-      if (repairBtn) repairBtn.style.display = 'inline-flex';
     } else if (health.warnings?.length) {
       dot.className = 'health-dot has-warnings';
       dot.title = `Warnings: ${health.warnings.join(' · ')}`;
@@ -3335,6 +3343,7 @@ async function checkScenarioHealth(scenarioId) {
       dot.className = 'health-dot healthy';
       dot.title = 'All required fields present';
     }
+    if (repairBtn) repairBtn.style.display = 'inline-flex';
   } catch {
     if (dot) { dot.className = 'health-dot'; dot.style.background = 'var(--border)'; dot.title = 'Health check unavailable'; }
   }

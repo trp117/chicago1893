@@ -53,15 +53,16 @@
     "suspicion": {}
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:45:24.602Z",
+  "updatedAt": "2026-05-24T03:08:53.160Z",
   "real_name": null,
   "cover_name": null,
   "is_player_character": false,
   "identity_note": null,
   "aliases": [],
-  "context_sentence": "You are Gene Kranz, Flight Director of NASA's White Team, the man responsible for returning the crew of Apollo 13 to Earth after an oxygen tank explosion on April 13, 1970 crippled the Command Module 200,000 miles from home and forced three astronauts to survive in a lunar module designed for two.",
+  "context_sentence": "You are Gene Kranz, Flight Director, and the loop is waiting for an answer you don't have yet.",
   "character_type": "real",
   "historical_record_note": "Gene Kranz, Flight Director during the Apollo 13 crisis. His white vest became iconic. His account is the basis for the film's famous \"failure is not an option\" framing (a phrase actually coined by the screenwriters, not Kranz).",
   "fact_checked": false,
-  "bridge_sentence": "The telemetry wall is showing numbers that should not be possible."
+  "bridge_sentence": "The telemetry wall is showing numbers that should not be possible.",
+  "represents": ""
 }
