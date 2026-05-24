@@ -442,10 +442,11 @@ li { margin-bottom: 8px; }
   }
   /* ── Intro panel listen button ── */
   .intro-listen-bar {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
-    border-top: 0.5px solid var(--border);
-    margin-bottom: 0.5rem;
+    margin-top: 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+    border-top: none;
+    margin-bottom: 1rem;
   }
   .intro-listen-btn {
     display: inline-flex;
@@ -1798,15 +1799,7 @@ function renderStreamlinedScreen1() {
 
     const introNarrationText = [worldText, stakesText, sceneText].filter(Boolean).join(' ');
 
-    // Prose paragraphs first
-    for (const txt of [worldText, stakesText, sceneText].filter(Boolean)) {
-      const p = document.createElement('p');
-      p.className = 'intro-panel-text';
-      p.textContent = txt;
-      introContent.appendChild(p);
-    }
-
-    // Listen button at bottom, above Close
+    // Listen button FIRST — visible immediately on panel open
     const listenBar  = document.createElement('div');
     listenBar.className = 'intro-listen-bar';
     const listenBtn  = document.createElement('button');
@@ -1823,6 +1816,14 @@ function renderStreamlinedScreen1() {
     listenBtn.appendChild(listenLabel);
     listenBar.appendChild(listenBtn);
     introContent.appendChild(listenBar);
+
+    // Prose paragraphs after
+    for (const txt of [worldText, stakesText, sceneText].filter(Boolean)) {
+      const p = document.createElement('p');
+      p.className = 'intro-panel-text';
+      p.textContent = txt;
+      introContent.appendChild(p);
+    }
 
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
@@ -1909,9 +1910,8 @@ function renderStreamlinedScreen1() {
       introToggle.setAttribute('aria-expanded', String(!isOpen));
       arrow.textContent = isOpen ? '↓' : '↑';
       if (!isOpen) {
-        // Scroll to bottom of panel so Listen + Close are immediately visible
         setTimeout(() => {
-          closeBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          listenBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
       }
     });
