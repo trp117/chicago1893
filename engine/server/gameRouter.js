@@ -1259,5 +1259,40 @@ Do not open with the historical context. Open inside the character's body. Let t
     }
   });
 
+  r.post('/extract-facts', async (req, res) => {
+    const { narrative = '', existingFacts = [] } = req.body || {};
+    if (!narrative.trim()) return res.json({ newFacts: [] });
+    try {
+      const existingList = existingFacts.length
+        ? `\nFacts already recorded:\n${existingFacts.map((f, i) => `${i + 1}. ${f}`).join('\n')}`
+        : '';
+      const prompt = `You are extracting concrete facts learned by a player in a historical immersion game.\n\nNarrative passage:\n"""\n${narrative}\n"""${existingList}\n\nExtract up to 3 NEW concrete facts the player character learned or observed in this passage that are not already in the recorded list. Each fact should be a single sentence, written from the player character's perspective (first person is fine). Focus on actions taken, people met, information discovered, or situations witnessed. Return ONLY a JSON array of strings, no other text. If there are no new facts, return [].`;
+
+      const apiResp = await fetch(ANTHROPIC_URL, {
+        method: 'POST',
+        headers: {
+          'x-api-key':         anthropicApiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type':      'application/json',
+        },
+        body: JSON.stringify({
+          model:      'claude-haiku-4-5-20251001',
+          max_tokens: 200,
+          messages:   [{ role: 'user', content: prompt }],
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!apiResp.ok) return res.json({ newFacts: [] });
+      const apiData = await apiResp.json();
+      const raw = apiData.content?.[0]?.text?.trim() || '[]';
+      const match = raw.match(/\[[\s\S]*\]/);
+      const newFacts = match ? JSON.parse(match[0]) : [];
+      return res.json({ newFacts: Array.isArray(newFacts) ? newFacts.filter(f => typeof f === 'string') : [] });
+    } catch {
+      return res.json({ newFacts: [] });
+    }
+  });
+
   return r;
 }
