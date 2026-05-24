@@ -2,6 +2,7 @@
   "id": "loc_cm_odyssey",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Command Module Odyssey — Instrument Panel",
+  "short_name": "Command Module Odyssey",
   "description": "Powered down to its minimum survival state, Odyssey is cold and dark — a dead ship waiting to be resurrected. The instrument panel is covered in condensation that catches the faint light from the LM tunnel.",
   "mood": "dark, tense, dormant, threatening",
   "linkedCharacterIds": [

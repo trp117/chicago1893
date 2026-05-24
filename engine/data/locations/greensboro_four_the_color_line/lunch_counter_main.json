@@ -2,6 +2,7 @@
   "id": "lunch_counter_main",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "The Lunch Counter — Long Arm",
+  "short_name": "Woolworth's, South Elm Street",
   "description": "The long horizontal section of the L-shaped counter, fourteen fixed stools on chrome posts bolted to the black-and-white checkerboard tile floor, the laminate surface wiped to a cold shine under fluorescent light. This is where Ezell, Franklin, and Joseph are seated — the section most visible from the store's main aisle.",
   "mood": "tense, exposed, historically charged, fluorescent-bright",
   "linkedCharacterIds": [

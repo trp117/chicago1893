@@ -2,6 +2,7 @@
   "id": "commercial_hotel_bar",
   "scenarioId": "singing_wires",
   "name": "The Commercial Hotel Bar, Market Street",
+  "short_name": "Commercial Hotel Bar",
   "description": "The ground-floor saloon of Sandusky's principal commercial hotel, where traveling men, railroad contractors, and merchants drink in the amber light of six oil lamps. Arden Gill has a room upstairs and is currently at the corner table with a glass of rye whiskey and a commercial codebook open in front of him.",
   "mood": "public, deceptive, observed, performative",
   "linkedCharacterIds": [

@@ -2,6 +2,7 @@
   "id": "loc_shingle",
   "scenarioId": "dog_green_sector",
   "name": "The Shingle — The Seawall",
+  "short_name": "The Shingle",
   "description": "A bank of smooth, fist-sized stones rising four feet above the sand, offering the first real defilade from direct fire — men press against it in clusters, some reorganizing, some unable to move, some past moving.",
   "mood": "fragile refuge, organized desperation, rallying point",
   "linkedCharacterIds": [

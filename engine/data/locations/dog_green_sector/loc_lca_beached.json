@@ -2,6 +2,7 @@
   "id": "loc_lca_beached",
   "scenarioId": "dog_green_sector",
   "name": "Beached LCA — The Waterline",
+  "short_name": "Beached LCA",
   "description": "The grounded landing craft, ramp down, engine still running at idle, its hull scarred by shrapnel and one small-arms hit that punched through the armored side without penetrating — a steel island at the edge of the killing ground.",
   "mood": "threshold, mechanical, abandoned, functional",
   "linkedCharacterIds": [

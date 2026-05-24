@@ -895,11 +895,7 @@ function updateCandleIndicator(minutesRemaining, totalMinutes) {
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 function renderSidebar() {
-  const sub = document.getElementById('header-subtitle');
-  if (sub) {
-    const t = timeToPeriodString(gameState.remainingMinutes, scenario?.sessionTargetMinutes);
-    sub.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-  }
+  updateHeaderSubtitle();
   updateSlimLabel();
 }
 
@@ -1035,24 +1031,19 @@ function renderOutput(output, meta = {}) {
   }
 }
 
-function timeToPeriodString(minutesRemaining, sessionTargetMinutes) {
-  const nums = ['','one','two','three','four','five','six','seven','eight','nine','ten',
-    'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen',
-    'twenty','twenty-one','twenty-two','twenty-three','twenty-four','twenty-five',
-    'twenty-six','twenty-seven','twenty-eight','twenty-nine'];
-  const hrs  = ['twelve','one','two','three','four','five','six','seven','eight','nine','ten','eleven'];
-  const elapsed = (sessionTargetMinutes || 30) - (minutesRemaining ?? 0);
-  const total   = 9 * 60 + 30 + Math.max(0, elapsed);
-  const h = Math.floor(total / 60) % 12;
-  const m = total % 60;
-  const hw = hrs[h], nw = hrs[(h + 1) % 12];
-  if (m === 0)  return `${hw} o'clock`;
-  if (m === 15) return `quarter past ${hw}`;
-  if (m === 30) return `half past ${hw}`;
-  if (m === 45) return `quarter to ${nw}`;
-  if (m < 30 && m < nums.length)  return `${nums[m]} past ${hw}`;
-  const rem = 60 - m;
-  return rem < nums.length ? `${nums[rem]} to ${nw}` : `${hw}`;
+function getLocationDisplayName(locationId) {
+  if (!locationId) return '';
+  const loc = locationsList.find(l => l.id === locationId);
+  if (loc) return loc.short_name || loc.name || locationId;
+  return locationId
+    .replace(/^loc_/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function updateHeaderSubtitle() {
+  const sub = document.getElementById('header-subtitle');
+  if (sub && gameState) sub.textContent = getLocationDisplayName(gameState.location);
 }
 
 function updateLocationDisplay(locationId) {
@@ -1061,10 +1052,7 @@ function updateLocationDisplay(locationId) {
   if (!h1) return;
   const loc = locationsList.find(l => l.id === locationId);
   h1.textContent = loc ? loc.name : prettifyId(locationId);
-  if (sub && gameState) {
-    const t = timeToPeriodString(gameState.remainingMinutes, scenario?.sessionTargetMinutes);
-    sub.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-  }
+  updateHeaderSubtitle();
   updateSlimLabel();
 }
 

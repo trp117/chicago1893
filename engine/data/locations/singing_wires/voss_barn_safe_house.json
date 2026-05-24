@@ -2,6 +2,7 @@
   "id": "voss_barn_safe_house",
   "scenarioId": "singing_wires",
   "name": "Voss Barn, North Edge of Sandusky, Shore Road",
+  "short_name": "Voss Barn",
   "description": "A weathered hay barn a quarter mile north of the dry goods store on the road toward the lake, its hayloft converted into a hidden rest space with blankets and a water barrel. This is the last station before the shore road, and seven people are currently inside it waiting for word.",
   "mood": "desperate, hushed, fearful, close",
   "linkedCharacterIds": [

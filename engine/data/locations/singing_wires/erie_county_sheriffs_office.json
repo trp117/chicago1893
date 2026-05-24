@@ -2,6 +2,7 @@
   "id": "erie_county_sheriffs_office",
   "scenarioId": "singing_wires",
   "name": "Erie County Sheriff's Office, Columbus Avenue",
+  "short_name": "Sheriff's Office",
   "description": "A two-room brick building two blocks from the waterfront, its front room lit by a single hanging lantern and smelling of horse leather and pipe tobacco. Deputy Crane's desk is covered with papers including the red fire dispatch, which he has read twice and annotated in the margins.",
   "mood": "authoritative, procedural, threatening, methodical",
   "linkedCharacterIds": [

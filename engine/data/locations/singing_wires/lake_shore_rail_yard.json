@@ -2,6 +2,7 @@
   "id": "lake_shore_rail_yard",
   "scenarioId": "singing_wires",
   "name": "Lake Shore Railroad Yard, South End of Sandusky",
+  "short_name": "Lake Shore Rail Yard",
   "description": "Three sidings of iron rail converging on the main depot, crowded with freight cars waiting for the morning consist and lit by a pair of yard lanterns that cast more shadow than light. The night freight from Cleveland is expected in forty minutes, and the yard foreman is somewhere among the cars with a lantern.",
   "mood": "industrial, shadowed, transitional, mechanical",
   "linkedCharacterIds": [

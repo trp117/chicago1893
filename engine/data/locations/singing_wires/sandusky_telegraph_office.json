@@ -2,6 +2,7 @@
   "id": "sandusky_telegraph_office",
   "scenarioId": "singing_wires",
   "name": "Sandusky Telegraph Office, Lake Shore Railroad Junction",
+  "short_name": "Telegraph Office",
   "description": "A narrow frame building attached to the rail depot, smelling of battery acid and lamp oil, its single operational window overlooking the dark rail yard where three sidings converge. The sounder on the main desk clicks with a steady rhythm of distant traffic, and the traffic log lies open beside it.",
   "mood": "tense, technical, isolated, electric",
   "linkedCharacterIds": [

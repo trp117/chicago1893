@@ -2,6 +2,7 @@
   "id": "huron_road_bottomland",
   "scenarioId": "singing_wires",
   "name": "Huron River Bottomland, Shore Road North",
+  "short_name": "Huron Road Bottomland",
   "description": "The low, wooded ground between the Huron River crossing and the north edge of Sandusky — a mile and a half of elm and cottonwood forest threaded by a single dirt track and two informal paths that only the conductors know. The telegraph line runs along the main road on cedar poles, its wires audible in the wind.",
   "mood": "dark, physical, urgent, ancient",
   "linkedCharacterIds": [

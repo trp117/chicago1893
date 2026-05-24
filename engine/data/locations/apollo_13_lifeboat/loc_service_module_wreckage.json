@@ -2,6 +2,7 @@
   "id": "loc_service_module_wreckage",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Service Module — Jettison View",
+  "short_name": "Service Module Wreckage",
   "description": "When the Service Module is finally jettisoned before re-entry, the crew sees the damage for the first time through the window — an entire panel blown away, wiring hanging in the vacuum, the oxygen tank bay a ruin.",
   "mood": "revelatory, sobering, conclusive, grief-adjacent",
   "linkedCharacterIds": [

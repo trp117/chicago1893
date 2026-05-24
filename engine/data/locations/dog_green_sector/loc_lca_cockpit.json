@@ -2,6 +2,7 @@
   "id": "loc_lca_cockpit",
   "scenarioId": "dog_green_sector",
   "name": "LCA Cockpit — The Run-In",
+  "short_name": "LCA Cockpit",
   "description": "A steel box the size of a wardrobe, smelling of diesel and vomit, with a narrow armored viewing slit through which the beach appears as a strip of smoke and white water between two walls of grey sky. The engine is loud enough to feel in the sternum.",
   "mood": "claustrophobic, tense, mechanical, isolated",
   "linkedCharacterIds": [

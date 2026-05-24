@@ -2,6 +2,7 @@
   "id": "south_elm_street_entrance",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "South Elm Street — Store Entrance",
+  "short_name": "South Elm Street Entrance",
   "description": "The glass double doors of the Woolworth's opening onto the 132 South Elm Street sidewalk — the threshold the students crossed at 4:29 PM and the threshold they will cross again at 6:00 PM, the difference between those two crossings being the entire content of this story.",
   "mood": "threshold, cold, public",
   "linkedCharacterIds": [

@@ -2,6 +2,7 @@
   "id": "loc_lm_aquarius",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Lunar Module Aquarius — Interior",
+  "short_name": "Lunar Module Aquarius",
   "description": "A triangular cabin roughly the size of a broom closet, designed for two men standing up for 36 hours. Three men now live here, and the walls are beginning to sweat. Every surface is covered in switches, circuit breakers, and handwritten notes taped over the original labels.",
   "mood": "claustrophobic, cold, focused, survival",
   "linkedCharacterIds": [

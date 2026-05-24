@@ -2,6 +2,7 @@
   "id": "loc_mocr_main_floor",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Mission Operations Control Room — Main Floor",
+  "short_name": "Mission Control, Houston",
   "description": "The nerve center of the American space program, now running on adrenaline and cigarette smoke. Rows of consoles face a wall of screens showing data that makes no sense and trajectories that lead to death unless someone changes them.",
   "mood": "urgent, pressurized, institutional, exhausted",
   "linkedCharacterIds": [

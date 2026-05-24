@@ -2,6 +2,7 @@
   "id": "loc_surf_zone",
   "scenarioId": "dog_green_sector",
   "name": "The Surf Zone — Obstacle Belt",
+  "short_name": "The Surf Zone",
   "description": "Chest-deep water churned white by propeller wash and shellfire, threaded with steel hedgehogs and Belgian Gates, the sand beneath invisible and unreliable. Men move through it in slow motion, weighed down by eighty pounds of soaked equipment.",
   "mood": "lethal, chaotic, disorienting, desperate",
   "linkedCharacterIds": [

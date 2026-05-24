@@ -2,6 +2,7 @@
   "id": "loc_far_side_silence",
   "scenarioId": "apollo_13_lifeboat",
   "name": "The Far Side — Radio Blackout Zone",
+  "short_name": "The Far Side",
   "description": "The spacecraft passes behind the Moon and all communication with Earth ceases for 45 minutes. In this silence, the crew is more alone than any human beings have ever been.",
   "mood": "isolated, silent, existential, suspended",
   "linkedCharacterIds": [

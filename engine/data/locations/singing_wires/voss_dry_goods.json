@@ -2,6 +2,7 @@
   "id": "voss_dry_goods",
   "scenarioId": "singing_wires",
   "name": "Voss Dry Goods Store, Water Street, Sandusky",
+  "short_name": "Voss Dry Goods",
   "description": "A well-kept merchant's storefront on Water Street, its shelves of calico bolts and barrel goods a careful disguise for the hidden room behind the back storeroom where passengers rest before the final leg north. The store is dark at this hour but a lamp burns in the rear window — the lantern is lit.",
   "mood": "secretive, domestic, precarious, watchful",
   "linkedCharacterIds": [

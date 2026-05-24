@@ -2,6 +2,7 @@
   "id": "lunch_counter_corner",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "The Lunch Counter — Corner and Short Arm",
+  "short_name": "Lunch Counter Corner",
   "description": "The L-bend and its four short-arm stools, where David Richmond sits at the terminal stool nearest the store's south wall — the position most isolated from the others and most exposed to the crowd assembling in the adjacent candy-counter aisle.",
   "mood": "isolated, pressured, watched",
   "linkedCharacterIds": [

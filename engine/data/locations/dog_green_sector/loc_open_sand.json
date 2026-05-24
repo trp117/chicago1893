@@ -2,6 +2,7 @@
   "id": "loc_open_sand",
   "scenarioId": "dog_green_sector",
   "name": "The Open Sand — The Killing Ground",
+  "short_name": "The Open Sand",
   "description": "Five hundred yards of flat, featureless beach between the surf line and the shingle, with no cover of any kind — a geometric problem in exposure that the German gunners solved before the first American boot touched it.",
   "mood": "exposed, merciless, vast, annihilating",
   "linkedCharacterIds": [

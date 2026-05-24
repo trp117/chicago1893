@@ -2,6 +2,7 @@
   "id": "counter_kitchen_passthrough",
   "scenarioId": "greensboro_four_the_color_line",
   "name": "Counter Kitchen and Pass-Through Window",
+  "short_name": "Counter Kitchen",
   "description": "The narrow kitchen area behind the lunch counter, accessible only through the pass-through window and a staff door at the counter's far end — where Patsy Howell retreats when the pressure on the floor becomes unmanageable.",
   "mood": "enclosed, humid, refuge",
   "linkedCharacterIds": [

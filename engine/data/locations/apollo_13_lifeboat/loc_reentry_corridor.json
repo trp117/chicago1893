@@ -2,6 +2,7 @@
   "id": "loc_reentry_corridor",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Re-entry Corridor — Atmospheric Interface",
+  "short_name": "Re-entry Corridor",
   "description": "The narrow band of atmosphere where survival is possible — 6 degrees wide, 400,000 feet above the Pacific Ocean. The spacecraft is a falling stone; the corridor is a needle's eye.",
   "mood": "terminal, irreversible, precise, culminating",
   "linkedCharacterIds": [

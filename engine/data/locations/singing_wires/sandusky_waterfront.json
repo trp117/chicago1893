@@ -2,6 +2,7 @@
   "id": "sandusky_waterfront",
   "scenarioId": "singing_wires",
   "name": "Sandusky Waterfront and Dock Row",
+  "short_name": "Sandusky Waterfront",
   "description": "The working edge of the lake — a line of timber wharves, fish sheds, and moored freight schooners whose hulls knock against the dock pilings in the northeast chop. One vessel, the schooner Patience, is moored at the far end of the commercial dock with no running lights showing.",
   "mood": "cold, open, final, liminal",
   "linkedCharacterIds": [

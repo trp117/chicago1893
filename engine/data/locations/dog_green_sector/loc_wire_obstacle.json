@@ -2,6 +2,7 @@
   "id": "loc_wire_obstacle",
   "scenarioId": "dog_green_sector",
   "name": "The Concertina Wire — Draw Approach",
+  "short_name": "The Concertina Wire",
   "description": "Three rolls of German concertina wire staked into the sand at the base of the Vierville Draw, each roll interlaced with the next, forming a barrier twelve feet deep that no man can cross without being cut to pieces or cut through with explosives.",
   "mood": "objective, dangerous, focused, terminal",
   "linkedCharacterIds": [

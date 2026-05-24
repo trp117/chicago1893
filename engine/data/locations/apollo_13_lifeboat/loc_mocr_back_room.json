@@ -2,6 +2,7 @@
   "id": "loc_mocr_back_room",
   "scenarioId": "apollo_13_lifeboat",
   "name": "Mission Control — Back Room Support Bays",
+  "short_name": "Mission Control Back Room",
   "description": "The rooms behind the main floor where the specialists work — engineers with slide rules and reference manuals, building solutions out of physics and whatever materials the crew has on board.",
   "mood": "focused, improvisational, desperate, inventive",
   "linkedCharacterIds": [
