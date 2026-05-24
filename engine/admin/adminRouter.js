@@ -200,6 +200,13 @@ function validateStoredScenario(scenario, playerRoles, characters = []) {
     }
   });
 
+  // Glossary warnings (non-blocking)
+  if (!scenario.glossary || scenario.glossary.length === 0) {
+    warnings.push('Glossary is empty — consider adding period vocabulary definitions. Use "Suggest terms" in the admin.');
+  } else if (scenario.glossary.length < 5) {
+    warnings.push(`Glossary has only ${scenario.glossary.length} term(s) — run "Suggest terms" to find additional vocabulary.`);
+  }
+
   return { errors, warnings };
 }
 
@@ -2110,6 +2117,99 @@ Return ONLY valid JSON in this exact structure:
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
+  });
+
+  // ── Glossary ──────────────────────────────────────────────────────────────────
+
+  r.get('/scenarios/:id/glossary', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    res.json({ glossary: scenario.glossary || [] });
+  });
+
+  r.post('/scenarios/:id/suggest-glossary', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured.' });
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+
+    const existingTerms = (scenario.glossary || []).map(g => g.term.toLowerCase());
+    const introText = (scenario.introduction?.sections || []).map(s => s.text || '').filter(Boolean).join('\n\n');
+    const vocabTerms = (scenario.period_vocabulary?.categories || [])
+      .flatMap(c => c.terms || []).map(t => t.term).join(', ');
+    const exclusionNote = existingTerms.length
+      ? `\n\nDo not suggest these terms — they are already in the glossary: ${existingTerms.join(', ')}`
+      : '';
+
+    const prompt = `You are building a player-facing glossary for a historical immersion game set during: ${scenario.title || scenario.id}.
+
+Scenario context:
+${introText || '(no introduction text available)'}
+
+${vocabTerms ? `Period vocabulary already defined (do not duplicate): ${vocabTerms}` : ''}
+${exclusionNote}
+
+Identify 10-15 terms a general reader might not know: military jargon, period equipment, historical proper nouns, technical terminology, period slang.
+
+For each term provide:
+- "term": exactly as it would appear in narrative prose
+- "definition": one to two sentences, historically accurate, accessible to a modern reader
+- "reason": one brief phrase explaining why this term needs definition
+
+Return ONLY valid JSON: { "suggestions": [ { "term": "...", "definition": "...", "reason": "..." } ] }`;
+
+    try {
+      const client = getAnthropicClient(anthropicApiKey);
+      const msg = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      const raw = msg.content[0]?.text?.trim() || '{}';
+      const match = raw.match(/\{[\s\S]*\}/);
+      const parsed = match ? JSON.parse(match[0]) : { suggestions: [] };
+      res.json({ suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [] });
+    } catch (err) {
+      console.error('[SUGGEST-GLOSSARY]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  r.post('/scenarios/:id/glossary', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const { term, definition, source } = req.body;
+    if (!term?.trim() || !definition?.trim()) return badRequest(res, 'term and definition required');
+    const glossary = scenario.glossary || [];
+    if (glossary.some(g => g.term.toLowerCase() === term.trim().toLowerCase()))
+      return badRequest(res, `Term "${term}" already exists in glossary`);
+    glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
+    const updated = { ...scenario, glossary };
+    repos.scenarios.save(updated);
+    res.json({ success: true, glossary: updated.glossary });
+  });
+
+  r.put('/scenarios/:id/glossary/:term', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const termName = decodeURIComponent(req.params.term);
+    const { definition, source } = req.body;
+    if (!definition?.trim()) return badRequest(res, 'definition required');
+    const glossary = (scenario.glossary || []).map(g =>
+      g.term.toLowerCase() === termName.toLowerCase()
+        ? { ...g, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
+        : g
+    );
+    repos.scenarios.save({ ...scenario, glossary });
+    res.json({ success: true, glossary });
+  });
+
+  r.delete('/scenarios/:id/glossary/:term', (req, res) => {
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const termName = decodeURIComponent(req.params.term);
+    const glossary = (scenario.glossary || []).filter(g => g.term.toLowerCase() !== termName.toLowerCase());
+    repos.scenarios.save({ ...scenario, glossary });
+    res.json({ success: true, glossary });
   });
 
   console.log('[admin] Pipeline routes registered');

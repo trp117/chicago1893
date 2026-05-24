@@ -61,6 +61,8 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot-pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
 .scene-error { color: #e07060; }
+.gloss-term { border-bottom: 1.5px dotted #b8962e; cursor: help; }
+#gloss-tooltip { position: fixed; z-index: 9999; max-width: 280px; background: #1a1612; border: 1px solid #b8962e; border-radius: 6px; padding: 10px 14px; font-size: 12px; line-height: 1.55; color: #f0e8d8; box-shadow: 0 4px 16px rgba(0,0,0,0.5); pointer-events: none; display: none; }
 .bottom-bar { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
 .npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-area-wrap { transition: opacity 250ms ease; }
 .choices-area-wrap.hidden { display: none; }
@@ -942,7 +944,7 @@ function renderOutput(output, meta = {}) {
     ? `<p class="sensory-opening">${output.sensory_opening}</p>`
     : '';
   const narrativeHtml = markupNarrative(output.narrative);
-  const html = `${sensoryHtml}<p>${narrativeHtml}</p>`;
+  const html = markupGlossaryTerms(`${sensoryHtml}<p>${narrativeHtml}</p>`);
 
   const currentLocation  = gameState?.location;
   const isTransitionTurn = meta.prevLocation != null && meta.prevLocation !== currentLocation;
@@ -1336,9 +1338,11 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     if (streamEl) streamEl.remove();
 
     const prevLocation = gameState?.location;
-    const preservedFacts = gameState.discoveredFacts;
+    const preservedFacts   = gameState.discoveredFacts;
+    const preservedGlossary = gameState.glossary;
     gameState = nextState;
     gameState.discoveredFacts = preservedFacts || [...(gameState.playerStartingKnowledge || [])];
+    gameState.glossary = preservedGlossary || [];
 
     conversationHistory.push(
       { role: 'user',      content: playerInput },
@@ -2228,6 +2232,7 @@ function buildClientInitialState(scenario, role) {
     playerAccessLevel:       role.accessLevel || 'staff',
     playerStartingKnowledge: role.startingKnowledge || [],
     discoveredFacts:         [...(role.startingKnowledge || [])],
+    glossary:                [],
     location:                startLoc,
     visitedLocations:        [startLoc],
     elapsedMinutes:          0,
@@ -2746,11 +2751,58 @@ if (!SpeechRecognition) {
   }
 }
 
+// ── Glossary tooltips ─────────────────────────────────────────────────────────
+
+const glossTooltip = document.getElementById('gloss-tooltip');
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function markupGlossaryTerms(html) {
+  const glossary = gameState?.glossary;
+  if (!glossary?.length) return html;
+
+  const terms = [...glossary].sort((a, b) => b.term.length - a.term.length);
+
+  // Stash HTML tags behind placeholders so we only replace text content
+  const stash = [];
+  let safe = html.replace(/<[^>]+>/g, m => { stash.push(m); return `\x00${stash.length - 1}\x00`; });
+
+  for (const { term, definition } of terms) {
+    const escapedDef = (definition || '').replace(/"/g, '&quot;');
+    const re = new RegExp(`(?<![\\w\\-])(${escapeRegex(term)})(?![\\w\\-])`, 'i');
+    if (re.test(safe)) {
+      safe = safe.replace(re, `<span class="gloss-term" data-def="${escapedDef}">$1</span>`);
+    }
+  }
+
+  return safe.replace(/\x00(\d+)\x00/g, (_, i) => stash[+i]);
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('.gloss-term');
+  if (!el) { glossTooltip.style.display = 'none'; return; }
+  e.stopPropagation();
+  const def = el.dataset.def || '';
+  glossTooltip.textContent = def;
+  glossTooltip.style.display = 'block';
+  const rect = el.getBoundingClientRect();
+  const ttW = 280, ttH = 80;
+  let left = rect.left + window.scrollX;
+  let top  = rect.bottom + window.scrollY + 6;
+  if (left + ttW > window.innerWidth - 8) left = window.innerWidth - ttW - 8;
+  if (top + ttH > window.innerHeight + window.scrollY) top = rect.top + window.scrollY - ttH - 6;
+  glossTooltip.style.left = left + 'px';
+  glossTooltip.style.top  = top  + 'px';
+});
+
 // ── Debug helper ──────────────────────────────────────────────────────────────
 window.__setTime = n => { if (gameState) { gameState.remainingMinutes = n; gameState.elapsedMinutes = (scenario?.sessionTargetMinutes || 15) - n; } };
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadGame();
 </script>
+<div id="gloss-tooltip"></div>
 </body>
 </html>

@@ -1930,6 +1930,207 @@ function renderTechnicalFactsSection(data) {
   </div>`;
 }
 
+function renderGlossarySection(data) {
+  const scenarioId = data.scenario?.id || '';
+  return `<div style="margin-bottom:20px">
+    <details id="glossary-details">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="display:flex;align-items:center;gap:10px">Glossary <span id="glossary-count-badge" style="font-size:11px;font-weight:600;background:var(--border);color:var(--text-soft);padding:2px 8px;border-radius:10px;text-transform:none;letter-spacing:0"></span></span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <div id="glossary-section-body" style="font-size:13px;color:var(--text-soft)">Loading…</div>
+      </div>
+    </details>
+  </div>`;
+}
+
+async function initGlossarySection(scenarioId) {
+  const body = document.getElementById('glossary-section-body');
+  if (!body) return;
+  try {
+    const { glossary } = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`);
+    renderGlossaryBody(scenarioId, glossary || []);
+  } catch (err) {
+    body.innerHTML = `<span style="color:#e74c3c">Failed to load glossary: ${esc(err.message)}</span>`;
+  }
+}
+
+function renderGlossaryBody(scenarioId, glossary) {
+  const body  = document.getElementById('glossary-section-body');
+  const badge = document.getElementById('glossary-count-badge');
+  if (!body) return;
+  if (badge) badge.textContent = glossary.length ? `${glossary.length} term${glossary.length === 1 ? '' : 's'}` : '';
+
+  const approvedHtml = glossary.length
+    ? glossary.map(g => buildApprovedTermCard(g, scenarioId)).join('')
+    : `<div id="glossary-empty-state" style="padding:16px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px;margin-bottom:12px">
+        No terms yet. Click "Suggest terms" to generate a first draft, or add terms manually.
+       </div>`;
+
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <span style="font-size:12px;color:var(--text-soft)">Dotted-gold underline in player sessions. Nothing saves until you click Approve or Save.</span>
+      <button type="button" class="btn btn-primary btn-sm" id="glossary-suggest-btn">✦ Suggest terms</button>
+    </div>
+    <div id="glossary-suggestions-area"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Approved terms (${glossary.length})</span>
+      <button type="button" class="btn btn-secondary btn-sm" id="glossary-add-btn">+ Add term manually</button>
+    </div>
+    <div id="glossary-approved-list">${approvedHtml}</div>`;
+
+  document.getElementById('glossary-suggest-btn')?.addEventListener('click', () => runGlossarySuggest(scenarioId));
+  document.getElementById('glossary-add-btn')?.addEventListener('click',    () => addGlossaryTermManually(scenarioId));
+}
+
+function buildApprovedTermCard(g, scenarioId) {
+  const te = esc(g.term); const de = esc(g.definition); const se = esc(g.source || '');
+  const srcLine = g.source ? `<div style="margin-top:4px;font-size:11px;color:var(--text-soft)">Source: ${se}</div>` : '';
+  return `<div class="glossary-term-card" data-term="${te}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--card)">
+    <div class="term-display">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${te}</div>
+      <div style="font-size:13px;color:var(--text)">${de}</div>
+      ${srcLine}
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="editGlossaryTerm('${te}')">Edit</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="deleteGlossaryTerm('${te}','${esc(scenarioId)}')">Delete</button>
+      </div>
+    </div>
+    <div class="term-edit" hidden>
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">${te}</div>
+      <textarea class="edit-definition" rows="3" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical">${de}</textarea>
+      <input type="text" class="edit-source" placeholder="Source (optional)" value="${se}" style="width:100%;font-size:12px;margin-bottom:10px">
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveGlossaryTermEdit('${te}','${esc(scenarioId)}')">Save</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="cancelGlossaryTermEdit('${te}')">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function editGlossaryTerm(term) {
+  const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
+  if (!card) return;
+  card.querySelector('.term-display').hidden = true;
+  card.querySelector('.term-edit').hidden = false;
+  card.querySelector('.edit-definition').focus();
+}
+
+function cancelGlossaryTermEdit(term) {
+  const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
+  if (!card) return;
+  card.querySelector('.term-display').hidden = false;
+  card.querySelector('.term-edit').hidden = true;
+}
+
+async function saveGlossaryTermEdit(term, scenarioId) {
+  const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
+  if (!card) return;
+  const definition = card.querySelector('.edit-definition').value.trim();
+  const source     = card.querySelector('.edit-source').value.trim();
+  if (!definition) { toast('Definition cannot be empty', 'error'); return; }
+  try {
+    const { glossary } = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, { definition, source });
+    toast('Term updated', 'success');
+    renderGlossaryBody(scenarioId, glossary);
+  } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+}
+
+async function deleteGlossaryTerm(term, scenarioId) {
+  if (!confirm(`Delete "${term}" from the glossary?`)) return;
+  try {
+    const { glossary } = await apiFetch('DELETE', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`);
+    toast('Term deleted', 'success');
+    renderGlossaryBody(scenarioId, glossary);
+  } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+}
+
+async function runGlossarySuggest(scenarioId) {
+  const suggestBtn = document.getElementById('glossary-suggest-btn');
+  const area       = document.getElementById('glossary-suggestions-area');
+  if (!suggestBtn || !area) return;
+  suggestBtn.disabled = true;
+  suggestBtn.textContent = 'Generating…';
+  area.innerHTML = '<p style="font-size:13px;color:var(--text-soft);padding:8px 0">Asking Haiku for suggestions…</p>';
+  try {
+    const { suggestions } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/suggest-glossary`, {});
+    if (!suggestions?.length) { area.innerHTML = '<p style="font-size:13px;color:var(--text-soft)">No new suggestions found.</p>'; return; }
+    area.innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+        Review suggestions — ${suggestions.length} found. Nothing saves until you click Approve.
+      </div>
+      ${suggestions.map((s, i) => buildSuggestionCard(s, i, scenarioId)).join('')}
+      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">`;
+  } catch (err) {
+    area.innerHTML = `<p style="color:#e74c3c;font-size:13px">Error: ${esc(err.message)}</p>`;
+  } finally {
+    suggestBtn.disabled = false;
+    suggestBtn.textContent = '✦ Suggest terms';
+  }
+}
+
+function buildSuggestionCard(s, i, scenarioId) {
+  const id  = `sug-${i}`;
+  const te  = esc(s.term); const de = esc(s.definition); const re = esc(s.reason || '');
+  return `<div id="${id}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)">
+    <div style="font-weight:700;font-size:13px;margin-bottom:2px">${te}</div>
+    ${re ? `<div style="font-size:11px;color:var(--text-soft);margin-bottom:8px">Why: ${re}</div>` : ''}
+    <textarea id="${id}-def" rows="3" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical">${de}</textarea>
+    <input type="text" id="${id}-src" placeholder="Source (optional)" style="width:100%;font-size:12px;margin-bottom:10px">
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn btn-primary btn-sm" onclick="approveSuggestion('${id}','${te}','${esc(scenarioId)}')">Approve</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Delete suggestion</button>
+    </div>
+  </div>`;
+}
+
+async function approveSuggestion(cardId, term, scenarioId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const definition = card.querySelector(`#${cardId}-def`)?.value?.trim();
+  const source     = card.querySelector(`#${cardId}-src`)?.value?.trim() || '';
+  if (!definition) { toast('Definition cannot be empty', 'error'); return; }
+  try {
+    const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+    card.remove();
+    toast(`"${term}" approved`, 'success');
+    renderGlossaryBody(scenarioId, glossary);
+  } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+}
+
+function addGlossaryTermManually(scenarioId) {
+  const list = document.getElementById('glossary-approved-list');
+  if (!list) return;
+  const empty = document.getElementById('glossary-empty-state');
+  if (empty) empty.remove();
+  const id = `new-term-${Date.now()}`;
+  const card = document.createElement('div');
+  card.id = id;
+  card.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)';
+  card.innerHTML = `
+    <input type="text" class="new-term-input" placeholder="Term as it appears in prose" style="width:100%;font-size:13px;font-weight:700;margin-bottom:6px">
+    <textarea class="new-definition-input" rows="3" placeholder="Period-specific definition — one to two sentences" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical"></textarea>
+    <input type="text" class="new-source-input" placeholder="Source (optional)" style="width:100%;font-size:12px;margin-bottom:10px">
+    <div style="display:flex;gap:8px">
+      <button type="button" class="btn btn-primary btn-sm" id="${id}-save">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Cancel</button>
+    </div>`;
+  list.prepend(card);
+  card.querySelector('.new-term-input').focus();
+  document.getElementById(`${id}-save`).addEventListener('click', async () => {
+    const term       = card.querySelector('.new-term-input').value.trim();
+    const definition = card.querySelector('.new-definition-input').value.trim();
+    const source     = card.querySelector('.new-source-input').value.trim();
+    if (!term || !definition) { toast('Term and definition are required', 'error'); return; }
+    try {
+      const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+      toast(`"${term}" added`, 'success');
+      renderGlossaryBody(scenarioId, glossary);
+    } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+  });
+}
+
 function renderEpilogueSection(data) {
   const ep           = data.scenario?.epilogue || {};
   const generated    = ep.generated  === true;
@@ -2468,6 +2669,7 @@ function renderPreview(data, autoSaved = false) {
       ${(data.scenario?.beats_status || 'not_generated') !== 'approved'
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
         : ''}
+      ${renderGlossarySection(data)}
       ${renderTechnicalFactsSection(data)}
       ${renderEpilogueSection(data)}
       <div class="form-actions" style="padding-bottom:32px">
@@ -2480,6 +2682,7 @@ function renderPreview(data, autoSaved = false) {
   if (scenarioId) {
     document.getElementById('content').insertAdjacentHTML('beforeend', buildAIPanel(scenarioId));
     initAIPanel(scenarioId);
+    initGlossarySection(scenarioId);
     const declMount = document.getElementById('char-declarations-mount');
     if (declMount) renderCharacterDeclarationsSection(scenarioId, declMount);
 

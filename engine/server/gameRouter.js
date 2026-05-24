@@ -495,6 +495,9 @@ export function createGameRouter(repos, config = {}) {
         initialState.technicalFacts = [];
       }
 
+      // Pass approved glossary terms to the client
+      initialState.glossary = (scenario.glossary || []).filter(g => g.approved !== false);
+
       // Attach briefing context from the briefing screen
       if (character_context)   initialState.character_context = character_context;
       if (player_addition)     initialState.player_addition   = player_addition;
