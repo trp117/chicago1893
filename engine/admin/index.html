@@ -198,6 +198,8 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .suggestion-source-technical { background: rgba(59,130,246,0.15); color: #60a5fa; }
 .suggestion-source-jargon    { background: rgba(201,168,76,0.15); color: #C9A84C; }
 .suggestion-source-historical{ background: rgba(34,197,94,0.15);  color: #4ade80; }
+.suggestions-header { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.suggestions-header-text { flex:1; min-width:160px; font-size:12px; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:.5px; }
 </style>
 </head>
 <body>
@@ -1979,7 +1981,7 @@ function renderGlossaryBody(scenarioId, glossary) {
     </div>
     <div id="glossary-suggestions-area"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Approved terms (${glossary.length})</span>
+      <span id="glossary-approved-count" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Approved terms (${glossary.length})</span>
       <button type="button" class="btn btn-secondary btn-sm" id="glossary-add-btn">+ Add term manually</button>
     </div>
     <div id="glossary-approved-list">${approvedHtml}</div>`;
@@ -2061,11 +2063,15 @@ async function runGlossarySuggest(scenarioId) {
     const { suggestions } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/suggest-glossary`, {});
     if (!suggestions?.length) { area.innerHTML = '<p style="font-size:13px;color:var(--text-soft)">No new suggestions found.</p>'; return; }
     area.innerHTML = `
-      <div style="font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
-        Review suggestions — ${suggestions.length} found. Nothing saves until you click Approve.
+      <div class="suggestions-header">
+        <span id="suggestions-header-text" class="suggestions-header-text">Review suggestions — ${suggestions.length} found. Nothing saves until you click Approve.</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="approve-all-btn">Approve all</button>
+        <button type="button" class="btn btn-danger btn-sm" id="delete-all-btn">Delete all</button>
       </div>
       ${suggestions.map((s, i) => buildSuggestionCard(s, i, scenarioId)).join('')}
       <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">`;
+    document.getElementById('approve-all-btn')?.addEventListener('click', () => approveAll(scenarioId));
+    document.getElementById('delete-all-btn')?.addEventListener('click', () => deleteAll(scenarioId));
   } catch (err) {
     area.innerHTML = `<p style="color:#e74c3c;font-size:13px">Error: ${esc(err.message)}</p>`;
   } finally {
@@ -2080,7 +2086,7 @@ function buildSuggestionCard(s, i, scenarioId) {
   const st  = s.source_type || 'historical';
   const stLabel = st === 'technical' ? 'Technical' : st === 'jargon' ? 'Period jargon' : 'Historical';
   const badge = `<span class="suggestion-source-badge suggestion-source-${esc(st)}">${stLabel}</span>`;
-  return `<div id="${id}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)">
+  return `<div id="${id}" class="suggestion-card" data-term="${te}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
       <span style="font-weight:700;font-size:13px">${te}</span>${badge}
     </div>
@@ -2102,10 +2108,91 @@ async function approveSuggestion(cardId, term, scenarioId) {
   if (!definition) { toast('Definition cannot be empty', 'error'); return; }
   try {
     const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
-    card.remove();
+    // Fade and remove only this card — never re-render the whole section
+    card.style.transition = 'opacity 0.2s';
+    card.style.opacity = '0';
+    setTimeout(() => {
+      card.remove();
+      const remaining = document.querySelectorAll('.suggestion-card').length;
+      if (remaining === 0) {
+        restoreSuggestButton(scenarioId);
+      } else {
+        const headerText = document.getElementById('suggestions-header-text');
+        if (headerText) headerText.textContent = `Review suggestions — ${remaining} remaining. Nothing saves until you click Approve.`;
+      }
+    }, 210);
+    // Insert new approved card without re-rendering approved list
+    const list  = document.getElementById('glossary-approved-list');
+    const empty = document.getElementById('glossary-empty-state');
+    if (empty) empty.remove();
+    if (list) list.insertAdjacentHTML('afterbegin', buildApprovedTermCard({ term, definition, source }, scenarioId));
+    // Update counts in-place
+    const countEl = document.getElementById('glossary-approved-count');
+    if (countEl) countEl.textContent = `Approved terms (${glossary.length})`;
+    const badge = document.getElementById('glossary-count-badge');
+    if (badge) badge.textContent = `${glossary.length} term${glossary.length === 1 ? '' : 's'}`;
     toast(`"${term}" approved`, 'success');
-    renderGlossaryBody(scenarioId, glossary);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+}
+
+function restoreSuggestButton(scenarioId) {
+  const area = document.getElementById('glossary-suggestions-area');
+  if (!area) return;
+  area.innerHTML = '<button type="button" class="btn btn-primary btn-sm" id="glossary-suggest-btn">✦ Suggest terms</button>';
+  document.getElementById('glossary-suggest-btn').addEventListener('click', () => runGlossarySuggest(scenarioId));
+}
+
+async function approveAll(scenarioId) {
+  const approveBtn = document.getElementById('approve-all-btn');
+  const deleteBtn  = document.getElementById('delete-all-btn');
+  if (approveBtn) { approveBtn.disabled = true; approveBtn.textContent = 'Approving…'; }
+  if (deleteBtn)  deleteBtn.disabled = true;
+  const cards = [...document.querySelectorAll('.suggestion-card')];
+  let approved = 0;
+  for (const card of cards) {
+    const cardId     = card.id;
+    const term       = card.dataset.term;
+    const definition = card.querySelector(`#${cardId}-def`)?.value?.trim();
+    const source     = card.querySelector(`#${cardId}-src`)?.value?.trim() || '';
+    if (!term || !definition) continue;
+    try {
+      const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+      card.style.transition = 'opacity 0.15s';
+      card.style.opacity = '0';
+      await new Promise(r => setTimeout(r, 160));
+      card.remove();
+      approved++;
+      const remaining = document.querySelectorAll('.suggestion-card').length;
+      const headerText = document.getElementById('suggestions-header-text');
+      if (headerText && remaining > 0) headerText.textContent = `Approving — ${remaining} remaining…`;
+      const countEl = document.getElementById('glossary-approved-count');
+      if (countEl) countEl.textContent = `Approved terms (${glossary.length})`;
+      const badge = document.getElementById('glossary-count-badge');
+      if (badge) badge.textContent = `${glossary.length} term${glossary.length === 1 ? '' : 's'}`;
+      const list  = document.getElementById('glossary-approved-list');
+      const empty = document.getElementById('glossary-empty-state');
+      if (empty) empty.remove();
+      if (list) list.insertAdjacentHTML('afterbegin', buildApprovedTermCard({ term, definition, source }, scenarioId));
+    } catch (_) { /* skip failed card, continue */ }
+  }
+  if (document.querySelectorAll('.suggestion-card').length === 0) {
+    restoreSuggestButton(scenarioId);
+  }
+  toast(`${approved} term${approved === 1 ? '' : 's'} approved`, 'success');
+}
+
+function deleteAll(scenarioId) {
+  const cards = [...document.querySelectorAll('.suggestion-card')];
+  if (!cards.length) return;
+  if (!confirm(`Delete all ${cards.length} suggestion${cards.length === 1 ? '' : 's'}? They are not saved.`)) return;
+  cards.forEach(card => {
+    card.style.transition = 'opacity 0.2s';
+    card.style.opacity = '0';
+    setTimeout(() => card.remove(), 210);
+  });
+  setTimeout(() => {
+    if (document.querySelectorAll('.suggestion-card').length === 0) restoreSuggestButton(scenarioId);
+  }, 300);
 }
 
 function addGlossaryTermManually(scenarioId) {
