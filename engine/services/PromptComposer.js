@@ -598,7 +598,7 @@ function buildNpcIntroInstruction(state, location, characters, playerInput = '')
 
   const introLines = newChars.map(c => {
     const anchor = c.introAnchor || c.publicFace || c.role || '';
-    return `- ${c.name} (id: ${c.id}): "${anchor}"`;
+    return `- ${c.name}: "${anchor}"`;
   }).join('\n');
 
   return `⚠️ FIRST ENCOUNTER — the following NPCs appear for the first time this session. Before any dialogue, weave their anchor description naturally into the narrative (do not quote it verbatim — integrate it into the prose):\n${introLines}\n\nIf any generated choice references an NPC not yet in the state's introducedNpcs list, append their role in parentheses after the name.`;

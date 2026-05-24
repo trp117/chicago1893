@@ -137,6 +137,25 @@ function fixPlayerAttribution(text) {
   });
 }
 
+// ── Character ID leak fixer ────────────────────────────────────────────────────
+
+function fixCharacterIdLeaks(text, characters) {
+  const idPattern = /char_[a-z_]+:/gi;
+  if (!idPattern.test(text)) return text;
+
+  console.warn('[SCENE VALIDATOR] Character ID leak detected in narrative — auto-fixing');
+  let fixed = text;
+  for (const char of characters) {
+    if (!char.id) continue;
+    const idRegex = new RegExp(char.id + ':', 'gi');
+    if (idRegex.test(fixed)) {
+      console.warn(`[SCENE VALIDATOR] Replacing "${char.id}:" with "${char.name}:"`);
+      fixed = fixed.replace(idRegex, char.name + ':');
+    }
+  }
+  return fixed;
+}
+
 // ── Retry signal detectors ─────────────────────────────────────────────────────
 
 function hasSpeech(narrative) {
@@ -499,23 +518,23 @@ export function createGameRouter(repos, config = {}) {
 
       // When the streamlined onboarding is active the player has not seen the world/stakes
       // screens — inject that context into Turn 1 prose so the world reveals itself naturally.
-      const worldContextBlock = onboardingFlow === 'streamlined'
-        ? (() => {
-            const introSections = scenario.introduction?.sections || [];
-            const worldText  = introSections.find(s => s.type === 'world')?.text  || '';
-            const stakesText = introSections.find(s => s.type === 'stakes')?.text || '';
-            if (!worldText && !stakesText) return '';
-            return [
-              '',
-              'WORLD INTRODUCTION — weave this into the opening prose of this first turn.',
-              'Do not reproduce it verbatim. Use it to ground the player in the historical moment.',
-              'The player has not read this context yet — it should feel like the world revealing itself, not like a history lesson.',
-              worldText  ? `WORLD: ${worldText}`   : '',
-              stakesText ? `STAKES: ${stakesText}` : '',
-              '',
-              'The player has not read any world introduction. The opening scene must establish the historical moment through 2-3 specific details woven into the prose — the year, the political context, the specific stakes of tonight. Not as a block. As details the character would be aware of. These must feel like the world pressing in on the character\'s immediate reality, not like narration added from outside.',
-            ].filter(Boolean).join('\n');
-          })()
+      const introSections = scenario.introduction?.sections || [];
+      const worldText  = introSections.find(s => s.type === 'world')?.text  || '';
+      const stakesText = introSections.find(s => s.type === 'stakes')?.text || '';
+      const worldContextBlock = onboardingFlow === 'streamlined' && (worldText || stakesText)
+        ? `WORLD CONTEXT — THIS TURN ONLY:
+
+The player has not read a world introduction. Weave ONE OR TWO specific details from the historical context below into the opening prose — not as a block, not as summary, but as details that exist in the character's immediate awareness.
+
+The details should feel like the character has been living with this knowledge for hours. Not introduced. Already present.
+
+Choose the most specific and resonant details — a number, a temperature, a political fact — and let them arrive as part of the character's physical present. Do not summarize. Do not inventory. One detail from the world context, one from the stakes if it fits naturally. If forcing a second detail breaks the prose rhythm, use only one.
+
+WORLD: ${worldText.slice(0, 400)}
+
+STAKES: ${stakesText.slice(0, 400)}
+
+Do not open with the historical context. Open inside the character's body. Let the context arrive in the second or third sentence, not the first. This applies to THIS TURN ONLY.`
         : '';
 
       const openingInput = [
@@ -579,6 +598,12 @@ export function createGameRouter(repos, config = {}) {
       }
 
       output.timeAdvance = 0;  // guard: opening never advances the clock
+
+      // Fix raw character ID leaks before transcript and client delivery
+      if (output.narrative) {
+        output.narrative = fixCharacterIdLeaks(output.narrative, characters);
+      }
+
       const nextState = mergeState(seededInitial, output, scenario, clues, '');
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
@@ -586,7 +611,7 @@ export function createGameRouter(repos, config = {}) {
       appData.saveSession(sessionId, nextState);
 
       // Transcript — fire-and-forget (writeFile creates fresh; no stale append risk)
-      const introSections = scenario.introduction?.sections || [];
+      // introSections already declared above for worldContextBlock — reuse it
       let introText = '';
       for (const section of introSections) {
         const text = section.type === 'entry'
@@ -830,6 +855,11 @@ export function createGameRouter(repos, config = {}) {
           console.warn(`[ATTRIBUTION FIX] "You:" tag stripped — session ${sessionId}`);
           output.narrative = fixed;
         }
+      }
+
+      // Fix raw character ID leaks (e.g. "char_jim_lovell:" → "Jim Lovell:")
+      if (output.narrative) {
+        output.narrative = fixCharacterIdLeaks(output.narrative, characters);
       }
 
       // Anchor violation check — runs after all retries, before streaming done
