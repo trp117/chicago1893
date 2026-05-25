@@ -61,8 +61,13 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot-pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
 .scene-error { color: #e07060; }
-.gloss-term { border-bottom: 1.5px dotted #b8962e; cursor: help; }
-#gloss-tooltip { position: fixed; z-index: 9999; max-width: 280px; background: #1a1612; border: 1px solid #b8962e; border-radius: 6px; padding: 10px 14px; font-size: 12px; line-height: 1.55; color: #f0e8d8; box-shadow: 0 4px 16px rgba(0,0,0,0.5); pointer-events: none; display: none; }
+.gloss-term { border-bottom: 1.5px dotted #b8962e; cursor: pointer; }
+#gloss-tooltip { position: fixed; z-index: 9999; max-width: 300px; background: #1a1612; border: 1px solid #b8962e; border-radius: 6px; font-size: 12px; line-height: 1.55; color: #f0e8d8; box-shadow: 0 4px 16px rgba(0,0,0,0.5); display: none; }
+#gloss-tooltip-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid rgba(184,150,46,0.3); gap: 8px; }
+#gloss-tooltip-term { font-weight: 600; font-size: 12px; flex: 1; }
+#gloss-tooltip-close { background: none; border: none; color: #b8962e; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; opacity: 0.6; flex-shrink: 0; }
+#gloss-tooltip-close:hover { opacity: 1; }
+#gloss-tooltip-def { padding: 8px 10px 10px; }
 .bottom-bar { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
 .npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-area-wrap { transition: opacity 250ms ease; }
 .choices-area-wrap.hidden { display: none; }
@@ -2753,8 +2758,6 @@ if (!SpeechRecognition) {
 
 // ── Glossary tooltips ─────────────────────────────────────────────────────────
 
-const glossTooltip = document.getElementById('gloss-tooltip');
-
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -2781,20 +2784,46 @@ function markupGlossaryTerms(html) {
 }
 
 document.addEventListener('click', e => {
+  const tt = document.getElementById('gloss-tooltip');
+  if (!tt) return;
+
+  // Close button — explicit close, no propagation needed
+  if (e.target.closest('#gloss-tooltip-close')) {
+    e.stopPropagation();
+    tt.style.display = 'none';
+    return;
+  }
+
+  // Click on a glossary term — populate and show
   const el = e.target.closest('.gloss-term');
-  if (!el) { glossTooltip.style.display = 'none'; return; }
-  e.stopPropagation();
-  const def = el.dataset.def || '';
-  glossTooltip.textContent = def;
-  glossTooltip.style.display = 'block';
-  const rect = el.getBoundingClientRect();
-  const ttW = 280, ttH = 80;
-  let left = rect.left + window.scrollX;
-  let top  = rect.bottom + window.scrollY + 6;
-  if (left + ttW > window.innerWidth - 8) left = window.innerWidth - ttW - 8;
-  if (top + ttH > window.innerHeight + window.scrollY) top = rect.top + window.scrollY - ttH - 6;
-  glossTooltip.style.left = left + 'px';
-  glossTooltip.style.top  = top  + 'px';
+  if (el) {
+    e.stopPropagation();
+    const termEl = document.getElementById('gloss-tooltip-term');
+    const defEl  = document.getElementById('gloss-tooltip-def');
+    if (termEl) termEl.textContent = el.textContent;
+    if (defEl)  defEl.textContent  = el.dataset.def || '';
+    const rect = el.getBoundingClientRect();
+    const ttW = 300, ttH = 90;
+    let left = rect.left;
+    if (left + ttW > window.innerWidth - 8) left = window.innerWidth - ttW - 8;
+    if (left < 8) left = 8;
+    let top = rect.bottom + 8;
+    if (top + ttH > window.innerHeight - 8) top = rect.top - ttH - 8;
+    tt.style.left    = left + 'px';
+    tt.style.top     = top  + 'px';
+    tt.style.display = 'block';
+    return;
+  }
+
+  // Click anywhere outside — close
+  if (!e.target.closest('#gloss-tooltip')) tt.style.display = 'none';
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const tt = document.getElementById('gloss-tooltip');
+    if (tt) tt.style.display = 'none';
+  }
 });
 
 // ── Debug helper ──────────────────────────────────────────────────────────────
@@ -2803,6 +2832,12 @@ window.__setTime = n => { if (gameState) { gameState.remainingMinutes = n; gameS
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadGame();
 </script>
-<div id="gloss-tooltip"></div>
+<div id="gloss-tooltip">
+  <div id="gloss-tooltip-header">
+    <span id="gloss-tooltip-term"></span>
+    <button type="button" id="gloss-tooltip-close" aria-label="Close">✕</button>
+  </div>
+  <div id="gloss-tooltip-def"></div>
+</div>
 </body>
 </html>
