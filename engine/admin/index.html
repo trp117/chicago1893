@@ -2383,6 +2383,22 @@ async function handleManualSave(data, containerEl) {
   const btn = document.getElementById('preview-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   if (containerEl) collectEdits(containerEl, data);
+
+  // Glossary is managed via dedicated API endpoints (not form fields), so collectEdits
+  // never sees it. Read approved term cards from the DOM and inject into the payload.
+  // If a card is in edit mode (Edit clicked but term-level Save not yet clicked), the
+  // in-progress textarea value is captured here — scenario Save commits whatever is typed.
+  const glossaryList = document.getElementById('glossary-approved-list');
+  if (glossaryList && data.scenario) {
+    const cards = [...glossaryList.querySelectorAll('.glossary-term-card')];
+    data.scenario.glossary = cards.map(card => ({
+      term: card.dataset.term || '',
+      definition: card.querySelector('.edit-definition')?.value?.trim() || '',
+      source: card.querySelector('.edit-source')?.value?.trim() || '',
+      approved: true,
+    })).filter(g => g.term && g.definition);
+  }
+
   try {
     await apiPost('/generate/save', data);
     toast(`"${data.scenario?.title}" saved.`, 'success');
