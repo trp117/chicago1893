@@ -226,7 +226,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:08:53.139Z",
+  "updatedAt": "2026-05-25T04:04:24.720Z",
   "premise": "April 13, 1970: an oxygen tank has exploded 200,000 miles from Earth, and three men must survive four days in a spacecraft never designed for survival.",
   "playerGoal": "",
   "openingSituation": "",
@@ -694,5 +694,121 @@
     ]
   },
   "allow_free_input": false,
-  "setting": "200,000 miles from Earth, April 1970"
+  "setting": "200,000 miles from Earth, April 1970",
+  "glossary": [
+    {
+      "term": "splashdown",
+      "definition": "The moment a spacecraft returns to Earth and impacts the ocean, bringing the crew safely home — Apollo 13 splashed down in the South Pacific on April 17, 1970.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "psia",
+      "definition": "Pounds per square inch absolute — the unit used to measure oxygen tank pressure; Tank Two dropped from a safe pressure to zero within 130 minutes of the explosion.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "power-up budget",
+      "definition": "A detailed calculation of exactly how much electricity can be used for each system during re-entry — systems engineer John Aaron was called back to Mission Control to create the budget that kept the Command Module powered just long enough.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Tiger Team",
+      "definition": "A dedicated team of controllers isolated to work on a single critical problem — Gene Kranz's White Team became the Tiger Team, focused exclusively on re-entry procedures after the explosion.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Flight Director",
+      "definition": "The highest-ranking controller in the Mission Control room, responsible for all decisions during a mission phase — Gene Kranz led the crisis response through the explosion, then handed off to Glynn Lunney.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "EECOM",
+      "definition": "Electrical, Environmental, and Communications Officer — the Mission Control specialist responsible for monitoring all spacecraft systems; Sy Liebergot initially assessed the oxygen tank readings as a sensor failure.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Service Module",
+      "definition": "The unpressurized compartment behind the Command Module that housed fuel cells, oxygen tanks, and the main engine — the oxygen tank explosion rendered it useless and it was jettisoned before re-entry.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "descent batteries",
+      "definition": "Two batteries in the Lunar Module with a combined 1,600 amp-hours, originally designed to run the moon lander for 45 hours — they were stretched to run life support for 87 hours.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "entry batteries",
+      "definition": "Three batteries in the Command Module with a combined 135 amp-hours of power — they needed to supply at least 43 amp-hours to complete re-entry, leaving almost no margin for error.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "delta-V",
+      "definition": "A measure of the change in velocity achieved by a rocket burn — the PC+2 maneuver produced approximately 860.5 feet per second of delta-V.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Lunar Module Descent Propulsion System",
+      "definition": "The engine designed to lower the lunar lander to the moon's surface — it became the only available engine to execute course corrections and return the crew to Earth.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "PC+2 burn",
+      "definition": "A course-correction burn executed two hours after passing closest to the moon using the Lunar Module's descent engine — it shortened the return journey to Earth by approximately 10 hours.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "mailbox",
+      "definition": "The improvised CO2 scrubber adapter built from a Command Module canister, plastic bags, a flight plan cover, a sock, and duct tape — a makeshift solution that saved the crew's lives.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "carbon dioxide partial pressure",
+      "definition": "A measurement of CO2 concentration in the cabin air; at 7.6 mmHg the crew risked losing consciousness, and cognitive problems begin around 15 mmHg.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "lithium hydroxide canisters",
+      "definition": "Chemical scrubbers that absorb carbon dioxide from the cabin air — the Lunar Module's canisters were insufficient for three men over 87 hours, requiring an improvised adapter.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Command Module Odyssey",
+      "definition": "The capsule that carried the crew and housed life support systems during Earth orbit and coast — it became unpowered and dangerously cold once the Service Module was crippled.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Lunar Module Aquarius",
+      "definition": "The moon lander that became an unplanned lifeboat for all three astronauts after the Service Module failed — designed for two men for 36 hours, it had to support three for 87 hours.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Mission Elapsed Time",
+      "definition": "The official mission clock that starts at launch and measures every moment of the flight — at the moment of the explosion, it read 55 hours, 54 minutes, and 53 seconds.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Oxygen Tank Two",
+      "definition": "One of two cryogenic oxygen storage tanks in the Service Module; the rupture of this tank triggered the cascade of failures that crippled Apollo 13.",
+      "source": "",
+      "approved": true
+    }
+  ]
 }
