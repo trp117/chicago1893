@@ -205,7 +205,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <div class="nav-logo">Ledger 250</div>
   <ul class="nav-links">
     <li class="nav-hide"><a href="#scenarios">Scenarios</a></li>
-    <li class="nav-hide"><a href="/categories">Categories</a></li>
+    <li class="nav-hide"><a href="#categories">Categories</a></li>
     <li class="nav-hide"><a href="#educators">Educators</a></li>
     <li><a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="nav-cta">Enter the ledger &rarr;</a></li>
   </ul>
@@ -395,16 +395,15 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </section>
 <section class="section section--dark" id="all-scenarios">
   <div class="section-header reveal">
-    <div><p class="section-label">The Full Ledger</p><h2 class="section-title">All scenarios</h2></div>
+    <div><p class="section-label">The Full Ledger</p><h2 class="section-title">25 moments &middot; 250 years</h2></div>
   </div>
   <div class="filter-row reveal">
-    <button class="filter-btn active" onclick="filterStories('all',this)">All</button>
+    <button class="filter-btn active" onclick="filterStories('all',this)">All 25</button>
     <button class="filter-btn" onclick="filterStories('space',this)">Space</button>
+    <button class="filter-btn" onclick="filterStories('civil',this)">Civil Rights</button>
     <button class="filter-btn" onclick="filterStories('military',this)">Military</button>
-    <button class="filter-btn" onclick="filterStories('civil-rights',this)">Civil Rights</button>
-    <button class="filter-btn" onclick="filterStories('underground',this)">Underground</button>
-    <button class="filter-btn" onclick="filterStories('maritime',this)">Maritime</button>
-    <button class="filter-btn" onclick="filterStories('industrial',this)">Industrial</button>
+    <button class="filter-btn" onclick="filterStories('political',this)">Political Crisis</button>
+    <button class="filter-btn" onclick="filterStories('labor',this)">Labor &amp; Society</button>
   </div>
   <div class="stories-grid" id="stories-grid"></div>
 </section>
@@ -510,23 +509,27 @@ function drawImages(){
   const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-sargasso':SCENES['ci-political'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
   Object.entries(fcMap).forEach(([id,p])=>{const el=document.getElementById(id);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(800,500,p)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'});
 }
-let _renderCard=null,_storiesCache=null;
-async function renderGrid(cat){
-  if(!_renderCard){const m=await import('/js/scenario-card.js');_renderCard=m.renderScenarioCard;}
-  if(!_storiesCache){const r=await fetch('/api/stories');_storiesCache=await r.json();}
+function renderGrid(cat){
   const grid=document.getElementById('stories-grid');
-  const items=cat==='all'?_storiesCache:_storiesCache.filter(s=>s.category===cat);
-  grid.innerHTML=items.map(s=>_renderCard(s,{baseUrl:BASE_URL})).join('');
+  const items=cat==='all'?STORIES:STORIES.filter(s=>s.cat===cat);
+  grid.innerHTML=items.map(s=>`
+    <div class="story-card" onclick="location.href=BASE_URL+'/game?scenarioId=${s.id}'">
+      <div class="story-card-img ${s.scene}" style="border-left:3px solid ${CAT_COLORS[s.cat]}"></div>
+      <div class="story-card-body">
+        <p class="story-era">${s.era} &middot; ${s.year}</p>
+        <h3 class="story-title">${s.title}</h3>
+        <p class="story-hook">${s.hook}</p>
+        <p class="story-cost">Cost tracked: ${s.cost}</p>
+        <div class="story-footer">
+          <div class="story-pills">${s.perspectives.map(p=>`<span class="meta-pill">${p}</span>`).join('')}</div>
+          <div class="story-arrow"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg></div>
+        </div>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.story-card-img').forEach(el=>{const key=[...el.classList].find(c=>c.startsWith('ci-'));if(key&&SCENES[key]){el.style.backgroundImage=`url(${makeCanvas(600,140,SCENES[key])})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}});
 }
-function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat);}
-function filterTo(cat){
-  document.getElementById('all-scenarios').scrollIntoView({behavior:'smooth'});
-  const slugMap={space:'space',civil:'civil-rights',military:'military',political:null,labor:null};
-  const newCat=cat in slugMap?slugMap[cat]:cat;
-  if(!newCat)return;
-  const btn=[...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.toLowerCase().includes(newCat.slice(0,4)));
-  if(btn)filterStories(newCat,btn);
-}
+function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat)}
+function filterTo(cat){document.getElementById('all-scenarios').scrollIntoView({behavior:'smooth'});const btn=[...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.toLowerCase().includes(cat.slice(0,4)));if(btn)filterStories(cat,btn)}
 function initReveal(){const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))}
 window.addEventListener('DOMContentLoaded',()=>{drawHero();drawFeaturedHero();drawImages();renderGrid('all');initReveal();initNavLogo();});
 window.addEventListener('resize',()=>{drawHero();drawFeaturedHero();});

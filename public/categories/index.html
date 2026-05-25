@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ledger 250 — Browse scenarios by category. Space, Military, Civil Rights, Underground, Maritime, Industrial.">
+<title>Browse Categories — Ledger 250</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0b08;--parchment:#f5f0e8;--ash:#3a3530;--dark-ash:#1e1b18;--wire:#2a2520;
+  --gold:#c49a3c;--gold-light:#e8c46a;
+  --pad-x:clamp(16px,5vw,64px);--pad-y:clamp(48px,8vw,96px);--gap:2px;
+}
+body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background:#0a0a08}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;white-space:nowrap;text-decoration:none}
+.nav-links{display:flex;gap:clamp(14px,2.5vw,32px);list-style:none;align-items:center}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.20em;text-transform:uppercase;color:var(--parchment);opacity:.95;text-decoration:none;transition:opacity .2s;white-space:nowrap}
+.nav-links a:hover{opacity:1}
+.nav-cta{opacity:.9!important;color:var(--gold-light)!important}
+@media(max-width:600px){.nav-hide{display:none}}
+.page-header{padding:calc(var(--pad-y) + 64px) var(--pad-x) var(--pad-y);border-bottom:1px solid rgba(245,240,232,.06)}
+.section-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,56px);font-weight:300;line-height:1.05;color:var(--parchment)}
+.page-body{padding:var(--pad-y) var(--pad-x)}
+.cat-grid{display:grid;gap:var(--gap);grid-template-columns:repeat(2,1fr)}
+@media(min-width:600px){.cat-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.cat-grid{grid-template-columns:repeat(3,1fr)}}
+.cat-card{background:#161310;padding:clamp(24px,3vw,40px) clamp(20px,2.5vw,32px);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(200px,22vw,260px);position:relative;overflow:hidden;transition:background .22s;text-decoration:none;color:inherit}
+.cat-card:hover{background:#1e1a16}
+.cat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.cat-card:hover::after{transform:scaleX(1)}
+.cat-space::after{background:#6a9fd8}
+.cat-military::after{background:#c0524a}
+.cat-civil::after{background:#5a8a5a}
+.cat-underground::after{background:#b8832a}
+.cat-maritime::after{background:#6a9fd8}
+.cat-industrial::after{background:#8a6040}
+.cat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,56px);font-weight:300;color:var(--parchment);opacity:.05;line-height:1;margin-bottom:12px}
+.cat-name{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,26px);font-weight:400;color:var(--parchment);line-height:1.15;margin-bottom:8px}
+.cat-tagline{font-size:13px;line-height:1.6;color:var(--parchment);opacity:.72;margin-bottom:0}
+.cat-footer{margin-top:24px;display:flex;align-items:center;justify-content:space-between}
+.cat-count{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.20em;text-transform:uppercase;color:var(--gold-light);opacity:.9}
+.cat-arrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:.7;transition:opacity .2s}
+.cat-card:hover .cat-arrow{opacity:1}
+footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid rgba(245,240,232,.06)}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;opacity:.8}
+.footer-note{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--parchment);opacity:.82}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">Ledger 250</a>
+  <ul class="nav-links">
+    <li class="nav-hide"><a href="/#scenarios">Scenarios</a></li>
+    <li class="nav-hide"><a href="/categories" style="color:var(--gold-light)">Categories</a></li>
+    <li class="nav-hide"><a href="/#educators">Educators</a></li>
+    <li><a href="#" id="nav-enter" class="nav-cta">Enter the ledger &rarr;</a></li>
+  </ul>
+</nav>
+<div class="page-header">
+  <p class="section-label">Browse</p>
+  <h1 class="page-title">Scenarios by Category</h1>
+</div>
+<div class="page-body">
+  <div class="cat-grid">
+    <a href="/categories/space" class="cat-card cat-space">
+      <div>
+        <div class="cat-num">01</div>
+        <h2 class="cat-name">Space &amp; Cold War</h2>
+        <p class="cat-tagline">The margin between mission success and catastrophe is measured in fractions. Every decision is made with the whole world watching.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">2 scenarios</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+    <a href="/categories/military" class="cat-card cat-military">
+      <div>
+        <div class="cat-num">02</div>
+        <h2 class="cat-name">Military</h2>
+        <p class="cat-tagline">From the beaches of Normandy to the trenches of the Argonne. The cost was always paid by someone specific.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">2 scenarios</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+    <a href="/categories/civil-rights" class="cat-card cat-civil">
+      <div>
+        <div class="cat-num">03</div>
+        <h2 class="cat-name">Civil Rights</h2>
+        <p class="cat-tagline">Discipline in the face of violence is the hardest decision of all. The ledger measures what it cost to hold the line.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">1 scenario</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+    <a href="/categories/underground" class="cat-card cat-underground">
+      <div>
+        <div class="cat-num">04</div>
+        <h2 class="cat-name">Underground</h2>
+        <p class="cat-tagline">Secret networks, covert dispatches, and the people who risked everything to move freedom through enemy territory.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">3 scenarios</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+    <a href="/categories/maritime" class="cat-card cat-maritime">
+      <div>
+        <div class="cat-num">05</div>
+        <h2 class="cat-name">Maritime</h2>
+        <p class="cat-tagline">On the water, the margin for error is measured in minutes. Ships, submarines, and the cold calculus of survival at sea.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">1 scenario</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+    <a href="/categories/industrial" class="cat-card cat-industrial">
+      <div>
+        <div class="cat-num">06</div>
+        <h2 class="cat-name">Industrial</h2>
+        <p class="cat-tagline">The infrastructure of civilization, under pressure. Engineers, workers, and the crises that tested what was built to last.</p>
+      </div>
+      <div class="cat-footer">
+        <span class="cat-count">2 scenarios</span>
+        <span class="cat-arrow">Explore &rarr;</span>
+      </div>
+    </a>
+  </div>
+</div>
+<footer>
+  <div class="footer-logo">Ledger 250</div>
+  <div class="footer-note">Launches July 4, 2026 &nbsp;&middot;&nbsp; ledger250.com</div>
+  <div class="footer-note">A project for America&rsquo;s 250th</div>
+</footer>
+<script>
+const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+document.getElementById('nav-enter').onclick=e=>{e.preventDefault();location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat'};
+</script>
+</body>
+</html>

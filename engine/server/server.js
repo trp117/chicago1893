@@ -62,11 +62,29 @@ function deriveEra(s) {
   const rest = (s.genre || []).filter(g => !['historical','drama','survival'].includes(g));
   return rest[0] || 'Historical';
 }
+const CATEGORY_MAP = {
+  apollo_13_lifeboat:               'space',
+  sargasso_deep_three_keys:         'space',
+  dog_green_sector:                 'military',
+  zero_hour_cantigny:               'military',
+  greensboro_four_the_color_line:   'civil-rights',
+  lightning_and_the_midnight_coach: 'underground',
+  singing_wires:                    'underground',
+  midnight_errand_boston:           'underground',
+  titanic_final_hours:              'maritime',
+  artesian_height_1892:             'industrial',
+  bornholmer_strasse_first_breach:  'industrial',
+};
 app.get('/api/stories', (req, res) => {
   try {
     const allRoles = repos.scenarios.findPlayerRoles();
-    const rolesBy  = {};
-    allRoles.forEach(r => { rolesBy[r.scenarioId] = (rolesBy[r.scenarioId] || 0) + 1; });
+    const rolesBy      = {};
+    const roleNamesBy  = {};
+    allRoles.forEach(r => {
+      rolesBy[r.scenarioId] = (rolesBy[r.scenarioId] || 0) + 1;
+      if (!roleNamesBy[r.scenarioId]) roleNamesBy[r.scenarioId] = [];
+      roleNamesBy[r.scenarioId].push(r.name);
+    });
     const stories = repos.scenarios.findAll()
       .filter(s => s.hidden !== true && (rolesBy[s.id] || 0) > 0)
       .map(s => ({
@@ -75,6 +93,10 @@ app.get('/api/stories', (req, res) => {
         description: s.description,
         era:         deriveEra(s),
         duration:    s.sessionTargetMinutes ? `~${s.sessionTargetMinutes} min` : null,
+        category:    CATEGORY_MAP[s.id] || null,
+        image_url:   s.image?.url || null,
+        roles:       roleNamesBy[s.id] || [],
+        cost_tracked: s.costTracked || null,
       }));
     res.json(stories);
   } catch (err) {
@@ -90,6 +112,13 @@ const HTML_HEADERS = { headers: { 'Cache-Control': 'public, max-age=300, must-re
 app.get('/',     (_, res) => res.sendFile(path.join(publicDir, 'index.html'), HTML_HEADERS));
 app.get('/test', (_, res) => res.sendFile(path.join(publicDir, 'test.html'),  HTML_HEADERS));
 app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   HTML_HEADERS));
+
+app.get('/categories',  (_, res) => res.sendFile(path.join(publicDir, 'categories/index.html'),  HTML_HEADERS));
+app.get('/categories/', (_, res) => res.sendFile(path.join(publicDir, 'categories/index.html'),  HTML_HEADERS));
+['space','military','civil-rights','underground','maritime','industrial'].forEach(slug => {
+  app.get(`/categories/${slug}`,  (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
+  app.get(`/categories/${slug}/`, (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
+});
 
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
 app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
