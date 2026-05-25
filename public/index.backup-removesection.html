@@ -284,6 +284,29 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     </a>
   </div>
 </section>
+<div style="border-top:1px solid rgba(245,240,232,.06);border-bottom:1px solid rgba(245,240,232,.06);background:#0a0807">
+  <p class="section-label" style="padding:clamp(16px,2.5vw,24px) var(--pad-x) clamp(8px,1.2vw,12px)">WHAT YOU ARE STEPPING INTO</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr)">
+    <div class="stat-cell reveal rd1">
+      <p class="section-label" style="margin-bottom:10px">CHOOSE YOUR ROLE</p>
+      <p style="font-size:15px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">Each scenario offers 2&ndash;3 historical perspectives. Pick the one closest to the decision.</p>
+    </div>
+    <div class="stat-cell reveal rd2">
+      <p class="section-label" style="margin-bottom:10px">ACT UNDER PRESSURE</p>
+      <p style="font-size:15px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">30 minutes. Real constraints. The clock, the physics, and the people in the room don&rsquo;t wait.</p>
+    </div>
+    <div class="stat-cell reveal rd3">
+      <p class="section-label" style="margin-bottom:10px">DISCOVER THE COST</p>
+      <p style="font-size:15px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">The outcome was fixed before you began. What wasn&rsquo;t fixed is what it took to get there.</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(245,240,232,.06)">
+    <div class="lc reveal rd1"><div class="lc-val r">43.2 amp-hrs</div><div class="lc-label">Battery reserve at power-down</div></div>
+    <div class="lc reveal rd2"><div class="lc-val a">38&deg;F</div><div class="lc-label">Cabin temp at splashdown</div></div>
+    <div class="lc reveal rd3"><div class="lc-val a">72 hrs</div><div class="lc-label">Without adequate sleep</div></div>
+    <div class="lc reveal rd4"><div class="lc-val g">Survived</div><div class="lc-label">The outcome you already knew</div></div>
+  </div>
+</div>
 <section class="ledger-featured" id="featured" style="position:relative">
   <a href="#scenarios" class="featured-skip-link">Skip to scenarios ↓</a>
   <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-hero-img reveal" style="display:block;text-decoration:none">
@@ -317,15 +340,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="lp-row"><span class="lp-key">LM_Aquarius</span><span class="lp-val g">Powering up</span></div>
         <div class="lp-row"><span class="lp-key">Decision_Window</span><span class="lp-val r">04:08 remaining</span></div>
         <div class="lp-note">Every number is drawn from NASA telemetry and mission transcripts. Your decisions are evaluated against historical margin &mdash; not survival, which is already guaranteed.</div>
-      </div>
-      <div style="margin-top:2px;border:1px solid rgba(196,154,60,.18)">
-        <div style="padding:.5rem 1.25rem .4rem;border-bottom:1px solid rgba(196,154,60,.12)"><span class="section-label" style="font-size:11px;letter-spacing:.28em">Apollo 13 &mdash; Recorded cost</span></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr)">
-          <div class="lc"><div class="lc-val r">43.2 amp-hrs</div><div class="lc-label">Battery reserve at power-down</div></div>
-          <div class="lc"><div class="lc-val a">38&deg;F</div><div class="lc-label">Cabin temp at splashdown</div></div>
-          <div class="lc"><div class="lc-val a">72 hrs</div><div class="lc-label">Without adequate sleep</div></div>
-          <div class="lc"><div class="lc-val g">Survived</div><div class="lc-label">The outcome you already knew</div></div>
-        </div>
       </div>
       <div class="ledger-card" style="margin-top:2px">
         <div class="lp-title">What the ledger measures</div>
