@@ -102,10 +102,9 @@ li { margin-bottom: 8px; }
 .tts-toggle.active { background: var(--accent); color: #1a150c; border-color: var(--accent); }
 .tts-bar { display: flex; }
 .tools-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 2px 28px 6px; }
-.tts-stop-btn { display: inline-flex; align-items: center; gap: 5px; border: 0.5px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: normal; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.tts-stop-btn { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 4px 10px; font-size: 12px; color: var(--muted); cursor: pointer; font-weight: normal; transition: all 0.15s ease; }
 .tts-stop-btn:hover { border-color: var(--accent); color: var(--text); }
-.tts-stop-btn.active { border-color: var(--accent); color: var(--accent); }
-.tts-stop-btn.active:hover { background: rgba(208,176,106,0.08); }
+.tts-stop-btn.active { background: var(--accent); color: #1a150c; border-color: var(--accent); }
 .driving-btn { height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: Georgia, serif; font-size: 0.78rem; font-weight: normal; cursor: pointer; letter-spacing: 0.03em; transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .driving-btn:hover { border-color: var(--accent); color: var(--accent); }
 .driving-btn.active { border-color: var(--accent); background: var(--accent); color: #1a150c; }
@@ -777,13 +776,9 @@ function updateSlimLabel() {
 }
 
 function updateTtsBarUI() {
-  if (ttsEnabled) {
-    ttsStopBtn.innerHTML = '🔊 Mute narration';
-    ttsStopBtn.classList.add('active');
-  } else {
-    ttsStopBtn.innerHTML = '▶ Unmute narration';
-    ttsStopBtn.classList.remove('active');
-  }
+  const label = ttsEnabled ? 'Narration on' : 'Narration off';
+  ttsStopBtn.innerHTML = `<span>🔊</span><span>${label}</span>`;
+  ttsStopBtn.classList.toggle('active', ttsEnabled);
 }
 
 function ttsSpeakFallback(text) {
@@ -866,6 +861,8 @@ ttsStopBtn.addEventListener('click', () => {
   }
   updateTtsBarUI();
   updateTtsToggleUI();
+  updateSlimAudioUI();
+  updateSheetTtsUI();
 });
 
 // ── Chase UI ──────────────────────────────────────────────────────────────────
