@@ -2004,7 +2004,9 @@ function buildApprovedTermCard(g, scenarioId) {
       </div>
     </div>
     <div class="term-edit" hidden>
-      <div style="font-weight:700;font-size:13px;margin-bottom:8px">${te}</div>
+      <label style="font-size:12px;color:var(--text-soft);margin-bottom:2px;display:block">Term name</label>
+      <input type="text" class="edit-term" value="${te}" style="width:100%;font-size:13px;font-weight:700;margin-bottom:8px">
+      <div class="edit-term-error" style="display:none;color:#d32f2f;font-size:12px;margin-bottom:6px"></div>
       <textarea class="edit-definition" rows="3" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical">${de}</textarea>
       <input type="text" class="edit-source" placeholder="Source (optional)" value="${se}" style="width:100%;font-size:12px;margin-bottom:10px">
       <div style="display:flex;gap:8px">
@@ -2033,11 +2035,28 @@ function cancelGlossaryTermEdit(term) {
 async function saveGlossaryTermEdit(term, scenarioId) {
   const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
   if (!card) return;
+  const newTerm    = card.querySelector('.edit-term').value.trim();
   const definition = card.querySelector('.edit-definition').value.trim();
   const source     = card.querySelector('.edit-source').value.trim();
+  const errEl      = card.querySelector('.edit-term-error');
+
+  errEl.style.display = 'none'; errEl.textContent = '';
+
+  if (!newTerm) {
+    errEl.textContent = 'Term name cannot be empty.'; errEl.style.display = 'block'; return;
+  }
+  if (newTerm.toLowerCase() !== term.toLowerCase()) {
+    const collision = [...document.querySelectorAll('.glossary-term-card')]
+      .some(c => c !== card && (c.querySelector('.edit-term')?.value?.trim() || c.dataset.term).toLowerCase() === newTerm.toLowerCase());
+    if (collision) {
+      errEl.textContent = 'A term with that name already exists.'; errEl.style.display = 'block'; return;
+    }
+  }
   if (!definition) { toast('Definition cannot be empty', 'error'); return; }
   try {
-    const { glossary } = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, { definition, source });
+    const body = { definition, source };
+    if (newTerm.toLowerCase() !== term.toLowerCase()) body.newTerm = newTerm;
+    const { glossary } = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, body);
     toast('Term updated', 'success');
     renderGlossaryBody(scenarioId, glossary);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
@@ -2392,7 +2411,7 @@ async function handleManualSave(data, containerEl) {
   if (glossaryList && data.scenario) {
     const cards = [...glossaryList.querySelectorAll('.glossary-term-card')];
     data.scenario.glossary = cards.map(card => ({
-      term: card.dataset.term || '',
+      term: card.querySelector('.edit-term')?.value?.trim() || card.dataset.term || '',
       definition: card.querySelector('.edit-definition')?.value?.trim() || '',
       source: card.querySelector('.edit-source')?.value?.trim() || '',
       approved: true,

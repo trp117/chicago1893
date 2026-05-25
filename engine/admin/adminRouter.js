@@ -2222,11 +2222,21 @@ Maximum 20 suggestions. Prioritize technical terms — aim for at least 10 from 
     const scenario = repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
-    const { definition, source } = req.body;
+    const { definition, source, newTerm } = req.body;
     if (!definition?.trim()) return badRequest(res, 'definition required');
-    const glossary = (scenario.glossary || []).map(g =>
+    const existing = scenario.glossary || [];
+    if (newTerm !== undefined) {
+      if (!newTerm.trim()) return badRequest(res, 'term name cannot be empty');
+      const collision = existing.some(g =>
+        g.term.toLowerCase() !== termName.toLowerCase() &&
+        g.term.toLowerCase() === newTerm.trim().toLowerCase()
+      );
+      if (collision) return badRequest(res, 'a term with that name already exists');
+    }
+    const resolvedTerm = newTerm?.trim() || termName;
+    const glossary = existing.map(g =>
       g.term.toLowerCase() === termName.toLowerCase()
-        ? { ...g, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
+        ? { ...g, term: resolvedTerm, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
         : g
     );
     repos.scenarios.save({ ...scenario, glossary });
