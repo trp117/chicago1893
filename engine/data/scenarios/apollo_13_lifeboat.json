@@ -226,7 +226,7 @@
     ]
   },
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T04:04:24.720Z",
+  "updatedAt": "2026-05-25T14:53:42.946Z",
   "premise": "April 13, 1970: an oxygen tank has exploded 200,000 miles from Earth, and three men must survive four days in a spacecraft never designed for survival.",
   "playerGoal": "",
   "openingSituation": "",
@@ -807,6 +807,54 @@
     {
       "term": "Oxygen Tank Two",
       "definition": "One of two cryogenic oxygen storage tanks in the Service Module; the rupture of this tank triggered the cascade of failures that crippled Apollo 13.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Bus B",
+      "definition": "The electrical power distribution system for the Command Module Odyssey, separate from the Service Module's fuel cells; Bus B remained partially powered after the explosion, allowing critical systems to remain operational until the final power-down for re-entry.",
+      "source": "Apollo 13 Flight Data File, NASA Mission Operations Reports, April 1970; Apollo 13 Technical Debriefing, MSC-02680, NASA Manned Spacecraft Center, June 1970",
+      "approved": true
+    },
+    {
+      "term": "IMU",
+      "definition": "Inertial Measurement Unit—the platform of gyroscopes and accelerometers that maintained Odyssey's navigational reference in space. When the explosion damaged the Command Module's systems, Mission Control had to realign the IMU using star sightings through the telescope, a procedure normally performed only during cislunar coast phases.",
+      "source": "Apollo 13 Flight Journal, NASA Johnson Space Center, https://history.nasa.gov/afj/ap13fj/index.html; Apollo 13 Technical Crew Debriefing, NASA, April 1970.",
+      "approved": true
+    },
+    {
+      "term": "PC+2",
+      "definition": "The midcourse correction burn executed 2 hours past closest approach to the Moon, using the Lunar Module's descent engine to accelerate the return trajectory and shorten the journey home by approximately 10 hours — a critical maneuver that allowed the crippled spacecraft to reach Earth before life support systems failed.",
+      "source": "NASA Apollo 13 Mission Report, NASA SP-4029, May 1970. Available at: https://www.nasa.gov/history/alsj/a13/a13.html",
+      "approved": true
+    },
+    {
+      "term": "LM",
+      "definition": "The Lunar Module Aquarius — a two-man spacecraft designed for 45 hours on the lunar surface — became a lifeboat for three men for 87 hours, its lithium hydroxide canisters and descent batteries the only systems keeping the crew alive on the journey home.",
+      "source": "NASA Apollo 13 Technical Crew Debriefing, April 1970; NASA Report on the Apollo 13 Accident, June 1970. https://www.nasa.gov/history/apollo-13-accident-and-recovery/",
+      "approved": true
+    },
+    {
+      "term": "GUIDO",
+      "definition": "Flight controller at Mission Control responsible for guidance, navigation, and control of the spacecraft — the person in the MOCR (Mission Operations Control Room) who communicates directly with the crew and manages trajectory decisions. During Apollo 13's crisis, GUIDO John Aaron was called back from home to calculate the power-down procedures that would keep Odyssey alive for re-entry.",
+      "source": "NASA Mission Control transcript archives and Gene Kranz, 'Failure Is Not an Option' (Simon & Schuster, 2000), pp. 311-330; NASA Historical Reference Collection, https://history.nasa.gov/sp4029.pdf",
+      "approved": true
+    },
+    {
+      "term": "CM",
+      "definition": "Command Module Odyssey — the conical spacecraft where the three astronauts lived during Earth orbit and trans-lunar coast, and where they would return for re-entry; after the oxygen tank explosion, it became a dead spacecraft with only 43 amp-hours of battery power needed for re-entry, forcing the crew to shelter in the Lunar Module.",
+      "source": "NASA Apollo 13 Mission Report, MSC-02680, April 1970, https://www.nasa.gov/history/alsj/a13/Apollo13MissionReport.pdf",
+      "approved": true
+    },
+    {
+      "term": "G-7",
+      "definition": "The seventh guidance platform alignment check during the Lunar Module emergency activation sequence — a critical realignment of the Inertial Measurement Unit that had to be completed in the compressed 83-minute powered-up window before the platform's gyroscopes drifted beyond usable tolerance.",
+      "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 6.2.2 'Lunar Module Activation and Navigation,' April 1970. Available at NASA Technical Reports Server (NTRS): https://ntrs.nasa.gov/",
+      "approved": true
+    },
+    {
+      "term": "Loop",
+      "definition": "A term meaning a flight controller or astronaut is actively connected to, monitoring, or speaking on a specific, closed-circuit NASA voice communication channel.  During Apollo 13, being \"on the loop\" meant a specialist was plugged directly into the real-time audio network—such as the Flight Director's channel or the Air-to-Ground frequency—instantly hearing the crisis unfold and coordinating the rescue alongside the rest of the team.",
       "source": "",
       "approved": true
     }

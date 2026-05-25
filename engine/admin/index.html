@@ -2225,14 +2225,50 @@ function addGlossaryTermManually(scenarioId) {
   card.style.cssText = 'border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)';
   card.innerHTML = `
     <input type="text" class="new-term-input" placeholder="Term as it appears in prose" style="width:100%;font-size:13px;font-weight:700;margin-bottom:6px">
-    <textarea class="new-definition-input" rows="3" placeholder="Period-specific definition — one to two sentences" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical"></textarea>
+    <textarea class="new-definition-input" rows="3" placeholder="Period-specific definition — one to two sentences" style="width:100%;font-size:13px;margin-bottom:4px;resize:vertical"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+      <button type="button" class="btn btn-secondary btn-sm" id="${id}-generate" style="font-size:11px">✨ Generate definition</button>
+    </div>
     <input type="text" class="new-source-input" placeholder="Source (optional)" style="width:100%;font-size:12px;margin-bottom:10px">
+    <div id="${id}-gen-error" style="display:none;color:#e74c3c;font-size:12px;margin-bottom:8px"></div>
     <div style="display:flex;gap:8px">
       <button type="button" class="btn btn-primary btn-sm" id="${id}-save">Save</button>
       <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Cancel</button>
     </div>`;
   list.prepend(card);
   card.querySelector('.new-term-input').focus();
+  document.getElementById(`${id}-generate`).addEventListener('click', async () => {
+    const termInput = card.querySelector('.new-term-input');
+    const defInput  = card.querySelector('.new-definition-input');
+    const srcInput  = card.querySelector('.new-source-input');
+    const genBtn    = document.getElementById(`${id}-generate`);
+    const errEl     = document.getElementById(`${id}-gen-error`);
+    errEl.style.display = 'none';
+    const term = termInput.value.trim();
+    if (!term) {
+      errEl.textContent = 'Enter a term first.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if ((defInput.value.trim() || srcInput.value.trim()) && !confirm('Replace current definition?')) return;
+    genBtn.textContent = 'Generating…';
+    genBtn.disabled = true;
+    termInput.disabled = defInput.disabled = srcInput.disabled = true;
+    try {
+      const { definition, source } = await apiPost(
+        `/scenarios/${encodeURIComponent(scenarioId)}/generate-glossary-term`, { term }
+      );
+      defInput.value = definition;
+      srcInput.value = source || '';
+    } catch (err) {
+      errEl.textContent = `Generation failed: ${err.message}`;
+      errEl.style.display = 'block';
+    } finally {
+      genBtn.textContent = '✨ Generate definition';
+      genBtn.disabled = false;
+      termInput.disabled = defInput.disabled = srcInput.disabled = false;
+    }
+  });
   document.getElementById(`${id}-save`).addEventListener('click', async () => {
     const term       = card.querySelector('.new-term-input').value.trim();
     const definition = card.querySelector('.new-definition-input').value.trim();

@@ -2204,6 +2204,79 @@ Maximum 20 suggestions. Prioritize technical terms — aim for at least 10 from 
     }
   });
 
+  r.post('/scenarios/:id/generate-glossary-term', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured.' });
+    const scenario = repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const { term } = req.body;
+    if (!term?.trim()) return badRequest(res, 'term is required');
+
+    const rawFacts = (scenario.technical_facts?.facts || []).map(f => f.content || '').filter(Boolean);
+    const techFactsText = rawFacts.length
+      ? `TECHNICAL FACTS (verified historical and technical data):\n${rawFacts.join('\n')}`
+      : '';
+    const introText = (scenario.introduction?.sections || []).map(s => s.text || '').filter(Boolean).join('\n\n');
+
+    // Sample up to 5 existing definitions so the LLM can match the scenario's voice
+    const existingDefs = (scenario.glossary || []).slice(0, 5)
+      .map(g => `"${g.term}": ${g.definition}`).join('\n');
+    const voiceSample = existingDefs
+      ? `EXISTING GLOSSARY VOICE (match this register and style):\n${existingDefs}`
+      : '';
+
+    const contextText = [techFactsText, introText, voiceSample].filter(Boolean).join('\n\n').slice(0, 4000);
+    const settingLabel = scenario.setting || scenario.title || 'historical setting';
+
+    const prompt = `You are writing a single glossary entry for a historical immersive fiction experience set in: ${settingLabel}.
+
+Term to define: "${term.trim()}"
+
+${contextText ? `CONTEXT:\n${contextText}\n\n` : ''}Write a definition that:
+- Is one to two sentences
+- Is historically accurate for the period — no anachronisms, no modern terminology projected backward
+- Matches the voice of the existing glossary entries shown above: terse and specific, not a dictionary definition
+- Gives the reader one quick, specific fact before sending them back into the story
+
+WRONG: "The fuel cell is an electrochemical device that converts hydrogen and oxygen into electricity..."
+RIGHT: "One of three units that generated all of Odyssey's electricity — when all three failed, the Command Module had 45 amp-hours left."
+
+For the source field, provide a citation ONLY if you are highly confident the source exists and supports the specific information you are citing. If uncertain, return an empty string — an empty source is strongly preferred over an uncertain or invented one.
+
+Do NOT invent URLs, page numbers, journal articles, ISBN numbers, or direct quotations.
+
+Accepted citation formats (use these exactly, nothing else):
+- Books: "Author Last Name, Title" (no page numbers, no edition)
+- Government/agency records: "Agency, Document Type, Year" — e.g. "NASA, Apollo 13 Mission Report, 1970"
+- Archives: "Archive Name, Collection Name"
+- Newspapers of record: "Publication, Date" (no headline, no URL)
+
+Do NOT cite Wikipedia. Do NOT cite encyclopedia entries. Do NOT include URLs unless you are certain the URL exists. An empty source is the correct response when you are uncertain.
+
+Return JSON only:
+{
+  "definition": "one to two sentence period-specific definition",
+  "source": "citation in accepted format, or empty string if uncertain"
+}`;
+
+    try {
+      const client = getAnthropicClient(anthropicApiKey);
+      const msg = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      const raw = msg.content[0]?.text?.trim() || '{}';
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) return res.status(422).json({ error: 'LLM returned unparseable response' });
+      const parsed = JSON.parse(match[0]);
+      if (!parsed.definition) return res.status(422).json({ error: 'LLM response missing definition field' });
+      res.json({ definition: parsed.definition, source: parsed.source || '' });
+    } catch (err) {
+      console.error('[GENERATE-GLOSSARY-TERM]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.post('/scenarios/:id/glossary', (req, res) => {
     const scenario = repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
