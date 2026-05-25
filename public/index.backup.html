@@ -82,9 +82,9 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 @media(min-width:1024px){.featured-grid{grid-template-columns:repeat(3,1fr);grid-auto-rows:420px}}
 .fc-live .fc-title{font-size:clamp(18px,2.4vw,26px)}
 .fc-live .fc-desc{font-size:13px}
-.featured-card{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(160deg,#2a2420 0%,#0f0d08 100%);height:320px;display:block;text-decoration:none;color:inherit}
+.featured-card{position:relative;overflow:hidden;cursor:pointer;background:var(--dark-ash);height:320px;display:block;text-decoration:none;color:inherit}
 @media(min-width:600px){.featured-card{height:auto}}
-.fc-bg{position:absolute;inset:0;transition:transform .55s ease;z-index:0;background-image:linear-gradient(160deg,#292218 0%,#0e0c08 100%)}
+.fc-bg{position:absolute;inset:0;transition:transform .55s ease;z-index:0}
 .featured-card:hover .fc-bg{transform:scale(1.04)}
 .bg-apollo{background:linear-gradient(160deg,#0a0a1e,#10103a 45%,#1a1a50)}
 .bg-omaha{background:linear-gradient(160deg,#2a3010,#1a2008 50%,#0e1406)}
@@ -131,7 +131,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 @media(min-width:900px){.stories-grid{grid-template-columns:repeat(3,1fr)}}
 .story-card{background:#181512;cursor:pointer;display:flex;flex-direction:column;border-left:2px solid transparent;transition:background .22s,border-color .22s;overflow:hidden}
 .story-card:hover{background:#221e1a;border-left-color:var(--gold)}
-.story-card-img{width:100%;height:140px;background-image:linear-gradient(145deg,#1e1a16 0%,#0d0b09 100%);background-size:cover;background-position:center;filter:brightness(.5) sepia(.3);transition:filter .3s,transform .5s;flex-shrink:0}
+.story-card-img{width:100%;height:140px;background-size:cover;background-position:center;filter:brightness(.5) sepia(.3);transition:filter .3s,transform .5s;flex-shrink:0}
 .story-card:hover .story-card-img{filter:brightness(.6) sepia(.2);transform:scale(1.03)}
 .story-card-body{padding:clamp(16px,2.2vw,22px);display:flex;flex-direction:column;flex:1}
 .story-era{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:1;margin-bottom:7px}
@@ -192,9 +192,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 .reveal.visible{opacity:1;transform:none}
 .rd1{transition-delay:.08s}.rd2{transition-delay:.16s}.rd3{transition-delay:.24s}.rd4{transition-delay:.32s}.rd5{transition-delay:.4s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.featured-skip-link{display:none;position:absolute;top:16px;right:var(--pad-x);z-index:10;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);opacity:.55;text-decoration:none;transition:opacity .2s}
-.featured-skip-link:hover{opacity:.9}
-@media(min-width:601px){.featured-skip-link{display:block}}
 </style>
 </head>
 <body>
@@ -216,13 +213,12 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <div class="hero-rule"></div>
     <p class="hero-eyebrow">America 1776 &ndash; 2026 &nbsp;&middot;&nbsp; The 250th Anniversary</p>
     <h1 class="hero-title">You cannot change<br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
-    <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American crises across 250 years.</p><p class="hero-sub-inner" style="margin-top:10px">Choose a historical crisis. Step inside it as the person whose decisions shaped what happened next.</p></div>
+    <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American crises across 250 years.</p></div>
     <div class="hero-cta">
       <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary">Begin with Apollo 13 &rarr;</a>
       <a href="#scenarios" class="btn-ghost">Browse all scenarios</a>
     </div>
-    <p class="section-label" style="margin-top:clamp(36px,5vw,56px);opacity:0;animation:fadeUp .9s 1.0s forwards">WHAT THE SESSION TRACKS</p>
-    <div class="hero-ledger" style="margin-top:8px">
+    <div class="hero-ledger">
       <div class="lc"><div class="lc-val r">43.2 amp-hrs</div><div class="lc-label">Battery reserve at power-down</div></div>
       <div class="lc"><div class="lc-val a">38&deg;F</div><div class="lc-label">Cabin temp at splashdown</div></div>
       <div class="lc"><div class="lc-val a">72 hrs</div><div class="lc-label">Without adequate sleep</div></div>
@@ -230,20 +226,73 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     </div>
   </div>
 </section>
-<div class="stats-strip" style="grid-template-columns:repeat(3,1fr)">
-  <div class="stat-cell reveal rd1">
-    <p class="section-label" style="margin-bottom:10px">CHOOSE YOUR ROLE</p>
-    <p style="font-size:13px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">Each scenario offers 2&ndash;3 historical perspectives. Pick the one closest to the decision.</p>
+<section class="statement" id="about">
+  <div class="reveal">
+    <p class="statement-label">The premise</p>
+    <h2 class="statement-headline">Other experiences ask:<br>can you change the past?<br><em>We ask something harder.</em></h2>
+    <div class="statement-body">
+      <p>Apollo 13 returns safely. John Lewis reaches the other side of the bridge. The Woolworth counter holds. You know this before you begin.</p>
+      <p>What you don&rsquo;t know is the margin. How close to blackout did Armstrong get before he fired the thrusters? How many times did Lewis nearly break his discipline before the troopers charged?</p>
+      <p>The ledger doesn&rsquo;t track whether you win. It tracks what winning actually cost the people who did it. That&rsquo;s the history they don&rsquo;t put in the textbook.</p>
+    </div>
   </div>
-  <div class="stat-cell reveal rd2">
-    <p class="section-label" style="margin-bottom:10px">ACT UNDER PRESSURE</p>
-    <p style="font-size:13px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">30 minutes. Real constraints. The clock, the physics, and the people in the room don&rsquo;t wait.</p>
+  <div class="reveal rd2">
+    <div class="principle"><div class="principle-head">The macro-ledger is fixed</div><div class="principle-body">The crew of Apollo 13 survives. You cannot change this. The historical record is the record.</div></div>
+    <div class="principle"><div class="principle-head">The micro-ledger is yours</div><div class="principle-body">Your decisions determine the human cost of that survival &mdash; the physical toll, the psychological margin, the weight carried home.</div></div>
+    <div class="principle"><div class="principle-head">The shared fact ledger is real</div><div class="principle-body">Every number on screen comes from the historical record. NASA telemetry. Mission transcripts. Primary sources. Nothing is invented.</div></div>
+    <div class="principle"><div class="principle-head">The epilogue is the point</div><div class="principle-body">Every scenario closes with what the people in that room lived with afterward. Sourced. Documented. The part that usually gets left out.</div></div>
   </div>
-  <div class="stat-cell reveal rd3">
-    <p class="section-label" style="margin-bottom:10px">DISCOVER THE COST</p>
-    <p style="font-size:13px;line-height:1.6;color:var(--parchment);opacity:.88;font-family:'Barlow',sans-serif;font-weight:300">The outcome was fixed before you began. What wasn&rsquo;t fixed is what it took to get there.</p>
-  </div>
+</section>
+<div class="stats-strip">
+  <div class="stat-cell reveal rd1"><div class="stat-num">25</div><div class="stat-desc">Scenarios at launch</div></div>
+  <div class="stat-cell reveal rd2"><div class="stat-num">75</div><div class="stat-desc">Perspectives</div></div>
+  <div class="stat-cell reveal rd3"><div class="stat-num">250</div><div class="stat-desc">Years of the republic</div></div>
+  <div class="stat-cell reveal rd4"><div class="stat-num">0</div><div class="stat-desc">Rewritten outcomes</div></div>
 </div>
+<section class="ledger-featured" id="featured">
+  <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-hero-img reveal" style="display:block;text-decoration:none">
+    <canvas id="fc-hero-canvas" class="featured-hero-canvas"></canvas>
+    <div class="featured-hero-overlay"></div>
+    <div class="featured-hero-meta">
+      <div class="featured-hero-tag">Featured Scenario &nbsp;&middot;&nbsp; Apollo 13: Lifeboat &nbsp;&middot;&nbsp; April 13, 1970</div>
+      <span class="featured-hero-play">Enter the scenario &rarr;</span>
+    </div>
+  </a>
+  <div class="ledger-featured-body">
+    <div>
+      <p class="section-label reveal">Apollo 13: Lifeboat</p>
+      <h2 class="section-title reveal rd1" style="margin-bottom:1.5rem">You are Jack Swigert.<br>Main Bus B is gone.</h2>
+      <p style="font-size:15px;color:var(--parchment);opacity:.95;margin-bottom:1.5rem;font-family:'Barlow',sans-serif;line-height:1.65" class="reveal rd2">April 13, 1970 &nbsp;&middot;&nbsp; 200,000 miles from Earth &nbsp;&middot;&nbsp; The instrument panel is wet and the master alarm has gone silent.</p>
+      <blockquote style="border-left:2px solid var(--gold);padding-left:1.25rem;margin-bottom:1.75rem;font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--parchment);opacity:.95;line-height:1.65" class="reveal rd2">&ldquo;The instrument panel is wet. The master alarm cut out two minutes ago and the silence it left is worse.&rdquo;</blockquote>
+      <p class="section-label reveal rd2" style="margin-bottom:.75rem">Choose your position</p>
+      <div class="persp-list reveal rd3">
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=swigert';return false" class="persp-item"><div class="persp-dot" style="background:#6a9fd8"></div>Jack Swigert<span class="persp-role">Command Module Pilot</span></a>
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=lovell';return false" class="persp-item"><div class="persp-dot" style="background:#c9a84c"></div>Jim Lovell<span class="persp-role">Mission Commander</span></a>
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=kranz';return false" class="persp-item"><div class="persp-dot" style="background:#6a7a5a"></div>Gene Kranz<span class="persp-role">Flight Director, Houston</span></a>
+      </div>
+      <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary reveal rd4" style="display:inline-block">Enter the scenario &rarr;</a>
+    </div>
+    <div class="ledger-panel reveal rd2">
+      <div class="ledger-card">
+        <div class="lp-title">Shared fact ledger &mdash; live state</div>
+        <div class="lp-row"><span class="lp-key">Battery_Reserve</span><span class="lp-val r">43.2 amp-hrs &darr;</span></div>
+        <div class="lp-row"><span class="lp-key">Bus_A_Voltage</span><span class="lp-val r">25.5 V &darr;&darr;</span></div>
+        <div class="lp-row"><span class="lp-key">CO2_Partial_Pressure</span><span class="lp-val a">4.2 mmHg &uarr;</span></div>
+        <div class="lp-row"><span class="lp-key">LM_Aquarius</span><span class="lp-val g">Powering up</span></div>
+        <div class="lp-row"><span class="lp-key">Decision_Window</span><span class="lp-val r">04:08 remaining</span></div>
+        <div class="lp-note">Every number is drawn from NASA telemetry and mission transcripts. Your decisions are evaluated against historical margin &mdash; not survival, which is already guaranteed.</div>
+      </div>
+      <div class="ledger-card" style="margin-top:2px">
+        <div class="lp-title">What the ledger measures</div>
+        <div class="lp-row"><span class="lp-key">Crew_Physical_Margin</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">System_Stability_Cost</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">Psychological_Load</span><span class="lp-val a">Tracking</span></div>
+        <div class="lp-row"><span class="lp-key">Historical_Divergence</span><span class="lp-val g">Within bounds</span></div>
+        <div class="lp-note">The scenario does not ask if you save the crew. It asks at what cost &mdash; and compares your path to the one Swigert actually walked.</div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="section section--dark" id="scenarios">
   <div class="section-header reveal">
     <div><p class="section-label">Open Now</p><h2 class="section-title">Four scenarios open now</h2></div>
@@ -300,74 +349,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
       </div>
     </a>
-  </div>
-</section>
-<section class="statement" id="about">
-  <div class="reveal">
-    <p class="statement-label">The premise</p>
-    <h2 class="statement-headline">Other experiences ask:<br>can you change the past?<br><em>We ask something harder.</em></h2>
-    <div class="statement-body">
-      <p>Apollo 13 returns safely. John Lewis reaches the other side of the bridge. The Woolworth counter holds. You know this before you begin.</p>
-      <p>What you don&rsquo;t know is the margin. How close to blackout did Armstrong get before he fired the thrusters? How many times did Lewis nearly break his discipline before the troopers charged?</p>
-      <p>The ledger doesn&rsquo;t track whether you win. It tracks what winning actually cost the people who did it. That&rsquo;s the history they don&rsquo;t put in the textbook.</p>
-    </div>
-  </div>
-  <div class="reveal rd2">
-    <div class="principle"><div class="principle-head">The macro-ledger is fixed</div><div class="principle-body">The crew of Apollo 13 survives. You cannot change this. The historical record is the record.</div></div>
-    <div class="principle"><div class="principle-head">The micro-ledger is yours</div><div class="principle-body">Your decisions determine the human cost of that survival &mdash; the physical toll, the psychological margin, the weight carried home.</div></div>
-    <div class="principle"><div class="principle-head">The shared fact ledger is real</div><div class="principle-body">Every number on screen comes from the historical record. NASA telemetry. Mission transcripts. Primary sources. Nothing is invented.</div></div>
-    <div class="principle"><div class="principle-head">The epilogue is the point</div><div class="principle-body">Every scenario closes with what the people in that room lived with afterward. Sourced. Documented. The part that usually gets left out.</div></div>
-  </div>
-</section>
-<div class="stats-strip">
-  <div class="stat-cell reveal rd1"><div class="stat-num">25</div><div class="stat-desc">Scenarios at launch</div></div>
-  <div class="stat-cell reveal rd2"><div class="stat-num">75</div><div class="stat-desc">Perspectives</div></div>
-  <div class="stat-cell reveal rd3"><div class="stat-num">250</div><div class="stat-desc">Years of the republic</div></div>
-  <div class="stat-cell reveal rd4"><div class="stat-num">0</div><div class="stat-desc">Rewritten outcomes</div></div>
-</div>
-<section class="ledger-featured" id="featured" style="position:relative">
-  <a href="#scenarios" class="featured-skip-link">Skip to scenarios ↓</a>
-  <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-hero-img reveal" style="display:block;text-decoration:none">
-    <canvas id="fc-hero-canvas" class="featured-hero-canvas"></canvas>
-    <div class="featured-hero-overlay"></div>
-    <div class="featured-hero-meta">
-      <div class="featured-hero-tag">Featured Scenario &nbsp;&middot;&nbsp; Apollo 13: Lifeboat &nbsp;&middot;&nbsp; April 13, 1970</div>
-      <span class="featured-hero-play">Enter the scenario &rarr;</span>
-    </div>
-  </a>
-  <div class="ledger-featured-body">
-    <div>
-      <p class="section-label reveal">Apollo 13: Lifeboat</p>
-      <h2 class="section-title reveal rd1" style="margin-bottom:1.5rem">You are Jack Swigert.<br>Main Bus B is gone.</h2>
-      <p style="font-size:15px;color:var(--parchment);opacity:.95;margin-bottom:1.5rem;font-family:'Barlow',sans-serif;line-height:1.65" class="reveal rd2">April 13, 1970 &nbsp;&middot;&nbsp; 200,000 miles from Earth &nbsp;&middot;&nbsp; The instrument panel is wet and the master alarm has gone silent.</p>
-      <blockquote style="border-left:2px solid var(--gold);padding-left:1.25rem;margin-bottom:1.75rem;font-family:'Cormorant Garamond',serif;font-size:19px;font-style:italic;color:var(--parchment);opacity:.95;line-height:1.65" class="reveal rd2">&ldquo;The instrument panel is wet. The master alarm cut out two minutes ago and the silence it left is worse.&rdquo;</blockquote>
-      <p class="section-label reveal rd2" style="margin-bottom:.75rem">Choose your position</p>
-      <div class="persp-list reveal rd3">
-        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=swigert';return false" class="persp-item"><div class="persp-dot" style="background:#6a9fd8"></div>Jack Swigert<span class="persp-role">Command Module Pilot</span></a>
-        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=lovell';return false" class="persp-item"><div class="persp-dot" style="background:#c9a84c"></div>Jim Lovell<span class="persp-role">Mission Commander</span></a>
-        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat&character=kranz';return false" class="persp-item"><div class="persp-dot" style="background:#6a7a5a"></div>Gene Kranz<span class="persp-role">Flight Director, Houston</span></a>
-      </div>
-      <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary reveal rd4" style="display:inline-block">Enter the scenario &rarr;</a>
-    </div>
-    <div class="ledger-panel reveal rd2">
-      <div class="ledger-card">
-        <div class="lp-title">Shared fact ledger &mdash; live state</div>
-        <div class="lp-row"><span class="lp-key">Battery_Reserve</span><span class="lp-val r">43.2 amp-hrs &darr;</span></div>
-        <div class="lp-row"><span class="lp-key">Bus_A_Voltage</span><span class="lp-val r">25.5 V &darr;&darr;</span></div>
-        <div class="lp-row"><span class="lp-key">CO2_Partial_Pressure</span><span class="lp-val a">4.2 mmHg &uarr;</span></div>
-        <div class="lp-row"><span class="lp-key">LM_Aquarius</span><span class="lp-val g">Powering up</span></div>
-        <div class="lp-row"><span class="lp-key">Decision_Window</span><span class="lp-val r">04:08 remaining</span></div>
-        <div class="lp-note">Every number is drawn from NASA telemetry and mission transcripts. Your decisions are evaluated against historical margin &mdash; not survival, which is already guaranteed.</div>
-      </div>
-      <div class="ledger-card" style="margin-top:2px">
-        <div class="lp-title">What the ledger measures</div>
-        <div class="lp-row"><span class="lp-key">Crew_Physical_Margin</span><span class="lp-val a">Tracking</span></div>
-        <div class="lp-row"><span class="lp-key">System_Stability_Cost</span><span class="lp-val a">Tracking</span></div>
-        <div class="lp-row"><span class="lp-key">Psychological_Load</span><span class="lp-val a">Tracking</span></div>
-        <div class="lp-row"><span class="lp-key">Historical_Divergence</span><span class="lp-val g">Within bounds</span></div>
-        <div class="lp-note">The scenario does not ask if you save the crew. It asks at what cost &mdash; and compares your path to the one Swigert actually walked.</div>
-      </div>
-    </div>
   </div>
 </section>
 <section class="section section--mid" id="categories">
