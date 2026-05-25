@@ -223,64 +223,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     </div>
   </div>
 </section>
-<section class="section section--dark" id="scenarios" style="padding-top:48px">
-  <div class="section-header reveal">
-    <div><p class="section-label">Open Now</p><h2 class="section-title">Four scenarios open now</h2></div>
-    <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
-  </div>
-  <div class="featured-grid">
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live" id="fc-card-apollo">
-      <div class="fc-bg bg-apollo" id="fc-apollo"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">Space &middot; April 1970</p>
-        <h3 class="fc-title">Apollo 13: Lifeboat</h3>
-        <p class="fc-desc">Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.</p>
-        <p class="fc-cost">Cost tracked: battery reserve, crew physical margin</p>
-        <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live" id="fc-card-dgs">
-      <div class="fc-bg bg-omaha" id="fc-omaha"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">World War II &middot; June 6, 1944</p>
-        <h3 class="fc-title">Dog Green Sector</h3>
-        <p class="fc-desc">The ramp drops. The gap in the wire is yours to find &mdash; if it exists at all. 300 yards of open water between you and the seawall.</p>
-        <p class="fc-cost">Cost tracked: physical survival margin, unit cohesion</p>
-        <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live" id="fc-card-greensboro">
-      <div class="fc-bg bg-civil" id="fc-greensboro"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">Civil Rights &middot; February 1, 1960</p>
-        <h3 class="fc-title">Greensboro Four: The Color Line</h3>
-        <p class="fc-desc">Four students have occupied the lunch counter at Woolworth&rsquo;s on South Elm Street. Service has been refused. They are not leaving.</p>
-        <p class="fc-cost">Cost tracked: psychological discipline under provocation</p>
-        <div class="fc-meta"><span class="meta-pill">Ezell Blair Jr.</span><span class="meta-pill">Franklin McCain</span><span class="meta-pill">Joseph McNeil</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live" id="fc-card-sargasso">
-      <div class="fc-bg bg-sub" id="fc-sargasso"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">Cuban Missile Crisis &middot; October 27, 1962</p>
-        <h3 class="fc-title">Sargasso Deep: The Three Keys</h3>
-        <p class="fc-desc">B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.</p>
-        <p class="fc-cost">Cost tracked: command authority, oxygen, heat exhaustion</p>
-        <div class="fc-meta"><span class="meta-pill">Hydroacoustic Officer</span><span class="meta-pill">Second-in-Command</span><span class="meta-pill">USS Cony captain</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=triangle_shirtwaist';return false" class="featured-card fc-small">
-      <div class="fc-bg bg-fire" id="fc-fire"></div>
-      <div class="fc-inner">
-        <p class="fc-tag">Labor &amp; Society &middot; Mar 1911</p>
-        <h3 class="fc-title">Triangle Shirtwaist Fire</h3>
-        <p class="fc-desc">The door is locked from outside. The smoke is rising.</p>
-        <p class="fc-cost">Cost tracked: seconds to decision</p>
-        <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
-      </div>
-    </a>
-  </div>
-</section>
 <div style="border-top:1px solid rgba(245,240,232,.06);border-bottom:1px solid rgba(245,240,232,.06);background:#0a0807">
   <p class="section-label" style="padding:clamp(16px,2.5vw,24px) var(--pad-x) clamp(8px,1.2vw,12px)">WHAT YOU ARE STEPPING INTO</p>
   <div style="display:grid;grid-template-columns:repeat(3,1fr)">
@@ -355,6 +297,64 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <div class="stat-cell reveal rd3"><div class="stat-num">250</div><div class="stat-desc">Years of American history</div></div>
   <div class="stat-cell reveal rd4"><div class="stat-num">1,514</div><div class="stat-desc">Lives in the historical record</div></div>
 </div>
+<section class="section section--dark" id="scenarios">
+  <div class="section-header reveal">
+    <div><p class="section-label">Open Now</p><h2 class="section-title">Four scenarios open now</h2></div>
+    <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
+  </div>
+  <div class="featured-grid">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live" id="fc-card-apollo">
+      <div class="fc-bg bg-apollo" id="fc-apollo"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Space &middot; April 1970</p>
+        <h3 class="fc-title">Apollo 13: Lifeboat</h3>
+        <p class="fc-desc">Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.</p>
+        <p class="fc-cost">Cost tracked: battery reserve, crew physical margin</p>
+        <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live" id="fc-card-dgs">
+      <div class="fc-bg bg-omaha" id="fc-omaha"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">World War II &middot; June 6, 1944</p>
+        <h3 class="fc-title">Dog Green Sector</h3>
+        <p class="fc-desc">The ramp drops. The gap in the wire is yours to find &mdash; if it exists at all. 300 yards of open water between you and the seawall.</p>
+        <p class="fc-cost">Cost tracked: physical survival margin, unit cohesion</p>
+        <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live" id="fc-card-greensboro">
+      <div class="fc-bg bg-civil" id="fc-greensboro"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Civil Rights &middot; February 1, 1960</p>
+        <h3 class="fc-title">Greensboro Four: The Color Line</h3>
+        <p class="fc-desc">Four students have occupied the lunch counter at Woolworth&rsquo;s on South Elm Street. Service has been refused. They are not leaving.</p>
+        <p class="fc-cost">Cost tracked: psychological discipline under provocation</p>
+        <div class="fc-meta"><span class="meta-pill">Ezell Blair Jr.</span><span class="meta-pill">Franklin McCain</span><span class="meta-pill">Joseph McNeil</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live" id="fc-card-sargasso">
+      <div class="fc-bg bg-sub" id="fc-sargasso"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Cuban Missile Crisis &middot; October 27, 1962</p>
+        <h3 class="fc-title">Sargasso Deep: The Three Keys</h3>
+        <p class="fc-desc">B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.</p>
+        <p class="fc-cost">Cost tracked: command authority, oxygen, heat exhaustion</p>
+        <div class="fc-meta"><span class="meta-pill">Hydroacoustic Officer</span><span class="meta-pill">Second-in-Command</span><span class="meta-pill">USS Cony captain</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=triangle_shirtwaist';return false" class="featured-card fc-small">
+      <div class="fc-bg bg-fire" id="fc-fire"></div>
+      <div class="fc-inner">
+        <p class="fc-tag">Labor &amp; Society &middot; Mar 1911</p>
+        <h3 class="fc-title">Triangle Shirtwaist Fire</h3>
+        <p class="fc-desc">The door is locked from outside. The smoke is rising.</p>
+        <p class="fc-cost">Cost tracked: seconds to decision</p>
+        <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
+      </div>
+    </a>
+  </div>
+</section>
 <section class="statement" id="about">
   <div class="reveal">
     <p class="statement-label">The premise</p>
