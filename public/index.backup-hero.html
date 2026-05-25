@@ -23,14 +23,14 @@ html{scroll-behavior:smooth}
 body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.3;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")}
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background-image:linear-gradient(to bottom,rgba(13,11,8,.96) 0%,transparent 100%);background-color:transparent;transition:background-color .2s ease}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;white-space:nowrap;transition:opacity .2s ease}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;white-space:nowrap}
 .nav-links{display:flex;gap:clamp(14px,2.5vw,32px);list-style:none;align-items:center}
 .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.20em;text-transform:uppercase;color:var(--parchment);opacity:.95;text-decoration:none;transition:opacity .2s;white-space:nowrap}
 .nav-links a:hover{opacity:1}
 .nav-cta{opacity:.9!important;color:var(--gold-light)!important}
 @media(max-width:600px){.nav-hide{display:none}}
 .nav-scrolled{background-color:#0a0a08}
-.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-start;padding:0 var(--pad-x) clamp(52px,9vh,96px);overflow:hidden}
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 var(--pad-x) clamp(52px,9vh,96px);overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:#0c0a08}
 .hero-bg canvas{position:absolute;inset:0;width:100%;height:100%}
 .hero-content{position:relative;max-width:860px}
@@ -41,8 +41,6 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .hero-sub{margin-top:clamp(16px,3vw,28px);font-size:clamp(14px,1.8vw,16px);line-height:1.65;color:var(--parchment);opacity:0;max-width:520px;animation:fadeUp .9s .75s forwards}
 .hero-sub-inner{opacity:1}
 .hero-cta{margin-top:clamp(24px,4vw,40px);display:flex;flex-wrap:wrap;gap:12px;opacity:0;animation:fadeUp .9s .95s forwards}
-.hero-display-rule{width:40px;height:1px;background:var(--gold-light);border:none;margin:0 0 16px;opacity:0;animation:fadeUp .9s .05s forwards}
-.hero-display-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(48px,6vw,64px);font-weight:300;line-height:1;color:var(--gold-light);letter-spacing:-.01em;margin-bottom:clamp(16px,2.5vw,24px);opacity:0;animation:fadeUp .9s .1s forwards}
 .hero-ledger{margin-top:clamp(36px,5vw,56px);display:grid;grid-template-columns:repeat(4,1fr);border:1px solid rgba(196,154,60,.18);opacity:0;animation:fadeUp .9s 1.1s forwards}
 .lc{padding:1rem 1.25rem;border-right:1px solid rgba(196,154,60,.12);background:rgba(22,18,12,.6)}
 .lc:last-child{border-right:none}
@@ -210,13 +208,13 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <li><a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="nav-cta">Enter the ledger &rarr;</a></li>
   </ul>
 </nav>
-<section class="hero" style="padding-bottom:16px;padding-top:clamp(72px,9vh,96px)">
+<section class="hero" style="padding-bottom:16px">
   <div class="hero-bg">
     <canvas id="hero-canvas"></canvas>
+    <canvas id="hero-montage" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
   </div>
   <div class="hero-content">
-    <div class="hero-display-rule"></div>
-    <p class="hero-display-logo">Ledger 250</p>
+    <div class="hero-rule"></div>
     <p class="hero-eyebrow">America 1776 &ndash; 2026 &nbsp;&middot;&nbsp; The 250th Anniversary</p>
     <h1 class="hero-title">You cannot change<br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
     <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American moments across 250 years.</p><p class="hero-sub-inner" style="margin-top:10px">Choose a historical moment. Step inside it as the person whose decisions shaped what happened next.</p></div>
@@ -518,6 +516,28 @@ function drawHero(){
   const hg=ctx.createRadialGradient(w*.5,h*.58,0,w*.5,h*.58,w*.55);hg.addColorStop(0,'rgba(196,154,60,.10)');hg.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=hg;ctx.fillRect(0,0,w,h);
   const bv=ctx.createLinearGradient(0,h*.18,0,h);bv.addColorStop(0,'rgba(5,4,2,0)');bv.addColorStop(.55,'rgba(5,4,2,.55)');bv.addColorStop(1,'rgba(5,4,2,.92)');ctx.fillStyle=bv;ctx.fillRect(0,0,w,h);
 }
+function drawHeroMontage(){
+  const mc=document.getElementById('hero-montage');if(!mc)return;
+  mc.width=window.innerWidth;mc.height=window.innerHeight;
+  const ctx=mc.getContext('2d'),w=mc.width,h=mc.height;
+  const scale=Math.min(w,h)*.0015;
+  const rH=h*.40*scale;const rW=13*scale;const rCx=w*.86;const rBase=h*.73;const rTop=rBase-rH;
+  const fl=ctx.createRadialGradient(rCx,rBase,0,rCx,rBase,rW*18);fl.addColorStop(0,'rgba(196,154,60,.13)');fl.addColorStop(.4,'rgba(196,154,60,.04)');fl.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=fl;ctx.fillRect(rCx-rW*18,rBase-rW*4,rW*36,rW*22);
+  ctx.fillStyle='rgba(255,190,50,.55)';ctx.beginPath();ctx.moveTo(rCx-rW*.7,rBase);ctx.lineTo(rCx,rBase+rW*5);ctx.lineTo(rCx+rW*.7,rBase);ctx.fill();
+  ctx.fillStyle='rgba(255,230,130,.45)';ctx.beginPath();ctx.moveTo(rCx-rW*.3,rBase);ctx.lineTo(rCx,rBase+rW*2.5);ctx.lineTo(rCx+rW*.3,rBase);ctx.fill();
+  ctx.fillStyle='rgba(80,65,45,.55)';ctx.fillRect(rCx-rW*5.5,rTop*.98,rW*.8,rBase-rTop*.98);
+  for(let i=0;i<6;i++){ctx.fillStyle='rgba(80,65,45,.35)';ctx.fillRect(rCx-rW*5.5,rTop*.98+i*((rBase-rTop*.98)/6),rW*.8,1);}
+  ctx.fillStyle='rgba(70,55,35,.45)';ctx.fillRect(rCx-rW*5.2,rTop+rH*.42,rW*4.9,rW*.55);
+  ctx.fillStyle='rgba(50,40,25,.5)';ctx.fillRect(rCx-rW*6,rBase,rW*12,rW*1.5);
+  ctx.fillStyle='rgba(220,210,195,.28)';ctx.fillRect(rCx-rW,rBase-rH*.44,rW*2,rH*.44);
+  ctx.fillStyle='rgba(30,20,10,.4)';ctx.fillRect(rCx-rW,rBase-rH*.44,rW*2,rW*.3);
+  const s2=rW*.88;ctx.fillStyle='rgba(210,200,185,.24)';ctx.fillRect(rCx-s2,rBase-rH*.68,s2*2,rH*.24);ctx.fillStyle='rgba(30,20,10,.35)';ctx.fillRect(rCx-s2,rBase-rH*.68,s2*2,rW*.25);
+  const s3=rW*.76;ctx.fillStyle='rgba(195,185,170,.2)';ctx.fillRect(rCx-s3,rBase-rH*.82,s3*2,rH*.14);ctx.fillStyle='rgba(30,20,10,.3)';ctx.fillRect(rCx-s3,rBase-rH*.82,s3*2,rW*.2);
+  const smW=rW*.65;ctx.fillStyle='rgba(180,170,155,.18)';ctx.beginPath();ctx.moveTo(rCx-smW,rBase-rH*.9);ctx.lineTo(rCx,rBase-rH*.955);ctx.lineTo(rCx+smW,rBase-rH*.9);ctx.fill();
+  ctx.fillStyle='rgba(60,50,35,.35)';ctx.fillRect(rCx-rW*.06,rTop,rW*.12,rH*.06);
+  const rv=ctx.createLinearGradient(w*.62,0,w,0);rv.addColorStop(0,'rgba(5,4,2,0)');rv.addColorStop(.55,'rgba(5,4,2,.25)');rv.addColorStop(1,'rgba(5,4,2,.82)');ctx.fillStyle=rv;ctx.fillRect(w*.62,0,w*.38,h);
+  const bv=ctx.createLinearGradient(0,h*.6,0,h);bv.addColorStop(0,'rgba(5,4,2,0)');bv.addColorStop(.6,'rgba(5,4,2,.65)');bv.addColorStop(1,'rgba(5,4,2,.95)');ctx.fillStyle=bv;ctx.fillRect(w*.58,0,w*.42,h);
+}
 function drawImages(){
   Object.entries(SCENES).forEach(([key,painter])=>{const el=document.getElementById(key);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(400,220,painter)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';});
   const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-sargasso':SCENES['ci-political'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
@@ -545,10 +565,9 @@ function renderGrid(cat){
 function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat)}
 function filterTo(cat){document.getElementById('all-scenarios').scrollIntoView({behavior:'smooth'});const btn=[...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.toLowerCase().includes(cat.slice(0,4)));if(btn)filterStories(cat,btn)}
 function initReveal(){const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))}
-window.addEventListener('DOMContentLoaded',()=>{drawHero();drawFeaturedHero();drawImages();renderGrid('all');initReveal();initNavLogo();});
-window.addEventListener('resize',()=>{drawHero();drawFeaturedHero();});
+window.addEventListener('DOMContentLoaded',()=>{drawHero();drawHeroMontage();drawFeaturedHero();drawImages();renderGrid('all');initReveal();});
+window.addEventListener('resize',()=>{drawHero();drawHeroMontage();drawFeaturedHero();});
 window.addEventListener('scroll',()=>{const nav=document.querySelector('.nav');if(window.scrollY>10){nav.classList.add('nav-scrolled')}else{nav.classList.remove('nav-scrolled')}});
-function initNavLogo(){const displayLogo=document.querySelector('.hero-display-logo');const navWordmark=document.querySelector('.nav-logo');if(!displayLogo||!navWordmark)return;const obs=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){navWordmark.style.opacity='0';navWordmark.style.pointerEvents='none'}else{navWordmark.style.opacity='1';navWordmark.style.pointerEvents='auto'}})},{threshold:0});obs.observe(displayLogo)}
 </script>
 </body>
 </html>
