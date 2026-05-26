@@ -65,7 +65,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <li class="nav-hide"><a href="/#scenarios">Scenarios</a></li>
     <li class="nav-hide"><a href="/categories" style="color:var(--gold-light)">Categories</a></li>
     <li class="nav-hide"><a href="/#educators">Educators</a></li>
-    <li><a href="#" id="nav-enter" class="nav-cta">Enter the ledger &rarr;</a></li>
+    <li><a href="/categories" class="nav-cta">Enter the ledger &rarr;</a></li>
   </ul>
 </nav>
 <div class="page-header">
@@ -88,7 +88,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 <script type="module">
 import { renderScenarioCard } from '/js/scenario-card.js';
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
-document.getElementById('nav-enter').onclick=e=>{e.preventDefault();location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat'};
 (async()=>{
   const res=await fetch('/api/stories');
   const all=await res.json();
