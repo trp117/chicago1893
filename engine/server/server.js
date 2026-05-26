@@ -120,6 +120,80 @@ app.get('/categories/', (_, res) => res.sendFile(path.join(publicDir, 'categorie
   app.get(`/categories/${slug}/`, (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
 });
 
+// TEMPORARY — remove after Supabase connection is confirmed
+app.get('/admin/supabase-test', async (req, res) => {
+  try {
+    const { createClient } = await import('@supabase/supabase-js')
+
+    const url = process.env.SUPABASE_URL
+    const key = process.env.SUPABASE_SERVICE_KEY
+
+    if (!url || !key) {
+      return res.json({
+        status: 'fail',
+        reason: 'Missing environment variables',
+        SUPABASE_URL: url ? 'set' : 'MISSING',
+        SUPABASE_SERVICE_KEY: key ? 'set' : 'MISSING'
+      })
+    }
+
+    const supabase = createClient(url, key, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    })
+
+    const { data, error } = await supabase
+      .from('scenarios')
+      .select('id')
+      .limit(1)
+
+    if (error) {
+      return res.json({
+        status: 'fail',
+        reason: 'Query failed',
+        error: error.message,
+        hint: error.hint || null,
+        SUPABASE_URL: url.substring(0, 30) + '...'
+      })
+    }
+
+    const testId = '_connection_test_' + Date.now()
+
+    const { error: insertError } = await supabase
+      .from('scenarios')
+      .insert({
+        id: testId,
+        title: 'Connection test',
+        content: { test: true },
+        current_version: 1
+      })
+
+    if (insertError) {
+      return res.json({
+        status: 'fail',
+        reason: 'Write test failed',
+        error: insertError.message
+      })
+    }
+
+    await supabase.from('scenarios').delete().eq('id', testId)
+
+    return res.json({
+      status: 'ok',
+      message: 'Supabase connection confirmed. Read and write both working.',
+      SUPABASE_URL: url.substring(0, 30) + '...',
+      scenarios_table: 'accessible',
+      write_test: 'passed'
+    })
+
+  } catch (err) {
+    return res.json({
+      status: 'fail',
+      reason: 'Unexpected error',
+      error: err.message
+    })
+  }
+})
+
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
 app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
 app.get('/admin/pipeline.html', (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
