@@ -579,7 +579,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         method: 'POST', signal,
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
-          model: MODEL, max_tokens: 900, temperature: 0.8, stream: true,
+          model: MODEL, max_tokens: 1600, temperature: 0.8, stream: true,
           system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
           messages: [{ role: 'user', content: prompt }]
         })
@@ -717,7 +717,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       const endingSignals = checkEndingReadiness(state, scenario);
       const mightEnd      = endingSignals.readyForClimax || (state.namedConspirators || []).length >= 1;
       const isLateGame    = (state.remainingMinutes <= 7 && state.remainingMinutes > 0) || state.elapsedMinutes >= (scenario.sessionTargetMinutes * 0.75);
-      const maxToks       = isEndingTurn ? 2000 : mightEnd ? 1800 : isLateGame ? 1400 : 900;
+      const maxToks       = isEndingTurn ? 2000 : mightEnd ? 1800 : isLateGame ? 1400 : 1600;
 
       const turnTrace  = langfuse?.trace({ name: 'turn', sessionId, input: { playerInput, location: state.location, act: state.act, elapsedMinutes: state.elapsedMinutes, scenarioId: state.scenarioId } });
       const traceTags  = [];

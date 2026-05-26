@@ -1344,7 +1344,9 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     const preservedGlossary = gameState.glossary;
     gameState = nextState;
     gameState.discoveredFacts = preservedFacts || [...(gameState.playerStartingKnowledge || [])];
-    gameState.glossary = preservedGlossary || [];
+    if (!gameState.glossary?.length && preservedGlossary?.length) {
+      gameState.glossary = preservedGlossary;
+    }
 
     conversationHistory.push(
       { role: 'user',      content: playerInput },
@@ -2234,7 +2236,7 @@ function buildClientInitialState(scenario, role) {
     playerAccessLevel:       role.accessLevel || 'staff',
     playerStartingKnowledge: role.startingKnowledge || [],
     discoveredFacts:         [...(role.startingKnowledge || [])],
-    glossary:                [],
+    glossary:                scenario.glossary || [],
     location:                startLoc,
     visitedLocations:        [startLoc],
     elapsedMinutes:          0,
