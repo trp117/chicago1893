@@ -145,6 +145,14 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .story-pills{display:flex;gap:6px;flex-wrap:wrap}
 .story-arrow{width:26px;height:26px;border:1px solid rgba(245,240,232,.13);display:flex;align-items:center;justify-content:center;opacity:0;flex-shrink:0;transition:opacity .2s}
 .story-card:hover .story-arrow{opacity:1}
+.hero-inner{display:flex;align-items:flex-start;gap:clamp(24px,4vw,48px);width:100%;padding-top:clamp(56px,6vh,72px)}
+.hero-inner .hero-content{flex:0 0 55%;min-width:0;max-width:none}
+.hero-right{flex:1;min-width:0;opacity:0;animation:fadeUp .9s 1.1s forwards}
+.hero-feat-card{background:#181512;border-left:2px solid rgba(196,154,60,.3);overflow:hidden;width:100%;display:flex;flex-direction:column}
+.hero-feat-img{width:100%;height:280px;background:linear-gradient(to bottom,#0e0e28 0%,#040410 100%);background-size:cover;background-position:center;position:relative;flex-shrink:0}
+.hero-feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,4,.95) 0%,rgba(8,6,4,.3) 60%,transparent 100%);pointer-events:none}
+.hero-feat-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.4vw,16px);font-style:italic;line-height:1.6;color:var(--parchment);opacity:.88;margin-bottom:clamp(14px,1.8vw,20px)}
+@media(max-width:768px){.hero-inner{flex-direction:column}.hero-inner .hero-content,.hero-right{flex:none;width:100%}}
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,32px)}
 .filter-btn{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:6px 16px;border:1px solid rgba(245,240,232,.2);background:transparent;color:var(--parchment);opacity:.92;cursor:pointer;transition:all .2s}
 .filter-btn:hover{opacity:.9;border-color:rgba(196,154,60,.4)}
@@ -210,19 +218,41 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <li><a href="/categories" class="nav-cta">Enter the ledger &rarr;</a></li>
   </ul>
 </nav>
-<section class="hero" style="padding-bottom:16px;padding-top:clamp(56px,6vh,72px)">
+<section class="hero" style="padding-bottom:16px">
   <div class="hero-bg">
     <canvas id="hero-canvas"></canvas>
   </div>
-  <div class="hero-content">
-    <div class="hero-display-rule"></div>
-    <p class="hero-display-logo">Ledger 250</p>
-    <p class="hero-eyebrow">America 1776 &ndash; 2026 &nbsp;&middot;&nbsp; The 250th Anniversary</p>
-    <h1 class="hero-title">You cannot change<br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
-    <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American moments across 250 years.</p><p class="hero-sub-inner" style="margin-top:10px">Choose a historical moment. Step inside it as the person whose decisions shaped what happened next.</p></div>
-    <div class="hero-cta">
-      <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary">Begin with Apollo 13 &rarr;</a>
-      <a href="#scenarios" class="btn-ghost">Browse all scenarios</a>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-display-rule"></div>
+      <p class="hero-display-logo">Ledger 250</p>
+      <p class="hero-eyebrow">America 1776 &ndash; 2026 &nbsp;&middot;&nbsp; The 250th Anniversary</p>
+      <h1 class="hero-title">You cannot change<br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
+      <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American moments across 250 years.</p><p class="hero-sub-inner" style="margin-top:10px">Choose a historical moment. Step inside it as the person whose decisions shaped what happened next.</p></div>
+      <div class="hero-cta">
+        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary">Begin with Apollo 13 &rarr;</a>
+        <a href="#scenarios" class="btn-ghost">Browse all scenarios</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-feat-card" style="cursor:pointer" onclick="location.href=BASE_URL+'/game?scenarioId='+HERO_FEATURED_SCENARIO_ID">
+        <div class="hero-feat-img" id="hero-feat-img-el">
+          <div class="hero-feat-overlay"></div>
+        </div>
+        <div class="story-card-body">
+          <p class="story-era" id="hero-feat-era">Space &middot; April 1970</p>
+          <h3 class="story-title">Apollo 13: Lifeboat</h3>
+          <p class="hero-feat-quote">&ldquo;Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.&rdquo;</p>
+          <div style="margin-top:clamp(14px,2vw,20px)"><span class="btn-primary">Enter this scenario &rarr;</span></div>
+          <div class="story-footer" style="margin-top:clamp(14px,2vw,20px)">
+            <div class="story-pills" id="hero-feat-pills">
+              <span class="meta-pill">Jack Swigert</span>
+              <span class="meta-pill">Jim Lovell</span>
+              <span class="meta-pill">Gene Kranz</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -436,6 +466,8 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </footer>
 <script>
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+// Change this ID to feature a different scenario in the hero.
+const HERO_FEATURED_SCENARIO_ID='apollo_13_lifeboat';
 const STORIES=[
   {id:'apollo_13_lifeboat',cat:'space',era:'Space Race',year:'Apr 13, 1970',title:'Apollo 13: Lifeboat',hook:'Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.',cost:'Battery reserve, crew physical margin',perspectives:['Jack Swigert','Jim Lovell','Gene Kranz'],scene:'ci-space'},
   {id:'gemini8',cat:'space',era:'Space Race',year:'Mar 16, 1966',title:'Gemini 8: The Tumble',hook:'One revolution per second. Vision tunneling. Armstrong must fire the thrusters before the craft disintegrates.',cost:'G-force tolerance, abort window',perspectives:['Neil Armstrong','David Scott','Capcom'],scene:'ci-space'},
@@ -513,10 +545,22 @@ function drawImages(){
 let _renderCard=null,_storiesCache=null;
 async function renderGrid(cat){
   if(!_renderCard){const m=await import('/js/scenario-card.js');_renderCard=m.renderScenarioCard;}
+  const firstLoad=!_storiesCache;
   if(!_storiesCache){const r=await fetch('/api/stories');_storiesCache=await r.json();}
+  if(firstLoad)updateHeroFeatured(_storiesCache);
   const grid=document.getElementById('stories-grid');
   const items=cat==='all'?_storiesCache:_storiesCache.filter(s=>s.category===cat);
   grid.innerHTML=items.map(s=>_renderCard(s,{baseUrl:BASE_URL})).join('');
+}
+function updateHeroFeatured(stories){
+  const s=stories.find(x=>x.id===HERO_FEATURED_SCENARIO_ID);
+  if(!s)return;
+  const imgEl=document.getElementById('hero-feat-img-el');
+  if(imgEl&&s.image_url)imgEl.style.backgroundImage=`url('${s.image_url}')`;
+  const pillsEl=document.getElementById('hero-feat-pills');
+  if(pillsEl&&s.roles&&s.roles.length){pillsEl.innerHTML=s.roles.map(r=>`<span class="meta-pill">${r}</span>`).join('');}
+  const eraEl=document.getElementById('hero-feat-era');
+  if(eraEl&&s.era)eraEl.textContent=s.era;
 }
 function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat);}
 function filterTo(cat){
