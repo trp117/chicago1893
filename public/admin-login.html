@@ -37,9 +37,7 @@
       color: #e8e4da;
       margin-bottom: 32px;
     }
-    .field {
-      margin-bottom: 20px;
-    }
+    .field { margin-bottom: 20px; }
     label {
       display: block;
       font-size: 11px;
@@ -60,10 +58,8 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    input:focus {
-      border-color: #c9a84c;
-    }
-    button {
+    input:focus { border-color: #c9a84c; }
+    .btn-primary {
       width: 100%;
       padding: 12px;
       background: #c9a84c;
@@ -78,8 +74,24 @@
       margin-top: 8px;
       transition: background 0.15s;
     }
-    button:hover { background: #d4b660; }
-    button:disabled { background: #444; cursor: not-allowed; }
+    .btn-primary:hover { background: #d4b660; }
+    .btn-primary:disabled { background: #444; cursor: not-allowed; }
+    .btn-ghost {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      color: #888780;
+      border: 1px solid #2a2a26;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-ghost:hover { color: #e8e4da; border-color: #444; }
+    .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
     .error {
       font-size: 13px;
       color: #e05555;
@@ -87,31 +99,78 @@
       display: none;
     }
     .error.visible { display: block; }
+    .success {
+      font-size: 13px;
+      color: #4ade80;
+      margin-top: 16px;
+      display: none;
+    }
+    .success.visible { display: block; }
+    .back-link {
+      font-size: 12px;
+      color: #c9a84c;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-top: 20px;
+      display: block;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .panel { display: none; }
+    .panel.active { display: block; }
   </style>
 </head>
 <body>
   <div class="login-box">
     <div class="login-logo">Ledger 250</div>
-    <div class="login-title">Admin access</div>
-    <form id="login-form">
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" autocomplete="email" required>
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" autocomplete="current-password" required>
-      </div>
-      <button type="submit" id="submit-btn">Sign in</button>
-      <div class="error" id="error-msg"></div>
-    </form>
+
+    <!-- Login panel -->
+    <div id="panel-login" class="panel active">
+      <div class="login-title">Admin access</div>
+      <form id="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary" id="login-btn">Sign in</button>
+        <button type="button" class="btn-ghost" onclick="showPanel('forgot')">Forgot password</button>
+        <div class="error" id="login-error"></div>
+      </form>
+    </div>
+
+    <!-- Forgot password panel -->
+    <div id="panel-forgot" class="panel">
+      <div class="login-title">Reset password</div>
+      <form id="forgot-form">
+        <div class="field">
+          <label for="reset-email">Email</label>
+          <input type="email" id="reset-email" name="email" autocomplete="email" required>
+        </div>
+        <button type="submit" class="btn-primary" id="reset-btn">Send reset link</button>
+        <div class="error" id="forgot-error"></div>
+        <div class="success" id="forgot-success"></div>
+      </form>
+      <button class="back-link" onclick="showPanel('login')">← Back to sign in</button>
+    </div>
   </div>
 
   <script>
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+      document.getElementById('panel-' + name).classList.add('active')
+    }
+
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault()
-      const btn = document.getElementById('submit-btn')
-      const errorEl = document.getElementById('error-msg')
+      const btn = document.getElementById('login-btn')
+      const errorEl = document.getElementById('login-error')
 
       btn.disabled = true
       btn.textContent = 'Signing in...'
@@ -126,7 +185,6 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         })
-
         const data = await res.json()
 
         if (data.success) {
@@ -137,11 +195,50 @@
           btn.disabled = false
           btn.textContent = 'Sign in'
         }
-      } catch (err) {
+      } catch {
         errorEl.textContent = 'Connection error. Please try again.'
         errorEl.classList.add('visible')
         btn.disabled = false
         btn.textContent = 'Sign in'
+      }
+    })
+
+    document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const btn = document.getElementById('reset-btn')
+      const errorEl = document.getElementById('forgot-error')
+      const successEl = document.getElementById('forgot-success')
+
+      btn.disabled = true
+      btn.textContent = 'Sending...'
+      errorEl.classList.remove('visible')
+      successEl.classList.remove('visible')
+
+      const email = document.getElementById('reset-email').value.trim()
+
+      try {
+        const res = await fetch('/admin/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        })
+        const data = await res.json()
+
+        if (data.success) {
+          successEl.textContent = 'Reset link sent — check your email.'
+          successEl.classList.add('visible')
+          btn.textContent = 'Sent'
+        } else {
+          errorEl.textContent = data.error || 'Could not send reset email.'
+          errorEl.classList.add('visible')
+          btn.disabled = false
+          btn.textContent = 'Send reset link'
+        }
+      } catch {
+        errorEl.textContent = 'Connection error. Please try again.'
+        errorEl.classList.add('visible')
+        btn.disabled = false
+        btn.textContent = 'Send reset link'
       }
     })
   </script>

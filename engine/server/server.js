@@ -182,6 +182,28 @@ app.post('/admin/auth/login', async (req, res) => {
   }
 });
 
+// Send password reset email
+app.post('/admin/auth/forgot-password', async (req, res) => {
+  const { email } = req.body
+  if (!email) return res.json({ success: false, error: 'Email is required.' })
+
+  const resetUrl = (process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+    : 'http://localhost:' + (process.env.PORT || 3002)) + '/admin/reset-password'
+
+  try {
+    const { error } = await supabaseAuth.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectTo: resetUrl
+    })
+    if (error) throw error
+    console.log(`[AUTH] Password reset requested for ${email}`)
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[AUTH] Reset error:', err.message)
+    res.json({ success: false, error: 'Could not send reset email.' })
+  }
+});
+
 // Handle logout
 app.post('/admin/auth/logout', (req, res) => {
   const email = req.session.adminUser?.email
@@ -189,6 +211,27 @@ app.post('/admin/auth/logout', (req, res) => {
     console.log(`[AUTH] Logout: ${email}`)
     res.json({ success: true })
   })
+});
+
+// Password reset page — public, Supabase redirects here after reset email link
+app.get('/admin/reset-password', (req, res) => {
+  res.sendFile(path.join(publicDir, 'admin-reset-password.html'))
+});
+
+// Update password using Supabase recovery token (called from reset page)
+app.post('/admin/auth/update-password', async (req, res) => {
+  const { accessToken, password } = req.body
+  if (!accessToken || !password) return res.json({ success: false, error: 'Missing token or password.' })
+  try {
+    const { error } = await supabaseAuth.auth.setSession({ access_token: accessToken, refresh_token: '' })
+    if (error) throw error
+    const { error: updateError } = await supabaseAuth.auth.updateUser({ password })
+    if (updateError) throw updateError
+    res.json({ success: true })
+  } catch (err) {
+    console.error('[AUTH] Update password error:', err.message)
+    res.json({ success: false, error: 'Could not update password. The link may have expired.' })
+  }
 });
 
 // Who am I — returns current logged-in user for the admin UI
