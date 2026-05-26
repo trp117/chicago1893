@@ -232,7 +232,12 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 <div id="main">
   <div id="topbar">
     <span id="topbar-title">Dashboard</span>
-    <div id="topbar-actions"></div>
+    <div id="topbar-actions">
+      <div id="admin-user-bar" style="font-size:12px; color:#888780; display:flex; align-items:center; gap:12px;">
+        <span id="admin-user-email"></span>
+        <button onclick="adminLogout()" style="font-size:11px; padding:4px 10px; background:transparent; border:1px solid #cbd5e1; color:#64748b; border-radius:4px; cursor:pointer;">Sign out</button>
+      </div>
+    </div>
   </div>
   <div id="content"><p>Loading…</p></div>
 </div>
@@ -251,6 +256,23 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 </div>
 
 <script>
+// ── Auth ──────────────────────────────────────────────────────────────────────
+fetch('/admin/auth/me')
+  .then(r => r.json())
+  .then(data => {
+    if (data.email) {
+      document.getElementById('admin-user-email').textContent = data.email
+    }
+  })
+  .catch(() => {
+    window.location.href = '/admin/login'
+  })
+
+async function adminLogout() {
+  await fetch('/admin/auth/logout', { method: 'POST' })
+  window.location.href = '/admin/login'
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════

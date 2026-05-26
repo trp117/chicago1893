@@ -7,7 +7,7 @@ export class ScenarioRepository {
 
   async findById(id)   { try { return await getScenario(id); } catch { return null; } }
   async findAll()      { return listScenarios(); }
-  async save(scenario) { await saveScenario(scenario.id, scenario); return scenario; }
+  async save(scenario, options = {}) { await saveScenario(scenario.id, scenario, options); return scenario; }
 
   findPlayerRole(id)          { return this.store.findById(ROLES_COLLECTION, id); }
   findPlayerRoles(scenarioId) {

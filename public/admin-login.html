@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ledger 250 — Admin Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a08;
+      color: #e8e4da;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 48px 40px;
+      border: 1px solid #2a2a26;
+      border-radius: 8px;
+      background: #111110;
+    }
+    .login-logo {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 8px;
+    }
+    .login-title {
+      font-size: 22px;
+      font-weight: 400;
+      color: #e8e4da;
+      margin-bottom: 32px;
+    }
+    .field {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888780;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      background: #1a1a18;
+      border: 1px solid #2a2a26;
+      border-radius: 4px;
+      color: #e8e4da;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus {
+      border-color: #c9a84c;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #c9a84c;
+      color: #0a0a08;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+    }
+    button:hover { background: #d4b660; }
+    button:disabled { background: #444; cursor: not-allowed; }
+    .error {
+      font-size: 13px;
+      color: #e05555;
+      margin-top: 16px;
+      display: none;
+    }
+    .error.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-logo">Ledger 250</div>
+    <div class="login-title">Admin access</div>
+    <form id="login-form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="submit-btn">Sign in</button>
+      <div class="error" id="error-msg"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const btn = document.getElementById('submit-btn')
+      const errorEl = document.getElementById('error-msg')
+
+      btn.disabled = true
+      btn.textContent = 'Signing in...'
+      errorEl.classList.remove('visible')
+
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+
+      try {
+        const res = await fetch('/admin/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        })
+
+        const data = await res.json()
+
+        if (data.success) {
+          window.location.href = data.redirect || '/admin'
+        } else {
+          errorEl.textContent = data.error || 'Invalid email or password.'
+          errorEl.classList.add('visible')
+          btn.disabled = false
+          btn.textContent = 'Sign in'
+        }
+      } catch (err) {
+        errorEl.textContent = 'Connection error. Please try again.'
+        errorEl.classList.add('visible')
+        btn.disabled = false
+        btn.textContent = 'Sign in'
+      }
+    })
+  </script>
+</body>
+</html>

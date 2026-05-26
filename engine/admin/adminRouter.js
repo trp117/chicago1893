@@ -804,7 +804,7 @@ export function createAdminRouter(repos, config = {}) {
     const merged = { ...SENSORY_DEFAULTS, ...(scenario.sensory_opening || {}), ...sopFields };
     const updated = { ...scenario, sensory_opening: merged };
     if (tts_narration_speed !== undefined) updated.tts_narration_speed = Number(tts_narration_speed);
-    await repos.scenarios.save(updated);
+    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0 });
   });
 
@@ -906,7 +906,7 @@ export function createAdminRouter(repos, config = {}) {
             console.error(`[REPAIR ERROR] entry ${role.name}: ${err.message}`);
           }
         }
-        await repos.scenarios.save(scenario);
+        await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
       }
     }
 
@@ -940,7 +940,7 @@ export function createAdminRouter(repos, config = {}) {
         }
         scenario.period_vocabulary = vocab;
         console.log(`[REPAIR] Writing vocabulary to ${req.params.id} — ${vocab.categories.length} categories, keys: ${Object.keys(vocab).join(', ')}`);
-        await repos.scenarios.save(scenario);
+        await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
         repairs.push(`Generated period vocabulary (${vocab.categories.length} categories)`);
         console.log(`[REPAIR] ${req.params.id} — period vocabulary written successfully`);
       } catch (err) {
@@ -1483,7 +1483,7 @@ Return ONLY valid JSON in this exact structure:
           facts,
         },
       };
-      await repos.scenarios.save(updated);
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
       res.json(updated.technical_facts);
     } catch (err) {
@@ -1593,7 +1593,7 @@ Return ONLY valid JSON in this exact structure:
           choice_echoes:    epilogueData.choice_echoes     || [],
         },
       };
-      await repos.scenarios.save(updated);
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
       res.json(updated.epilogue);
     } catch (err) {
@@ -1606,7 +1606,7 @@ Return ONLY valid JSON in this exact structure:
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
-      await repos.scenarios.save(scenario);
+      await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
@@ -2287,7 +2287,7 @@ Return JSON only:
       return badRequest(res, `Term "${term}" already exists in glossary`);
     glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
     const updated = { ...scenario, glossary };
-    await repos.scenarios.save(updated);
+    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ success: true, glossary: updated.glossary });
   });
 
@@ -2312,7 +2312,7 @@ Return JSON only:
         ? { ...g, term: resolvedTerm, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
         : g
     );
-    await repos.scenarios.save({ ...scenario, glossary });
+    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ success: true, glossary });
   });
 
@@ -2321,7 +2321,7 @@ Return JSON only:
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
     const glossary = (scenario.glossary || []).filter(g => g.term.toLowerCase() !== termName.toLowerCase());
-    await repos.scenarios.save({ ...scenario, glossary });
+    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ success: true, glossary });
   });
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
+import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -17,8 +18,9 @@ import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
-import { checkSupabaseConnection, } from '../../lib/supabase.js';
+import { checkSupabaseConnection, supabaseAuth } from '../../lib/supabase.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
+import { requireAdminAuth } from '../../lib/adminAuth.js';
 
 dotenv.config();
 
@@ -45,13 +47,24 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(publicDir, { maxAge: '5m' }));
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'ledger250-dev-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
 const gameConfig = {
   anthropicApiKey:    process.env.ANTHROPIC_API_KEY,
   elevenLabsApiKey:   process.env.ELEVENLABS_API_KEY,
   elevenLabsVoiceId:  process.env.ELEVENLABS_VOICE_ID,
 };
 
-app.use('/admin/api', createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
+app.use('/admin/api', requireAdminAuth, createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
 app.use('/game/api',  createGameRouter(repos, gameConfig));
 
 // Public scenario listing — no auth required
@@ -123,8 +136,75 @@ app.get('/categories/', (_, res) => res.sendFile(path.join(publicDir, 'categorie
   app.get(`/categories/${slug}/`, (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
 });
 
-// Version history endpoints — must be before /admin/* catch-all
-app.get('/admin/scenario/:id/versions', async (req, res) => {
+// ── Auth routes — public, no requireAdminAuth ──────────────────────────────
+
+// Serve login page
+app.get('/admin/login', (req, res) => {
+  if (req.session && req.session.adminUser) {
+    return res.redirect('/admin')
+  }
+  res.sendFile(path.join(publicDir, 'admin-login.html'))
+});
+
+// Handle login form submission
+app.post('/admin/auth/login', async (req, res) => {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.json({ success: false, error: 'Email and password are required.' })
+  }
+
+  try {
+    const { data, error } = await supabaseAuth.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password
+    })
+
+    if (error || !data.user) {
+      console.warn(`[AUTH] Failed login attempt for ${email}`)
+      return res.json({ success: false, error: 'Invalid email or password.' })
+    }
+
+    req.session.adminUser = {
+      id: data.user.id,
+      email: data.user.email,
+      loginAt: new Date().toISOString()
+    }
+
+    console.log(`[AUTH] Login: ${data.user.email}`)
+
+    const redirect = req.session.returnTo || '/admin'
+    delete req.session.returnTo
+
+    return res.json({ success: true, redirect })
+
+  } catch (err) {
+    console.error('[AUTH] Login error:', err.message)
+    return res.json({ success: false, error: 'Login failed. Please try again.' })
+  }
+});
+
+// Handle logout
+app.post('/admin/auth/logout', (req, res) => {
+  const email = req.session.adminUser?.email
+  req.session.destroy(() => {
+    console.log(`[AUTH] Logout: ${email}`)
+    res.json({ success: true })
+  })
+});
+
+// Who am I — returns current logged-in user for the admin UI
+app.get('/admin/auth/me', requireAdminAuth, (req, res) => {
+  res.json({
+    email: req.adminUser.email,
+    loginAt: req.adminUser.loginAt
+  })
+});
+
+// ── Protected admin routes ─────────────────────────────────────────────────
+
+// Version history endpoints — protected, must be before /admin/* catch-all
+app.get('/admin/scenario/:id/versions', requireAdminAuth, async (req, res) => {
   try {
     const versions = await getScenarioVersions(req.params.id);
     res.json(versions);
@@ -132,19 +212,23 @@ app.get('/admin/scenario/:id/versions', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.post('/admin/scenario/:id/restore/:version', async (req, res) => {
+app.post('/admin/scenario/:id/restore/:version', requireAdminAuth, async (req, res) => {
   try {
-    const newVersion = await restoreScenarioVersion(req.params.id, parseInt(req.params.version, 10));
+    const newVersion = await restoreScenarioVersion(
+      req.params.id,
+      parseInt(req.params.version, 10),
+      { savedBy: req.adminUser.email }
+    );
     res.json({ success: true, version: newVersion });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
-app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
-app.get('/admin/pipeline.html', (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
-app.get('/admin/*', (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
+app.use('/admin', requireAdminAuth, express.static(adminDir, { maxAge: '5m' }));
+app.get('/admin',              requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
+app.get('/admin/pipeline.html', requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
+app.get('/admin/*',            requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
 
 const PORT = process.env.PORT || process.env.ENGINE_PORT || 3002;
 
