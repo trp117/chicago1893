@@ -223,10 +223,11 @@ app.post('/admin/scenario/:id/restore/:version', requireAdminAuth, async (req, r
   }
 });
 
-app.use('/admin', requireAdminAuth, express.static(adminDir, { maxAge: '5m' }));
-app.get('/admin',              requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
-app.get('/admin/pipeline.html', requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
-app.get('/admin/*',            requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
+const ADMIN_HEADERS = { headers: { 'Cache-Control': 'no-store' } };
+app.use('/admin', requireAdminAuth, express.static(adminDir, { maxAge: 0, setHeaders: (res) => res.setHeader('Cache-Control', 'no-store') }));
+app.get('/admin',              requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), ADMIN_HEADERS));
+app.get('/admin/pipeline.html', requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), ADMIN_HEADERS));
+app.get('/admin/*',            requireAdminAuth, (_, res) => res.sendFile(path.join(adminDir, 'index.html'), ADMIN_HEADERS));
 
 const PORT = process.env.PORT || process.env.ENGINE_PORT || 3002;
 
