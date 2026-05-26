@@ -787,8 +787,8 @@ export function createAdminRouter(repos, config = {}) {
     target_sentences: 4, tts_pacing_hint: 'slow',
   };
 
-  r.get('/scenarios/:id/sensory-opening', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.get('/scenarios/:id/sensory-opening', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     res.json({
       ...SENSORY_DEFAULTS,
@@ -797,21 +797,21 @@ export function createAdminRouter(repos, config = {}) {
     });
   });
 
-  r.patch('/scenarios/:id/sensory-opening', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.patch('/scenarios/:id/sensory-opening', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const { tts_narration_speed, ...sopFields } = req.body;
     const merged = { ...SENSORY_DEFAULTS, ...(scenario.sensory_opening || {}), ...sopFields };
     const updated = { ...scenario, sensory_opening: merged };
     if (tts_narration_speed !== undefined) updated.tts_narration_speed = Number(tts_narration_speed);
-    repos.scenarios.save(updated);
+    await repos.scenarios.save(updated);
     res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0 });
   });
 
   // ── Locations ────────────────────────────────────────────────────────────────
-  r.get('/scenarios',      (_, res) => res.json(repos.scenarios.findAll()));
-  r.get('/scenarios/:id/full', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.get('/scenarios',      async (_, res) => res.json(await repos.scenarios.findAll()));
+  r.get('/scenarios/:id/full', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const arcId    = scenario.storyArcIds?.[0];
     const storyArc = arcId ? repos.storyArcs.findById(arcId) : null;
@@ -823,8 +823,8 @@ export function createAdminRouter(repos, config = {}) {
   });
 
   // ── Scenario health check ────────────────────────────────────────────────────
-  r.get('/scenarios/:id/health', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.get('/scenarios/:id/health', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const playerRoles  = repos.scenarios.findPlayerRoles(req.params.id);
     const characters   = repos.characters.findAll().filter(c => c.scenarioIds?.includes(req.params.id));
@@ -855,7 +855,7 @@ export function createAdminRouter(repos, config = {}) {
   // ── Scenario repair ──────────────────────────────────────────────────────────
   r.post('/scenarios/:id/repair', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
 
@@ -906,7 +906,7 @@ export function createAdminRouter(repos, config = {}) {
             console.error(`[REPAIR ERROR] entry ${role.name}: ${err.message}`);
           }
         }
-        repos.scenarios.save(scenario);
+        await repos.scenarios.save(scenario);
       }
     }
 
@@ -940,7 +940,7 @@ export function createAdminRouter(repos, config = {}) {
         }
         scenario.period_vocabulary = vocab;
         console.log(`[REPAIR] Writing vocabulary to ${req.params.id} — ${vocab.categories.length} categories, keys: ${Object.keys(vocab).join(', ')}`);
-        repos.scenarios.save(scenario);
+        await repos.scenarios.save(scenario);
         repairs.push(`Generated period vocabulary (${vocab.categories.length} categories)`);
         console.log(`[REPAIR] ${req.params.id} — period vocabulary written successfully`);
       } catch (err) {
@@ -961,7 +961,7 @@ export function createAdminRouter(repos, config = {}) {
   // Generate a bridge sentence draft for a single player role
   r.post('/scenarios/:id/roles/:roleId/generate-bridge-sentence', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const roles = repos.scenarios.findPlayerRoles(req.params.id);
     const role   = roles.find(r => r.id === req.params.roleId);
@@ -1399,7 +1399,7 @@ Return ONLY valid JSON in this exact structure:
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const { scenarioId, title = '', world = '', stakes = '', characters = [], clues = [], period_vocabulary = '', essential_beats = [] } = req.body;
     if (!scenarioId) return badRequest(res, 'scenarioId is required.');
-    const scenario = repos.scenarios.findById(scenarioId);
+    const scenario = await repos.scenarios.findById(scenarioId);
     if (!scenario) return notFound(res);
 
     const systemPrompt = [
@@ -1483,7 +1483,7 @@ Return ONLY valid JSON in this exact structure:
           facts,
         },
       };
-      repos.scenarios.save(updated);
+      await repos.scenarios.save(updated);
       console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
       res.json(updated.technical_facts);
     } catch (err) {
@@ -1496,7 +1496,7 @@ Return ONLY valid JSON in this exact structure:
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const { scenarioId, title = '', world = '', stakes = '', characters = [], essential_beats = [] } = req.body;
     if (!scenarioId) return badRequest(res, 'scenarioId is required.');
-    const scenario = repos.scenarios.findById(scenarioId);
+    const scenario = await repos.scenarios.findById(scenarioId);
     if (!scenario) return notFound(res);
 
     const systemPrompt = [
@@ -1593,7 +1593,7 @@ Return ONLY valid JSON in this exact structure:
           choice_echoes:    epilogueData.choice_echoes     || [],
         },
       };
-      repos.scenarios.save(updated);
+      await repos.scenarios.save(updated);
       console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
       res.json(updated.epilogue);
     } catch (err) {
@@ -1602,11 +1602,11 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
-  r.post('/generate/save', (req, res) => {
+  r.post('/generate/save', async (req, res) => {
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
-      repos.scenarios.save(scenario);
+      await repos.scenarios.save(scenario);
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
@@ -1725,8 +1725,8 @@ Return ONLY valid JSON in this exact structure:
   // Returns a plain-text block formatted for pasting into an external AI
   // fact-checking system. Lists every player role and NPC with their declared
   // character_type, represents field, and fact_checked status.
-  r.get('/scenarios/:id/character-declarations', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.get('/scenarios/:id/character-declarations', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
 
     const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
@@ -1858,10 +1858,10 @@ Return ONLY valid JSON in this exact structure:
     return paths;
   }
 
-  r.get('/scenarios/:id/name-search', (req, res) => {
+  r.get('/scenarios/:id/name-search', async (req, res) => {
     const { oldName } = req.query;
     if (!oldName || !oldName.trim()) return badRequest(res, 'oldName query param required');
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
 
     const needle = oldName.trim();
@@ -1898,7 +1898,7 @@ Return ONLY valid JSON in this exact structure:
     const { oldName, newName } = req.body || {};
     if (!oldName || !oldName.trim()) return badRequest(res, 'oldName required');
     if (!newName || !newName.trim()) return badRequest(res, 'newName required');
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
 
     const needle = oldName.trim();
@@ -2121,15 +2121,15 @@ Return ONLY valid JSON in this exact structure:
 
   // ── Glossary ──────────────────────────────────────────────────────────────────
 
-  r.get('/scenarios/:id/glossary', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.get('/scenarios/:id/glossary', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     res.json({ glossary: scenario.glossary || [] });
   });
 
   r.post('/scenarios/:id/suggest-glossary', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured.' });
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
 
     const existingTerms = (scenario.glossary || []).map(g => g.term.toLowerCase());
@@ -2206,7 +2206,7 @@ Maximum 20 suggestions. Prioritize technical terms — aim for at least 10 from 
 
   r.post('/scenarios/:id/generate-glossary-term', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY not configured.' });
-    const scenario = repos.scenarios.findById(req.params.id);
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const { term } = req.body;
     if (!term?.trim()) return badRequest(res, 'term is required');
@@ -2277,8 +2277,8 @@ Return JSON only:
     }
   });
 
-  r.post('/scenarios/:id/glossary', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.post('/scenarios/:id/glossary', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const { term, definition, source } = req.body;
     if (!term?.trim() || !definition?.trim()) return badRequest(res, 'term and definition required');
@@ -2287,12 +2287,12 @@ Return JSON only:
       return badRequest(res, `Term "${term}" already exists in glossary`);
     glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
     const updated = { ...scenario, glossary };
-    repos.scenarios.save(updated);
+    await repos.scenarios.save(updated);
     res.json({ success: true, glossary: updated.glossary });
   });
 
-  r.put('/scenarios/:id/glossary/:term', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.put('/scenarios/:id/glossary/:term', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
     const { definition, source, newTerm } = req.body;
@@ -2312,16 +2312,16 @@ Return JSON only:
         ? { ...g, term: resolvedTerm, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
         : g
     );
-    repos.scenarios.save({ ...scenario, glossary });
+    await repos.scenarios.save({ ...scenario, glossary });
     res.json({ success: true, glossary });
   });
 
-  r.delete('/scenarios/:id/glossary/:term', (req, res) => {
-    const scenario = repos.scenarios.findById(req.params.id);
+  r.delete('/scenarios/:id/glossary/:term', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
     const glossary = (scenario.glossary || []).filter(g => g.term.toLowerCase() !== termName.toLowerCase());
-    repos.scenarios.save({ ...scenario, glossary });
+    await repos.scenarios.save({ ...scenario, glossary });
     res.json({ success: true, glossary });
   });
 

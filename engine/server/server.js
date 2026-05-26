@@ -17,6 +17,8 @@ import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
+import { checkSupabaseConnection, } from '../../lib/supabase.js';
+import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 
 dotenv.config();
 
@@ -75,7 +77,7 @@ const CATEGORY_MAP = {
   artesian_height_1892:             'industrial',
   bornholmer_strasse_first_breach:  'industrial',
 };
-app.get('/api/stories', (req, res) => {
+app.get('/api/stories', async (req, res) => {
   try {
     const allRoles = repos.scenarios.findPlayerRoles();
     const rolesBy      = {};
@@ -85,7 +87,8 @@ app.get('/api/stories', (req, res) => {
       if (!roleNamesBy[r.scenarioId]) roleNamesBy[r.scenarioId] = [];
       roleNamesBy[r.scenarioId].push(r.name);
     });
-    const stories = repos.scenarios.findAll()
+    const scenarios = await repos.scenarios.findAll();
+    const stories = scenarios
       .filter(s => s.hidden !== true && (rolesBy[s.id] || 0) > 0)
       .map(s => ({
         id:          s.id,
@@ -120,6 +123,24 @@ app.get('/categories/', (_, res) => res.sendFile(path.join(publicDir, 'categorie
   app.get(`/categories/${slug}/`, (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
 });
 
+// Version history endpoints — must be before /admin/* catch-all
+app.get('/admin/scenario/:id/versions', async (req, res) => {
+  try {
+    const versions = await getScenarioVersions(req.params.id);
+    res.json(versions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.post('/admin/scenario/:id/restore/:version', async (req, res) => {
+  try {
+    const newVersion = await restoreScenarioVersion(req.params.id, parseInt(req.params.version, 10));
+    res.json({ success: true, version: newVersion });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.use('/admin', express.static(adminDir, { maxAge: '5m' }));
 app.get('/admin',   (_, res) => res.sendFile(path.join(adminDir, 'index.html'), HTML_HEADERS));
 app.get('/admin/pipeline.html', (_, res) => res.sendFile(path.join(adminDir, 'pipeline.html'), HTML_HEADERS));
@@ -140,6 +161,7 @@ function startServer() {
     console.log(`  Stories: http://localhost:${PORT}/`);
     console.log(`  Admin:   http://localhost:${PORT}/admin`);
     console.log(`  Game:    http://localhost:${PORT}/game?scenarioId=YOUR_ID`);
+    checkSupabaseConnection();
   });
   server.on('error', err => {
     if (err.code === 'EADDRINUSE') {

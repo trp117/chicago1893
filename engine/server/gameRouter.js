@@ -55,8 +55,8 @@ const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC
 
 // ── Data helpers ───────────────────────────────────────────────────────────────
 
-function getScenarioData(repos, scenarioId) {
-  const scenario = repos.scenarios.findAll().find(s => s.id === scenarioId);
+async function getScenarioData(repos, scenarioId) {
+  const scenario = await repos.scenarios.findById(scenarioId);
   if (!scenario) throw new Error(`Scenario "${scenarioId}" not found.`);
   const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
   const characters  = repos.characters.findAll().filter(c => (c.scenarioIds || []).includes(scenarioId));
@@ -410,11 +410,11 @@ export function createGameRouter(repos, config = {}) {
   });
 
   // ── Bootstrap ──────────────────────────────────────────────────────────────
-  r.get('/bootstrap', (req, res) => {
+  r.get('/bootstrap', async (req, res) => {
     const scenarioId = req.query.scenarioId;
     if (!scenarioId) return res.status(400).json({ error: 'scenarioId is required.' });
     try {
-      const { scenario, playerRoles, characters, locations, clues } = getScenarioData(repos, scenarioId);
+      const { scenario, playerRoles, characters, locations, clues } = await getScenarioData(repos, scenarioId);
       console.log(`[BOOTSTRAP] scenario=${scenarioId} roles=${playerRoles.length} locs=${locations.length} clues=${clues.length}`);
 
       const playerRoleOptions = playerRoles.map(r => ({
@@ -457,7 +457,7 @@ export function createGameRouter(repos, config = {}) {
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
-      const gameData = getScenarioData(repos, scenarioId);
+      const gameData = await getScenarioData(repos, scenarioId);
       const { scenario, playerRoles, characters, locations, clues } = gameData;
 
       const role = playerRoles.find(r => r.id === roleId);
@@ -690,7 +690,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       console.log(`[TURN] scenario=${state.scenarioId} loc=${state.location} act=${state.act} input="${playerInput.slice(0, 60)}"`);
 
-      const gameData = getScenarioData(repos, state.scenarioId);
+      const gameData = await getScenarioData(repos, state.scenarioId);
       const { scenario, characters, locations, clues } = gameData;
 
       // Save current state so promptBuilder can read session context
@@ -995,11 +995,11 @@ Do not open with the historical context. Open inside the character's body. Let t
   });
 
   // ── Notes (server-side aggregation, no LLM call) ──────────────────────────
-  r.post('/notes', (req, res) => {
+  r.post('/notes', async (req, res) => {
     try {
       const { state } = req.body;
       if (!state?.scenarioId) return res.status(400).json({ error: 'Missing state.scenarioId.' });
-      const { characters, locations, clues } = getScenarioData(repos, state.scenarioId);
+      const { characters, locations, clues } = await getScenarioData(repos, state.scenarioId);
 
       const discoveredClues = (state.discoveredClueIds || [])
         .map(id => getClueById(id, clues))
@@ -1119,7 +1119,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       const sess = appData.getSession(sessionId);
       scenarioId = sess?.scenarioId || null;
     }
-    const scenarioData  = scenarioId ? repos.scenarios.findAll().find(s => s.id === scenarioId) : null;
+    const scenarioData  = scenarioId ? await repos.scenarios.findById(scenarioId) : null;
     const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
 
     // Use notes-guided path for partial/failure when the feature is enabled and notes exist
