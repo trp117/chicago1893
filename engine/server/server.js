@@ -190,7 +190,7 @@ app.post('/admin/auth/forgot-password', async (req, res) => {
   const resetUrl = (process.env.PUBLIC_URL || 'http://localhost:' + (process.env.PORT || 3002)) + '/admin/reset-password'
 
   try {
-    const { error } = await supabaseAuth.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: resetUrl
     })
     if (error) throw error
@@ -198,7 +198,7 @@ app.post('/admin/auth/forgot-password', async (req, res) => {
     res.json({ success: true })
   } catch (err) {
     console.error('[AUTH] Reset error:', err.message)
-    res.json({ success: false, error: 'Could not send reset email.' })
+    res.json({ success: false, error: err.message || 'Could not send reset email.' })
   }
 });
 
