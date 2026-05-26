@@ -970,6 +970,20 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
+// TEMPORARY — remove after export
+app.get('/admin/export/scenario/:id', (req, res) => {
+  const exportKey = process.env.SCENARIO_EXPORT_KEY;
+  if (!exportKey || req.query.export_key !== exportKey) {
+    return res.status(403).json({ error: 'Forbidden.' });
+  }
+  const scenarioPath = path.join(rootDir, 'engine', 'data', 'scenarios', `${req.params.id}.json`);
+  if (!fs.existsSync(scenarioPath)) {
+    return res.status(404).json({ error: 'Scenario not found.' });
+  }
+  res.set('Content-Type', 'application/json');
+  return res.send(fs.readFileSync(scenarioPath, 'utf8'));
+});
+
 app.listen(PORT, () => {
   console.log(`Chicago 1893 server running on http://localhost:${PORT}`);
 });
