@@ -7,21 +7,11 @@ const CAT_COLORS = {
   industrial:     '#8a6040',
 };
 
-const CAT_GRADIENTS = {
-  space:          'linear-gradient(145deg,#0a0a24 0%,#060618 100%)',
-  military:       'linear-gradient(145deg,#281008 0%,#180808 100%)',
-  'civil-rights': 'linear-gradient(145deg,#0e1a10 0%,#080e08 100%)',
-  underground:    'linear-gradient(145deg,#281808 0%,#180e04 100%)',
-  maritime:       'linear-gradient(145deg,#0a1428 0%,#060c18 100%)',
-  industrial:     'linear-gradient(145deg,#1e1208 0%,#100a04 100%)',
-};
-
 export function renderScenarioCard(scenario, { baseUrl = '' } = {}) {
-  const color    = CAT_COLORS[scenario.category]    || 'rgba(196,154,60,0.4)';
-  const gradient = CAT_GRADIENTS[scenario.category] || 'linear-gradient(145deg,#1e1a16 0%,#0d0b09 100%)';
+  const color    = CAT_COLORS[scenario.category] || 'rgba(196,154,60,0.4)';
   const imgStyle = scenario.image_url
     ? `background-image:url('${scenario.image_url}');background-size:cover;background-position:center`
-    : `background:${gradient}`;
+    : `background:var(--card-img-gradient,linear-gradient(to bottom,#1e1a16 0%,#0d0b09 100%))`;
   const roles    = (scenario.roles || []).map(r => `<span class="meta-pill">${r}</span>`).join('');
   const costLine = scenario.cost_tracked
     ? `<p class="story-cost">Cost tracked: ${scenario.cost_tracked}</p>`

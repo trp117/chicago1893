@@ -16,6 +16,7 @@
   --red-cost:#c0524a;--amber-cost:#b8832a;--green-cost:#5a8a4a;
   --pad-x:clamp(16px,5vw,64px);--pad-y:clamp(48px,8vw,96px);--gap:2px;
   --cat-accent:#b8832a;
+  --card-img-gradient:linear-gradient(to bottom,#0a1a0a 0%,#040c04 100%);
 }
 body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background:#0a0a08}
@@ -25,7 +26,8 @@ body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-seri
 .nav-links a:hover{opacity:1}
 .nav-cta{opacity:.9!important;color:var(--gold-light)!important}
 @media(max-width:600px){.nav-hide{display:none}}
-.page-header{padding:calc(var(--pad-y) + 64px) var(--pad-x) var(--pad-y);border-bottom:3px solid var(--cat-accent)}
+.page-header{padding:calc(var(--pad-y) + 64px) var(--pad-x) var(--pad-y)}
+.cat-rule{width:40px;height:1px;background:var(--gold-light);border:none;margin:0 0 16px;display:block}
 .breadcrumb{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--parchment);opacity:.55;margin-bottom:16px}
 .breadcrumb a{color:inherit;text-decoration:none;opacity:1}
 .breadcrumb a:hover{opacity:.8}
@@ -68,6 +70,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </nav>
 <div class="page-header">
   <p class="breadcrumb"><a href="/categories">Categories</a> &nbsp;/&nbsp; Underground</p>
+  <div class="cat-rule"></div>
   <p class="section-label">Category</p>
   <h1 class="page-title">Underground</h1>
   <p class="page-desc">Secret networks, covert dispatches, and the people who risked everything to move freedom through enemy territory. The ledger measures what secrecy cost and what betrayal would have cost more.</p>
