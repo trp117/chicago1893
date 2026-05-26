@@ -187,9 +187,7 @@ app.post('/admin/auth/forgot-password', async (req, res) => {
   const { email } = req.body
   if (!email) return res.json({ success: false, error: 'Email is required.' })
 
-  const resetUrl = (process.env.RAILWAY_PUBLIC_DOMAIN
-    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-    : 'http://localhost:' + (process.env.PORT || 3002)) + '/admin/reset-password'
+  const resetUrl = (process.env.PUBLIC_URL || 'http://localhost:' + (process.env.PORT || 3002)) + '/admin/reset-password'
 
   try {
     const { error } = await supabaseAuth.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
