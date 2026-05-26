@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import session from 'express-session';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
@@ -21,8 +21,6 @@ import { SchemaValidator }      from '../services/SchemaValidator.js';
 import { checkSupabaseConnection, supabaseAuth } from '../../lib/supabase.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
-
-dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
