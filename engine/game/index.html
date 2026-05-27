@@ -2379,7 +2379,11 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   }
 
   // Promote server state as authoritative
+  const openingGlossary = gameState.glossary;
   gameState = { ...openingNextState, narrativeStyle: gameState.narrativeStyle };
+  if (!gameState.glossary?.length && openingGlossary?.length) {
+    gameState.glossary = openingGlossary;
+  }
 
   loadingEl.remove();
   renderOutput(openingOutput);
