@@ -94,12 +94,13 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .bg-civil{background:linear-gradient(160deg,#1a2a1a,#0e1a10 50%,#081008)}
 .bg-sub{background:linear-gradient(160deg,#10182a,#0a1020 50%,#060c18)}
 .bg-fire{background:linear-gradient(160deg,#3a1008,#280808 50%,#180408)}
-.bg-img-apollo{background-image:url('/images/scenarios/apollo_13.png');background-size:cover;background-position:center}
-.bg-img-omaha{background-image:url('/images/scenarios/dog_green.png');background-size:cover;background-position:center}
-.bg-img-greensboro{background-image:url('/images/scenarios/greensboro_four.png');background-size:cover;background-position:center}
-.bg-img-sargasso{background-image:url('/images/scenarios/sargasso_deep.png');background-size:cover;background-position:center}
+.bg-img-apollo{background-image:url('/images/scenarios/apollo_13.jpg');background-size:cover;background-position:center}
+.bg-img-omaha{background-image:url('/images/scenarios/dog_green.jpg');background-size:cover;background-position:center}
+.bg-img-greensboro{background-image:url('/images/scenarios/greensboro_four.jpg');background-size:cover;background-position:30% center}
+.bg-img-sargasso{background-image:url('/images/scenarios/sargasso_deep.jpg');background-size:cover;background-position:center}
 .fc-ai-attr{font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic;z-index:2}
 .fc-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,2.5vw,28px);background:linear-gradient(to top,rgba(8,6,4,.92) 0%,rgba(8,6,4,.3) 55%,transparent 100%)}
+.fc-has-img .fc-inner{background:linear-gradient(to top,rgba(8,6,4,.74) 0%,rgba(8,6,4,.22) 55%,transparent 100%)}
 .fc-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;display:flex;align-items:center;gap:8px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
 .fc-tag::before{content:'';display:inline-block;width:14px;height:1px;background:var(--gold);flex-shrink:0}
 .fc-title{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15;color:#fff;margin-bottom:10px;text-shadow:0 1px 8px rgba(0,0,0,.95),0 2px 16px rgba(0,0,0,.8)}
@@ -268,7 +269,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
     <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
   </div>
   <div class="featured-grid">
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live" id="fc-card-dgs">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live fc-has-img" id="fc-card-dgs">
       <div class="fc-bg bg-omaha bg-img-omaha" id="fc-omaha"></div>
       <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
@@ -279,7 +280,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
       </div>
     </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live" id="fc-card-apollo">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live fc-has-img" id="fc-card-apollo">
       <div class="fc-bg bg-apollo bg-img-apollo" id="fc-apollo"></div>
       <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
@@ -290,7 +291,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
       </div>
     </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live" id="fc-card-greensboro">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live fc-has-img" id="fc-card-greensboro">
       <div class="fc-bg bg-civil bg-img-greensboro" id="fc-greensboro"></div>
       <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
@@ -301,7 +302,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">Ezell Blair Jr.</span><span class="meta-pill">Franklin McCain</span><span class="meta-pill">Joseph McNeil</span></div>
       </div>
     </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live" id="fc-card-sargasso">
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live fc-has-img" id="fc-card-sargasso">
       <div class="fc-bg bg-sub bg-img-sargasso" id="fc-sargasso"></div>
       <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
@@ -566,7 +567,7 @@ function updateHeroFeatured(stories){
   const s=stories.find(x=>x.id===HERO_FEATURED_SCENARIO_ID);
   if(!s)return;
   const imgEl=document.getElementById('hero-feat-img-el');
-  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13.png',dog_green_sector:'/images/scenarios/dog_green.png',greensboro_four_the_color_line:'/images/scenarios/greensboro_four.png',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep.png'}[s.id];
+  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13.jpg',dog_green_sector:'/images/scenarios/dog_green.jpg',greensboro_four_the_color_line:'/images/scenarios/greensboro_four.jpg',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep.jpg'}[s.id];
   const _heroImgSrc=s.image_url||_heroLocalImg;
   if(imgEl&&_heroImgSrc)imgEl.style.backgroundImage=`url('${_heroImgSrc}')`;
   const pillsEl=document.getElementById('hero-feat-pills');
