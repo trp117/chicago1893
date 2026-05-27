@@ -1233,7 +1233,7 @@ function buildAssistantHistoryContent(output) {
 async function submitTurn(playerInput, { isChoice = false } = {}) {
   if (!playerInput?.trim() || submitting) return;
   if (gameState?.remainingMinutes <= 0) {
-    triggerClosingSequence(false, false);
+    showClosingScreen(null, sessionId);
     return;
   }
   submitting = true;
@@ -1372,7 +1372,9 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     extractAndStoreFacts(output.narrative);
 
     if (gameState.remainingMinutes <= 0) {
-      triggerClosingSequence(false, false);
+      submitBtn.disabled = true;
+      inputEl.disabled = true;
+      showClosingScreen(output?.endState || null, sessionId);
     } else if (output?.endState?.isEnding) {
       try {
         formEl.querySelector('button[type="submit"]').disabled = true;

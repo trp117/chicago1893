@@ -94,6 +94,11 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .bg-civil{background:linear-gradient(160deg,#1a2a1a,#0e1a10 50%,#081008)}
 .bg-sub{background:linear-gradient(160deg,#10182a,#0a1020 50%,#060c18)}
 .bg-fire{background:linear-gradient(160deg,#3a1008,#280808 50%,#180408)}
+.bg-img-apollo{background-image:url('/images/scenarios/apollo_13.png');background-size:cover;background-position:center}
+.bg-img-omaha{background-image:url('/images/scenarios/dog_green.png');background-size:cover;background-position:center}
+.bg-img-greensboro{background-image:url('/images/scenarios/greensboro_four.png');background-size:cover;background-position:center}
+.bg-img-sargasso{background-image:url('/images/scenarios/sargasso_deep.png');background-size:cover;background-position:center}
+.fc-ai-attr{font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic;z-index:2}
 .fc-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,2.5vw,28px);background:linear-gradient(to top,rgba(8,6,4,.92) 0%,rgba(8,6,4,.3) 55%,transparent 100%)}
 .fc-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;display:flex;align-items:center;gap:8px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
 .fc-tag::before{content:'';display:inline-block;width:14px;height:1px;background:var(--gold);flex-shrink:0}
@@ -264,7 +269,8 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   </div>
   <div class="featured-grid">
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live" id="fc-card-apollo">
-      <div class="fc-bg bg-apollo" id="fc-apollo"></div>
+      <div class="fc-bg bg-apollo bg-img-apollo" id="fc-apollo"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
         <p class="fc-tag">Space &middot; April 1970</p>
         <h3 class="fc-title">Apollo 13: Lifeboat</h3>
@@ -274,7 +280,8 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
       </div>
     </a>
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live" id="fc-card-dgs">
-      <div class="fc-bg bg-omaha" id="fc-omaha"></div>
+      <div class="fc-bg bg-omaha bg-img-omaha" id="fc-omaha"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
         <p class="fc-tag">World War II &middot; June 6, 1944</p>
         <h3 class="fc-title">Dog Green Sector</h3>
@@ -284,7 +291,8 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
       </div>
     </a>
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live" id="fc-card-greensboro">
-      <div class="fc-bg bg-civil" id="fc-greensboro"></div>
+      <div class="fc-bg bg-civil bg-img-greensboro" id="fc-greensboro"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
         <p class="fc-tag">Civil Rights &middot; February 1, 1960</p>
         <h3 class="fc-title">Greensboro Four: The Color Line</h3>
@@ -294,7 +302,8 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
       </div>
     </a>
     <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live" id="fc-card-sargasso">
-      <div class="fc-bg bg-sub" id="fc-sargasso"></div>
+      <div class="fc-bg bg-sub bg-img-sargasso" id="fc-sargasso"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
         <p class="fc-tag">Cuban Missile Crisis &middot; October 27, 1962</p>
         <h3 class="fc-title">Sargasso Deep: The Three Keys</h3>
@@ -540,7 +549,7 @@ function drawHero(){
 }
 function drawImages(){
   Object.entries(SCENES).forEach(([key,painter])=>{const el=document.getElementById(key);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(400,220,painter)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';});
-  const fcMap={'fc-apollo':SCENES['ci-space'],'fc-omaha':SCENES['ci-military'],'fc-sargasso':SCENES['ci-political'],'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
+  const fcMap={'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
   Object.entries(fcMap).forEach(([id,p])=>{const el=document.getElementById(id);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(800,500,p)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'});
 }
 let _renderCard=null,_storiesCache=null;

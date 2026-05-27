@@ -839,7 +839,7 @@ async function renderDashboard() {
             <span class="health-dot checking" title="Checking health…"></span>
             <div style="min-width:0;">
               <div class="scenario-play-card-title">${s.title || s.id}</div>
-              <div class="scenario-play-card-meta">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</div>
+              <div class="scenario-play-card-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${statusBadge(s.status)}<span style="color:var(--text-soft)">${(s.genre || []).join(', ')} · ${s.sessionTargetMinutes || '?'} min · id: ${s.id}</span></div>
             </div>
           </div>
           <div class="scenario-play-card-actions">
@@ -1325,6 +1325,11 @@ function edSection(title, html) {
 function edDetails(summary, sub, bodyHtml, open = false) {
   return `<details class="entity-details"${open ? ' open' : ''}><summary class="entity-details-summary">${esc(summary)}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</summary><div class="entity-details-body">${bodyHtml}</div></details>`;
 }
+function statusBadge(status) {
+  const cfg = { published: ['#22c55e','Published'], hidden: ['#94a3b8','Hidden'], archived: ['#f59e0b','Archived'] };
+  const [color, label] = cfg[status] || cfg.published;
+  return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:${color}"><span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>${label}</span>`;
+}
 
 function collectEdits(containerEl, data) {
   containerEl.querySelectorAll('[data-path]').forEach(el => {
@@ -1528,6 +1533,7 @@ function renderScenarioSection(data) {
   return edSection('Scenario', `
     ${edField('Title',             edInput('scenario.title',             s.title))}
     ${edField('Scenario ID',       edInput('scenario.id',               s.id),              'snake_case slug — used in URLs')}
+    ${edField('Status', `<select data-path="scenario.status"><option value="published"${(s.status || 'published') === 'published' ? ' selected' : ''}>Published</option><option value="hidden"${s.status === 'hidden' ? ' selected' : ''}>Hidden</option><option value="archived"${s.status === 'archived' ? ' selected' : ''}>Archived</option></select>`, 'Published = visible publicly. Hidden = admin-only. Archived = not shown publicly.')}
     ${edField('Description',        edTextarea('scenario.description',    s.description,      3), 'Shown on the role selection screen — one paragraph summarising the situation and stakes')}
     ${edField('Premise',           edTextarea('scenario.premise',        s.premise,          2))}
     ${edField('Player Goal',       edTextarea('scenario.playerGoal',     s.playerGoal,       2))}

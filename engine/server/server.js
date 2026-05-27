@@ -101,7 +101,7 @@ app.get('/api/stories', async (req, res) => {
     });
     const scenarios = await repos.scenarios.findAll();
     const stories = scenarios
-      .filter(s => s.hidden !== true && (rolesBy[s.id] || 0) > 0)
+      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0)
       .map(s => ({
         id:          s.id,
         title:       s.title,

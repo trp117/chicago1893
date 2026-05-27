@@ -394,9 +394,9 @@ export function createGameRouter(repos, config = {}) {
   const r = Router();
 
   // ── Public scenario listing ────────────────────────────────────────────────
-  r.get('/scenarios', (_, res) => {
-    const all = repos.scenarios.findAll()
-      .filter(s => !s.hidden)
+  r.get('/scenarios', async (_, res) => {
+    const all = (await repos.scenarios.findAll())
+      .filter(s => s.status === 'published')
       .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
       .map(s => ({
         id:                   s.id,
@@ -1121,6 +1121,7 @@ Do not open with the historical context. Open inside the character's body. Let t
     }
     const scenarioData  = scenarioId ? await repos.scenarios.findById(scenarioId) : null;
     const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
+    const characters    = scenarioId ? repos.characters.findAll().filter(c => (c.scenarioIds || []).includes(scenarioId)) : [];
 
     // Use notes-guided path for partial/failure when the feature is enabled and notes exist
     const useStructured = scenarioData?.structured_endings_enabled
@@ -1190,13 +1191,15 @@ Do not open with the historical context. Open inside the character's body. Let t
           messages: [{ role: 'user', content: closingPrompt }],
         }),
       });
-      const prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
+      let prose = await streamRawText(resp, chunk => sendSse(res, { type: 'chunk', text: chunk }));
+      if (characters.length) prose = fixCharacterIdLeaks(prose, characters);
 
       // Generate historical epilogue and bibliography
       console.log('[EPILOGUE-CLOSE] reached closing-prose route — sessionId:', sessionId);
       let epilogueResult = null;
       let bibliography   = [];
       const sessionState = sessionId ? appData.getSession(sessionId) : null;
+      console.log('[EPILOGUE-CLOSE] interacted_characters:', (sessionState?.introducedNpcs || []).length, 'completed_beats:', (sessionState?.resolved_threads || []).length);
       console.log('[EPILOGUE-CLOSE] conditions — generated:', scenarioData?.epilogue?.generated, 'reviewed:', scenarioData?.epilogue?.reviewed);
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
         const summary = buildEpilogueSummary(sessionState, endResult);
@@ -1205,6 +1208,9 @@ Do not open with the historical context. Open inside the character's body. Let t
         try {
           console.log('[EPILOGUE-CLOSE] calling epilogue API');
           epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey, role?.historical_record_note || null);
+          if (epilogueResult?.text && characters.length) {
+            epilogueResult = { ...epilogueResult, text: fixCharacterIdLeaks(epilogueResult.text, characters) };
+          }
         } catch (e) {
           console.error('[EPILOGUE]', e.message);
         }
