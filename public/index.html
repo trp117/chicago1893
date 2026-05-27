@@ -566,7 +566,9 @@ function updateHeroFeatured(stories){
   const s=stories.find(x=>x.id===HERO_FEATURED_SCENARIO_ID);
   if(!s)return;
   const imgEl=document.getElementById('hero-feat-img-el');
-  if(imgEl&&s.image_url)imgEl.style.backgroundImage=`url('${s.image_url}')`;
+  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13.png',dog_green_sector:'/images/scenarios/dog_green.png',greensboro_four_the_color_line:'/images/scenarios/greensboro_four.png',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep.png'}[s.id];
+  const _heroImgSrc=s.image_url||_heroLocalImg;
+  if(imgEl&&_heroImgSrc)imgEl.style.backgroundImage=`url('${_heroImgSrc}')`;
   const pillsEl=document.getElementById('hero-feat-pills');
   if(pillsEl&&s.roles&&s.roles.length){pillsEl.innerHTML=s.roles.map(r=>`<span class="meta-pill">${r}</span>`).join('');}
   const eraEl=document.getElementById('hero-feat-era');
