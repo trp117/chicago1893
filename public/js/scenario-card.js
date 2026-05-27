@@ -8,7 +8,7 @@ const CAT_COLORS = {
 };
 
 const LOCAL_IMAGES = {
-  apollo_13_lifeboat:             '/images/scenarios/apollo_13.jpg',
+  apollo_13_lifeboat:             '/images/scenarios/apollo_13_short.jpg',
   dog_green_sector:               '/images/scenarios/dog_green.jpg',
   greensboro_four_the_color_line: '/images/scenarios/greensboro_four.jpg',
   sargasso_deep_three_keys:       '/images/scenarios/sargasso_deep.jpg',
@@ -24,7 +24,7 @@ export function renderScenarioCard(scenario, { baseUrl = '' } = {}) {
   const imgSrc   = scenario.image_url || localImg;
   const imgPos   = LOCAL_IMG_POSITION[scenario.id] || 'center';
   const imgStyle = imgSrc
-    ? `background-image:url('${imgSrc}');background-size:cover;background-position:${imgPos};filter:brightness(.65) sepia(.15)`
+    ? `background-image:url('${imgSrc}');background-size:cover;background-position:${imgPos}`
     : `background:var(--card-img-gradient,linear-gradient(to bottom,#1e1a16 0%,#0d0b09 100%))`;
   const aiAttr = localImg
     ? `<span style="font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic">AI-generated illustration</span>`
