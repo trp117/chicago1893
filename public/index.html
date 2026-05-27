@@ -156,7 +156,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .hero-right{flex:1;min-width:0;padding-top:clamp(56px,6vh,72px);opacity:0;animation:fadeUp .9s 1.1s forwards}
 .hero-feat-card{background:#181512;border-left:2px solid rgba(196,154,60,.3);overflow:hidden;width:100%;display:flex;flex-direction:column}
 .hero-feat-img{width:100%;height:280px;background:linear-gradient(to bottom,#0e0e28 0%,#040410 100%);background-size:cover;background-position:center;position:relative;flex-shrink:0}
-.hero-feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,4,.95) 0%,rgba(8,6,4,.3) 60%,transparent 100%);pointer-events:none}
+.hero-feat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,4,.55) 0%,rgba(8,6,4,.08) 60%,transparent 100%);pointer-events:none}
 .hero-feat-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.4vw,16px);font-style:italic;line-height:1.6;color:var(--parchment);opacity:.88;margin-bottom:clamp(14px,1.8vw,20px)}
 @media(max-width:768px){.hero-inner{flex-direction:column}.hero-inner .hero-content,.hero-right{flex:none;width:100%}}
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:clamp(20px,3vw,32px)}
@@ -567,7 +567,7 @@ function updateHeroFeatured(stories){
   const s=stories.find(x=>x.id===HERO_FEATURED_SCENARIO_ID);
   if(!s)return;
   const imgEl=document.getElementById('hero-feat-img-el');
-  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13.jpg',dog_green_sector:'/images/scenarios/dog_green.jpg',greensboro_four_the_color_line:'/images/scenarios/greensboro_four.jpg',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep.jpg'}[s.id];
+  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13_wide.jpg',dog_green_sector:'/images/scenarios/dog_green.jpg',greensboro_four_the_color_line:'/images/scenarios/greensboro_four.jpg',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep.jpg'}[s.id];
   const _heroImgSrc=s.image_url||_heroLocalImg;
   if(imgEl&&_heroImgSrc)imgEl.style.backgroundImage=`url('${_heroImgSrc}')`;
   const pillsEl=document.getElementById('hero-feat-pills');
