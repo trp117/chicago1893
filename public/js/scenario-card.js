@@ -9,9 +9,9 @@ const CAT_COLORS = {
 
 const LOCAL_IMAGES = {
   apollo_13_lifeboat:             '/images/scenarios/apollo_13_short.jpg',
-  dog_green_sector:               '/images/scenarios/dog_green.jpg',
-  greensboro_four_the_color_line: '/images/scenarios/greensboro_four.jpg',
-  sargasso_deep_three_keys:       '/images/scenarios/sargasso_deep.jpg',
+  dog_green_sector:               '/images/scenarios/dog_green_short.jpg',
+  greensboro_four_the_color_line: '/images/scenarios/greensboro_four_short.jpg',
+  sargasso_deep_three_keys:       '/images/scenarios/sargasso_deep_short.jpg',
 };
 
 const LOCAL_IMG_POSITION = {
