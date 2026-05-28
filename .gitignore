@@ -4,3 +4,6 @@ node_modules/
 .DS_Store
 data/sessions/
 engine/data/transcripts/
+images/sources/
+engine/data/scenarios.backup/
+.claude/settings.local.json
