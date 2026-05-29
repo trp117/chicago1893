@@ -200,6 +200,29 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .suggestion-source-historical{ background: rgba(34,197,94,0.15);  color: #4ade80; }
 .suggestions-header { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
 .suggestions-header-text { flex:1; min-width:160px; font-size:12px; font-weight:700; color:var(--text-soft); text-transform:uppercase; letter-spacing:.5px; }
+
+/* ── Image Prompt Studio ──────────────────────────────────────── */
+.img-prompt-studio { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.img-prompt-studio-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; background: #eef4ff; font-size: 14px; font-weight: 700; color: var(--navy, #1e2a4a); border-bottom: 1px solid var(--accent); transition: background .15s; }
+.img-prompt-studio-header:hover { background: #dceafe; }
+.img-prompt-studio-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.img-prompt-master-spec { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; }
+.img-prompt-label { font-size: 12px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.img-prompt-toggle { font-size: 11px; font-weight: 500; color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.img-prompt-toggle:hover { text-decoration: underline; }
+.img-prompt-pre { font-size: 11px; font-family: monospace; white-space: pre-wrap; color: var(--text); background: #f1f5f9; border-radius: 4px; padding: 10px; margin-top: 8px; max-height: 300px; overflow-y: auto; line-height: 1.5; }
+.img-prompt-textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text); background: #fff; font-family: inherit; resize: vertical; min-height: 160px; line-height: 1.6; transition: border-color .15s, box-shadow .15s; }
+.img-prompt-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px #4f8ef720; }
+.img-prompt-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-img-prompt-gen  { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--accent); color: #fff; transition: background .15s, opacity .15s; }
+.btn-img-prompt-gen:hover  { background: var(--accent-dk, #3a7de8); }
+.btn-img-prompt-gen:disabled { opacity: .5; cursor: not-allowed; }
+.btn-img-prompt-save { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: var(--success); color: #fff; transition: background .15s, opacity .15s; }
+.btn-img-prompt-save:hover { background: #16a34a; }
+.btn-img-prompt-save:disabled { opacity: .5; cursor: not-allowed; }
+.btn-img-prompt-copy { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); transition: background .15s; }
+.btn-img-prompt-copy:hover { background: var(--bg); }
+.img-prompt-status { font-size: 12px; min-height: 18px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -295,6 +318,10 @@ const state = {
   scenarioFilter: '',     // '' = all, else scenarioId string
   scenarios: [],          // all known scenarios
 };
+
+// Tracks the scenario currently open in the editor so Image Prompt Studio
+// functions (global scope, called from onclick) can reach it.
+let _imgPromptScenarioId = '';
 
 // ═══════════════════════════════════════════════════════════════
 // API
@@ -2823,9 +2850,174 @@ function downloadScenarioDoc(data, promptPrefix = '') {
   URL.revokeObjectURL(url);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// IMAGE PROMPT STUDIO
+// ═══════════════════════════════════════════════════════════════
+
+const MASTER_IMAGE_SPEC = `Ledger 250 — Scenario Image Generation Prompt (Master, v1.3)
+
+Generate a single AI image for use on the Ledger 250 platform as scenario card artwork. The image must satisfy the following technical specifications and content rules.
+
+OUTPUT SPECIFICATIONS
+- Aspect ratio: 16:9 horizontal, minimum 1536×864
+- Format: PNG output is acceptable; conversion to JPEG happens downstream
+- No text, no watermarks, no captions, no overlay graphics anywhere in the frame
+- Photorealistic, cinematic lighting, period-accurate to the year specified
+- Full color — do not desaturate or apply a tonal grade; the platform CSS handles the final mood
+
+COMPOSITION RULES — CRITICAL
+- Vertical face zone (non-negotiable): all faces and primary action must sit within the vertical band between 35% and 65% of the frame height. This is a hard requirement of the platform banner layout — the image gets cropped to a thin horizontal band that pulls from this middle zone. Faces above 35% will be cropped off the top. Faces below 65% will be cropped off the bottom. Place faces exactly in this central third.
+- Horizontal balance: main subject can be left, center, or right of frame — be intentional about which. Composition should leave room for a text overlay in the lower portion.
+- Depth: include foreground subject, middle ground action, and background environment. A single flat subject against a flat background looks weak at card scale.
+- Lower-band clearance: the lower 25% of the frame should not contain critical narrative detail (faces, primary action, key objects). A semi-opaque text overlay will be applied to this band in the final card render, so anything important placed there will be obscured.
+
+CONTENT & ACCURACY RULES — STRICT
+- No copyrighted insignia, logos, or branded patches. No military unit patches, no flag-bearing badges, no corporate logos. Uniforms must be period-correct but generic.
+- No invented or stylized insignia of any kind. The following must be either omitted entirely or rendered as period-generic with no decorative content: rank marks, shoulder boards, collar tabs, cuff stripes, unit patches, sleeve chevrons, cap badges, hat emblems, helmet decals, helmet markings, lapel pins, breast pocket badges, belt buckle emblems, embroidered devices on any uniform surface, and any other decoration that would normally identify rank, branch, unit, or nationality. If a piece of headgear or uniform would historically have a visible emblem, render that surface as plain. Inventing a plausible-looking but fictional emblem is worse than omitting the emblem entirely.
+- No recognizable celebrity or real-person faces. Figures should look like historically plausible everymen — the right age, build, hair, and grooming for the era — but not portraits of specific historical figures.
+- Period accuracy in equipment, clothing, and environment. Verify the year. Helmets, weapons, vehicles, lighting fixtures, and clothing must match the specific year, not a generic era. Anachronistic technology is a disqualifying error.
+- No graphic violence, no visible blood, no wounded bodies. Tension and danger are conveyed through environment, lighting, expression, and posture — never explicit injury.
+- Lighting must be readable. Even dark or low-light scenes must have clear illumination on faces and primary action. The platform applies a dark CSS overlay; images that are already dark become unreadable. Err 20% brighter than your instinct.
+
+STYLE REFERENCES
+Cinematic realism in the tradition of Roger Deakins, Janusz Kaminski, or Robert Richardson. Photorealistic. Shot on 35mm film, slight grain, no digital sheen. No motion blur. No HDR. No text or graphic elements anywhere in the frame.
+
+FILE NAMING AFTER GENERATION
+Save the source PNG as [scenario_id]_source.png. Downstream processing produces [scenario_id]_wide.jpg (1600x900, 16:9) and [scenario_id]_short.jpg (1800x493, 3.65:1).
+
+---
+SCENARIO-SPECIFIC SCENE DESCRIPTION
+`;
+
+function renderImgPromptStudio(data) {
+  const existingDraft = data.scenario?.image?.generation_prompt || '';
+  const escaped = existingDraft.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `
+<div class="img-prompt-studio" id="img-prompt-studio">
+  <div class="img-prompt-studio-header" onclick="toggleImgPromptStudio()">
+    <span>🎨 Image Prompt Studio</span>
+    <span id="img-prompt-studio-chevron">▼</span>
+  </div>
+  <div class="img-prompt-studio-body" id="img-prompt-studio-body" style="display:none">
+    <div class="img-prompt-master-spec">
+      <div class="img-prompt-label">Master spec (v1.3)
+        <span class="img-prompt-toggle" onclick="toggleMasterSpec()">show ▼</span>
+      </div>
+      <pre id="img-prompt-master-spec-text" style="display:none" class="img-prompt-pre"></pre>
+    </div>
+    <div>
+      <div class="img-prompt-label">Scene description</div>
+      <textarea id="img-prompt-scene-desc" class="img-prompt-textarea"
+        placeholder="Click 'Generate draft' to auto-fill from scenario data, or write your own scene description here.">${escaped}</textarea>
+    </div>
+    <div class="img-prompt-buttons">
+      <button onclick="generateImgPromptDraft()" class="btn-img-prompt-gen" id="btn-generate-draft">✦ Generate draft</button>
+      <button onclick="saveImgPromptDraft()" class="btn-img-prompt-save" id="btn-save-draft">Save draft</button>
+      <button onclick="copyImgPrompt()" class="btn-img-prompt-copy" id="btn-copy-prompt">Copy prompt</button>
+    </div>
+    <div id="img-prompt-status" class="img-prompt-status"></div>
+  </div>
+</div>`;
+}
+
+function toggleImgPromptStudio() {
+  const body    = document.getElementById('img-prompt-studio-body');
+  const chevron = document.getElementById('img-prompt-studio-chevron');
+  const open    = body.style.display === 'none';
+  body.style.display  = open ? 'block' : 'none';
+  chevron.textContent = open ? '▲' : '▼';
+}
+
+function toggleMasterSpec() {
+  const pre    = document.getElementById('img-prompt-master-spec-text');
+  const toggle = document.querySelector('.img-prompt-toggle');
+  const open   = pre.style.display === 'none';
+  pre.style.display  = open ? 'block' : 'none';
+  pre.textContent    = open ? MASTER_IMAGE_SPEC : '';
+  toggle.textContent = open ? 'hide ▲' : 'show ▼';
+}
+
+async function generateImgPromptDraft() {
+  const btn      = document.getElementById('btn-generate-draft');
+  const status   = document.getElementById('img-prompt-status');
+  const textarea = document.getElementById('img-prompt-scene-desc');
+  const scenarioId = _imgPromptScenarioId;
+  if (!scenarioId) { status.textContent = 'No scenario selected.'; return; }
+
+  btn.disabled    = true;
+  btn.textContent = '⏳ Generating…';
+  status.textContent = '';
+
+  try {
+    const resp = await fetch(`${API}/scenarios/${scenarioId}/generate-image-prompt`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.detail || data.error);
+    textarea.value        = data.draft;
+    status.textContent    = '✓ Draft generated. Edit as needed, then save.';
+    status.style.color    = 'var(--success)';
+  } catch (err) {
+    status.textContent = '✗ Generation failed: ' + err.message;
+    status.style.color = 'var(--danger)';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = '✦ Generate draft';
+  }
+}
+
+async function saveImgPromptDraft() {
+  const btn      = document.getElementById('btn-save-draft');
+  const status   = document.getElementById('img-prompt-status');
+  const textarea = document.getElementById('img-prompt-scene-desc');
+  const scenarioId = _imgPromptScenarioId;
+  if (!scenarioId) { status.textContent = 'No scenario selected.'; return; }
+
+  btn.disabled    = true;
+  btn.textContent = '⏳ Saving…';
+
+  try {
+    const resp = await fetch(`${API}/scenarios/${scenarioId}/image-prompt`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ generation_prompt: textarea.value }),
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'Save failed');
+    status.textContent = '✓ Draft saved.';
+    status.style.color = 'var(--success)';
+  } catch (err) {
+    status.textContent = '✗ Save failed: ' + err.message;
+    status.style.color = 'var(--danger)';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Save draft';
+  }
+}
+
+function copyImgPrompt() {
+  const textarea = document.getElementById('img-prompt-scene-desc');
+  const status   = document.getElementById('img-prompt-status');
+  const sceneDesc = textarea.value.trim();
+  if (!sceneDesc) {
+    status.textContent = '✗ Scene description is empty. Generate or write a draft first.';
+    status.style.color = 'var(--danger)';
+    return;
+  }
+  const combined = MASTER_IMAGE_SPEC + sceneDesc;
+  navigator.clipboard.writeText(combined).then(() => {
+    status.textContent = '✓ Full prompt copied to clipboard. Paste into ChatGPT.';
+    status.style.color = 'var(--success)';
+  }).catch(() => {
+    status.textContent = '✗ Clipboard write failed. Try copying from the text area manually.';
+    status.style.color = 'var(--danger)';
+  });
+}
+
 function renderPreview(data, autoSaved = false) {
   const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
   const scenarioId = scenario.id || scenario.scenario_id || '';
+  _imgPromptScenarioId = scenarioId;
 
   setTopbar(scenario.title || 'Generated Story', [
     { label: '▶ Play',        cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
@@ -2873,6 +3065,7 @@ function renderPreview(data, autoSaved = false) {
       ${renderGlossarySection(data)}
       ${renderTechnicalFactsSection(data)}
       ${renderEpilogueSection(data)}
+      ${renderImgPromptStudio(data)}
       <div class="form-actions" style="padding-bottom:32px">
         <button class="btn btn-success"   id="preview-play">▶ Play Now</button>
         <button class="btn btn-primary"   id="preview-save">💾 Save</button>

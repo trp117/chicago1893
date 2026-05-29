@@ -2325,6 +2325,71 @@ Return JSON only:
     res.json({ success: true, glossary });
   });
 
+  // ── Image Prompt Studio ───────────────────────────────────────────────────────
+
+  r.post('/scenarios/:id/generate-image-prompt', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const playerRoles = repos.scenarios.findPlayerRoles(req.params.id);
+
+    const roleNames = playerRoles.map(r => r.name).filter(Boolean).join(', ');
+    const genre     = (scenario.genre || []).join(', ');
+
+    const userMessage = [
+      `Scenario title: ${scenario.title || ''}`,
+      `Historical description: ${scenario.description || ''}`,
+      `Genre tags: ${genre}`,
+      `Player roles: ${roleNames}`,
+      `Cost tracked: ${scenario.costTracked || ''}`,
+      `Session length: ${scenario.sessionTargetMinutes || ''} minutes`,
+    ].filter(Boolean).join('\n');
+
+    try {
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        {
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          system: `You are a professional art director writing image generation prompts for a historical immersive fiction platform. You write scene descriptions that will be appended to a master technical specification and sent to an AI image generator.
+
+Write a 300-400 word scene description for the scenario data provided. The description must include:
+- The exact historical moment being depicted (specific time, place, date)
+- The figures present: who they are, what they are doing, what they are wearing, their emotional state
+- The physical environment in precise detail: architecture, objects, lighting sources, weather/atmosphere
+- The specific lighting: quality, direction, color temperature, dramatic effect
+- The emotional register: what mood the image should convey, what the viewer should feel
+
+Do not include technical specifications, aspect ratios, file naming, or any reference to the image generation platform. Do not write headers or labels. Write only the scene narrative as flowing prose.
+
+Return only the scene description. No preamble, no closing remarks.`,
+          messages: [{ role: 'user', content: userMessage }],
+        },
+        { timeout: 60_000 }
+      );
+      const draft = msg.content[0]?.text?.trim();
+      if (!draft) return res.status(500).json({ error: 'No text returned from Anthropic' });
+      res.json({ draft });
+    } catch (err) {
+      console.error('[IMG-PROMPT-GEN]', err.message);
+      res.status(500).json({ error: 'Draft generation failed', detail: err.message });
+    }
+  });
+
+  r.put('/scenarios/:id/image-prompt', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const { generation_prompt } = req.body;
+    const updated = {
+      ...scenario,
+      image: {
+        ...(scenario.image || {}),
+        generation_prompt: generation_prompt || '',
+      },
+    };
+    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true });
+  });
+
   console.log('[admin] Pipeline routes registered');
   return r;
 }
