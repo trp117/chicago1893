@@ -2500,6 +2500,14 @@ async function handleManualSave(data, containerEl) {
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   if (containerEl) collectEdits(containerEl, data);
 
+  // Image Prompt Studio — textarea is outside the data-path form system, so collectEdits
+  // never picks it up. Inject the current value here so main Save never overwrites a
+  // previously-saved draft with undefined.
+  const imgPromptTextarea = document.getElementById('img-prompt-scene-desc');
+  if (imgPromptTextarea && data.scenario) {
+    data.scenario.image = { ...(data.scenario.image || {}), generation_prompt: imgPromptTextarea.value };
+  }
+
   // Glossary is managed via dedicated API endpoints (not form fields), so collectEdits
   // never sees it. Read approved term cards from the DOM and inject into the payload.
   // If a card is in edit mode (Edit clicked but term-level Save not yet clicked), the
