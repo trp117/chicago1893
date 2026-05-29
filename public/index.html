@@ -98,6 +98,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .bg-img-omaha{background-image:url('/images/scenarios/dog_green_wide.jpg');background-size:cover;background-position:center}
 .bg-img-greensboro{background-image:url('/images/scenarios/greensboro_four_wide.jpg');background-size:cover;background-position:30% center}
 .bg-img-sargasso{background-image:url('/images/scenarios/sargasso_deep_wide.jpg');background-size:cover;background-position:center}
+.bg-img-cantigny{background-image:url('/images/scenarios/zero_hour_cantigny_wide.jpg');background-size:cover;background-position:center}
 .fc-ai-attr{font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic;z-index:2}
 .fc-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,2.5vw,28px);background:linear-gradient(to top,rgba(8,6,4,.92) 0%,rgba(8,6,4,.3) 55%,transparent 100%)}
 .fc-has-img .fc-inner{background:linear-gradient(to top,rgba(8,6,4,.55) 0%,rgba(8,6,4,.25) 55%,transparent 100%)}
@@ -313,14 +314,15 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <div class="fc-meta"><span class="meta-pill">Hydroacoustic Officer</span><span class="meta-pill">Second-in-Command</span><span class="meta-pill">USS Cony captain</span></div>
       </div>
     </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=triangle_shirtwaist';return false" class="featured-card fc-small">
-      <div class="fc-bg bg-fire" id="fc-fire"></div>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=zero_hour_cantigny';return false" class="featured-card fc-live fc-has-img" id="fc-card-cantigny">
+      <div class="fc-bg bg-military bg-img-cantigny" id="fc-cantigny"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
       <div class="fc-inner">
-        <p class="fc-tag">Labor &amp; Society &middot; Mar 1911</p>
-        <h3 class="fc-title">Triangle Shirtwaist Fire</h3>
-        <p class="fc-desc">The door is locked from outside. The smoke is rising.</p>
-        <p class="fc-cost">Cost tracked: seconds to decision</p>
-        <div class="fc-meta"><span class="meta-pill">3 perspectives</span></div>
+        <p class="fc-tag">World War I &middot; May 28, 1918</p>
+        <h3 class="fc-title">The Zero Hour at Cantigny</h3>
+        <p class="fc-desc">The barrage has started but something is wrong. A cut wire, falsified tables, and a chain of command that has gone silent.</p>
+        <p class="fc-cost">Cost tracked: command authority, unit cohesion, tactical margin</p>
+        <div class="fc-meta"><span class="meta-pill">The Artillery Commander</span><span class="meta-pill">The Doughboy</span><span class="meta-pill">The Signaler</span></div>
       </div>
     </a>
   </div>

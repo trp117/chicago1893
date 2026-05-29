@@ -12,6 +12,7 @@ const LOCAL_IMAGES = {
   dog_green_sector:               '/images/scenarios/dog_green_short.jpg',
   greensboro_four_the_color_line: '/images/scenarios/greensboro_four_short.jpg',
   sargasso_deep_three_keys:       '/images/scenarios/sargasso_deep_short.jpg',
+  zero_hour_cantigny:             '/images/scenarios/zero_hour_cantigny_short.jpg',
 };
 
 const LOCAL_IMG_POSITION = {
