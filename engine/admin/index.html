@@ -1966,8 +1966,8 @@ function renderTechnicalFactsSection(data) {
       <button type="button" id="mark-tf-reviewed-btn" class="btn btn-primary" ${reviewed ? 'disabled' : ''}>
         ${reviewed ? '✓ Technical Facts Reviewed' : 'Mark Technical Facts Reviewed'}
       </button>
-      <button type="button" id="download-tf-facts-btn" class="btn btn-secondary">↓ Download Facts (.txt)</button>
-      <button type="button" id="download-tf-facts-with-prompt-btn" class="btn btn-secondary">↓ Download with AI Prompt</button>
+      <button type="button" id="download-tf-facts-btn" class="btn btn-secondary">⎘ Copy Facts</button>
+      <button type="button" id="download-tf-facts-with-prompt-btn" class="btn btn-secondary">⎘ Copy with AI Prompt</button>
       ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Verify every fact against its source before marking as reviewed.</span>' : ''}
     </div>`;
 
@@ -2408,8 +2408,8 @@ function renderEpilogueSection(data) {
         <button type="button" id="mark-epilogue-reviewed-btn" class="btn btn-primary" ${reviewed ? 'disabled' : ''}>
           ${reviewed ? '✓ Historical Data Reviewed' : 'Mark Historical Data Reviewed'}
         </button>
-        <button type="button" id="download-epilogue-facts-btn" class="btn btn-secondary">↓ Download Facts (.txt)</button>
-        <button type="button" id="download-epilogue-facts-with-prompt-btn" class="btn btn-secondary">↓ Download with AI Prompt</button>
+        <button type="button" id="download-epilogue-facts-btn" class="btn btn-secondary">⎘ Copy Facts</button>
+        <button type="button" id="download-epilogue-facts-with-prompt-btn" class="btn btn-secondary">⎘ Copy with AI Prompt</button>
         ${!reviewed ? '<span style="font-size:12px;color:var(--text-soft)">Review all entries carefully before marking as reviewed.</span>' : ''}
       </div>`;
   }
@@ -2536,10 +2536,9 @@ async function handleManualSave(data, containerEl) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SCENARIO DOWNLOAD
+// SCENARIO COPY
 // ═══════════════════════════════════════════════════════════════
-function downloadScenarioDocWithPrompt(data) {
-  const SCENARIO_REVIEW_PROMPT = `You are reviewing a complete interactive historical fiction scenario for accuracy and internal consistency. Check every section — opening scene, win/fail conditions, story arc beats, player roles, characters, locations, clues, period vocabulary, and epilogue data — against primary historical sources.
+const SCENARIO_REVIEW_PROMPT = `You are reviewing a complete interactive historical fiction scenario for accuracy and internal consistency. Check every section — opening scene, win/fail conditions, story arc beats, player roles, characters, locations, clues, period vocabulary, and epilogue data — against primary historical sources.
 
 For every correction needed, use EXACTLY this format — no prose between corrections:
 
@@ -2560,10 +2559,40 @@ Do not invent corrections. If you cannot verify something, write:
 
 SCENARIO TO REVIEW:
 `;
-  downloadScenarioDoc(data, SCENARIO_REVIEW_PROMPT);
+
+function copyScenarioDocWithPrompt(data, btn) {
+  const text = buildScenarioDocText(data, SCENARIO_REVIEW_PROMPT);
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => toast('Clipboard write failed', 'error'));
 }
 
-function downloadScenarioDoc(data, promptPrefix = '') {
+function copyScenarioDoc(data, btn) {
+  const text = buildScenarioDocText(data);
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => toast('Clipboard write failed', 'error'));
+}
+
+async function copyTranscript(btn, id) {
+  try {
+    const resp = await fetch(`${API}/transcripts/${encodeURIComponent(id)}/download`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    await navigator.clipboard.writeText(text);
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  } catch (err) {
+    toast('Copy failed: ' + err.message, 'error');
+  }
+}
+
+function buildScenarioDocText(data, promptPrefix = '') {
   const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
   const L  = lines => lines.join('\n');
   const HR = '═'.repeat(60);
@@ -2847,15 +2876,7 @@ function downloadScenarioDoc(data, promptPrefix = '') {
 
   out.push(''); out.push(HR); out.push('');
 
-  const suffix   = promptPrefix ? '_with_prompt' : '';
-  const filename = `${(scenario.id || scenario.title || 'scenario').replace(/\s+/g, '_')}_review${suffix}.txt`;
-  const blob = new Blob([promptPrefix + out.join('\n')], { type: 'text/plain' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  return promptPrefix + out.join('\n');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3030,8 +3051,8 @@ function renderPreview(data, autoSaved = false) {
   setTopbar(scenario.title || 'Generated Story', [
     { label: '▶ Play',        cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
     { label: '💾 Save',       cls: 'btn-primary',   action: () => handleManualSave(data, document.getElementById('preview-form')) },
-    { label: '↓ Download',             cls: 'btn-secondary', action: () => downloadScenarioDoc(data) },
-    { label: '↓ Download + AI Prompt', cls: 'btn-secondary', action: () => downloadScenarioDocWithPrompt(data) },
+    { label: '⎘ Copy',             cls: 'btn-secondary', action: (e) => copyScenarioDoc(data, e.currentTarget) },
+    { label: '⎘ Copy + AI Prompt', cls: 'btn-secondary', action: (e) => copyScenarioDocWithPrompt(data, e.currentTarget) },
     { label: '+ New Story',            cls: 'btn-secondary', action: () => renderGenerator() },
   ]);
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
@@ -3397,20 +3418,16 @@ function renderPreview(data, autoSaved = false) {
         }
       });
 
-      const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
-      const url  = URL.createObjectURL(blob);
-      const a    = Object.assign(document.createElement('a'), {
-        href:     url,
-        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_epilogue_facts.txt`,
-      });
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const btn = e.target.closest('#download-epilogue-facts-btn');
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied to clipboard';
+        setTimeout(() => { btn.textContent = orig; }, 2000);
+      }).catch(() => toast('Clipboard write failed', 'error'));
       return;
     }
 
-    // Download epilogue facts with AI review prompt
+    // Copy epilogue facts with AI review prompt
     if (e.target.closest('#download-epilogue-facts-with-prompt-btn')) {
       const epDetails = formEl.querySelector('#epilogue-data-details');
       if (!epDetails) return;
@@ -3478,20 +3495,16 @@ EPILOGUE DATA TO REVIEW:
         const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
         if (id || record) { if (id) lines.push(`Beat: ${id}`); if (record) lines.push(record); lines.push(''); }
       });
-      const blob = new Blob([EP_REVIEW_PROMPT + lines.join('\n')], { type: 'text/plain' });
-      const url  = URL.createObjectURL(blob);
-      const a    = Object.assign(document.createElement('a'), {
-        href:     url,
-        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_epilogue_facts_with_prompt.txt`,
-      });
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const btnWp = e.target.closest('#download-epilogue-facts-with-prompt-btn');
+      navigator.clipboard.writeText(EP_REVIEW_PROMPT + lines.join('\n')).then(() => {
+        const orig = btnWp.textContent;
+        btnWp.textContent = '✓ Copied to clipboard';
+        setTimeout(() => { btnWp.textContent = orig; }, 2000);
+      }).catch(() => toast('Clipboard write failed', 'error'));
       return;
     }
 
-    // Download technical facts as plain text
+    // Copy technical facts as plain text
     if (e.target.closest('#download-tf-facts-btn')) {
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (!tfDetails) return;
@@ -3516,20 +3529,16 @@ EPILOGUE DATA TO REVIEW:
         lines.push('');
       });
 
-      const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
-      const url  = URL.createObjectURL(blob);
-      const a    = Object.assign(document.createElement('a'), {
-        href:     url,
-        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_technical_facts.txt`,
-      });
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const btnTf = e.target.closest('#download-tf-facts-btn');
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        const orig = btnTf.textContent;
+        btnTf.textContent = '✓ Copied to clipboard';
+        setTimeout(() => { btnTf.textContent = orig; }, 2000);
+      }).catch(() => toast('Clipboard write failed', 'error'));
       return;
     }
 
-    // Download technical facts with AI review prompt
+    // Copy technical facts with AI review prompt
     if (e.target.closest('#download-tf-facts-with-prompt-btn')) {
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (!tfDetails) return;
@@ -3572,16 +3581,12 @@ TECHNICAL FACTS TO REVIEW:
         if (valid_from || valid_until) lines.push(`Valid: ${valid_from || '—'} → ${valid_until || '—'}`);
         lines.push('');
       });
-      const blob = new Blob([TF_REVIEW_PROMPT + lines.join('\n')], { type: 'text/plain' });
-      const url  = URL.createObjectURL(blob);
-      const a    = Object.assign(document.createElement('a'), {
-        href:     url,
-        download: `${scenarioTitle.toLowerCase().replace(/\s+/g, '_')}_technical_facts_with_prompt.txt`,
-      });
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const btnTfWp = e.target.closest('#download-tf-facts-with-prompt-btn');
+      navigator.clipboard.writeText(TF_REVIEW_PROMPT + lines.join('\n')).then(() => {
+        const orig = btnTfWp.textContent;
+        btnTfWp.textContent = '✓ Copied to clipboard';
+        setTimeout(() => { btnTfWp.textContent = orig; }, 2000);
+      }).catch(() => toast('Clipboard write failed', 'error'));
       return;
     }
   }, true); // capture phase so it fires before the existing click delegation
@@ -3808,7 +3813,7 @@ async function renderTranscripts() {
       <td>${resultBadge(t.result)}</td>
       <td style="text-align:right;white-space:nowrap;color:var(--text-soft);font-size:12px">${kb}</td>
       <td style="text-align:right;white-space:nowrap">
-        <a class="btn btn-secondary btn-sm" href="${API}/transcripts/${t.id}/download" download="transcript-${t.id}.md" style="text-decoration:none;margin-right:6px">Download</a>
+        <button class="btn btn-secondary btn-sm" style="margin-right:6px" onclick="copyTranscript(this,'${t.id}')">⎘ Copy</button>
         <button class="btn btn-danger btn-sm" data-delete-transcript="${t.id}">Delete</button>
       </td>
     </tr>`;
