@@ -89,6 +89,14 @@ const CATEGORY_MAP = {
   artesian_height_1892:             'industrial',
   bornholmer_strasse_first_breach:  'industrial',
 };
+const CATEGORY_LABELS = {
+  space:          'Space & Cold War',
+  military:       'Military',
+  'civil-rights': 'Civil Rights',
+  underground:    'Underground',
+  maritime:       'Maritime',
+  industrial:     'Industrial',
+};
 app.get('/api/stories', async (req, res) => {
   try {
     const allRoles = repos.scenarios.findPlayerRoles();
@@ -106,7 +114,7 @@ app.get('/api/stories', async (req, res) => {
         id:          s.id,
         title:       s.title,
         description: s.description,
-        era:         deriveEra(s),
+        era:         CATEGORY_LABELS[CATEGORY_MAP[s.id]] || deriveEra(s),
         duration:    s.sessionTargetMinutes ? `~${s.sessionTargetMinutes} min` : null,
         category:    CATEGORY_MAP[s.id] || null,
         image_url:   s.image?.url || null,
