@@ -87,7 +87,7 @@ const CATEGORY_MAP = {
   midnight_errand_boston:           'underground',
   titanic_final_hours:              'maritime',
   artesian_height_1892:             'industrial',
-  bornholmer_strasse_first_breach:  'industrial',
+  bornholmer_strasse_first_breach:  'space',
 };
 const CATEGORY_LABELS = {
   space:          'Space & Cold War',
