@@ -99,6 +99,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .bg-img-greensboro{background-image:url('/images/scenarios/greensboro_four_wide.jpg');background-size:cover;background-position:30% center}
 .bg-img-sargasso{background-image:url('/images/scenarios/sargasso_deep_wide.jpg');background-size:cover;background-position:center}
 .bg-img-cantigny{background-image:url('/images/scenarios/zero_hour_cantigny_wide.jpg');background-size:cover;background-position:center}
+.bg-img-titanic{background-image:url('/images/scenarios/titanic_final_hours_wide.jpg');background-size:cover;background-position:center}
 .fc-ai-attr{font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic;z-index:2}
 .fc-inner{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(18px,2.5vw,28px);background:linear-gradient(to top,rgba(8,6,4,.92) 0%,rgba(8,6,4,.3) 55%,transparent 100%)}
 .fc-has-img .fc-inner{background:linear-gradient(to top,rgba(8,6,4,.55) 0%,rgba(8,6,4,.25) 55%,transparent 100%)}
@@ -323,6 +324,17 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
         <p class="fc-desc">The barrage has started but something is wrong. A cut wire, falsified tables, and a chain of command that has gone silent.</p>
         <p class="fc-cost">Cost tracked: command authority, unit cohesion, tactical margin</p>
         <div class="fc-meta"><span class="meta-pill">The Artillery Commander</span><span class="meta-pill">The Doughboy</span><span class="meta-pill">The Signaler</span></div>
+      </div>
+    </a>
+    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=titanic_final_hours';return false" class="featured-card fc-live fc-has-img" id="fc-card-titanic">
+      <div class="fc-bg bg-sub bg-img-titanic" id="fc-titanic"></div>
+      <span class="fc-ai-attr">AI-generated illustration</span>
+      <div class="fc-inner">
+        <p class="fc-tag">Maritime &middot; April 14, 1912</p>
+        <h3 class="fc-title">Titanic: The Final Hours</h3>
+        <p class="fc-desc">11:40 PM. The iceberg has opened five compartments. The wireless room is the last place on the ship where someone can still change what happens next.</p>
+        <p class="fc-cost">Cost tracked: lifeboat capacity, time to flooding</p>
+        <div class="fc-meta"><span class="meta-pill">Senior Wireless Operator</span><span class="meta-pill">Second Engineer</span><span class="meta-pill">First Class Steward</span></div>
       </div>
     </a>
   </div>
