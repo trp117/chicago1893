@@ -320,9 +320,40 @@ function assembleBibliography(scenarioData, summary, sessionState) {
   });
 }
 
+// Strip {text,source} objects back to plain strings before sending to the prose-generation LLM.
+// key_facts and historical_frame may be stored as objects after the schema change; the
+// epilogue-text model only needs the text, not the source attribution.
+function normalizeEpilogueForLLM(epilogueData) {
+  if (!epilogueData) return epilogueData;
+  const toText = arr => (arr || []).map(f => (typeof f === 'string' ? f : (f.text || '')));
+  return {
+    ...epilogueData,
+    immediate_outcome: epilogueData.immediate_outcome ? {
+      ...epilogueData.immediate_outcome,
+      key_facts: toText(epilogueData.immediate_outcome.key_facts),
+    } : epilogueData.immediate_outcome,
+    historical_frame: toText(epilogueData.historical_frame),
+  };
+}
+
+function getCompositeDisclosure(epilogueData, summary) {
+  const interacted = new Set(summary.interacted_characters || []);
+  return (epilogueData?.character_fates || [])
+    .filter(f => interacted.has(f.character_id) && f.classification === 'composite')
+    .map(f => ({ character_id: f.character_id, name: f.name }));
+}
+
 async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote) {
   const playerNoteRule = playerHistoricalNote
     ? 'Layer 0 — The player character: the PLAYER CHARACTER NOTE below is verified fact about the person the player portrayed. Include it. It appears after the character\'s own session ends — do not omit it.'
+    : '';
+
+  const interactedSet  = new Set(sessionSummary.interacted_characters || []);
+  const compositeNames = (epilogueData?.character_fates || [])
+    .filter(f => interactedSet.has(f.character_id) && f.classification === 'composite')
+    .map(f => f.name);
+  const compositeRule  = compositeNames.length > 0
+    ? `COMPOSITE CHARACTER CONSTRAINT: The following characters are fictional composites — invented figures placed within a documented historical context. They have no individual historical record: ${compositeNames.join(', ')}. Do NOT assign, imply, or speculate about their individual outcomes or fates. Do NOT write phrases such as "their fate is unknown" or "what became of them is unrecorded" — these still imply a real person. If you must reference them, note only the documented role they represented (e.g. a soldier present on Dog Green Sector on June 6, 1944) without any claim about what happened to that individual.`
     : '';
 
   const systemPrompt = [
@@ -344,6 +375,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     'Register: historian\'s record. Precise. Clean. Unsentimental. No literary reach. No interiority.',
     'Last sentence: a verified historical fact. Not a meaning-statement. A fact.',
     'Length: 150 to 250 words exactly.',
+    compositeRule,
   ].filter(Boolean).join('\n');
 
   const userParts = [];
@@ -355,7 +387,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     JSON.stringify(sessionSummary, null, 2),
     '',
     'EPILOGUE DATA BLOCK:',
-    JSON.stringify(epilogueData, null, 2),
+    JSON.stringify(normalizeEpilogueForLLM(epilogueData), null, 2),
     '',
     'CLOSING PROSE (do not repeat or continue its style):',
     closingProse,
@@ -784,6 +816,31 @@ Do not open with the historical context. Open inside the character's body. Let t
             if (retryText) output = extractJson(retryText);
           } catch {}
         }
+        // At the time boundary the model naturally writes closing prose rather than
+        // structured JSON.  Coerce it into a minimal ending payload so the client
+        // receives a `done` event and transitions to /closing-prose normally.
+        if (!output && state.remainingMinutes <= 0 && stopReason === 'end_turn') {
+          traceTags.push('closing-coerce');
+          console.log(`[CLOSING COERCE] time boundary — coercing end_turn prose to ending payload`);
+          output = {
+            narrative:    text,
+            choices:      [],
+            npcMoments:   [],
+            stateChanges: {},
+            location:     state.location,
+            endState: {
+              isEnding:                true,
+              result:                  'failure',
+              scene:                   text,
+              conspiracySummary:       (scenario?.partialSuccessExamples || [])[0] || 'The session ended as time expired.',
+              whatPlayerDiscovered:    'No formal conclusion was reached.',
+              outcome:                 (scenario?.failConditions || [])[0] || 'Time expired.',
+              playerContribution:      'The investigation could not be completed in the time available.',
+              authorityResponse:       scenario?.coreSystems?.failureAuthorityQuote || 'Time has run out.',
+              correctSuspectIdentified: false,
+            },
+          };
+        }
         if (!output) {
           traceTags.push('json-error');
           scoreTrace(0, `invalid-json stop_reason=${stopReason}`);
@@ -1155,6 +1212,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         '',
         'CLOSING PROSE CONSTRAINT: Closing prose may move inward but it may not step back. A physically grounded interior observation is permitted — render what the player character feels in their hands, their boots, their chest. What is prohibited is the sentence that names what the experience meant, what the player character learned, or what the session signified. The physical image is the meaning. Do not label it.',
         'This constraint applies to all narration in the closing prose. If named characters appear in the closing prose, their actions may be described physically but their significance may not be explained. The closing prose ends on a physical image. It does not end on a meaning-statement, a lesson, or a declaration addressed to the player.',
+        'PLAYER AGENCY CONSTRAINT: Closing prose may narrate involuntary, momentary physical reactions — a pause, a caught breath, a hand that steadies. It must not narrate the player taking a committed voluntary action they did not choose: moving to a location, speaking a decision, or engaging a character in a way that alters what actually happened in the session. Describe the physical residue of what occurred. Do not invent new decisions.',
       ].join('\n');
     } else {
       closingPrompt = [
@@ -1166,6 +1224,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         '',
         'CLOSING PROSE CONSTRAINT: Closing prose may move inward but it may not step back. A physically grounded interior observation is permitted — render what the player character feels in their hands, their boots, their chest. What is prohibited is the sentence that names what the experience meant, what the player character learned, or what the session signified. The physical image is the meaning. Do not label it.',
         'This constraint applies to all narration in the closing prose. If named characters appear in the closing prose, their actions may be described physically but their significance may not be explained. The closing prose ends on a physical image. It does not end on a meaning-statement, a lesson, or a declaration addressed to the player.',
+        'PLAYER AGENCY CONSTRAINT: Closing prose may narrate involuntary, momentary physical reactions — a pause, a caught breath, a hand that steadies. It must not narrate the player taking a committed voluntary action they did not choose: moving to a location, speaking a decision, or engaging a character in a way that alters what actually happened in the session. Describe the physical residue of what occurred. Do not invent new decisions.',
         '',
         '---',
         '',
@@ -1227,7 +1286,12 @@ Do not open with the historical context. Open inside the character's body. Let t
         console.warn(`[EPILOGUE] Skipped for session ${sessionId} — epilogue data not reviewed on scenario "${scenarioId}"`);
       }
 
-      sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult, bibliography });
+      const compositeDisclosure = (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed)
+        ? getCompositeDisclosure(scenarioData.epilogue, buildEpilogueSummary(sessionState, endResult))
+        : [];
+      console.log('[EPILOGUE-CLOSE] composite_disclosure — count:', compositeDisclosure.length);
+
+      sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult, bibliography, composite_disclosure: compositeDisclosure });
       res.end();
 
       // Write closing sections to the session transcript
@@ -1252,6 +1316,10 @@ Do not open with the historical context. Open inside the character's body. Let t
                 if (src.access_note) lines.push(`  *(${src.access_note})*`);
               }
             }
+          }
+          if (compositeDisclosure.length) {
+            const names = compositeDisclosure.map(c => c.name).join(', ');
+            lines.push('', '---', '', '## A Note on the Characters', '', `${names} ${compositeDisclosure.length === 1 ? 'is a fictional composite' : 'are fictional composites'} placed within a documented historical context. ${compositeDisclosure.length === 1 ? 'This character is' : 'These characters are'} not based on identified historical individuals.`);
           }
           lines.push('');
           await appendFile(transcriptPath, lines.join('\n'));

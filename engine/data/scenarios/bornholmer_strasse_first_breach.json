@@ -223,6 +223,7 @@
     "character_fates": [
       {
         "character_id": "char_jaeger",
+        "classification": "documented",
         "name": "Harald Jäger",
         "outcome": "survived",
         "historical_record": "Harald Jäger was the real Stasi lieutenant colonel commanding the Bornholmer Straße passport control unit (PASS) on the night of November 9, 1989. Facing a crowd he estimated at tens of thousands and receiving no usable orders from superiors, he made the unilateral decision at approximately 23:30 to open the checkpoint to unrestricted passage. He was subsequently dismissed from the Stasi and faced professional and legal proceedings.Following German reunification, Jäger was honorably discharged from the border troops. He worked as a small business owner and security consultant, co-authored an autobiographical account of the night, and lived in retirement near Berlin until his death. He was alive and giving interviews as late as 2019.",
@@ -234,6 +235,7 @@
       },
       {
         "character_id": "char_protester",
+        "classification": "composite",
         "name": "Anna Schreiber",
         "outcome": "unknown",
         "historical_record": "Anna Schreiber is a fictional composite character. No individual named Anna Schreiber is documented in primary sources as a named participant at the front of the Bornholmer Straße crowd on November 9, 1989. The experiences attributed to her are drawn from documented crowd testimony but she has no individual historical record.",
@@ -241,6 +243,7 @@
       },
       {
         "character_id": "char_journalist",
+        "classification": "composite",
         "name": "Thomas Weller",
         "outcome": "unknown",
         "historical_record": "Thomas Weller is a fictional character. ARD (Arbeitsgemeinschaft der öffentlich-rechtlichen Rundfunkanstalten der Bundesrepublik Deutschland) did have camera crews operating in West Berlin on the night of November 9, 1989, and footage from the Bornholmer Straße crossing was broadcast. The specific camera operators present at Bornholmer Straße in the first minutes of the opening are not individually named in available published sources. No individual named Thomas Weller appears in documented ARD crew records for that night in accessible historical literature.",
@@ -248,6 +251,7 @@
       },
       {
         "character_id": "char_brenner",
+        "classification": "composite",
         "name": "Klaus Brenner",
         "outcome": "unknown",
         "historical_record": "Klaus Brenner is a fictional character. Individual Grenztruppen enlisted personnel stationed at Bornholmer Straße on November 9, 1989 are not named in publicly available primary sources. The general fate of Grenztruppen personnel after the fall of the Wall is documented collectively: the Grenztruppen der DDR was dissolved on 3 October 1990 upon German reunification. Individual soldiers were discharged; some faced legal proceedings related to the Schießbefehl (shoot-to-kill order), though prosecutions focused primarily on commanders and political leadership.",
@@ -255,6 +259,7 @@
       },
       {
         "character_id": "char_oberst_mielke",
+        "classification": "composite",
         "name": "Dietrich Raab",
         "outcome": "unknown",
         "historical_record": "Dietrich Raab is a fictional character. No Stasi liaison officer of this name and rank is documented in available primary sources as present at or in communication with Bornholmer Straße on November 9, 1989. The historical record does confirm that Jäger attempted to reach superiors by telephone multiple times that evening and received no actionable orders. The identities of the specific Stasi district command officers he contacted are not fully established in open sources.",
@@ -262,6 +267,7 @@
       },
       {
         "character_id": "char_mueller",
+        "classification": "composite",
         "name": "Hans Müller",
         "outcome": "unknown",
         "historical_record": "Hans Müller is a fictional character. Individual Grenztruppen Gefreiter personnel at Bornholmer Straße on November 9, 1989 are not named in publicly available primary sources. See note under char_brenner for the collective fate of Grenztruppen personnel after reunification.",
@@ -269,6 +275,7 @@
       },
       {
         "character_id": "char_westberlin_producer",
+        "classification": "composite",
         "name": "Ingrid Hartmann",
         "outcome": "unknown",
         "historical_record": "Ingrid Hartmann is a fictional character. No ARD field producer of this name is documented in available primary sources as stationed on the western approach to the Bornholmer bridge on November 9, 1989. ARD's presence in West Berlin that night is historically confirmed but individual production staff at this specific location are not named in accessible historical literature.",

@@ -446,6 +446,7 @@
     "character_fates": [
       {
         "character_id": "david_richmond",
+        "classification": "documented",
         "name": "David Richmond",
         "outcome": "died",
         "historical_record": "David Richmond was one of the four original sit-in participants on February 1, 1960. He continued his studies at North Carolina A&T State University but faced intense post-protest isolation, death threats, and difficulty securing long-term employment in Greensboro, eventually working as a porter and laborer. He died on November 7, 1990, in Greensboro at age 49, and was the first of the Greensboro Four to pass away.",
@@ -457,6 +458,7 @@
       },
       {
         "character_id": "ezell_blair_jr",
+        "classification": "documented",
         "name": "Ezell Blair Jr. (later Jibreel Khazan)",
         "outcome": "survived",
         "historical_record": "Ezell Blair Jr. later changed his name to Jibreel Khazan. He graduated from A&T and earned a master's degree from UMass Dartmouth. He became a social worker in New Bedford, Massachusetts. He was one of the four students honored when the Greensboro Woolworth's lunch counter stools were donated to the Smithsonian Institution's National Museum of American History in 1993.",
@@ -468,6 +470,7 @@
       },
       {
         "character_id": "franklin_mccain",
+        "classification": "documented",
         "name": "Franklin McCain",
         "outcome": "died",
         "historical_record": "Franklin McCain graduated from A&T, earned a chemistry degree, and built a career in the chemical industry with Celanese Corporation in Charlotte, North Carolina. He remained a prominent civil rights figure and public speaker for decades. He remained an active public speaker and civil rights advocate throughout his life. McCain died on January 10, 2014, in Greensboro, North Carolina, at age 73.",
@@ -479,6 +482,7 @@
       },
       {
         "character_id": "joseph_mcneil",
+        "classification": "documented",
         "name": "Joseph McNeil",
         "outcome": "survived",
         "historical_record": "Joseph McNeil graduated from A&T, served in the United States Air Force, and retired as a major general — the highest military rank achieved by any of the four. He pursued a career in finance after his military service. He was among the four honored at the Smithsonian donation ceremony in 1993.",
@@ -490,6 +494,7 @@
       },
       {
         "character_id": "harris_mackintosh",
+        "classification": "composite",
         "name": "Harris Mackintosh",
         "outcome": "unknown",
         "historical_record": "The store manager present on February 1, 1960, at the Greensboro Woolworth's is identified in some accounts as C.L. Harris. The specific individual's subsequent career and fate are not documented in available primary or secondary historical sources. The name Harris Mackintosh as used in this scenario is a composite or fictionalized rendering; no primary source confirms this individual's identity or later history.",
@@ -497,6 +502,7 @@
       },
       {
         "character_id": "james_caldwell",
+        "classification": "composite",
         "name": "James Caldwell",
         "outcome": "unknown",
         "historical_record": "The Carolina Peacemaker, Greensboro's Black-owned weekly newspaper, did cover the sit-in movement. The specific reporter present on February 1, 1960, and their subsequent career are not individually documented in available primary historical sources. The name James Caldwell as used in this scenario cannot be confirmed against the historical record.",
@@ -504,6 +510,7 @@
       },
       {
         "character_id": "patsy_howell",
+        "classification": "composite",
         "name": "Patsy Howell",
         "outcome": "unknown",
         "historical_record": "Individual counter assistants working at the Greensboro Woolworth's on February 1, 1960, are not named in available primary or secondary historical sources. The name Patsy Howell as used in this scenario cannot be confirmed against the historical record. Accounts note that the waitress on duty declined to serve the students and that the counter was eventually closed, but individual staff members are not identified by name in documented sources.",
@@ -511,6 +518,7 @@
       },
       {
         "character_id": "ruth_carver",
+        "classification": "composite",
         "name": "Ruth Carver",
         "outcome": "unknown",
         "historical_record": "Individual white patrons present in the Greensboro Woolworth's on February 1, 1960, are not identified by name in available primary or secondary historical sources. The name Ruth Carver as used in this scenario cannot be confirmed against the historical record.",
@@ -518,6 +526,7 @@
       },
       {
         "character_id": "sergeant_dale_pruitt",
+        "classification": "composite",
         "name": "Sergeant Dale Pruitt",
         "outcome": "unknown",
         "historical_record": "Accounts of the February 1, 1960, sit-in note that a police officer was present in the store and observed the situation without making arrests. The Greensboro Police Department did not intervene to remove the students on that day. The specific officer's name, rank, and subsequent career are not documented in available primary historical sources. The name Sergeant Dale Pruitt as used in this scenario cannot be confirmed against the historical record.",

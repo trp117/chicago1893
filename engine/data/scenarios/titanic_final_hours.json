@@ -236,6 +236,7 @@
     "character_fates": [
       {
         "character_id": "harold_bride",
+        "classification": "documented",
         "name": "Harold Bride",
         "outcome": "survived",
         "historical_record": "Harold Bride remained at the wireless set transmitting distress calls until approximately 02:10 AM, when Captain Smith released him from duty. He was washed off the ship as it sank and clung to an overturned collapsible lifeboat (Collapsible B) alongside Second Officer Lightoller and others. He was rescued by RMS Carpathia with frostbitten feet. He subsequently testified before both the U.S. Senate Inquiry (April 1912) and the British Board of Trade Inquiry (May 1912). He gave a first-person account to The New York Times published April 19, 1912.",
@@ -247,6 +248,7 @@
       },
       {
         "character_id": "jack_phillips",
+        "classification": "documented",
         "name": "Jack Phillips",
         "outcome": "died",
         "historical_record": "Jack Phillips continued transmitting distress signals until power failed at approximately 02:17 AM. He was last seen by Harold Bride attempting to reach Collapsible B. He did not survive. His body, if recovered, was never identified. He was 25 years old. Bride testified that Phillips was still at the key when Bride left the Marconi Room.",
@@ -258,6 +260,7 @@
       },
       {
         "character_id": "joseph_bell",
+        "classification": "documented",
         "name": "Chief Engineer Joseph Bell",
         "outcome": "died",
         "historical_record": "Chief Engineer Joseph Bell and all 35 engineering officers remained at their posts in the engine and boiler rooms throughout the sinking, maintaining power and steam. None survived. Bell's body was never recovered. His actions were cited in the British Board of Trade Inquiry as exemplary. He was 51 years old at the time of his death.",
@@ -269,6 +272,7 @@
       },
       {
         "character_id": "charles_lightoller",
+        "classification": "documented",
         "name": "Second Officer Charles Lightoller",
         "outcome": "survived",
         "historical_record": "Charles Lightoller was the most senior surviving officer of RMS Titanic. He loaded and oversaw the lowering of all port-side lifeboats, enforcing a strict women-and-children-only policy. He was washed off the ship as it sank, was briefly sucked against a ventilation grate, and eventually reached Collapsible B, which he commanded. He was rescued by Carpathia. He was the primary witness at both the U.S. Senate Inquiry and the British Board of Trade Inquiry, where his testimony was extensive and at times contradicted by other witnesses. He later served in World War I and World War II, and died in 1952.",
@@ -280,6 +284,7 @@
       },
       {
         "character_id": "thomas_andrews",
+        "classification": "documented",
         "name": "Thomas Andrews",
         "outcome": "died",
         "historical_record": "Thomas Andrews was seen by Steward John Stewart in the First Class Smoking Room at approximately 01:40 AM staring at a painting, but was later reliably spotted by multiple crew members on the Boat Deck frantically throwing deck chairs into the water as flotation devices and urging passengers into the final lifeboats before the ship's final plunge. He did not survive. His body was never recovered. He was 39 years old. Steward John Stewart and other crew members testified to seeing him in the Smoking Room in his final minutes. Andrews had informed Captain Smith of the flooding rate and the ship's fate approximately 20 to 25 minutes after the collision, following a physical inspection of the forward flooded spaces.",
@@ -291,6 +296,7 @@
       },
       {
         "character_id": "margaret_brown",
+        "classification": "documented",
         "name": "Margaret Brown",
         "outcome": "survived",
         "historical_record": "Margaret Brown was loaded into Lifeboat No. 6 at approximately 00:55 AM. Lifeboat No. 6 departed with approximately 28 persons aboard, against a capacity of 65. Brown repeatedly urged Quartermaster Robert Hichens, who commanded the boat, to return for survivors in the water; Hichens refused. Brown organized the women in the boat to row and maintain morale. She was rescued by Carpathia and helped organize relief efforts for survivors aboard that ship. She later testified before the U.S. Senate Inquiry. The popular characterization of her as 'the Unsinkable Molly Brown' was a later theatrical invention; she was known in her lifetime as Maggie Brown.",

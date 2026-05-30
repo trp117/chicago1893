@@ -1451,11 +1451,19 @@ function collectEdits(containerEl, data) {
     });
 
     const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
-    const ioFacts   = [];
-    epDetails.querySelectorAll('.ep-fact-val').forEach(el => { const v = el.value.trim(); if (v) ioFacts.push(v); });
+    const ioFacts = [];
+    epDetails.querySelectorAll('.ep-fact-row').forEach(row => {
+      const text   = row.querySelector('.ep-fact-val')?.value.trim()    || '';
+      const source = row.querySelector('.ep-fact-source')?.value.trim() || null;
+      if (text) ioFacts.push({ text, source: source || null });
+    });
 
     const frame = [];
-    epDetails.querySelectorAll('.ep-frame-val').forEach(el => { const v = el.value.trim(); if (v) frame.push(v); });
+    epDetails.querySelectorAll('.ep-frame-row').forEach(row => {
+      const text   = row.querySelector('.ep-frame-val')?.value.trim()    || '';
+      const source = row.querySelector('.ep-frame-source')?.value.trim() || null;
+      if (text) frame.push({ text, source: source || null });
+    });
 
     const threads = [];
     epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
@@ -1855,16 +1863,32 @@ function renderEpilogueCharFateRow(f) {
 }
 
 function renderEpilogueFactRow(fact) {
-  return `<div class="ep-fact-row" style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">
-    <input type="text" class="ep-fact-val" placeholder="Key fact…" value="${esc(fact)}" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
-    <button type="button" class="remove-ep-fact-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:4px 0">×</button>
+  const f = typeof fact === 'string' ? { text: fact, source: '' } : { text: fact?.text || '', source: fact?.source || '' };
+  const missing = !f.source.trim();
+  return `<div class="ep-fact-row" style="border:1px solid ${missing && f.text ? '#f87171' : 'var(--border)'};border-radius:6px;padding:10px;margin-bottom:6px">
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+      <input type="text" class="ep-fact-val" placeholder="Key fact…" value="${esc(f.text)}" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      <button type="button" class="remove-ep-fact-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:4px 0">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      ${missing && f.text ? '<span style="font-size:11px;color:#dc2626;font-weight:600;flex-shrink:0;white-space:nowrap">⚠ Source required</span>' : '<span style="font-size:11px;color:var(--text-soft);flex-shrink:0">Source</span>'}
+      <input type="text" class="ep-fact-source" placeholder="Author, Title, Year — or primary document" value="${esc(f.source)}" style="flex:1;padding:5px 8px;border:1px solid ${missing && f.text ? '#f87171' : 'var(--border)'};border-radius:4px;font-size:12px">
+    </div>
   </div>`;
 }
 
-function renderEpilogueFrameRow(text) {
-  return `<div class="ep-frame-row" style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">
-    <textarea class="ep-frame-val" rows="2" placeholder="Verified historical frame fact…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(text)}</textarea>
-    <button type="button" class="remove-ep-frame-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+function renderEpilogueFrameRow(fact) {
+  const f = typeof fact === 'string' ? { text: fact, source: '' } : { text: fact?.text || '', source: fact?.source || '' };
+  const missing = !f.source.trim();
+  return `<div class="ep-frame-row" style="border:1px solid ${missing && f.text ? '#f87171' : 'var(--border)'};border-radius:6px;padding:10px;margin-bottom:6px">
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+      <textarea class="ep-frame-val" rows="2" placeholder="Verified historical frame fact…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(f.text)}</textarea>
+      <button type="button" class="remove-ep-frame-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      ${missing && f.text ? '<span style="font-size:11px;color:#dc2626;font-weight:600;flex-shrink:0;white-space:nowrap">⚠ Source required</span>' : '<span style="font-size:11px;color:var(--text-soft);flex-shrink:0">Source</span>'}
+      <input type="text" class="ep-frame-source" placeholder="Author, Title, Year — or primary document" value="${esc(f.source)}" style="flex:1;padding:5px 8px;border:1px solid ${missing && f.text ? '#f87171' : 'var(--border)'};border-radius:4px;font-size:12px">
+    </div>
   </div>`;
 }
 
@@ -3308,7 +3332,7 @@ function renderPreview(data, autoSaved = false) {
     }
     if (e.target.closest('#add-ep-fact-btn')) {
       const div = document.createElement('div');
-      div.innerHTML = renderEpilogueFactRow('');
+      div.innerHTML = renderEpilogueFactRow({});
       formEl.querySelector('#ep-facts-list')?.appendChild(div.firstElementChild);
       return;
     }
@@ -3319,7 +3343,7 @@ function renderPreview(data, autoSaved = false) {
         return;
       }
       const div = document.createElement('div');
-      div.innerHTML = renderEpilogueFrameRow('');
+      div.innerHTML = renderEpilogueFrameRow({});
       frameList?.appendChild(div.firstElementChild);
       return;
     }
@@ -3338,6 +3362,22 @@ function renderPreview(data, autoSaved = false) {
 
     // Mark Historical Data Reviewed
     if (e.target.closest('#mark-epilogue-reviewed-btn')) {
+      // Gate: block if any key_facts or historical_frame entries lack a source attribution.
+      const unsourced = [];
+      formEl.querySelectorAll('#epilogue-data-details .ep-fact-row').forEach((row, i) => {
+        const text   = row.querySelector('.ep-fact-val')?.value.trim()    || '';
+        const source = row.querySelector('.ep-fact-source')?.value.trim() || '';
+        if (text && !source) unsourced.push(`Key Fact ${i + 1}: "${text.length > 70 ? text.slice(0, 70) + '…' : text}"`);
+      });
+      formEl.querySelectorAll('#epilogue-data-details .ep-frame-row').forEach((row, i) => {
+        const text   = row.querySelector('.ep-frame-val')?.value.trim()    || '';
+        const source = row.querySelector('.ep-frame-source')?.value.trim() || '';
+        if (text && !source) unsourced.push(`Historical Frame ${i + 1}: "${text.length > 70 ? text.slice(0, 70) + '…' : text}"`);
+      });
+      if (unsourced.length > 0) {
+        toast(`Cannot mark as reviewed — ${unsourced.length} entr${unsourced.length === 1 ? 'y lacks a' : 'ies lack'} source attribution. Add a source to each highlighted entry first:\n\n${unsourced.join('\n')}`, 'error');
+        return;
+      }
       const revInput = formEl.querySelector('#epilogue-reviewed-input');
       if (revInput) revInput.value = 'true';
       const badge = formEl.querySelector('#epilogue-status-badge');

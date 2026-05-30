@@ -62,6 +62,11 @@ export function buildNarrativeStyleRules(scenario = {}) {
   // 3. MOVEMENT AND TRANSITION RULE — when the player moves to a new
   //    location, the scene opens in motion, not at the destination.
   //
+  // 4. PLAYER AGENCY RULE — involuntary, momentary, reversible bodily
+  //    reactions are permitted. Committed voluntary actions the player did
+  //    not choose (moving, speaking, leaving, using an item) are never
+  //    narrated by the engine.
+  //
   // All rules apply globally to every story and every character.
   // Inserted at {{SENSORY_OPENING_RULE}} in game_system_prompt.md (line 144)
   // and via buildSystemPromptLegacy() for all scenarios.
@@ -180,6 +185,29 @@ export function buildNarrativeStyleRules(scenario = {}) {
     'This rule does not apply to choices that involve dialogue, observation, or action within the current location. It applies only when the player\'s choice explicitly involves physical movement to a new place.',
     '',
     'Never open a scene already at a destination the player has just chosen to travel to. The journey is part of the experience.',
+    '',
+    '---',
+    '',
+    '## PLAYER AGENCY RULE — DO NOT COMMIT THE PLAYER TO UNCHOSEN ACTIONS',
+    '',
+    'The engine may narrate involuntary, momentary, reversible bodily reactions when dramatically warranted — a pause, a flinch, a caught breath, a hand that steadies. These do not commit the player to a choice; the player remains free on the next turn.',
+    '',
+    'The engine must NEVER narrate the player taking a committed, voluntary action they did not choose: moving to a location, using an item, speaking a decision, leaving a scene, or engaging a character in a way that forecloses options.',
+    '',
+    'ACCEPTABLE — involuntary, reversible, player still free next turn:',
+    '"He does not raise his voice. That is the thing that stops your feet."',
+    '"Your hand finds the door frame."',
+    '"You hold still."',
+    '',
+    'NOT ACCEPTABLE — commits the player to an action they did not choose:',
+    '"You decide to stay and kneel beside him."',
+    '"You step outside and light the lantern."',
+    '"You tell him what you know."',
+    '"You leave before he can answer."',
+    '',
+    'THE TEST: Would removing this sentence require the player to undo something they did not choose to do? If yes — rewrite as a stimulus, not a player action. Describe what the world does. Let the player decide what they do next.',
+    '',
+    'WHEN IN DOUBT: Describe the stimulus. Let the player choose the response.',
     '',
     '---',
     '',

@@ -487,6 +487,7 @@
     "character_fates": [
       {
         "character_id": "char_savitsky",
+        "classification": "documented",
         "name": "Valentin Grigorievich Savitsky",
         "outcome": "survived",
         "historical_record": "Savitsky surfaced B-59 on the night of 27 October 1962 after Arkhipov refused to authorize nuclear torpedo launch. He was not court-martialed. The Soviet Navy did not publicly acknowledge the incident during his lifetime. He continued his naval career and died in 1999. The full account of his actions aboard B-59 was not publicly confirmed by Russian sources until the 2002 Havana conference on the Cuban Missile Crisis.",
@@ -498,6 +499,7 @@
       },
       {
         "character_id": "char_maslennikov",
+        "classification": "documented",
         "name": "Ivan Maslennikov",
         "outcome": "survived",
         "historical_record": "Maslennikov was the zampolit (political officer) aboard B-59 and held one of the two keys required to authorize nuclear torpedo launch under the standing orders carried by the Foxtrot submarines during Operation Anadyr. He agreed with Savitsky's assessment and indicated willingness to authorize launch. His subsequent career and personal fate after 1962 are not documented in available declassified sources. He was identified by name in accounts given by surviving crew members at the 2002 Havana conference.",
@@ -509,6 +511,7 @@
       },
       {
         "character_id": "char_arkhipov",
+        "classification": "documented",
         "name": "Vasili Alexandrovich Arkhipov",
         "outcome": "survived",
         "historical_record": "Arkhipov was Flotilla Chief of Staff embarked on B-59 and held equal authority to Savitsky under the authorization protocol for nuclear torpedo use, which required the agreement of the commanding officer, the political officer, and the flotilla commander. He refused to authorize launch, breaking the required unanimity. The submarine surfaced on 27 October 1962. Arkhipov was not publicly recognized for his actions during the Soviet period. He was promoted to Vice Admiral and later to Admiral. He died on 19 August 1998. His role was publicly confirmed at the 2002 Havana conference. Thomas Blanton of the National Security Archive stated in 2002 that Arkhipov 'saved the world.'",
@@ -520,6 +523,7 @@
       },
       {
         "character_id": "char_sonar_analyst",
+        "classification": "composite",
         "name": "Dmitri Volkov",
         "outcome": "unknown",
         "historical_record": "No individual identified as the hydroacoustic (sonar) officer or senior sonar rating of B-59 by the name Dmitri Volkov appears in declassified Soviet or Russian naval records, survivor testimony transcripts, or published scholarship on the incident. The crew of B-59 numbered approximately 78 men. Crew members other than Savitsky, Arkhipov, and Maslennikov are not individually documented in available primary sources. This character as named is not historically attested.",
@@ -527,6 +531,7 @@
       },
       {
         "character_id": "char_captain_estocin",
+        "classification": "documented",
         "name": "Paul Henry Estocin",
         "outcome": "died",
         "historical_record": "Commander Paul Estocin commanded USS Cony (DD-508) during the Cuban Missile Crisis quarantine operations in October 1962, including the tracking and hold-down of B-59. He survived the crisis. He subsequently transitioned to naval aviation. On 26 April 1967, while flying an A-4E Skyhawk on a strike mission against the Hanoi thermal power plant during the Vietnam War, his aircraft was hit by a surface-to-air missile. He was posthumously awarded the Medal of Honor. His citation describes two separate strike missions on 20 and 26 April 1967. He was declared killed in action. His remains were not recovered.",
@@ -538,6 +543,7 @@
       },
       {
         "character_id": "char_chief_petty_officer_kozlov",
+        "classification": "composite",
         "name": "Anatoly Kozlov",
         "outcome": "unknown",
         "historical_record": "No individual identified as Chief of the Boat or senior enlisted member of B-59 by the name Anatoly Kozlov appears in declassified records, survivor testimony, or published scholarship on the incident. Crew members of B-59 below officer rank are not individually documented in available primary sources. This character as named is not historically attested.",
@@ -545,6 +551,7 @@
       },
       {
         "character_id": "char_lt_commander_hayes",
+        "classification": "composite",
         "name": "Robert Hayes",
         "outcome": "unknown",
         "historical_record": "No individual identified as Executive Officer of USS Cony (DD-508) by the name Robert Hayes during the October 1962 period appears in declassified Navy records or published scholarship consulted for this scenario. The officer complement of USS Cony during the Cuban Missile Crisis is not fully documented in available open sources. This character as named is not historically attested.",

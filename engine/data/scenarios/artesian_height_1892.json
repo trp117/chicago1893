@@ -500,6 +500,7 @@
     "character_fates": [
       {
         "character_id": "char_benezette_williams",
+        "classification": "documented",
         "name": "Benezette Williams",
         "outcome": "unknown",
         "historical_record": "Benezette Williams was a real civil engineer who served as chief engineer for the Western Springs, Illinois artesian well project, completed in 1892. Williams and Williams, the firm he led with his brother Edgar, was contracted by the village to design and oversee the drilling. The well reportedly reached the St. Peter Sandstone aquifer at a depth of approximately 1,800 feet, though surviving published depth figures vary somewhat across later historical summaries and became the primary water supply for Western Springs. Historical records confirm Williams certified the project's engineering work. His subsequent career and the full scope of his professional biography beyond this project are not documented in sources presently available.",
@@ -511,6 +512,7 @@
       },
       {
         "character_id": "char_edgar_williams",
+        "classification": "documented",
         "name": "Edgar Williams",
         "outcome": "unknown",
         "historical_record": "Edgar Williams served as the business partner and project manager for Williams and Williams during the Western Springs artesian well project. His role was primarily administrative and financial rather than field engineering. The firm's involvement in the Western Springs project is documented in village records. His individual post-project biography is not established in sources presently available.",
@@ -522,6 +524,7 @@
       },
       {
         "character_id": "char_wickerson",
+        "classification": "composite",
         "name": "Aldous Wickerson",
         "outcome": "unknown",
         "historical_record": "A village president of Western Springs presided over the municipal bond process and infrastructure development that funded the artesian well project in the early 1890s. The specific individual holding that office during the 1891–1892 drilling period and the details of their subsequent tenure are not confirmed in sources presently available. Western Springs was incorporated as a village in 1886, and its early elected leadership oversaw the transition from private cisterns and shallow wells to a centralized municipal water system.",
@@ -533,6 +536,7 @@
       },
       {
         "character_id": "char_alderman_voss",
+        "classification": "composite",
         "name": "Corey Voss",
         "outcome": "unknown",
         "historical_record": "Corey Voss is a fictional character. He represents the category of village aldermen and bond committee members who served on municipal finance bodies in small Illinois incorporated villages during the 1880s and 1890s. Such officials were responsible for approving infrastructure bonds, reviewing contractor cost certifications, and voting on public works expenditures. Illinois municipal bond law of this period required committee approval before bonds could be issued for capital projects. Corruption and falsification of cost records in municipal infrastructure contracting were documented concerns in Illinois during this era, and several Cook County municipalities experienced contested bond proceedings in the 1890s. The names and outcomes of individual aldermen in Western Springs during this period are not fully preserved in accessible records.",
@@ -540,6 +544,7 @@
       },
       {
         "character_id": "char_dolan_marsh",
+        "classification": "composite",
         "name": "Dolan Marsh",
         "outcome": "unknown",
         "historical_record": "Dolan Marsh is a fictional character. He represents the category of Chicago, Burlington and Quincy Railroad firemen who worked the line through Western Springs, Illinois during the early 1890s. The CBQ main line passed through Western Springs, and railroad workers were a consistent presence in the village. Firemen on steam locomotives of this period worked shifts that included overnight runs and yard duties, placing them near infrastructure sites along the right-of-way at irregular hours. Their observations were occasionally recorded in inquest and municipal proceedings when they witnessed events near the tracks, though most such testimony was never formally preserved.",
@@ -547,6 +552,7 @@
       },
       {
         "character_id": "char_ethan_philbrick",
+        "classification": "composite",
         "name": "Ethan Philbrick",
         "outcome": "unknown",
         "historical_record": "Ethan Philbrick is a fictional character. He represents the category of local engineers and village infrastructure liaisons who served as intermediaries between municipal governments and outside engineering contractors in small Illinois villages during the 1880s and 1890s. Such individuals were typically trained in practical engineering or surveying, held informal or formally appointed positions with the village, and were responsible for day-to-day oversight of construction projects on behalf of elected officials. Their access to both the contractor's technical records and the village's financial documents made them uniquely positioned within infrastructure projects. The historical record of individuals in this role is fragmentary, as their appointments were often informal and their correspondence rarely archived.",
@@ -554,6 +560,7 @@
       },
       {
         "character_id": "char_silas_greer",
+        "classification": "composite",
         "name": "Silas Greer",
         "outcome": "unknown",
         "historical_record": "Silas Greer is a fictional character. He represents the category of night laborers employed on municipal well-drilling and infrastructure construction sites in Illinois during the 1890s. Such workers were typically hired on a day-wage or shift basis, worked without formal contracts, and were among the most economically vulnerable participants in public works projects. Their names were rarely recorded in surviving project documents. Night laborers on drilling sites performed tasks including spoil removal, equipment monitoring, fuel handling, and site security. Their testimony in disputes over project conduct was seldom solicited and rarely preserved in official records.",

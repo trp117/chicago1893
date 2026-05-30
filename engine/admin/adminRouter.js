@@ -1530,17 +1530,17 @@ Return ONLY valid JSON in this exact structure:
       '',
       'Generate the following:',
       'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters.',
-      'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of strings.',
-      'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements.',
+      'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of objects. Every entry MUST include a source attribution. A dated, timed, or quantitative claim with no source must be omitted rather than stored unsourced.',
+      'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements. Every entry MUST include a source attribution.',
       'open_threads: For each essential beat in the scenario, consider whether that beat corresponds to a historical question that was raised at inquiry, disputed, or never satisfactorily resolved. If so, include an entry with the beat\'s id as thread_id and the historical record of that open question.',
       'choice_echoes: For each essential beat in the scenario, provide the verified historical record of what actually happened at that moment. This is what the epilogue will compare the player\'s choices against.',
       'Return only a JSON object matching this exact schema with no other text, no markdown, no explanation:',
       '{',
       '"character_fates": [{ "character_id": "string", "name": "string", "outcome": "survived|died|unknown", "historical_record": "string", "primary_source": "string|null" }],',
-      '"immediate_outcome": { "summary": "string", "key_facts": ["string"] },',
-      '"historical_frame": ["string"],',
-      '"open_threads": [{ "thread_id": "string", "historical_record": "string" }],',
-      '"choice_echoes": [{ "beat_id": "string", "historical_record": "string" }]',
+      '"immediate_outcome": { "summary": "string", "key_facts": [{ "text": "string", "source": "string" }] },',
+      '"historical_frame": [{ "text": "string", "source": "string" }],',
+      '"open_threads": [{ "thread_id": "string", "historical_record": "string", "source": "string|null" }],',
+      '"choice_echoes": [{ "beat_id": "string", "historical_record": "string", "source": "string|null" }]',
       '}',
     ].join('\n');
 
@@ -1581,14 +1581,21 @@ Return ONLY valid JSON in this exact structure:
       const cleaned     = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
       const epilogueData = JSON.parse(cleaned);
 
+      // Normalize key_facts and historical_frame to {text,source} objects in case the model
+      // returned bare strings despite the prompt instruction.
+      const normFactArr = arr => (arr || []).map(f =>
+        typeof f === 'string' ? { text: f, source: null } : { text: f.text || '', source: f.source || null }
+      );
+      const rawIo = epilogueData.immediate_outcome || { summary: '', key_facts: [] };
+
       const updated = {
         ...scenario,
         epilogue: {
           generated:        true,
           reviewed:         false,
           character_fates:  epilogueData.character_fates   || [],
-          immediate_outcome: epilogueData.immediate_outcome || { summary: '', key_facts: [] },
-          historical_frame: epilogueData.historical_frame  || [],
+          immediate_outcome: { summary: rawIo.summary || '', key_facts: normFactArr(rawIo.key_facts) },
+          historical_frame: normFactArr(epilogueData.historical_frame),
           open_threads:     epilogueData.open_threads      || [],
           choice_echoes:    epilogueData.choice_echoes     || [],
         },

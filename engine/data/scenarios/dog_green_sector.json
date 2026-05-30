@@ -236,10 +236,11 @@
   "beats_status": "not_generated",
   "epilogue": {
     "generated": true,
-    "reviewed": true,
+    "reviewed": false,
     "character_fates": [
       {
         "character_id": "char_cpl_drennan",
+        "classification": "composite",
         "name": "Corporal James Drennan",
         "outcome": "unknown",
         "historical_record": "No individual named James Drennan appears in the verified casualty rolls or after-action reports of the 2nd Ranger Battalion for June 6, 1944. The 2nd Ranger Battalion suffered approximately 50 percent casualties on D-Day across its companies. This character is a composite fictional figure placed within a documented unit. Outcome cannot be assigned from the historical record.",
@@ -247,6 +248,7 @@
       },
       {
         "character_id": "char_feldwebel_brandt",
+        "classification": "composite",
         "name": "Feldwebel Heinrich Brandt",
         "outcome": "unknown",
         "historical_record": "No individual named Heinrich Brandt appears in surviving German personnel records for Widerstandsnest 72 or the 352nd Infantry Division for June 6, 1944. WN-72 directly enfiladed the Dog Green Sector at the Vierville draw and was neutralized by American forces during the morning of June 6, 1944, when its garrison was killed, captured, or forced to withdraw inland. The specific fates of individual enlisted MG section commanders at WN-72 are not documented in surviving records. This character is a composite fictional figure placed within a documented position.",
@@ -254,6 +256,7 @@
       },
       {
         "character_id": "char_lt_hargrove",
+        "classification": "composite",
         "name": "First Lieutenant Calvin Hargrove",
         "outcome": "unknown",
         "historical_record": "No individual named Calvin Hargrove appears in the verified officer roster or casualty records of Company A, 116th Infantry Regiment, 29th Infantry Division for June 6, 1944. Company A, 116th Infantry, suffered catastrophic casualties at Dog Green Sector on the morning of June 6, 1944, with the company effectively destroyed as a fighting unit within the first thirty minutes of landing. This character is a composite fictional figure placed within a documented unit.",
@@ -261,6 +264,7 @@
       },
       {
         "character_id": "char_medic_calloway",
+        "classification": "composite",
         "name": "T/5 Raymond Calloway",
         "outcome": "unknown",
         "historical_record": "No individual named Raymond Calloway appears in the verified enlisted records or casualty rolls of the 116th Infantry Regiment's medical personnel for June 6, 1944. This character is a composite fictional figure. The documented experience of battalion aid men at Dog Green Sector on June 6, 1944, is recorded in the 29th Infantry Division's after-action reports and in survivor testimony collected by the U.S. Army Center of Military History.",
@@ -268,6 +272,7 @@
       },
       {
         "character_id": "char_petty_officer_reed",
+        "classification": "composite",
         "name": "Petty Officer Second Class Arthur Reed",
         "outcome": "unknown",
         "historical_record": "No individual named Arthur Reed appears in the verified crew records of the 551st LCA Flotilla for June 6, 1944. Royal Navy LCA coxswains operating at Omaha Beach on June 6, 1944, suffered significant casualties. Individual crew fates for the 551st LCA Flotilla are not fully documented in publicly available records. This character is a composite fictional figure placed within a documented flotilla designation.",
@@ -275,6 +280,7 @@
       },
       {
         "character_id": "char_pvt_szymanski",
+        "classification": "composite",
         "name": "Private Olek Szymanski",
         "outcome": "unknown",
         "historical_record": "No individual named Olek Szymanski appears in the verified enlisted casualty rolls or morning reports of Company A, 116th Infantry Regiment for June 6, 1944. This character is a composite fictional figure placed within a documented unit. Company A, 116th Infantry, sustained casualties estimated at over 90 percent killed, wounded, or missing in the first assault wave at Dog Green Sector.",
@@ -282,6 +288,7 @@
       },
       {
         "character_id": "char_sgt_kowalski",
+        "classification": "composite",
         "name": "Staff Sergeant Thomas Kowalski",
         "outcome": "unknown",
         "historical_record": "No individual named Thomas Kowalski appears in the verified NCO roster or casualty records of Dog Company, 2nd Ranger Battalion for June 6, 1944. This character is a composite fictional figure placed within a documented unit. Dog Company, 2nd Ranger Battalion, landed at Omaha Beach on June 6, 1944, and participated in the assault on the Vierville draw sector.",
@@ -289,14 +296,14 @@
       }
     ],
     "immediate_outcome": {
-      "summary": "The Vierville draw — Exit D-1 — was bypassed and its flanking bluffs cleared by approximately 0900 hours on June 6, 1944, after sustained small-unit actions by surviving elements of the 116th Infantry Regiment and Ranger units. This was combined with direct naval gunfire support from destroyers including USS McCook and USS Carmick, which closed dangerously close to the shallows—within 600 to 800 yards of the beach—to engage German strongpoints. Company A of the 116th Infantry Regiment, which landed in the first wave at Dog Green Sector, was effectively destroyed as a fighting unit within the first thirty minutes, suffering casualties estimated at over 90 percent killed, wounded, or missing.",
+      "summary": "The Vierville draw — Exit D-1 — was the last of the Omaha Beach draws to be cleared on June 6, 1944. Mixed survivor groups from the 116th Infantry Regiment and Ranger units ascended the flanking bluffs by routes that bypassed the draw itself through mid-to-late morning. The draw road was blocked by a reinforced concrete wall and was only partially cleared by approximately 1400 hours; it was not passable to wheeled vehicles until approximately 1700 hours, after the 121st Engineer Combat Battalion demolished the concrete obstacle blocking the road. This was combined with direct naval gunfire support from destroyers including USS McCook and USS Carmick, which closed dangerously close to the shallows—within 600 to 800 yards of the beach—to engage German strongpoints. Company A of the 116th Infantry Regiment, which landed in the first wave at Dog Green Sector, was effectively destroyed as a fighting unit within the first thirty minutes, suffering casualties estimated at over 90 percent killed, wounded, or missing.",
       "key_facts": [
         "Company A, 116th Infantry Regiment, 29th Infantry Division, landed at Dog Green Sector at approximately 0636 hours on June 6, 1944.",
         "The 741st Tank Battalion's DD tanks, assigned to support the Omaha Beach assault, lost 27 of 29 tanks launched in the eastern sector; the 743rd Tank Battalion, assigned to the western sector including Dog Green, launched tanks directly from LCTs closer to shore, with better survival rates.",
         "The 352nd Infantry Division, a full-strength experienced German division, had moved into the Omaha Beach defensive sector in March 1944; Allied intelligence had not confirmed its presence at the time of the assault.",
         "The USAAF bombardment preceding the landing at Omaha Beach dropped approximately 13,000 bombs; due to cloud cover and concern about hitting landing craft, bombardiers delayed release, causing bombs to fall up to three miles inland, leaving German beach defenses largely intact.",
         "USS McCook (DD-496) and USS Carmick (DD-493) provided direct fire support against WN-72 and adjacent strongpoints during the morning of June 6, 1944, closing to ranges as tight as 600 yards from the shore.",
-        "Exit D-1 at Vierville-sur-Mer was reported cleared of heavy concrete obstacles and officially opened to vehicle traffic by approximately 1100 hours on June 6, 1944.",
+        "Exit D-1 at Vierville-sur-Mer was the last of the five Omaha Beach draws to be cleared; the concrete wall blocking the road was not demolished until approximately 1700 hours on June 6, 1944, when the 121st Engineer Combat Battalion breached the obstacle, opening the draw to vehicle traffic for the first time.",
         "The 2nd Ranger Battalion landed elements at Dog Green and adjacent sectors on June 6, 1944, with Dog Company among the units committed to the Vierville draw area."
       ]
     },

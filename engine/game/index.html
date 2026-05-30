@@ -152,6 +152,10 @@ li { margin-bottom: 8px; }
 .closing-bibliography-item a { color: #7a7570; text-decoration: underline; text-underline-offset: 2px; }
 .closing-bibliography-item a:hover { color: #d0b06a; }
 .closing-bibliography-access { display: block; font-size: 0.72rem; color: #4a4540; font-style: italic; margin-top: 2px; }
+.closing-composite-note { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
+.closing-composite-note.visible { opacity: 1; }
+.closing-composite-note-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-composite-note-text { font-size: 0.8rem; color: #5a5550; line-height: 1.7; font-style: italic; }
 .closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
 .closing-return.visible { opacity: 1; }
 .closing-return:hover { color: #d0b06a; }
@@ -635,6 +639,10 @@ li { margin-bottom: 8px; }
       <div class="closing-bibliography-label">Primary Sources</div>
       <ul id="closing-bibliography-list" class="closing-bibliography-list"></ul>
     </div>
+    <div id="closing-composite-note" class="closing-composite-note">
+      <div class="closing-composite-note-label">A note on the characters</div>
+      <div id="closing-composite-note-text" class="closing-composite-note-text"></div>
+    </div>
     <a id="closing-return" href="/" class="closing-return">&#8592; Return to Stories</a>
   </div>
 </div>
@@ -1103,16 +1111,18 @@ function toggleClosingNarration() {
 // ── Closing screen ────────────────────────────────────────────────────────────
 
 function showClosingScreen(endState, sessionId) {
-  const overlay      = document.getElementById('closing-overlay');
-  const dotsEl       = document.getElementById('closing-dots');
-  const proseEl      = document.getElementById('closing-prose');
-  const aftermathEl  = document.getElementById('closing-aftermath');
-  const epilogueEl   = document.getElementById('closing-epilogue');
-  const epTextEl     = document.getElementById('closing-epilogue-text');
-  const epSourcesEl  = document.getElementById('closing-epilogue-sources');
-  const bibEl        = document.getElementById('closing-bibliography');
-  const bibListEl    = document.getElementById('closing-bibliography-list');
-  const returnEl     = document.getElementById('closing-return');
+  const overlay       = document.getElementById('closing-overlay');
+  const dotsEl        = document.getElementById('closing-dots');
+  const proseEl       = document.getElementById('closing-prose');
+  const aftermathEl   = document.getElementById('closing-aftermath');
+  const epilogueEl    = document.getElementById('closing-epilogue');
+  const epTextEl      = document.getElementById('closing-epilogue-text');
+  const epSourcesEl   = document.getElementById('closing-epilogue-sources');
+  const bibEl         = document.getElementById('closing-bibliography');
+  const bibListEl     = document.getElementById('closing-bibliography-list');
+  const compNoteEl    = document.getElementById('closing-composite-note');
+  const compNoteTexEl = document.getElementById('closing-composite-note-text');
+  const returnEl      = document.getElementById('closing-return');
 
   if (!overlay || !dotsEl || !proseEl || !aftermathEl || !epilogueEl || !returnEl) {
     console.error('[CLOSING] missing DOM element — closing screen cannot show');
@@ -1128,7 +1138,7 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
   syncClosingNarrationBtn();
 
-  async function triggerClosingSequence(hasEpilogue, hasBibliography) {
+  async function triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote) {
     if (ttsEnabled) {
       await ttsClosingSpeak(proseEl.textContent);
       aftermathEl.classList.add('visible');
@@ -1142,13 +1152,21 @@ function showClosingScreen(endState, sessionId) {
         await new Promise(r => setTimeout(r, 500));
         bibEl.classList.add('visible');
       }
+      if (hasCompositeNote && compNoteEl) {
+        await new Promise(r => setTimeout(r, 500));
+        compNoteEl.classList.add('visible');
+      }
       await new Promise(r => setTimeout(r, 500));
       returnEl.classList.add('visible');
     } else {
       setTimeout(() => aftermathEl.classList.add('visible'), 2500);
       setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
-      setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, hasEpilogue ? 10000 : 8000);
-      setTimeout(() => returnEl.classList.add('visible'), hasEpilogue ? (hasBibliography ? 12000 : 8500) : 7000);
+      const bibDelay = hasEpilogue ? 10000 : 8000;
+      setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, bibDelay);
+      const noteDelay = bibDelay + (hasBibliography ? 2000 : 0);
+      setTimeout(() => { if (hasCompositeNote && compNoteEl) compNoteEl.classList.add('visible'); }, noteDelay);
+      const returnDelay = noteDelay + (hasCompositeNote ? 2000 : (hasBibliography ? 2000 : (hasEpilogue ? 500 : 0)));
+      setTimeout(() => returnEl.classList.add('visible'), returnDelay);
     }
   }
 
@@ -1184,8 +1202,9 @@ function showClosingScreen(endState, sessionId) {
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
-            let hasEpilogue     = false;
-            let hasBibliography = false;
+            let hasEpilogue      = false;
+            let hasBibliography  = false;
+            let hasCompositeNote = false;
             if (evt.epilogue?.text) {
               hasEpilogue = true;
               epTextEl.textContent = evt.epilogue.text;
@@ -1203,11 +1222,20 @@ function showClosingScreen(endState, sessionId) {
                 return `<li class="closing-bibliography-item">${inner}</li>`;
               }).join('');
             }
-            triggerClosingSequence(hasEpilogue, hasBibliography);
+            if (evt.composite_disclosure?.length && compNoteEl && compNoteTexEl) {
+              hasCompositeNote = true;
+              const names   = evt.composite_disclosure.map(c => c.name);
+              const plural   = names.length > 1;
+              const nameList = plural
+                ? names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1]
+                : names[0];
+              compNoteTexEl.textContent = `${nameList} ${plural ? 'are fictional composites' : 'is a fictional composite'} placed within a documented historical context. ${plural ? 'These characters are' : 'This character is'} not based on identified historical individuals.`;
+            }
+            triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             dotsEl.classList.add('hidden');
-            triggerClosingSequence(false, false);
+            triggerClosingSequence(false, false, false);
           }
         }
       }
@@ -1215,7 +1243,7 @@ function showClosingScreen(endState, sessionId) {
     .catch(() => {
       clearTimeout(timeoutId);
       dotsEl.classList.add('hidden');
-      triggerClosingSequence(false, false);
+      triggerClosingSequence(false, false, false);
     });
 }
 

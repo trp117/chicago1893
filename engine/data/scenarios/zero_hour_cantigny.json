@@ -505,6 +505,7 @@
     "character_fates": [
       {
         "character_id": "char_mccormick",
+        "classification": "documented",
         "name": "Colonel Robert R. McCormick",
         "outcome": "survived",
         "historical_record": "Robert Rutherford McCormick commanded the 1st Battalion, 5th Field Artillery, AEF at Cantigny on 28 May 1918. He survived the battle and the war, was promoted, and returned to the United States where he resumed leadership of the Chicago Tribune, which he had co-inherited before the war. He served as editor and publisher of the Tribune until his death on 1 April 1955. His role at Cantigny became a point of personal pride he referenced publicly for decades.",
@@ -516,6 +517,7 @@
       },
       {
         "character_id": "char_ely",
+        "classification": "documented",
         "name": "Colonel Hanson Ely",
         "outcome": "survived",
         "historical_record": "Hanson Edward Ely commanded the 28th Infantry Regiment at Cantigny and led the assault on 28 May 1918. He was widely credited with the regiment's success in taking and holding the village against repeated German counterattacks. He was subsequently promoted to Brigadier General and later Major General. He served as Commandant of the Army War College from 1927 to 1930 and died on 13 November 1958.",
@@ -527,6 +529,7 @@
       },
       {
         "character_id": "char_farrow",
+        "classification": "composite",
         "name": "Lieutenant Gerald Farrow",
         "outcome": "unknown",
         "historical_record": "Lieutenant Gerald Farrow, as written in this scenario, is a fictional character. No officer of this name serving as adjutant of the 1st Battalion, 5th Field Artillery at Cantigny appears in available AEF records, regimental histories, or the National Archives Record Group 120 holdings for the 1st Division. His outcome cannot be documented because he does not correspond to a verified historical individual.",
@@ -534,6 +537,7 @@
       },
       {
         "character_id": "char_renard",
+        "classification": "composite",
         "name": "Captain Henri Renard",
         "outcome": "unknown",
         "historical_record": "Captain Henri Renard, as written in this scenario, is a fictional character. French liaison officers were attached to the 1st Division during the Cantigny operation — the division had trained under French tutelage in the Picardy sector — but no officer named Henri Renard in a liaison capacity at 1st Division HQ appears in available French or American archival records for this period. His outcome cannot be documented.",
@@ -541,6 +545,7 @@
       },
       {
         "character_id": "char_voss",
+        "classification": "composite",
         "name": "Sergeant Emil Voss",
         "outcome": "unknown",
         "historical_record": "Sergeant Emil Voss, as written in this scenario, is a fictional character. No individual of this name serving as a platoon sergeant in Company C, 28th Infantry Regiment at Cantigny is documented in available regimental records, casualty lists, or the 1st Division's operational summaries held at the National Archives. His outcome cannot be documented.",
@@ -548,6 +553,7 @@
       },
       {
         "character_id": "char_kowalski",
+        "classification": "composite",
         "name": "Private First Class Tadeusz Kowalski",
         "outcome": "unknown",
         "historical_record": "Private First Class Tadeusz Kowalski, as written in this scenario, is a fictional character. Signal Corps wire-laying personnel were attached to the 28th Infantry for the Cantigny operation and suffered casualties during the assault and subsequent counterattacks, but no individual of this name appears in available Signal Corps detachment records or 1st Division casualty documentation for 28 May 1918. His outcome cannot be documented.",
@@ -555,6 +561,7 @@
       },
       {
         "character_id": "char_beaumont",
+        "classification": "composite",
         "name": "Corporal James Beaumont",
         "outcome": "unknown",
         "historical_record": "Corporal James Beaumont, as written in this scenario, is a fictional character. Artillery fire direction telephone operators served with the 5th Field Artillery at Cantigny, and the regiment's records note communications difficulties during the battle, but no individual named James Beaumont in this role appears in available 5th Field Artillery records or 1st Division documentation. His outcome cannot be documented.",
