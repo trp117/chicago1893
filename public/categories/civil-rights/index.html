@@ -89,8 +89,11 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 import { renderScenarioCard } from '/js/scenario-card.js';
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
 (async()=>{
-  const res=await fetch('/api/stories');
-  const all=await res.json();
+  const [storiesRes,catsRes]=await Promise.all([fetch('/api/stories'),fetch('/api/categories')]);
+  const all=await storiesRes.json();
+  const cats=await catsRes.json();
+  const cat=cats.find(c=>c.slug==='civil-rights');
+  if(cat){document.querySelector('.page-title').textContent=cat.displayName;document.querySelector('.page-desc').textContent=cat.blurb;}
   const grid=document.getElementById('stories-grid');
   const items=all.filter(s=>s.category==='civil-rights');
   grid.innerHTML=items.length

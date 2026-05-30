@@ -36,7 +36,7 @@ body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-seri
 .cat-card:hover::after{transform:scaleX(1)}
 .cat-space::after{background:#6a9fd8}
 .cat-military::after{background:#c0524a}
-.cat-civil::after{background:#5a8a5a}
+.cat-civil-rights::after{background:#5a8a5a}
 .cat-underground::after{background:#b8832a}
 .cat-maritime::after{background:#6a9fd8}
 .cat-industrial::after{background:#8a6040}
@@ -67,74 +67,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <h1 class="page-title">Scenarios by Category</h1>
 </div>
 <div class="page-body">
-  <div class="cat-grid">
-    <a href="/categories/space" class="cat-card cat-space">
-      <div>
-        <div class="cat-num">01</div>
-        <h2 class="cat-name">Space &amp; Cold War</h2>
-        <p class="cat-tagline">The margin between mission success and catastrophe is measured in fractions. Every decision is made with the whole world watching.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">2 scenarios</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-    <a href="/categories/military" class="cat-card cat-military">
-      <div>
-        <div class="cat-num">02</div>
-        <h2 class="cat-name">Military</h2>
-        <p class="cat-tagline">From the beaches of Normandy to the trenches of the Argonne. The cost was always paid by someone specific.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">2 scenarios</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-    <a href="/categories/civil-rights" class="cat-card cat-civil">
-      <div>
-        <div class="cat-num">03</div>
-        <h2 class="cat-name">Civil Rights</h2>
-        <p class="cat-tagline">Discipline in the face of violence is the hardest decision of all. The ledger measures what it cost to hold the line.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">1 scenario</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-    <a href="/categories/underground" class="cat-card cat-underground">
-      <div>
-        <div class="cat-num">04</div>
-        <h2 class="cat-name">Underground</h2>
-        <p class="cat-tagline">Secret networks, covert dispatches, and the people who risked everything to move freedom through enemy territory.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">3 scenarios</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-    <a href="/categories/maritime" class="cat-card cat-maritime">
-      <div>
-        <div class="cat-num">05</div>
-        <h2 class="cat-name">Maritime</h2>
-        <p class="cat-tagline">On the water, the margin for error is measured in minutes. Ships, submarines, and the cold calculus of survival at sea.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">1 scenario</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-    <a href="/categories/industrial" class="cat-card cat-industrial">
-      <div>
-        <div class="cat-num">06</div>
-        <h2 class="cat-name">Industrial</h2>
-        <p class="cat-tagline">The infrastructure of civilization, under pressure. Engineers, workers, and the crises that tested what was built to last.</p>
-      </div>
-      <div class="cat-footer">
-        <span class="cat-count">2 scenarios</span>
-        <span class="cat-arrow">Explore &rarr;</span>
-      </div>
-    </a>
-  </div>
+  <div class="cat-grid" id="cat-grid"></div>
 </div>
 <footer>
   <div class="footer-logo">Ledger 250</div>
@@ -143,6 +76,21 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </footer>
 <script>
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+(async()=>{
+  const cats=await fetch('/api/categories').then(r=>r.json());
+  const grid=document.getElementById('cat-grid');
+  grid.innerHTML=cats.map(c=>{
+    const num=String(c.order).padStart(2,'0');
+    const count=c.count===1?'1 scenario':`${c.count} scenarios`;
+    return `<a href="/categories/${c.slug}" class="cat-card cat-${c.slug}">`
+      +`<div><div class="cat-num">${num}</div>`
+      +`<h2 class="cat-name">${esc(c.displayName)}</h2>`
+      +`<p class="cat-tagline">${esc(c.blurb)}</p></div>`
+      +`<div class="cat-footer"><span class="cat-count">${count}</span><span class="cat-arrow">Explore &rarr;</span></div>`
+      +`</a>`;
+  }).join('');
+})();
 </script>
 </body>
 </html>

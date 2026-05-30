@@ -116,21 +116,17 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;o
 .meta-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid rgba(196,154,60,.4);color:var(--gold-light);opacity:1}
 .categories-grid{display:grid;gap:var(--gap);grid-template-columns:repeat(2,1fr)}
 @media(min-width:600px){.categories-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:860px){.categories-grid{grid-template-columns:repeat(5,1fr)}}
+@media(min-width:860px){.categories-grid{grid-template-columns:repeat(3,1fr)}}
 .cat-card{background:#161310;padding:clamp(18px,2.2vw,26px) clamp(14px,1.8vw,20px) clamp(16px,2vw,22px);cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(170px,18vw,210px);position:relative;overflow:hidden;transition:background .22s}
 .cat-card:hover{background:#1e1a16}
 .cat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
 .cat-card:hover::after{transform:scaleX(1)}
-.cat-space::after{background:#6a9fd8}.cat-civil::after{background:#5a8a5a}
-.cat-military::after{background:#c0524a}.cat-political::after{background:#7f77dd}.cat-labor::after{background:#b8832a}
+.cat-space::after{background:#6a9fd8}.cat-military::after{background:#c0524a}
+.cat-civil-rights::after{background:#5a8a5a}.cat-underground::after{background:#b8832a}
+.cat-maritime::after{background:#6a9fd8}.cat-industrial::after{background:#8a6040}
 .cat-img{position:absolute;inset:0;z-index:0;transition:transform .5s ease;background-size:cover;background-position:center}
 .cat-card:hover .cat-img{transform:scale(1.04)}
 .cat-overlay{position:absolute;inset:0;z-index:0;background:linear-gradient(to top,rgba(8,6,4,.88) 0%,rgba(8,6,4,.4) 55%,rgba(8,6,4,.1) 100%)}
-.ci-space{background:linear-gradient(180deg,#0a0a24,#060618)}
-.ci-civil{background:linear-gradient(145deg,#0e1a10,#080e08)}
-.ci-military{background:linear-gradient(145deg,#281008,#180808)}
-.ci-political{background:linear-gradient(145deg,#14103a,#0a0828)}
-.ci-labor{background:linear-gradient(145deg,#281808,#180e04)}
 .cat-body{position:relative;z-index:1}
 .cat-number{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4.5vw,50px);font-weight:300;color:var(--parchment);opacity:.05;line-height:1;margin-bottom:8px}
 .cat-name{font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.7vw,17px);font-weight:400;color:#fff;line-height:1.2;margin-bottom:5px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
@@ -420,47 +416,13 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <div class="section-header reveal">
     <div><p class="section-label">Browse</p><h2 class="section-title">By Category</h2></div>
   </div>
-  <div class="categories-grid">
-    <div class="cat-card cat-space reveal rd1" onclick="filterTo('space')">
-      <div class="cat-img ci-space" id="ci-space"></div><div class="cat-overlay"></div>
-      <div class="cat-body"><div class="cat-number">01</div><h3 class="cat-name">Space exploration</h3><p class="cat-tagline">The margin between mission and catastrophe is thinner than you think.</p></div>
-      <div class="cat-count">3 Scenarios &rarr;</div>
-    </div>
-    <div class="cat-card cat-civil reveal rd2" onclick="filterTo('civil')">
-      <div class="cat-img ci-civil" id="ci-civil"></div><div class="cat-overlay"></div>
-      <div class="cat-body"><div class="cat-number">02</div><h3 class="cat-name">Civil rights</h3><p class="cat-tagline">Discipline in the face of violence is the hardest decision of all.</p></div>
-      <div class="cat-count">5 Scenarios &rarr;</div>
-    </div>
-    <div class="cat-card cat-military reveal rd3" onclick="filterTo('military')">
-      <div class="cat-img ci-military" id="ci-military"></div><div class="cat-overlay"></div>
-      <div class="cat-body"><div class="cat-number">03</div><h3 class="cat-name">Military</h3><p class="cat-tagline">From Dog Green Sector to Valley Forge. The cost was always paid by someone.</p></div>
-      <div class="cat-count">5 Scenarios &rarr;</div>
-    </div>
-    <div class="cat-card cat-political reveal rd4" onclick="filterTo('political')">
-      <div class="cat-img ci-political" id="ci-political"></div><div class="cat-overlay"></div>
-      <div class="cat-body"><div class="cat-number">04</div><h3 class="cat-name">Political crisis</h3><p class="cat-tagline">The decisions that almost ended everything &mdash; and the few who held the line.</p></div>
-      <div class="cat-count">6 Scenarios &rarr;</div>
-    </div>
-    <div class="cat-card cat-labor reveal rd5" onclick="filterTo('labor')">
-      <div class="cat-img ci-labor" id="ci-labor"></div><div class="cat-overlay"></div>
-      <div class="cat-body"><div class="cat-number">05</div><h3 class="cat-name">Labor &amp; society</h3><p class="cat-tagline">The frontier, the factory floor, the pandemic ward. Ordinary people, impossible stakes.</p></div>
-      <div class="cat-count">7 Scenarios &rarr;</div>
-    </div>
-  </div>
+  <div class="categories-grid" id="categories-grid"></div>
 </section>
 <section class="section section--dark" id="all-scenarios">
   <div class="section-header reveal">
     <div><p class="section-label">The Full Ledger</p><h2 class="section-title">All scenarios</h2></div>
   </div>
-  <div class="filter-row reveal">
-    <button class="filter-btn active" onclick="filterStories('all',this)">All</button>
-    <button class="filter-btn" onclick="filterStories('space',this)">Space</button>
-    <button class="filter-btn" onclick="filterStories('military',this)">Military</button>
-    <button class="filter-btn" onclick="filterStories('civil-rights',this)">Civil Rights</button>
-    <button class="filter-btn" onclick="filterStories('underground',this)">Underground</button>
-    <button class="filter-btn" onclick="filterStories('maritime',this)">Maritime</button>
-    <button class="filter-btn" onclick="filterStories('industrial',this)">Industrial</button>
-  </div>
+  <div class="filter-row reveal" id="filter-row"></div>
   <div class="stories-grid" id="stories-grid"></div>
 </section>
 <section class="section section--mid">
@@ -522,7 +484,7 @@ const STORIES=[
   {id:'lewisclark',cat:'labor',era:'Frontier Era',year:'Aug 12, 1805',title:'Lewis & Clark: The Continental Divide',hook:'Her brother is likely in that camp. She is the negotiation. The expedition depends on what she says next.',cost:'Negotiation margin, trust threshold',perspectives:['Sacagawea','Meriwether Lewis','Chief Cameahwait'],scene:'ci-labor'},
   {id:'mission_control',cat:'labor',era:'Space Race',year:'Jul 20, 1969',title:'Moon Landing: Mission Control',hook:'You are 24 years old. Your index card decides the first Moon landing. You wrote it yourself six months ago.',cost:'Abort window, decision confidence',perspectives:['Jack Garman','Gene Kranz','Walter Cronkite'],scene:'ci-labor'},
 ];
-const CAT_COLORS={space:'#6a9fd8',civil:'#5a8a5a',military:'#c0524a',political:'#7f77dd',labor:'#b8832a'};
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function makeCanvas(w,h,painter){const c=document.createElement('canvas');c.width=w;c.height=h;painter(c.getContext('2d'),w,h);return c.toDataURL('image/jpeg',.85)}
 const SCENES={
   'ci-space':(ctx,w,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#06061a');g.addColorStop(1,'#0a0a28');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.fillStyle='#f5f0e8';for(let i=0;i<80;i++){ctx.globalAlpha=Math.random()*.8+.1;ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*1.2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;const eg=ctx.createRadialGradient(w*.1,h*1.1,0,w*.1,h*1.1,h*.9);eg.addColorStop(0,'rgba(30,60,140,.55)');eg.addColorStop(1,'rgba(30,60,140,0)');ctx.fillStyle=eg;ctx.fillRect(0,0,w,h);const pg=ctx.createRadialGradient(w*.5,h*.7,0,w*.5,h*.7,w*.4);pg.addColorStop(0,'rgba(196,154,60,.18)');pg.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=pg;ctx.fillRect(0,0,w,h);},
@@ -564,8 +526,6 @@ function drawHero(){
 }
 function drawImages(){
   Object.entries(SCENES).forEach(([key,painter])=>{const el=document.getElementById(key);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(400,220,painter)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';});
-  const fcMap={'fc-civil':SCENES['ci-civil'],'fc-sub':SCENES['ci-political'],'fc-fire':SCENES['ci-labor']};
-  Object.entries(fcMap).forEach(([id,p])=>{const el=document.getElementById(id);if(!el)return;el.style.backgroundImage=`url(${makeCanvas(800,500,p)})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'});
 }
 let _renderCard=null,_storiesCache=null;
 async function renderGrid(cat){
@@ -590,16 +550,30 @@ function updateHeroFeatured(stories){
   if(eraEl&&s.era)eraEl.textContent=s.era;
 }
 function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat);}
-function filterTo(cat){
+function filterTo(slug){
   document.getElementById('all-scenarios').scrollIntoView({behavior:'smooth'});
-  const slugMap={space:'space',civil:'civil-rights',military:'military',political:null,labor:null};
-  const newCat=cat in slugMap?slugMap[cat]:cat;
-  if(!newCat)return;
-  const btn=[...document.querySelectorAll('.filter-btn')].find(b=>b.textContent.toLowerCase().includes(newCat.slice(0,4)));
-  if(btn)filterStories(newCat,btn);
+  const btn=document.querySelector(`.filter-btn[data-slug="${slug}"]`);
+  if(btn)filterStories(slug,btn);
+}
+function renderFilterBar(cats){
+  const row=document.getElementById('filter-row');if(!row)return;
+  row.innerHTML=`<button class="filter-btn active" data-slug="all" onclick="filterStories('all',this)">All</button>`
+    +cats.map(c=>`<button class="filter-btn" data-slug="${c.slug}" onclick="filterStories('${c.slug}',this)">${esc(c.displayName)}</button>`).join('');
+}
+function renderCategories(cats){
+  const grid=document.getElementById('categories-grid');if(!grid)return;
+  grid.innerHTML=cats.map((c,i)=>{
+    const n=String(i+1).padStart(2,'0');
+    const count=c.count===1?'1 Scenario':`${c.count} Scenarios`;
+    return `<div class="cat-card cat-${c.slug} reveal rd${i+1}" onclick="filterTo('${c.slug}')"><div class="cat-body"><div class="cat-number">${n}</div><h3 class="cat-name">${esc(c.displayName)}</h3><p class="cat-tagline">${esc(c.blurb)}</p></div><div class="cat-count">${count} →</div></div>`;
+  }).join('');
+  initReveal();
 }
 function initReveal(){const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el))}
-window.addEventListener('DOMContentLoaded',()=>{drawHero();drawFeaturedHero();drawImages();renderGrid('all');initReveal();initNavLogo();});
+window.addEventListener('DOMContentLoaded',()=>{
+  drawHero();drawFeaturedHero();drawImages();renderGrid('all');initReveal();initNavLogo();
+  fetch('/api/categories').then(r=>r.json()).then(cats=>{renderFilterBar(cats);renderCategories(cats);}).catch(()=>{});
+});
 window.addEventListener('resize',()=>{drawHero();drawFeaturedHero();});
 window.addEventListener('scroll',()=>{const nav=document.querySelector('.nav');if(window.scrollY>10){nav.classList.add('nav-scrolled')}else{nav.classList.remove('nav-scrolled')}});
 function initNavLogo(){const displayLogo=document.querySelector('.hero-display-logo');const navWordmark=document.querySelector('.nav-logo');if(!displayLogo||!navWordmark)return;const obs=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){navWordmark.style.opacity='0';navWordmark.style.pointerEvents='none'}else{navWordmark.style.opacity='1';navWordmark.style.pointerEvents='auto'}})},{threshold:0});obs.observe(displayLogo)}

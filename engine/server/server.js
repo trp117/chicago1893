@@ -89,14 +89,38 @@ const CATEGORY_MAP = {
   artesian_height_1892:             'industrial',
   bornholmer_strasse_first_breach:  'space',
 };
-const CATEGORY_LABELS = {
-  space:          'Space & Cold War',
-  military:       'Military',
-  'civil-rights': 'Civil Rights',
-  underground:    'Underground',
-  maritime:       'Maritime',
-  industrial:     'Industrial',
+const CATEGORIES = {
+  'space':        { displayName: 'Space & Cold War', order: 1, blurb: 'The margin between mission success and catastrophe is measured in fractions. Every decision is made with the whole world watching — and the outcome already written.' },
+  'military':     { displayName: 'Military',         order: 2, blurb: 'From the beaches of Normandy to the trenches of the Argonne. The cost was always paid by someone specific, in a moment that history recorded as a number.' },
+  'civil-rights': { displayName: 'Civil Rights',     order: 3, blurb: 'Discipline in the face of violence is the hardest decision of all. The ledger measures what it cost to hold the line — physically, psychologically, and politically.' },
+  'underground':  { displayName: 'Underground',      order: 4, blurb: 'Secret networks, covert dispatches, and the people who risked everything to move freedom through enemy territory. The ledger measures what secrecy cost and what betrayal would have cost more.' },
+  'maritime':     { displayName: 'Maritime',         order: 5, blurb: 'On the water, the margin for error is measured in minutes. Ships and submarines, the cold calculus of survival at sea, and the decisions made when the ocean leaves no room for error.' },
+  'industrial':   { displayName: 'Industrial',       order: 6, blurb: 'The infrastructure of civilization, under pressure. Engineers, workers, and the crises that tested what was built to last — when technology met its limit and decisions had to be made in the dark.' },
 };
+const CATEGORY_LABELS = Object.fromEntries(Object.entries(CATEGORIES).map(([k,v]) => [k, v.displayName]));
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const allRoles = repos.scenarios.findPlayerRoles();
+    const rolesBy = {};
+    allRoles.forEach(r => { rolesBy[r.scenarioId] = (rolesBy[r.scenarioId] || 0) + 1; });
+    const scenarios = await repos.scenarios.findAll();
+    const countBySlug = {};
+    scenarios
+      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0)
+      .forEach(s => {
+        const slug = CATEGORY_MAP[s.id];
+        if (slug) countBySlug[slug] = (countBySlug[slug] || 0) + 1;
+      });
+    const result = Object.entries(CATEGORIES)
+      .sort(([,a],[,b]) => a.order - b.order)
+      .map(([slug, c]) => ({ slug, displayName: c.displayName, blurb: c.blurb, order: c.order, count: countBySlug[slug] || 0 }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/stories', async (req, res) => {
   try {
     const allRoles = repos.scenarios.findPlayerRoles();
