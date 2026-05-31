@@ -310,7 +310,7 @@ function killPort(port) {
   try { execSync(`powershell -NoProfile -Command "Get-Process -Id (Get-NetTCPConnection -LocalPort ${port} -State Listen).OwningProcess | Stop-Process -Force"`, { stdio: 'ignore' }); } catch {}
 }
 
-new SchemaValidator(repos).report();
+new SchemaValidator(repos).report().catch(e => console.error('[SCHEMA]', e.message));
 
 function startServer() {
   const server = app.listen(PORT, () => {

@@ -3,9 +3,9 @@ export class SchemaValidator {
     this.repos = repos;
   }
 
-  validateIdentityIntegrity() {
+  async validateIdentityIntegrity() {
     const issues = [];
-    const scenarios = this.repos.scenarios.findAll();
+    const scenarios = await this.repos.scenarios.findAll();
 
     for (const scenario of scenarios) {
       const roles      = this.repos.scenarios.findPlayerRoles(scenario.id);
@@ -40,7 +40,7 @@ export class SchemaValidator {
     return issues;
   }
 
-  validate() {
+  async validate() {
     const issues = [];
 
     const err  = (type, id, field, note = '') => issues.push({ severity: 'error', type, id, field, note });
@@ -57,7 +57,7 @@ export class SchemaValidator {
     }
 
     // ── Scenarios + Roles ─────────────────────────────────────────────────────
-    const scenarios = this.repos.scenarios.findAll();
+    const scenarios = await this.repos.scenarios.findAll();
     for (const s of scenarios) {
       if (!s.setting)                      warn('scenario', s.id, 'setting',             'location header subtitle will be blank');
       if (!s.keyEvidenceClueIds?.length)   warn('scenario', s.id, 'keyEvidenceClueIds',  'strong victory condition undefined');
@@ -101,17 +101,17 @@ export class SchemaValidator {
       if (!hasChars)       warn('location', l.id, 'linkedCharacterIds', 'no NPCs linked — location may feel empty');
     }
 
-    issues.push(...this.validateIdentityIntegrity());
+    issues.push(...await this.validateIdentityIntegrity());
 
     return issues;
   }
 
-  report() {
+  async report() {
     console.log('[SCHEMA] Validating content...');
 
     let issues;
     try {
-      issues = this.validate();
+      issues = await this.validate();
     } catch (err) {
       console.error(`[SCHEMA] Validator threw an error: ${err.message}`);
       return;

@@ -496,7 +496,7 @@ export function createGameRouter(repos, config = {}) {
       if (!role) return res.status(404).json({ error: `Role "${roleId}" not found.` });
 
       // Block start if any player alias collides with an NPC in this scenario
-      const identityIssues = new SchemaValidator(repos).validateIdentityIntegrity()
+      const identityIssues = (await new SchemaValidator(repos).validateIdentityIntegrity())
         .filter(i => i.id.startsWith(scenarioId + '/') && i.severity === 'error');
       if (identityIssues.length > 0) {
         const detail = identityIssues.map(i => i.note).join(' | ');
