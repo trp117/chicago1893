@@ -1529,14 +1529,14 @@ Return ONLY valid JSON in this exact structure:
       '- Everything stated must be verifiable. If uncertain, omit.',
       '',
       'Generate the following:',
-      'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters.',
+      'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters. Set classification to match the character_type field: "real" → "real", "composite" → "composite", "fictional" → "fictional". Set verified to false for every fate — this field is set by a human review process and must never be true in generated output.',
       'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of objects. Every entry MUST include a source attribution. A dated, timed, or quantitative claim with no source must be omitted rather than stored unsourced.',
       'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements. Every entry MUST include a source attribution.',
       'open_threads: For each essential beat in the scenario, consider whether that beat corresponds to a historical question that was raised at inquiry, disputed, or never satisfactorily resolved. If so, include an entry with the beat\'s id as thread_id and the historical record of that open question.',
       'choice_echoes: For each essential beat in the scenario, provide the verified historical record of what actually happened at that moment. This is what the epilogue will compare the player\'s choices against.',
       'Return only a JSON object matching this exact schema with no other text, no markdown, no explanation:',
       '{',
-      '"character_fates": [{ "character_id": "string", "name": "string", "outcome": "survived|died|unknown", "historical_record": "string", "primary_source": "string|null" }],',
+      '"character_fates": [{ "character_id": "string", "name": "string", "classification": "composite|real|fictional", "outcome": "survived|died|unknown", "historical_record": "string", "primary_source": "string|null", "verified": false }],',
       '"immediate_outcome": { "summary": "string", "key_facts": [{ "text": "string", "source": "string" }] },',
       '"historical_frame": [{ "text": "string", "source": "string" }],',
       '"open_threads": [{ "thread_id": "string", "historical_record": "string", "source": "string|null" }],',
@@ -1593,7 +1593,7 @@ Return ONLY valid JSON in this exact structure:
         epilogue: {
           generated:        true,
           reviewed:         false,
-          character_fates:  epilogueData.character_fates   || [],
+          character_fates:  (epilogueData.character_fates || []).map(f => ({ ...f, verified: false })),
           immediate_outcome: { summary: rawIo.summary || '', key_facts: normFactArr(rawIo.key_facts) },
           historical_frame: normFactArr(epilogueData.historical_frame),
           open_threads:     epilogueData.open_threads      || [],
@@ -1802,6 +1802,33 @@ Return ONLY valid JSON in this exact structure:
         uncheckedNpcs:  uncheckedChars,
       },
     });
+  });
+
+  // ── Fate Verification Report ─────────────────────────────────────────────
+  // Cross-scenario worklist: every character_fate with its verified status.
+  // Human reviewers mark fates verified:true in the scenario JSON after checking
+  // each historical_record claim against its primary_source.
+  r.get('/fate-verification-report', async (req, res) => {
+    const all = await repos.scenarios.findAll();
+    const rows = [];
+    for (const scenario of all) {
+      for (const fate of scenario.epilogue?.character_fates || []) {
+        rows.push({
+          scenarioId:        scenario.id,
+          scenarioTitle:     scenario.title,
+          character_id:      fate.character_id,
+          name:              fate.name,
+          classification:    fate.classification || 'undeclared',
+          outcome:           fate.outcome,
+          verified:          fate.verified === true,
+          has_primary_source: !!fate.primary_source,
+        });
+      }
+    }
+    const total      = rows.length;
+    const verified   = rows.filter(r => r.verified).length;
+    const unverified = total - verified;
+    res.json({ total, verified, unverified, fates: rows });
   });
 
   // ── Name Cascade ──────────────────────────────────────────────────────────

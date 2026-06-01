@@ -1,502 +1,113 @@
 {
   "id": "artesian_height_1892",
-  "version": "1.0.0",
-  "title": "The Artesian Height",
-  "description": "Western Springs, Illinois, summer 1892. The village's landmark stone water tower is days from completion when a bound drill string, a failed pressure test, and whispers of bond fraud threaten to bury the entire project — and one engineer's reputation — two thousand feet underground. Three perspectives. One crisis. Thirty minutes to hold the line.",
+  "tone": [],
   "genre": [
     "historical",
     "thriller",
     "mystery"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "storyArcIds": [
-    "artesian_height_1892_main_arc"
-  ],
-  "playerRoleIds": [
-    "role_chief_engineer",
-    "role_pump_operator",
-    "role_night_marshal"
-  ],
-  "keyEvidenceClueIds": [
-    "clue_tampered_torque_log",
-    "clue_forged_bond_petition"
-  ],
+  "title": "The Artesian Height",
+  "premise": "The strongbox has been forced. Three pages of bore log records are missing. The midnight freight consist rolls out in less than an hour. Someone who knew the schedule came through that door — and one of the people standing in this room right now is watching you figure out who.",
+  "setting": "Western Springs, Illinois, 1892",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
-      "well_drill_torque": {
-        "min": 1,
-        "max": 100,
-        "default": 62
-      },
-      "tank_hydrostatic_load": {
-        "min": 0,
-        "max": 133000,
-        "default": 0
-      },
-      "boiler_steam_pressure": {
-        "min": 0,
-        "max": 120,
-        "default": 45
-      },
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 2
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
+      },
+      "well_drill_torque": {
+        "max": 100,
+        "min": 1,
+        "default": 62
+      },
+      "boiler_steam_pressure": {
+        "max": 120,
+        "min": 0,
+        "default": 45
+      },
+      "tank_hydrostatic_load": {
+        "max": 133000,
+        "min": 0,
+        "default": 0
       }
     },
     "pressureEvents": [
       "At minute 8: A section of the construction trench collapses along the Block A perimeter, trapping a stone cutter and drawing the Night Marshal away from the lower office.",
       "At minute 16: The Boiler_Steam_Pressure spikes unexpectedly to 98 PSI — a coal-feed valve is found wedged open, and the Pump Operator must decide whether to vent or hold.",
       "At minute 24: Village President Wickerson arrives at the tower base with two bond-committee members and demands a public accounting of all expenditures before the final pressurization is certified."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
-  "winConditions": [
-    "The drill string clears the shale fault without fracturing, the well strikes the St. Peter Sandstone aquifer, and the tower's first pressure test is certified by Benezette Williams.",
-    "The sabotage conspiracy against the municipal bond issue is exposed and at least one culprit is in custody or formally denounced before the board vote.",
-    "The tower reservoir reaches operational capacity sufficient for certification under the village waterworks test procedures with Boiler_Steam_Pressure held between 60 and 85 PSI, confirming system integrity."
-  ],
-  "failConditions": [
-    "The wrought-iron drill string snaps inside the bore hole at 1,800 feet, rendering the well unrecoverable within budget.",
-    "Boiler_Steam_Pressure exceeds the safe working limits of the drilling and pumping system and the safety relief valves lift, fracturing a cast-iron intake pipe and flooding the subterranean pump room.",
-    "The municipal bond vote is called before the sabotage is exposed, and the board freezes funding — halting the project permanently.",
-    "The session clock expires at 30 minutes with no accusation made and no pressure-test certification filed."
-  ],
-  "partialSuccessExamples": [
-    "The well strikes water but the bond sabotage is never fully exposed — the village gains its aquifer but the conspirators escape censure and the project's final costs remain disputed.",
-    "The saboteur is identified and confronted but flees before the Night Marshal can secure custody — the bond vote proceeds under a cloud of rumor rather than clear evidence.",
-    "The pressure test is certified at only 52,000 gallons — technically a pass, but the board imposes a reduced bond allocation that leaves the tower's upper iron tank only half-fitted."
-  ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "Cook County in the summer of 1892 is a place being remade by water and money in roughly equal measure. The city of Chicago, nine miles to the east, has just been awarded the World's Columbian Exposition and is consuming lumber, steel, and labor at a rate that makes the surrounding townships feel the pull like iron filings near a magnet. Western Springs, incorporated only four years prior, sits at the edge of that gravitational field — close enough to feel the heat, far enough to have chosen a different path. The village's answer to Chicago's annexation pressure is infrastructure: a combined water tower, artesian well, and municipal pumping station budgeted at exactly $79,119.10, designed by the engineering firm Williams and Williams of Chicago, and built from locally quarried limestone transported by rail from the Chicago region's quarry network."
-      },
-      {
-        "type": "stakes",
-        "text": "The tower is not merely a utility structure. It is the physical argument that Western Springs can govern itself — that it does not need Chicago's water mains, Chicago's utility contracts, or Chicago's political machinery reaching into its tax rolls. If the project fails, the village board loses the confidence of its own bond market, and annexation advocates and regional utility interests will have additional political leverage to argue that small villages could not independently sustain modern municipal infrastructure. For Benezette Williams personally, failure here means the end of a practice built on the reputation that his calculations do not miss — not at depth, not under pressure, not when the geology refuses to cooperate. The drill is currently bound at 1,800 feet, 200 feet short of the St. Peter Sandstone that his own survey promised was there."
-      },
-      {
-        "type": "scene",
-        "text": "It is past nine o'clock on a Tuesday evening in late July, and the heat has not broken. The construction site occupies the village center near the future water tower grounds, and the tower's limestone structure rises prominently above the surrounding streetscape, still unfinished under lantern light, pale and raw in the light of four gas lanterns mounted on iron stakes around the perimeter. The smell is wet mortar, coal smoke from the boiler stack venting through the foundation grate, and the faint mineral sharpness of freshly drilled rock dust that has been accumulating in the spoil barrels for six weeks. From the direction of the Chicago, Burlington and Quincy rail line two blocks south, a freight consist is idling — its fireman has been watching the construction lights for the better part of an hour, and he is not the only one."
-      },
-      {
-        "type": "entry",
-        "text": "You have been on this site since before dawn, and the day has produced three crises and no resolution to any of them. The drill string is jammed. The bond committee is meeting in forty-eight hours. And someone — someone with access to this site and knowledge of its engineering tolerances — has been feeding false numbers into the official project ledger, numbers designed to make the cost overrun look catastrophic rather than manageable. You know this because you have seen the original figures, and you have seen what was submitted to the board. The lantern light catches the limestone dust on your sleeve as you turn toward the tower entrance, the iron door standing open against the warm night, and the decision you have been postponing for the last three hours cannot be postponed any further.",
-        "character_entries": {
-          "role_chief_engineer": "The torque gauge needle sits at 62, and you have not looked away from it in four minutes. Your thumb is on the brake collar housing — not gripping, just resting, the way you rest a hand on a patient's wrist to feel what the numbers cannot tell you — and the gas lantern to your left is close enough that you can see the small weld seam on the gauge face where the casing was opened and reclosed, a seam that was not there on Monday. The drill platform smells of shale dust and warm iron and something faintly organic from the spoil barrels, and beneath your boots the decking carries a vibration that is wrong in its frequency, too regular, too shallow for a string bound at depth. You set the baseline at 41. You set it yourself, before the first shift, before anyone else was on this platform, and you know the shale fault at 1,800 feet accounts for eight points of additional resistance because you saw it in the core samples three weeks ago and said nothing to the board because the fault was traversable and the St. Peter Sandstone was still there — is still there, 200 feet below the bit, exactly where your survey placed it. The figure circulating among Wickerson's committee is not your figure. The boiler has not reached operating pressure tonight, which means the timeline your foreman gave you this morning contains at least one deliberate falsehood, and the man who altered this gauge understood torque measurement well enough to make the number look like geology to anyone who had not set the baseline himself. Forty-eight hours. The bond committee meets in forty-eight hours, and the true project cost is $71,340.22, and below you the pump room is cold and dark and waiting, and somewhere between this platform and that room is the origin point of every false figure that is moving through the village tonight. The lantern is close. The weld seam is visible. You lift your thumb from the collar and reach for the gauge.",
-          "role_pump_operator": "Your left hand is pressed flat against the packing gland housing of the number-two pump, and the water coming through is no longer a weep — it is hitting your palm in hard, cold pulses, one every second and a half, maybe faster now than a minute ago. The pump room sits eight feet below grade and the limestone walls hold the heat differently than above ground, close and mineral and wrong, and the clack-hiss of the pistons fills the space so completely that you feel it in your back teeth before you hear it. The pressure gauge reads 48. It read 45 when you found the shim. The shim is in your breast pocket now, and what you know — what nobody standing in the lantern light above your head knows — is that the wood is dry. Whoever carved it and set it in the coal-feed valve seat did not do it tonight. They did it before the shift, before the boiler came up to temperature, before the drill crew started their final push toward the St. Peter Sandstone. That means they knew the schedule. The relief valves will lift somewhere past 90, and the pressure test window closes at 85, and you have perhaps forty minutes to find what else they touched before you decide whether to call up for the marshal or hold the line alone and say nothing until the water comes.",
-          "role_night_marshal": "The bent hasp is still warm from whoever's hands bent it, and that is the fact you keep returning to as you stand with your palm flat against the strongbox lid and the cell keys pressing cold through the fabric at your hip. Warm metal means recent. Recent means the perimeter walk — twenty-two minutes, no longer — was enough time for someone who knew your schedule, or had watched it long enough to trust it. The binder sits open on the draughtsmen's cabinet where you set it, three ragged stubs where the pages were, and the tears are clean at the top and rough at the bottom, which tells you the person pulled upward and fast, which tells you they knew exactly which pages they wanted before their hands touched the paper. You are not an engineer. You cannot tell a sandstone formation from a clay seam, and you could not read a bore log if Benezette Williams himself stood at your shoulder explaining it. What you can read is a room, and this room says two things plainly: whoever came through that door did not need to search, and they left through it without looking back. The sworn complaint form is in the drawer beneath your left hand. Outside, the four gas lanterns hold the limestone pale and still, and somewhere south along the Burlington and Quincy siding, a fireman who has been watching this site for two nights is watching it right now. You have a bent hasp, three missing pages, and something left behind that the person who left it does not yet know they left. You draw a slow breath and reach for the lantern."
-        }
-      }
-    ]
-  },
-  "period_vocabulary": {
-    "categories": [
-      {
-        "name": "Civil Engineering Field Argot",
-        "context": "Used by Williams and Williams draughtsmen, site engineers, and drill-crew foremen when communicating technical conditions on the bore hole and tower structure.",
-        "terms": [
-          {
-            "term": "making hole",
-            "meaning": "Actively advancing the drill bit through rock — any pause in downward progress is 'not making hole'"
-          },
-          {
-            "term": "fishing job",
-            "meaning": "The costly, often futile operation of retrieving a broken or stuck drill string from inside the bore hole"
-          },
-          {
-            "term": "string weight",
-            "meaning": "The cumulative downward force of the entire suspended drill pipe column, used to calculate torque limits"
-          },
-          {
-            "term": "lost circulation",
-            "meaning": "The condition where drilling fluid disappears into a fractured formation rather than returning to surface — a warning sign of a fault zone"
-          },
-          {
-            "term": "dressed bit",
-            "meaning": "A diamond-set or hardened-steel drill crown that has been freshly reset with cutting inserts by the tool dresser"
-          },
-          {
-            "term": "heave",
-            "meaning": "Upward movement of the formation floor into the bore hole caused by hydrostatic imbalance — a critical failure precursor"
-          },
-          {
-            "term": "spud",
-            "meaning": "The formal commencement of drilling at a new bore location; also used as a verb — 'we spudded this hole six weeks ago'"
-          }
-        ]
-      },
-      {
-        "name": "Steam Plant Operators' Language",
-        "context": "Used by pump engineers, firemen, and boiler tenders working the subterranean Deane duplex installation and the surface boiler house.",
-        "terms": [
-          {
-            "term": "popping off",
-            "meaning": "When a safety relief valve lifts and vents steam — desirable in a controlled test, catastrophic if unplanned"
-          },
-          {
-            "term": "priming",
-            "meaning": "Water carried over into the steam space of a boiler, causing violent pressure surges and potential pipe fracture"
-          },
-          {
-            "term": "dead men",
-            "meaning": "Anchor bolts or buried timber blocks used to fix pump foundations against the thrust of high-pressure discharge"
-          },
-          {
-            "term": "packing gland",
-            "meaning": "The stuffing-box seal around a pump shaft or valve stem — a weeping gland is a minor leak; a blown gland is an emergency"
-          },
-          {
-            "term": "throttle back",
-            "meaning": "To reduce steam admission to the engine cylinders by partially closing the main steam valve — the primary pressure-reduction action"
-          },
-          {
-            "term": "clinker",
-            "meaning": "Fused ash and unburned coal residue that builds up in the firebox grate, blocking airflow and reducing combustion efficiency"
-          },
-          {
-            "term": "gauge glass",
-            "meaning": "The vertical glass tube showing the water level inside the boiler — the single most critical instrument a fireman watches"
-          }
-        ]
-      },
-      {
-        "name": "Municipal Bond and Finance Language",
-        "context": "Used by village board members, bond committee clerks, and the financial agents of the Chicago bond houses dealing with Western Springs' infrastructure debt.",
-        "terms": [
-          {
-            "term": "special assessment roll",
-            "meaning": "The official ledger apportioning improvement costs against specific parcels of village property — the legal basis for bond repayment"
-          },
-          {
-            "term": "coupon bonds",
-            "meaning": "Bearer bonds with detachable interest coupons; the form in which Western Springs' $79,119.10 infrastructure debt was issued"
-          },
-          {
-            "term": "floating the issue",
-            "meaning": "Successfully placing a bond series with investors — failure to float means the project has no cash authorization"
-          },
-          {
-            "term": "cost certificate",
-            "meaning": "The engineer's sworn statement of actual expenditures, required by Illinois statute before a bond series can be closed out"
-          },
-          {
-            "term": "frost the bonds",
-            "meaning": "Alleged colloquial financial slang associated with disputes over municipal bond valuations and project overruns"
-          },
-          {
-            "term": "deficiency warrant",
-            "meaning": "An emergency spending authorization issued by the village board when actual costs exceed the bonded amount — politically toxic and publicly visible"
-          }
-        ]
-      },
-      {
-        "name": "Late-Victorian Law Enforcement Vernacular",
-        "context": "Used by village marshals, county constables, and railroad police operating in Cook County townships in the early 1890s.",
-        "terms": [
-          {
-            "term": "the calaboose",
-            "meaning": "The local jail cell — in this case the iron-barred room in the tower's lower level"
-          },
-          {
-            "term": "sworn complaint",
-            "meaning": "The formal written accusation that triggers a justice-of-the-peace warrant; without one, a marshal cannot legally detain"
-          },
-          {
-            "term": "on the tramp",
-            "meaning": "Describing an itinerant laborer or vagrant moving between construction sites — not inherently criminal but grounds for watch"
-          },
-          {
-            "term": "railroad bull",
-            "meaning": "A private detective or guard employed by the CBQ or another rail line to police their right-of-way and freight yards"
-          },
-          {
-            "term": "disturbing the peace bond",
-            "meaning": "A cash surety posted by someone arrested for disorderly conduct — forfeited to the village if the behavior continues"
-          },
-          {
-            "term": "remanded",
-            "meaning": "Held in custody pending a hearing before the justice of the peace — the marshal's standard disposition for serious cases"
-          }
-        ]
-      },
-      {
-        "name": "Stone Masonry and Quarry Trade",
-        "context": "Used by the limestone cutters, hod carriers, and masonry foremen working the tower's exterior courses and the Block A perimeter.",
-        "terms": [
-          {
-            "term": "banker",
-            "meaning": "The heavy stone-cutting bench on which a mason dresses and shapes individual blocks before they are lifted to the wall"
-          },
-          {
-            "term": "bed face",
-            "meaning": "The natural horizontal grain of a quarried limestone block — cutting against the bed face weakens the stone"
-          },
-          {
-            "term": "spall",
-            "meaning": "A sharp fragment of stone knocked free during dressing — spalls are hazardous on a construction platform and indicate poor technique"
-          },
-          {
-            "term": "plug and feather",
-            "meaning": "The hand-drilling and wedge-splitting method used to cleave large limestone blocks along a controlled fracture line"
-          },
-          {
-            "term": "tuck pointing",
-            "meaning": "Finishing the mortar joints between laid courses with a narrow, slightly projecting ridge — both weatherproofing and aesthetic"
-          },
-          {
-            "term": "hod",
-            "meaning": "The V-shaped wooden trough on a pole used to carry mortar or brick up scaffolding — a hod carrier is the lowest-status masonry laborer"
-          }
-        ]
-      }
-    ]
-  },
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.841Z",
-  "premise": "The strongbox has been forced. Three pages of bore log records are missing. The midnight freight consist rolls out in less than an hour. Someone who knew the schedule came through that door — and one of the people standing in this room right now is watching you figure out who.",
-  "playerGoal": "",
-  "openingSituation": "",
-  "tone": [],
-  "structured_endings_enabled": false,
-  "allow_free_input": true,
-  "beats_status": "not_generated",
-  "technical_facts": {
-    "generated": true,
-    "reviewed": true,
-    "facts": [
-      {
-        "fact_id": "st_peter_sandstone_depth_illinois",
-        "content": "The St. Peter Sandstone aquifer in northeastern Illinois lies at depths ranging from approximately 1,400 to 2,000 feet below surface, depending on local geology, and was the primary artesian target for deep municipal wells drilled in the Chicago metropolitan region during the 1880s and 1890s.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); U.S. Geological Survey Water-Supply Paper No. 114 (1905)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "artesian_pressure_st_peter",
-        "content": "Artesian wells completed in the St. Peter Sandstone in the Chicago region during the late nineteenth century typically exhibited static head pressures sufficient to raise water 50 to 200 feet above the surface casing collar, with flow rates at completion ranging from 50,000 to over 500,000 gallons per day depending on bore diameter and local aquifer conditions.",
-        "domain": "other",
-        "source": {
-          "citation": "U.S. Geological Survey Water-Supply Paper No. 114 (1905); Illinois State Water Survey, Historical Well Records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "western_springs_village_incorporation",
-        "content": "Western Springs, Illinois was incorporated as a village in 1886, placing its early municipal infrastructure projects — including water supply development — within the governance framework of a village board with elected aldermen and a village president.",
-        "domain": "other",
-        "source": {
-          "citation": "Village of Western Springs, Illinois, Municipal Records; Cook County incorporation filings, 1886",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "cable_tool_vs_rotary_drill_1890s",
-        "content": "Deep artesian well drilling in Illinois during the 1880s and 1890s was performed primarily by cable-tool (percussion) methods; rotary drilling technology was not in widespread use for municipal water wells in the Midwest until after 1900, meaning a rotary table and associated torque gauge on an 1890s Illinois well project represents an advanced or experimental installation for the period.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); E.E. Brainerd, 'Deep Well Drilling in Illinois,' Engineering News, 1893",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "drill_string_failure_torque_threshold",
-        "content": "Wrought iron drill pipe used in deep well boring during the late nineteenth century was rated for tensile loads but was vulnerable to torsional failure when rotary torque exceeded the pipe's yield point; excessive brake resistance on a rotary table transmitted directly to the drill string as torsional stress, and a sudden release after over-torquing could snap the string at a tool joint.",
-        "domain": "other",
-        "source": {
-          "citation": "C.A. Ashburner, 'Notes on Rotary Drilling,' Transactions of the American Institute of Mining Engineers, 1896",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "boiler_operating_pressure_1890s_field",
-        "content": "Portable and semi-portable steam boilers used to power well-drilling equipment in the 1890s typically operated at working pressures between 60 and 100 PSI; relief valves were set at or near the maximum allowable working pressure stamped on the boiler shell, and sustained operation above that threshold risked seam failure or fitting rupture.",
-        "domain": "power",
-        "source": {
-          "citation": "ASME Boiler Code predecessor standards; Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "municipal_bond_issuance_illinois_villages",
-        "content": "Under Illinois law in the 1890s, a village could issue general obligation bonds for public works — including water supply infrastructure — only upon approval by the village board and, for amounts above specified thresholds, subject to a public petition or referendum process; bond certificates required the signatures of the village president and attesting officers.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), 1891 edition; Illinois Supreme Court, Village of Hyde Park v. Blair, 1890",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "benezette_williams_engineer_record",
-        "content": "Benezette Williams was a practicing civil engineer in Illinois during the late nineteenth century; Benezette Williams operated an independent civil engineering practice in the Chicago metropolitan region, serving as the sole Chief Engineer for the Western Springs municipal infrastructure and water supply projects of 1892.",
-        "domain": "personnel",
-        "source": {
-          "citation": "Illinois Society of Civil Engineers membership records; Chicago city directories, 1880s–1890s",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "cbq_railroad_western_springs_service",
-        "content": "The Chicago, Burlington and Quincy Railroad (CBQ) operated a line through Western Springs, Illinois, with the Western Springs depot serving as a regular stop; CBQ locomotive crews on the Aurora branch ran overnight freight and early morning passenger consists through the village, placing a CBQ fireman in a position to observe the station and adjacent properties during nighttime hours.",
-        "domain": "navigation",
-        "source": {
-          "citation": "Chicago, Burlington and Quincy Railroad, Annual Report, 1890; Illinois Railroad and Warehouse Commission records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "shale_fault_core_sample_identification",
-        "content": "During deep well drilling in Illinois, shale interbeds and fault zones within the Cambrian and Ordovician sequence above the St. Peter Sandstone were identifiable in core and cutting samples by the presence of dark grey to black fissile shale fragments and by anomalous increases in drilling resistance; competent field engineers were expected to log these occurrences and adjust the drill program accordingly.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); Stuart Weller, 'Geology of the Chicago Area,' 1900",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "bore_log_legal_status_illinois",
-        "content": "In Illinois municipal well projects of the 1890s, the daily bore log maintained by the supervising engineer constituted the primary technical record of the work and was the evidentiary basis for certifying completion and authorizing payment under the construction contract; alteration or destruction of bore log entries could constitute fraud against the municipality.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), forgery provisions, 1891; standard municipal engineering contract language of the period",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "coal_feed_valve_boiler_function",
-        "content": "On a fire-tube boiler of the 1890s, the coal-feed or stoker-feed valve controlled the rate of fuel delivery to the firebox; holding this valve artificially open beyond the operator's set position would cause the fire to burn hotter than intended, accelerating steam generation and driving boiler pressure upward toward the relief valve setting over a period of one to three hours depending on boiler size and initial water temperature.",
-        "domain": "power",
-        "source": {
-          "citation": "Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition; Kent's Mechanical Engineers' Pocket-Book, 1895",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "white_oak_identification_grain",
-        "content": "White oak (Quercus alba) is identifiable by its straight, coarse grain, light tan to pale brown color, and the presence of tyloses in the pores, which give it a characteristic ray-fleck pattern on radial surfaces; it was a standard material for office furniture manufacture in the Midwest during the 1880s and 1890s and was readily distinguishable from red oak or other species by a trained observer.",
-        "domain": "other",
-        "source": {
-          "citation": "U.S. Department of Agriculture, Division of Forestry, Bulletin No. 10 (1891); standard cabinet-making references of the period",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "document_forgery_signature_analysis",
-        "content": "Questioned document examination in the nineteenth century relied on direct visual comparison of letter forms, pen pressure, and habitual writing characteristics; courts and investigators of the period accepted testimony from individuals familiar with a signatory's habitual hand as evidence of forgery, and differences in specific letterforms — such as the construction of capital B or the crossbar length of lowercase t — were treated as material indicators.",
-        "domain": "other",
-        "source": {
-          "citation": "William E. Hagan, 'Disputed Handwriting,' 1894; standard legal practice in Illinois courts, 1890s",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "pipe_wrench_jaw_diameter_matching",
-        "content": "A Stillson-pattern pipe wrench of the 1890s had adjustable jaws set by a knurled nut; once set to grip a specific diameter, the jaw opening remained fixed until readjusted, and the jaw width could be measured and compared to the diameter of any fitting it had been used on — a standard investigative technique for connecting a tool to a specific point of use.",
-        "domain": "other",
-        "source": {
-          "citation": "Daniel C. Stillson patent (U.S. Patent No. 95,744, 1869); standard mechanical engineering reference practice",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "chicago_financial_agency_retainer_practice",
-        "content": "Chicago-based financial agencies and bond underwriting firms in the 1890s routinely paid retainers to local engineers, attorneys, or officials who could provide inside information on municipal bond issuances or influence the terms of bond certifications; such payments were not per se illegal under Illinois law of the period but could constitute bribery or fraud if connected to the falsification of public documents.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), bribery provisions, 1891; contemporary accounts of municipal bond market practices in the Chicago Tribune, 1890s",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "trench_collapse_soil_conditions_illinois",
-        "content": "Shallow trenching in the glacial till and lacustrine clay soils characteristic of northeastern Illinois presented a recognized collapse hazard in the 1890s, particularly when trench walls were unsupported and soil moisture was elevated; a trench collapse in a construction perimeter zone was a foreseeable emergency requiring immediate response from site supervisory personnel.",
-        "domain": "other",
-        "source": {
-          "citation": "Engineering News, 'Trench Accidents in Clay Soils,' 1893; Illinois Bureau of Labor Statistics, Annual Report, 1894",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "night_marshal_authority_illinois_village",
-        "content": "Under Illinois village law of the 1890s, a night marshal or night watchman appointed by the village board had authority to detain persons found on village property under suspicious circumstances, to secure evidence of crimes against village property, and to swear complaints before a justice of the peace; the night marshal's sworn complaint was sufficient to authorize a search of a private person's effects when probable cause was stated.",
-        "domain": "other",
-        "source": {
-          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), police powers provisions, 1891",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      }
-    ]
-  },
+  "version": "1.0.0",
   "epilogue": {
-    "generated": true,
     "reviewed": true,
+    "generated": true,
+    "open_threads": [
+      {
+        "thread_id": "the_chief_engineer",
+        "historical_record": "The technical records of the Western Springs well drilling — including torque logs, drill string specifications, and formation sample records — are not known to have survived in any accessible archive. Whether anomalies in drilling performance during the project were investigated, recorded, or disputed is not established by any presently available source. In Illinois municipal infrastructure projects of this period generally, engineering field records were rarely preserved beyond project completion, and disputes over drilling performance were typically resolved informally between the contractor and the village board without formal inquiry."
+      },
+      {
+        "thread_id": "the_pump_operator",
+        "historical_record": "Steam boiler operation on well-drilling rigs in 1890s Illinois was governed by practical field standards rather than formal regulatory inspection in most municipalities. The Illinois Boiler Inspection Act was not enacted until 1903. Prior to that date, boiler pressure management on construction sites was the responsibility of the contractor's crew, and incidents of improper valve configuration or pressure failure were not systematically reported to any state authority. Whether the Western Springs project experienced any boiler-related incidents during drilling is not documented in available sources."
+      },
+      {
+        "thread_id": "the_night_marshal",
+        "historical_record": "Formation sample logbooks and spoil records from the Western Springs well project are not known to have survived. In Illinois well-drilling projects of this period, sample logs were maintained by the drilling contractor and were not routinely submitted to or retained by the village government. The chain of custody for such records, and whether their contents were ever subject to dispute or inquiry in the Western Springs project, is not established by any presently available source."
+      },
+      {
+        "thread_id": "all_three_perspectives",
+        "historical_record": "Instrumentation on rotary drilling rigs in the early 1890s was limited and not standardized. Torque gauges, where present, were mechanical devices subject to drift and manual adjustment. Whether baseline readings were formally recorded, and whether discrepancies in gauge readings were ever the subject of a formal dispute or inquiry on the Western Springs project, is not documented in available sources. The question of what instrumentation was actually present on the Williams and Williams rig is not resolved by surviving records."
+      },
+      {
+        "thread_id": "the_pressure_event",
+        "historical_record": "Trench and excavation collapses were a documented hazard on deep well and waterworks construction sites in Illinois during the 1890s. No record of a specific trench collapse incident during the Western Springs well project has been identified in available sources. Illinois had no formal construction safety inspection regime for municipal projects in this period; incidents were recorded only if they resulted in injury claims or litigation, and no such record has been identified for this project."
+      },
+      {
+        "thread_id": "the_well_breaks",
+        "historical_record": "Drill string failures — including pipe separation and string loss in the bore — were among the most serious and costly hazards in deep well drilling of the 1890s. Such failures could render a bore unrecoverable and require redrilling from the surface. Whether the Western Springs project experienced any drill string incident is not documented in available sources. The technical specifications of the drill string used by Williams and Williams on this project are not preserved in any source presently accessible."
+      },
+      {
+        "thread_id": "the_boilersteampressure_spike",
+        "historical_record": "The operating pressure range for steam-powered well-drilling equipment in the early 1890s varied by rig design and boiler capacity. Manufacturers' specifications for rigs of this period typically cited working pressures between 60 and 100 PSI for the boiler systems used in deep well applications, though field practice varied. Whether the Western Springs project experienced a pressure event during the final stages of drilling, and how it was managed, is not documented in any source presently available."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "the_chief_engineer",
+        "historical_record": "No record survives of how Benezette Williams or any engineer on the Western Springs project identified or responded to anomalies in drilling torque or equipment performance during the 1891–1892 drilling operation. The project was completed successfully, which establishes that no catastrophic equipment failure or unresolved technical obstruction prevented the well from reaching the St. Peter Sandstone. The internal process by which the engineering team managed drilling performance is not documented in any source presently available."
+      },
+      {
+        "beat_id": "the_pump_operator",
+        "historical_record": "The operational history of the steam equipment used on the Western Springs well project is not preserved in available records. The well's successful completion confirms that adequate steam pressure was achieved to drive the drill to target depth, but the specific incidents, adjustments, or interventions that occurred during the drilling process are not documented. No record of equipment tampering or deliberate interference with the boiler system on this project has been identified in any source."
+      },
+      {
+        "beat_id": "the_night_marshal",
+        "historical_record": "No record of a night watchman, marshal, or security personnel assigned to the Western Springs well construction site has been identified in available sources. Whether the site was guarded overnight, and whether any unauthorized access to project records or equipment was investigated, is not established. The spoil-sample logbook for the project, if one was maintained, has not been identified in any archive."
+      },
+      {
+        "beat_id": "all_three_perspectives",
+        "historical_record": "The Western Springs well project produced a functioning artesian well at approximately 1,800 feet depth in 1892. The convergence of engineering, operational, and administrative oversight that made this outcome possible is not documented in detail in surviving records. Whether the project encountered coordinated obstruction, financial irregularities, or internal disputes during its execution is not established by any source presently available. The successful completion of the well and the bond financing that supported it are the verifiable outcomes."
+      },
+      {
+        "beat_id": "the_pressure_event",
+        "historical_record": "No record of a site emergency, trench collapse, or security incident during the construction of the Western Springs artesian well has been identified in available sources. The project's completion in 1892 without documented litigation or formal inquiry suggests that no incident of sufficient severity to generate a legal or administrative record occurred, though minor incidents would not necessarily have been recorded under the regulatory environment of the period."
+      },
+      {
+        "beat_id": "the_well_breaks",
+        "historical_record": "The Western Springs artesian well was successfully completed and reached the St. Peter Sandstone aquifer, confirming that the drill string was not lost in the bore and that the well was not abandoned due to equipment failure. The specific drilling conditions encountered at the shale fault or formation transition zones during the project are not documented in any source presently available. The successful completion is the verifiable historical outcome."
+      },
+      {
+        "beat_id": "the_boilersteampressure_spike",
+        "historical_record": "The Western Springs artesian well produced flowing water from the St. Peter Sandstone aquifer upon completion in 1892, confirming that sufficient pressure — both steam pressure to drive the drill and artesian pressure in the formation — was achieved during the project. The specific pressure readings, operational events, or crew interventions during the final stages of drilling are not preserved in any source presently available."
+      }
+    ],
     "character_fates": [
       {
         "character_id": "char_benezette_williams",
@@ -567,6 +178,11 @@
         "primary_source": null
       }
     ],
+    "historical_frame": [
+      "Between 1880 and 1900, hundreds of Illinois municipalities drilled deep artesian wells into the St. Peter Sandstone and Galena-Platteville dolomite formations; the St. Peter Sandstone, lying at depths of 1,500 to 2,000 feet beneath the Chicago plain, was the primary target for municipal water supply in Cook and DuPage Counties during this period.",
+      "Municipal bond fraud and falsification of contractor cost certifications were sufficiently common in Illinois public works during the 1880s and 1890s that the Illinois General Assembly amended municipal bond statutes multiple times in this period to require additional certification and public notice requirements before bonds could be issued.",
+      "The Chicago, Burlington and Quincy Railroad's main line through Western Springs was operational by the time of the village's incorporation in 1886, and the railroad's presence was a primary driver of residential and commercial development in the village during the period of the well project."
+    ],
     "immediate_outcome": {
       "summary": "The Western Springs artesian well was completed in 1892, reaching the St. Peter Sandstone aquifer at a depth of approximately 1,800 feet and providing the village with a pressurized municipal water supply. The project was financed through a municipal bond issue and engineered by the firm of Williams and Williams. The well remained the foundation of Western Springs' water infrastructure for decades following its completion.",
       "key_facts": [
@@ -578,102 +194,486 @@
         "The well was funded through a municipal bond issue approved by the village board.",
         "Artesian pressure in the St. Peter Sandstone aquifer in northeastern Illinois often allowed water to rise substantially within wells during this period, though many municipal systems still relied on pumping infrastructure for distribution and storage."
       ]
-    },
-    "historical_frame": [
-      "Between 1880 and 1900, hundreds of Illinois municipalities drilled deep artesian wells into the St. Peter Sandstone and Galena-Platteville dolomite formations; the St. Peter Sandstone, lying at depths of 1,500 to 2,000 feet beneath the Chicago plain, was the primary target for municipal water supply in Cook and DuPage Counties during this period.",
-      "Municipal bond fraud and falsification of contractor cost certifications were sufficiently common in Illinois public works during the 1880s and 1890s that the Illinois General Assembly amended municipal bond statutes multiple times in this period to require additional certification and public notice requirements before bonds could be issued.",
-      "The Chicago, Burlington and Quincy Railroad's main line through Western Springs was operational by the time of the village's incorporation in 1886, and the railroad's presence was a primary driver of residential and commercial development in the village during the period of the well project."
-    ],
-    "open_threads": [
+    }
+  },
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-05-22T22:09:01.841Z",
+  "playerGoal": "",
+  "description": "Western Springs, Illinois, summer 1892. The village's landmark stone water tower is days from completion when a bound drill string, a failed pressure test, and whispers of bond fraud threaten to bury the entire project — and one engineer's reputation — two thousand feet underground. Three perspectives. One crisis. Thirty minutes to hold the line.",
+  "storyArcIds": [
+    "artesian_height_1892_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
       {
-        "thread_id": "the_chief_engineer",
-        "historical_record": "The technical records of the Western Springs well drilling — including torque logs, drill string specifications, and formation sample records — are not known to have survived in any accessible archive. Whether anomalies in drilling performance during the project were investigated, recorded, or disputed is not established by any presently available source. In Illinois municipal infrastructure projects of this period generally, engineering field records were rarely preserved beyond project completion, and disputes over drilling performance were typically resolved informally between the contractor and the village board without formal inquiry."
+        "text": "Cook County in the summer of 1892 is a place being remade by water and money in roughly equal measure. The city of Chicago, nine miles to the east, has just been awarded the World's Columbian Exposition and is consuming lumber, steel, and labor at a rate that makes the surrounding townships feel the pull like iron filings near a magnet. Western Springs, incorporated only four years prior, sits at the edge of that gravitational field — close enough to feel the heat, far enough to have chosen a different path. The village's answer to Chicago's annexation pressure is infrastructure: a combined water tower, artesian well, and municipal pumping station budgeted at exactly $79,119.10, designed by the engineering firm Williams and Williams of Chicago, and built from locally quarried limestone transported by rail from the Chicago region's quarry network.",
+        "type": "world"
       },
       {
-        "thread_id": "the_pump_operator",
-        "historical_record": "Steam boiler operation on well-drilling rigs in 1890s Illinois was governed by practical field standards rather than formal regulatory inspection in most municipalities. The Illinois Boiler Inspection Act was not enacted until 1903. Prior to that date, boiler pressure management on construction sites was the responsibility of the contractor's crew, and incidents of improper valve configuration or pressure failure were not systematically reported to any state authority. Whether the Western Springs project experienced any boiler-related incidents during drilling is not documented in available sources."
+        "text": "The tower is not merely a utility structure. It is the physical argument that Western Springs can govern itself — that it does not need Chicago's water mains, Chicago's utility contracts, or Chicago's political machinery reaching into its tax rolls. If the project fails, the village board loses the confidence of its own bond market, and annexation advocates and regional utility interests will have additional political leverage to argue that small villages could not independently sustain modern municipal infrastructure. For Benezette Williams personally, failure here means the end of a practice built on the reputation that his calculations do not miss — not at depth, not under pressure, not when the geology refuses to cooperate. The drill is currently bound at 1,800 feet, 200 feet short of the St. Peter Sandstone that his own survey promised was there.",
+        "type": "stakes"
       },
       {
-        "thread_id": "the_night_marshal",
-        "historical_record": "Formation sample logbooks and spoil records from the Western Springs well project are not known to have survived. In Illinois well-drilling projects of this period, sample logs were maintained by the drilling contractor and were not routinely submitted to or retained by the village government. The chain of custody for such records, and whether their contents were ever subject to dispute or inquiry in the Western Springs project, is not established by any presently available source."
+        "text": "It is past nine o'clock on a Tuesday evening in late July, and the heat has not broken. The construction site occupies the village center near the future water tower grounds, and the tower's limestone structure rises prominently above the surrounding streetscape, still unfinished under lantern light, pale and raw in the light of four gas lanterns mounted on iron stakes around the perimeter. The smell is wet mortar, coal smoke from the boiler stack venting through the foundation grate, and the faint mineral sharpness of freshly drilled rock dust that has been accumulating in the spoil barrels for six weeks. From the direction of the Chicago, Burlington and Quincy rail line two blocks south, a freight consist is idling — its fireman has been watching the construction lights for the better part of an hour, and he is not the only one.",
+        "type": "scene"
       },
       {
-        "thread_id": "all_three_perspectives",
-        "historical_record": "Instrumentation on rotary drilling rigs in the early 1890s was limited and not standardized. Torque gauges, where present, were mechanical devices subject to drift and manual adjustment. Whether baseline readings were formally recorded, and whether discrepancies in gauge readings were ever the subject of a formal dispute or inquiry on the Western Springs project, is not documented in available sources. The question of what instrumentation was actually present on the Williams and Williams rig is not resolved by surviving records."
-      },
-      {
-        "thread_id": "the_pressure_event",
-        "historical_record": "Trench and excavation collapses were a documented hazard on deep well and waterworks construction sites in Illinois during the 1890s. No record of a specific trench collapse incident during the Western Springs well project has been identified in available sources. Illinois had no formal construction safety inspection regime for municipal projects in this period; incidents were recorded only if they resulted in injury claims or litigation, and no such record has been identified for this project."
-      },
-      {
-        "thread_id": "the_well_breaks",
-        "historical_record": "Drill string failures — including pipe separation and string loss in the bore — were among the most serious and costly hazards in deep well drilling of the 1890s. Such failures could render a bore unrecoverable and require redrilling from the surface. Whether the Western Springs project experienced any drill string incident is not documented in available sources. The technical specifications of the drill string used by Williams and Williams on this project are not preserved in any source presently accessible."
-      },
-      {
-        "thread_id": "the_boilersteampressure_spike",
-        "historical_record": "The operating pressure range for steam-powered well-drilling equipment in the early 1890s varied by rig design and boiler capacity. Manufacturers' specifications for rigs of this period typically cited working pressures between 60 and 100 PSI for the boiler systems used in deep well applications, though field practice varied. Whether the Western Springs project experienced a pressure event during the final stages of drilling, and how it was managed, is not documented in any source presently available."
+        "text": "You have been on this site since before dawn, and the day has produced three crises and no resolution to any of them. The drill string is jammed. The bond committee is meeting in forty-eight hours. And someone — someone with access to this site and knowledge of its engineering tolerances — has been feeding false numbers into the official project ledger, numbers designed to make the cost overrun look catastrophic rather than manageable. You know this because you have seen the original figures, and you have seen what was submitted to the board. The lantern light catches the limestone dust on your sleeve as you turn toward the tower entrance, the iron door standing open against the warm night, and the decision you have been postponing for the last three hours cannot be postponed any further.",
+        "type": "entry",
+        "character_entries": {
+          "role_night_marshal": "The bent hasp is still warm from whoever's hands bent it, and that is the fact you keep returning to as you stand with your palm flat against the strongbox lid and the cell keys pressing cold through the fabric at your hip. Warm metal means recent. Recent means the perimeter walk — twenty-two minutes, no longer — was enough time for someone who knew your schedule, or had watched it long enough to trust it. The binder sits open on the draughtsmen's cabinet where you set it, three ragged stubs where the pages were, and the tears are clean at the top and rough at the bottom, which tells you the person pulled upward and fast, which tells you they knew exactly which pages they wanted before their hands touched the paper. You are not an engineer. You cannot tell a sandstone formation from a clay seam, and you could not read a bore log if Benezette Williams himself stood at your shoulder explaining it. What you can read is a room, and this room says two things plainly: whoever came through that door did not need to search, and they left through it without looking back. The sworn complaint form is in the drawer beneath your left hand. Outside, the four gas lanterns hold the limestone pale and still, and somewhere south along the Burlington and Quincy siding, a fireman who has been watching this site for two nights is watching it right now. You have a bent hasp, three missing pages, and something left behind that the person who left it does not yet know they left. You draw a slow breath and reach for the lantern.",
+          "role_pump_operator": "Your left hand is pressed flat against the packing gland housing of the number-two pump, and the water coming through is no longer a weep — it is hitting your palm in hard, cold pulses, one every second and a half, maybe faster now than a minute ago. The pump room sits eight feet below grade and the limestone walls hold the heat differently than above ground, close and mineral and wrong, and the clack-hiss of the pistons fills the space so completely that you feel it in your back teeth before you hear it. The pressure gauge reads 48. It read 45 when you found the shim. The shim is in your breast pocket now, and what you know — what nobody standing in the lantern light above your head knows — is that the wood is dry. Whoever carved it and set it in the coal-feed valve seat did not do it tonight. They did it before the shift, before the boiler came up to temperature, before the drill crew started their final push toward the St. Peter Sandstone. That means they knew the schedule. The relief valves will lift somewhere past 90, and the pressure test window closes at 85, and you have perhaps forty minutes to find what else they touched before you decide whether to call up for the marshal or hold the line alone and say nothing until the water comes.",
+          "role_chief_engineer": "The torque gauge needle sits at 62, and you have not looked away from it in four minutes. Your thumb is on the brake collar housing — not gripping, just resting, the way you rest a hand on a patient's wrist to feel what the numbers cannot tell you — and the gas lantern to your left is close enough that you can see the small weld seam on the gauge face where the casing was opened and reclosed, a seam that was not there on Monday. The drill platform smells of shale dust and warm iron and something faintly organic from the spoil barrels, and beneath your boots the decking carries a vibration that is wrong in its frequency, too regular, too shallow for a string bound at depth. You set the baseline at 41. You set it yourself, before the first shift, before anyone else was on this platform, and you know the shale fault at 1,800 feet accounts for eight points of additional resistance because you saw it in the core samples three weeks ago and said nothing to the board because the fault was traversable and the St. Peter Sandstone was still there — is still there, 200 feet below the bit, exactly where your survey placed it. The figure circulating among Wickerson's committee is not your figure. The boiler has not reached operating pressure tonight, which means the timeline your foreman gave you this morning contains at least one deliberate falsehood, and the man who altered this gauge understood torque measurement well enough to make the number look like geology to anyone who had not set the baseline himself. Forty-eight hours. The bond committee meets in forty-eight hours, and the true project cost is $71,340.22, and below you the pump room is cold and dark and waiting, and somewhere between this platform and that room is the origin point of every false figure that is moving through the village tonight. The lantern is close. The weld seam is visible. You lift your thumb from the collar and reach for the gauge."
+        }
       }
     ],
-    "choice_echoes": [
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_chief_engineer",
+    "role_pump_operator",
+    "role_night_marshal"
+  ],
+  "winConditions": [
+    "The drill string clears the shale fault without fracturing, the well strikes the St. Peter Sandstone aquifer, and the tower's first pressure test is certified by Benezette Williams.",
+    "The sabotage conspiracy against the municipal bond issue is exposed and at least one culprit is in custody or formally denounced before the board vote.",
+    "The tower reservoir reaches operational capacity sufficient for certification under the village waterworks test procedures with Boiler_Steam_Pressure held between 60 and 85 PSI, confirming system integrity."
+  ],
+  "failConditions": [
+    "The wrought-iron drill string snaps inside the bore hole at 1,800 feet, rendering the well unrecoverable within budget.",
+    "Boiler_Steam_Pressure exceeds the safe working limits of the drilling and pumping system and the safety relief valves lift, fracturing a cast-iron intake pipe and flooding the subterranean pump room.",
+    "The municipal bond vote is called before the sabotage is exposed, and the board freezes funding — halting the project permanently.",
+    "The session clock expires at 30 minutes with no accusation made and no pressure-test certification filed."
+  ],
+  "technical_facts": {
+    "facts": [
       {
-        "beat_id": "the_chief_engineer",
-        "historical_record": "No record survives of how Benezette Williams or any engineer on the Western Springs project identified or responded to anomalies in drilling torque or equipment performance during the 1891–1892 drilling operation. The project was completed successfully, which establishes that no catastrophic equipment failure or unresolved technical obstruction prevented the well from reaching the St. Peter Sandstone. The internal process by which the engineering team managed drilling performance is not documented in any source presently available."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); U.S. Geological Survey Water-Supply Paper No. 114 (1905)",
+          "access_note": null
+        },
+        "content": "The St. Peter Sandstone aquifer in northeastern Illinois lies at depths ranging from approximately 1,400 to 2,000 feet below surface, depending on local geology, and was the primary artesian target for deep municipal wells drilled in the Chicago metropolitan region during the 1880s and 1890s.",
+        "fact_id": "st_peter_sandstone_depth_illinois",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "the_pump_operator",
-        "historical_record": "The operational history of the steam equipment used on the Western Springs well project is not preserved in available records. The well's successful completion confirms that adequate steam pressure was achieved to drive the drill to target depth, but the specific incidents, adjustments, or interventions that occurred during the drilling process are not documented. No record of equipment tampering or deliberate interference with the boiler system on this project has been identified in any source."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "U.S. Geological Survey Water-Supply Paper No. 114 (1905); Illinois State Water Survey, Historical Well Records",
+          "access_note": null
+        },
+        "content": "Artesian wells completed in the St. Peter Sandstone in the Chicago region during the late nineteenth century typically exhibited static head pressures sufficient to raise water 50 to 200 feet above the surface casing collar, with flow rates at completion ranging from 50,000 to over 500,000 gallons per day depending on bore diameter and local aquifer conditions.",
+        "fact_id": "artesian_pressure_st_peter",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "the_night_marshal",
-        "historical_record": "No record of a night watchman, marshal, or security personnel assigned to the Western Springs well construction site has been identified in available sources. Whether the site was guarded overnight, and whether any unauthorized access to project records or equipment was investigated, is not established. The spoil-sample logbook for the project, if one was maintained, has not been identified in any archive."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Village of Western Springs, Illinois, Municipal Records; Cook County incorporation filings, 1886",
+          "access_note": null
+        },
+        "content": "Western Springs, Illinois was incorporated as a village in 1886, placing its early municipal infrastructure projects — including water supply development — within the governance framework of a village board with elected aldermen and a village president.",
+        "fact_id": "western_springs_village_incorporation",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "all_three_perspectives",
-        "historical_record": "The Western Springs well project produced a functioning artesian well at approximately 1,800 feet depth in 1892. The convergence of engineering, operational, and administrative oversight that made this outcome possible is not documented in detail in surviving records. Whether the project encountered coordinated obstruction, financial irregularities, or internal disputes during its execution is not established by any source presently available. The successful completion of the well and the bond financing that supported it are the verifiable outcomes."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); E.E. Brainerd, 'Deep Well Drilling in Illinois,' Engineering News, 1893",
+          "access_note": null
+        },
+        "content": "Deep artesian well drilling in Illinois during the 1880s and 1890s was performed primarily by cable-tool (percussion) methods; rotary drilling technology was not in widespread use for municipal water wells in the Midwest until after 1900, meaning a rotary table and associated torque gauge on an 1890s Illinois well project represents an advanced or experimental installation for the period.",
+        "fact_id": "cable_tool_vs_rotary_drill_1890s",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "the_pressure_event",
-        "historical_record": "No record of a site emergency, trench collapse, or security incident during the construction of the Western Springs artesian well has been identified in available sources. The project's completion in 1892 without documented litigation or formal inquiry suggests that no incident of sufficient severity to generate a legal or administrative record occurred, though minor incidents would not necessarily have been recorded under the regulatory environment of the period."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "C.A. Ashburner, 'Notes on Rotary Drilling,' Transactions of the American Institute of Mining Engineers, 1896",
+          "access_note": null
+        },
+        "content": "Wrought iron drill pipe used in deep well boring during the late nineteenth century was rated for tensile loads but was vulnerable to torsional failure when rotary torque exceeded the pipe's yield point; excessive brake resistance on a rotary table transmitted directly to the drill string as torsional stress, and a sudden release after over-torquing could snap the string at a tool joint.",
+        "fact_id": "drill_string_failure_torque_threshold",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "the_well_breaks",
-        "historical_record": "The Western Springs artesian well was successfully completed and reached the St. Peter Sandstone aquifer, confirming that the drill string was not lost in the bore and that the well was not abandoned due to equipment failure. The specific drilling conditions encountered at the shale fault or formation transition zones during the project are not documented in any source presently available. The successful completion is the verifiable historical outcome."
+        "domain": "power",
+        "source": {
+          "url": null,
+          "citation": "ASME Boiler Code predecessor standards; Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition",
+          "access_note": null
+        },
+        "content": "Portable and semi-portable steam boilers used to power well-drilling equipment in the 1890s typically operated at working pressures between 60 and 100 PSI; relief valves were set at or near the maximum allowable working pressure stamped on the boiler shell, and sustained operation above that threshold risked seam failure or fitting rupture.",
+        "fact_id": "boiler_operating_pressure_1890s_field",
+        "valid_from": null,
+        "valid_until": null
       },
       {
-        "beat_id": "the_boilersteampressure_spike",
-        "historical_record": "The Western Springs artesian well produced flowing water from the St. Peter Sandstone aquifer upon completion in 1892, confirming that sufficient pressure — both steam pressure to drive the drill and artesian pressure in the formation — was achieved during the project. The specific pressure readings, operational events, or crew interventions during the final stages of drilling are not preserved in any source presently available."
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), 1891 edition; Illinois Supreme Court, Village of Hyde Park v. Blair, 1890",
+          "access_note": null
+        },
+        "content": "Under Illinois law in the 1890s, a village could issue general obligation bonds for public works — including water supply infrastructure — only upon approval by the village board and, for amounts above specified thresholds, subject to a public petition or referendum process; bond certificates required the signatures of the village president and attesting officers.",
+        "fact_id": "municipal_bond_issuance_illinois_villages",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Illinois Society of Civil Engineers membership records; Chicago city directories, 1880s–1890s",
+          "access_note": null
+        },
+        "content": "Benezette Williams was a practicing civil engineer in Illinois during the late nineteenth century; Benezette Williams operated an independent civil engineering practice in the Chicago metropolitan region, serving as the sole Chief Engineer for the Western Springs municipal infrastructure and water supply projects of 1892.",
+        "fact_id": "benezette_williams_engineer_record",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Chicago, Burlington and Quincy Railroad, Annual Report, 1890; Illinois Railroad and Warehouse Commission records",
+          "access_note": null
+        },
+        "content": "The Chicago, Burlington and Quincy Railroad (CBQ) operated a line through Western Springs, Illinois, with the Western Springs depot serving as a regular stop; CBQ locomotive crews on the Aurora branch ran overnight freight and early morning passenger consists through the village, placing a CBQ fireman in a position to observe the station and adjacent properties during nighttime hours.",
+        "fact_id": "cbq_railroad_western_springs_service",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); Stuart Weller, 'Geology of the Chicago Area,' 1900",
+          "access_note": null
+        },
+        "content": "During deep well drilling in Illinois, shale interbeds and fault zones within the Cambrian and Ordovician sequence above the St. Peter Sandstone were identifiable in core and cutting samples by the presence of dark grey to black fissile shale fragments and by anomalous increases in drilling resistance; competent field engineers were expected to log these occurrences and adjust the drill program accordingly.",
+        "fact_id": "shale_fault_core_sample_identification",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), forgery provisions, 1891; standard municipal engineering contract language of the period",
+          "access_note": null
+        },
+        "content": "In Illinois municipal well projects of the 1890s, the daily bore log maintained by the supervising engineer constituted the primary technical record of the work and was the evidentiary basis for certifying completion and authorizing payment under the construction contract; alteration or destruction of bore log entries could constitute fraud against the municipality.",
+        "fact_id": "bore_log_legal_status_illinois",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "power",
+        "source": {
+          "url": null,
+          "citation": "Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition; Kent's Mechanical Engineers' Pocket-Book, 1895",
+          "access_note": null
+        },
+        "content": "On a fire-tube boiler of the 1890s, the coal-feed or stoker-feed valve controlled the rate of fuel delivery to the firebox; holding this valve artificially open beyond the operator's set position would cause the fire to burn hotter than intended, accelerating steam generation and driving boiler pressure upward toward the relief valve setting over a period of one to three hours depending on boiler size and initial water temperature.",
+        "fact_id": "coal_feed_valve_boiler_function",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "U.S. Department of Agriculture, Division of Forestry, Bulletin No. 10 (1891); standard cabinet-making references of the period",
+          "access_note": null
+        },
+        "content": "White oak (Quercus alba) is identifiable by its straight, coarse grain, light tan to pale brown color, and the presence of tyloses in the pores, which give it a characteristic ray-fleck pattern on radial surfaces; it was a standard material for office furniture manufacture in the Midwest during the 1880s and 1890s and was readily distinguishable from red oak or other species by a trained observer.",
+        "fact_id": "white_oak_identification_grain",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "William E. Hagan, 'Disputed Handwriting,' 1894; standard legal practice in Illinois courts, 1890s",
+          "access_note": null
+        },
+        "content": "Questioned document examination in the nineteenth century relied on direct visual comparison of letter forms, pen pressure, and habitual writing characteristics; courts and investigators of the period accepted testimony from individuals familiar with a signatory's habitual hand as evidence of forgery, and differences in specific letterforms — such as the construction of capital B or the crossbar length of lowercase t — were treated as material indicators.",
+        "fact_id": "document_forgery_signature_analysis",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Daniel C. Stillson patent (U.S. Patent No. 95,744, 1869); standard mechanical engineering reference practice",
+          "access_note": null
+        },
+        "content": "A Stillson-pattern pipe wrench of the 1890s had adjustable jaws set by a knurled nut; once set to grip a specific diameter, the jaw opening remained fixed until readjusted, and the jaw width could be measured and compared to the diameter of any fitting it had been used on — a standard investigative technique for connecting a tool to a specific point of use.",
+        "fact_id": "pipe_wrench_jaw_diameter_matching",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), bribery provisions, 1891; contemporary accounts of municipal bond market practices in the Chicago Tribune, 1890s",
+          "access_note": null
+        },
+        "content": "Chicago-based financial agencies and bond underwriting firms in the 1890s routinely paid retainers to local engineers, attorneys, or officials who could provide inside information on municipal bond issuances or influence the terms of bond certifications; such payments were not per se illegal under Illinois law of the period but could constitute bribery or fraud if connected to the falsification of public documents.",
+        "fact_id": "chicago_financial_agency_retainer_practice",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Engineering News, 'Trench Accidents in Clay Soils,' 1893; Illinois Bureau of Labor Statistics, Annual Report, 1894",
+          "access_note": null
+        },
+        "content": "Shallow trenching in the glacial till and lacustrine clay soils characteristic of northeastern Illinois presented a recognized collapse hazard in the 1890s, particularly when trench walls were unsupported and soil moisture was elevated; a trench collapse in a construction perimeter zone was a foreseeable emergency requiring immediate response from site supervisory personnel.",
+        "fact_id": "trench_collapse_soil_conditions_illinois",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), police powers provisions, 1891",
+          "access_note": null
+        },
+        "content": "Under Illinois village law of the 1890s, a night marshal or night watchman appointed by the village board had authority to detain persons found on village property under suspicious circumstances, to secure evidence of crimes against village property, and to swear complaints before a justice of the peace; the night marshal's sworn complaint was sufficient to authorize a search of a private person's effects when probable cause was stated.",
+        "fact_id": "night_marshal_authority_illinois_village",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ],
+    "reviewed": true,
+    "generated": true
+  },
+  "allow_free_input": true,
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": true
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": true
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": true
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": true
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": true
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": true
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": true
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Civil Engineering Field Argot",
+        "terms": [
+          {
+            "term": "making hole",
+            "meaning": "Actively advancing the drill bit through rock — any pause in downward progress is 'not making hole'"
+          },
+          {
+            "term": "fishing job",
+            "meaning": "The costly, often futile operation of retrieving a broken or stuck drill string from inside the bore hole"
+          },
+          {
+            "term": "string weight",
+            "meaning": "The cumulative downward force of the entire suspended drill pipe column, used to calculate torque limits"
+          },
+          {
+            "term": "lost circulation",
+            "meaning": "The condition where drilling fluid disappears into a fractured formation rather than returning to surface — a warning sign of a fault zone"
+          },
+          {
+            "term": "dressed bit",
+            "meaning": "A diamond-set or hardened-steel drill crown that has been freshly reset with cutting inserts by the tool dresser"
+          },
+          {
+            "term": "heave",
+            "meaning": "Upward movement of the formation floor into the bore hole caused by hydrostatic imbalance — a critical failure precursor"
+          },
+          {
+            "term": "spud",
+            "meaning": "The formal commencement of drilling at a new bore location; also used as a verb — 'we spudded this hole six weeks ago'"
+          }
+        ],
+        "context": "Used by Williams and Williams draughtsmen, site engineers, and drill-crew foremen when communicating technical conditions on the bore hole and tower structure."
+      },
+      {
+        "name": "Steam Plant Operators' Language",
+        "terms": [
+          {
+            "term": "popping off",
+            "meaning": "When a safety relief valve lifts and vents steam — desirable in a controlled test, catastrophic if unplanned"
+          },
+          {
+            "term": "priming",
+            "meaning": "Water carried over into the steam space of a boiler, causing violent pressure surges and potential pipe fracture"
+          },
+          {
+            "term": "dead men",
+            "meaning": "Anchor bolts or buried timber blocks used to fix pump foundations against the thrust of high-pressure discharge"
+          },
+          {
+            "term": "packing gland",
+            "meaning": "The stuffing-box seal around a pump shaft or valve stem — a weeping gland is a minor leak; a blown gland is an emergency"
+          },
+          {
+            "term": "throttle back",
+            "meaning": "To reduce steam admission to the engine cylinders by partially closing the main steam valve — the primary pressure-reduction action"
+          },
+          {
+            "term": "clinker",
+            "meaning": "Fused ash and unburned coal residue that builds up in the firebox grate, blocking airflow and reducing combustion efficiency"
+          },
+          {
+            "term": "gauge glass",
+            "meaning": "The vertical glass tube showing the water level inside the boiler — the single most critical instrument a fireman watches"
+          }
+        ],
+        "context": "Used by pump engineers, firemen, and boiler tenders working the subterranean Deane duplex installation and the surface boiler house."
+      },
+      {
+        "name": "Municipal Bond and Finance Language",
+        "terms": [
+          {
+            "term": "special assessment roll",
+            "meaning": "The official ledger apportioning improvement costs against specific parcels of village property — the legal basis for bond repayment"
+          },
+          {
+            "term": "coupon bonds",
+            "meaning": "Bearer bonds with detachable interest coupons; the form in which Western Springs' $79,119.10 infrastructure debt was issued"
+          },
+          {
+            "term": "floating the issue",
+            "meaning": "Successfully placing a bond series with investors — failure to float means the project has no cash authorization"
+          },
+          {
+            "term": "cost certificate",
+            "meaning": "The engineer's sworn statement of actual expenditures, required by Illinois statute before a bond series can be closed out"
+          },
+          {
+            "term": "frost the bonds",
+            "meaning": "Alleged colloquial financial slang associated with disputes over municipal bond valuations and project overruns"
+          },
+          {
+            "term": "deficiency warrant",
+            "meaning": "An emergency spending authorization issued by the village board when actual costs exceed the bonded amount — politically toxic and publicly visible"
+          }
+        ],
+        "context": "Used by village board members, bond committee clerks, and the financial agents of the Chicago bond houses dealing with Western Springs' infrastructure debt."
+      },
+      {
+        "name": "Late-Victorian Law Enforcement Vernacular",
+        "terms": [
+          {
+            "term": "the calaboose",
+            "meaning": "The local jail cell — in this case the iron-barred room in the tower's lower level"
+          },
+          {
+            "term": "sworn complaint",
+            "meaning": "The formal written accusation that triggers a justice-of-the-peace warrant; without one, a marshal cannot legally detain"
+          },
+          {
+            "term": "on the tramp",
+            "meaning": "Describing an itinerant laborer or vagrant moving between construction sites — not inherently criminal but grounds for watch"
+          },
+          {
+            "term": "railroad bull",
+            "meaning": "A private detective or guard employed by the CBQ or another rail line to police their right-of-way and freight yards"
+          },
+          {
+            "term": "disturbing the peace bond",
+            "meaning": "A cash surety posted by someone arrested for disorderly conduct — forfeited to the village if the behavior continues"
+          },
+          {
+            "term": "remanded",
+            "meaning": "Held in custody pending a hearing before the justice of the peace — the marshal's standard disposition for serious cases"
+          }
+        ],
+        "context": "Used by village marshals, county constables, and railroad police operating in Cook County townships in the early 1890s."
+      },
+      {
+        "name": "Stone Masonry and Quarry Trade",
+        "terms": [
+          {
+            "term": "banker",
+            "meaning": "The heavy stone-cutting bench on which a mason dresses and shapes individual blocks before they are lifted to the wall"
+          },
+          {
+            "term": "bed face",
+            "meaning": "The natural horizontal grain of a quarried limestone block — cutting against the bed face weakens the stone"
+          },
+          {
+            "term": "spall",
+            "meaning": "A sharp fragment of stone knocked free during dressing — spalls are hazardous on a construction platform and indicate poor technique"
+          },
+          {
+            "term": "plug and feather",
+            "meaning": "The hand-drilling and wedge-splitting method used to cleave large limestone blocks along a controlled fracture line"
+          },
+          {
+            "term": "tuck pointing",
+            "meaning": "Finishing the mortar joints between laid courses with a narrow, slightly projecting ridge — both weatherproofing and aesthetic"
+          },
+          {
+            "term": "hod",
+            "meaning": "The V-shaped wooden trough on a pole used to carry mortar or brick up scaffolding — a hod carrier is the lowest-status masonry laborer"
+          }
+        ],
+        "context": "Used by the limestone cutters, hod carriers, and masonry foremen working the tower's exterior courses and the Block A perimeter."
       }
     ]
   },
-  "review_checklist": {
-    "beat_count": {
-      "checked": true,
-      "notes": ""
-    },
-    "sequence_check": {
-      "checked": true,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": true,
-      "notes": ""
-    },
-    "final_beat_spec": {
-      "checked": true,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": true,
-      "notes": ""
-    },
-    "reviewer_summary": {
-      "checked": true,
-      "notes": ""
-    },
-    "manual_playthrough": {
-      "checked": true,
-      "notes": ""
-    }
-  },
-  "setting": "Western Springs, Illinois, 1892"
+  "keyEvidenceClueIds": [
+    "clue_tampered_torque_log",
+    "clue_forged_bond_petition"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The well strikes water but the bond sabotage is never fully exposed — the village gains its aquifer but the conspirators escape censure and the project's final costs remain disputed.",
+    "The saboteur is identified and confronted but flees before the Night Marshal can secure custody — the bond vote proceeds under a cloud of rumor rather than clear evidence.",
+    "The pressure test is certified at only 52,000 gallons — technically a pass, but the board imposes a reduced bond allocation that leaves the tower's upper iron tank only half-fitted."
+  ],
+  "structured_endings_enabled": false
 }

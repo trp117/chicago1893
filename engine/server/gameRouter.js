@@ -41,6 +41,10 @@ const ANTHROPIC_URL    = 'https://api.anthropic.com/v1/messages';
 const MODEL            = 'claude-sonnet-4-6';
 const MAX_HISTORY_MSGS = 8;
 
+// When true, only character_fates with verified:true are passed to the epilogue LLM.
+// Default OFF — existing fates have not been human-verified yet. Flip on after the review pass.
+const STRICT_FATE_VERIFICATION = process.env.STRICT_FATE_VERIFICATION === 'true';
+
 const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC_KEY)
   ? new Langfuse({
       secretKey: process.env.LANGFUSE_SECRET_KEY,
@@ -289,9 +293,16 @@ function buildEpilogueSummary(state, endResult) {
     interacted_characters: state?.introducedNpcs     || [],
     named_conspirators:    state?.namedConspirators  || [],
     completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
-    resolved_threads:      state?.resolved_threads   || [],
+    resolved_threads:      (state?.resolved_threads  || []).map(t => ({ thread_id: t.thread_id })),
     outcome:               endResult || 'unknown',
   };
+}
+
+// Matches "turn 29", "Turn 3", "turn N" etc — must not appear in record-voice prose.
+const TURN_META_RE = /\bturn\s+\d+\b/gi;
+function scrubTurnMeta(text) {
+  if (typeof text !== 'string') return text;
+  return text.replace(TURN_META_RE, '').replace(/  +/g, ' ').trim();
 }
 
 function normSource(val) {
@@ -344,37 +355,54 @@ function getCompositeDisclosure(epilogueData, summary) {
 }
 
 async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote) {
-  const playerNoteRule = playerHistoricalNote
-    ? 'Layer 0 — The player character: the PLAYER CHARACTER NOTE below is verified fact about the person the player portrayed. Include it. It appears after the character\'s own session ends — do not omit it.'
-    : '';
-
   const interactedSet  = new Set(sessionSummary.interacted_characters || []);
   const compositeNames = (epilogueData?.character_fates || [])
     .filter(f => interactedSet.has(f.character_id) && f.classification === 'composite')
     .map(f => f.name);
-  const compositeRule  = compositeNames.length > 0
-    ? `COMPOSITE CHARACTER CONSTRAINT: The following characters are fictional composites — invented figures placed within a documented historical context. They have no individual historical record: ${compositeNames.join(', ')}. Do NOT assign, imply, or speculate about their individual outcomes or fates. Do NOT write phrases such as "their fate is unknown" or "what became of them is unrecorded" — these still imply a real person. If you must reference them, note only the documented role they represented (e.g. a soldier present on Dog Green Sector on June 6, 1944) without any claim about what happened to that individual.`
+  const compositeRule = compositeNames.length > 0
+    ? `COMPOSITE CHARACTER CONSTRAINT (record block only): The following characters are fictional composites — invented figures placed within a documented historical context. They have no individual historical record: ${compositeNames.join(', ')}. Do NOT assign, imply, or speculate about their individual outcomes or fates. Do NOT write phrases such as "their fate is unknown" or "what became of them is unrecorded" — these still imply a real person. If you must reference them, note only the documented role they represented (e.g. a soldier present on Dog Green Sector on June 6, 1944) without any claim about what happened to that individual.`
     : '';
 
+  const playerNoteLayer = playerHistoricalNote
+    ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Include it in the record block.'
+    : '';
+
+  // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
+  const fatesForLLM = STRICT_FATE_VERIFICATION
+    ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
+    : (epilogueData?.character_fates || []);
+  const filteredEpilogueData = epilogueData ? { ...epilogueData, character_fates: fatesForLLM } : epilogueData;
+
   const systemPrompt = [
-    'You are writing the historical epilogue for a completed Living History session. This is not closing prose. It is historical record — a different register entirely: precise, unsentimental, a careful historian\'s final note. The closing prose has already been delivered. Do not repeat it or continue its style.',
+    'You are generating the epilogue for a completed Living History session. Return ONLY a valid JSON object with exactly two string keys: "session_block" and "record_block". No markdown fences, no preamble, no trailing text — just the raw JSON object.',
     '',
-    'You have two inputs: the session summary showing what this specific player did, and the scenario\'s verified historical facts. Select and sequence the relevant facts into an epilogue of 150 to 250 words.',
+    '══ SESSION BLOCK ══',
+    'Source: SESSION SUMMARY only.',
+    'Voice: reported past tense or second person. Not documentary. Not historian\'s record.',
+    'Content: what this player did — which characters they encountered, key decisions made, how the session ended for them.',
+    'Length: 60–100 words.',
+    'Rules:',
+    '- Draw ONLY from SESSION SUMMARY data. Do not use any data from the EPILOGUE DATA BLOCK here.',
+    '- Do not write in historian\'s record voice.',
+    '- Do not attribute player choices or actions to real historical people as documented fact.',
+    '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
     '',
-    'Follow the concentric circle rule:',
-    playerNoteRule,
-    'Layer 1 — The room: what happened to the named characters this player interacted with directly. Cover every character whose character_id appears in the session summary\'s interacted_characters list. Do not omit any.',
-    'Layer 2 — The immediate event: the verified outcome from immediate_outcome.',
-    'Layer 3 — The larger frame: maximum two facts from historical_frame that connect to what this player actually did. Do not reach beyond this.',
-    '',
-    'Additional rules:',
-    'Open with the player\'s last significant action or the immediate consequence of the session\'s closing moment. Do not open with a general historical statement.',
-    'Include open_threads entries only when the matching thread_id appears in the session\'s resolved_threads.',
-    'Include choice_echoes entries only when the matching beat_id appears in the session\'s completed_beats.',
-    'Do not invent, extrapolate, or editorialize. Every fact must come from the epilogue data block or the player character note.',
-    'Register: historian\'s record. Precise. Clean. Unsentimental. No literary reach. No interiority.',
-    'Last sentence: a verified historical fact. Not a meaning-statement. A fact.',
-    'Length: 150 to 250 words exactly.',
+    '══ RECORD BLOCK ══',
+    'Source: EPILOGUE DATA BLOCK only.',
+    'Voice: historian\'s record — precise, unsentimental, no literary reach, no interiority.',
+    'Content — follow this concentric circle order:',
+    playerNoteLayer,
+    '  Layer 1 — Characters: the documented fate (from character_fates) of every character whose character_id appears in interacted_characters. Cover every one. Do not omit any.',
+    '  Layer 2 — Outcome: the verified result from immediate_outcome.',
+    '  Layer 3 — Frame: up to two facts from historical_frame relevant to what happened in this session.',
+    'Length: 100–150 words.',
+    'Rules:',
+    '- Draw ONLY from EPILOGUE DATA BLOCK. Do not describe what this player did, chose, or experienced. The player is not mentioned.',
+    '- Include open_threads entries only when the matching thread_id appears in the session\'s resolved_threads.',
+    '- Include choice_echoes entries only when the matching beat_id appears in the session\'s completed_beats.',
+    '- Do not invent, extrapolate, or editorialize. Every fact from epilogue data only.',
+    '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
+    '- Last sentence: a verified historical fact. Not a meaning-statement.',
     compositeRule,
   ].filter(Boolean).join('\n');
 
@@ -387,9 +415,9 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     JSON.stringify(sessionSummary, null, 2),
     '',
     'EPILOGUE DATA BLOCK:',
-    JSON.stringify(normalizeEpilogueForLLM(epilogueData), null, 2),
+    JSON.stringify(normalizeEpilogueForLLM(filteredEpilogueData), null, 2),
     '',
-    'CLOSING PROSE (do not repeat or continue its style):',
+    'CLOSING PROSE (context only — do not repeat or continue its style):',
     closingProse,
   );
   const userContent = userParts.join('\n');
@@ -399,15 +427,31 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     method: 'POST', signal,
     headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: MODEL, max_tokens: 400, temperature: 0.5,
+      model: MODEL, max_tokens: 600, temperature: 0.5,
       system: systemPrompt,
       messages: [{ role: 'user', content: userContent }],
     }),
   });
   if (!resp.ok) throw new Error(`Anthropic API error: ${resp.status}`);
   const respData = await resp.json();
-  const text     = respData.content?.[0]?.text?.trim();
-  if (!text) throw new Error('No epilogue text returned');
+  const rawText  = respData.content?.[0]?.text?.trim();
+  if (!rawText) throw new Error('No epilogue text returned');
+
+  let session_block, record_block;
+  try {
+    const cleaned = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    const parsed  = JSON.parse(cleaned);
+    session_block = (parsed.session_block || '').trim();
+    record_block  = (parsed.record_block  || '').trim();
+  } catch {
+    throw new Error('Epilogue response was not valid JSON');
+  }
+
+  // Post-generation guard: strip any surviving turn-number patterns from the record block.
+  if (TURN_META_RE.test(record_block)) {
+    console.warn('[EPILOGUE] turn-meta pattern detected in record_block — stripping');
+    record_block = record_block.replace(TURN_META_RE, '').replace(/  +/g, ' ').trim();
+  }
 
   const interacted = new Set(sessionSummary.interacted_characters || []);
   const sources    = [...new Set(
@@ -416,7 +460,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
       .map(f => f.primary_source)
   )];
 
-  return { text, label: 'Historical Record', sources, style_hint: 'historian' };
+  return { session_block, record_block, label: 'Historical Record', sources, style_hint: 'historian' };
 }
 
 // ── Router export ──────────────────────────────────────────────────────────────
@@ -1266,14 +1310,18 @@ Do not open with the historical context. Open inside the character's body. Let t
 
         try {
           console.log('[EPILOGUE-CLOSE] calling epilogue API');
-          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, prose, anthropicApiKey, role?.historical_record_note || null);
-          if (epilogueResult?.text && characters.length) {
-            epilogueResult = { ...epilogueResult, text: fixCharacterIdLeaks(epilogueResult.text, characters) };
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null);
+          if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
+            epilogueResult = {
+              ...epilogueResult,
+              session_block: fixCharacterIdLeaks(epilogueResult.session_block || '', characters),
+              record_block:  fixCharacterIdLeaks(epilogueResult.record_block  || '', characters),
+            };
           }
         } catch (e) {
           console.error('[EPILOGUE]', e.message);
         }
-        console.log('[EPILOGUE-CLOSE] epilogue API result — success:', !!epilogueResult, 'length:', epilogueResult?.text?.length);
+        console.log('[EPILOGUE-CLOSE] epilogue API result — success:', !!epilogueResult, 'session_block:', epilogueResult?.session_block?.length, 'record_block:', epilogueResult?.record_block?.length);
 
         try {
           bibliography = assembleBibliography(scenarioData, summary, sessionState);
@@ -1303,8 +1351,11 @@ Do not open with the historical context. Open inside the character's body. Let t
           const aftermath = scenarioData?.historical_aftermath || '';
           const lines = ['', '## Closing Prose', '', prose];
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
-          if (epilogueResult?.text) {
-            lines.push('', '---', '', '## Historical Record', '', epilogueResult.text);
+          if (epilogueResult?.session_block) {
+            lines.push('', '---', '', '## Your Session', '', epilogueResult.session_block);
+          }
+          if (epilogueResult?.record_block) {
+            lines.push('', '---', '', '## Historical Record', '', epilogueResult.record_block);
           }
           if (bibliography?.length) {
             lines.push('', '---', '', '## Primary Sources', '');

@@ -1,39 +1,24 @@
 {
   "id": "bornholmer_strasse_first_breach",
-  "version": "1.0.0",
-  "title": "Bornholmer Straße: The First Breach",
-  "description": "November 9, 1989. A fumbled press conference has ignited East Berlin. Three people — a border commander, a student protester, and a Western journalist — must navigate the next ninety minutes as twenty thousand citizens press against a gate that history will open, but that could just as easily become a massacre. The outcome is not yet written.",
+  "tone": [],
   "genre": [
     "historical",
     "thriller",
     "political-drama"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "storyArcIds": [
-    "bornholmer_strasse_first_breach_main_arc"
-  ],
-  "playerRoleIds": [
-    "role_gatekeeper",
-    "role_catalyst",
-    "role_chronicler"
-  ],
-  "keyEvidenceClueIds": [
-    "clue_schabowski_note",
-    "clue_jaeger_order_log"
-  ],
+  "title": "Bornholmer Straße: The First Breach",
+  "premise": "A Politburo spokesman read a travel regulation on live television tonight that was not supposed to take effect until tomorrow. The crowd at Bornholmer Straße heard the words 'immediately, without delay' and is now pressing against the gate. The guards have live ammunition and no orders. Someone has to decide.",
+  "setting": "Berlin, Germany, 1989",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 2
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -43,183 +28,61 @@
       "A West Berlin television crew's spotlight sweeps across the death strip, momentarily blinding the guards and electrifying the crowd",
       "Rumour spreads through the crowd that the Bornholmer gate is already open — Aggression_Level escalates one tier",
       "A Grenztruppen guard on the eastern platform unslings his Kalashnikov and racks the bolt — every player's next action carries double weight"
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
-  "winConditions": [
-    "The gate is opened without violence — crowd flows through peacefully and the historical breach is achieved",
-    "The Journalist successfully broadcasts live footage of the opening moment to Western networks",
-    "The Protester crosses to West Berlin and locates their separated family member",
-    "Jäger issues the unilateral open order before Crowd_Density reaches 100 with Aggression_Level at Flashpoint simultaneously"
-  ],
-  "failConditions": [
-    "Aggression_Level reaches Flashpoint while Crowd_Density is above 90 and no open order has been issued — panic stampede kills civilians",
-    "A guard fires a weapon into the crowd before the gate opens",
-    "Comms_Status is Severed and Jäger issues a lockdown order rather than an open order — the moment passes and the crowd is violently dispersed",
-    "The Journalist is detained by Volkspolizei before broadcasting any footage of the breach",
-    "Time expires — 23:30 arrives — with the gate still closed and Crowd_Density above 80"
-  ],
-  "partialSuccessExamples": [
-    "The gate opens but a stampede injures dozens — the historical breach occurs but the human cost is catastrophic",
-    "The Journalist broadcasts the breach but is struck by a crowd surge and loses the camera — the footage is incomplete",
-    "The Protester crosses but cannot find their family in the chaos — they stand alone on the Bornholmer bridge at midnight",
-    "Jäger opens the gate but is immediately arrested by Stasi officers — the breach happens but he is taken away in handcuffs"
-  ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "It is the autumn of 1989, and the German Democratic Republic is hemorrhaging. Since August, more than fifty thousand East Germans have fled through Hungary and Czechoslovakia — the largest mass exodus since the Wall's construction in 1961. Erich Honecker has been removed from power and replaced by Egon Krenz, who has promised reform but delivered only the language of it. The SED Politburo is fracturing in real time, its members issuing contradictory signals to a population that has stopped believing any of them. Tonight, at a routine press conference carried live on East German television, Politburo spokesman Günter Schabowski reads from a note he has not been briefed on — a draft travel regulation not yet scheduled for implementation — and when a Reuters correspondent asks when it takes effect, Schabowski shuffles his papers and says, without certainty: 'Immediately, without delay.'"
-      },
-      {
-        "type": "stakes",
-        "text": "What hangs on the next ninety minutes is not merely a checkpoint policy. It is the question of whether one of the most heavily guarded borders in postwar Europe ends with a bureaucratic shrug or with bodies on the death strip. The border guards at Bornholmer Straße have live ammunition and decades of border-fire doctrine behind them — policies that contributed to at least 140 deaths connected to the Berlin Wall since 1961. Yet tonight no one in the chain of command is willing to clearly authorize or clearly forbid the use of force against the crowd gathering at the checkpoint. For Lieutenant Colonel Harald Jäger, the stakes are the weight of command without authority: every phone call to his superiors goes unanswered or ends in abuse, and the decision that history will require of him is one no one above him is willing to make. For the thousands pressing against the gate, the stakes are simpler and more absolute — they have heard the words 'immediately, without delay' and they are here to collect."
-      },
-      {
-        "type": "scene",
-        "text": "Bornholmer Straße in November smells of coal smoke and wet concrete and the exhaust of a hundred Trabants idling in a queue that has stopped moving. The floodlights mounted on the watchtowers wash everything in a flat, merciless white that kills shadow and turns faces into masks. The temperature has dropped to just above freezing and the fog that rolled the sweeping Nordbahn railway cut earlier in the evening has thickened against the lights into a luminous haze, so that the crowd — already thousands strong and growing by the minute — appears to materialize out of nothing at the edge of the illuminated zone, pressing forward in a slow, irresistible tide. On the western side of the bridge, the lights of the Bundesrepublik glow amber and warm through the same fog, close enough to read the street signs, separated by forty meters of death strip and twenty-eight years of history."
-      },
-      {
-        "type": "entry",
-        "text": "You have arrived at this crossing by different roads — one in uniform behind the barrier, one pressed against the cold steel of the turnstile in a crowd that has become a single organism, one crouched behind a camera on the western approach with a radio earpiece feeding you fragments of chaos. None of you asked to be the person history required tonight. The phone lines are beginning to fail. The crowd is beginning to sing. Somewhere behind the floodlights, a guard has placed his hand on the grip of his weapon without quite knowing why. You are standing at the precise hinge-point of the twentieth century, and it is about to ask you what you are made of.",
-        "character_entries": {
-          "role_gatekeeper": "The security phone is still in your hand. You have been holding it for four minutes — you know this because the logbook is open in front of you and the last entry is timestamped and you have been watching the second hand on the wall clock move through its arc with the fixed attention of a man who has run out of other things to do. The fluorescent tube above the duty desk hums at a frequency you have never noticed before tonight. Through the concrete and the bulletproof glass you can hear the crowd — not individual voices anymore, not since the Durchschleusung failed and the released ones came back with the others behind them, but a single low pressure, a sound less heard than registered in the sternum, twenty thousand people breathing in the same direction. You know something the others outside do not: that Brenner has loaded his weapon without being ordered to, and that the Schießbefehl is technically still in force, and that both of these facts are now equally useless to you. The mathematics resolved themselves some time ago. What remains is the logbook, open to the last entry in your own handwriting — *Kein Befehl* — and the clock, and the phone, and the particular silence of a chain of command that has chosen to leave one man standing at the end of it. Your thumb is on the receiver. The crowd presses. You have spent thirty-one years waiting to be told what to do, and the order is not coming, and you already know what you are going to do, and you have not done it yet.",
-          "role_catalyst": "The steel bar is at your sternum and has been for forty minutes, and you have stopped feeling it the way you have stopped feeling the cold — both have passed through discomfort into something that simply is, the way the fog is, the way the floodlights are, the way the singing behind you is. The singing is what frightens you most right now. Not the guard's hand on his weapon grip, not the Druckwelle arriving in waves that are shortening and strengthening the way contractions do, but the singing — because you were in Leipzig in October and you know what a crowd sounds like when it stops being afraid of itself, and this crowd has just stopped. You can feel every surge in your ribs before it arrives. You are the only person here who knows why that matters, who understands that the calculation running behind your eyes with every forward press of bodies is not abstract, that there is a third set of stakes in this moment that belongs to no one else. The guard is looking at you again in that way that is not quite looking, and you let him, because in twenty minutes of not-quite-eye-contact you have made him real to yourself and yourself to him, and that is the only currency you have. Somewhere past forty meters of floodlit concrete and thirty-eight years of wire, your mother is waiting in an address you have memorized like a prayer. The crowd surges. The guard's fingers tighten. You open your mouth.",
-          "role_chronicler": "Forty meters of death strip live in your viewfinder, and the fog has already cost you the gate twice tonight — a slow grey erasure that the floodlights turn luminous and useless, that makes the eastern checkpoint dissolve into something almost abstract, almost painterly, which is the one thing it cannot be allowed to be. Your eye stays at the viewfinder. The condensation is back on the lens. You know it is back because the gate has gone soft at the edges, the hard geometry of the barrier bleeding into the haze, and you are making the calculation you have been making for six minutes: the cost of a blurred gate versus the cost of the thirty seconds it takes to wipe it clean. In your right ear, Hamburg is still pending. Ingrid is still saying *hold position* in that particular register that means she is holding her own nerve together with both hands. What Ingrid does not know, what Hamburg does not know, is that you are the only angle in the world right now that captures both the gate and the full length of the strip simultaneously — every other camera is shooting the crowd from the south, which means they will get the moment but not the geometry of it, not the forty meters that have killed a hundred and forty people, not the specific distance between a bureaucratic shrug and a body on the concrete. The amber light on the relay unit is still dark. Somewhere in your bag, beneath the spare tapes, is a credential with your photograph and an East Berlin address and a stamp you have not explained to anyone. The gate is still closed. You reach for the lens cloth."
-        }
-      }
-    ]
-  },
-  "period_vocabulary": {
-    "categories": [
-      {
-        "name": "Grenztruppen Operational Language",
-        "context": "Used by East German border troops and Stasi officers at checkpoint installations when coordinating security procedures and reporting up the chain of command.",
-        "terms": [
-          {
-            "term": "Passkontrolle",
-            "meaning": "Passport control — the formal processing station where travel documents are inspected; also used as shorthand for the entire checkpoint procedure"
-          },
-          {
-            "term": "Sperrgebiet",
-            "meaning": "Restricted zone — the classified death strip and its immediate approaches, entry to which by unauthorized persons is grounds for use of lethal force"
-          },
-          {
-            "term": "Schießbefehl",
-            "meaning": "Shoot-to-kill order — the standing directive authorizing border guards to fire on anyone attempting unauthorized crossing; its exact legal status tonight is ambiguous"
-          },
-          {
-            "term": "Diensthabender Offizier",
-            "meaning": "Duty officer — the officer of the watch responsible for a given shift; Jäger holds this role tonight and it is the source of both his authority and his isolation"
-          },
-          {
-            "term": "Durchschleusung",
-            "meaning": "Controlled throughput — the procedure of releasing a small number of individuals through the checkpoint to reduce pressure, the strategy Jäger attempts in Act II"
-          },
-          {
-            "term": "Ausbürgerung",
-            "meaning": "Expatriation — the administrative act of revoking East German citizenship, used tonight as a punitive measure against those released through Durchschleusung"
-          },
-          {
-            "term": "Meldung",
-            "meaning": "Situation report — the formal upward communication required at each escalation threshold; by Act III, Jäger has filed three with no response"
-          }
-        ]
-      },
-      {
-        "name": "SED Politburo Internal Register",
-        "context": "The bureaucratic and ideological vocabulary used by East German Communist Party officials in internal communications, press statements, and chain-of-command directives on the night of November 9.",
-        "terms": [
-          {
-            "term": "Schabowskis Zettel",
-            "meaning": "Schabowski's note — the single sheet of paper containing the draft travel regulation that Schabowski read aloud without context; by midnight it will be the most consequential piece of paper in German history"
-          },
-          {
-            "term": "Reiseregelung",
-            "meaning": "Travel regulation — the specific policy instrument announced tonight; its language was intended to describe a future procedure, not an immediate right"
-          },
-          {
-            "term": "Ständige Vertretung",
-            "meaning": "Permanent Mission — the West German diplomatic office in East Berlin, whose phone lines are flooded tonight with citizens seeking clarification of their new rights"
-          },
-          {
-            "term": "Zentralkomitee",
-            "meaning": "Central Committee — the governing body of the SED whose internal communications Jäger's superiors are monitoring even as they refuse to answer his calls"
-          },
-          {
-            "term": "Volkspolizei",
-            "meaning": "People's Police — the civilian law enforcement arm, distinct from the Grenztruppen; their units are being mobilized on both sides of the checkpoint tonight but have no clear orders"
-          }
-        ]
-      },
-      {
-        "name": "Western Press Corps Field Language",
-        "context": "The working shorthand used by West German and international television and radio crews operating at the Bornholmer Straße bridge approach on the night of the breach.",
-        "terms": [
-          {
-            "term": "Liveschaltung",
-            "meaning": "Live cut — the moment a field unit's feed is switched to broadcast in real time; every journalist on the bridge is waiting for the call that their Liveschaltung is active"
-          },
-          {
-            "term": "Tagesschau",
-            "meaning": "ARD's flagship evening news broadcast — the program that carried Schabowski's press conference and whose correspondents are now scrambling to cover the consequences"
-          },
-          {
-            "term": "Mauerfall",
-            "meaning": "Wall fall — the term that will enter the historical lexicon tonight; in the field, journalists are using it cautiously, aware they may be witnessing a suppression rather than a collapse"
-          },
-          {
-            "term": "Drüben",
-            "meaning": "Over there — the colloquial West German term for East Germany, used with a specific weight of distance and longing that has defined the divided city for twenty-eight years"
-          },
-          {
-            "term": "Schnittbild",
-            "meaning": "Cut image — a usable piece of footage, distinguished from raw tape; field producers are demanding Schnittbilder even before the situation resolves"
-          },
-          {
-            "term": "Rüssel",
-            "meaning": "Trunk — press slang for the large directional microphone boom used in crowd situations; its operator is the most physically exposed member of any field crew"
-          }
-        ]
-      },
-      {
-        "name": "East Berlin Street Register",
-        "context": "The vernacular spoken by ordinary East Berlin citizens — students, workers, families — gathered at the checkpoint, mixing political frustration with the specific idiom of a divided city.",
-        "terms": [
-          {
-            "term": "Trabant",
-            "meaning": "The ubiquitous East German automobile, nicknamed Trabi; its two-stroke engine produces the distinctive blue exhaust smell that saturates the checkpoint queue tonight"
-          },
-          {
-            "term": "Wende",
-            "meaning": "The turn — the word East Germans are using for the political transformation underway; it is deliberately ambiguous, implying change without specifying its direction or permanence"
-          },
-          {
-            "term": "Rüben",
-            "meaning": "Turnips — derogatory slang for border guards, used by protesters just out of earshot; it implies both rootedness and stupidity"
-          },
-          {
-            "term": "Antragsteller",
-            "meaning": "Applicant — a person who has formally applied for an exit visa through official channels; tonight, thousands of Antragsteller are in the crowd, having waited months or years for a document that may now be irrelevant"
-          },
-          {
-            "term": "Druckwelle",
-            "meaning": "Pressure wave — the physical phenomenon the crowd itself uses to describe the surging compression at the front ranks, where bodies are pressed against the turnstile steel"
-          },
-          {
-            "term": "Westfernsehen",
-            "meaning": "Western television — the West German and American broadcasts that most East Berliners receive illegally via rooftop antenna; it is how the majority of the crowd learned about Schabowski's announcement"
-          }
-        ]
-      }
-    ]
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.964Z",
+  "version": "1.0.0",
   "epilogue": {
-    "generated": true,
     "reviewed": true,
+    "generated": true,
+    "open_threads": [
+      {
+        "thread_id": "beat_schabowski_announcement",
+        "historical_record": "It remains disputed whether Schabowski's announcement of immediate unrestricted travel was a deliberate acceleration of reform, a bureaucratic miscommunication, or the result of Schabowski not having fully understood the final implementation procedure at the Politbüro session that finalized the travel regulation text. Schabowski himself stated in interviews that he had not read the full document before the press conference. The precise chain of authorization and whether any senior SED official intended the announcement to have the effect it did has not been definitively resolved. See: Hans-Hermann Hertle, 'Der Fall der Mauer,' Westdeutscher Verlag, 1996."
+      },
+      {
+        "thread_id": "beat_jaeger_orders",
+        "historical_record": "Jäger's testimony establishes that he attempted to reach superiors multiple times and received no orders authorizing him to open the checkpoint. The question of whether any superior officer was reachable and chose not to respond, or whether the command structure had genuinely broken down operationally under the speed of events, was examined in subsequent legal proceedings but not conclusively resolved. No superior officer was successfully prosecuted for the events at Bornholmer Straße. Jäger's own legal situation was eventually resolved without conviction for the opening decision itself."
+      },
+      {
+        "thread_id": "beat_crowd_pressure",
+        "historical_record": "The precise size of the crowd at Bornholmer Straße at the moment of opening is not established by a reliable contemporaneous count. Estimates in historical literature range from several thousand to twenty thousand. No systematic crowd count was conducted. The question of at what point the crowd size made a violent dispersal physically impossible, and whether Jäger's assessment of that threshold was accurate, has been discussed in historical literature but cannot be resolved from available evidence."
+      },
+      {
+        "thread_id": "beat_expulsion_stamp_tactic",
+        "historical_record": "Jäger's use of the Ausreisestempel tactic — stamping passports to void citizenship and releasing individuals as a pressure-reduction measure — is documented in his testimony and corroborated by individuals who received such stamps. Whether this tactic was authorized by any superior or improvised entirely by Jäger is not fully established. Some individuals who received these stamps subsequently faced bureaucratic complications regarding their citizenship status, though these were resolved after reunification."
+      },
+      {
+        "thread_id": "beat_western_media_presence",
+        "historical_record": "Western media, including ARD, were present at or near Bornholmer Straße on the night of November 9, 1989, and footage of the opening was broadcast. The exact positions of camera crews, the precise timing of when footage began rolling, and the degree to which media presence influenced crowd behavior or the decisions of checkpoint personnel have not been systematically documented in available primary sources."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "beat_schabowski_announcement",
+        "historical_record": "At approximately 18:53 on November 9, 1989, Günter Schabowski read from a draft SED Central Committee decision at a live televised press conference, stating that East Germans could apply for private travel abroad 'without prerequisites' and that this applied 'immediately' (unverzüglich). When asked by journalists when the regulation took effect, Schabowski improvised and stated, 'To my knowledge, this takes effect... it's right away, immediately' (sofort, unverzüglich). This historic exchange was broadcast live on East German television and immediately picked up by West German news media, accelerating the crowd's belief that the borders were open. The Politbüro had actually intended the regulation to take effect the following morning after border agencies were properly briefed."
+      },
+      {
+        "beat_id": "beat_crowd_gathering",
+        "historical_record": "Crowds began gathering at Bornholmer Straße and other Berlin Wall checkpoints within approximately two hours of the Schabowski announcement. Contemporary accounts and subsequent interviews confirm that many East Berliners heard the announcement on West German television, which was widely received in East Berlin, and proceeded directly to checkpoints. The crowd at Bornholmer Straße grew continuously from approximately 21:00 onward."
+      },
+      {
+        "beat_id": "beat_jaeger_orders",
+        "historical_record": "According to Jäger's documented testimony, he made multiple telephone calls to superiors seeking orders on how to handle the crowd and received no actionable guidance. He described his superiors as either unreachable or unwilling to issue orders. He made the decision to open the checkpoint on his own authority at approximately 23:30, stating in later interviews that he saw no alternative that would not result in deaths."
+      },
+      {
+        "beat_id": "beat_expulsion_stamp_tactic",
+        "historical_record": "Jäger ordered his unit to begin processing individuals through the checkpoint using an Ausreisestempel, a stamp that voided the bearer's East German citizenship and constituted a formal expulsion, as a means of releasing pressure from the crowd in controlled numbers. This began at approximately 21:30. The tactic reduced pressure temporarily but the crowd continued to grow and the rate of processing was insufficient to manage the volume of people present."
+      },
+      {
+        "beat_id": "beat_gate_opening",
+        "historical_record": "At approximately 23:30 on November 9, 1989, Harald Jäger ordered the vehicle barrier at Bornholmer Straße raised and directed his personnel to allow unrestricted passage in both directions. Overwhelmed by the crowd, passport control staff completely abandoned checking names against search lists or stamping documents, allowing East Berliners to pass through by simply displaying their identity papers. Crowds crossed immediately. Jäger's order was not authorized by any superior command. Bornholmer Straße was the first Berlin Wall checkpoint to open to unrestricted passage that night, and no lethal incidents occurred during the historic breach."
+      },
+      {
+        "beat_id": "beat_western_media",
+        "historical_record": "ARD and other West German broadcasters had camera crews operating in West Berlin on November 9, 1989. Footage of crowds crossing at Berlin Wall checkpoints, including Bornholmer Straße, was broadcast that night and became part of the global television record of the event. The presence of cameras on the western side of the Bornholmer bridge is consistent with the documented media coverage but the specific positions and timing of individual crews at this checkpoint are not established in available primary sources."
+      }
+    ],
     "character_fates": [
       {
         "character_id": "char_jaeger",
@@ -282,6 +145,11 @@
         "primary_source": null
       }
     ],
+    "historical_frame": [
+      "The Berlin Wall had been constructed beginning on August 13, 1961, and had divided Berlin for 28 years, 2 months, and 27 days at the time of the Bornholmer Straße opening.",
+      "Between 1961 and 1989, at least 140 people died at or in direct connection with attempts to cross the Berlin Wall, according to the Berlin Wall Memorial's documented research (Gedenkstätte Berliner Mauer, research as of 2017).",
+      "German reunification was formally completed on October 3, 1990, less than eleven months after the opening of the Bornholmer Straße checkpoint."
+    ],
     "immediate_outcome": {
       "summary": "At approximately 23:30 on November 9, 1989, Harald Jäger ordered the Bornholmer Straße checkpoint opened to unrestricted passage into West Berlin. Control procedures collapsed almost immediately, and movement soon became chaotic in both directions. Thousands of East Berliners crossed into West Berlin within minutes, and the opening triggered the sequential opening of all other Berlin Wall checkpoints within the following hour.",
       "key_facts": [
@@ -293,319 +161,451 @@
         "Bornholmer Straße was the first of the Berlin Wall's crossing points to open on the night of November 9, 1989.",
         "The Invalidenstraße, Checkpoint Charlie, and other crossing points opened within approximately one hour of Bornholmer Straße."
       ]
-    },
-    "historical_frame": [
-      "The Berlin Wall had been constructed beginning on August 13, 1961, and had divided Berlin for 28 years, 2 months, and 27 days at the time of the Bornholmer Straße opening.",
-      "Between 1961 and 1989, at least 140 people died at or in direct connection with attempts to cross the Berlin Wall, according to the Berlin Wall Memorial's documented research (Gedenkstätte Berliner Mauer, research as of 2017).",
-      "German reunification was formally completed on October 3, 1990, less than eleven months after the opening of the Bornholmer Straße checkpoint."
-    ],
-    "open_threads": [
-      {
-        "thread_id": "beat_schabowski_announcement",
-        "historical_record": "It remains disputed whether Schabowski's announcement of immediate unrestricted travel was a deliberate acceleration of reform, a bureaucratic miscommunication, or the result of Schabowski not having fully understood the final implementation procedure at the Politbüro session that finalized the travel regulation text. Schabowski himself stated in interviews that he had not read the full document before the press conference. The precise chain of authorization and whether any senior SED official intended the announcement to have the effect it did has not been definitively resolved. See: Hans-Hermann Hertle, 'Der Fall der Mauer,' Westdeutscher Verlag, 1996."
-      },
-      {
-        "thread_id": "beat_jaeger_orders",
-        "historical_record": "Jäger's testimony establishes that he attempted to reach superiors multiple times and received no orders authorizing him to open the checkpoint. The question of whether any superior officer was reachable and chose not to respond, or whether the command structure had genuinely broken down operationally under the speed of events, was examined in subsequent legal proceedings but not conclusively resolved. No superior officer was successfully prosecuted for the events at Bornholmer Straße. Jäger's own legal situation was eventually resolved without conviction for the opening decision itself."
-      },
-      {
-        "thread_id": "beat_crowd_pressure",
-        "historical_record": "The precise size of the crowd at Bornholmer Straße at the moment of opening is not established by a reliable contemporaneous count. Estimates in historical literature range from several thousand to twenty thousand. No systematic crowd count was conducted. The question of at what point the crowd size made a violent dispersal physically impossible, and whether Jäger's assessment of that threshold was accurate, has been discussed in historical literature but cannot be resolved from available evidence."
-      },
-      {
-        "thread_id": "beat_expulsion_stamp_tactic",
-        "historical_record": "Jäger's use of the Ausreisestempel tactic — stamping passports to void citizenship and releasing individuals as a pressure-reduction measure — is documented in his testimony and corroborated by individuals who received such stamps. Whether this tactic was authorized by any superior or improvised entirely by Jäger is not fully established. Some individuals who received these stamps subsequently faced bureaucratic complications regarding their citizenship status, though these were resolved after reunification."
-      },
-      {
-        "thread_id": "beat_western_media_presence",
-        "historical_record": "Western media, including ARD, were present at or near Bornholmer Straße on the night of November 9, 1989, and footage of the opening was broadcast. The exact positions of camera crews, the precise timing of when footage began rolling, and the degree to which media presence influenced crowd behavior or the decisions of checkpoint personnel have not been systematically documented in available primary sources."
-      }
-    ],
-    "choice_echoes": [
-      {
-        "beat_id": "beat_schabowski_announcement",
-        "historical_record": "At approximately 18:53 on November 9, 1989, Günter Schabowski read from a draft SED Central Committee decision at a live televised press conference, stating that East Germans could apply for private travel abroad 'without prerequisites' and that this applied 'immediately' (unverzüglich). When asked by journalists when the regulation took effect, Schabowski improvised and stated, 'To my knowledge, this takes effect... it's right away, immediately' (sofort, unverzüglich). This historic exchange was broadcast live on East German television and immediately picked up by West German news media, accelerating the crowd's belief that the borders were open. The Politbüro had actually intended the regulation to take effect the following morning after border agencies were properly briefed."
-      },
-      {
-        "beat_id": "beat_crowd_gathering",
-        "historical_record": "Crowds began gathering at Bornholmer Straße and other Berlin Wall checkpoints within approximately two hours of the Schabowski announcement. Contemporary accounts and subsequent interviews confirm that many East Berliners heard the announcement on West German television, which was widely received in East Berlin, and proceeded directly to checkpoints. The crowd at Bornholmer Straße grew continuously from approximately 21:00 onward."
-      },
-      {
-        "beat_id": "beat_jaeger_orders",
-        "historical_record": "According to Jäger's documented testimony, he made multiple telephone calls to superiors seeking orders on how to handle the crowd and received no actionable guidance. He described his superiors as either unreachable or unwilling to issue orders. He made the decision to open the checkpoint on his own authority at approximately 23:30, stating in later interviews that he saw no alternative that would not result in deaths."
-      },
-      {
-        "beat_id": "beat_expulsion_stamp_tactic",
-        "historical_record": "Jäger ordered his unit to begin processing individuals through the checkpoint using an Ausreisestempel, a stamp that voided the bearer's East German citizenship and constituted a formal expulsion, as a means of releasing pressure from the crowd in controlled numbers. This began at approximately 21:30. The tactic reduced pressure temporarily but the crowd continued to grow and the rate of processing was insufficient to manage the volume of people present."
-      },
-      {
-        "beat_id": "beat_gate_opening",
-        "historical_record": "At approximately 23:30 on November 9, 1989, Harald Jäger ordered the vehicle barrier at Bornholmer Straße raised and directed his personnel to allow unrestricted passage in both directions. Overwhelmed by the crowd, passport control staff completely abandoned checking names against search lists or stamping documents, allowing East Berliners to pass through by simply displaying their identity papers. Crowds crossed immediately. Jäger's order was not authorized by any superior command. Bornholmer Straße was the first Berlin Wall checkpoint to open to unrestricted passage that night, and no lethal incidents occurred during the historic breach."
-      },
-      {
-        "beat_id": "beat_western_media",
-        "historical_record": "ARD and other West German broadcasters had camera crews operating in West Berlin on November 9, 1989. Footage of crowds crossing at Berlin Wall checkpoints, including Bornholmer Straße, was broadcast that night and became part of the global television record of the event. The presence of cameras on the western side of the Bornholmer bridge is consistent with the documented media coverage but the specific positions and timing of individual crews at this checkpoint are not established in available primary sources."
-      }
-    ]
-  },
-  "premise": "A Politburo spokesman read a travel regulation on live television tonight that was not supposed to take effect until tomorrow. The crowd at Bornholmer Straße heard the words 'immediately, without delay' and is now pressing against the gate. The guards have live ammunition and no orders. Someone has to decide.",
-  "playerGoal": "",
-  "openingSituation": "",
-  "tone": [],
-  "structured_endings_enabled": false,
-  "beats_status": "not_generated",
-  "technical_facts": {
-    "generated": true,
-    "reviewed": true,
-    "facts": [
-      {
-        "fact_id": "schabowski_press_conference_time",
-        "content": "Günter Schabowski announced the new travel regulations at a live televised press conference that concluded at approximately 19:00 on November 9, 1989; the pivotal, improvised exchange clarifying that the rules took effect immediately occurred at 18:57.",
-        "domain": "timing",
-        "source": {
-          "citation": "Schabowski press conference transcript, ZDF/ARD broadcast record, November 9, 1989",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "bornholmer_gate_opening_time",
-        "content": "Harald Jäger ordered the Bornholmer Straße checkpoint barrier opened at approximately 23:30 on November 9, 1989, making it the first Berlin Wall crossing point to open that night.",
-        "domain": "timing",
-        "source": {
-          "citation": "Harald Jäger testimony, documented in Michael Sontheimer and Dirk Kurbjuweit, Der Grenzfall (2009); confirmed in BStU archive records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "jaeger_rank_and_role",
-        "content": "Harald Jäger held the rank of Oberstleutnant (Lieutenant Colonel) in the Stasi and served as duty officer commanding the passport control unit (Passkontrolleinheit) at Bornholmer Straße on the night of November 9, 1989.",
-        "domain": "personnel",
-        "source": {
-          "citation": "BStU (Bundesbeauftragte für die Stasi-Unterlagen) personnel records; Jäger's own memoir account published in Der Spiegel, 2009",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "jaeger_durchschleusung_strategy",
-        "content": "Jäger implemented a Durchschleusung (venting/sluicing) strategy beginning at approximately 21:30, processing small numbers of aggressive protesters through the checkpoint while simultaneously stamping their identity documents with a specific code (Ausreisestempel) that effectively revoked their East German citizenship, expelling them permanently without the right of legal return.",
-        "domain": "personnel",
-        "source": {
-          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "crowd_size_bornholmer",
-        "content": "The crowd at Bornholmer Straße checkpoint reached an estimated 20,000 people by approximately 23:00 on November 9, 1989.",
-        "domain": "capacity",
-        "source": {
-          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous ARD and ZDF broadcast reports",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "schabowski_immediate_effect_statement",
-        "content": "When asked by journalists when the new travel regulations would take effect, Schabowski consulted his notes at 18:57 on November 9, 1989, and replied: 'Das tritt nach meiner Kenntnis... ist das sofort, unverzüglich' — 'To my knowledge... this takes effect right away, immediately'.",
-        "domain": "timing",
-        "source": {
-          "citation": "Schabowski press conference transcript; documented in Hans-Hermann Hertle, Der Fall der Mauer (1996)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "travel_regulation_intended_date",
-        "content": "The Politbüro travel regulation announced by Schabowski was drafted to take effect on November 10, 1989, following publication in the Gesetzblatt (official legal gazette), not on the evening of November 9.",
-        "domain": "other",
-        "source": {
-          "citation": "Original Politbüro draft regulation text; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and BStU archive materials",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "schabowski_not_briefed",
-        "content": "Schabowski had not attended the Politbüro session at which the travel regulation was finalized and was handed the note by Egon Krenz immediately before the press conference, without being briefed on its implementation conditions.",
-        "domain": "personnel",
-        "source": {
-          "citation": "Schabowski's own account; documented in Hans-Hermann Hertle and Kathrin Elsner, Mein 9. November (1999)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "bornholmer_checkpoint_structure",
-        "content": "The Bornholmer Straße checkpoint (Grenzübergangsstelle Bornholmer Straße) carried vehicle and pedestrian traffic over the Bösebrücke bridge and was one of the busiest urban crossing points between East and West Berlin, processing thousands of travelers daily under normal operations.",
-        "domain": "capacity",
-        "source": {
-          "citation": "BStU checkpoint operational records; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "ard_broadcast_bornholmer",
-        "content": "ARD television broadcast live footage from Bornholmer Straße on the night of November 9, 1989, with the opening of the checkpoint captured on camera and transmitted to West German audiences.",
-        "domain": "personnel",
-        "source": {
-          "citation": "ARD broadcast archive, November 9–10, 1989; documented in contemporaneous broadcast logs",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "grenztruppen_weapons_standard",
-        "content": "Grenztruppen (GDR Border Troops) guards at Berlin Wall checkpoints in 1989 were standardly armed with the AK-47 variant Kalaschnikow MPi-KMS-72 and carried loaded magazines; the Schießbefehl (order to shoot) remained formally in effect on November 9, 1989, though it had been de-emphasized in practice since early 1989.",
-        "domain": "other",
-        "source": {
-          "citation": "Grenztruppen operational regulations; documented in Hope M. Harrison, Driving the Soviets Up the Wall (2003); BStU records on Schießbefehl",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "schiesbefehl_formal_status",
-        "content": "The Schießbefehl — the standing order authorizing border guards to use lethal force against unauthorized crossing attempts — was never formally rescinded before the night of November 9, 1989; it remained technically in force throughout the events at Bornholmer Straße.",
-        "domain": "other",
-        "source": {
-          "citation": "BStU archive; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996); confirmed in post-unification legal proceedings against border guards",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "jaeger_superior_contact_attempts",
-        "content": "Harald Jäger made repeated telephone calls to superior officers throughout the evening of November 9, 1989, seeking orders on how to handle the crowd; he received no actionable instructions from any superior during the critical period between approximately 20:00 and 23:30.",
-        "domain": "personnel",
-        "source": {
-          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and Der Spiegel interview, November 2009",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "first_crowds_arrive_bornholmer",
-        "content": "The first curious East Berliners began arriving at the Bornholmer Straße checkpoint within roughly thirty minutes of Schabowski's press conference, with the crowd size expanding exponentially after 21:00 as West German evening television news updates widely reported that the borders were open.",
-        "domain": "timing",
-        "source": {
-          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous witness accounts compiled in BStU records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "bornholmer_geographic_position",
-        "content": "The Bornholmer Straße checkpoint is located at approximately 52°33′N 13°24′E, in the Prenzlauer Berg district of East Berlin, crossing into the Wedding district of West Berlin via the Bösebrücke bridge over the long-distance and S-Bahn railway yards.",
-        "domain": "navigation",
-        "source": {
-          "citation": "Berlin city cartographic records; documented in contemporaneous checkpoint operational maps held in BStU archive",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "humboldt_university_location",
-        "content": "Humboldt-Universität zu Berlin is located on Unter den Linden 6, in the Mitte district of East Berlin, approximately 4.5 kilometers by road from the Bornholmer Straße checkpoint.",
-        "domain": "navigation",
-        "source": {
-          "citation": "Berlin city records; Humboldt-Universität institutional records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "passkontrolleinheit_stasi_control",
-        "content": "he passport control units (Passkontrolleinheiten, PKE) at all Berlin Wall checkpoints were staffed by undercover Stasi officers under Ministry for State Security command, making them distinct from and superior in administrative decisions to the Grenztruppen soldiers who provided the outer perimeter guard security; [cite_start]Jäger's unit reported strictly through Stasi lines of command.",
-        "domain": "other",
-        "source": {
-          "citation": "BStU organizational records; documented in Daniela Münkel, ed., Staatssicherheit und Gesellschaft (2008)",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "fact_id": "west_german_tv_broadcast_reach",
-        "content": "West German ARD and ZDF television signals were receivable by the majority of East Berlin households in 1989; Schabowski's press conference was broadcast live on West German television and was watched by large numbers of East Berlin residents on the evening of November 9, 1989.",
-        "domain": "other",
-        "source": {
-          "citation": "Documented in Hans-Hermann Hertle, Der Fall der Mauer (1996); contemporaneous viewer surveys and witness testimony compiled in BStU records",
-          "url": null,
-          "access_note": null
-        },
-        "valid_from": null,
-        "valid_until": null
-      }
-    ]
-  },
-  "review_checklist": {
-    "beat_count": {
-      "checked": false,
-      "notes": ""
-    },
-    "sequence_check": {
-      "checked": false,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": false,
-      "notes": ""
-    },
-    "final_beat_spec": {
-      "checked": false,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": false,
-      "notes": ""
-    },
-    "reviewer_summary": {
-      "checked": false,
-      "notes": ""
-    },
-    "manual_playthrough": {
-      "checked": false,
-      "notes": ""
     }
   },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T18:14:55.964Z",
+  "playerGoal": "",
+  "description": "November 9, 1989. A fumbled press conference has ignited East Berlin. Three people — a border commander, a student protester, and a Western journalist — must navigate the next ninety minutes as twenty thousand citizens press against a gate that history will open, but that could just as easily become a massacre. The outcome is not yet written.",
+  "storyArcIds": [
+    "bornholmer_strasse_first_breach_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "It is the autumn of 1989, and the German Democratic Republic is hemorrhaging. Since August, more than fifty thousand East Germans have fled through Hungary and Czechoslovakia — the largest mass exodus since the Wall's construction in 1961. Erich Honecker has been removed from power and replaced by Egon Krenz, who has promised reform but delivered only the language of it. The SED Politburo is fracturing in real time, its members issuing contradictory signals to a population that has stopped believing any of them. Tonight, at a routine press conference carried live on East German television, Politburo spokesman Günter Schabowski reads from a note he has not been briefed on — a draft travel regulation not yet scheduled for implementation — and when a Reuters correspondent asks when it takes effect, Schabowski shuffles his papers and says, without certainty: 'Immediately, without delay.'",
+        "type": "world"
+      },
+      {
+        "text": "What hangs on the next ninety minutes is not merely a checkpoint policy. It is the question of whether one of the most heavily guarded borders in postwar Europe ends with a bureaucratic shrug or with bodies on the death strip. The border guards at Bornholmer Straße have live ammunition and decades of border-fire doctrine behind them — policies that contributed to at least 140 deaths connected to the Berlin Wall since 1961. Yet tonight no one in the chain of command is willing to clearly authorize or clearly forbid the use of force against the crowd gathering at the checkpoint. For Lieutenant Colonel Harald Jäger, the stakes are the weight of command without authority: every phone call to his superiors goes unanswered or ends in abuse, and the decision that history will require of him is one no one above him is willing to make. For the thousands pressing against the gate, the stakes are simpler and more absolute — they have heard the words 'immediately, without delay' and they are here to collect.",
+        "type": "stakes"
+      },
+      {
+        "text": "Bornholmer Straße in November smells of coal smoke and wet concrete and the exhaust of a hundred Trabants idling in a queue that has stopped moving. The floodlights mounted on the watchtowers wash everything in a flat, merciless white that kills shadow and turns faces into masks. The temperature has dropped to just above freezing and the fog that rolled the sweeping Nordbahn railway cut earlier in the evening has thickened against the lights into a luminous haze, so that the crowd — already thousands strong and growing by the minute — appears to materialize out of nothing at the edge of the illuminated zone, pressing forward in a slow, irresistible tide. On the western side of the bridge, the lights of the Bundesrepublik glow amber and warm through the same fog, close enough to read the street signs, separated by forty meters of death strip and twenty-eight years of history.",
+        "type": "scene"
+      },
+      {
+        "text": "You have arrived at this crossing by different roads — one in uniform behind the barrier, one pressed against the cold steel of the turnstile in a crowd that has become a single organism, one crouched behind a camera on the western approach with a radio earpiece feeding you fragments of chaos. None of you asked to be the person history required tonight. The phone lines are beginning to fail. The crowd is beginning to sing. Somewhere behind the floodlights, a guard has placed his hand on the grip of his weapon without quite knowing why. You are standing at the precise hinge-point of the twentieth century, and it is about to ask you what you are made of.",
+        "type": "entry",
+        "character_entries": {
+          "role_catalyst": "The steel bar is at your sternum and has been for forty minutes, and you have stopped feeling it the way you have stopped feeling the cold — both have passed through discomfort into something that simply is, the way the fog is, the way the floodlights are, the way the singing behind you is. The singing is what frightens you most right now. Not the guard's hand on his weapon grip, not the Druckwelle arriving in waves that are shortening and strengthening the way contractions do, but the singing — because you were in Leipzig in October and you know what a crowd sounds like when it stops being afraid of itself, and this crowd has just stopped. You can feel every surge in your ribs before it arrives. You are the only person here who knows why that matters, who understands that the calculation running behind your eyes with every forward press of bodies is not abstract, that there is a third set of stakes in this moment that belongs to no one else. The guard is looking at you again in that way that is not quite looking, and you let him, because in twenty minutes of not-quite-eye-contact you have made him real to yourself and yourself to him, and that is the only currency you have. Somewhere past forty meters of floodlit concrete and thirty-eight years of wire, your mother is waiting in an address you have memorized like a prayer. The crowd surges. The guard's fingers tighten. You open your mouth.",
+          "role_chronicler": "Forty meters of death strip live in your viewfinder, and the fog has already cost you the gate twice tonight — a slow grey erasure that the floodlights turn luminous and useless, that makes the eastern checkpoint dissolve into something almost abstract, almost painterly, which is the one thing it cannot be allowed to be. Your eye stays at the viewfinder. The condensation is back on the lens. You know it is back because the gate has gone soft at the edges, the hard geometry of the barrier bleeding into the haze, and you are making the calculation you have been making for six minutes: the cost of a blurred gate versus the cost of the thirty seconds it takes to wipe it clean. In your right ear, Hamburg is still pending. Ingrid is still saying *hold position* in that particular register that means she is holding her own nerve together with both hands. What Ingrid does not know, what Hamburg does not know, is that you are the only angle in the world right now that captures both the gate and the full length of the strip simultaneously — every other camera is shooting the crowd from the south, which means they will get the moment but not the geometry of it, not the forty meters that have killed a hundred and forty people, not the specific distance between a bureaucratic shrug and a body on the concrete. The amber light on the relay unit is still dark. Somewhere in your bag, beneath the spare tapes, is a credential with your photograph and an East Berlin address and a stamp you have not explained to anyone. The gate is still closed. You reach for the lens cloth.",
+          "role_gatekeeper": "The security phone is still in your hand. You have been holding it for four minutes — you know this because the logbook is open in front of you and the last entry is timestamped and you have been watching the second hand on the wall clock move through its arc with the fixed attention of a man who has run out of other things to do. The fluorescent tube above the duty desk hums at a frequency you have never noticed before tonight. Through the concrete and the bulletproof glass you can hear the crowd — not individual voices anymore, not since the Durchschleusung failed and the released ones came back with the others behind them, but a single low pressure, a sound less heard than registered in the sternum, twenty thousand people breathing in the same direction. You know something the others outside do not: that Brenner has loaded his weapon without being ordered to, and that the Schießbefehl is technically still in force, and that both of these facts are now equally useless to you. The mathematics resolved themselves some time ago. What remains is the logbook, open to the last entry in your own handwriting — *Kein Befehl* — and the clock, and the phone, and the particular silence of a chain of command that has chosen to leave one man standing at the end of it. Your thumb is on the receiver. The crowd presses. You have spent thirty-one years waiting to be told what to do, and the order is not coming, and you already know what you are going to do, and you have not done it yet."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_gatekeeper",
+    "role_catalyst",
+    "role_chronicler"
+  ],
+  "winConditions": [
+    "The gate is opened without violence — crowd flows through peacefully and the historical breach is achieved",
+    "The Journalist successfully broadcasts live footage of the opening moment to Western networks",
+    "The Protester crosses to West Berlin and locates their separated family member",
+    "Jäger issues the unilateral open order before Crowd_Density reaches 100 with Aggression_Level at Flashpoint simultaneously"
+  ],
+  "failConditions": [
+    "Aggression_Level reaches Flashpoint while Crowd_Density is above 90 and no open order has been issued — panic stampede kills civilians",
+    "A guard fires a weapon into the crowd before the gate opens",
+    "Comms_Status is Severed and Jäger issues a lockdown order rather than an open order — the moment passes and the crowd is violently dispersed",
+    "The Journalist is detained by Volkspolizei before broadcasting any footage of the breach",
+    "Time expires — 23:30 arrives — with the gate still closed and Crowd_Density above 80"
+  ],
+  "technical_facts": {
+    "facts": [
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Schabowski press conference transcript, ZDF/ARD broadcast record, November 9, 1989",
+          "access_note": null
+        },
+        "content": "Günter Schabowski announced the new travel regulations at a live televised press conference that concluded at approximately 19:00 on November 9, 1989; the pivotal, improvised exchange clarifying that the rules took effect immediately occurred at 18:57.",
+        "fact_id": "schabowski_press_conference_time",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Harald Jäger testimony, documented in Michael Sontheimer and Dirk Kurbjuweit, Der Grenzfall (2009); confirmed in BStU archive records",
+          "access_note": null
+        },
+        "content": "Harald Jäger ordered the Bornholmer Straße checkpoint barrier opened at approximately 23:30 on November 9, 1989, making it the first Berlin Wall crossing point to open that night.",
+        "fact_id": "bornholmer_gate_opening_time",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "BStU (Bundesbeauftragte für die Stasi-Unterlagen) personnel records; Jäger's own memoir account published in Der Spiegel, 2009",
+          "access_note": null
+        },
+        "content": "Harald Jäger held the rank of Oberstleutnant (Lieutenant Colonel) in the Stasi and served as duty officer commanding the passport control unit (Passkontrolleinheit) at Bornholmer Straße on the night of November 9, 1989.",
+        "fact_id": "jaeger_rank_and_role",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+          "access_note": null
+        },
+        "content": "Jäger implemented a Durchschleusung (venting/sluicing) strategy beginning at approximately 21:30, processing small numbers of aggressive protesters through the checkpoint while simultaneously stamping their identity documents with a specific code (Ausreisestempel) that effectively revoked their East German citizenship, expelling them permanently without the right of legal return.",
+        "fact_id": "jaeger_durchschleusung_strategy",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "capacity",
+        "source": {
+          "url": null,
+          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous ARD and ZDF broadcast reports",
+          "access_note": null
+        },
+        "content": "The crowd at Bornholmer Straße checkpoint reached an estimated 20,000 people by approximately 23:00 on November 9, 1989.",
+        "fact_id": "crowd_size_bornholmer",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Schabowski press conference transcript; documented in Hans-Hermann Hertle, Der Fall der Mauer (1996)",
+          "access_note": null
+        },
+        "content": "When asked by journalists when the new travel regulations would take effect, Schabowski consulted his notes at 18:57 on November 9, 1989, and replied: 'Das tritt nach meiner Kenntnis... ist das sofort, unverzüglich' — 'To my knowledge... this takes effect right away, immediately'.",
+        "fact_id": "schabowski_immediate_effect_statement",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Original Politbüro draft regulation text; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and BStU archive materials",
+          "access_note": null
+        },
+        "content": "The Politbüro travel regulation announced by Schabowski was drafted to take effect on November 10, 1989, following publication in the Gesetzblatt (official legal gazette), not on the evening of November 9.",
+        "fact_id": "travel_regulation_intended_date",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Schabowski's own account; documented in Hans-Hermann Hertle and Kathrin Elsner, Mein 9. November (1999)",
+          "access_note": null
+        },
+        "content": "Schabowski had not attended the Politbüro session at which the travel regulation was finalized and was handed the note by Egon Krenz immediately before the press conference, without being briefed on its implementation conditions.",
+        "fact_id": "schabowski_not_briefed",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "capacity",
+        "source": {
+          "url": null,
+          "citation": "BStU checkpoint operational records; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996)",
+          "access_note": null
+        },
+        "content": "The Bornholmer Straße checkpoint (Grenzübergangsstelle Bornholmer Straße) carried vehicle and pedestrian traffic over the Bösebrücke bridge and was one of the busiest urban crossing points between East and West Berlin, processing thousands of travelers daily under normal operations.",
+        "fact_id": "bornholmer_checkpoint_structure",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "ARD broadcast archive, November 9–10, 1989; documented in contemporaneous broadcast logs",
+          "access_note": null
+        },
+        "content": "ARD television broadcast live footage from Bornholmer Straße on the night of November 9, 1989, with the opening of the checkpoint captured on camera and transmitted to West German audiences.",
+        "fact_id": "ard_broadcast_bornholmer",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Grenztruppen operational regulations; documented in Hope M. Harrison, Driving the Soviets Up the Wall (2003); BStU records on Schießbefehl",
+          "access_note": null
+        },
+        "content": "Grenztruppen (GDR Border Troops) guards at Berlin Wall checkpoints in 1989 were standardly armed with the AK-47 variant Kalaschnikow MPi-KMS-72 and carried loaded magazines; the Schießbefehl (order to shoot) remained formally in effect on November 9, 1989, though it had been de-emphasized in practice since early 1989.",
+        "fact_id": "grenztruppen_weapons_standard",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "BStU archive; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996); confirmed in post-unification legal proceedings against border guards",
+          "access_note": null
+        },
+        "content": "The Schießbefehl — the standing order authorizing border guards to use lethal force against unauthorized crossing attempts — was never formally rescinded before the night of November 9, 1989; it remained technically in force throughout the events at Bornholmer Straße.",
+        "fact_id": "schiesbefehl_formal_status",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Harald Jäger testimony; documented in Hans-Hermann Hertle, Chronik des Mauerfalls (1996) and Der Spiegel interview, November 2009",
+          "access_note": null
+        },
+        "content": "Harald Jäger made repeated telephone calls to superior officers throughout the evening of November 9, 1989, seeking orders on how to handle the crowd; he received no actionable instructions from any superior during the critical period between approximately 20:00 and 23:30.",
+        "fact_id": "jaeger_superior_contact_attempts",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Hans-Hermann Hertle, Chronik des Mauerfalls (1996); contemporaneous witness accounts compiled in BStU records",
+          "access_note": null
+        },
+        "content": "The first curious East Berliners began arriving at the Bornholmer Straße checkpoint within roughly thirty minutes of Schabowski's press conference, with the crowd size expanding exponentially after 21:00 as West German evening television news updates widely reported that the borders were open.",
+        "fact_id": "first_crowds_arrive_bornholmer",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Berlin city cartographic records; documented in contemporaneous checkpoint operational maps held in BStU archive",
+          "access_note": null
+        },
+        "content": "The Bornholmer Straße checkpoint is located at approximately 52°33′N 13°24′E, in the Prenzlauer Berg district of East Berlin, crossing into the Wedding district of West Berlin via the Bösebrücke bridge over the long-distance and S-Bahn railway yards.",
+        "fact_id": "bornholmer_geographic_position",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Berlin city records; Humboldt-Universität institutional records",
+          "access_note": null
+        },
+        "content": "Humboldt-Universität zu Berlin is located on Unter den Linden 6, in the Mitte district of East Berlin, approximately 4.5 kilometers by road from the Bornholmer Straße checkpoint.",
+        "fact_id": "humboldt_university_location",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "BStU organizational records; documented in Daniela Münkel, ed., Staatssicherheit und Gesellschaft (2008)",
+          "access_note": null
+        },
+        "content": "he passport control units (Passkontrolleinheiten, PKE) at all Berlin Wall checkpoints were staffed by undercover Stasi officers under Ministry for State Security command, making them distinct from and superior in administrative decisions to the Grenztruppen soldiers who provided the outer perimeter guard security; [cite_start]Jäger's unit reported strictly through Stasi lines of command.",
+        "fact_id": "passkontrolleinheit_stasi_control",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Documented in Hans-Hermann Hertle, Der Fall der Mauer (1996); contemporaneous viewer surveys and witness testimony compiled in BStU records",
+          "access_note": null
+        },
+        "content": "West German ARD and ZDF television signals were receivable by the majority of East Berlin households in 1989; Schabowski's press conference was broadcast live on West German television and was watched by large numbers of East Berlin residents on the evening of November 9, 1989.",
+        "fact_id": "west_german_tv_broadcast_reach",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ],
+    "reviewed": true,
+    "generated": true
+  },
   "allow_free_input": true,
-  "setting": "Berlin, Germany, 1989"
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": false
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": false
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": false
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": false
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Grenztruppen Operational Language",
+        "terms": [
+          {
+            "term": "Passkontrolle",
+            "meaning": "Passport control — the formal processing station where travel documents are inspected; also used as shorthand for the entire checkpoint procedure"
+          },
+          {
+            "term": "Sperrgebiet",
+            "meaning": "Restricted zone — the classified death strip and its immediate approaches, entry to which by unauthorized persons is grounds for use of lethal force"
+          },
+          {
+            "term": "Schießbefehl",
+            "meaning": "Shoot-to-kill order — the standing directive authorizing border guards to fire on anyone attempting unauthorized crossing; its exact legal status tonight is ambiguous"
+          },
+          {
+            "term": "Diensthabender Offizier",
+            "meaning": "Duty officer — the officer of the watch responsible for a given shift; Jäger holds this role tonight and it is the source of both his authority and his isolation"
+          },
+          {
+            "term": "Durchschleusung",
+            "meaning": "Controlled throughput — the procedure of releasing a small number of individuals through the checkpoint to reduce pressure, the strategy Jäger attempts in Act II"
+          },
+          {
+            "term": "Ausbürgerung",
+            "meaning": "Expatriation — the administrative act of revoking East German citizenship, used tonight as a punitive measure against those released through Durchschleusung"
+          },
+          {
+            "term": "Meldung",
+            "meaning": "Situation report — the formal upward communication required at each escalation threshold; by Act III, Jäger has filed three with no response"
+          }
+        ],
+        "context": "Used by East German border troops and Stasi officers at checkpoint installations when coordinating security procedures and reporting up the chain of command."
+      },
+      {
+        "name": "SED Politburo Internal Register",
+        "terms": [
+          {
+            "term": "Schabowskis Zettel",
+            "meaning": "Schabowski's note — the single sheet of paper containing the draft travel regulation that Schabowski read aloud without context; by midnight it will be the most consequential piece of paper in German history"
+          },
+          {
+            "term": "Reiseregelung",
+            "meaning": "Travel regulation — the specific policy instrument announced tonight; its language was intended to describe a future procedure, not an immediate right"
+          },
+          {
+            "term": "Ständige Vertretung",
+            "meaning": "Permanent Mission — the West German diplomatic office in East Berlin, whose phone lines are flooded tonight with citizens seeking clarification of their new rights"
+          },
+          {
+            "term": "Zentralkomitee",
+            "meaning": "Central Committee — the governing body of the SED whose internal communications Jäger's superiors are monitoring even as they refuse to answer his calls"
+          },
+          {
+            "term": "Volkspolizei",
+            "meaning": "People's Police — the civilian law enforcement arm, distinct from the Grenztruppen; their units are being mobilized on both sides of the checkpoint tonight but have no clear orders"
+          }
+        ],
+        "context": "The bureaucratic and ideological vocabulary used by East German Communist Party officials in internal communications, press statements, and chain-of-command directives on the night of November 9."
+      },
+      {
+        "name": "Western Press Corps Field Language",
+        "terms": [
+          {
+            "term": "Liveschaltung",
+            "meaning": "Live cut — the moment a field unit's feed is switched to broadcast in real time; every journalist on the bridge is waiting for the call that their Liveschaltung is active"
+          },
+          {
+            "term": "Tagesschau",
+            "meaning": "ARD's flagship evening news broadcast — the program that carried Schabowski's press conference and whose correspondents are now scrambling to cover the consequences"
+          },
+          {
+            "term": "Mauerfall",
+            "meaning": "Wall fall — the term that will enter the historical lexicon tonight; in the field, journalists are using it cautiously, aware they may be witnessing a suppression rather than a collapse"
+          },
+          {
+            "term": "Drüben",
+            "meaning": "Over there — the colloquial West German term for East Germany, used with a specific weight of distance and longing that has defined the divided city for twenty-eight years"
+          },
+          {
+            "term": "Schnittbild",
+            "meaning": "Cut image — a usable piece of footage, distinguished from raw tape; field producers are demanding Schnittbilder even before the situation resolves"
+          },
+          {
+            "term": "Rüssel",
+            "meaning": "Trunk — press slang for the large directional microphone boom used in crowd situations; its operator is the most physically exposed member of any field crew"
+          }
+        ],
+        "context": "The working shorthand used by West German and international television and radio crews operating at the Bornholmer Straße bridge approach on the night of the breach."
+      },
+      {
+        "name": "East Berlin Street Register",
+        "terms": [
+          {
+            "term": "Trabant",
+            "meaning": "The ubiquitous East German automobile, nicknamed Trabi; its two-stroke engine produces the distinctive blue exhaust smell that saturates the checkpoint queue tonight"
+          },
+          {
+            "term": "Wende",
+            "meaning": "The turn — the word East Germans are using for the political transformation underway; it is deliberately ambiguous, implying change without specifying its direction or permanence"
+          },
+          {
+            "term": "Rüben",
+            "meaning": "Turnips — derogatory slang for border guards, used by protesters just out of earshot; it implies both rootedness and stupidity"
+          },
+          {
+            "term": "Antragsteller",
+            "meaning": "Applicant — a person who has formally applied for an exit visa through official channels; tonight, thousands of Antragsteller are in the crowd, having waited months or years for a document that may now be irrelevant"
+          },
+          {
+            "term": "Druckwelle",
+            "meaning": "Pressure wave — the physical phenomenon the crowd itself uses to describe the surging compression at the front ranks, where bodies are pressed against the turnstile steel"
+          },
+          {
+            "term": "Westfernsehen",
+            "meaning": "Western television — the West German and American broadcasts that most East Berliners receive illegally via rooftop antenna; it is how the majority of the crowd learned about Schabowski's announcement"
+          }
+        ],
+        "context": "The vernacular spoken by ordinary East Berlin citizens — students, workers, families — gathered at the checkpoint, mixing political frustration with the specific idiom of a divided city."
+      }
+    ]
+  },
+  "keyEvidenceClueIds": [
+    "clue_schabowski_note",
+    "clue_jaeger_order_log"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The gate opens but a stampede injures dozens — the historical breach occurs but the human cost is catastrophic",
+    "The Journalist broadcasts the breach but is struck by a crowd surge and loses the camera — the footage is incomplete",
+    "The Protester crosses but cannot find their family in the chaos — they stand alone on the Bornholmer bridge at midnight",
+    "Jäger opens the gate but is immediately arrested by Stasi officers — the breach happens but he is taken away in handcuffs"
+  ],
+  "structured_endings_enabled": false
 }

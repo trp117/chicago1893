@@ -1,40 +1,27 @@
 {
   "id": "titanic_final_hours",
-  "version": "1.0.0",
-  "title": "Titanic: The Final Hours",
-  "description": "It is 11:40 PM on April 14, 1912, and the RMS Titanic has struck an iceberg at 41°43'N 49°56'W. Three crew members — a wireless operator, a second engineer, and a first class steward — must coordinate across the sinking ship to keep the lights burning, the signals transmitting, and the lifeboats filled before the Atlantic claims her. Every decision has a price.",
+  "tone": [],
   "genre": [
     "historical",
     "survival",
     "drama"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "sessionStartTime": "23:55",
-  "storyArcIds": [
-    "titanic_final_hours_main_arc"
-  ],
-  "playerRoleIds": [
-    "senior_wireless_operator",
-    "second_engineer",
-    "first_class_steward"
-  ],
-  "keyEvidenceClueIds": [
-    "flooding_rate_calculation",
-    "lifeboat_capacity_manifest"
-  ],
+  "image": {
+    "generation_prompt": "The North Atlantic, 400 miles south of Newfoundland, 11:40 PM, April 14th, 1912. The RMS Titanic lists almost imperceptibly to starboard, her hull groaning beneath the waterline where steel has peeled back against ice at twenty-two and a half knots. Steam vents screech from the funnels into a sky of absolute, merciless clarity — no moon, stars burning cold and indifferent above a glassy black sea that is, tonight, catastrophically calm.\n\nThree men occupy three separate worlds within the same dying vessel. In the Marconi room on the Boat Deck, Senior Wireless Operator Jack Phillips hunches over his transmitter, his face bathed in the pale amber glow of the instrument panel, fingers moving with mechanical precision across the key. His uniform jacket hangs unbuttoned, collar loosened, dark crescents beneath his eyes betraying fourteen continuous hours at the set. He is not afraid yet — he is working, which is the same as faith. Beside him, blue sparks leap from the transmission arc with each pulse of CQD, stuttering light against the brass fittings.\n\nFour decks below, in the forward boiler room, Second Engineer Herbert Morrison stands waist-deep in the nightmare geometry of the lower ship — pipes sweating, pressure gauges twitching, bilge water already cold and black around his boots. His face is streaked with coal dust and purpose, lit from below by the hellish orange of the furnace doors, shadows thrown upward across the riveted iron walls. He moves with the deliberate calm of a man who understands exactly what is happening and refuses to honor it with panic.\n\nOn D Deck, First Class Steward Charles Whitmore moves through a corridor of impossible elegance — mahogany paneling, plush carpet, electric sconces burning warm gold, the entire fantasy of the ship still intact and glowing around him — knocking on stateroom doors with measured authority, his white gloves immaculate, his voice steady, coaxing passengers into lifebelts with the professional grace of a man serving tea. His eyes betray everything his voice conceals: a precision of terror sublimated entirely into duty.\n\nThe image should carry the weight of beauty about to be extinguished — gorgeous, doomed, suffused with the amber warmth of electric light against cold darkness pressing in from every direction."
+  },
+  "title": "Titanic: The Final Hours",
+  "premise": "April 14, 1912, 11:40 PM. RMS Titanic has struck an iceberg 400 miles south of Newfoundland. The ship's designer knows she will sink in under two hours. There are lifeboats for half the passengers. Three people — a senior wireless operator, a second engineer, and a first class steward — have ninety minutes to make decisions that will determine who survives, and what the record will show about how it ended.",
+  "setting": "North Atlantic, April 1912",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 2
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 2
       }
     },
@@ -44,288 +31,13 @@
       "01:20 AM — Water reaches the Forecastle Deck; the Marconi Room power fluctuates as Engine Room No. 1 begins to flood",
       "01:50 AM — The last davit-ready lifeboats (Nos. 2 and 4) are lowered; only Collapsibles A, B, C, and D remain",
       "02:10 AM — The bow submerges entirely; the stern rises clear of the water; structural failure is imminent"
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
-  "winConditions": [
-    "Carpathia's coordinates are confirmed and relayed before the Marconi Room loses power",
-    "Dynamos remain operational until the final lifeboat clears the davits",
-    "At least 12 of 16 standard lifeboats are launched at or above 50 percent capacity",
-    "All three player characters reach a lifeboat or Collapsible before 02:10 AM"
-  ],
-  "failConditions": [
-    "Marconi Room loses power before Carpathia confirms her course and ETA",
-    "Dynamos fail before Boat 4 is lowered, leaving the boat deck in darkness",
-    "Fewer than half the lifeboats are launched with meaningful loads",
-    "Time expires at 02:20 AM with characters still aboard"
-  ],
-  "partialSuccessExamples": [
-    "The Price of Gallantry: Carpathia is guided in and boats are well-filled, but the Black Gang and wireless operators go down with the ship — maximum passenger survival, crew lost",
-    "The Operator's Bargain: Signals are maintained and Carpathia arrives, but two lifeboats launched half-empty due to officer interference — 400 additional deaths",
-    "The Engineer's Hour: Lights stay on and boats are filled, but no SOS reaches Carpathia in time — survivors rescued only at dawn by a passing vessel, with severe hypothermia casualties"
-  ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "The year is 1912, and the North Atlantic in April is a killing ground that no amount of engineering hubris has ever tamed. The White Star Line's RMS Titanic — 882 feet long, 46,328 gross tons, the largest moving object ever built by human hands — departed Southampton on April 10th carrying 2,224 souls across three classes and a crew of 908. Her builders at Harland and Wolff in Belfast fitted her with sixteen watertight compartments and a double-bottom hull, and the press of two continents obligingly called her unsinkable, a word that no naval architect at the firm ever used. The wireless apparatus aboard — a Marconi Type 1 spark-gap transmitter capable of reaching 400 miles in daylight — represents the most advanced communication technology afloat, and it has been busy all day relaying ice warnings from the Mesaba, the Baltic, and the Amerika, warnings that reached the bridge and were noted and set aside."
-      },
-      {
-        "type": "stakes",
-        "text": "At 11:40 PM on April 14th, lookout Frederick Fleet spots a black mass in the flat, starless water and rings the crow's nest bell three times. First Officer Murdoch orders hard-a-starboard and full astern, but 46,000 tons of steel requires more than 37 seconds to answer a helm. The iceberg scrapes the starboard hull for ten seconds across a distance of 300 feet, and the damage — a series of buckled seams and popped rivets rather than a single clean gash — opens the first five watertight compartments to the sea. Naval architect Thomas Andrews, who is aboard as a guarantee of the ship's perfection, does the arithmetic in his stateroom within the hour and tells Captain Smith the result quietly: the ship has between one and two hours. There are lifeboats for 1,178 people. There are 2,224 people aboard."
-      },
-      {
-        "type": "scene",
-        "text": "On the Boat Deck, the night air is dead calm and twenty-eight degrees Fahrenheit — cold enough that breath fogs white and the rigging has begun to frost. The sea is a black mirror, utterly without swell, which is why the iceberg was invisible until it was thirty seconds away. Below decks, the smell of salt water in places it has never been before is beginning to reach the corridors: a cold, mineral wrongness beneath the familiar coal smoke and machine oil. The eight-piece band has assembled near the First Class entrance and is playing ragtime, a sound that carries across the still water with an almost indecent cheerfulness, because the officers have decided that music will prevent panic, and panic is the thing they fear most."
-      },
-      {
-        "type": "entry",
-        "text": "You are one of three people on this ship who understands, with professional clarity, what the next two hours will require. The wireless operator in his crackling Marconi Room knows that the nearest answering ship is 58 miles away through pack ice and that every minute of signal strength is a minute of lives. The second engineer in the flooding heat of Boiler Room No. 4 knows that the moment the dynamos go dark, the electric winches on the davits stop and the lifeboats stop moving. The first class steward on C-Deck knows that the boats are being lowered half-empty by officers who are afraid of the math, and that the gates to the lower decks are still locked. The ship will sink at approximately 2:20 AM. It is now 11:55 PM. You are standing at the exact point where your choices begin to matter.",
-        "character_entries": {
-          "senior_wireless_operator": "Ozone and burnt transformer resin — that is what you breathe in this room, have breathed for sixteen hours, and the smell has stopped registering except as a marker that the equipment is still running, which is the only fact that matters. Your right hand rests on the key with the particular looseness of a hand that has been transmitting since before midnight and knows it may need to transmit for another hour, and the receiver against your left ear is delivering static with one clean frequency beneath it — Carpathia, still there, still coming, seventeen knots through black water she cannot see any better than you could see the ice. The signal log is open to your left, Carpathia's 12:25 confirmation in your own handwriting, a position and a bearing and an ETA that you have done the arithmetic on and found adequate, barely, if the power holds. The floor is wrong beneath your feet — two degrees, maybe two and a half now — and Phillips beside you transmits without looking up, his face a closed door, and what he knows and you know and the man in the First Class smoking room does not know is that there are twenty minutes of transmitting power that do not yet exist but could, if someone closes two bus bar switches in the engine room, if someone can reach the speaking tube, if there is still an engineer at the other end of it. The speaking tube cap is in your left hand. You did not decide to pick it up. The static hisses against your palm like something alive, and you hold it there, at the edge of your mouth, and do not yet speak.",
-          "second_engineer": "Your boots are in three inches of water now — you checked two minutes ago and it was two and a half, and the rate-of-change arithmetic you have done four times produces the same answer every time, which is the answer you do not want. The dynamo gauge on the bulkhead reads nominal. The winch circuits on the boat deck are drawing current in the uneven, stop-start pattern that means boats are actually moving, which means the one thing you came down here to do is being done, and the forty men of the Black Gang working the flats below you do not know that Boiler Room No. 6 is already a closed system and No. 5 is thirty-one inches deep and climbing. Bell said *your discretion, son* at 1:05, which is a chief engineer's way of saying the ledger is settled and the remainder is yours to spend. The bus bar switches are six inches from your left hand. Ninety seconds, both hands, twenty additional minutes of light on the boat deck — you have run the sequence in your head until it is as clean and certain as a pressure calculation, and it is clean and certain, except for the water in No. 4, which has been behaving in a way that no calculation has yet explained. The stokers are watching your face. Your hand is on the switch.",
-          "first_class_steward": "The ring of keys is biting into your left palm because you have been gripping it for forty minutes without noticing, and the C-Deck corridor smells of dinner still — braised lamb, good carpet, the faint cedar of expensive luggage — underneath the other smell, the one that has no business being here, the cold mineral wrongness advancing from below like a tide that has forgotten its boundaries. You have spent eleven years making the machinery of this ship invisible, ensuring that the distance between a First Class stateroom and a Third Class berth registered as natural law rather than a locked gate and a key ring, and the machinery is still running: the band is playing two decks above you, Lightoller is recording forty-one souls in a boat that left with twenty-eight, and somewhere below E-Deck the people you have never been required to see are watching water move across their corridor floor. The steward's office is thirty feet behind you. You know the load tests run in Southampton four days ago. You know what Margaret Brown has been counting from the rail. You know what Lightoller does not know you know. Your lifebelt is still in your right hand, still not on your body, which is perhaps the most honest thing about you at this moment — the one piece of the evening's official narrative you have not yet agreed to perform. The corridor is empty. You take one breath of cedar and cold salt and lamb and the specific, countable, preventable arithmetic of the night, and you turn."
-        }
-      }
-    ]
-  },
-  "period_vocabulary": {
-    "categories": [
-      {
-        "name": "Marconi Room Signals",
-        "context": "Used by wireless operators and officers when sending or discussing distress communications and ship-to-ship traffic.",
-        "terms": [
-          {
-            "term": "CQD",
-            "meaning": "The established Marconi distress signal, read as 'Seek You, Danger' — the standard call for assistance before SOS was adopted"
-          },
-          {
-            "term": "SOS",
-            "meaning": "The newer international distress signal adopted at the 1906 Berlin Convention, simpler to tap in Morse and harder to misread — rarely used in practice by 1912"
-          },
-          {
-            "term": "Marconigram",
-            "meaning": "A wireless telegram sent via the Marconi apparatus, typically personal messages from passengers to shore or other ships"
-          },
-          {
-            "term": "QTH",
-            "meaning": "Operator shorthand for a ship's current position, used when relaying coordinates to rescue vessels"
-          },
-          {
-            "term": "working through",
-            "meaning": "Continuing to transmit despite deteriorating conditions — a point of professional pride for Marconi operators"
-          },
-          {
-            "term": "silent hours",
-            "meaning": "Designated listening periods when all operators were required to monitor the distress frequency — not always observed on commercial ships"
-          },
-          {
-            "term": "spark-gap",
-            "meaning": "The transmitter technology used aboard Titanic, producing a broad, crackling signal recognizable across hundreds of miles"
-          }
-        ]
-      },
-      {
-        "name": "Black Gang Trade Argot",
-        "context": "Used by the engineers, firemen, trimmers, and greasers working in the boiler rooms and engine spaces below the waterline.",
-        "terms": [
-          {
-            "term": "Black Gang",
-            "meaning": "Collective name for all engine-room crew — engineers, stokers, coal-trimmers, and greasers — named for the coal dust and grease that permanently stained their skin"
-          },
-          {
-            "term": "trimmer",
-            "meaning": "A worker whose job is to shovel coal from the bunkers to within reach of the firemen at the furnace doors"
-          },
-          {
-            "term": "stoker",
-            "meaning": "The fireman who feeds coal directly into the furnace and manages the fire's intensity to maintain steam pressure"
-          },
-          {
-            "term": "the plates",
-            "meaning": "The steel floor gratings of the boiler room — 'water on the plates' was the first sign of serious flooding"
-          },
-          {
-            "term": "draw fires",
-            "meaning": "To rake burning coal out of the furnaces and douse it — the procedure for safely shutting down a boiler under emergency conditions"
-          },
-          {
-            "term": "watertight flat",
-            "meaning": "The sealed bulkhead door between compartments — once closed from the bridge, it could not be opened from inside without special authority"
-          },
-          {
-            "term": "dynamo",
-            "meaning": "The steam-driven electrical generators that powered the ship's lights, wireless, and lifeboat winches — keeping them running was the engineers' final mission"
-          }
-        ]
-      },
-      {
-        "name": "Deck and Steward Service Language",
-        "context": "Used by deck officers, stewards, and pursers in the management of passengers and ship operations above the waterline.",
-        "terms": [
-          {
-            "term": "the List",
-            "meaning": "The visible lean of the ship to one side as water floods unevenly into the hull — a List to starboard meant the starboard boats were harder to swing out"
-          },
-          {
-            "term": "davit",
-            "meaning": "The crane-like iron arm from which lifeboats were suspended and lowered — Titanic used Welin davits, capable of handling two boats per station"
-          },
-          {
-            "term": "the Shins",
-            "meaning": "Informal crew slang for Third Class steerage passengers, derived from 'steerage'"
-          },
-          {
-            "term": "mustering",
-            "meaning": "The formal assembly of passengers at their assigned lifeboat stations — Titanic had never conducted a full muster drill with passengers"
-          },
-          {
-            "term": "boat fall",
-            "meaning": "The rope and pulley system used to lower a lifeboat from the davit to the water — a jammed fall could strand a loaded boat mid-air"
-          },
-          {
-            "term": "working passage",
-            "meaning": "A crew member traveling as staff rather than a paying passenger — many stewards held this status and had no assigned lifeboat seat"
-          },
-          {
-            "term": "the women-and-children rule",
-            "meaning": "The informal protocol, not a formal maritime law in 1912, by which officers prioritized women and children for lifeboat seats — interpretation varied wildly by officer"
-          }
-        ]
-      },
-      {
-        "name": "Bridge and Navigation Terms",
-        "context": "Used by officers, quartermasters, and lookouts in the operation and command of the vessel.",
-        "terms": [
-          {
-            "term": "hard-a-starboard",
-            "meaning": "In 1912 tiller-order convention, this commanded the helm to turn the wheel to port, swinging the bow to port — the opposite of modern usage"
-          },
-          {
-            "term": "full astern",
-            "meaning": "The order to reverse all engines at maximum power — reducing forward momentum but also removing rudder effectiveness"
-          },
-          {
-            "term": "the crow's nest",
-            "meaning": "The lookout platform high on the foremast — the two lookouts there had no binoculars on the night of April 14th, the glasses having been locked away since Southampton"
-          },
-          {
-            "term": "ice field",
-            "meaning": "A region of pack ice and bergs dense enough to require reduced speed or an altered course — multiple warnings of one ahead were received and disregarded on April 14th"
-          },
-          {
-            "term": "dead reckoning",
-            "meaning": "Navigation by calculating position from a known point using speed, heading, and elapsed time — the method used to relay Titanic's distress coordinates to Carpathia"
-          }
-        ]
-      }
-    ]
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.047Z",
-  "premise": "[NEEDS PREMISE]",
-  "playerGoal": "",
-  "openingSituation": "",
-  "tone": [],
-  "structured_endings_enabled": false,
-  "beats_status": "not_generated",
+  "version": "1.0.0",
   "epilogue": {
-    "generated": true,
     "reviewed": true,
-    "character_fates": [
-      {
-        "character_id": "harold_bride",
-        "classification": "documented",
-        "name": "Harold Bride",
-        "outcome": "survived",
-        "historical_record": "Harold Bride remained at the wireless set transmitting distress calls until approximately 02:10 AM, when Captain Smith released him from duty. He was washed off the ship as it sank and clung to an overturned collapsible lifeboat (Collapsible B) alongside Second Officer Lightoller and others. He was rescued by RMS Carpathia with frostbitten feet. He subsequently testified before both the U.S. Senate Inquiry (April 1912) and the British Board of Trade Inquiry (May 1912). He gave a first-person account to The New York Times published April 19, 1912.",
-        "primary_source": {
-          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726; New York Times, April 19, 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
-          "access_note": null
-        }
-      },
-      {
-        "character_id": "jack_phillips",
-        "classification": "documented",
-        "name": "Jack Phillips",
-        "outcome": "died",
-        "historical_record": "Jack Phillips continued transmitting distress signals until power failed at approximately 02:17 AM. He was last seen by Harold Bride attempting to reach Collapsible B. He did not survive. His body, if recovered, was never identified. He was 25 years old. Bride testified that Phillips was still at the key when Bride left the Marconi Room.",
-        "primary_source": {
-          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
-          "access_note": null
-        }
-      },
-      {
-        "character_id": "joseph_bell",
-        "classification": "documented",
-        "name": "Chief Engineer Joseph Bell",
-        "outcome": "died",
-        "historical_record": "Chief Engineer Joseph Bell and all 35 engineering officers remained at their posts in the engine and boiler rooms throughout the sinking, maintaining power and steam. None survived. Bell's body was never recovered. His actions were cited in the British Board of Trade Inquiry as exemplary. He was 51 years old at the time of his death.",
-        "primary_source": {
-          "citation": "British Board of Trade Inquiry, Report of the Court, 1912, Cmd. 6352; Eaton, John P. and Haas, Charles A., Titanic: Triumph and Tragedy, 1986",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
-          "access_note": null
-        }
-      },
-      {
-        "character_id": "charles_lightoller",
-        "classification": "documented",
-        "name": "Second Officer Charles Lightoller",
-        "outcome": "survived",
-        "historical_record": "Charles Lightoller was the most senior surviving officer of RMS Titanic. He loaded and oversaw the lowering of all port-side lifeboats, enforcing a strict women-and-children-only policy. He was washed off the ship as it sank, was briefly sucked against a ventilation grate, and eventually reached Collapsible B, which he commanded. He was rescued by Carpathia. He was the primary witness at both the U.S. Senate Inquiry and the British Board of Trade Inquiry, where his testimony was extensive and at times contradicted by other witnesses. He later served in World War I and World War II, and died in 1952.",
-        "primary_source": {
-          "citation": "U.S. Senate Inquiry, Testimony of Charles Lightoller, April 19–20, 1912, 62nd Congress, 2nd Session, S. Doc. 726; British Board of Trade Inquiry, Days 12–13, May 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
-          "access_note": null
-        }
-      },
-      {
-        "character_id": "thomas_andrews",
-        "classification": "documented",
-        "name": "Thomas Andrews",
-        "outcome": "died",
-        "historical_record": "Thomas Andrews was seen by Steward John Stewart in the First Class Smoking Room at approximately 01:40 AM staring at a painting, but was later reliably spotted by multiple crew members on the Boat Deck frantically throwing deck chairs into the water as flotation devices and urging passengers into the final lifeboats before the ship's final plunge. He did not survive. His body was never recovered. He was 39 years old. Steward John Stewart and other crew members testified to seeing him in the Smoking Room in his final minutes. Andrews had informed Captain Smith of the flooding rate and the ship's fate approximately 20 to 25 minutes after the collision, following a physical inspection of the forward flooded spaces.",
-        "primary_source": {
-          "citation": "U.S. Senate Inquiry, Testimony of John Stewart (First Class Steward), 1912; Shan Bullock, Thomas Andrews, Shipbuilder, 1912",
-          "url": "https://archive.org/details/thomasandrewsshi00bulkuoft",
-          "access_note": null
-        }
-      },
-      {
-        "character_id": "margaret_brown",
-        "classification": "documented",
-        "name": "Margaret Brown",
-        "outcome": "survived",
-        "historical_record": "Margaret Brown was loaded into Lifeboat No. 6 at approximately 00:55 AM. Lifeboat No. 6 departed with approximately 28 persons aboard, against a capacity of 65. Brown repeatedly urged Quartermaster Robert Hichens, who commanded the boat, to return for survivors in the water; Hichens refused. Brown organized the women in the boat to row and maintain morale. She was rescued by Carpathia and helped organize relief efforts for survivors aboard that ship. She later testified before the U.S. Senate Inquiry. The popular characterization of her as 'the Unsinkable Molly Brown' was a later theatrical invention; she was known in her lifetime as Maggie Brown.",
-        "primary_source": {
-          "citation": "U.S. Senate Inquiry, Testimony of Margaret Brown, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
-          "access_note": null
-        }
-      }
-    ],
-    "immediate_outcome": {
-      "summary": "RMS Titanic sank at 02:20 AM on April 15, 1912, approximately 2 hours and 40 minutes after striking the iceberg at 23:40 on April 14. Of the 2,224 persons aboard, 710 survived and 1,514 died. RMS Carpathia, having received the distress call and steamed approximately 58 miles at full speed, arrived at the position at approximately 04:10 AM and completed the rescue of all surviving lifeboats by approximately 08:30 AM.",
-      "key_facts": [
-        "RMS Titanic struck an iceberg at 23:40 on April 14, 1912 (ship's time)",
-        "RMS Titanic sank at 02:20 AM on April 15, 1912",
-        "2,224 persons were aboard according to the British Board of Trade Inquiry figure",
-        "710 persons survived; 1,514 persons died",
-        "20 lifeboats were carried, with a total certified capacity of 1,178 persons",
-        "The lifeboats departed with an average occupancy substantially below capacity; the British Inquiry calculated a total of 711 persons in all boats combined",
-        "RMS Carpathia received the first CQD distress call at 01:05 AM Carpathia time (approximately 00:15 AM Titanic ship's time) and arrived at approximately 04:10 AM",
-        "Carpathia recovered 710 survivors and brought them to New York, arriving April 18, 1912",
-        "The water temperature at the site was approximately 28°F (minus 2°C); survival in the water without a lifeboat was measured in minutes"
-      ]
-    },
-    "historical_frame": [
-      "The sinking of RMS Titanic resulted in the International Convention for the Safety of Life at Sea (SOLAS), first adopted in 1914, which established requirements for sufficient lifeboat capacity for all persons aboard and mandatory 24-hour wireless watch on passenger vessels.",
-      "The U.S. Senate Inquiry, chaired by Senator William Alden Smith, opened April 19, 1912, four days after the disaster, and heard testimony from 86 witnesses over 18 days; the British Board of Trade Inquiry, presided over by Lord Mersey, ran from May 2 to July 3, 1912, and examined 97 witnesses across 36 days of hearings.",
-      "At the time of her sinking, RMS Titanic carried lifeboats exceeding the legal minimum required by the British Board of Trade, which based its lifeboat table on vessel tonnage rather than passenger capacity; a ship of Titanic's gross tonnage of 46,328 tons was required to carry boats for 962 persons, a regulation written in 1894 and not updated before 1912."
-    ],
+    "generated": true,
     "open_threads": [
       {
         "thread_id": "each_player_character",
@@ -409,343 +121,636 @@
         "beat_id": "the_steward_discovers",
         "historical_record": "Third Class passengers had a survival rate of approximately 25 percent (approximately 178 of 710 Third Class passengers survived, though exact figures vary between inquiries). First Class survival rate was approximately 60 percent. Multiple Third Class survivors testified to gates being locked or guarded. The British Board of Trade Inquiry concluded that no deliberate policy of exclusion existed but acknowledged that Third Class passengers faced structural and linguistic barriers to reaching the boat deck. The U.S. Senate Inquiry was more critical of the treatment of Third Class passengers. No officer or crew member was found to have given a specific order to hold Third Class passengers below decks, and no such order was documented."
       }
-    ]
-  },
-  "review_checklist": {
-    "beat_count": {
-      "checked": false,
-      "notes": ""
-    },
-    "sequence_check": {
-      "checked": false,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": false,
-      "notes": ""
-    },
-    "final_beat_spec": {
-      "checked": false,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": false,
-      "notes": ""
-    },
-    "reviewer_summary": {
-      "checked": false,
-      "notes": ""
-    },
-    "manual_playthrough": {
-      "checked": false,
-      "notes": ""
+    ],
+    "character_fates": [
+      {
+        "character_id": "harold_bride",
+        "classification": "documented",
+        "name": "Harold Bride",
+        "outcome": "survived",
+        "historical_record": "Harold Bride remained at the wireless set transmitting distress calls until approximately 02:10 AM, when Captain Smith released him from duty. He was washed off the ship as it sank and clung to an overturned collapsible lifeboat (Collapsible B) alongside Second Officer Lightoller and others. He was rescued by RMS Carpathia with frostbitten feet. He subsequently testified before both the U.S. Senate Inquiry (April 1912) and the British Board of Trade Inquiry (May 1912). He gave a first-person account to The New York Times published April 19, 1912.",
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726; New York Times, April 19, 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "jack_phillips",
+        "classification": "documented",
+        "name": "Jack Phillips",
+        "outcome": "died",
+        "historical_record": "Jack Phillips continued transmitting distress signals until power failed at approximately 02:17 AM. He was last seen by Harold Bride attempting to reach Collapsible B. He did not survive. His body, if recovered, was never identified. He was 25 years old. Bride testified that Phillips was still at the key when Bride left the Marconi Room.",
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Harold Bride, April 15–May 25, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "joseph_bell",
+        "classification": "documented",
+        "name": "Chief Engineer Joseph Bell",
+        "outcome": "died",
+        "historical_record": "Chief Engineer Joseph Bell and all 35 engineering officers remained at their posts in the engine and boiler rooms throughout the sinking, maintaining power and steam. None survived. Bell's body was never recovered. His actions were cited in the British Board of Trade Inquiry as exemplary. He was 51 years old at the time of his death.",
+        "primary_source": {
+          "citation": "British Board of Trade Inquiry, Report of the Court, 1912, Cmd. 6352; Eaton, John P. and Haas, Charles A., Titanic: Triumph and Tragedy, 1986",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "charles_lightoller",
+        "classification": "documented",
+        "name": "Second Officer Charles Lightoller",
+        "outcome": "survived",
+        "historical_record": "Charles Lightoller was the most senior surviving officer of RMS Titanic. He loaded and oversaw the lowering of all port-side lifeboats, enforcing a strict women-and-children-only policy. He was washed off the ship as it sank, was briefly sucked against a ventilation grate, and eventually reached Collapsible B, which he commanded. He was rescued by Carpathia. He was the primary witness at both the U.S. Senate Inquiry and the British Board of Trade Inquiry, where his testimony was extensive and at times contradicted by other witnesses. He later served in World War I and World War II, and died in 1952.",
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Charles Lightoller, April 19–20, 1912, 62nd Congress, 2nd Session, S. Doc. 726; British Board of Trade Inquiry, Days 12–13, May 1912",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "thomas_andrews",
+        "classification": "documented",
+        "name": "Thomas Andrews",
+        "outcome": "died",
+        "historical_record": "Thomas Andrews was seen by Steward John Stewart in the First Class Smoking Room at approximately 01:40 AM staring at a painting, but was later reliably spotted by multiple crew members on the Boat Deck frantically throwing deck chairs into the water as flotation devices and urging passengers into the final lifeboats before the ship's final plunge. He did not survive. His body was never recovered. He was 39 years old. Steward John Stewart and other crew members testified to seeing him in the Smoking Room in his final minutes. Andrews had informed Captain Smith of the flooding rate and the ship's fate approximately 20 to 25 minutes after the collision, following a physical inspection of the forward flooded spaces.",
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of John Stewart (First Class Steward), 1912; Shan Bullock, Thomas Andrews, Shipbuilder, 1912",
+          "url": "https://archive.org/details/thomasandrewsshi00bulkuoft",
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "margaret_brown",
+        "classification": "documented",
+        "name": "Margaret Brown",
+        "outcome": "survived",
+        "historical_record": "Margaret Brown was loaded into Lifeboat No. 6 at approximately 00:55 AM. Lifeboat No. 6 departed with approximately 28 persons aboard, against a capacity of 65. Brown repeatedly urged Quartermaster Robert Hichens, who commanded the boat, to return for survivors in the water; Hichens refused. Brown organized the women in the boat to row and maintain morale. She was rescued by Carpathia and helped organize relief efforts for survivors aboard that ship. She later testified before the U.S. Senate Inquiry. The popular characterization of her as 'the Unsinkable Molly Brown' was a later theatrical invention; she was known in her lifetime as Maggie Brown.",
+        "primary_source": {
+          "citation": "U.S. Senate Inquiry, Testimony of Margaret Brown, 1912, 62nd Congress, 2nd Session, S. Doc. 726",
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "access_note": null
+        }
+      }
+    ],
+    "historical_frame": [
+      "The sinking of RMS Titanic resulted in the International Convention for the Safety of Life at Sea (SOLAS), first adopted in 1914, which established requirements for sufficient lifeboat capacity for all persons aboard and mandatory 24-hour wireless watch on passenger vessels.",
+      "The U.S. Senate Inquiry, chaired by Senator William Alden Smith, opened April 19, 1912, four days after the disaster, and heard testimony from 86 witnesses over 18 days; the British Board of Trade Inquiry, presided over by Lord Mersey, ran from May 2 to July 3, 1912, and examined 97 witnesses across 36 days of hearings.",
+      "At the time of her sinking, RMS Titanic carried lifeboats exceeding the legal minimum required by the British Board of Trade, which based its lifeboat table on vessel tonnage rather than passenger capacity; a ship of Titanic's gross tonnage of 46,328 tons was required to carry boats for 962 persons, a regulation written in 1894 and not updated before 1912."
+    ],
+    "immediate_outcome": {
+      "summary": "RMS Titanic sank at 02:20 AM on April 15, 1912, approximately 2 hours and 40 minutes after striking the iceberg at 23:40 on April 14. Of the 2,224 persons aboard, 710 survived and 1,514 died. RMS Carpathia, having received the distress call and steamed approximately 58 miles at full speed, arrived at the position at approximately 04:10 AM and completed the rescue of all surviving lifeboats by approximately 08:30 AM.",
+      "key_facts": [
+        "RMS Titanic struck an iceberg at 23:40 on April 14, 1912 (ship's time)",
+        "RMS Titanic sank at 02:20 AM on April 15, 1912",
+        "2,224 persons were aboard according to the British Board of Trade Inquiry figure",
+        "710 persons survived; 1,514 persons died",
+        "20 lifeboats were carried, with a total certified capacity of 1,178 persons",
+        "The lifeboats departed with an average occupancy substantially below capacity; the British Inquiry calculated a total of 711 persons in all boats combined",
+        "RMS Carpathia received the first CQD distress call at 01:05 AM Carpathia time (approximately 00:15 AM Titanic ship's time) and arrived at approximately 04:10 AM",
+        "Carpathia recovered 710 survivors and brought them to New York, arriving April 18, 1912",
+        "The water temperature at the site was approximately 28°F (minus 2°C); survival in the water without a lifeboat was measured in minutes"
+      ]
     }
   },
+  "glossary": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.047Z",
+  "playerGoal": "",
+  "description": "It is 11:40 PM on April 14, 1912, and the RMS Titanic has struck an iceberg at 41°43'N 49°56'W. Three crew members — a wireless operator, a second engineer, and a first class steward — must coordinate across the sinking ship to keep the lights burning, the signals transmitting, and the lifeboats filled before the Atlantic claims her. Every decision has a price.",
+  "storyArcIds": [
+    "titanic_final_hours_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "The year is 1912, and the North Atlantic in April is a killing ground that no amount of engineering hubris has ever tamed. The White Star Line's RMS Titanic — 882 feet long, 46,328 gross tons, the largest moving object ever built by human hands — departed Southampton on April 10th carrying 2,224 souls across three classes and a crew of 908. Her builders at Harland and Wolff in Belfast fitted her with sixteen watertight compartments and a double-bottom hull, and the press of two continents obligingly called her unsinkable, a word that no naval architect at the firm ever used. The wireless apparatus aboard — a Marconi Type 1 spark-gap transmitter capable of reaching 400 miles in daylight — represents the most advanced communication technology afloat, and it has been busy all day relaying ice warnings from the Mesaba, the Baltic, and the Amerika, warnings that reached the bridge and were noted and set aside.",
+        "type": "world"
+      },
+      {
+        "text": "At 11:40 PM on April 14th, lookout Frederick Fleet spots a black mass in the flat, starless water and rings the crow's nest bell three times. First Officer Murdoch orders hard-a-starboard and full astern, but 46,000 tons of steel requires more than 37 seconds to answer a helm. The iceberg scrapes the starboard hull for ten seconds across a distance of 300 feet, and the damage — a series of buckled seams and popped rivets rather than a single clean gash — opens the first five watertight compartments to the sea. Naval architect Thomas Andrews, who is aboard as a guarantee of the ship's perfection, does the arithmetic in his stateroom within the hour and tells Captain Smith the result quietly: the ship has between one and two hours. There are lifeboats for 1,178 people. There are 2,224 people aboard.",
+        "type": "stakes"
+      },
+      {
+        "text": "On the Boat Deck, the night air is dead calm and twenty-eight degrees Fahrenheit — cold enough that breath fogs white and the rigging has begun to frost. The sea is a black mirror, utterly without swell, which is why the iceberg was invisible until it was thirty seconds away. Below decks, the smell of salt water in places it has never been before is beginning to reach the corridors: a cold, mineral wrongness beneath the familiar coal smoke and machine oil. The eight-piece band has assembled near the First Class entrance and is playing ragtime, a sound that carries across the still water with an almost indecent cheerfulness, because the officers have decided that music will prevent panic, and panic is the thing they fear most.",
+        "type": "scene"
+      },
+      {
+        "text": "You are one of three people on this ship who understands, with professional clarity, what the next two hours will require. The wireless operator in his crackling Marconi Room knows that the nearest answering ship is 58 miles away through pack ice and that every minute of signal strength is a minute of lives. The second engineer in the flooding heat of Boiler Room No. 4 knows that the moment the dynamos go dark, the electric winches on the davits stop and the lifeboats stop moving. The first class steward on C-Deck knows that the boats are being lowered half-empty by officers who are afraid of the math, and that the gates to the lower decks are still locked. The ship will sink at approximately 2:20 AM. It is now 11:55 PM. You are standing at the exact point where your choices begin to matter.",
+        "type": "entry",
+        "character_entries": {
+          "second_engineer": "Your boots are in three inches of water now — you checked two minutes ago and it was two and a half, and the rate-of-change arithmetic you have done four times produces the same answer every time, which is the answer you do not want. The dynamo gauge on the bulkhead reads nominal. The winch circuits on the boat deck are drawing current in the uneven, stop-start pattern that means boats are actually moving, which means the one thing you came down here to do is being done, and the forty men of the Black Gang working the flats below you do not know that Boiler Room No. 6 is already a closed system and No. 5 is thirty-one inches deep and climbing. Bell said *your discretion, son* at 1:05, which is a chief engineer's way of saying the ledger is settled and the remainder is yours to spend. The bus bar switches are six inches from your left hand. Ninety seconds, both hands, twenty additional minutes of light on the boat deck — you have run the sequence in your head until it is as clean and certain as a pressure calculation, and it is clean and certain, except for the water in No. 4, which has been behaving in a way that no calculation has yet explained. The stokers are watching your face. Your hand is on the switch.",
+          "first_class_steward": "The ring of keys is biting into your left palm because you have been gripping it for forty minutes without noticing, and the C-Deck corridor smells of dinner still — braised lamb, good carpet, the faint cedar of expensive luggage — underneath the other smell, the one that has no business being here, the cold mineral wrongness advancing from below like a tide that has forgotten its boundaries. You have spent eleven years making the machinery of this ship invisible, ensuring that the distance between a First Class stateroom and a Third Class berth registered as natural law rather than a locked gate and a key ring, and the machinery is still running: the band is playing two decks above you, Lightoller is recording forty-one souls in a boat that left with twenty-eight, and somewhere below E-Deck the people you have never been required to see are watching water move across their corridor floor. The steward's office is thirty feet behind you. You know the load tests run in Southampton four days ago. You know what Margaret Brown has been counting from the rail. You know what Lightoller does not know you know. Your lifebelt is still in your right hand, still not on your body, which is perhaps the most honest thing about you at this moment — the one piece of the evening's official narrative you have not yet agreed to perform. The corridor is empty. You take one breath of cedar and cold salt and lamb and the specific, countable, preventable arithmetic of the night, and you turn.",
+          "senior_wireless_operator": "Ozone and burnt transformer resin — that is what you breathe in this room, have breathed for sixteen hours, and the smell has stopped registering except as a marker that the equipment is still running, which is the only fact that matters. Your right hand rests on the key with the particular looseness of a hand that has been transmitting since before midnight and knows it may need to transmit for another hour, and the receiver against your left ear is delivering static with one clean frequency beneath it — Carpathia, still there, still coming, seventeen knots through black water she cannot see any better than you could see the ice. The signal log is open to your left, Carpathia's 12:25 confirmation in your own handwriting, a position and a bearing and an ETA that you have done the arithmetic on and found adequate, barely, if the power holds. The floor is wrong beneath your feet — two degrees, maybe two and a half now — and Phillips beside you transmits without looking up, his face a closed door, and what he knows and you know and the man in the First Class smoking room does not know is that there are twenty minutes of transmitting power that do not yet exist but could, if someone closes two bus bar switches in the engine room, if someone can reach the speaking tube, if there is still an engineer at the other end of it. The speaking tube cap is in your left hand. You did not decide to pick it up. The static hisses against your palm like something alive, and you hold it there, at the edge of your mouth, and do not yet speak."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "senior_wireless_operator",
+    "second_engineer",
+    "first_class_steward"
+  ],
+  "winConditions": [
+    "Carpathia's coordinates are confirmed and relayed before the Marconi Room loses power",
+    "Dynamos remain operational until the final lifeboat clears the davits",
+    "At least 12 of 16 standard lifeboats are launched at or above 50 percent capacity",
+    "All three player characters reach a lifeboat or Collapsible before 02:10 AM"
+  ],
+  "failConditions": [
+    "Marconi Room loses power before Carpathia confirms her course and ETA",
+    "Dynamos fail before Boat 4 is lowered, leaving the boat deck in darkness",
+    "Fewer than half the lifeboats are launched with meaningful loads",
+    "Time expires at 02:20 AM with characters still aboard"
+  ],
   "technical_facts": {
-    "generated": true,
-    "reviewed": false,
     "facts": [
       {
-        "fact_id": "titanic_sinking_time",
-        "content": "RMS Titanic foundered at 2:20 AM ship's time on 15 April 1912.",
         "domain": "timing",
         "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352); US Senate Inquiry, 1912",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "access_note": null
         },
+        "content": "RMS Titanic foundered at 2:20 AM ship's time on 15 April 1912.",
+        "fact_id": "titanic_sinking_time",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "collision_time",
-        "content": "Titanic struck the iceberg at 11:40 PM ship's time on 14 April 1912.",
         "domain": "timing",
         "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "citation": "British Board of Trade Inquiry, 1912; testimony of Fourth Officer Joseph Boxhall",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "access_note": null
         },
+        "content": "Titanic struck the iceberg at 11:40 PM ship's time on 14 April 1912.",
+        "fact_id": "collision_time",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "titanic_position_at_sinking",
-        "content": "Titanic's distress position, as calculated by Fourth Officer Boxhall and transmitted by wireless, was 41°46'N, 50°14'W.",
         "domain": "navigation",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of Harold Bride and Joseph Boxhall",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Titanic's distress position, as calculated by Fourth Officer Boxhall and transmitted by wireless, was 41°46'N, 50°14'W.",
+        "fact_id": "titanic_position_at_sinking",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "carpathia_response_time",
-        "content": "RMS Carpathia received Titanic's CQD distress call at 12:25 AM on 15 April 1912 and arrived at the position at approximately 4:10 AM, approximately 58 miles from her position when she received the call.",
         "domain": "timing",
         "source": {
-          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron of Carpathia",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron of Carpathia",
           "access_note": null
         },
+        "content": "RMS Carpathia received Titanic's CQD distress call at 12:25 AM on 15 April 1912 and arrived at the position at approximately 4:10 AM, approximately 58 miles from her position when she received the call.",
+        "fact_id": "carpathia_response_time",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "carpathia_speed",
-        "content": "Carpathia increased speed from her service speed of approximately 14 knots to approximately 17 knots — her maximum — after receiving Titanic's distress signal.",
         "domain": "navigation",
         "source": {
-          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; testimony of Captain Arthur Rostron",
           "access_note": null
         },
+        "content": "Carpathia increased speed from her service speed of approximately 14 knots to approximately 17 knots — her maximum — after receiving Titanic's distress signal.",
+        "fact_id": "carpathia_speed",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "first_distress_signal_sent",
-        "content": "Jack Phillips began transmitting the CQD distress call at approximately 12:15 AM on 15 April 1912, approximately 35 minutes after the collision.",
         "domain": "timing",
         "source": {
-          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
           "access_note": null
         },
+        "content": "Jack Phillips began transmitting the CQD distress call at approximately 12:15 AM on 15 April 1912, approximately 35 minutes after the collision.",
+        "fact_id": "first_distress_signal_sent",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "sos_first_use",
-        "content": "Harold Bride suggested to Jack Phillips that they transmit SOS in addition to CQD, as SOS was the newer international distress signal; Titanic was among the first ships to transmit SOS in a genuine distress situation.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Harold Bride suggested to Jack Phillips that they transmit SOS in addition to CQD, as SOS was the newer international distress signal; Titanic was among the first ships to transmit SOS in a genuine distress situation.",
+        "fact_id": "sos_first_use",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "total_souls_aboard",
+        "domain": "capacity",
+        "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "access_note": null
+        },
         "content": "RMS Titanic carried 2,224 persons on her maiden voyage, comprising approximately 1,317 passengers and 908 crew.",
-        "domain": "capacity",
-        "source": {
-          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
-          "access_note": null
-        },
+        "fact_id": "total_souls_aboard",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "total_lifeboat_capacity",
+        "domain": "capacity",
+        "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "access_note": null
+        },
         "content": "Titanic carried 20 lifeboats with a total certified capacity of 1,178 persons: 14 standard wooden lifeboats each certified for 65 persons, 2 emergency cutters each certified for 40 persons, and 4 Engelhardt collapsible boats each certified for 47 persons.",
-        "domain": "capacity",
-        "source": {
-          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
-          "access_note": null
-        },
+        "fact_id": "total_lifeboat_capacity",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "total_survivors",
+        "domain": "capacity",
+        "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
+          "access_note": null
+        },
         "content": "710 persons survived the sinking of RMS Titanic; 1,514 persons perished.",
-        "domain": "capacity",
-        "source": {
-          "citation": "British Board of Trade Inquiry, 1912 (Cmd. 6352)",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
-          "access_note": null
-        },
+        "fact_id": "total_survivors",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lifeboat_7_occupancy",
-        "content": "Lifeboat No. 7, the first boat lowered from the starboard side at approximately 12:40 AM, carried approximately 28 persons against its certified capacity of 65.",
         "domain": "capacity",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Lifeboat No. 7, the first boat lowered from the starboard side at approximately 12:40 AM, carried approximately 28 persons against its certified capacity of 65.",
+        "fact_id": "lifeboat_7_occupancy",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lifeboat_1_occupancy",
-        "content": "Emergency cutter No. 1, certified for 40 persons, was lowered at approximately 1:10 AM carrying only 12 persons.",
         "domain": "capacity",
         "source": {
-          "citation": "British Board of Trade Inquiry, 1912; testimony of Sir Cosmo Duff-Gordon",
           "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Sir Cosmo Duff-Gordon",
           "access_note": null
         },
+        "content": "Emergency cutter No. 1, certified for 40 persons, was lowered at approximately 1:10 AM carrying only 12 persons.",
+        "fact_id": "lifeboat_1_occupancy",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "dynamo_power_maintained",
-        "content": "Titanic's engineers maintained electrical power to the ship's systems, including the wireless room, until shortly before the ship foundered at 2:20 AM; the lights remained on until the final plunge.",
         "domain": "power",
         "source": {
-          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; multiple survivor testimonies",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; multiple survivor testimonies",
           "access_note": null
         },
+        "content": "Titanic's engineers maintained electrical power to the ship's systems, including the wireless room, until shortly before the ship foundered at 2:20 AM; the lights remained on until the final plunge.",
+        "fact_id": "dynamo_power_maintained",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "titanic_electrical_output",
-        "content": "Titanic was equipped with four 400-kilowatt steam-driven dynamos located in the turbine room aft of the reciprocating engine room, providing ship's service power at 100 volts DC.",
         "domain": "power",
         "source": {
-          "citation": "Harland and Wolff shipbuilding records; Titanic's electrical installation specifications as cited in the British Board of Trade Inquiry, 1912",
           "url": null,
+          "citation": "Harland and Wolff shipbuilding records; Titanic's electrical installation specifications as cited in the British Board of Trade Inquiry, 1912",
           "access_note": "Harland and Wolff records not publicly available; specifications cited in British Board of Trade Inquiry (Cmd. 6352)"
         },
+        "content": "Titanic was equipped with four 400-kilowatt steam-driven dynamos located in the turbine room aft of the reciprocating engine room, providing ship's service power at 100 volts DC.",
+        "fact_id": "titanic_electrical_output",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "marconi_transmitter_power",
-        "content": "Titanic's Marconi wireless transmitter operated at 5 kilowatts and had a guaranteed working range of 250 miles, with an actual range under good conditions of up to 2,000 miles at night.",
         "domain": "power",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "Marconi International Marine Communication Company equipment specifications; US Senate Inquiry, 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Titanic's Marconi wireless transmitter operated at 5 kilowatts and had a guaranteed working range of 250 miles, with an actual range under good conditions of up to 2,000 miles at night.",
+        "fact_id": "marconi_transmitter_power",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "chief_engineer_bell_fate",
-        "content": "Chief Engineer Joseph Bell remained at his post in the engine room and perished with the ship; he was last seen alive by surviving crew members at his station maintaining power.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "citation": "British Board of Trade Inquiry, 1912; survivor testimonies of engine room crew",
-          "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
           "access_note": null
         },
+        "content": "Chief Engineer Joseph Bell remained at his post in the engine room and perished with the ship; he was last seen alive by surviving crew members at his station maintaining power.",
+        "fact_id": "chief_engineer_bell_fate",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "harold_bride_fate",
-        "content": "Harold Bride survived the sinking; he remained in the Marconi room transmitting until power failed, was washed off the ship when it foundered, and was pulled onto Collapsible B with injured feet, later rescued by Carpathia.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of Harold Bride; New York Times interview, 19 April 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Harold Bride survived the sinking; he remained in the Marconi room transmitting until power failed, was washed off the ship when it foundered, and was pulled onto Collapsible B with injured feet, later rescued by Carpathia.",
+        "fact_id": "harold_bride_fate",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "jack_phillips_fate",
-        "content": "Jack Phillips remained at the wireless key transmitting distress calls until power failed and did not survive; his body was never recovered.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of Harold Bride",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Jack Phillips remained at the wireless key transmitting distress calls until power failed and did not survive; his body was never recovered.",
+        "fact_id": "jack_phillips_fate",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lightoller_women_children_policy",
-        "content": "Second Officer Charles Lightoller enforced a strict women-and-children-only policy on the port side, refusing to allow men to board even when boats were not full; he survived by clinging to overturned Collapsible B.",
         "domain": "personnel",
         "source": {
-          "citation": "British Board of Trade Inquiry, 1912; testimony of Charles Lightoller; US Senate Inquiry, 1912",
           "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Charles Lightoller; US Senate Inquiry, 1912",
           "access_note": null
         },
+        "content": "Second Officer Charles Lightoller enforced a strict women-and-children-only policy on the port side, refusing to allow men to board even when boats were not full; he survived by clinging to overturned Collapsible B.",
+        "fact_id": "lightoller_women_children_policy",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "thomas_andrews_fate",
-        "content": "Thomas Andrews was last seen alive by survivor John Stewart in the First Class Smoking Room at approximately 2:00 AM, standing alone with his arms folded, staring at a painting; he did not survive and his body was never recovered.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of steward John Stewart; British Board of Trade Inquiry, 1912",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Thomas Andrews was last seen alive by survivor John Stewart in the First Class Smoking Room at approximately 2:00 AM, standing alone with his arms folded, staring at a painting; he did not survive and his body was never recovered.",
+        "fact_id": "thomas_andrews_fate",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "margaret_brown_lifeboat_6",
-        "content": "Margaret Brown was placed in Lifeboat No. 6 at approximately 12:55 AM and, according to survivor accounts, took an oar and urged the boat's crew to return for survivors in the water after the ship sank.",
         "domain": "personnel",
         "source": {
+          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "citation": "US Senate Inquiry, 1912; testimony of Quartermaster Robert Hichens and Margaret Brown",
-          "url": "https://www.titanicinquiry.org/USInq/USInq.php",
           "access_note": null
         },
+        "content": "Margaret Brown was placed in Lifeboat No. 6 at approximately 12:55 AM and, according to survivor accounts, took an oar and urged the boat's crew to return for survivors in the water after the ship sank.",
+        "fact_id": "margaret_brown_lifeboat_6",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "mesaba_warning_not_delivered",
-        "content": "The ice warning transmitted by SS Mesaba at 9:40 PM on 14 April 1912, which described heavy pack ice and large icebergs in the latitude and longitude range directly ahead of Titanic, was received by the Marconi room but was never delivered to the bridge.",
         "domain": "personnel",
         "source": {
-          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of Harold Bride",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of Harold Bride",
           "access_note": null
         },
+        "content": "The ice warning transmitted by SS Mesaba at 9:40 PM on 14 April 1912, which described heavy pack ice and large icebergs in the latitude and longitude range directly ahead of Titanic, was received by the Marconi room but was never delivered to the bridge.",
+        "fact_id": "mesaba_warning_not_delivered",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "boiler_room_6_flooding",
-        "content": "Boiler Room No. 6 began flooding immediately after the collision at 11:40 PM; stoker Frederick Barrett testified that water burst through the ship's side at the forward end of the boiler room and the watertight door was closed by electric control from the bridge.",
         "domain": "flooding",
         "source": {
-          "citation": "British Board of Trade Inquiry, 1912; testimony of Leading Stoker Frederick Barrett",
           "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912; testimony of Leading Stoker Frederick Barrett",
           "access_note": null
         },
+        "content": "Boiler Room No. 6 began flooding immediately after the collision at 11:40 PM; stoker Frederick Barrett testified that water burst through the ship's side at the forward end of the boiler room and the watertight door was closed by electric control from the bridge.",
+        "fact_id": "boiler_room_6_flooding",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "andrews_two_hour_estimate",
-        "content": "Thomas Andrews informed Captain Smith shortly after midnight that the ship could remain afloat for approximately one to two hours based on his assessment of the flooding in the forward compartments.",
         "domain": "timing",
         "source": {
-          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of multiple witnesses including steward Henry Etches",
           "url": "https://www.titanicinquiry.org/USInq/USInq.php",
+          "citation": "US Senate Inquiry, 1912; British Board of Trade Inquiry, 1912; testimony of multiple witnesses including steward Henry Etches",
           "access_note": null
         },
+        "content": "Thomas Andrews informed Captain Smith shortly after midnight that the ship could remain afloat for approximately one to two hours based on his assessment of the flooding in the forward compartments.",
+        "fact_id": "andrews_two_hour_estimate",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "welin_davit_capacity",
-        "content": "Titanic was fitted with Welin double-acting davits, which were designed and tested to handle lifeboats loaded to full capacity; the davit system was capable of launching more boats than the ship actually carried.",
         "domain": "other",
         "source": {
-          "citation": "British Board of Trade Inquiry, 1912; Welin Davit and Engineering Company specifications entered into evidence",
           "url": "https://www.titanicinquiry.org/BOTInq/BOTInq.php",
+          "citation": "British Board of Trade Inquiry, 1912; Welin Davit and Engineering Company specifications entered into evidence",
           "access_note": null
         },
+        "content": "Titanic was fitted with Welin double-acting davits, which were designed and tested to handle lifeboats loaded to full capacity; the davit system was capable of launching more boats than the ship actually carried.",
+        "fact_id": "welin_davit_capacity",
         "valid_from": null,
         "valid_until": null
       }
+    ],
+    "reviewed": false,
+    "generated": true
+  },
+  "allow_free_input": true,
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": false
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": false
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": false
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": false
+    }
+  },
+  "sessionStartTime": "23:55",
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Marconi Room Signals",
+        "terms": [
+          {
+            "term": "CQD",
+            "meaning": "The established Marconi distress signal, read as 'Seek You, Danger' — the standard call for assistance before SOS was adopted"
+          },
+          {
+            "term": "SOS",
+            "meaning": "The newer international distress signal adopted at the 1906 Berlin Convention, simpler to tap in Morse and harder to misread — rarely used in practice by 1912"
+          },
+          {
+            "term": "Marconigram",
+            "meaning": "A wireless telegram sent via the Marconi apparatus, typically personal messages from passengers to shore or other ships"
+          },
+          {
+            "term": "QTH",
+            "meaning": "Operator shorthand for a ship's current position, used when relaying coordinates to rescue vessels"
+          },
+          {
+            "term": "working through",
+            "meaning": "Continuing to transmit despite deteriorating conditions — a point of professional pride for Marconi operators"
+          },
+          {
+            "term": "silent hours",
+            "meaning": "Designated listening periods when all operators were required to monitor the distress frequency — not always observed on commercial ships"
+          },
+          {
+            "term": "spark-gap",
+            "meaning": "The transmitter technology used aboard Titanic, producing a broad, crackling signal recognizable across hundreds of miles"
+          }
+        ],
+        "context": "Used by wireless operators and officers when sending or discussing distress communications and ship-to-ship traffic."
+      },
+      {
+        "name": "Black Gang Trade Argot",
+        "terms": [
+          {
+            "term": "Black Gang",
+            "meaning": "Collective name for all engine-room crew — engineers, stokers, coal-trimmers, and greasers — named for the coal dust and grease that permanently stained their skin"
+          },
+          {
+            "term": "trimmer",
+            "meaning": "A worker whose job is to shovel coal from the bunkers to within reach of the firemen at the furnace doors"
+          },
+          {
+            "term": "stoker",
+            "meaning": "The fireman who feeds coal directly into the furnace and manages the fire's intensity to maintain steam pressure"
+          },
+          {
+            "term": "the plates",
+            "meaning": "The steel floor gratings of the boiler room — 'water on the plates' was the first sign of serious flooding"
+          },
+          {
+            "term": "draw fires",
+            "meaning": "To rake burning coal out of the furnaces and douse it — the procedure for safely shutting down a boiler under emergency conditions"
+          },
+          {
+            "term": "watertight flat",
+            "meaning": "The sealed bulkhead door between compartments — once closed from the bridge, it could not be opened from inside without special authority"
+          },
+          {
+            "term": "dynamo",
+            "meaning": "The steam-driven electrical generators that powered the ship's lights, wireless, and lifeboat winches — keeping them running was the engineers' final mission"
+          }
+        ],
+        "context": "Used by the engineers, firemen, trimmers, and greasers working in the boiler rooms and engine spaces below the waterline."
+      },
+      {
+        "name": "Deck and Steward Service Language",
+        "terms": [
+          {
+            "term": "the List",
+            "meaning": "The visible lean of the ship to one side as water floods unevenly into the hull — a List to starboard meant the starboard boats were harder to swing out"
+          },
+          {
+            "term": "davit",
+            "meaning": "The crane-like iron arm from which lifeboats were suspended and lowered — Titanic used Welin davits, capable of handling two boats per station"
+          },
+          {
+            "term": "the Shins",
+            "meaning": "Informal crew slang for Third Class steerage passengers, derived from 'steerage'"
+          },
+          {
+            "term": "mustering",
+            "meaning": "The formal assembly of passengers at their assigned lifeboat stations — Titanic had never conducted a full muster drill with passengers"
+          },
+          {
+            "term": "boat fall",
+            "meaning": "The rope and pulley system used to lower a lifeboat from the davit to the water — a jammed fall could strand a loaded boat mid-air"
+          },
+          {
+            "term": "working passage",
+            "meaning": "A crew member traveling as staff rather than a paying passenger — many stewards held this status and had no assigned lifeboat seat"
+          },
+          {
+            "term": "the women-and-children rule",
+            "meaning": "The informal protocol, not a formal maritime law in 1912, by which officers prioritized women and children for lifeboat seats — interpretation varied wildly by officer"
+          }
+        ],
+        "context": "Used by deck officers, stewards, and pursers in the management of passengers and ship operations above the waterline."
+      },
+      {
+        "name": "Bridge and Navigation Terms",
+        "terms": [
+          {
+            "term": "hard-a-starboard",
+            "meaning": "In 1912 tiller-order convention, this commanded the helm to turn the wheel to port, swinging the bow to port — the opposite of modern usage"
+          },
+          {
+            "term": "full astern",
+            "meaning": "The order to reverse all engines at maximum power — reducing forward momentum but also removing rudder effectiveness"
+          },
+          {
+            "term": "the crow's nest",
+            "meaning": "The lookout platform high on the foremast — the two lookouts there had no binoculars on the night of April 14th, the glasses having been locked away since Southampton"
+          },
+          {
+            "term": "ice field",
+            "meaning": "A region of pack ice and bergs dense enough to require reduced speed or an altered course — multiple warnings of one ahead were received and disregarded on April 14th"
+          },
+          {
+            "term": "dead reckoning",
+            "meaning": "Navigation by calculating position from a known point using speed, heading, and elapsed time — the method used to relay Titanic's distress coordinates to Carpathia"
+          }
+        ],
+        "context": "Used by officers, quartermasters, and lookouts in the operation and command of the vessel."
+      }
     ]
   },
-  "setting": "North Atlantic, April 1912"
+  "keyEvidenceClueIds": [
+    "flooding_rate_calculation",
+    "lifeboat_capacity_manifest"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The Price of Gallantry: Carpathia is guided in and boats are well-filled, but the Black Gang and wireless operators go down with the ship — maximum passenger survival, crew lost",
+    "The Operator's Bargain: Signals are maintained and Carpathia arrives, but two lifeboats launched half-empty due to officer interference — 400 additional deaths",
+    "The Engineer's Hour: Lights stay on and boats are filled, but no SOS reaches Carpathia in time — survivors rescued only at dawn by a passing vessel, with severe hypothermia casualties"
+  ],
+  "structured_endings_enabled": false
 }

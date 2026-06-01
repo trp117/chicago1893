@@ -143,7 +143,9 @@ li { margin-bottom: 8px; }
 .closing-epilogue-separator { text-align: center; color: #4a4540; font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 0.8em; }
 .closing-epilogue-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
 .closing-epilogue-text { font-size: 0.95rem; font-style: normal; color: #b8b4ae; line-height: 1.75; margin-bottom: 1.4em; }
-.closing-epilogue-sources { font-size: 0.75rem; color: #4a4540; font-style: italic; line-height: 1.6; }
+.closing-epilogue-block { display: none; }
+.closing-epilogue-block.visible { display: block; }
+.closing-epilogue-block.visible + .closing-epilogue-block.visible { margin-top: 1.4em; }
 .closing-bibliography { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-bibliography.visible { opacity: 1; }
 .closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
@@ -631,9 +633,14 @@ li { margin-bottom: 8px; }
     <div id="closing-aftermath" class="closing-aftermath"></div>
     <div id="closing-epilogue" class="closing-epilogue">
       <div class="closing-epilogue-separator">— — —</div>
-      <div class="closing-epilogue-label">Historical Record</div>
-      <div id="closing-epilogue-text" class="closing-epilogue-text"></div>
-      <div id="closing-epilogue-sources" class="closing-epilogue-sources"></div>
+      <div id="closing-epilogue-session" class="closing-epilogue-block">
+        <div class="closing-epilogue-label">Your Session</div>
+        <div id="closing-epilogue-session-text" class="closing-epilogue-text"></div>
+      </div>
+      <div id="closing-epilogue-record" class="closing-epilogue-block">
+        <div class="closing-epilogue-label">Historical Record</div>
+        <div id="closing-epilogue-record-text" class="closing-epilogue-text"></div>
+      </div>
     </div>
     <div id="closing-bibliography" class="closing-bibliography">
       <div class="closing-bibliography-label">Primary Sources</div>
@@ -1116,8 +1123,10 @@ function showClosingScreen(endState, sessionId) {
   const proseEl       = document.getElementById('closing-prose');
   const aftermathEl   = document.getElementById('closing-aftermath');
   const epilogueEl    = document.getElementById('closing-epilogue');
-  const epTextEl      = document.getElementById('closing-epilogue-text');
-  const epSourcesEl   = document.getElementById('closing-epilogue-sources');
+  const epSessionEl     = document.getElementById('closing-epilogue-session');
+  const epSessionTextEl = document.getElementById('closing-epilogue-session-text');
+  const epRecordEl      = document.getElementById('closing-epilogue-record');
+  const epRecordTextEl  = document.getElementById('closing-epilogue-record-text');
   const bibEl         = document.getElementById('closing-bibliography');
   const bibListEl     = document.getElementById('closing-bibliography-list');
   const compNoteEl    = document.getElementById('closing-composite-note');
@@ -1146,7 +1155,8 @@ function showClosingScreen(endState, sessionId) {
       await new Promise(r => setTimeout(r, 1500));
       if (hasEpilogue) {
         epilogueEl.classList.add('visible');
-        await ttsClosingSpeak(epTextEl.textContent);
+        if (epSessionTextEl?.textContent) await ttsClosingSpeak(epSessionTextEl.textContent);
+        if (epRecordTextEl?.textContent)  await ttsClosingSpeak(epRecordTextEl.textContent);
       }
       if (hasBibliography && bibEl) {
         await new Promise(r => setTimeout(r, 500));
@@ -1205,11 +1215,17 @@ function showClosingScreen(endState, sessionId) {
             let hasEpilogue      = false;
             let hasBibliography  = false;
             let hasCompositeNote = false;
-            if (evt.epilogue?.text) {
+            const sessionText = evt.epilogue?.session_block || '';
+            const recordText  = evt.epilogue?.record_block  || '';
+            if (sessionText || recordText) {
               hasEpilogue = true;
-              epTextEl.textContent = evt.epilogue.text;
-              if (evt.epilogue.sources?.length) {
-                epSourcesEl.textContent = 'Sources: ' + evt.epilogue.sources.join('; ');
+              if (sessionText && epSessionEl && epSessionTextEl) {
+                epSessionTextEl.textContent = sessionText;
+                epSessionEl.classList.add('visible');
+              }
+              if (recordText && epRecordEl && epRecordTextEl) {
+                epRecordTextEl.textContent = recordText;
+                epRecordEl.classList.add('visible');
               }
             }
             if (evt.bibliography?.length && bibEl && bibListEl) {
