@@ -146,6 +146,13 @@ li { margin-bottom: 8px; }
 .closing-epilogue-block { display: none; }
 .closing-epilogue-block.visible { display: block; }
 .closing-epilogue-block.visible + .closing-epilogue-block.visible { margin-top: 1.4em; }
+.closing-epilogue-loading { display: none; text-align: center; margin-top: 2.4em; }
+.closing-epilogue-loading.visible { display: flex; align-items: center; justify-content: center; gap: 0.5em; }
+.closing-epilogue-loading-label { font-size: 0.72rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #d0b06a; }
+.closing-epilogue-loading-dots span { font-size: 1.2rem; color: #d0b06a; opacity: 0.35; display: inline-block; animation: epilogue-dot-breathe 2.4s ease-in-out infinite; }
+.closing-epilogue-loading-dots span:nth-child(2) { animation-delay: 0.8s; }
+.closing-epilogue-loading-dots span:nth-child(3) { animation-delay: 1.6s; }
+@keyframes epilogue-dot-breathe { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
 .closing-bibliography { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-bibliography.visible { opacity: 1; }
 .closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
@@ -631,6 +638,10 @@ li { margin-bottom: 8px; }
   <div class="closing-inner">
     <div id="closing-prose" class="closing-prose"></div>
     <div id="closing-aftermath" class="closing-aftermath"></div>
+    <div id="closing-epilogue-loading" class="closing-epilogue-loading" aria-live="polite">
+      <span class="closing-epilogue-loading-label">Composing the epilogue</span>
+      <span class="closing-epilogue-loading-dots" aria-hidden="true"><span>·</span><span>·</span><span>·</span></span>
+    </div>
     <div id="closing-epilogue" class="closing-epilogue">
       <div class="closing-epilogue-separator">— — —</div>
       <div id="closing-epilogue-session" class="closing-epilogue-block">
@@ -1132,6 +1143,7 @@ function showClosingScreen(endState, sessionId) {
   const compNoteEl    = document.getElementById('closing-composite-note');
   const compNoteTexEl = document.getElementById('closing-composite-note-text');
   const returnEl      = document.getElementById('closing-return');
+  const epLoadingEl   = document.getElementById('closing-epilogue-loading');
 
   if (!overlay || !dotsEl || !proseEl || !aftermathEl || !epilogueEl || !returnEl) {
     console.error('[CLOSING] missing DOM element — closing screen cannot show');
@@ -1154,6 +1166,7 @@ function showClosingScreen(endState, sessionId) {
       if (aftermath) await ttsClosingSpeak(aftermathEl.textContent);
       await new Promise(r => setTimeout(r, 1500));
       if (hasEpilogue) {
+        epLoadingEl?.classList.remove('visible');
         epilogueEl.classList.add('visible');
         if (epSessionTextEl?.textContent) await ttsClosingSpeak(epSessionTextEl.textContent);
         if (epRecordTextEl?.textContent)  await ttsClosingSpeak(epRecordTextEl.textContent);
@@ -1170,7 +1183,7 @@ function showClosingScreen(endState, sessionId) {
       returnEl.classList.add('visible');
     } else {
       setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-      setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
+      setTimeout(() => { if (hasEpilogue) { epLoadingEl?.classList.remove('visible'); epilogueEl.classList.add('visible'); } }, 5500);
       const bibDelay = hasEpilogue ? 10000 : 8000;
       setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, bibDelay);
       const noteDelay = bibDelay + (hasBibliography ? 2000 : 0);
@@ -1247,10 +1260,14 @@ function showClosingScreen(endState, sessionId) {
                 : names[0];
               compNoteTexEl.textContent = `${nameList} ${plural ? 'are fictional composites' : 'is a fictional composite'} placed within a documented historical context. ${plural ? 'These characters are' : 'This character is'} not based on identified historical individuals.`;
             }
+            if (!hasEpilogue) epLoadingEl?.classList.remove('visible');
             triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote);
+          } else if (evt.type === 'epilogue_pending') {
+            epLoadingEl?.classList.add('visible');
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             dotsEl.classList.add('hidden');
+            epLoadingEl?.classList.remove('visible');
             triggerClosingSequence(false, false, false);
           }
         }
@@ -1259,6 +1276,7 @@ function showClosingScreen(endState, sessionId) {
     .catch(() => {
       clearTimeout(timeoutId);
       dotsEl.classList.add('hidden');
+      epLoadingEl?.classList.remove('visible');
       triggerClosingSequence(false, false, false);
     });
 }

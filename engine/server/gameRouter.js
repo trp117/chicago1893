@@ -354,41 +354,84 @@ function getCompositeDisclosure(epilogueData, summary) {
     .map(f => ({ character_id: f.character_id, name: f.name }));
 }
 
-async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote) {
-  const interactedSet  = new Set(sessionSummary.interacted_characters || []);
-  const compositeNames = (epilogueData?.character_fates || [])
-    .filter(f => interactedSet.has(f.character_id) && f.classification === 'composite')
-    .map(f => f.name);
-  const compositeRule = compositeNames.length > 0
-    ? `COMPOSITE CHARACTER CONSTRAINT (record block only): The following characters are fictional composites — invented figures placed within a documented historical context. They have no individual historical record: ${compositeNames.join(', ')}. Do NOT assign, imply, or speculate about their individual outcomes or fates. Do NOT write phrases such as "their fate is unknown" or "what became of them is unrecorded" — these still imply a real person. If you must reference them, note only the documented role they represented (e.g. a soldier present on Dog Green Sector on June 6, 1944) without any claim about what happened to that individual.`
-    : '';
-
-  const playerNoteLayer = playerHistoricalNote
-    ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Include it in the record block.'
-    : '';
-
+async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = []) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
     : (epilogueData?.character_fates || []);
   const filteredEpilogueData = epilogueData ? { ...epilogueData, character_fates: fatesForLLM } : epilogueData;
 
-  const systemPrompt = [
-    'You are generating the epilogue for a completed Living History session. Return ONLY a valid JSON object with exactly two string keys: "session_block" and "record_block". No markdown fences, no preamble, no trailing text — just the raw JSON object.',
+  const interactedSet  = new Set(sessionSummary.interacted_characters || []);
+  const compositeNames = (epilogueData?.character_fates || [])
+    .filter(f => interactedSet.has(f.character_id) && f.classification === 'composite')
+    .map(f => f.name);
+  const compositeRule = compositeNames.length > 0
+    ? `COMPOSITE CHARACTER CONSTRAINT: The following characters are fictional composites — invented figures placed within a documented historical context. They have no individual historical record: ${compositeNames.join(', ')}. Do NOT assign, imply, or speculate about their individual outcomes or fates. Do NOT write phrases such as "their fate is unknown" or "what became of them is unrecorded" — these still imply a real person. If you must reference them, note only the documented role they represented (e.g. a soldier present on Dog Green Sector on June 6, 1944) without any claim about what happened to that individual.`
+    : '';
+
+  // ── Call 1: session block ────────────────────────────────────────────────────
+  // Inputs: sessionSummary + closingProse ONLY.
+  // Must NOT receive epilogueData, playerHistoricalNote, or compositeRule.
+  const sessionSystemPrompt = [
+    'You are writing the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
-    '══ SESSION BLOCK ══',
-    'Source: SESSION SUMMARY only.',
-    'Voice: reported past tense or second person. Not documentary. Not historian\'s record.',
-    'Content: what this player did — which characters they encountered, key decisions made, how the session ended for them.',
+    'Describe what this player did in this session: which characters they encountered, key decisions made, how the session ended for them.',
+    '',
     'Length: 60–100 words.',
-    'Rules:',
-    '- Draw ONLY from SESSION SUMMARY data. Do not use any data from the EPILOGUE DATA BLOCK here.',
-    '- Do not write in historian\'s record voice.',
-    '- Do not attribute player choices or actions to real historical people as documented fact.',
-    '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
+    'Voice: reported past tense or second person. Not documentary. Not historian\'s record.',
     '',
-    '══ RECORD BLOCK ══',
-    'Source: EPILOGUE DATA BLOCK only.',
+    'Rules:',
+    '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
+    '- Name characters ONLY from the CHARACTERS PRESENT THIS SESSION list. Never invent a name or substitute a name not on that list.',
+    '- If outcome is "unknown", state plainly that the session ended without resolution — do not imply, infer, or invent a conclusion.',
+    '- Never state an outcome the player did not reach. Never import the documented historical ending of the real event, even when the player portrayed a real historical figure.',
+    '- Do not write in historian\'s record voice.',
+    '- Do not attribute the player\'s choices or actions to real historical people as documented fact.',
+    '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
+  ].join('\n');
+
+  const npcListSection = sessionNpcList.length > 0
+    ? 'CHARACTERS PRESENT THIS SESSION (name characters only from this list — never invent a name):\n' +
+      sessionNpcList.map(c => `- ${c.name}${c.role ? ` (${c.role})` : ''}`).join('\n')
+    : 'CHARACTERS PRESENT THIS SESSION: none recorded.';
+
+  const sessionUserContent = [
+    'SESSION SUMMARY:',
+    JSON.stringify(sessionSummary, null, 2),
+    '',
+    npcListSection,
+    '',
+    'CLOSING PROSE (context only — do not repeat or continue its style):',
+    closingProse,
+  ].join('\n');
+
+  const sessionSignal = AbortSignal.timeout(30000);
+  const sessionResp = await fetch(ANTHROPIC_URL, {
+    method: 'POST', signal: sessionSignal,
+    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 200, temperature: 0.5,
+      system: sessionSystemPrompt,
+      messages: [{ role: 'user', content: sessionUserContent }],
+    }),
+  });
+  if (!sessionResp.ok) throw new Error(`Anthropic API error (session block): ${sessionResp.status}`);
+  const sessionData = await sessionResp.json();
+  const session_block = (sessionData.content?.[0]?.text?.trim()) || '';
+  if (!session_block) throw new Error('No session block text returned');
+
+  // ── Call 2: record block ─────────────────────────────────────────────────────
+  // Inputs: epilogueData + playerHistoricalNote + compositeRule +
+  //         sessionSummary scoping arrays (interacted_characters, resolved_threads,
+  //         completed_beats) for fate/thread/echo filtering only.
+  // Must NOT receive closingProse or any player narrative.
+  const playerNoteLayer = playerHistoricalNote
+    ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Include it in the record block.'
+    : '';
+
+  const recordSystemPrompt = [
+    'You are writing the "Historical Record" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
+    '',
     'Voice: historian\'s record — precise, unsentimental, no literary reach, no interiority.',
     'Content — follow this concentric circle order:',
     playerNoteLayer,
@@ -397,55 +440,48 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     '  Layer 3 — Frame: up to two facts from historical_frame relevant to what happened in this session.',
     'Length: 100–150 words.',
     'Rules:',
-    '- Draw ONLY from EPILOGUE DATA BLOCK. Do not describe what this player did, chose, or experienced. The player is not mentioned.',
-    '- Include open_threads entries only when the matching thread_id appears in the session\'s resolved_threads.',
-    '- Include choice_echoes entries only when the matching beat_id appears in the session\'s completed_beats.',
+    '- Draw ONLY from the EPILOGUE DATA BLOCK. Do not describe what this player did, chose, or experienced. The player is not mentioned.',
+    '- Include open_threads entries only when the matching thread_id appears in SESSION SCOPING resolved_threads.',
+    '- Include choice_echoes entries only when the matching beat_id appears in SESSION SCOPING completed_beats.',
     '- Do not invent, extrapolate, or editorialize. Every fact from epilogue data only.',
     '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
     '- Last sentence: a verified historical fact. Not a meaning-statement.',
     compositeRule,
   ].filter(Boolean).join('\n');
 
-  const userParts = [];
+  const recordScopingData = {
+    interacted_characters: sessionSummary.interacted_characters || [],
+    resolved_threads:      sessionSummary.resolved_threads      || [],
+    completed_beats:       sessionSummary.completed_beats       || [],
+  };
+
+  const recordUserParts = [];
   if (playerHistoricalNote) {
-    userParts.push(`PLAYER CHARACTER NOTE:\n${playerHistoricalNote}`, '');
+    recordUserParts.push(`PLAYER CHARACTER NOTE:\n${playerHistoricalNote}`, '');
   }
-  userParts.push(
-    'SESSION SUMMARY:',
-    JSON.stringify(sessionSummary, null, 2),
+  recordUserParts.push(
+    'SESSION SCOPING (use to filter character fates, open_threads, and choice_echoes — do not narrate these values):',
+    JSON.stringify(recordScopingData, null, 2),
     '',
     'EPILOGUE DATA BLOCK:',
     JSON.stringify(normalizeEpilogueForLLM(filteredEpilogueData), null, 2),
-    '',
-    'CLOSING PROSE (context only — do not repeat or continue its style):',
-    closingProse,
   );
-  const userContent = userParts.join('\n');
+  const recordUserContent = recordUserParts.join('\n');
 
-  const signal = AbortSignal.timeout(30000);
-  const resp   = await fetch(ANTHROPIC_URL, {
-    method: 'POST', signal,
+  const recordSignal = AbortSignal.timeout(30000);
+  const recordResp = await fetch(ANTHROPIC_URL, {
+    method: 'POST', signal: recordSignal,
     headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: MODEL, max_tokens: 600, temperature: 0.5,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userContent }],
+      model: MODEL, max_tokens: 400, temperature: 0.5,
+      system: recordSystemPrompt,
+      messages: [{ role: 'user', content: recordUserContent }],
     }),
   });
-  if (!resp.ok) throw new Error(`Anthropic API error: ${resp.status}`);
-  const respData = await resp.json();
-  const rawText  = respData.content?.[0]?.text?.trim();
-  if (!rawText) throw new Error('No epilogue text returned');
-
-  let session_block, record_block;
-  try {
-    const cleaned = rawText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const parsed  = JSON.parse(cleaned);
-    session_block = (parsed.session_block || '').trim();
-    record_block  = (parsed.record_block  || '').trim();
-  } catch {
-    throw new Error('Epilogue response was not valid JSON');
-  }
+  if (!recordResp.ok) throw new Error(`Anthropic API error (record block): ${recordResp.status}`);
+  const recordData = await recordResp.json();
+  let record_block = (recordData.content?.[0]?.text?.trim()) || '';
+  if (!record_block) throw new Error('No record block text returned');
 
   // Post-generation guard: strip any surviving turn-number patterns from the record block.
   if (TURN_META_RE.test(record_block)) {
@@ -1308,9 +1344,27 @@ Do not open with the historical context. Open inside the character's body. Let t
         const summary = buildEpilogueSummary(sessionState, endResult);
         console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome);
 
+        sendSse(res, { type: 'epilogue_pending' });
+
         try {
           console.log('[EPILOGUE-CLOSE] calling epilogue API');
-          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null);
+          // Resolve interacted_characters to display names, excluding the player's own character.
+          // The link is: role.real_name is a substring of the player's char.name.
+          // If real_name is empty (composite-player roles) no filtering is applied.
+          const playerRealName = role?.real_name || '';
+          const sessionNpcList = (summary.interacted_characters || [])
+            .filter(id => {
+              if (!playerRealName) return true;
+              const char = characters.find(c => c.id === id);
+              return !char || !char.name.includes(playerRealName);
+            })
+            .map(id => {
+              const char = characters.find(c => c.id === id);
+              return char ? { name: char.name, role: char.role || '' } : null;
+            })
+            .filter(Boolean);
+          console.log('[EPILOGUE-CLOSE] sessionNpcList — count:', sessionNpcList.length, 'playerExcluded:', !!playerRealName);
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList);
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,
