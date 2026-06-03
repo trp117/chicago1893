@@ -1275,13 +1275,57 @@ async function handleGenerate() {
       <p style="font-size:17px;font-weight:600;margin-bottom:10px">Claude is writing your story…</p>
       <p style="font-size:13px;color:var(--text-soft);line-height:1.6">
         Generating characters, locations, clues, player roles, and briefings.<br>
-        This usually takes <strong>30–90 seconds</strong>.
+        This usually takes <strong>5–8 minutes</strong>.
       </p>
+      <p id="gen-progress" style="font-size:12px;color:var(--text-soft);margin-top:16px">Generating… 0 tokens</p>
     </div>`;
 
   let generated;
   try {
-    generated = await apiPost('/generate', { description, playTimeMinutes });
+    const resp = await fetch(`${API}/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description, playTimeMinutes }),
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || `Server error (${resp.status})`);
+    }
+
+    const reader     = resp.body.getReader();
+    const decoder    = new TextDecoder();
+    let sseBuffer    = '';
+    let result       = null;
+    let errorMsg     = null;
+    const progressEl = document.getElementById('gen-progress');
+
+    outer:
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+        if (evt.type === 'progress') {
+          if (progressEl) progressEl.textContent = `Generating… ${evt.tokens.toLocaleString()} tokens`;
+        } else if (evt.type === 'result') {
+          result = evt.data;
+          break outer;
+        } else if (evt.type === 'error') {
+          errorMsg = evt.error;
+          break outer;
+        }
+      }
+    }
+
+    if (errorMsg) throw new Error(errorMsg);
+    if (!result)  throw new Error('No response received.');
+    generated = result;
   } catch (err) {
     setTopbar('Generation Failed', []);
     document.getElementById('content').innerHTML = `

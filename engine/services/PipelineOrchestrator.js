@@ -257,7 +257,28 @@ class PipelineOrchestrator {
       throw new Error(`Generate endpoint error ${response.status}: ${err}`);
     }
 
-    const data = await response.json();
+    const genReader  = response.body.getReader();
+    const genDecoder = new TextDecoder();
+    let genBuffer = '';
+    let data      = null;
+
+    genOuter:
+    while (true) {
+      const { done, value } = await genReader.read();
+      if (done) break;
+      genBuffer += genDecoder.decode(value, { stream: true });
+      const lines = genBuffer.split('\n');
+      genBuffer = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+        if (evt.type === 'result') { data = evt.data; break genOuter; }
+        if (evt.type === 'error')  throw new Error(`Generate endpoint error: ${evt.error}`);
+      }
+    }
+
+    if (!data) throw new Error('Generate endpoint closed without result');
     if (!data.scenario) throw new Error('Generation returned no scenario data');
     const merged = {
       ...data.scenario,

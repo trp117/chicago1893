@@ -1165,6 +1165,19 @@ export function createAdminRouter(repos, config = {}) {
     const { description, playTimeMinutes = 15 } = req.body;
     if (!description) return badRequest(res, '"description" is required.');
 
+    res.set({
+      'Content-Type':      'text/event-stream',
+      'Cache-Control':     'no-cache',
+      'Connection':        'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+    res.flushHeaders();
+    const sseSend = (obj) => {
+      res.write(`data: ${JSON.stringify(obj)}\n\n`);
+      if (typeof res.flush === 'function') res.flush();
+    };
+    sseSend({ type: 'progress', tokens: 0 });
+
     const prompt = buildGenerationPrompt({ description, playTimeMinutes: Number(playTimeMinutes) });
     const toks   = generationMaxTokens(Number(playTimeMinutes));
 
@@ -1185,9 +1198,12 @@ export function createAdminRouter(repos, config = {}) {
         );
 
         text = '';
+        let tokenCount = 0;
         for await (const chunk of stream) {
           if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
             text += chunk.delta.text;
+            tokenCount++;
+            if (tokenCount % 100 === 0) sseSend({ type: 'progress', tokens: tokenCount });
           }
         }
 
@@ -1198,12 +1214,16 @@ export function createAdminRouter(repos, config = {}) {
         if (finalMsg.stop_reason === 'max_tokens') {
           console.error(`[GENERATE ERROR] Truncated at max_tokens — ${text.length} chars, budget was ${toks}`);
           genTrace?.update({ tags: ['truncated'] });
-          return res.status(500).json({ error: 'Scenario generation failed — response truncated.', lastChars: text.slice(-500) });
+          sseSend({ type: 'error', error: 'Scenario generation failed — response truncated.' });
+          res.end();
+          return;
         }
 
         if (!text) {
           genTrace?.update({ tags: ['no-text'] });
-          return res.status(500).json({ error: 'No response from Claude.' });
+          sseSend({ type: 'error', error: 'No response from Claude.' });
+          res.end();
+          return;
         }
 
         lastErr = null;
@@ -1221,12 +1241,16 @@ export function createAdminRouter(repos, config = {}) {
         const isTimeout = err?.status === 408 || err?.code === 'ETIMEDOUT' || err?.message?.toLowerCase().includes('timeout') || err?.name === 'APITimeoutError';
         genSpan?.end({ metadata: { error: isTimeout ? 'timeout' : err.message } });
         genTrace?.update({ tags: [isTimeout ? 'timeout' : 'error'] });
-        return res.status(500).json({ error: isTimeout ? 'Generation timed out — try a shorter play time.' : err.message });
+        sseSend({ type: 'error', error: isTimeout ? 'Generation timed out — try a shorter play time.' : err.message });
+        res.end();
+        return;
       }
     }
     if (lastErr) {
       genTrace?.update({ tags: ['error'] });
-      return res.status(500).json({ error: lastErr.message });
+      sseSend({ type: 'error', error: lastErr.message });
+      res.end();
+      return;
     }
 
     const generated = extractAndValidateJson(text);
@@ -1234,25 +1258,29 @@ export function createAdminRouter(repos, config = {}) {
       console.error('[SCENARIO GEN] JSON truncated or malformed');
       console.error('[SCENARIO GEN] Last 500 chars:', text.slice(-500));
       genTrace?.update({ tags: ['invalid-json'] });
-      return res.status(500).json({
-        error: 'Scenario generation failed — response truncated. The max_tokens limit may still be too low for this scenario size.',
-        lastChars: text.slice(-500)
-      });
+      sseSend({ type: 'error', error: 'Scenario generation failed — response truncated. The max_tokens limit may still be too low for this scenario size.' });
+      res.end();
+      return;
     }
     const missing = ['scenario','storyArc','characters','locations','clues','playerRoles'].filter(k => !generated[k]);
     if (missing.length) {
       genTrace?.update({ tags: ['missing-keys'] });
-      return res.status(500).json({ error: `Generated JSON is missing: ${missing.join(', ')}`, rawText: text.slice(0,500) });
+      sseSend({ type: 'error', error: `Generated JSON is missing: ${missing.join(', ')}` });
+      res.end();
+      return;
     }
     const completenessErrors = validateGeneratedScenario(generated);
     if (completenessErrors.length > 0) {
       console.error('[SCENARIO GEN] Validation failed:', completenessErrors);
       genTrace?.update({ tags: ['validation-failed'] });
-      return res.status(500).json({ error: 'Generated scenario is incomplete', missing: completenessErrors });
+      sseSend({ type: 'error', error: 'Generated scenario is incomplete' });
+      res.end();
+      return;
     }
     genTrace?.update({ tags: ['success'], output: { scenarioId: generated.scenario?.id, characters: generated.characters?.length, locations: generated.locations?.length, clues: generated.clues?.length } });
     console.log(`[GENERATE] saved scenario=${generated.scenario?.id} chars=${generated.characters?.length} locs=${generated.locations?.length} clues=${generated.clues?.length}`);
-    return res.json(generated);
+    sseSend({ type: 'result', data: generated });
+    res.end();
   });
 
   r.post('/generate/player-briefings', async (req, res) => {
