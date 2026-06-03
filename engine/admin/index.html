@@ -330,9 +330,14 @@ async function apiFetch(method, path, body) {
   const opts = { method, headers: { 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(API + path, opts);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Server error');
-  return data;
+  if ((res.headers.get('content-type') || '').includes('text/html')) {
+    throw new Error('Session expired — please reload');
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Server error (${res.status})`);
+  }
+  return res.json();
 }
 const apiGet    = path       => apiFetch('GET',    path);
 const apiPost   = (path, b)  => apiFetch('POST',   path, b);
@@ -3707,106 +3712,104 @@ TECHNICAL FACTS TO REVIEW:
     data.scenario.technical_facts.reviewed = true;
   });
 
-  // ── Generate Technical Facts ────────────────────────────────────
-  const genTfBtn = document.getElementById('gen-tf-btn');
-  if (genTfBtn) {
-    genTfBtn.addEventListener('click', async () => {
-      if (!confirm('Generate technical facts for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+  // ── Generate Technical Facts (delegated — survives section re-render) ────────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#gen-tf-btn')) return;
+    const btn = e.target.closest('#gen-tf-btn');
 
-      const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
-      const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
-      const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
-      const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
-      const characters = (data.characters || []).map(c => ({
-        character_id:     c.id,
-        name:             c.name,
-        role:             c.role || c.publicFace || '',
-        startingKnowledge: c.startingKnowledge || [],
-      }));
-      const clues = (data.clues || []).map(cl => ({
-        id:          cl.id,
-        name:        cl.name,
-        description: cl.description || cl.content || '',
-      }));
-      const period_vocabulary = data.scenario?.period_vocabulary || '';
-      const essential_beats = (data.storyArc?.acts || [])
-        .flatMap(a => a.beats || [])
-        .filter(b => b.id?.trim() && b.description?.trim())
-        .slice(0, 10);
+    if (!confirm('Generate technical facts for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
 
-      genTfBtn.disabled    = true;
-      genTfBtn.textContent = 'Generating historical facts…';
-      try {
-        const tf = await apiPost('/generate/technical-facts', {
-          scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
-        });
-        if (!data.scenario) data.scenario = {};
-        data.scenario.technical_facts = tf;
-        const tfDetails = formEl.querySelector('#tf-data-details');
-        if (tfDetails) {
-          const newHtml = renderTechnicalFactsSection(data);
-          const tmp = document.createElement('div');
-          tmp.innerHTML = newHtml;
-          tfDetails.replaceWith(tmp.firstElementChild);
-        }
-        toast(`${tf.facts?.length || 0} technical facts generated. Verify each against its primary source before marking as reviewed.`, 'success');
-      } catch (err) {
-        toast(`Technical facts generation failed: ${err.message}`, 'error');
-      } finally {
-        genTfBtn.disabled    = false;
-        genTfBtn.textContent = data.scenario?.technical_facts?.generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts';
+    const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
+    const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
+    const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
+    const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+    const characters = (data.characters || []).map(c => ({
+      character_id:     c.id,
+      name:             c.name,
+      role:             c.role || c.publicFace || '',
+      startingKnowledge: c.startingKnowledge || [],
+    }));
+    const clues = (data.clues || []).map(cl => ({
+      id:          cl.id,
+      name:        cl.name,
+      description: cl.description || cl.content || '',
+    }));
+    const period_vocabulary = data.scenario?.period_vocabulary || '';
+    const essential_beats = (data.storyArc?.acts || [])
+      .flatMap(a => a.beats || [])
+      .filter(b => b.id?.trim() && b.description?.trim())
+      .slice(0, 10);
+
+    btn.disabled    = true;
+    btn.textContent = 'Generating historical facts…';
+    try {
+      const tf = await apiPost('/generate/technical-facts', {
+        scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
+      });
+      if (!data.scenario) data.scenario = {};
+      data.scenario.technical_facts = tf;
+      const tfDetails = formEl.querySelector('#tf-data-details');
+      if (tfDetails) {
+        const newHtml = renderTechnicalFactsSection(data);
+        const tmp = document.createElement('div');
+        tmp.innerHTML = newHtml;
+        tfDetails.replaceWith(tmp.firstElementChild);
       }
-    });
-  }
+      toast(`${tf.facts?.length || 0} technical facts generated. Verify each against its primary source before marking as reviewed.`, 'success');
+    } catch (err) {
+      toast(`Technical facts generation failed: ${err.message}`, 'error');
+      btn.disabled    = false;
+      btn.textContent = data.scenario?.technical_facts?.generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts';
+    }
+  });
 
-  // ── Generate Epilogue Data ──────────────────────────────────────
-  const genEpilogueBtn = document.getElementById('gen-epilogue-btn');
-  if (genEpilogueBtn) {
-    genEpilogueBtn.addEventListener('click', async () => {
-      if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+  // ── Generate Epilogue Data (delegated — survives section re-render) ──────────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#gen-epilogue-btn')) return;
+    const btn = e.target.closest('#gen-epilogue-btn');
 
-      const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
-      const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
-      const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
-      const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
-      const characters = (data.characters || []).map(c => ({
-        character_id: c.id,
-        name:         c.name,
-        role:         c.role || c.publicFace || '',
-      }));
-      // Filter to structured beats only (must have both id and description).
-      const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
-        .filter(b => b.id?.trim() && b.description?.trim());
-      // Cap at 10 — the epilogue system is built around the 3-6 essential beats checklist;
-      // sending all raw act beats overruns the token budget.
-      const essential_beats = allBeats.slice(0, 10);
+    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
 
-      genEpilogueBtn.disabled    = true;
-      genEpilogueBtn.textContent = 'Generating historical data…';
-      try {
-        const epilogue = await apiPost('/generate/epilogue-data', {
-          scenarioId, title, world, stakes, characters, essential_beats,
-        });
-        // Rebuild the epilogue data in the in-memory data object
-        if (!data.scenario) data.scenario = {};
-        data.scenario.epilogue = epilogue;
-        // Re-render just the epilogue section
-        const epDetails = formEl.querySelector('#epilogue-data-details');
-        if (epDetails) {
-          const newHtml = renderEpilogueSection(data);
-          const tmp = document.createElement('div');
-          tmp.innerHTML = newHtml;
-          epDetails.replaceWith(tmp.firstElementChild);
-        }
-        toast('Epilogue data generated. Review each entry carefully before marking as reviewed.', 'success');
-      } catch (err) {
-        toast(`Epilogue generation failed: ${err.message}`, 'error');
-      } finally {
-        genEpilogueBtn.disabled    = false;
-        genEpilogueBtn.textContent = data.scenario?.epilogue?.generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data';
+    const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
+    const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
+    const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
+    const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+    const characters = (data.characters || []).map(c => ({
+      character_id: c.id,
+      name:         c.name,
+      role:         c.role || c.publicFace || '',
+    }));
+    // Filter to structured beats only (must have both id and description).
+    const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
+      .filter(b => b.id?.trim() && b.description?.trim());
+    // Cap at 10 — the epilogue system is built around the 3-6 essential beats checklist;
+    // sending all raw act beats overruns the token budget.
+    const essential_beats = allBeats.slice(0, 10);
+
+    btn.disabled    = true;
+    btn.textContent = 'Generating historical data…';
+    try {
+      const epilogue = await apiPost('/generate/epilogue-data', {
+        scenarioId, title, world, stakes, characters, essential_beats,
+      });
+      // Rebuild the epilogue data in the in-memory data object
+      if (!data.scenario) data.scenario = {};
+      data.scenario.epilogue = epilogue;
+      // Re-render just the epilogue section
+      const epDetails = formEl.querySelector('#epilogue-data-details');
+      if (epDetails) {
+        const newHtml = renderEpilogueSection(data);
+        const tmp = document.createElement('div');
+        tmp.innerHTML = newHtml;
+        epDetails.replaceWith(tmp.firstElementChild);
       }
-    });
-  }
+      toast('Epilogue data generated. Review each entry carefully before marking as reviewed.', 'success');
+    } catch (err) {
+      toast(`Epilogue generation failed: ${err.message}`, 'error');
+      btn.disabled    = false;
+      btn.textContent = data.scenario?.epilogue?.generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data';
+    }
+  });
 
   // ── Generate Essential Beats ────────────────────────────────────
   const genBeatsBtn = document.getElementById('gen-beats-btn');
