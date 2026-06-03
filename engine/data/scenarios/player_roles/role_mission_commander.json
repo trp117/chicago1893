@@ -74,6 +74,7 @@
   "aliases": [],
   "context_sentence": "You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands.",
   "character_type": "real",
+  "character_id": "char_jim_lovell",
   "historical_record_note": "Jim Lovell, Commander of Apollo 13. Survived the mission. Became the first person to fly to the Moon twice without landing. Later commanded the crew of Apollo 13 in the 1995 film.",
   "fact_checked": false,
   "bridge_sentence": "Main Bus B is gone.",

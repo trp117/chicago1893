@@ -61,6 +61,7 @@
   },
   "context_sentence": "You are the Coxswain of LCA-551, and the ramp is dropping right now into water you know is too deep.",
   "character_type": "fictional",
+  "character_id": "char_petty_officer_reed",
   "represents": "Coast Guard and Navy coxswains who piloted landing craft at Omaha Beach on June 6, 1944",
   "fact_checked": false,
   "bridge_sentence": "Sixty yards out and the hull is grinding."

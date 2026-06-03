@@ -118,7 +118,7 @@ function validateGeneratedScenario(generated) {
 // Returns { errors: string[], warnings: string[] }
 // errors   = blocking (red) — scenario cannot be considered complete
 // warnings = non-blocking (yellow) — require human review before publication
-function validateStoredScenario(scenario, playerRoles, characters = []) {
+function validateStoredScenario(scenario, playerRoles, characters = [], locations = []) {
   const errors = [];
   const warnings = [];
 
@@ -169,6 +169,42 @@ function validateStoredScenario(scenario, playerRoles, characters = []) {
     if (role.entry_paragraph_flags?.length > 0) {
       warnings.push(
         `Role "${role.name}" entry paragraph has ${role.entry_paragraph_flags.length} going-wide flag(s) — review before publishing`
+      );
+    }
+  });
+
+  // De-link check: a player's own character must not appear in any location's linkedCharacterIds.
+  // character_id on the role is the authoritative link (set by the generator or manually).
+  const claimedCharacterIds = new Set(
+    (playerRoles || []).map(r => r.character_id).filter(Boolean)
+  );
+  if (claimedCharacterIds.size > 0 && locations.length > 0) {
+    claimedCharacterIds.forEach(charId => {
+      const linkedIn = (locations || []).filter(
+        l => (l.linkedCharacterIds || l.linkedNPCs || []).includes(charId)
+      );
+      if (linkedIn.length > 0) {
+        const role = (playerRoles || []).find(r => r.character_id === charId);
+        errors.push(
+          `Player character "${charId}" (role "${role?.name}") is in linkedCharacterIds of: ${linkedIn.map(l => l.id).join(', ')} — remove it to prevent player doubling`
+        );
+      }
+    });
+  }
+
+  // Soft warning: character whose name shares a significant word with an unclaimed playerRole —
+  // possible missed character_id link.
+  characters.forEach(char => {
+    if (claimedCharacterIds.has(char.id)) return;
+    const charWords = char.name.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+    const matchedRole = (playerRoles || []).find(role => {
+      if (role.character_id) return false;
+      const roleName = role.name.toLowerCase();
+      return charWords.some(w => roleName.includes(w));
+    });
+    if (matchedRole) {
+      warnings.push(
+        `Character "${char.name}" (${char.id}) shares a name with role "${matchedRole.name}" but no role has character_id pointing to it — possible unclaimed player character link`
       );
     }
   });
@@ -546,6 +582,8 @@ OUTPUT RULES:
 6. Exactly 2 clues must have isKeyEvidence: true
 7. Every playerRole MUST include briefing, character_hooks, and suggested_secret (rules below)
 8. The scenario MUST include an introduction object (rules below)
+9. For each playerRole, set character_id to the id of the matching record in the characters array if this role portrays a named character who also appears there; null otherwise. You generated both objects in the same pass — the pairing is known.
+10. Do NOT place a player's own character in any location's linkedCharacterIds — not the start location, not any other. The character record belongs in the characters array (for the epilogue layer), but must not appear in the NPC location graph anywhere.
 
 INTRODUCTION RULES (required on scenario):
 Write a 4-section pre-game reading experience in the style of a serious narrative historian — specific, cinematic, grounded in concrete detail. No genre clichés.
@@ -710,6 +748,7 @@ REQUIRED JSON STRUCTURE:
     {
       "id": "role_slug",
       "scenarioId": "your_scenario_slug",
+      "character_id": "matching_character_id_from_characters_array_or_null",
       "name": "Role Name",
       "description": "1–2 sentences shown when choosing this role",
       "startLocationId": "location_slug",
@@ -828,7 +867,8 @@ export function createAdminRouter(repos, config = {}) {
     if (!scenario) return notFound(res);
     const playerRoles  = repos.scenarios.findPlayerRoles(req.params.id);
     const characters   = repos.characters.findAll().filter(c => c.scenarioIds?.includes(req.params.id));
-    const { errors: missing, warnings } = validateStoredScenario(scenario, playerRoles, characters);
+    const locations    = repos.locations.findByScenario(req.params.id);
+    const { errors: missing, warnings } = validateStoredScenario(scenario, playerRoles, characters, locations);
     const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
     const roles = playerRoles.map(role => ({
       id:                role.id,
@@ -953,8 +993,10 @@ export function createAdminRouter(repos, config = {}) {
       return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [] });
     }
 
-    const updatedRoles = repos.scenarios.findPlayerRoles(req.params.id);
-    const { errors: remaining } = validateStoredScenario(scenario, updatedRoles);
+    const updatedRoles    = repos.scenarios.findPlayerRoles(req.params.id);
+    const validationChars = repos.characters.findAll().filter(c => c.scenarioIds?.includes(scenario.id));
+    const validationLocs  = repos.locations.findByScenario(scenario.id);
+    const { errors: remaining } = validateStoredScenario(scenario, updatedRoles, validationChars, validationLocs);
     res.json({ success: errors.length === 0, repairs, errors, remaining });
   });
 

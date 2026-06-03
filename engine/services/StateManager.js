@@ -9,6 +9,7 @@ export function buildInitialState(scenario, role, locations) {
   return {
     scenarioId:              scenario.id,
     playerRoleId:            role.id,
+    playerCharacterId:       role.character_id || null,
     playerRoleName:          role.name,
     playerRealName:          role.real_name    || null,
     playerCoverName:         role.cover_name   || null,
@@ -26,7 +27,7 @@ export function buildInitialState(scenario, role, locations) {
     threat:                  scales.threat?.default ?? 1,
     authorityTrust:          scales.authorityTrust?.default ?? 1,
     discoveredClueIds:       [],
-    introducedNpcs:          linkedChars.filter(id => id !== role.id),
+    introducedNpcs:          linkedChars.filter(id => id !== role.character_id),
     targetNpc:               null,
     suspicion:               { ...(role.roleInitialState?.suspicion || {}) },
     flags:                   { ...(role.roleInitialState?.flags || {}) },
@@ -93,7 +94,9 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
     if (last?.npc) next.targetNpc = last.npc;
     next.introducedNpcs = next.introducedNpcs || [];
     for (const m of modelOutput.npcMoments) {
-      if (m?.npc && !next.introducedNpcs.includes(m.npc)) next.introducedNpcs.push(m.npc);
+      if (!m?.npc) continue;
+      if (m.npc === next.playerCharacterId) continue;
+      if (!next.introducedNpcs.includes(m.npc)) next.introducedNpcs.push(m.npc);
     }
   }
 

@@ -61,6 +61,7 @@
   "aliases": [],
   "context_sentence": "You are Gene Kranz, Flight Director, and the loop is waiting for an answer you don't have yet.",
   "character_type": "real",
+  "character_id": "char_gene_kranz",
   "historical_record_note": "Gene Kranz, Flight Director during the Apollo 13 crisis. His white vest became iconic. His account is the basis for the film's famous \"failure is not an option\" framing (a phrase actually coined by the screenwriters, not Kranz).",
   "fact_checked": false,
   "bridge_sentence": "The telemetry wall is showing numbers that should not be possible.",

@@ -52,6 +52,7 @@
   "updatedAt": "2026-05-22T01:48:50.964Z",
   "context_sentence": "You are Mercy Voss, stationmaster of the Sandusky terminus of the Underground Railroad in October 1853, operating under the Fugitive Slave Act's threat of a thousand-dollar fine and six months' imprisonment, responsible tonight for seven people moving toward Lake Erie and a vessel captain who cannot wait past half past eleven.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network",
   "fact_checked": false,
   "bridge_sentence": "The decoded message is in your hand."

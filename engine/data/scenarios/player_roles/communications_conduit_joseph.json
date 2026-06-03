@@ -49,6 +49,7 @@
   "updatedAt": "2026-05-24T03:30:00.389Z",
   "context_sentence": "You are Joseph McNeil, seated at the Woolworth's lunch counter, and the floor walker is tightening his orbit around your stool.",
   "character_type": "real",
+  "character_id": null,
   "historical_record_note": "Joseph McNeil. His experience being refused service at a Greensboro bus terminal lunch counter in January 1960 was the immediate catalyst for the sit-in. Later became a USAF Brigadier General.",
   "fact_checked": false,
   "bridge_sentence": "The waitress has walked away.",

@@ -74,6 +74,7 @@
   },
   "context_sentence": "You are Klaus Mehner, an ARD camera operator stationed at the Bornholmer Straße checkpoint on the night of November 9, 1989, the first border crossing point in Berlin to open — the breach that preceded every other gate by nearly an hour.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "West German ARD television camera operators covering the Bornholmer Straße opening on November 9, 1989",
   "fact_checked": false,
   "bridge_sentence": "The fog has carried the crowd noise over the bridge."

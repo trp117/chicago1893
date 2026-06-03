@@ -49,6 +49,7 @@
   "updatedAt": "2026-05-22T22:09:01.861Z",
   "context_sentence": "You are Benezette Williams, the civil engineer contracted by the Village of Western Springs to design and oversee construction of a combined waterworks and standpipe tower, whose 1892 artesian well project at a depth exceeding 1,800 feet was intended to secure the village's water independence ahead of Chicago's expanding annexation pressure.",
   "character_type": "real",
+  "character_id": "char_benezette_williams",
   "represents": "",
   "fact_checked": false,
   "ending_notes": {

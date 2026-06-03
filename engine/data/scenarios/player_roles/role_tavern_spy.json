@@ -35,6 +35,7 @@
   "updatedAt": "2026-05-22T01:46:48.484Z",
   "context_sentence": "\"You are a printer's apprentice in Boston, one of the anonymous young men who carried intelligence between the Sons of Liberty's inner circle and the city's taverns and wharves in the weeks surrounding the destruction of the tea aboard the Dartmouth, Eleanor, and Beaver on the night of December 16, 1773.\"",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Informants and message carriers working for the Sons of Liberty in Boston in 1773",
   "fact_checked": false,
   "bridge_sentence": "The candle in the back booth has burned to the saucer."

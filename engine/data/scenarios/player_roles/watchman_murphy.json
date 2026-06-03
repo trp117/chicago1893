@@ -47,6 +47,7 @@
   "updatedAt": "2026-05-22T01:47:35.388Z",
   "context_sentence": "You are Watchman Murphy, a night security guard employed by the Columbian Guard auxiliary at the 1893 World's Columbian Exposition in Chicago, where over 27 million visitors passed through the fairgrounds and a network of freight tunnels and service corridors ran beneath the White City largely unmonitored after dark.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Night watchmen and security personnel employed at the World's Columbian Exposition, Chicago, 1893",
   "fact_checked": false,
   "bridge_sentence": "The freight yard has been quiet since the whistle at eleven."

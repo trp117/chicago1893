@@ -62,6 +62,7 @@
   },
   "context_sentence": "You are the Battalion Medic, and the man dying in your hands is not the man you need to reach.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Battalion aid men of the 116th Infantry Regiment at Omaha Beach on June 6, 1944",
   "fact_checked": false,
   "bridge_sentence": "The tide is at your elbows now."

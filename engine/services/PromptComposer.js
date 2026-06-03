@@ -445,6 +445,7 @@ function getCharacterLocations(charId, locations) {
 function getRelevantCharacters(state, location, characters, locations) {
   const ids = new Set(location?.linkedCharacterIds || location?.linkedNPCs || []);
   const currentLocId = location?.id;
+  const playerCharId = state.playerCharacterId || null;
 
   Object.entries(state.suspicion || {})
     .filter(([, score]) => score > 0)
@@ -455,16 +456,20 @@ function getRelevantCharacters(state, location, characters, locations) {
       if (charLocs.includes(currentLocId) || charLocs.length > 1) ids.add(id);
     });
 
-  return characters.filter(c => ids.has(c.id)).map(slimCharacter);
+  return characters
+    .filter(c => ids.has(c.id) && c.id !== playerCharId)
+    .map(slimCharacter);
 }
 
-export function buildCharacterRoutes(characters, locations) {
-  return characters.map(char => {
-    const locs = locations
-      .filter(l => (l.linkedCharacterIds || l.linkedNPCs || []).includes(char.id))
-      .map(l => l.id);
-    return { npc: char.id, name: char.name, locations: locs };
-  });
+export function buildCharacterRoutes(characters, locations, playerCharacterId = null) {
+  return characters
+    .filter(c => !playerCharacterId || c.id !== playerCharacterId)
+    .map(char => {
+      const locs = locations
+        .filter(l => (l.linkedCharacterIds || l.linkedNPCs || []).includes(char.id))
+        .map(l => l.id);
+      return { npc: char.id, name: char.name, locations: locs };
+    });
 }
 
 // ── TTS ────────────────────────────────────────────────────────────────────────
@@ -599,12 +604,12 @@ function buildLocationConstraint(locationId) {
 }
 
 function buildNpcIntroInstruction(state, location, characters, playerInput = '') {
-  const introduced  = state.introducedNpcs || [];
-  const playerRoleId = state.playerRoleId || '';
-  const linkedIds   = location?.linkedCharacterIds || location?.linkedNPCs || [];
+  const introduced      = state.introducedNpcs || [];
+  const playerCharId    = state.playerCharacterId || '';
+  const linkedIds       = location?.linkedCharacterIds || location?.linkedNPCs || [];
 
   let newChars = linkedIds
-    .filter(id => !introduced.includes(id) && id !== playerRoleId)
+    .filter(id => !introduced.includes(id) && id !== playerCharId)
     .filter(id => !state.targetNpc || id === state.targetNpc)
     .map(id => characters.find(c => c.id === id))
     .filter(Boolean);
@@ -612,7 +617,7 @@ function buildNpcIntroInstruction(state, location, characters, playerInput = '')
   if (newChars.length === 0 && MOVEMENT_RE.test(playerInput)) {
     const inputLower = playerInput.toLowerCase();
     for (const char of characters) {
-      if (introduced.includes(char.id) || char.id === playerRoleId) continue;
+      if (introduced.includes(char.id) || char.id === playerCharId) continue;
       const lastName  = char.name.split(' ').pop().toLowerCase();
       const firstName = char.name.split(' ')[0].toLowerCase();
       if (inputLower.includes(lastName) || inputLower.includes(firstName)) {
@@ -693,7 +698,7 @@ export function checkEndingReadiness(state, scenario) {
 export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues }) {
   const location      = getLocationById(state.location, locations);
   const relevantChars = getRelevantCharacters(state, location, characters, locations);
-  const charRoutes    = buildCharacterRoutes(characters, locations);
+  const charRoutes    = buildCharacterRoutes(characters, locations, state.playerCharacterId);
   const endingSignals = checkEndingReadiness(state, scenario);
 
   const refContext    = buildReferenceContext(playerInput, state, locations);

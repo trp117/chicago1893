@@ -62,6 +62,7 @@
   },
   "context_sentence": "You are Harold Bride, junior wireless operator aboard the RMS Titanic, and at 12:15 AM on April 15, 1912, you and Senior Operator Jack Phillips began transmitting the distress call CQD MGY — the first such signal ever sent by the largest ship afloat.",
   "character_type": "real",
+  "character_id": "jack_phillips",
   "historical_record_note": "Jack Phillips, Senior Wireless Operator aboard RMS Titanic. Remained at his post transmitting CQD and SOS distress calls after Captain Smith released him from duty. Died in the sinking. Body never recovered.",
   "fact_checked": false,
   "bridge_sentence": "Phillips has not stopped sending."

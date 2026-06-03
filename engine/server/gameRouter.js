@@ -1349,21 +1349,17 @@ Do not open with the historical context. Open inside the character's body. Let t
         try {
           console.log('[EPILOGUE-CLOSE] calling epilogue API');
           // Resolve interacted_characters to display names, excluding the player's own character.
-          // The link is: role.real_name is a substring of the player's char.name.
-          // If real_name is empty (composite-player roles) no filtering is applied.
-          const playerRealName = role?.real_name || '';
+          // Keyed off state.playerCharacterId (set from role.character_id).
+          // No-op when playerCharacterId is null (fictional/composite-player roles).
+          const playerCharacterId = sessionState?.playerCharacterId || null;
           const sessionNpcList = (summary.interacted_characters || [])
-            .filter(id => {
-              if (!playerRealName) return true;
-              const char = characters.find(c => c.id === id);
-              return !char || !char.name.includes(playerRealName);
-            })
+            .filter(id => !playerCharacterId || id !== playerCharacterId)
             .map(id => {
               const char = characters.find(c => c.id === id);
               return char ? { name: char.name, role: char.role || '' } : null;
             })
             .filter(Boolean);
-          console.log('[EPILOGUE-CLOSE] sessionNpcList — count:', sessionNpcList.length, 'playerExcluded:', !!playerRealName);
+          console.log('[EPILOGUE-CLOSE] sessionNpcList — count:', sessionNpcList.length, 'playerExcluded:', !!playerCharacterId);
           epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList);
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {

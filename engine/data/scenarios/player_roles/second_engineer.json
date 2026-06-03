@@ -62,6 +62,7 @@
   },
   "context_sentence": "You are Jonathan Shepherd, Second Engineer aboard RMS Titanic, one of the licensed engineering officers responsible for the reciprocating engine room on the night of April 14, 1912, who died at his post before the ship foundered at 2:20 AM and whose body was never recovered.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Engineering officers of RMS Titanic who maintained power at their stations during the sinking on April 14-15, 1912",
   "fact_checked": false,
   "bridge_sentence": "The saltwater smell reached the engine flat seven minutes ago."

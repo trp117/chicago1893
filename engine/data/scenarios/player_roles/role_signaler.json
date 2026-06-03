@@ -70,6 +70,7 @@
   },
   "context_sentence": "You are a Signal Corps lineman of the 1st Division, American Expeditionary Forces, one of the wire teams that advanced behind the assault infantry at Cantigny on May 28, 1918 — the first offensive operation conducted by American forces in the First World War.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Signal Corps linemen of the 1st Division who advanced behind the assault infantry at Cantigny on May 28, 1918",
   "fact_checked": false,
   "bridge_sentence": "The wire from battalion has been cut for six minutes."

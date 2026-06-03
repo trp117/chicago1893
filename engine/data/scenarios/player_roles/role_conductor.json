@@ -49,6 +49,7 @@
   "updatedAt": "2026-05-22T01:48:24.735Z",
   "context_sentence": "You are Elias Cutter, a freight hauler and eleven-year conductor on the Ohio corridor of the Underground Railroad, moving three freedom seekers north toward Lake Erie in October 1856, operating in direct violation of the Fugitive Slave Act of 1850, which mandated federal prosecution of anyone who aided an escaped slave.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Underground Railroad conductors operating in the Ohio corridor in the 1850s",
   "fact_checked": false,
   "bridge_sentence": "The sounder went quiet eleven minutes ago."

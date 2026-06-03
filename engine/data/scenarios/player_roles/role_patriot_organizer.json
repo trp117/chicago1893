@@ -35,6 +35,7 @@
   "updatedAt": "2026-05-22T01:46:46.240Z",
   "context_sentence": "\"You are Paul Revere, silversmith and dispatch rider for the Sons of Liberty, who on the night of December 16, 1773, coordinated the signal network between Old South Meeting House and Griffin's Wharf that launched the destruction of 342 chests of East India Company tea.\"",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Inner-circle lieutenants of Samuel Adams and the Sons of Liberty who organized and executed the Boston Tea Party on December 16, 1773",
   "fact_checked": false,
   "bridge_sentence": "The chanting from the wharf has carried to the hill."

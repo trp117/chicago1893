@@ -62,6 +62,7 @@
   },
   "context_sentence": "You are a First Class steward assigned to C-Deck aboard RMS Titanic on the night of April 14–15, 1912, one of the 908 crew members who knew the ship's locked gate system separated Third Class passengers from the boat deck on a vessel carrying lifeboats sufficient for fewer than half the souls aboard.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "First class stewards aboard RMS Titanic on the night of April 14-15, 1912",
   "fact_checked": false,
   "bridge_sentence": "The band has started its fourth number since the collision."

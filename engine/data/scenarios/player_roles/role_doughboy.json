@@ -74,6 +74,7 @@
   },
   "context_sentence": "You are Corporal Daniel Marsh, a squad leader in the 28th Infantry Regiment, 1st Division, United States Army, one of approximately 3,500 American soldiers who stepped off at 6:45 a.m. on May 28, 1918, in the first independent American offensive operation of the First World War.",
   "character_type": "fictional",
+  "character_id": null,
   "represents": "Enlisted men of the 28th Infantry Regiment, 1st Division, United States Army, who assaulted Cantigny on May 28, 1918",
   "fact_checked": false,
   "bridge_sentence": "The wool is soaked through to your skin."
