@@ -1,0 +1,18 @@
+{
+  "id": "loc_algiers_rooftop",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "Algiers Rooftop — Mirror Array",
+  "description": "The peaked roof of the Algiers house, accessible from the attic window, holds a hand-assembled signal mirror array that has been 22 degrees off optimal alignment since 3:00 PM; from here the Industrial Canal corridor is visible as a dark stripe through the flooded grid to the east.",
+  "mood": "exposed, critical, vertiginous",
+  "linkedCharacterIds": [],
+  "atmosphericDetails": [
+    "The mirror array consists of three salvaged bathroom mirrors mounted on a wooden frame with adjustable wing-nut brackets; the frame has shifted on its base, rotating the entire assembly clockwise from optimal east-northeast alignment",
+    "From the roof peak, the St. Claude Bridge is visible as a concrete line above the flood plane approximately a mile to the east-northeast — a small dark mass of people visible on the deck in the afternoon haze",
+    "The flat white-yellow light that offers no shadow also offers no reference point for alignment; optimal positioning requires sighting against a known landmark",
+    "The roof surface is hot enough to blister unprotected skin; the tar paper is soft"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.803Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

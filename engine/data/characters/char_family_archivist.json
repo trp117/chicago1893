@@ -1,0 +1,39 @@
+{
+  "id": "char_family_archivist",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
+  ],
+  "name": "Marcus Fontenot",
+  "role": "Asset custodian, flooded residence on Flood Street",
+  "publicFace": "A quiet man in his mid-fifties who stayed behind when everyone else left; the bridge camp knows him as the person who went back for the box",
+  "privateGoal": "Recover the deed and the 1962 ledger intact — not just for his family's property claim, but because the ledger documents what was done to four properties in a period that nobody in this ward names directly, and he will not let that record dissolve in silt",
+  "fear": "That the northwest plaster block releases while he is working on the lock, and the box is crushed, and he has to tell his mother what happened",
+  "knowledge": [
+    "He helped his father nail the lath in this ceiling in 1978 and knows exactly where the keys were doubled and where they were not",
+    "The silt smell thickening as the water drops has a sweet chemical undertone he has decided not to identify — he knows what it is",
+    "The lock mechanism on the deed box was already stiff in a dry year; the silt packing means forcing it is the only option, and forcing it wrong will shear the hinge",
+    "The 1962 ledger documents property transfers involving four families that were conducted under duress during a period of deliberate displacement — the kind of record that has never been safe to put down"
+  ],
+  "voice": "Methodical, observational — describes what he sees with the precision of someone who has learned that accuracy is a form of control when everything else is not",
+  "trustLogic": "Opens to people who demonstrate they understand what is actually at stake with the documents — not just the property claim, but the history; shuts down when people treat the box as a logistical problem rather than what it is",
+  "secrets": [
+    "He knows the sweet chemical smell in the water is Aeromonas hydrophila — he read about floodwater wound infections in a pamphlet at the staging area before he came back; he has a cut on his left palm from the crowbar",
+    "He has already decided that if he has to choose between the deed and the ledger, he will take the ledger"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Continues working while he talks; does not stop moving to answer questions",
+    "heavyPressure": "Stops, looks directly at the person, and asks them to explain what they think they know",
+    "breakingPoint": "Will not explain what is in the 1962 ledger to anyone he does not trust completely",
+    "fleeCondition": "If the plaster block shifts",
+    "fleeStyle": "Controlled withdrawal — back-paddles the kayak toward the doorframe without sudden movement",
+    "chaseStyle": "",
+    "capturedBehavior": "Cooperative but minimal — gives location and status, nothing more",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.800Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

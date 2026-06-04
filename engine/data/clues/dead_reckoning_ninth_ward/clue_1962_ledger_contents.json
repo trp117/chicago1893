@@ -1,0 +1,17 @@
+{
+  "id": "clue_1962_ledger_contents",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "title": "The 1962 Ledger — Property Transfer Record",
+  "description": "The ledger's pages are partially legible despite saturation; the entries in a heavy-pressed hand document four property transfers in a specific two-year period, with notations that include the phrase 'under instruction' and amounts that are approximately forty percent below assessed value for comparable properties. The four addresses are all within two blocks of the current flood zone. The lower pages are liquefying at the binding.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_flood_street_house",
+  "implicatesCharacterIds": [
+    "char_family_archivist"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.811Z",
+  "locationId": "",
+  "isRedHerring": false
+}

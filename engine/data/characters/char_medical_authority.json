@@ -1,0 +1,38 @@
+{
+  "id": "char_medical_authority",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
+  ],
+  "name": "Celestine Arceneaux",
+  "role": "Retired nurse, bridge camp medical monitor",
+  "publicFace": "A small, precise woman in her late sixties who has been doing wound checks and hydration assessments since the first morning without being asked; the camp treats her as the closest thing to a medical authority they have",
+  "privateGoal": "Get the two floodwater wound cases evacuated on the first available MEDEVAC asset — she has watched Aeromonas progress before and she knows exactly how much time is left",
+  "fear": "That the wound cases will be triaged below the MEDEVAC threshold because they are ambulatory and the coordinators will not understand that ambulatory does not mean stable",
+  "knowledge": [
+    "Both wound cases are showing early erythema and localized swelling consistent with Aeromonas hydrophila exposure; without antibiotics, systemic infection with fever and bacteremia is likely within 24 to 48 hours",
+    "The pediatric antibiotics in the skiff crate are the correct formulation — she recognized the pharmaceutical lot number when Loretta described it",
+    "One of the two wound cases is a child; the other is an elderly man who is also showing signs of medication deprivation for a chronic cardiac condition",
+    "The heat index on the bridge deck has been above 100 degrees since 10:00 AM; the most vulnerable population members — the elderly and the very young — are already at the edge of their endurance envelope"
+  ],
+  "voice": "Clinical, unhurried, specific — she uses medical terminology without apology and translates it without condescension",
+  "trustLogic": "Opens to anyone who asks specific questions; shuts down when people ask her to soften her assessments for population management purposes",
+  "secrets": [
+    "She has been giving her own water ration to the cardiac patient since yesterday morning; she is more dehydrated than anyone on the bridge deck except the people she is monitoring"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Repeats her assessment in different words until it is understood",
+    "heavyPressure": "Writes the clinical finding on whatever surface is available and hands it to the person questioning her",
+    "breakingPoint": "Will not pretend a wound is less serious than it is for any logistical reason",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Gives full clinical status of every patient she is monitoring without being asked",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.797Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

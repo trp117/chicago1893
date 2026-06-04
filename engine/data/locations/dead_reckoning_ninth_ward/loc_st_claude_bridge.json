@@ -1,0 +1,23 @@
+{
+  "id": "loc_st_claude_bridge",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "St. Claude Avenue Bridge — Camp Deck",
+  "description": "The concrete deck of the double-leaf bascule span sits twenty-two feet above the flood plane, its surface radiating stored heat at 4:45 PM as eighty survivors arrange themselves in the load-bearing configurations established on the first morning. The smell is salt marsh, diesel, and sun-baked organic matter; there is no shade and no wind.",
+  "mood": "tense, exhausted, organized, fragile",
+  "linkedCharacterIds": [
+    "char_dissenter",
+    "char_medical_authority",
+    "char_runner"
+  ],
+  "atmosphericDetails": [
+    "The concrete deck has been holding heat since 7:00 AM and it is not releasing it; the surface temperature through boot soles is measurable",
+    "Eighty people arranged in clusters — the specific spacing of a population that has learned to distribute its weight without being told why",
+    "From the northern railing, the Industrial Canal stretches south toward the levee breach site; the water is the color of setting concrete and absolutely still",
+    "A skiff with a red-cross crate knocks against the piling six feet below the deck edge, its motor idling",
+    "The southern maintenance panel, if you know to look for it, sits flush with the deck surface near the counterweight housing"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.806Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

@@ -1,0 +1,20 @@
+{
+  "id": "loc_bridge_piling_access",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "St. Claude Bridge — Piling Access and Skiff",
+  "description": "The maintenance ladder on the bridge's eastern face descends to a concrete ledge at water level where the skiff is moored; the crate stenciled with a red cross and a pharmaceutical lot number sits on the bow, and Devereux Molina watches the bridge deck from below.",
+  "mood": "urgent, transactional, exposed",
+  "linkedCharacterIds": [
+    "char_skiff_operator"
+  ],
+  "atmosphericDetails": [
+    "The water at piling level is the same grey-brown as the water everywhere — fuel iridescence visible in a thin film on the surface near the motor",
+    "The crate is stenciled with lot number consistent with a saline and electrolyte package; the sealed secondary package inside is not visible from the bridge deck",
+    "The canal surface reflects the flat white-yellow sky without distortion; there are no ripples except from the idling motor",
+    "The smell at water level is more chemical than at deck level — the petroleum hydrocarbon component is stronger here"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.807Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

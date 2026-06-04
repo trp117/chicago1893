@@ -1,0 +1,17 @@
+{
+  "id": "clue_wound_cases_status",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "title": "Cellulitis Progression — Two Floodwater Wound Cases",
+  "description": "Celestine Arceneaux's informal case notes, written on the back of an MRE accessory pack wrapper, document two floodwater wound cases: one child, one elderly male. Both show erythema and localized swelling consistent with Aeromonas hydrophila exposure. The notation reads: '24-48 hrs to systemic without abx.' The pharmaceutical lot number on the skiff crate matches the antibiotic formulation.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_st_claude_bridge",
+  "implicatesCharacterIds": [
+    "char_medical_authority"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.808Z",
+  "locationId": "",
+  "isRedHerring": false
+}

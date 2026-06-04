@@ -1,0 +1,19 @@
+{
+  "id": "clue_triage_discrepancy",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "title": "The Flood Street Count Discrepancy",
+  "description": "Two triage sheets on the card table, both marked with the Flood Street address in the same block notation, carry different casualty counts: one reads three survivors, one reads two. Neither sheet is annotated with a correction timestamp or a runner's initials. If the wrong number goes to Sergeant Duplessis, the operations post will allocate resources against a figure that does not match the actual population — and the wrong number is not a rounding error, it is a MEDEVAC priority calculation.",
+  "category": "documentary",
+  "discoveryLocationId": "loc_algiers_attic",
+  "implicatesCharacterIds": [
+    "char_runner"
+  ],
+  "unlocks": [
+    "clue_runner_wet_sheet"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.813Z",
+  "locationId": "",
+  "isRedHerring": false
+}

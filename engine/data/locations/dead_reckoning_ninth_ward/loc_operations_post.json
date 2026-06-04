@@ -1,0 +1,20 @@
+{
+  "id": "loc_operations_post",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "Emergency Operations Post — Sergeant Duplessis",
+  "description": "The forward operations post is a converted school bus at the edge of the dry road corridor north of the Industrial Canal, its radio equipment running off a generator that has been cycling on and off since this morning; Sergeant Duplessis manages the sector triage log from a folding table outside.",
+  "mood": "overwhelmed, bureaucratic, pivotal",
+  "linkedCharacterIds": [
+    "char_medical_authority"
+  ],
+  "atmosphericDetails": [
+    "The generator provides intermittent power; the radio is functional on VHF Channel 22A and Channel 16 but the operator has been logging traffic from four sectors simultaneously",
+    "The triage log is a ruled composition notebook with entries in three different handwriting styles — the shift changes are visible in the ink color",
+    "A reconnaissance airframe is scheduled to pass over the Lower Ninth Ward sector within the next forty minutes; its coordinates will be logged against whatever the operations post has on record for active survivor locations",
+    "The road surface here is dry — the first dry road surface within a mile of the canal; the contrast with the flooded grid to the south is absolute"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.804Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

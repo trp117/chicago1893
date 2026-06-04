@@ -1,0 +1,21 @@
+{
+  "id": "loc_flood_street_house",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "Flood Street Residence — Flooded Interior",
+  "description": "Three feet of grey silt water fills the ground floor of this shotgun house; the canvas kayak holds its position against the doorframe between the front room and the hall, and the deed box sits on the floor beneath a plaster block that has been shifting since the wet collapse two days ago.",
+  "mood": "claustrophobic, precarious, suffocating",
+  "linkedCharacterIds": [
+    "char_runner"
+  ],
+  "atmosphericDetails": [
+    "The silt smell is thickening as the water level drops — sweet and chemical underneath the river mud, a specific compound that experienced flood workers would recognize immediately",
+    "The silt line on the baseboard has dropped four inches since midmorning; the suspended particulate is consolidating, which means the box's lower seam is almost certainly packed",
+    "The ceiling above the left quadrant is stable at center and failing at its northwest corner; a plaster block the size of a dictionary, saturated weight approximately fifty-five pounds, sits directly over the box's left seam",
+    "The light inside is the color of river water filtered through a dirty window — flat, brownish, directionless",
+    "The 1978 lath work is visible where the plaster has already released from the northeast corner; the doubled keys are holding, the single keys are not"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.805Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

@@ -1,0 +1,117 @@
+{
+  "id": "dead_reckoning_ninth_ward_main_arc",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "name": "The Five-Day Window",
+  "premise": "Three survivors at three pressure points must coordinate across failing infrastructure — a bridge camp, a flooded house, and an attic radio station — to keep their sector alive and signal their location before resources, power, and time run out.",
+  "goal": "Transmit accurate triage coordinates to the emergency operations post, maintain the bridge camp population above critical resource threshold, and recover the family land deed before federal relief makes contact with the St. Claude Bridge camp.",
+  "openingSituation": "It is 4:45 PM on September 2, 2005. The battery voltage reads 11.8. The Community_Resource_Reserve stands at 380 fluid ounces. The mirror array has been 22 degrees off optimal alignment for nearly two hours. A skiff with a red-cross crate is knocking against the bridge piling. A plaster block is shifting above a waterlogged iron box. The arithmetic does not change no matter how many times it is done.",
+  "acts": [
+    {
+      "actNumber": 1,
+      "name": "Separate Reckonings",
+      "minuteRange": [
+        0,
+        7
+      ],
+      "beats": [
+        {
+          "id": "the_communications_pivot",
+          "description": "The Communications Pivot discovers the triage sheet discrepancy — two sheets, same address on Flood Street, two different casualty counts — and must decide whether to query runner Theo Delacroix before transmitting or send the best available figure now"
+        },
+        {
+          "id": "the_triage_coordinator",
+          "description": "The Triage Coordinator assesses the skiff delivery: accepting the saline crate increases medical capacity but the act of distribution will expose the gap between the announced water reserve and the actual figure, potentially destabilizing Renard Tureaud's faction"
+        },
+        {
+          "id": "the_asset_custodian",
+          "description": "The Asset Custodian takes the slow breath, calculates the plaster block's saturated weight at approximately fifty-five pounds, and makes the first move toward the deed box — or waits one more minute for the kayak to fully stabilize"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 2,
+      "name": "The Information Problem",
+      "minuteRange": [
+        7,
+        15
+      ],
+      "beats": [
+        {
+          "id": "runner_theo_delacroix",
+          "description": "Runner Theo Delacroix arrives at the bridge camp with a corrected casualty count from the Flood Street address — but the correction introduces a new problem: the count includes two survivors with open floodwater wounds showing early cellulitis signs, which changes the MEDEVAC priority classification"
+        },
+        {
+          "id": "the_communications_pivot",
+          "description": "The Communications Pivot learns from Devereux Molina's boat radio that the mirror array signal from the Algiers attic has been degraded for nearly two hours — anything the bridge camp read from that position may be wrong, and the reconnaissance airframe window is closing"
+        },
+        {
+          "id": "the_asset_custodian",
+          "description": "The Asset Custodian reaches the deed box but the lock mechanism is packed with consolidated silt; forcing it risks shearing the hinge and destroying the contents, but waiting risks the northwest plaster block releasing without warning"
+        },
+        {
+          "id": "celestine_arceneaux_the",
+          "description": "Celestine Arceneaux, the retired nurse at the bridge camp, confirms the cellulitis progression timeline: without the antibiotics in the skiff crate, the two wound cases will reach systemic infection within 24 to 48 hours — but accepting the crate means Renard Tureaud learns the actual water reserve figure"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 3,
+      "name": "The Convergence",
+      "minuteRange": [
+        15,
+        23
+      ],
+      "beats": [
+        {
+          "id": "the_communications_pivot",
+          "description": "The Communications Pivot must transmit the corrected coordinate package to Sergeant Duplessis at the operations post — the voltage is at 11.2 and falling, the drift is audible in the carrier wave, and the phonetic alphabet transmission of the grid reference will draw approximately 4 amperes for the duration"
+        },
+        {
+          "id": "renard_tureauds_faction",
+          "description": "Renard Tureaud's faction moves toward the skiff — the specific casualness of people who have made a decision — forcing the Triage Coordinator to choose between confrontation, concession, or a third option that spends the gap between announced and actual reserves"
+        },
+        {
+          "id": "the_asset_custodian",
+          "description": "The Asset Custodian gets the box open: the deed is present and legible, but the 1962 ledger's lower pages are partially liquefied at the binding; getting both documents to the bridge camp requires navigating two flooded blocks in a loaded kayak before the paper fibers complete their collapse"
+        },
+        {
+          "id": "the_reconnaissance_airframe",
+          "description": "The reconnaissance airframe makes its first pass at 16,000 feet — Signal_Beacon_Visibility is checked against the 75-point threshold; if the mirror array has not been corrected, this pass registers the sector only as a probable coordinate"
+        }
+      ],
+      "title": ""
+    },
+    {
+      "actNumber": 4,
+      "name": "First Contact",
+      "minuteRange": [
+        23,
+        30
+      ],
+      "beats": [
+        {
+          "id": "the_coordinate_transmission",
+          "description": "The coordinate transmission either reaches Sergeant Duplessis accurately or does not — the battery cuts to 10.5 volts during or after the transmission, and the rig goes QRT; what happens next depends entirely on whether the phonetic alphabet was clean and the grid reference was correct"
+        },
+        {
+          "id": "federal_relief_assets",
+          "description": "Federal relief assets — two Coast Guard rigid inflatables and a National Guard logistics truck at the north bridge approach — make first contact with the St. Claude Bridge camp; Community_Resource_Reserve is checked against the 40 fluid ounce threshold"
+        },
+        {
+          "id": "the_asset_custodian",
+          "description": "The Asset Custodian reaches the bridge camp with the deed box; the legal condition of the documents is assessed against the decay envelope — legible, contestable, or destroyed"
+        },
+        {
+          "id": "the_sectors_outcome",
+          "description": "The sector's outcome is fixed: the specific combination of what was transmitted, what was preserved, what was conserved, and what was spent determines which version of this afternoon enters the record that nobody will officially keep"
+        }
+      ],
+      "title": ""
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:20:58.796Z",
+  "opening": ""
+}
