@@ -1,0 +1,20 @@
+{
+  "id": "claiborne_avenue_staging_point",
+  "scenarioId": "high_water_reckoning",
+  "name": "Claiborne Avenue Overpass — Informal Supply Staging Area",
+  "description": "The underside of the Claiborne Avenue overpass, where the elevated roadway provides a dry platform above the flood plane. Two additional pharmaceutical crates are stacked here, covered with a blue tarpaulin, undisclosed to any official relief inventory.",
+  "mood": "hidden, transactional, morally ambiguous",
+  "linkedCharacterIds": [
+    "father_clement_tureaud",
+    "darnell_arceneaux"
+  ],
+  "atmosphericDetails": [
+    "The tarpaulin is weighed down with a concrete block — someone placed it deliberately, not hastily",
+    "A handwritten inventory list is taped to the inside of the nearest crate's lid, in Father Clement's recognizable block lettering",
+    "The sound of water moving against the overpass supports below — steady, indifferent"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.050Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

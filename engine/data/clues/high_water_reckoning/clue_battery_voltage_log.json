@@ -1,0 +1,15 @@
+{
+  "id": "clue_battery_voltage_log",
+  "scenarioId": "high_water_reckoning",
+  "title": "Handwritten Battery Voltage Log",
+  "description": "A column of voltage readings in Ida Broussard's handwriting on the back of a triage sheet, recorded at irregular intervals over the past six hours. The readings show a consistent 3% drop per minute of sustained transmission and a 0.5% passive drain per hour of standby. The most recent reading, taken eleven minutes ago, was 22%. The log includes a small notation in the margin: 'next window 11 min — burst only — DO NOT run full text.' This is Ida's own pre-crisis planning, written before the coordinate error was discovered.",
+  "category": "documentary",
+  "discoveryLocationId": "algiers_attic_radio_post",
+  "implicatesCharacterIds": [],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.057Z",
+  "locationId": "",
+  "isRedHerring": false
+}

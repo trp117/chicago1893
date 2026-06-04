@@ -1,0 +1,17 @@
+{
+  "id": "emergency_operations_relay_point",
+  "scenarioId": "high_water_reckoning",
+  "name": "Emergency Operations Post — West Bank Radio Relay",
+  "description": "A National Guard communications tent on the west bank of the river, accessible only through radio contact — the receiving end of Ida Broussard's transmission, staffed by net control operator Sergeant Dwayne Mouton.",
+  "mood": "bureaucratic, procedural, pressured",
+  "linkedCharacterIds": [],
+  "atmosphericDetails": [
+    "The frequency opens at fifteen-minute intervals — the next window is in eleven minutes and then again in twenty-six",
+    "Sergeant Mouton's voice on the frequency is calm and methodical — he has been doing this for five days and has learned to hear past the QRN",
+    "The post's own battery backup is at 60% — enough for another four hours of operation, which feels like luxury from the Algiers side"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.051Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

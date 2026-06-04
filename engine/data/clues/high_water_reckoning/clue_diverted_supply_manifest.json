@@ -1,0 +1,20 @@
+{
+  "id": "clue_diverted_supply_manifest",
+  "scenarioId": "high_water_reckoning",
+  "title": "Diverted FEMA Pharmaceutical Manifest",
+  "description": "A water-damaged but legible photocopied page from the FEMA Region VI emergency supply manifest, folded inside the pharmaceutical crate's lid. The lot number printed on the crate's exterior stencil matches line 14 of the manifest, which lists the shipment as 'confirmed delivered — Superdome staging area, August 31.' The shipment cannot be simultaneously delivered to the Superdome and sitting in Darnell Arceneaux's skiff. Beneath the manifest entry, in different handwriting, is a single authorization signature: C. Tureaud, Diocese Emergency Relief.",
+  "category": "documentary",
+  "discoveryLocationId": "st_claude_bridge_piling",
+  "implicatesCharacterIds": [
+    "father_clement_tureaud",
+    "darnell_arceneaux"
+  ],
+  "unlocks": [
+    "clue_clement_authorization_codes"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.056Z",
+  "locationId": "",
+  "isRedHerring": false
+}

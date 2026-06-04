@@ -1,0 +1,37 @@
+{
+  "id": "terrence_guidry",
+  "scenarioIds": [
+    "high_water_reckoning"
+  ],
+  "name": "Terrence Guidry",
+  "role": "Volunteer runner and informal messenger, Algiers radio post",
+  "publicFace": "A seventeen-year-old who has been carrying handwritten messages on foot between the Algiers radio post and the surrounding neighborhood for three days — he is proud of the work and does not yet know he made an error",
+  "privateGoal": "To be useful in a situation where every adult around him seems to be operating at the edge of their capacity — he is trying to prove that he can be trusted with serious responsibilities",
+  "fear": "That he made a mistake somewhere in the chain and that people will be hurt because of it — a fear that is, in this case, correct",
+  "knowledge": [
+    "He transcribed the grid coordinates from a handwritten note given to him by a woman named Delphine Arceneaux at the Algiers Point ferry landing — he does not know if Delphine transcribed them correctly from her source",
+    "He transposed two digits in the northing coordinate when he copied the note under poor light conditions — he does not yet know this",
+    "He has made three previous runs to the radio post without error and has been given increasing responsibility as a result"
+  ],
+  "voice": "Eager and precise in the way of someone who is trying very hard to be taken seriously — he repeats back what he has been told to demonstrate that he was listening",
+  "trustLogic": "Opens up immediately to anyone who treats him as a competent participant rather than a child running errands",
+  "secrets": [
+    "He copied the coordinates in near-darkness using a pencil stub that kept breaking, and he is not entirely certain he can read his own handwriting on the northing line — he has been telling himself it is fine"
+  ],
+  "aggressionProfile": {
+    "mildPressure": "Defends the accuracy of his transcription with increasing anxiety — he wants to be right",
+    "heavyPressure": "Goes quiet and looks at the note again very carefully, then admits that the light was bad",
+    "breakingPoint": "Being shown the specific digit transposition — at that point he will immediately disclose everything about the transcription conditions",
+    "fleeCondition": "",
+    "fleeStyle": "",
+    "chaseStyle": "",
+    "capturedBehavior": "Cooperates fully and offers to go back to Delphine Arceneaux to verify the original source coordinates",
+    "strikeFirst": null
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.048Z",
+  "description": "",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false
+}

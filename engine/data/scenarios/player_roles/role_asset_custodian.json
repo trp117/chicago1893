@@ -1,0 +1,60 @@
+{
+  "id": "role_asset_custodian",
+  "scenarioId": "high_water_reckoning",
+  "character_id": "marcus_fontenot",
+  "name": "The Asset Custodian",
+  "description": "You are inside your family's flooded shotgun house on Deslonde Street, working against mold and structural decay to recover the land deed that proves your family still owns this property — before the city's post-storm machinery decides otherwise.",
+  "startLocationId": "deslonde_street_shotgun_house",
+  "startingKnowledge": [
+    "The iron document box is pinned under the collapsed plaster ceiling section — visible but inaccessible without clearing debris",
+    "The ceiling is in active key failure and has approximately forty minutes before the remaining section drops",
+    "A carbon-copy receipt in the box's outer sleeve shows that a city assessor's agent filed this property as abandoned on August 31"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a man doing precise, physical work in a deteriorating environment while holding the knowledge that the legal and emotional stakes of what he is recovering are enormous — and that the clock is both structural and bureaucratic simultaneously.",
+  "briefing": "You are kneeling in a canvas kayak in three feet of grey-brown water in the front room of the house where you grew up, and the smell of drying silt and active mold is so specific and so wrong that it keeps interrupting your concentration. The waterline has dropped eighteen inches since this morning, which means the silt layer on the floor is beginning to bake under the unvented roof heat, and the ceiling plaster above the collapsed section is showing the fine radial cracking that you know, from watching this house age for forty years, means the lath underneath has already failed. The iron document box is visible beneath the largest plaster fragment — you can see the corner of it, dark with oxidation — but you cannot reach it without moving approximately sixty pounds of wet plaster by hand or by the rusted crowbar wedged under the kayak's bow. What you know that no one outside this room knows is that the outer sleeve of that box already gave you something: a carbon-copy receipt from the Orleans Parish Assessor's Office, dated August 31, classifying this property as abandoned, signed by an agent named C. Tureaud. You have been kneeling here for four minutes trying to decide whether to use the crowbar immediately and risk shredding the deed, or clear the plaster by hand and watch the mold advance another quarter-inch into the parchment while you work. The ceiling makes a sound above you — not a crack, not yet, but the specific settling groan that comes before one.",
+  "character_hooks": [
+    "My mother handed me this address on a piece of paper when I was seven years old and told me to memorize it in case we ever got separated — I have been carrying it ever since.",
+    "I am a licensed building inspector for Jefferson Parish; I know exactly how much time this ceiling has left, and it is less than I want it to be.",
+    "I saw Cynthia Tureaud's car parked on the Claiborne overpass on August 31 — I did not know then what she was doing, and I have been thinking about it ever since."
+  ],
+  "suggested_secret": "Marcus has already composed, in his head, the full text of a supporting affidavit from memory — every parcel number, every boundary description, every chain-of-title date — and he will use it if the documents are destroyed, regardless of the legal risk to himself.",
+  "opening": {
+    "narrative": "It is 4:45 PM on September 2, 2005, and the interior of the Fontenot family shotgun house on Deslonde Street smells like the inside of something that has been dying slowly for five days. The floodwater has receded to three feet, leaving a grey silt coating on every surface that is beginning to harden in the unvented heat. The front room ceiling has partially collapsed, and the iron document box that contains the family's land deed and abstract of title is visible beneath the debris — close enough to touch, inaccessible without a decision about how to reach it. Outside, the flood plane is quiet except for the occasional sound of a motor passing two blocks away.",
+    "npcMoments": [],
+    "choices": [
+      "Use the rusted crowbar to force the wet-swollen iron box seams immediately, accepting the risk of shredding saturated paper fibers",
+      "Clear the plaster debris by hand, piece by piece, to reach the box without mechanical force — accepting the time cost and the advancing mold",
+      "Examine the carbon-copy receipt already recovered from the box's outer sleeve more carefully before touching anything else"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "canvas kayak",
+      "rusted crowbar",
+      "carbon-copy assessor's receipt (partial)",
+      "waterproof bag (empty)"
+    ],
+    "flags": {
+      "box_accessible": false,
+      "ceiling_failure_imminent": true,
+      "receipt_recovered": true,
+      "deed_intact": "unknown"
+    },
+    "suspicion": {
+      "cynthia_tureaud": 3,
+      "father_clement_tureaud": 0
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.061Z",
+  "context_sentence": "You are the Asset Custodian, kneeling in floodwater over your family's land deed, and the ceiling above you just groaned.",
+  "bridge_sentence": "The diesel smell reaches you even here, through the collapsed ceiling.",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false,
+  "entry_paragraph_flags": [
+    "Possible going-wide (explanation): \"which means\" — review this sentence",
+    "Possible going-wide (explanation): \"which means\" — review this sentence"
+  ]
+}

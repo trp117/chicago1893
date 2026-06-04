@@ -1,0 +1,18 @@
+{
+  "id": "clue_darnell_fuel_chit",
+  "scenarioId": "high_water_reckoning",
+  "title": "Father Clement's Fuel Authorization Chit",
+  "description": "A handwritten slip of paper recovered from Darnell Arceneaux's shirt pocket, reading: 'Bearer authorized 8 gallons marine fuel — Claiborne staging — C. Tureaud.' The slip is dated September 1 and uses the same self-generated authorization code found in the supply ledger. It confirms that Father Clement has been compensating Darnell for supply runs with fuel from an undisclosed reserve — and that the Claiborne Avenue staging point exists and is stocked.",
+  "category": "physical",
+  "discoveryLocationId": "st_claude_bridge_piling",
+  "implicatesCharacterIds": [
+    "father_clement_tureaud",
+    "darnell_arceneaux"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.057Z",
+  "locationId": "",
+  "isRedHerring": false
+}

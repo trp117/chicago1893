@@ -14,7 +14,7 @@ const LOCAL_IMAGES = {
   sargasso_deep_three_keys:       '/images/scenarios/sargasso_deep_short.jpg',
   zero_hour_cantigny:             '/images/scenarios/zero_hour_cantigny_short.jpg',
   titanic_final_hours:            '/images/scenarios/titanic_final_hours_short.jpg',
-  dead_reckoning_ninth_ward:      '/images/scenarios/dead_reckoning_ninth_ward_short.jpg',
+  high_water_reckoning:           '/images/scenarios/high_water_reckoning_short.jpg',
 };
 
 const LOCAL_IMG_POSITION = {

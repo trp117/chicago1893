@@ -1,0 +1,55 @@
+{
+  "id": "role_triage_coordinator",
+  "scenarioId": "high_water_reckoning",
+  "character_id": "loretta_sainte_claire",
+  "name": "The Triage Coordinator",
+  "description": "You manage the survival arithmetic of eighty people on a concrete bridge deck in 140-degree heat. Every resource decision passes through you — and you have just noticed something wrong with the supply chain that has been keeping this camp alive.",
+  "startLocationId": "st_claude_bridge_deck",
+  "startingKnowledge": [
+    "The bridge deck's structural load tolerance is already exceeded by eleven people",
+    "The pharmaceutical lot number on the incoming crate matches a FEMA manifest she heard on the radio before the storm — meaning it was diverted from an official channel",
+    "Father Clement Tureaud has been signing supply receipts with an authorization code she cannot verify against any official relief organization"
+  ],
+  "accessLevel": "staff",
+  "perspective": "Write from the perspective of a woman who has been making life-or-death resource decisions for five days without adequate information, adequate supplies, or adequate sleep — and who is now discovering that the informal supply network she has been depending on is built on falsified authorization. Her analytical precision is her primary tool and her primary defense.",
+  "briefing": "You are standing at the eastern railing of the St. Claude Avenue Bridge with your back to the crowd and your eyes on the skiff below, and the concrete under your shoes is hot enough that you can feel it through the soles. Eighty people are arranged behind you along both railings in the flat, exhausted posture of people who stopped asking when help was coming two days ago. You have been keeping a mental ledger of every fluid ounce in this camp since the morning of August 30, and you know without checking the notebook that the electrolyte packages will last another six hours at current consumption — four hours if the temperature holds. The pharmaceutical crate in the bow of Darnell Arceneaux's skiff would extend that window significantly, but the lot number stenciled on its side has been troubling you since the moment you read it: you memorized that number from a FEMA regional broadcast three days before landfall, and the manifest listed it as destined for the Superdome staging area. What you know that no one else on this bridge knows is that the authorization signature on the supply receipts Father Clement has been filing does not match the diocesan emergency fund number printed on the first-aid pamphlet in your kit — and you have said nothing about it for two days because the supplies were real and the people were alive. The skiff is knocking against the piling. Three children are sitting in its stern. You have approximately ninety seconds before Darnell looks up at you and needs an answer.",
+  "character_hooks": [
+    "I came to this bridge with my neighbor's insulin and nothing else — I became the coordinator because I was the only one who kept a written list.",
+    "I worked triage at Charity Hospital for eleven years before I retired; I know what a supply diversion looks like, and I have been watching one happen for three days.",
+    "I recognized one of the children in Darnell's skiff — she is the daughter of the family whose house on Deslonde Street I watched go under on August 30."
+  ],
+  "suggested_secret": "Loretta has quietly been rationing her own water allocation to near-zero for forty-eight hours, redirecting her share to the camp's most vulnerable, and she is closer to heat exhaustion than anyone around her realizes.",
+  "opening": {
+    "narrative": "It is 4:45 PM on September 2, 2005, and the St. Claude Avenue Bridge has been a city unto itself for five days. The concrete deck radiates stored heat in visible waves, and the eighty people arranged along its railings have learned to move as little as possible between noon and sundown. Below the western approach, a flat-bottom aluminum skiff has just knocked against the piling for the third time — its operator, a lean young man in a soaked gray shirt, is looking up at the ladder with the particular expression of someone who needs a decision made quickly. The pharmaceutical crate in his bow represents either a critical resource extension or the most visible evidence yet of a supply diversion you have been watching build for three days.",
+    "npcMoments": [],
+    "choices": [
+      "Climb down the service ladder to the piling to examine the pharmaceutical crate's lot number and speak with Darnell Arceneaux directly",
+      "Send someone to retrieve Father Clement Tureaud from the far end of the bridge deck before making any decision about the crate",
+      "Check the supply ledger notebook at the folding table for the most recent authorization signature before responding to the skiff"
+    ]
+  },
+  "roleInitialState": {
+    "inventory": [
+      "waterproof supply ledger notebook",
+      "FEMA regional broadcast notes (memorized)",
+      "bridge camp shelter registry — spiral notebook"
+    ],
+    "flags": {
+      "knows_lot_number_discrepancy": true,
+      "has_disclosed_authorization_concern": false,
+      "structural_load_exceeded": true
+    },
+    "suspicion": {
+      "father_clement_tureaud": 2,
+      "darnell_arceneaux": 1
+    }
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.062Z",
+  "context_sentence": "You are the Triage Coordinator, and Darnell is looking up at you right now.",
+  "bridge_sentence": "The diesel smell is stronger than it was twenty minutes ago.",
+  "character_type": "fictional",
+  "represents": "",
+  "fact_checked": false,
+  "entry_paragraph_flags": []
+}

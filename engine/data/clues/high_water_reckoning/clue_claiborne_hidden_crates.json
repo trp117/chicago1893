@@ -1,0 +1,17 @@
+{
+  "id": "clue_claiborne_hidden_crates",
+  "scenarioId": "high_water_reckoning",
+  "title": "Undisclosed Pharmaceutical Crates — Claiborne Staging",
+  "description": "Two pharmaceutical crates under a blue tarpaulin at the Claiborne Avenue overpass staging point, each bearing the same FEMA manifest lot numbers as the crate on Darnell's skiff. The inventory list taped inside the nearest crate lid, in Father Clement's handwriting, lists contents including oral rehydration salts, pediatric electrolyte solution, and wound irrigation supplies — exactly the items the bridge camp has been short of for three days. The combined contents of both crates would extend the camp's Community_Resource_Reserve by an estimated 60%.",
+  "category": "physical",
+  "discoveryLocationId": "claiborne_avenue_staging_point",
+  "implicatesCharacterIds": [
+    "father_clement_tureaud"
+  ],
+  "unlocks": [],
+  "isKeyEvidence": false,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.060Z",
+  "locationId": "",
+  "isRedHerring": false
+}

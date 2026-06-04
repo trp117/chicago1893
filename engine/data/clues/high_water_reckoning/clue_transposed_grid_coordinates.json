@@ -1,0 +1,19 @@
+{
+  "id": "clue_transposed_grid_coordinates",
+  "scenarioId": "high_water_reckoning",
+  "title": "Terrence Guidry's Transcription Note",
+  "description": "The handwritten note Terrence Guidry used to transcribe the grid coordinates, recovered from his shirt pocket under Ida Broussard's request. The northing coordinate reads '3007.4' in Terrence's handwriting, but the digit '7' shows clear evidence of having been written over — the original pencil stroke beneath it reads '1', making the correct coordinate '3001.4'. The transposition would place an extraction landing zone 680 meters north of the St. Claude Bridge, directly over the flooded Industrial Canal. The note also shows the broken pencil pressure of someone writing in poor light.",
+  "category": "documentary",
+  "discoveryLocationId": "algiers_attic_radio_post",
+  "implicatesCharacterIds": [
+    "terrence_guidry"
+  ],
+  "unlocks": [
+    "clue_delphine_source_verification"
+  ],
+  "isKeyEvidence": true,
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.059Z",
+  "locationId": "",
+  "isRedHerring": false
+}

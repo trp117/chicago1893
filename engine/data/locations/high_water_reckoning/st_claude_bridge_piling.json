@@ -1,0 +1,19 @@
+{
+  "id": "st_claude_bridge_piling",
+  "scenarioId": "high_water_reckoning",
+  "name": "St. Claude Avenue Bridge — Lower Piling Access",
+  "description": "The concrete piling at the base of the bridge's western approach, accessible by a rusted service ladder, where Darnell Arceneaux's flat-bottom aluminum skiff knocks against the concrete in the brown current.",
+  "mood": "tense, transactional, liminal",
+  "linkedCharacterIds": [
+    "darnell_arceneaux"
+  ],
+  "atmosphericDetails": [
+    "The pharmaceutical crate stenciled with a red cross sits in the skiff's bow, its cardboard corners dark with water absorption",
+    "Three children sit in the stern of the skiff, their feet not touching the flood water, watching the ladder",
+    "The motor at the skiff's transom ticks as it cools — it has been running for four hours straight"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.053Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}

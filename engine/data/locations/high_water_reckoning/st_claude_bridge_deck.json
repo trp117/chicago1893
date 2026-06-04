@@ -1,0 +1,20 @@
+{
+  "id": "st_claude_bridge_deck",
+  "scenarioId": "high_water_reckoning",
+  "name": "St. Claude Avenue Bridge — Elevated Deck",
+  "description": "The concrete bascule span radiates stored heat at an estimated 140 degrees Fahrenheit, its iron railings too hot to grip with bare hands. Eighty survivors are arranged along both edges in whatever shade the railing posts cast, which is almost none.",
+  "mood": "oppressive, desperate, communal, exposed",
+  "linkedCharacterIds": [
+    "father_clement_tureaud",
+    "darnell_arceneaux"
+  ],
+  "atmosphericDetails": [
+    "The smell of baking asphalt and brackish water rises from the flood plane thirty feet below in visible waves of heat distortion",
+    "The sound of an infant crying somewhere in the middle of the crowd — thin, exhausted, no longer insistent",
+    "A row of salvaged mirrors propped against the eastern railing, angled toward the sky at slightly wrong degrees, waiting for someone to correct them"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T19:27:16.052Z",
+  "atmosphere": "",
+  "linkedNPCs": []
+}
