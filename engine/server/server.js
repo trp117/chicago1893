@@ -87,6 +87,7 @@ const CATEGORY_MAP = {
   midnight_errand_boston:           'underground',
   titanic_final_hours:              'maritime',
   artesian_height_1892:             'industrial',
+  dead_reckoning_ninth_ward:        'industrial',
   bornholmer_strasse_first_breach:  'space',
 };
 const CATEGORIES = {
