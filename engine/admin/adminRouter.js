@@ -555,10 +555,10 @@ function buildGenerationPrompt({ description, playTimeMinutes }) {
 Read the creator's description and generate a complete, immediately playable story package.
 
 GAME ENGINE:
-Players explore locations, question NPCs, discover clues, and solve a mystery before time runs out.
+Players inhabit a historical moment, interact with the people in it, and make decisions under the constraints that actually existed. The scenario ends when time runs out or the historical moment resolves.
 - Players travel between locations; clues are location-specific
-- NPCs have suspicion scores that rise as evidence is presented
-- The game ends on final accusation, time expiry, or triggered climax
+- NPCs respond based on professional role, chain of command, and the pressure of the situation
+- The game ends when time runs out or the player triggers the historical moment's resolution
 
 CREATOR'S DESCRIPTION:
 ${description}
@@ -568,7 +568,7 @@ TIME PER TURN: ${s.tpt} minutes
 
 REQUIRED SCALE:
 - Acts: exactly ${s.acts}
-- NPCs: ${s.chars} — at least 1–2 culprits, 1 authority figure, 1 neutral/ally
+- NPCs: ${s.chars} — characters representing the documented roles present at this moment: the chain of command, the specialists, the witnesses, the people whose work intersected the crisis. No invented villains.
 - Locations: ${s.locs} — 2–3 NPCs per location
 - Clues: ${s.clues} — exactly 2 with isKeyEvidence: true
 - Player Roles: ${s.roles}
@@ -580,10 +580,13 @@ OUTPUT RULES:
 4. All IDs: lowercase, letters/numbers/underscores only
 5. All cross-references must be consistent (linkedCharacterIds, discoveryLocationId, etc.)
 6. Exactly 2 clues must have isKeyEvidence: true
-7. Every playerRole MUST include briefing, character_hooks, and suggested_secret (rules below)
+7. Every playerRole MUST include briefing and character_hooks (rules below)
 8. The scenario MUST include an introduction object (rules below)
 9. For each playerRole, set character_id to the id of the matching record in the characters array if this role portrays a named character who also appears there; null otherwise. You generated both objects in the same pass — the pairing is known.
 10. Do NOT place a player's own character in any location's linkedCharacterIds — not the start location, not any other. The character record belongs in the characters array (for the epilogue layer), but must not appear in the NPC location graph anywhere.
+11. Do NOT invent conspiracies, traitors, saboteurs, secret agendas, or concealed villains. The antagonist in every scenario is the SITUATION — physics, materials, time, weather, chain of command, equipment failure, documented human decisions. If historical concealment is documented (e.g., Lightoller's under-loading of lifeboats, the Mesaba ice warning never reaching the bridge), include it. If concealment is not documented, it does not exist in this scenario.
+12. Obstacles come from documented constraints: equipment failing under documented conditions, information not reaching the right person through documented communication breakdowns, time pressure from documented timelines, conflicting documented orders or regulations. Never from invented human malice. Example — Cantigny 1918: the communication wire grounded out because stripped insulation met wet mud; a low-powder shell batch dropped the barrage short. NOT a traitor who sabotaged the wire.
+13. Use period-appropriate, unit-appropriate names drawn from documented rosters or period census data for the relevant nationality, service branch, and era. Do not reuse character names across scenarios. Avoid stock generic names unless documented.
 
 INTRODUCTION RULES (required on scenario):
 Write a 4-section pre-game reading experience in the style of a serious narrative historian — specific, cinematic, grounded in concrete detail. No genre clichés.
@@ -596,7 +599,7 @@ Each section: 3–5 sentences. No section headers in the text. No meta-commentar
 PLAYER BRIEFING RULES (required on every playerRole):
 - briefing: 150–250 word entry paragraph, second person present tense.
   Places this character in a specific physical location at the story's opening moment.
-  References what this character knows that the others do not.
+  References what this character knows from their professional position and documented experience.
   Establishes their emotional and physical state right now — not backstory, not history.
   Ends at the exact threshold of their first choice: the last breath before the player acts.
   Written in the same literary voice as the scenario introduction sections.
@@ -614,8 +617,7 @@ PLAYER BRIEFING RULES (required on every playerRole):
   This text appears as the Character Brief on the introduction screen and is written
   to the session transcript. A missing or template-copied briefing will create a blank
   transcript section. Write it specific to this character and this opening moment.
-- character_hooks: array of exactly 3 first-person sentences — alternative starting conditions (different debt, different rumour, different relationship). One is picked randomly each session.
-- suggested_secret: one sentence. Something nobody in the story knows about this player character.
+- character_hooks: array of exactly 3 first-person sentences — alternative starting conditions grounded in the scenario (different equipment state, different prior knowledge, different relationship to the chain of command). One is picked randomly each session.
 
 PERIOD VOCABULARY RULES (required on scenario):
 Generate a period_vocabulary object with 3–5 categories of authentic language from this specific world.
@@ -696,20 +698,14 @@ REQUIRED JSON STRUCTURE:
       "name": "Full Name",
       "role": "Official role or occupation",
       "publicFace": "How they appear to strangers",
-      "privateGoal": "What they really want",
+      "privateConstraint": "What limits this person — documented orders, professional obligation, physical condition, equipment state, conflicting loyalties grounded in their documented position. NOT a hidden agenda.",
       "fear": "Their greatest vulnerability",
       "knowledge": ["fact they know 1", "fact they know 2"],
       "voice": "Speaking style in one phrase",
-      "trustLogic": "What opens them up or shuts them down",
-      "secrets": ["secret 1", "secret 2"],
       "aggressionProfile": {
         "mildPressure": "Reaction when questioned lightly",
-        "heavyPressure": "Reaction when directly accused",
-        "breakingPoint": "What they will never admit",
-        "fleeCondition": "Trigger for flight — empty string if never",
-        "fleeStyle": "How they escape — empty string if never",
-        "chaseStyle": "Behavior when chased — empty string if never",
-        "capturedBehavior": "Behavior if cornered",
+        "heavyPressure": "Reaction under direct pressure",
+        "breakingPoint": "What this person cannot or will not disclose, grounded in their role, rank, or documented orders — NOT a secret they are protecting for personal advantage.",
         "strikeFirst": null
       },
       "createdAt": "2025-01-01T00:00:00Z",
@@ -756,8 +752,7 @@ REQUIRED JSON STRUCTURE:
       "accessLevel": "worker | staff | director",
       "perspective": "How the AI should write for this role's point of view",
       "briefing": "MUST BE A PLAIN STRING — NOT an object, NOT an array. Write the full briefing paragraph as a single string of 150-250 words. Example: 'You are standing [specific location] with [specific physical detail]. You have [what this character uniquely knows that others do not]. [What is at stake for them personally right now]. [The immediate sensory detail of this moment]. [Final sentence lands them at the threshold of their first action].'",
-      "character_hooks": ["First-person hook one.", "First-person hook two.", "First-person hook three."],
-      "suggested_secret": "One sentence nobody in the story knows.",
+      "character_hooks": ["First-person hook one — grounded in equipment state, prior knowledge, or chain-of-command relationship.", "First-person hook two.", "First-person hook three."],
       "opening": {
         "narrative": "4–6 sentence opening establishing time, place, and immediate tension. Do not start mid-action.",
         "npcMoments": [],
@@ -765,8 +760,7 @@ REQUIRED JSON STRUCTURE:
       },
       "roleInitialState": {
         "inventory": ["starting item"],
-        "flags": {},
-        "suspicion": {}
+        "flags": {}
       },
       "createdAt": "2025-01-01T00:00:00Z",
       "updatedAt": "2025-01-01T00:00:00Z"

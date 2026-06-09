@@ -429,7 +429,7 @@ export function slimCharacter(char) {
     id:               char.id,
     name:             char.name,
     voice:            char.voice,
-    goal:             char.privateGoal,
+    constraint:       char.privateConstraint || char.privateGoal || null,
     knowledge:        char.knowledge,
     aggressionProfile: char.aggressionProfile || null,
     introAnchor:      char.introAnchor || null
@@ -637,14 +637,6 @@ function buildNpcIntroInstruction(state, location, characters, playerInput = '')
   return `⚠️ FIRST ENCOUNTER — the following NPCs appear for the first time this session. Before any dialogue, weave their anchor description naturally into the narrative (do not quote it verbatim — integrate it into the prose):\n${introLines}\n\nIf any generated choice references an NPC not yet in the state's introducedNpcs list, append their role in parentheses after the name.`;
 }
 
-function buildChaseInstruction(state, characters) {
-  if (!state.chaseState?.active) return '';
-  const { npcId, turnsRemaining } = state.chaseState;
-  const char = characters.find(c => c.id === npcId);
-  const name = char?.name || npcId;
-  const chaseStyle = char?.aggressionProfile?.chaseStyle || 'panicked and unpredictable';
-  return `⚠️ CHASE IN PROGRESS — ${name} is fleeing. ${turnsRemaining} turn(s) remaining before escape is guaranteed. Chase style: ${chaseStyle}. Present exactly 2 pursuit choices. Narrative must be short and kinetic — no dialogue, no reflection. Signal resolution via chaseResolved.`;
-}
 
 function buildObjectStateBlock(state) {
   const inventory = state.inventory || [];
@@ -688,10 +680,10 @@ function buildVerifiedFactsBlock(state) {
 }
 
 export function checkEndingReadiness(state, scenario) {
-  const hasConspirators = (state.namedConspirators || []).length >= 1;
-  const isLateTurn      = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
+  const essentialBeatsComplete = state.essentialBeatsComplete === true;
+  const isLateTurn             = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
   return {
-    readyForClimax: hasConspirators || isLateTurn,
+    readyForClimax: essentialBeatsComplete || isLateTurn,
   };
 }
 
@@ -728,7 +720,6 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))
     .replace('{{NPC_INTRO_INSTRUCTION}}',  [
       buildNpcIntroInstruction(state, location, characters, playerInput),
-      buildChaseInstruction(state, characters),
       buildPossessionNote(state, characters, playerInput),
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')

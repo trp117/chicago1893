@@ -33,9 +33,9 @@ Player input:
 
 ⚠️ NPC-TO-NPC CHECK: If two or more NPCs are present and one asks the other a question, the questioned NPC MUST answer before the turn ends.
 
-⚠️ ESCALATION CHECK: For each NPC present, review their aggressionProfile. If an NPC's fleeCondition is met, you MUST output chaseInitiated. If their strikeFirst condition is met, you MUST output physicalConflict with type "npc_struck_first". These are mandatory when conditions are satisfied.
+⚠️ ESCALATION CHECK: For each NPC present, review their aggressionProfile. If an NPC's strikeFirst condition is met, you MUST output physicalConflict with type "npc_struck_first". This is mandatory when the condition is satisfied.
 
-⚠️ BREAKING POINT CHECK: For each NPC with suspicion 2 or higher, locate their breakingPoint. It is a hard ceiling — what this NPC will never reveal regardless of pressure. No NPC dialogue may cross it.
+⚠️ BREAKING POINT CHECK: For each NPC with suspicion 2 or higher, locate their breakingPoint. It is a hard ceiling — what this person cannot or will not disclose given their role and documented orders. No NPC dialogue may cross it.
 
 ⚠️ NPC_UPDATES REQUIRED: For every NPC who appears in this scene, include their id in npc_updates with trust_delta, aggression_mode, and last_interaction. This is mandatory — do not omit npc_updates if any NPC is present.
 
@@ -46,7 +46,7 @@ Player input:
 {{NPC_INTRO_INSTRUCTION}}
 
 Instructions:
-- Apply NPC information tier strictly by suspicion score. Tier 1 (0–1): surface demeanor only. Tier 2 (2–3): partial detail. Tier 3 (4+): specific facts. Tier can only advance mid-scene if the player references specific evidence observed earlier.
+- Apply NPC information tier strictly by suspicion score. Tier 1 (0–1): surface professional demeanor — role and observable facts only. Tier 2 (2–3): operational detail shared as the player demonstrates competence and situational awareness. Tier 3 (4+): specific technical facts and the NPC's own doubts or concerns. Tier can only advance mid-scene if the player demonstrates understanding or references specific evidence from earlier in the session.
 - Stay grounded in the current act and time of night.
 - Update only the state fields that actually change this turn.
 - Only change the top-level `location` field if the player's input explicitly says they are moving somewhere.
