@@ -39,17 +39,17 @@ function readDirRecursive(baseDir) {
 async function upsertBatch(rows) {
   const SIZE = 100;
   for (let i = 0; i < rows.length; i += SIZE) {
-    const { error } = await supabase.from('scenario_data').upsert(rows.slice(i, i + SIZE));
+    const { error } = await supabase.from('scenario_data').upsert(rows.slice(i, i + SIZE), { onConflict: 'data_type,scenario_id,id' });
     if (error) throw error;
   }
 }
 
 const COLLECTIONS = [
-  { dataType: 'character',   docs: readDir(path.join(DATA_DIR, 'characters')),                       sid: d => d.scenarioIds?.[0] || null },
-  { dataType: 'story_arc',   docs: readDir(path.join(DATA_DIR, 'story_arcs')),                       sid: d => d.scenarioId || null },
-  { dataType: 'player_role', docs: readDir(path.join(DATA_DIR, 'scenarios', 'player_roles')),        sid: d => d.scenarioId || null },
-  { dataType: 'location',    docs: readDirRecursive(path.join(DATA_DIR, 'locations')),               sid: d => d.scenarioId || null },
-  { dataType: 'clue',        docs: readDirRecursive(path.join(DATA_DIR, 'clues')),                   sid: d => d.scenarioId || null },
+  { dataType: 'character',   docs: readDir(path.join(DATA_DIR, 'characters')),                       sid: d => d.scenarioId || d.scenarioIds?.[0] || 'shared' },
+  { dataType: 'story_arc',   docs: readDir(path.join(DATA_DIR, 'story_arcs')),                       sid: d => d.scenarioId || d.scenarioIds?.[0] || 'shared' },
+  { dataType: 'player_role', docs: readDir(path.join(DATA_DIR, 'scenarios', 'player_roles')),        sid: d => d.scenarioId || d.scenarioIds?.[0] || 'shared' },
+  { dataType: 'location',    docs: readDirRecursive(path.join(DATA_DIR, 'locations')),               sid: d => d.scenarioId || d.scenarioIds?.[0] || 'shared' },
+  { dataType: 'clue',        docs: readDirRecursive(path.join(DATA_DIR, 'clues')),                   sid: d => d.scenarioId || d.scenarioIds?.[0] || 'shared' },
 ];
 
 const now = new Date().toISOString();
