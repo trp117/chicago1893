@@ -7,7 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
-import { JsonFileStore }        from '../repositories/JsonFileStore.js';
+import { DualWriteStore }       from '../../lib/DualWriteStore.js';
+import { restoreFromSupabase } from '../../lib/restoreFromSupabase.js';
 import { CharacterRepository }  from '../repositories/CharacterRepository.js';
 import { LocationRepository }   from '../repositories/LocationRepository.js';
 import { ClueRepository }       from '../repositories/ClueRepository.js';
@@ -28,7 +29,7 @@ const adminDir  = path.resolve(__dirname, '../admin');
 const gameDir   = path.resolve(__dirname, '../game');
 const publicDir = path.resolve(__dirname, '../../public');
 
-const store = new JsonFileStore(dataDir);
+const store = new DualWriteStore(dataDir);
 const repos = {
   characters: new CharacterRepository(store),
   locations:  new LocationRepository(store),
@@ -311,8 +312,6 @@ function killPort(port) {
   try { execSync(`powershell -NoProfile -Command "Get-Process -Id (Get-NetTCPConnection -LocalPort ${port} -State Listen).OwningProcess | Stop-Process -Force"`, { stdio: 'ignore' }); } catch {}
 }
 
-new SchemaValidator(repos).report().catch(e => console.error('[SCHEMA]', e.message));
-
 function startServer() {
   const server = app.listen(PORT, () => {
     console.log(`Engine running at http://localhost:${PORT}`);
@@ -332,4 +331,11 @@ function startServer() {
   });
 }
 
-startServer();
+(async () => {
+  await restoreFromSupabase();
+  new SchemaValidator(repos).report().catch(e => console.error('[SCHEMA]', e.message));
+  startServer();
+})().catch(err => {
+  console.error('[STARTUP] Fatal init error:', err.message);
+  process.exit(1);
+});
