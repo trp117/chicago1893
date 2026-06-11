@@ -291,7 +291,6 @@ async function streamRawText(fetchResponse, onChunk) {
 function buildEpilogueSummary(state, endResult) {
   return {
     interacted_characters: state?.introducedNpcs     || [],
-    named_conspirators:    state?.namedConspirators  || [],
     completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
     resolved_threads:      (state?.resolved_threads  || []).map(t => ({ thread_id: t.thread_id })),
     outcome:               endResult || 'unknown',
@@ -827,7 +826,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const isEndingTurn  = !!(state.finalAccusation || state.remainingMinutes <= 0);
       const endingSignals = checkEndingReadiness(state, scenario);
-      const mightEnd      = endingSignals.readyForClimax || (state.namedConspirators || []).length >= 1;
+      const mightEnd      = endingSignals.readyForClimax;
       const isLateGame    = (state.remainingMinutes <= 7 && state.remainingMinutes > 0) || state.elapsedMinutes >= (scenario.sessionTargetMinutes * 0.75);
       const maxToks       = isEndingTurn ? 2000 : mightEnd ? 1800 : isLateGame ? 1400 : 1600;
 
@@ -912,7 +911,7 @@ Do not open with the historical context. Open inside the character's body. Let t
               isEnding:                true,
               result:                  'failure',
               scene:                   text,
-              conspiracySummary:       (scenario?.partialSuccessExamples || [])[0] || 'The session ended as time expired.',
+              situationSummary:        (scenario?.partialSuccessExamples || [])[0] || 'The session ended as time expired.',
               whatPlayerDiscovered:    'No formal conclusion was reached.',
               outcome:                 (scenario?.failConditions || [])[0] || 'Time expired.',
               playerContribution:      'The investigation could not be completed in the time available.',
@@ -1046,7 +1045,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         output.endState = {
           isEnding: true, result: 'failure',
           scene: `Time has run out. ${failCond}`,
-          conspiracySummary: (scenario.partialSuccessExamples || [])[0] || 'The conspiracy was not fully exposed.',
+          situationSummary: (scenario.partialSuccessExamples || [])[0] || 'The session ended before the situation was fully resolved.',
           whatPlayerDiscovered: 'No conclusion was reached in time.',
           outcome: (scenario.failConditions || [])[0] || 'The case remains unresolved.',
           playerContribution: 'The investigation could not be completed in the time available.',
@@ -1164,7 +1163,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const openQuestions = [
         discoveredClues.length === 0 && 'No physical evidence has been found yet.',
-        (state.namedConspirators || []).length === 0 && 'No suspects have been formally identified.',
+        'Key questions remained unanswered when time expired.',
         !discoveredClues.some(() => true) && 'The method and motive remain unclear.'
       ].filter(Boolean);
 
