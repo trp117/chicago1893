@@ -1,38 +1,38 @@
 {
   "id": "benjamin_gill",
-  "scenarioIds": [
-    "midnight_errand_boston"
-  ],
+  "fear": "That his son will throw away everything Benjamin built for a war that will grind ordinary men to nothing.",
   "name": "Benjamin Gill",
   "role": "Master printer, father of Nathaniel Gill",
-  "publicFace": "A respected tradesman, cautious and fair, known for keeping his politics off his broadsheets.",
-  "privateGoal": "To keep his shop, his workers, and his son safe through whatever storm is coming — he no longer believes the Cause is worth the cost.",
-  "fear": "That his son will throw away everything Benjamin built for a war that will grind ordinary men to nothing.",
+  "voice": "Measured, heavy, the voice of a man who has learned that most arguments end badly — he finishes sentences slowly.",
+  "secrets": [
+    "He once printed a seditious pamphlet for the Sons of Liberty three years ago and has lived in fear of it ever since.",
+    "He has already been approached by a Loyalist merchant who offered to buy the shop — he has not said no."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the Sons of Liberty use print shops as dead-drops — he has refused to allow it in his own.",
     "He has seen Owen Pryce lingering near the shop after hours and suspects the journeyman of something, though not yet what.",
     "He knows Captain Aldrich by name and has shared a civil word with him at the market — a fact he would not advertise."
   ],
-  "voice": "Measured, heavy, the voice of a man who has learned that most arguments end badly — he finishes sentences slowly.",
+  "updatedAt": "2026-05-10T03:09:06.909Z",
+  "publicFace": "A respected tradesman, cautious and fair, known for keeping his politics off his broadsheets.",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from colonial Boston, 1774-1776",
   "trustLogic": "He responds to honesty about consequences, not appeals to liberty. He will listen if the player acknowledges the real danger. He closes entirely if he feels manipulated or lied to.",
-  "secrets": [
-    "He once printed a seditious pamphlet for the Sons of Liberty three years ago and has lived in fear of it ever since.",
-    "He has already been approached by a Loyalist merchant who offered to buy the shop — he has not said no."
+  "description": "",
+  "privateGoal": "To keep his shop, his workers, and his son safe through whatever storm is coming — he no longer believes the Cause is worth the cost.",
+  "scenarioIds": [
+    "midnight_errand_boston"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "He sets down whatever he is holding and gives the player his full, unsettling attention.",
-    "heavyPressure": "He does not raise his voice. He says: 'I will ask you once more, and I will know if you are lying.'",
-    "breakingPoint": "He will not accept that his son has already chosen — he needs to believe there is still time to pull him back.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "He sits down and puts his face in his hands. Then he asks what he can do to limit the damage.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.909Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from colonial Boston, 1774-1776",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "He sets down whatever he is holding and gives the player his full, unsettling attention.",
+    "breakingPoint": "He will not accept that his son has already chosen — he needs to believe there is still time to pull him back.",
+    "fleeCondition": "",
+    "heavyPressure": "He does not raise his voice. He says: 'I will ask you once more, and I will know if you are lying.'",
+    "capturedBehavior": "He sits down and puts his face in his hands. Then he asks what he can do to limit the damage."
+  }
 }

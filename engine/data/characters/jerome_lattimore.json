@@ -1,38 +1,38 @@
 {
   "id": "jerome_lattimore",
-  "scenarioIds": [
-    "singing_wires"
-  ],
+  "fear": "That Arden Gill will eventually give his name to the slave owner's agents, at which point his free papers — purchased, not born-to — will not protect him from being sold south as a recovered runaway.",
   "name": "Jerome Lattimore",
   "role": "Free Black laborer, former Underground Railroad passenger, Gill's inside informant",
-  "publicFace": "A quiet, hardworking free man who does dock labor and odd jobs around Sandusky's waterfront; known to the network as a former passenger who settled locally and occasionally helps with small tasks.",
-  "privateGoal": "He tells himself he is only giving Gill information about routes, not people — but tonight's dispatch has names and numbers in it that only he could have provided, and he knows it.",
-  "fear": "That Arden Gill will eventually give his name to the slave owner's agents, at which point his free papers — purchased, not born-to — will not protect him from being sold south as a recovered runaway.",
+  "voice": "Quiet, watchful, speaks in short careful sentences — a man who has learned that words are the most dangerous thing he owns.",
+  "secrets": [
+    "He has been giving Gill route information but has deliberately altered the departure times by one hour each time, believing this gives the passengers a margin — tonight he did not alter the time because Gill threatened to expose him if the last group got through again.",
+    "He wants out of the arrangement and has been trying to find a way to warn the network without exposing himself; tonight's children in the group are the thing that may finally break him toward the right side."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the network's recognition phrases and two of the safe house locations because he was moved through them three years ago.",
     "He knows that Arden Gill has his name in writing and that this fact makes him as vulnerable as the people he has been betraying.",
     "He does not know about the second red fire message or that Gill has already given his name upward."
   ],
-  "voice": "Quiet, watchful, speaks in short careful sentences — a man who has learned that words are the most dangerous thing he owns.",
+  "updatedAt": "2026-05-09T21:12:00.475Z",
+  "publicFace": "A quiet, hardworking free man who does dock labor and odd jobs around Sandusky's waterfront; known to the network as a former passenger who settled locally and occasionally helps with small tasks.",
+  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
   "trustLogic": "Opens to people who demonstrate they know his history with the network and who approach him without accusation. Closes completely to anyone who comes at him with anger — he has too much practice disappearing into silence.",
-  "secrets": [
-    "He has been giving Gill route information but has deliberately altered the departure times by one hour each time, believing this gives the passengers a margin — tonight he did not alter the time because Gill threatened to expose him if the last group got through again.",
-    "He wants out of the arrangement and has been trying to find a way to warn the network without exposing himself; tonight's children in the group are the thing that may finally break him toward the right side."
+  "description": "",
+  "privateGoal": "He tells himself he is only giving Gill information about routes, not people — but tonight's dispatch has names and numbers in it that only he could have provided, and he knows it.",
+  "scenarioIds": [
+    "singing_wires"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Goes very still, answers yes or no, makes no eye contact.",
-    "heavyPressure": "Denies everything with the flat affect of a man who has been questioned by people with much more power than these questioners before.",
-    "breakingPoint": "He will not give Gill's name unless he believes it is the only thing that will keep him alive — but if shown that Gill has already given his name upward, he breaks completely and gives everything.",
-    "fleeCondition": "If Arden Gill is arrested and Jerome believes Gill will talk immediately.",
     "fleeStyle": "Moves to the waterfront and the dock network — he knows every vessel captain who moves cargo on the lake.",
     "chaseStyle": "Disappears into the waterfront's geography; knows people who will hide him without questions.",
-    "capturedBehavior": "Produces his free papers immediately and repeatedly. Asks for the name of a specific minister at the African Methodist Episcopal church in Sandusky who can vouch for his character.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.475Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Goes very still, answers yes or no, makes no eye contact.",
+    "breakingPoint": "He will not give Gill's name unless he believes it is the only thing that will keep him alive — but if shown that Gill has already given his name upward, he breaks completely and gives everything.",
+    "fleeCondition": "If Arden Gill is arrested and Jerome believes Gill will talk immediately.",
+    "heavyPressure": "Denies everything with the flat affect of a man who has been questioned by people with much more power than these questioners before.",
+    "capturedBehavior": "Produces his free papers immediately and repeatedly. Asks for the name of a specific minister at the African Methodist Episcopal church in Sandusky who can vouch for his character."
+  }
 }

@@ -1,38 +1,38 @@
 {
   "id": "ida_broussard",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "Going QRT before the transmission is confirmed received — and not knowing, in the silence afterward, whether the coordinates got through",
   "name": "Ida Broussard",
   "role": "Licensed amateur radio operator and ARES net participant, Algiers",
-  "publicFace": "A compact, focused woman in her mid-thirties with the particular stillness of someone who has been listening to static for five days straight and learned to hear through it",
-  "privateGoal": "To transmit a complete, accurate SITREP to the emergency operations post before the battery dies — and to do it without a single transposition error, because she knows a wrong coordinate in this heat means a helicopter flies past eighty people",
-  "fear": "Going QRT before the transmission is confirmed received — and not knowing, in the silence afterward, whether the coordinates got through",
+  "voice": "Clipped and technical during operations, warmer and more expansive in the spaces between transmissions — she speaks to her equipment the way some people speak to animals",
+  "secrets": [
+    "She has been awake for seventy-two hours and made one calculation error two days ago that sent a supply boat to the wrong sector — no one was harmed, but she has been double-checking every number since with a ferocity that is slowing her down",
+    "She has a personal relationship with the net control operator at the emergency operations post and knows he will stay on frequency past the official window if she signals a partial transmission — but using that relationship feels like spending a resource she cannot replace"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "Her marine deep-cycle battery is at 22% and dropping approximately 3% per minute of sustained transmission — she has a maximum of seven minutes of broadcast time remaining",
     "The second runner's handwritten grid reference contains a transposition error that would place the extraction zone in the Industrial Canal — she caught it but has not yet been able to verify the correct coordinates independently",
     "The emergency operations post across the river is monitoring the designated ARES net frequency at fifteen-minute intervals — the next window opens in eleven minutes"
   ],
-  "voice": "Clipped and technical during operations, warmer and more expansive in the spaces between transmissions — she speaks to her equipment the way some people speak to animals",
+  "updatedAt": "2026-06-04T19:27:16.046Z",
+  "publicFace": "A compact, focused woman in her mid-thirties with the particular stillness of someone who has been listening to static for five days straight and learned to hear through it",
+  "represents": "",
   "trustLogic": "Opens up immediately to anyone who demonstrates technical competence; distrusts anyone who uses imprecise language about critical operational details",
-  "secrets": [
-    "She has been awake for seventy-two hours and made one calculation error two days ago that sent a supply boat to the wrong sector — no one was harmed, but she has been double-checking every number since with a ferocity that is slowing her down",
-    "She has a personal relationship with the net control operator at the emergency operations post and knows he will stay on frequency past the official window if she signals a partial transmission — but using that relationship feels like spending a resource she cannot replace"
+  "description": "",
+  "privateGoal": "To transmit a complete, accurate SITREP to the emergency operations post before the battery dies — and to do it without a single transposition error, because she knows a wrong coordinate in this heat means a helicopter flies past eighty people",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Asks for the source and verification method of any information being presented to her before she incorporates it into a transmission",
-    "heavyPressure": "States clearly that she will not transmit unverified data regardless of time pressure — and means it",
-    "breakingPoint": "Will never admit the calculation error from two days ago — she has classified it in her own mind as a navigational ambiguity rather than an operator error",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Continues operating her equipment for as long as physically possible regardless of external circumstances",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.046Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Asks for the source and verification method of any information being presented to her before she incorporates it into a transmission",
+    "breakingPoint": "Will never admit the calculation error from two days ago — she has classified it in her own mind as a navigational ambiguity rather than an operator error",
+    "fleeCondition": "",
+    "heavyPressure": "States clearly that she will not transmit unverified data regardless of time pressure — and means it",
+    "capturedBehavior": "Continues operating her equipment for as long as physically possible regardless of external circumstances"
+  }
 }

@@ -1,38 +1,38 @@
 {
   "id": "marcus_fontenot",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "That the documents will dissolve before he reaches them — and that even if he recovers them, no one with authority will be in a position to act on them before the redevelopment timeline moves forward",
   "name": "Marcus Fontenot",
   "role": "Property owner and informal salvage operator, Deslonde Street, Lower Ninth Ward",
-  "publicFace": "A quiet, methodical man in his early forties who moves through the flooded house with the deliberate calm of someone who grew up in it and knows every board",
-  "privateGoal": "To recover the land deed and abstract of title before the city's post-storm machinery can process the fraudulent abandonment filing and clear the lot",
-  "fear": "That the documents will dissolve before he reaches them — and that even if he recovers them, no one with authority will be in a position to act on them before the redevelopment timeline moves forward",
+  "voice": "Sparse and factual, with occasional lapses into the specific technical vocabulary of someone who has done physical labor in tight spaces his whole life",
+  "secrets": [
+    "He has already decided that if the documents are destroyed, he will fabricate a supporting affidavit using his memory of the deed's exact language — he believes this is justified and has not told anyone",
+    "He knows Cynthia Tureaud personally; they attended the same church for fifteen years, and her filing the property as abandoned while he was trapped in the flood is a betrayal he has not yet processed"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The iron document box is pinned under the collapsed plaster ceiling, which is showing active key failure — he has approximately forty minutes before the remaining ceiling section drops",
     "He found a carbon-copy receipt in the box's outer sleeve showing that city assessor's agent Cynthia Tureaud filed the property as abandoned on August 31 — two days before the mandatory shelter-in-place order was lifted",
     "The Fontenot family has held continuous title to this lot since 1923 — the abstract of title inside the box documents an unbroken chain of ownership that predates the city's current survey records"
   ],
-  "voice": "Sparse and factual, with occasional lapses into the specific technical vocabulary of someone who has done physical labor in tight spaces his whole life",
+  "updatedAt": "2026-06-04T19:27:16.047Z",
+  "publicFace": "A quiet, methodical man in his early forties who moves through the flooded house with the deliberate calm of someone who grew up in it and knows every board",
+  "represents": "",
   "trustLogic": "Opens up when the other person demonstrates they understand what is actually at stake legally — not emotionally, legally; closes down when treated as a victim rather than an agent",
-  "secrets": [
-    "He has already decided that if the documents are destroyed, he will fabricate a supporting affidavit using his memory of the deed's exact language — he believes this is justified and has not told anyone",
-    "He knows Cynthia Tureaud personally; they attended the same church for fifteen years, and her filing the property as abandoned while he was trapped in the flood is a betrayal he has not yet processed"
+  "description": "",
+  "privateGoal": "To recover the land deed and abstract of title before the city's post-storm machinery can process the fraudulent abandonment filing and clear the lot",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers questions with minimal information and waits to see what the other person does with it",
-    "heavyPressure": "States the legal facts of the situation with increasing precision, making clear that he has memorized the relevant statutes",
-    "breakingPoint": "Will never disclose his intention to fabricate a supporting affidavit if the originals are destroyed",
-    "fleeCondition": "If the ceiling shows imminent total key failure while he is still inside",
     "fleeStyle": "Exits through the window frame he entered, taking whatever documents he has recovered",
     "chaseStyle": "",
-    "capturedBehavior": "Cooperates with any authority while immediately requesting to speak to a legal aid representative",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.047Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers questions with minimal information and waits to see what the other person does with it",
+    "breakingPoint": "Will never disclose his intention to fabricate a supporting affidavit if the originals are destroyed",
+    "fleeCondition": "If the ceiling shows imminent total key failure while he is still inside",
+    "heavyPressure": "States the legal facts of the situation with increasing precision, making clear that he has memorized the relevant statutes",
+    "capturedBehavior": "Cooperates with any authority while immediately requesting to speak to a legal aid representative"
+  }
 }

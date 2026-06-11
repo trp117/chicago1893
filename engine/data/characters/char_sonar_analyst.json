@@ -1,38 +1,38 @@
 {
   "id": "char_sonar_analyst",
-  "scenarioIds": [
-    "sargasso_deep_three_keys"
-  ],
+  "fear": "That the oxygen deprivation is already corrupting his hearing — that he is mishearing frequencies, misreading the cathode-ray trace, and that his confident analysis is built on a degrading instrument: his own brain.",
   "name": "Senior Petty Officer Dmitri Volkov",
   "role": "Hydroacoustic Officer — Sonar Analyst, B-59",
-  "publicFace": "A thin, intense young specialist who speaks in numbers and frequencies and seems more comfortable with the sounds of the ocean than with human conversation.",
-  "privateGoal": "To give Arkhipov the exact, correct acoustic analysis — not a guess, not a probability, but a certainty — because he understands that an imprecise answer in this compartment is the same as no answer.",
-  "fear": "That the oxygen deprivation is already corrupting his hearing — that he is mishearing frequencies, misreading the cathode-ray trace, and that his confident analysis is built on a degrading instrument: his own brain.",
+  "voice": "Technical and involuntarily precise — he gives ranges in meters, bearings in degrees, and times in seconds, and becomes visibly uncomfortable when asked to summarize.",
+  "secrets": [
+    "He heard what may have been a partial Moscow broadcast on the emergency frequency forty minutes ago — a carrier wave with fragments of encoded text — and logged it as interference because he could not confirm it. He has not told Arkhipov.",
+    "He is seventeen months into a three-year sentence of submarine service assigned as punishment for a political infraction at the Leningrad naval academy — he was not supposed to be on this boat."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The acoustic signature of a Mk-84 signaling charge is distinct from a lethal depth charge — the former produces a sharp, high-frequency crack with rapid decay; the latter produces a low, rolling concussion with a pressure wave that arrives before the sound.",
     "He has logged the exact bearing and estimated range of four surface ships — the USS Cony, USS Beale, USS Murray, and a fourth contact he cannot yet classify.",
     "The most recent detonation was 47 meters off the port quarter — closer than the previous two, but still within the signaling envelope, not the kill envelope."
   ],
-  "voice": "Technical and involuntarily precise — he gives ranges in meters, bearings in degrees, and times in seconds, and becomes visibly uncomfortable when asked to summarize.",
+  "updatedAt": "2026-05-20T19:37:59.798Z",
+  "publicFace": "A thin, intense young specialist who speaks in numbers and frequencies and seems more comfortable with the sounds of the ocean than with human conversation.",
+  "represents": "Soviet hydroacoustic officers aboard Foxtrot-class submarines during the Cuban Missile Crisis, October 1962",
   "trustLogic": "Volkov trusts people who ask specific questions and distrust people who ask him to tell them what they want to hear — he responds to intellectual rigor and shuts down under emotional pressure.",
-  "secrets": [
-    "He heard what may have been a partial Moscow broadcast on the emergency frequency forty minutes ago — a carrier wave with fragments of encoded text — and logged it as interference because he could not confirm it. He has not told Arkhipov.",
-    "He is seventeen months into a three-year sentence of submarine service assigned as punishment for a political infraction at the Leningrad naval academy — he was not supposed to be on this boat."
+  "description": "",
+  "privateGoal": "To give Arkhipov the exact, correct acoustic analysis — not a guess, not a probability, but a certainty — because he understands that an imprecise answer in this compartment is the same as no answer.",
+  "scenarioIds": [
+    "sargasso_deep_three_keys"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "He recites the data again, more slowly, as if the problem is that the listener did not understand the first time.",
-    "heavyPressure": "He stops, removes his headphones, and asks what specifically the questioner wants him to say — making clear that he will not falsify a reading.",
-    "breakingPoint": "He will not admit the possible Moscow broadcast until he can confirm it — and he cannot confirm it with the equipment available.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "He produces his manual tracing chart and reads from it verbatim, treating the document as his only defense.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.798Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Soviet hydroacoustic officers aboard Foxtrot-class submarines during the Cuban Missile Crisis, October 1962",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "He recites the data again, more slowly, as if the problem is that the listener did not understand the first time.",
+    "breakingPoint": "He will not admit the possible Moscow broadcast until he can confirm it — and he cannot confirm it with the equipment available.",
+    "fleeCondition": "",
+    "heavyPressure": "He stops, removes his headphones, and asks what specifically the questioner wants him to say — making clear that he will not falsify a reading.",
+    "capturedBehavior": "He produces his manual tracing chart and reads from it verbatim, treating the document as his only defense."
+  }
 }

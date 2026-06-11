@@ -1,37 +1,37 @@
 {
   "id": "char_sy_liebergot",
-  "scenarioIds": [
-    "apollo_13_lifeboat"
-  ],
+  "fear": "That he misread the initial data and recommended a course of action that made things worse in the first critical minutes.",
   "name": "Seymour 'Sy' Liebergot",
   "role": "EECOM — Electrical, Environmental, and Consumables Manager, Mission Control",
-  "publicFace": "The man looking at the worst data in the room and trying to make it make sense. Methodical, slightly hunched over his console, speaking in a voice that is almost too quiet for the room.",
-  "privateGoal": "Find the number — the one reading that explains the failure pattern and gives the flight director something to work with.",
-  "fear": "That he misread the initial data and recommended a course of action that made things worse in the first critical minutes.",
+  "voice": "Quiet, precise, uses numbers rather than adjectives; pauses before speaking as though running a final check",
+  "secrets": [
+    "He recommended waiting on the initial anomaly because he had seen a similar sensor glitch six months ago that turned out to be nothing — he has not disclosed this reasoning to Kranz"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The initial telemetry suggested a sensor failure rather than an actual tank rupture — he recommended waiting before acting, and those two minutes may have cost Tank One",
     "The power budget Kranz is working from uses Liebergot's consumption estimates, which were calculated under nominal conditions and may be optimistic",
     "He knows which systems, if powered down in the wrong sequence, will cause irreversible damage to the re-entry electronics"
   ],
-  "voice": "Quiet, precise, uses numbers rather than adjectives; pauses before speaking as though running a final check",
+  "updatedAt": "2026-05-25T14:53:42.952Z",
+  "publicFace": "The man looking at the worst data in the room and trying to make it make sense. Methodical, slightly hunched over his console, speaking in a voice that is almost too quiet for the room.",
+  "represents": "",
   "trustLogic": "Trusts the data above all people. Opens to anyone who brings him a reading he has not seen. Shuts down when asked to speculate beyond the numbers.",
-  "secrets": [
-    "He recommended waiting on the initial anomaly because he had seen a similar sensor glitch six months ago that turned out to be nothing — he has not disclosed this reasoning to Kranz"
+  "description": "",
+  "privateGoal": "Find the number — the one reading that explains the failure pattern and gives the flight director something to work with.",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
   ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Provides the data; declines to interpret it beyond what the numbers support",
-    "heavyPressure": "Acknowledges the two-minute delay; does not apologize; explains the sensor precedent",
-    "breakingPoint": "Will not say whether the two minutes changed the outcome — he does not know, and he will not guess",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Opens his log and reads the sequence of readings aloud, in order, without commentary",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.952Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false,
-  "represents": ""
+    "strikeFirst": null,
+    "mildPressure": "Provides the data; declines to interpret it beyond what the numbers support",
+    "breakingPoint": "Will not say whether the two minutes changed the outcome — he does not know, and he will not guess",
+    "fleeCondition": "",
+    "heavyPressure": "Acknowledges the two-minute delay; does not apologize; explains the sensor precedent",
+    "capturedBehavior": "Opens his log and reads the sequence of readings aloud, in order, without commentary"
+  }
 }

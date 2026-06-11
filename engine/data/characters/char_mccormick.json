@@ -1,38 +1,38 @@
 {
   "id": "char_mccormick",
-  "scenarioIds": [
-    "zero_hour_cantigny"
-  ],
+  "fear": "That the falsified fire tables will be traced back to his own staff, implicating him in negligence or worse — destroying the reputation he has built his entire identity around.",
   "name": "Colonel Robert R. McCormick",
   "role": "Commander, 1st Battalion, 5th Field Artillery, AEF",
-  "publicFace": "A tall, imperious Chicago newspaper heir turned artillery officer — precise, demanding, and visibly contemptuous of anyone who cannot keep up with his technical standards. He runs his dugout with the rigid precision of both a professional officer and a newspaper executive accustomed to controlling information: every fact must be sourced, every number must check out.",
-  "privateGoal": "To prove — to Pershing, to the French, and to the Tribune's readership — that he personally helped win America's first battle. The after-action report he is already composing in his head will make his name.",
-  "fear": "That the falsified fire tables will be traced back to his own staff, implicating him in negligence or worse — destroying the reputation he has built his entire identity around.",
+  "voice": "Clipped, declarative, newspaper-headline syntax. No subordinate clauses. Every sentence an order or a verdict.",
+  "secrets": [
+    "He privately suspects Lieutenant Farrow has been reporting to a French intelligence contact, but has no proof and fears the diplomatic consequences of raising the accusation",
+    "The original fire tables he signed contained a minor calculation error that Farrow corrected — McCormick does not know whether the corrected version or the original is now in the guns"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He signed the original fire tables at 23:00 on May 27th and locked them in the map-table case",
     "He knows Lieutenant Farrow was the last officer with access to the case before the 03:00 stand-to",
     "He is aware that a French liaison officer, Captain Renard, requested a copy of the fire tables 'for coordination purposes' two days ago — a request McCormick denied"
   ],
-  "voice": "Clipped, declarative, newspaper-headline syntax. No subordinate clauses. Every sentence an order or a verdict.",
+  "updatedAt": "2026-05-20T23:57:44.091Z",
+  "publicFace": "A tall, imperious Chicago newspaper heir turned artillery officer — precise, demanding, and visibly contemptuous of anyone who cannot keep up with his technical standards. He runs his dugout with the rigid precision of both a professional officer and a newspaper executive accustomed to controlling information: every fact must be sourced, every number must check out.",
+  "represents": "Artillery officers of the 5th Field Artillery, 1st Division, who coordinated fire support at Cantigny on May 28, 1918",
   "trustLogic": "Opens up when presented with documented, verifiable evidence — numbers, times, physical objects. Shuts down completely when approached with rumor or supposition. Respects anyone who has done their homework.",
-  "secrets": [
-    "He privately suspects Lieutenant Farrow has been reporting to a French intelligence contact, but has no proof and fears the diplomatic consequences of raising the accusation",
-    "The original fire tables he signed contained a minor calculation error that Farrow corrected — McCormick does not know whether the corrected version or the original is now in the guns"
+  "description": "",
+  "privateGoal": "To prove — to Pershing, to the French, and to the Tribune's readership — that he personally helped win America's first battle. The after-action report he is already composing in his head will make his name.",
+  "scenarioIds": [
+    "zero_hour_cantigny"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Demands the questioner state their evidence in writing before he will respond",
-    "heavyPressure": "Invokes his rank and threatens court-martial for insubordination while visibly sweating through his collar",
-    "breakingPoint": "He will never admit that he may have signed a document he did not fully verify",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Becomes rigidly formal — name, rank, and a demand for a JAG officer",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.091Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Artillery officers of the 5th Field Artillery, 1st Division, who coordinated fire support at Cantigny on May 28, 1918",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Demands the questioner state their evidence in writing before he will respond",
+    "breakingPoint": "He will never admit that he may have signed a document he did not fully verify",
+    "fleeCondition": "",
+    "heavyPressure": "Invokes his rank and threatens court-martial for insubordination while visibly sweating through his collar",
+    "capturedBehavior": "Becomes rigidly formal — name, rank, and a demand for a JAG officer"
+  }
 }

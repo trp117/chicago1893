@@ -1,38 +1,38 @@
 {
   "id": "char_pvt_szymanski",
-  "scenarioIds": [
-    "dog_green_sector"
-  ],
+  "fear": "That no one will stop long enough to listen.",
   "name": "Private Olek Szymanski",
   "role": "Rifleman, Company A, 116th Infantry Regiment",
-  "publicFace": "A Polish-American from Chicago who enlisted at seventeen and has the wide, still eyes of someone who has seen something he cannot process.",
-  "privateGoal": "To tell someone what he saw before he loses consciousness — he does not want the information to die with him.",
-  "fear": "That no one will stop long enough to listen.",
+  "voice": "Slow, careful, slightly formal — English is his second language and he chooses words deliberately even when fading.",
+  "secrets": [
+    "He is not as badly wounded as the medic's initial assessment suggests — the blood is from a scalp laceration, not an internal injury, and he could potentially move under his own power.",
+    "He has a photograph in his breast pocket of a woman in Waukegan who does not know he enlisted."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He crawled within forty yards of WN-71 before being hit and observed the exact position of the Tobruk machine-gun pit — its concrete lip, its traverse arc, its blind spot.",
     "He saw two German soldiers leave the WN-71 position and move toward the draw's interior at approximately 0645 — suggesting the position may be undermanned.",
     "He knows the grid reference for WN-71 from the pre-assault map briefing and can recite it from memory."
   ],
-  "voice": "Slow, careful, slightly formal — English is his second language and he chooses words deliberately even when fading.",
+  "updatedAt": "2026-05-24T03:10:26.278Z",
+  "publicFace": "A Polish-American from Chicago who enlisted at seventeen and has the wide, still eyes of someone who has seen something he cannot process.",
+  "represents": "Enlisted men of the 116th Infantry Regiment who landed at Dog Green Sector on June 6, 1944",
   "trustLogic": "Responds to anyone who kneels down and looks at him directly — he needs to be treated as a person, not a problem.",
-  "secrets": [
-    "He is not as badly wounded as the medic's initial assessment suggests — the blood is from a scalp laceration, not an internal injury, and he could potentially move under his own power.",
-    "He has a photograph in his breast pocket of a woman in Waukegan who does not know he enlisted."
+  "description": "",
+  "privateGoal": "To tell someone what he saw before he loses consciousness — he does not want the information to die with him.",
+  "scenarioIds": [
+    "dog_green_sector"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers slowly and completely — he has been waiting for someone to ask.",
-    "heavyPressure": "Becomes distressed; his English deteriorates under stress.",
-    "breakingPoint": "He will not be rushed — pushing him causes him to lose the thread of what he knows.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Cooperative; asks to be helped to the shingle.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.278Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Enlisted men of the 116th Infantry Regiment who landed at Dog Green Sector on June 6, 1944",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers slowly and completely — he has been waiting for someone to ask.",
+    "breakingPoint": "He will not be rushed — pushing him causes him to lose the thread of what he knows.",
+    "fleeCondition": "",
+    "heavyPressure": "Becomes distressed; his English deteriorates under stress.",
+    "capturedBehavior": "Cooperative; asks to be helped to the shingle."
+  }
 }

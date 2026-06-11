@@ -1,0 +1,32 @@
+{
+  "id": "char_ezra_pedrick",
+  "fear": "That his crew will lose the stroke rhythm in the dark and drift toward the British warships before anyone realizes the bateau is off-course.",
+  "name": "Sergeant Ezra Pedrick",
+  "role": "Senior Oarsman, 14th Continental Regiment (Marblehead)",
+  "voice": "Monosyllabic, direct, with the authority of a man whose competence is self-evident to anyone watching him work.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "Exactly where the tidal current runs fastest in the mid-channel and which angle of approach minimizes drift.",
+    "Which oarsmen in his crew are close to physical failure and which can sustain another two hours.",
+    "The sound signature of the British warship Phoenix at anchor—her hull creaks in a distinctive pattern—and how close that sound has been getting."
+  ],
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "publicFace": "A broad-shouldered fisherman of forty who has been on the water since age nine; speaks little, communicates mostly through the set of his jaw and the angle of his oar.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "fictional",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Answers the question and returns immediately to the oar.",
+    "breakingPoint": "Will not admit his injury to a superior officer until the last crossing is complete; considers it irrelevant to the mission.",
+    "heavyPressure": "Looks at his hands, then at the questioner, then at the river; says what needs to be said without elaboration."
+  },
+  "privateConstraint": "Pedrick's hands are badly blistered from five hours of continuous rowing; he is concealing the severity of his injury from Glover because he refuses to be pulled from the crossing rotation at this stage of the operation."
+}

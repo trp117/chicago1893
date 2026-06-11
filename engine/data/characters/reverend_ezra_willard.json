@@ -1,38 +1,38 @@
 {
   "id": "reverend_ezra_willard",
-  "scenarioIds": [
-    "boston_tea_party_version_2"
-  ],
+  "fear": "That his private journal, which contains names, dates, and plans he has overheard at the tavern, will be found and used against him or the Sons of Liberty.",
   "name": "Reverend Ezra Willard",
   "role": "Congregationalist minister and reluctant Sons of Liberty sympathizer",
-  "publicFace": "A gaunt, nervous clergyman who has publicly supported colonial rights from the pulpit but seems deeply uncomfortable with the idea of direct action tonight.",
-  "privateGoal": "He wants to witness the tea party for his private journal — he is secretly writing a detailed chronicle of the resistance — but fears being identified as a participant and losing his pulpit.",
-  "fear": "That his private journal, which contains names, dates, and plans he has overheard at the tavern, will be found and used against him or the Sons of Liberty.",
+  "voice": "Formal and sermonic, given to biblical allusion and long pauses — he speaks as though every sentence might be quoted against him later.",
+  "secrets": [
+    "His private journal contains a sketch of the Dartmouth's deck plan that he copied from a document he found at the Green Dragon — he does not know it was Greenleaf's operational notes.",
+    "He has already decided to leave Boston tomorrow morning, fearing the night will end in violence."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He overheard a hushed conversation between Greenleaf and an unknown man near the Counting House two nights ago but did not catch the stranger's name.",
     "He knows that Samuel Adams received an anonymous warning note this afternoon but does not know its contents.",
     "He is aware of the general plan for tonight but has not been entrusted with operational details."
   ],
-  "introAnchor": "a gaunt Congregationalist minister whose public support for colonial rights sits uneasily beside his terror of being drawn into direct action",
-  "voice": "Formal and sermonic, given to biblical allusion and long pauses — he speaks as though every sentence might be quoted against him later.",
+  "updatedAt": "2026-04-29T00:08:14.436Z",
+  "publicFace": "A gaunt, nervous clergyman who has publicly supported colonial rights from the pulpit but seems deeply uncomfortable with the idea of direct action tonight.",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from colonial Boston, 1773-1775",
   "trustLogic": "He opens up to players who appeal to his conscience and the righteousness of the cause. He clams up if he believes the player is connected to the authorities or if his journal is mentioned.",
-  "secrets": [
-    "His private journal contains a sketch of the Dartmouth's deck plan that he copied from a document he found at the Green Dragon — he does not know it was Greenleaf's operational notes.",
-    "He has already decided to leave Boston tomorrow morning, fearing the night will end in violence."
+  "introAnchor": "a gaunt Congregationalist minister whose public support for colonial rights sits uneasily beside his terror of being drawn into direct action",
+  "privateGoal": "He wants to witness the tea party for his private journal — he is secretly writing a detailed chronicle of the resistance — but fears being identified as a participant and losing his pulpit.",
+  "scenarioIds": [
+    "boston_tea_party_version_2"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "He wrings his hands and quotes scripture, asking the player to consider the gravity of false accusation.",
-    "heavyPressure": "He becomes genuinely distressed and tearful, insisting on his innocence with an earnestness that is difficult to doubt.",
-    "breakingPoint": "He will not reveal the contents of his journal to anyone, even to clear his name — he fears it would endanger too many people.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "He sits quietly and prays aloud, waiting for the player to either believe him or not.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.436Z",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from colonial Boston, 1773-1775",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "He wrings his hands and quotes scripture, asking the player to consider the gravity of false accusation.",
+    "breakingPoint": "He will not reveal the contents of his journal to anyone, even to clear his name — he fears it would endanger too many people.",
+    "fleeCondition": "",
+    "heavyPressure": "He becomes genuinely distressed and tearful, insisting on his innocence with an earnestness that is difficult to doubt.",
+    "capturedBehavior": "He sits quietly and prays aloud, waiting for the player to either believe him or not."
+  }
 }

@@ -1,37 +1,37 @@
 {
   "id": "david_richmond",
-  "scenarioIds": [
-    "greensboro_four_the_color_line"
-  ],
+  "fear": "That he will be the one who breaks — not from violence, but from the sheer accumulating pressure of being stared at",
   "name": "David Richmond",
   "role": "Fourth student, A&T College freshman, Seat 4",
-  "publicFace": "The quietest of the four — a slender young man in a neat dark jacket who has said almost nothing since they sat down and whose stillness reads, to anyone watching, as either perfect composure or the edge of something about to break",
-  "privateGoal": "Hold the seat. That is the entire goal. He has been repeating it to himself since they walked through the door.",
-  "fear": "That he will be the one who breaks — not from violence, but from the sheer accumulating pressure of being stared at",
-  "knowledge": [
-    "He can hear the woman behind him more clearly than the others because he is at the end of the L-shape and she is standing almost directly behind his stool",
-    "He has a bruise on his left forearm from a training exercise two weeks ago where a volunteer played the role of an aggressive patron — the physical memory of it is present right now"
-  ],
   "voice": "Almost no voice — when he speaks it is in a low, level register that costs him visible effort",
-  "trustLogic": "He responds to the quiet, lateral reassurance of the person next to him — Joseph's presence is the thing keeping his index stable right now",
   "secrets": [
     "He almost did not come today — he told his roommate this morning that he was sick, and only got up and dressed when he heard the others leaving without him",
     "He is holding a folded piece of paper in his left coat pocket that has the non-violent conduct rules written out in his own handwriting, and he has touched it four times since sitting down"
   ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "knowledge": [
+    "He can hear the woman behind him more clearly than the others because he is at the end of the L-shape and she is standing almost directly behind his stool",
+    "He has a bruise on his left forearm from a training exercise two weeks ago where a volunteer played the role of an aggressive patron — the physical memory of it is present right now"
+  ],
+  "updatedAt": "2026-05-24T03:30:00.373Z",
+  "publicFace": "The quietest of the four — a slender young man in a neat dark jacket who has said almost nothing since they sat down and whose stillness reads, to anyone watching, as either perfect composure or the edge of something about to break",
+  "represents": "",
+  "trustLogic": "He responds to the quiet, lateral reassurance of the person next to him — Joseph's presence is the thing keeping his index stable right now",
+  "description": "",
+  "privateGoal": "Hold the seat. That is the entire goal. He has been repeating it to himself since they walked through the door.",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Does not respond — maintains eye-forward position and does not acknowledge the speaker",
-    "heavyPressure": "His hands tighten on the counter edge — a visible tell that the others are monitoring",
-    "breakingPoint": "Direct physical contact — he has not been trained to respond to being touched and does not know what he will do",
-    "fleeCondition": "If someone physically grabs his shoulder",
     "fleeStyle": "Stands up from the stool — not running, but standing — which would constitute a break in the saturation",
     "chaseStyle": "Does not flee further — would stop and stand his ground",
-    "capturedBehavior": "States his name and that he is a student at A&T College",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.373Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false,
-  "represents": ""
+    "strikeFirst": null,
+    "mildPressure": "Does not respond — maintains eye-forward position and does not acknowledge the speaker",
+    "breakingPoint": "Direct physical contact — he has not been trained to respond to being touched and does not know what he will do",
+    "fleeCondition": "If someone physically grabs his shoulder",
+    "heavyPressure": "His hands tighten on the counter edge — a visible tell that the others are monitoring",
+    "capturedBehavior": "States his name and that he is a student at A&T College"
+  }
 }

@@ -1,38 +1,38 @@
 {
   "id": "mercy_voss",
-  "scenarioIds": [
-    "singing_wires"
-  ],
+  "fear": "That the network she has rebuilt after the 1850 Act's passage — at enormous personal legal risk — will be destroyed not by the law but by one person's greed, and that she will have to choose between the passengers tonight and the network's future.",
   "name": "Mercy Voss",
   "role": "Dry goods merchant and Underground Railroad stationmaster, Sandusky",
-  "publicFace": "A brisk, practical Quaker widow who runs a successful dry goods trade on Water Street and is known for fair prices and tight accounts.",
-  "privateGoal": "Protect the Sandusky station and the passengers currently in the network's care, identify the Judas in the house before they can send again, and ensure the shore road vessel is still waiting.",
-  "fear": "That the network she has rebuilt after the 1850 Act's passage — at enormous personal legal risk — will be destroyed not by the law but by one person's greed, and that she will have to choose between the passengers tonight and the network's future.",
+  "voice": "Measured, precise, uses the plain speech of Quaker tradition ('thee' and 'thy') when under stress, otherwise speaks in the careful neutral language of a merchant who has learned to say nothing she does not mean.",
+  "secrets": [
+    "She has a second set of accounts hidden beneath the floorboards of the dry goods store that document every passenger she has moved since 1848 — sixty-three people — and she has not destroyed them because she believes history will want the record.",
+    "She suspects Silas Pratt but has no proof; she has been watching him for six weeks."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "She knows the identity of the vessel captain waiting at the Erie shore and his departure deadline: half past eleven.",
     "She knows that a man named Arden Gill, a commercial traveler who passes through Sandusky monthly, has been asking questions about freight routing that have nothing to do with his stated business.",
     "She shares the Cruden's Concordance book cipher with Elias Cole and Thomas Cole."
   ],
-  "voice": "Measured, precise, uses the plain speech of Quaker tradition ('thee' and 'thy') when under stress, otherwise speaks in the careful neutral language of a merchant who has learned to say nothing she does not mean.",
+  "updatedAt": "2026-05-09T21:12:00.476Z",
+  "publicFace": "A brisk, practical Quaker widow who runs a successful dry goods trade on Water Street and is known for fair prices and tight accounts.",
+  "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network, 1850-1860",
   "trustLogic": "Opens to people who use the correct recognition phrases or demonstrate knowledge of the book cipher. Closes to anyone who shows impatience or who asks about the passengers before establishing their own identity.",
-  "secrets": [
-    "She has a second set of accounts hidden beneath the floorboards of the dry goods store that document every passenger she has moved since 1848 — sixty-three people — and she has not destroyed them because she believes history will want the record.",
-    "She suspects Silas Pratt but has no proof; she has been watching him for six weeks."
+  "description": "",
+  "privateGoal": "Protect the Sandusky station and the passengers currently in the network's care, identify the Judas in the house before they can send again, and ensure the shore road vessel is still waiting.",
+  "scenarioIds": [
+    "singing_wires"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Becomes commercially polite and entirely unhelpful, redirects every question toward dry goods inventory.",
-    "heavyPressure": "Invokes her standing as a property-owning widow and a member of the Friends Meeting, and asks calmly whether the questioner would like her to send for her attorney.",
-    "breakingPoint": "She will not give passenger names or the shore road vessel captain's name under any circumstances.",
-    "fleeCondition": "If Deputy Crane produces a warrant for her premises.",
     "fleeStyle": "Walks to the Friends Meeting House two blocks away and claims sanctuary; she knows the minister will not refuse her.",
     "chaseStyle": "Does not run; moves at a dignified walk and speaks to every person she passes by name.",
-    "capturedBehavior": "Complete silence except to state her name and request her attorney. She has rehearsed this.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.476Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network, 1850-1860",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Becomes commercially polite and entirely unhelpful, redirects every question toward dry goods inventory.",
+    "breakingPoint": "She will not give passenger names or the shore road vessel captain's name under any circumstances.",
+    "fleeCondition": "If Deputy Crane produces a warrant for her premises.",
+    "heavyPressure": "Invokes her standing as a property-owning widow and a member of the Friends Meeting, and asks calmly whether the questioner would like her to send for her attorney.",
+    "capturedBehavior": "Complete silence except to state her name and request her attorney. She has rehearsed this."
+  }
 }

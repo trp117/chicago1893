@@ -1,0 +1,20 @@
+{
+  "id": "loc_manhattan_landing_slip",
+  "mood": "exhausted relief, urgent turnover, fog-shrouded",
+  "name": "Manhattan Ferry Landing, Cortlandt Street Slip",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "The north Manhattan shore in near-total darkness, where bateaux ground against the mud bank and men climb out into shallow water to clear the hull for the return crossing. A single hooded lantern marks the landing point.",
+  "atmosphericDetails": [
+    "The sound of men wading through shallow water and climbing the bank in the dark, equipment clanking despite orders for silence.",
+    "The hooded lantern swinging gently on its post, the only navigational reference point for bateaux coming in through the fog.",
+    "The voices of Manhattan-side officers directing the landed troops away from the slip to clear space for the next wave.",
+    "The smell of the Manhattan shore—different from Brooklyn, with more wood smoke and less river mud, the smell of a city rather than a fortification."
+  ],
+  "linkedCharacterIds": [
+    "char_ezra_pedrick"
+  ]
+}

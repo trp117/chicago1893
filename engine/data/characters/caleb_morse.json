@@ -1,39 +1,39 @@
 {
   "id": "caleb_morse",
-  "scenarioIds": [
-    "lightning_and_the_midnight_coach"
-  ],
+  "fear": "That he is not skilled enough — that some other dab on the line will catch the phantom and expose him before his father's passengers are safe.",
   "name": "Caleb Morse",
   "role": "Night telegraph operator, Sandusky junction",
-  "publicFace": "A reliable, fast operator — one of the best brass pounders on the Erie corridor. His supervisor considers him a model employee.",
-  "privateGoal": "Misdirect the red fire bounty dispatch using a phantom circuit, then cover his tracks well enough that no one can prove the Sandusky station was the point of interference.",
-  "fear": "That he is not skilled enough — that some other dab on the line will catch the phantom and expose him before his father's passengers are safe.",
+  "voice": "Quick, clipped, uses telegraph shorthand in speech — says 'min' when he needs a moment, 'red fire' for anything urgent, calls incompetents 'plugs' without apology.",
+  "secrets": [
+    "He has already been approached once by a company supervisor who suspected him of using the brass for unauthorized transmissions — he denied it and the matter was dropped, but the supervisor is watching him.",
+    "He knows the identity of the informant but has not told his father because he is afraid of what his father will do."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The red fire dispatch contains a physical description accurate enough to identify the passengers at a checkpoint.",
     "The Huron relay station is staffed tonight by a plug named Wickes who reads slowly and re-asks for repeats — this is both a vulnerability and an opportunity.",
     "The company's codebook has a commercial cipher entry that, repurposed, can be used to send a false location report that will look like a legitimate station update.",
     "His father has three passengers tonight, not two — there is a child, which the bounty description does not mention, meaning someone who saw them does not know the child exists."
   ],
-  "voice": "Quick, clipped, uses telegraph shorthand in speech — says 'min' when he needs a moment, 'red fire' for anything urgent, calls incompetents 'plugs' without apology.",
+  "updatedAt": "2026-05-08T17:48:26.455Z",
+  "publicFace": "A reliable, fast operator — one of the best brass pounders on the Erie corridor. His supervisor considers him a model employee.",
+  "represents": "Telegraph operators who used their wire access to support Underground Railroad networks in Ohio during the 1850s",
   "trustLogic": "Trusts people who demonstrate technical knowledge — if you know what phantoming means, he will talk. If you use the terminology wrong, he goes silent.",
-  "secrets": [
-    "He has already been approached once by a company supervisor who suspected him of using the brass for unauthorized transmissions — he denied it and the matter was dropped, but the supervisor is watching him.",
-    "He knows the identity of the informant but has not told his father because he is afraid of what his father will do."
+  "description": "",
+  "privateGoal": "Misdirect the red fire bounty dispatch using a phantom circuit, then cover his tracks well enough that no one can prove the Sandusky station was the point of interference.",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Keeps working the brass, answers over his shoulder, does not stop sending.",
-    "heavyPressure": "Challenges the questioner's technical knowledge — asks them to explain what they think they saw on the sounder.",
-    "breakingPoint": "He will not confirm his father's name or role under any circumstances.",
-    "fleeCondition": "If the phantom is discovered and a company inspector arrives at the station.",
     "fleeStyle": "Out the back window of the instrument room — he has done this in rehearsal.",
     "chaseStyle": "Cuts across the rail yard using the consist as cover, heading for the water tower.",
-    "capturedBehavior": "Claims equipment malfunction — says the line was grounded by weather and the phantom signal was atmospheric interference.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.455Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Telegraph operators who used their wire access to support Underground Railroad networks in Ohio during the 1850s",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Keeps working the brass, answers over his shoulder, does not stop sending.",
+    "breakingPoint": "He will not confirm his father's name or role under any circumstances.",
+    "fleeCondition": "If the phantom is discovered and a company inspector arrives at the station.",
+    "heavyPressure": "Challenges the questioner's technical knowledge — asks them to explain what they think they saw on the sounder.",
+    "capturedBehavior": "Claims equipment malfunction — says the line was grounded by weather and the phantom signal was atmospheric interference."
+  }
 }

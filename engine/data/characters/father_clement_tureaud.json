@@ -1,38 +1,38 @@
 {
   "id": "father_clement_tureaud",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "That the people who have trusted him for decades will learn that his sister filed their neighbors' properties as abandoned while those neighbors were still alive in the flood",
   "name": "Father Clement Tureaud",
   "role": "Roman Catholic parish priest and informal camp chaplain, St. Claude Avenue Bridge",
-  "publicFace": "A heavyset man in his early sixties wearing a clerical collar that has not been white since August 29 — he moves through the bridge camp with the unhurried authority of someone who has been a fixed point in this neighborhood for thirty years",
-  "privateGoal": "To maintain control of the informal supply distribution network he has built over the past five days — which he genuinely believes is more efficient and more equitable than the official FEMA channel, and which also happens to route resources through his personal contacts",
-  "fear": "That the people who have trusted him for decades will learn that his sister filed their neighbors' properties as abandoned while those neighbors were still alive in the flood",
+  "voice": "Warm, pastoral, and rhetorically practiced — he has been delivering difficult news to people for thirty years and knows how to make a justification sound like a confession of humility",
+  "secrets": [
+    "He has been in contact with a private real estate development intermediary who has expressed interest in several Lower Ninth Ward parcels — he has not acted on this contact, but he has not ended it either",
+    "He genuinely loves this community and has not fully reconciled his actions with that love — the cognitive dissonance is the crack in his composure"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "His sister Cynthia Tureaud is a city assessor's agent who has been filing abandoned-property classifications on Lower Ninth Ward parcels since August 31 — he knew about it and said nothing",
     "The authorization codes he has been using to sign supply receipts are drawn from a diocesan emergency relief fund that has not officially authorized his operations — he has been acting unilaterally",
     "There are two additional pharmaceutical crates staged under the Claiborne Avenue overpass that he has not disclosed to the bridge camp population"
   ],
-  "voice": "Warm, pastoral, and rhetorically practiced — he has been delivering difficult news to people for thirty years and knows how to make a justification sound like a confession of humility",
+  "updatedAt": "2026-06-04T19:27:16.045Z",
+  "publicFace": "A heavyset man in his early sixties wearing a clerical collar that has not been white since August 29 — he moves through the bridge camp with the unhurried authority of someone who has been a fixed point in this neighborhood for thirty years",
+  "represents": "",
   "trustLogic": "Opens up when addressed with spiritual or communal framing; becomes evasive and reframes when confronted with specific documentary evidence",
-  "secrets": [
-    "He has been in contact with a private real estate development intermediary who has expressed interest in several Lower Ninth Ward parcels — he has not acted on this contact, but he has not ended it either",
-    "He genuinely loves this community and has not fully reconciled his actions with that love — the cognitive dissonance is the crack in his composure"
+  "description": "",
+  "privateGoal": "To maintain control of the informal supply distribution network he has built over the past five days — which he genuinely believes is more efficient and more equitable than the official FEMA channel, and which also happens to route resources through his personal contacts",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Acknowledges the concern, contextualizes it within the larger crisis, and redirects toward what he is doing to help",
-    "heavyPressure": "Invokes his thirty years of service to the community and the impossibility of operating through official channels that have demonstrably failed",
-    "breakingPoint": "The connection between his sister's abandonment filings and the three children on Darnell's skiff — whose family property Cynthia filed as abandoned on August 31",
-    "fleeCondition": "If confronted simultaneously with the diversion manifest, the authorization code forgery, and his sister's filing — all three at once",
     "fleeStyle": "Moves toward the far end of the bridge deck, using the crowd as cover, attempting to reach the service ladder to the lower roadway",
     "chaseStyle": "Stops immediately when called by name — he will not run from people he has known for thirty years",
-    "capturedBehavior": "Confesses the supply diversion and his sister's filings in full, frames everything as a misguided attempt to protect the community, and offers to disclose the location of the Claiborne staging point",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.045Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Acknowledges the concern, contextualizes it within the larger crisis, and redirects toward what he is doing to help",
+    "breakingPoint": "The connection between his sister's abandonment filings and the three children on Darnell's skiff — whose family property Cynthia filed as abandoned on August 31",
+    "fleeCondition": "If confronted simultaneously with the diversion manifest, the authorization code forgery, and his sister's filing — all three at once",
+    "heavyPressure": "Invokes his thirty years of service to the community and the impossibility of operating through official channels that have demonstrably failed",
+    "capturedBehavior": "Confesses the supply diversion and his sister's filings in full, frames everything as a misguided attempt to protect the community, and offers to disclose the location of the Claiborne staging point"
+  }
 }

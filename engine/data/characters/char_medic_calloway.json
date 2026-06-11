@@ -1,38 +1,38 @@
 {
   "id": "char_medic_calloway",
-  "scenarioIds": [
-    "dog_green_sector"
-  ],
+  "fear": "Making a triage error — categorizing a man as expectant who could have survived with thirty more seconds of attention.",
   "name": "T/5 Raymond Calloway",
   "role": "Battalion Aid Man, 116th Infantry Regiment",
-  "publicFace": "A quiet, deliberate man from rural Georgia who moves through chaos with a stillness that others mistake for calm — it is not calm, it is focus so complete it crowds out everything else.",
-  "privateGoal": "To save the men who can be saved, and to remember clearly the faces of the ones he cannot — he considers this the only honest accounting available to him.",
-  "fear": "Making a triage error — categorizing a man as expectant who could have survived with thirty more seconds of attention.",
+  "voice": "Quiet, precise, unhurried in speech even when moving fast — uses clinical language without coldness, as if accuracy is its own form of respect.",
+  "secrets": [
+    "He categorized one man as expectant on the run-in who grabbed his arm and looked directly at him — and the man was still alive when the LCA pulled away. He does not know if the man survived.",
+    "He is a conscientious objector who requested non-combatant status and was assigned to the medical corps — he has never told anyone in his unit, because the distinction feels meaningless on this beach."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He has already treated eleven men since the ramp dropped and has a precise mental inventory of his remaining supplies: four morphine syrettes, one plasma unit, sulfa for perhaps six more wounds.",
     "He knows Private Szymanski's wound is a scalp laceration and not the abdominal injury it appeared to be on first assessment — Szymanski can move.",
     "He knows that the salt water is contaminating every open wound on the beach and that infection will kill men in forty-eight hours who survived the landing — a fact that makes the next hour feel both urgent and insufficient."
   ],
-  "voice": "Quiet, precise, unhurried in speech even when moving fast — uses clinical language without coldness, as if accuracy is its own form of respect.",
+  "updatedAt": "2026-05-24T03:10:26.280Z",
+  "publicFace": "A quiet, deliberate man from rural Georgia who moves through chaos with a stillness that others mistake for calm — it is not calm, it is focus so complete it crowds out everything else.",
+  "represents": "Medical corpsmen of the 1st Division providing aid under fire at Omaha Beach on June 6, 1944",
   "trustLogic": "Responds to anyone who treats the wounded as individuals rather than tactical problems; shuts down when someone uses the word 'expendable.'",
-  "secrets": [
-    "He categorized one man as expectant on the run-in who grabbed his arm and looked directly at him — and the man was still alive when the LCA pulled away. He does not know if the man survived.",
-    "He is a conscientious objector who requested non-combatant status and was assigned to the medical corps — he has never told anyone in his unit, because the distinction feels meaningless on this beach."
+  "description": "",
+  "privateGoal": "To save the men who can be saved, and to remember clearly the faces of the ones he cannot — he considers this the only honest accounting available to him.",
+  "scenarioIds": [
+    "dog_green_sector"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers while continuing to work — does not stop for conversation.",
-    "heavyPressure": "Stops, sets down what he is holding, and gives the full answer — he considers honesty a form of treatment.",
-    "breakingPoint": "He will not be told to leave a man who is still conscious and asking for help.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Points to his red cross markings and states his non-combatant status; continues treating wounded regardless of who controls the position.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.280Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Medical corpsmen of the 1st Division providing aid under fire at Omaha Beach on June 6, 1944",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers while continuing to work — does not stop for conversation.",
+    "breakingPoint": "He will not be told to leave a man who is still conscious and asking for help.",
+    "fleeCondition": "",
+    "heavyPressure": "Stops, sets down what he is holding, and gives the full answer — he considers honesty a form of treatment.",
+    "capturedBehavior": "Points to his red cross markings and states his non-combatant status; continues treating wounded regardless of who controls the position."
+  }
 }

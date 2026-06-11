@@ -1,38 +1,38 @@
 {
   "id": "harris_mackintosh",
-  "scenarioIds": [
-    "greensboro_four_the_color_line"
-  ],
+  "fear": "That Woolworth's corporate headquarters in New York will hold him personally responsible for whatever outcome this afternoon produces, whether it is a riot or a capitulation",
   "name": "Harris Mackintosh",
   "role": "Store Manager, F.W. Woolworth Co., Greensboro",
-  "publicFace": "A composed, business-suited store manager whose exact age and appearance are not documented in surviving historical records who speaks in the measured cadences of someone accustomed to resolving floor disputes quietly and quickly",
-  "privateGoal": "Protect the store's revenue and his own position — he cannot afford a violent incident on his floor, but he also cannot afford to be seen serving Black customers at the counter in front of his white clientele",
-  "fear": "That Woolworth's corporate headquarters in New York will hold him personally responsible for whatever outcome this afternoon produces, whether it is a riot or a capitulation",
+  "voice": "Flat, managerial, the voice of a man who has spent twenty years making problems disappear before they reach the sales floor",
+  "secrets": [
+    "He privately believes the lunch counter policy is bad for business and has said so in a letter to the regional office that was never answered",
+    "He has a personal friendship with the pastor of a Black congregation in Greensboro and has donated anonymously to its building fund — a fact that would destroy his credibility with his white staff if known"
+  ],
+  "createdAt": "2025-02-01T16:30:00Z",
   "knowledge": [
     "He has already telephoned the Greensboro Police Department non-emergency line and been told that unless there is violence, officers will not intervene",
     "He knows that the students have paid receipts from the dry-goods counter — they are legitimate customers of the store, which complicates any trespass argument",
     "He is aware from company communications and broader regional tensions that student protest activity at Southern lunch counters is becoming an increasing concern for store management"
   ],
-  "voice": "Flat, managerial, the voice of a man who has spent twenty years making problems disappear before they reach the sales floor",
+  "updatedAt": "2026-05-24T03:30:00.374Z",
+  "publicFace": "A composed, business-suited store manager whose exact age and appearance are not documented in surviving historical records who speaks in the measured cadences of someone accustomed to resolving floor disputes quietly and quickly",
+  "represents": "F.W. Woolworth store managers in the American South who confronted sit-in protesters at segregated lunch counters in 1960",
   "trustLogic": "He responds to calm, businesslike language and is briefly opened by any acknowledgment that his position is genuinely difficult; he closes entirely when he feels publicly humiliated or when he suspects the conversation is being performed for an audience",
-  "secrets": [
-    "He privately believes the lunch counter policy is bad for business and has said so in a letter to the regional office that was never answered",
-    "He has a personal friendship with the pastor of a Black congregation in Greensboro and has donated anonymously to its building fund — a fact that would destroy his credibility with his white staff if known"
+  "description": "",
+  "privateGoal": "Protect the store's revenue and his own position — he cannot afford a violent incident on his floor, but he also cannot afford to be seen serving Black customers at the counter in front of his white clientele",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Responds with procedural language — 'store policy,' 'the arrangement we have in place' — and physically positions himself between the students and the crowd to reduce spectacle",
-    "heavyPressure": "Invokes the threat of police removal in a low, controlled voice, but does not raise his hand or touch any student — he knows the optics of physical contact are catastrophic",
-    "breakingPoint": "He will never publicly admit that the policy is wrong or that the students have a legal right to be served — doing so would end his career in the Woolworth's system",
-    "fleeCondition": "If Caldwell the reporter approaches him with a direct question on the record",
     "fleeStyle": "Retreats to the back office and sends the assistant floor walker to handle further questions",
     "chaseStyle": "Refuses to engage, citing store policy on press inquiries",
-    "capturedBehavior": "Gives a prepared non-statement: 'Woolworth's policy is under review at the corporate level and we have no further comment at this time'",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.374Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "F.W. Woolworth store managers in the American South who confronted sit-in protesters at segregated lunch counters in 1960",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Responds with procedural language — 'store policy,' 'the arrangement we have in place' — and physically positions himself between the students and the crowd to reduce spectacle",
+    "breakingPoint": "He will never publicly admit that the policy is wrong or that the students have a legal right to be served — doing so would end his career in the Woolworth's system",
+    "fleeCondition": "If Caldwell the reporter approaches him with a direct question on the record",
+    "heavyPressure": "Invokes the threat of police removal in a low, controlled voice, but does not raise his hand or touch any student — he knows the optics of physical contact are catastrophic",
+    "capturedBehavior": "Gives a prepared non-statement: 'Woolworth's policy is under review at the corporate level and we have no further comment at this time'"
+  }
 }

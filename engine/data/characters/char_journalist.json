@@ -1,38 +1,38 @@
 {
   "id": "char_journalist",
-  "scenarioIds": [
-    "bornholmer_strasse_first_breach"
-  ],
+  "fear": "That he will be so focused on the frame that he misses the human moment inside it — that the footage will be historically significant and personally empty",
   "name": "Thomas Weller",
   "role": "ARD television camera operator, West Berlin bureau",
-  "publicFace": "A heavyset man in his late thirties with a professional stillness — he moves the camera as though it weighs nothing and speaks only when he has something to say",
-  "privateGoal": "To capture the single image that defines this night — not for the network, but for himself; he has been covering the Wall for eleven years and believes he owes the story a true witness",
-  "fear": "That he will be so focused on the frame that he misses the human moment inside it — that the footage will be historically significant and personally empty",
+  "voice": "Economical and precise — describes what he sees in the language of composition and light, occasionally forgetting that not everyone sees the world through a viewfinder",
+  "secrets": [
+    "He has a press credential for the East Berlin side — obtained through unofficial channels — that would allow him to cross the checkpoint if it opens; he has not told his producer or his crew",
+    "His younger sister lives in East Berlin; he has not seen her in six years and he does not know if she is in the crowd tonight"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "His ARD producer in Hamburg has told him via radio that the network is prepared to go to full live broadcast the moment the gate opens — his signal will go directly to air with no editing",
     "He has covered three previous border incidents and knows that the Volkspolizei on the western approach have orders not to impede press operations — but those orders were written for a normal night",
     "The freezing fog is condensing on his lens every four to six minutes — he has a lens cloth in his left breast pocket but using it requires taking the camera off his shoulder"
   ],
-  "voice": "Economical and precise — describes what he sees in the language of composition and light, occasionally forgetting that not everyone sees the world through a viewfinder",
+  "updatedAt": "2026-05-22T18:14:55.969Z",
+  "publicFace": "A heavyset man in his late thirties with a professional stillness — he moves the camera as though it weighs nothing and speaks only when he has something to say",
+  "represents": "West German ARD television camera operators covering the Bornholmer Straße opening on November 9, 1989",
   "trustLogic": "Responds to specificity — anyone who tells him something concrete and verifiable earns his attention immediately; dismisses anyone who speaks in abstractions or ideology",
-  "secrets": [
-    "He has a press credential for the East Berlin side — obtained through unofficial channels — that would allow him to cross the checkpoint if it opens; he has not told his producer or his crew",
-    "His younger sister lives in East Berlin; he has not seen her in six years and he does not know if she is in the crowd tonight"
+  "description": "",
+  "privateGoal": "To capture the single image that defines this night — not for the network, but for himself; he has been covering the Wall for eleven years and believes he owes the story a true witness",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Keeps filming — the camera is both his professional tool and his personal shield; being questioned while filming is a form of answer in itself",
-    "heavyPressure": "Lowers the camera and becomes very direct — states his press credentials, his employer, and the specific legal framework protecting his operations, in that order",
-    "breakingPoint": "He will not admit the East Berlin credential exists — producing it could end his career and his access to the western side permanently",
-    "fleeCondition": "If Volkspolizei on the western approach begin physically clearing the press area",
     "fleeStyle": "Backs away slowly, camera still rolling — never turns his back to the action",
     "chaseStyle": "Keeps filming while retreating; the footage is more valuable than his safety in his own calculus",
-    "capturedBehavior": "Immediately invokes press freedom protections and demands to speak with the West Berlin bureau chief — he has the number memorized",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.969Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "West German ARD television camera operators covering the Bornholmer Straße opening on November 9, 1989",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Keeps filming — the camera is both his professional tool and his personal shield; being questioned while filming is a form of answer in itself",
+    "breakingPoint": "He will not admit the East Berlin credential exists — producing it could end his career and his access to the western side permanently",
+    "fleeCondition": "If Volkspolizei on the western approach begin physically clearing the press area",
+    "heavyPressure": "Lowers the camera and becomes very direct — states his press credentials, his employer, and the specific legal framework protecting his operations, in that order",
+    "capturedBehavior": "Immediately invokes press freedom protections and demands to speak with the West Berlin bureau chief — he has the number memorized"
+  }
 }

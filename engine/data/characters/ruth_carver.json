@@ -1,37 +1,37 @@
 {
   "id": "ruth_carver",
-  "scenarioIds": [
-    "greensboro_four_the_color_line"
-  ],
+  "fear": "That her reaction to this moment will be witnessed and judged — both by the people around her who expect her to object, and by some quieter part of herself that she has not examined closely",
   "name": "Ruth Carver",
   "role": "White patron, housewife, regular Woolworth's customer",
-  "publicFace": "A woman in her mid-forties in a good wool coat, carrying a handled shopping bag, who initially appears to be simply a customer interrupted in her Monday errands",
-  "privateGoal": "She wants the situation resolved in a way that confirms her existing understanding of how the world is ordered — but she is not entirely certain what that confirmation would look like",
-  "fear": "That her reaction to this moment will be witnessed and judged — both by the people around her who expect her to object, and by some quieter part of herself that she has not examined closely",
-  "knowledge": [
-    "She recognized one of the students — she believes he is the son of a man who repaired her husband's car — but she has not said this aloud",
-    "She knows that two other women near her are watching to see what she does, which is shaping her behavior in real time"
-  ],
   "voice": "Socially calibrated, the voice of someone who chooses words carefully in public — clipped when anxious, almost formal when she is trying to project certainty she does not feel",
-  "trustLogic": "She responds to being addressed directly and respectfully — it disrupts her expectation of confrontation; she shuts down if she feels she is being lectured or made an example of",
   "secrets": [
     "She voted against a school segregation referendum in 1956 and told no one",
     "She is debating whether to leave the store without calling the police, which is what she told her companion she would do if 'something like this' ever happened"
   ],
+  "createdAt": "2025-02-01T16:30:00Z",
+  "knowledge": [
+    "She recognized one of the students — she believes he is the son of a man who repaired her husband's car — but she has not said this aloud",
+    "She knows that two other women near her are watching to see what she does, which is shaping her behavior in real time"
+  ],
+  "updatedAt": "2026-05-24T03:30:00.376Z",
+  "publicFace": "A woman in her mid-forties in a good wool coat, carrying a handled shopping bag, who initially appears to be simply a customer interrupted in her Monday errands",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Greensboro sit-in, February 1960",
+  "trustLogic": "She responds to being addressed directly and respectfully — it disrupts her expectation of confrontation; she shuts down if she feels she is being lectured or made an example of",
+  "description": "",
+  "privateGoal": "She wants the situation resolved in a way that confirms her existing understanding of how the world is ordered — but she is not entirely certain what that confirmation would look like",
+  "scenarioIds": [
+    "greensboro_four_the_color_line"
+  ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Speaks loudly to her companion about 'the arrangement' and 'what the police are for,' performing certainty for the nearby crowd",
-    "heavyPressure": "Approaches the floor walker and demands he do something, but stops short of approaching the students directly",
-    "breakingPoint": "She will not physically touch or threaten any student — the social prohibition against that specific act is stronger than her discomfort",
-    "fleeCondition": "If Caldwell the reporter produces his notepad and turns toward her",
     "fleeStyle": "Picks up her shopping bag and walks briskly toward the front exit without making eye contact",
     "chaseStyle": "Does not engage — increases pace",
-    "capturedBehavior": "Gives her name and says only that she was shopping and found the situation 'upsetting'",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.376Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Greensboro sit-in, February 1960",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Speaks loudly to her companion about 'the arrangement' and 'what the police are for,' performing certainty for the nearby crowd",
+    "breakingPoint": "She will not physically touch or threaten any student — the social prohibition against that specific act is stronger than her discomfort",
+    "fleeCondition": "If Caldwell the reporter produces his notepad and turns toward her",
+    "heavyPressure": "Approaches the floor walker and demands he do something, but stops short of approaching the students directly",
+    "capturedBehavior": "Gives her name and says only that she was shopping and found the situation 'upsetting'"
+  }
 }

@@ -1,38 +1,38 @@
 {
   "id": "thomas_cole",
-  "scenarioIds": [
-    "singing_wires"
-  ],
+  "fear": "That the technology he has built his life on — the brass, the lightning, the singing wires — is the direct instrument of his father's destruction, and that his skill serves the same system his father has spent twenty years fighting.",
   "name": "Thomas Cole",
   "role": "Night telegraph operator, Lake Shore Railroad junction, Sandusky",
-  "publicFace": "A young, fast, professionally respected brass pounder — one of the quickest fists on the Lake Shore line, known for clean code and long hours.",
-  "privateGoal": "Use his position on the wire to misdirect the catchers and buy his father the time he needs, without destroying his career or his freedom in the process.",
-  "fear": "That the technology he has built his life on — the brass, the lightning, the singing wires — is the direct instrument of his father's destruction, and that his skill serves the same system his father has spent twenty years fighting.",
+  "voice": "Fast, clipped, technical — uses telegraph shorthand even in spoken conversation, impatient with people who cannot keep up, warmer and slower only when speaking about his father.",
+  "secrets": [
+    "He has already sent one unauthorized message tonight — a coded warning to Mercy Voss using nulls — before the player takes control, and if Silas Pratt has read the log, Thomas is already exposed.",
+    "He is in love with a free Black woman in Sandusky named Clara Redd, whose family uses the network; his relationship with her is the real reason he agreed to help his father, not ideology alone."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the exact routing of the red fire dispatch and which stations have already relayed it — he can see the traffic log.",
     "He knows how to phantom a false circuit on the Sandusky-to-Norwalk line that would redirect Crane's catchers south.",
     "He knows that Silas Pratt, the day operator, has been receiving extra pay from an unknown source for the past two months — he found the notation in the station's private ledger by accident."
   ],
-  "voice": "Fast, clipped, technical — uses telegraph shorthand even in spoken conversation, impatient with people who cannot keep up, warmer and slower only when speaking about his father.",
+  "updatedAt": "2026-05-09T21:12:00.478Z",
+  "publicFace": "A young, fast, professionally respected brass pounder — one of the quickest fists on the Lake Shore line, known for clean code and long hours.",
+  "represents": "Telegraph operators who used their access to the wire to assist the Underground Railroad, 1850-1860",
   "trustLogic": "Responds to demonstrated technical competence and to anyone who shows they understand the wire without being told. Distrusts anyone who asks about traffic logs or message routing without a professional reason.",
-  "secrets": [
-    "He has already sent one unauthorized message tonight — a coded warning to Mercy Voss using nulls — before the player takes control, and if Silas Pratt has read the log, Thomas is already exposed.",
-    "He is in love with a free Black woman in Sandusky named Clara Redd, whose family uses the network; his relationship with her is the real reason he agreed to help his father, not ideology alone."
+  "description": "",
+  "privateGoal": "Use his position on the wire to misdirect the catchers and buy his father the time he needs, without destroying his career or his freedom in the process.",
+  "scenarioIds": [
+    "singing_wires"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Deflects with technical jargon, pretends not to understand the implication of questions, keeps his hands on the brass.",
-    "heavyPressure": "Goes cold and formal, invokes his professional authority as the licensed operator on duty, demands to know who authorized the inquiry.",
-    "breakingPoint": "He will never confirm his father's location or the passengers' route, even under threat of arrest.",
-    "fleeCondition": "If Silas Pratt or Deputy Crane produces the unauthorized message log as evidence of his sabotage.",
     "fleeStyle": "Walks out the back of the telegraph office toward the rail yard, where he knows the consist schedules and can deadhead south on a freight.",
     "chaseStyle": "Uses his knowledge of the rail yard geography — the sidings, the dark spaces between cars — to stay ahead.",
-    "capturedBehavior": "Claims every unauthorized transmission was a test of the line's integrity, a standard technical procedure; demands a supervisor and a lawyer before answering further.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.478Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Telegraph operators who used their access to the wire to assist the Underground Railroad, 1850-1860",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Deflects with technical jargon, pretends not to understand the implication of questions, keeps his hands on the brass.",
+    "breakingPoint": "He will never confirm his father's location or the passengers' route, even under threat of arrest.",
+    "fleeCondition": "If Silas Pratt or Deputy Crane produces the unauthorized message log as evidence of his sabotage.",
+    "heavyPressure": "Goes cold and formal, invokes his professional authority as the licensed operator on duty, demands to know who authorized the inquiry.",
+    "capturedBehavior": "Claims every unauthorized transmission was a test of the line's integrity, a standard technical procedure; demands a supervisor and a lawyer before answering further."
+  }
 }

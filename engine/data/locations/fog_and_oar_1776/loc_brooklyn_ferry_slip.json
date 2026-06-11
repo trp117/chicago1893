@@ -1,0 +1,22 @@
+{
+  "id": "loc_brooklyn_ferry_slip",
+  "mood": "desperate, bottlenecked, controlled chaos",
+  "name": "Fulton's Ferry Slip, Brooklyn Shore",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A log-reinforced ramp descending into the black East River, its timbers groaning under the weight of massed infantry pressing toward the water. The slip master's lantern is the only light permitted at the water's edge, throwing a narrow orange cone across the manifest tally board.",
+  "atmosphericDetails": [
+    "The smell of river mud and wet wool from thousands of men standing in close formation in the dark.",
+    "The creak and groan of the log slip timbers under continuous load; Cortelyou checks the joint bolts with his boot every quarter hour.",
+    "The muffled sound of oarlocks and the slap of flat-bottomed hulls against the chop as bateaux push off and return.",
+    "Hushed commands passing down the column in whispers, regiment to regiment, as each unit files off toward the water."
+  ],
+  "linkedCharacterIds": [
+    "char_glover",
+    "char_cortelyou",
+    "char_tallmadge"
+  ]
+}

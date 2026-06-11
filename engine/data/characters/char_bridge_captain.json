@@ -1,39 +1,39 @@
 {
   "id": "char_bridge_captain",
-  "scenarioIds": [
-    "dead_reckoning_ninth_ward"
-  ],
+  "fear": "That Renard Tureaud's faction will fracture the camp's cohesion at the exact moment relief assets arrive, creating a distribution crisis that kills someone who would otherwise have survived",
   "name": "Loretta Sainte-Claire",
   "role": "Informal triage coordinator, St. Claude Bridge camp",
-  "publicFace": "A composed, authoritative woman in her late forties who has been managing eighty people for five days without visible panic; survivors defer to her because she has not been wrong yet",
-  "privateGoal": "Keep the population count stable and the resource gap invisible long enough for organized relief to arrive — and get Marcus Fontenot's deed documents into the legal record before the city starts moving on blighted properties",
-  "fear": "That Renard Tureaud's faction will fracture the camp's cohesion at the exact moment relief assets arrive, creating a distribution crisis that kills someone who would otherwise have survived",
+  "voice": "Flat, precise, economical — she says exactly what is needed and stops; she does not reassure, she informs",
+  "secrets": [
+    "She has already decided that if Renard Tureaud moves on the skiff before relief arrives, she will let him take it — because the act of taking will isolate his faction from the rest of the camp more effectively than any confrontation",
+    "She knows the bridge deck's load rating and she knows the population is currently four people over the distributed-weight threshold; she has not told anyone"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The actual Community_Resource_Reserve is 380 fluid ounces — not the 440 she announced this morning; the gap is a managed perception, not a mistake",
     "The 24 MREs under the southern maintenance panel have not been disclosed to the general population",
     "Renard Tureaud's eight-person faction has been organizing since yesterday afternoon and is waiting for a specific moment to move on the skiff",
     "Two survivors in the third cluster have open floodwater wounds that Celestine Arceneaux has been monitoring without formal announcement"
   ],
-  "voice": "Flat, precise, economical — she says exactly what is needed and stops; she does not reassure, she informs",
+  "updatedAt": "2026-06-04T03:22:30.330Z",
+  "publicFace": "A composed, authoritative woman in her late forties who has been managing eighty people for five days without visible panic; survivors defer to her because she has not been wrong yet",
+  "represents": "",
   "trustLogic": "Opens to anyone who demonstrates they have already done the arithmetic and are not asking her to pretend the numbers are different than they are; shuts down immediately when someone introduces a variable she cannot quantify",
-  "secrets": [
-    "She has already decided that if Renard Tureaud moves on the skiff before relief arrives, she will let him take it — because the act of taking will isolate his faction from the rest of the camp more effectively than any confrontation",
-    "She knows the bridge deck's load rating and she knows the population is currently four people over the distributed-weight threshold; she has not told anyone"
+  "description": "",
+  "privateGoal": "Keep the population count stable and the resource gap invisible long enough for organized relief to arrive — and get Marcus Fontenot's deed documents into the legal record before the city starts moving on blighted properties",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers questions with questions — forces the questioner to articulate what they actually need before she responds",
-    "heavyPressure": "Goes very still and very quiet; her voice drops rather than rises, which is more frightening than shouting",
-    "breakingPoint": "Will not admit the load rating calculation; will not admit she has been managing the water figure",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Gives accurate information if she determines that withholding it will cost more than disclosing it — purely utilitarian",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.330Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers questions with questions — forces the questioner to articulate what they actually need before she responds",
+    "breakingPoint": "Will not admit the load rating calculation; will not admit she has been managing the water figure",
+    "fleeCondition": "",
+    "heavyPressure": "Goes very still and very quiet; her voice drops rather than rises, which is more frightening than shouting",
+    "capturedBehavior": "Gives accurate information if she determines that withholding it will cost more than disclosing it — purely utilitarian"
+  }
 }

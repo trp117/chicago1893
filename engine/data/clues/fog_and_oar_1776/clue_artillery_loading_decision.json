@@ -1,0 +1,19 @@
+{
+  "id": "clue_artillery_loading_decision",
+  "title": "The Artillery Loading Manifest",
+  "unlocks": [],
+  "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.167Z",
+  "locationId": "",
+  "scenarioId": "fog_and_oar_1776",
+  "description": "Tallmadge's tally board shows that loading the four remaining field cannon and their limbers will consume the equivalent of three full infantry waves—approximately 180 men's worth of boat space and an additional forty minutes of slip time. Washington's original order specified the cannon as priority cargo. But the field hospital still holds sixty-three wounded men who have not yet been assigned to a crossing wave. The manifest cannot accommodate both at the current crossing rate before dawn.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_artillery_park",
+  "implicatesCharacterIds": [
+    "char_tallmadge",
+    "char_washington",
+    "char_cortelyou"
+  ]
+}

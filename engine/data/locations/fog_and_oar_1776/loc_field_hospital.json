@@ -1,0 +1,20 @@
+{
+  "id": "loc_field_hospital",
+  "mood": "anguished, urgent, morally weighting",
+  "name": "Field Hospital, Brooklyn Earthwork Interior",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A shallow earthwork hollow behind the main parapet line, where the wounded from the August 27th fighting lie on straw in the mud. The groaning is continuous and low; the orderlies have been told to keep the men quiet but cannot enforce it.",
+  "atmosphericDetails": [
+    "The smell of wound suppuration and wet straw, underlaid by the iron tang of old blood on cloth.",
+    "The low, involuntary groaning of men who have been lying in the mud for two days and know the army is leaving.",
+    "The whispered arguments of orderlies debating whether to carry stretcher cases to the slip without authorization.",
+    "The sound of a man calling for water in the dark, repeatedly, with no one answering."
+  ],
+  "linkedCharacterIds": [
+    "char_tallmadge"
+  ]
+}

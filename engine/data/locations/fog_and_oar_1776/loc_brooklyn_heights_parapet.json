@@ -1,0 +1,21 @@
+{
+  "id": "loc_brooklyn_heights_parapet",
+  "mood": "hollow, tense, deceptive",
+  "name": "Brooklyn Heights Clay Parapet, Left Flank",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A high earthwork rampart of clay and timber, its fire grates blazing with green pine to simulate an occupied garrison. Behind the parapet: silence. The fortifications that held nine thousand men an hour ago are empty in every direction.",
+  "atmosphericDetails": [
+    "The snap and hiss of green pine burning in the fire grates, throwing jumping shadows across the empty earthworks behind the parapet.",
+    "The click of British equipment belts and the crunch of boots on gravel, audible when the wind shifts—less than two hundred yards south.",
+    "The hollow echo of entrenching spades struck against hard earth by Mifflin's men, simulating ongoing construction work.",
+    "The smell of sulfur from signal rockets fired earlier in the evening, still faint in the wet air."
+  ],
+  "linkedCharacterIds": [
+    "char_mifflin",
+    "char_nathaniel_stacey"
+  ]
+}

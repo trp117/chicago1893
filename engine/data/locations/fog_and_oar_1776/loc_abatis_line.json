@@ -1,0 +1,21 @@
+{
+  "id": "loc_abatis_line",
+  "mood": "threshold, exposed, the edge of controlled space",
+  "name": "Abatis Line, Forward Edge of Brooklyn Fortifications",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A barrier of felled trees with sharpened branches facing south toward the British lines, the outermost defensive work of the Brooklyn fortifications. Beyond this line, the ground is open and dark all the way to the British picket posts.",
+  "atmosphericDetails": [
+    "The interlocked branches of the abatis catching the wind and producing a low, continuous rustling that masks—or mimics—the sound of movement.",
+    "The absolute darkness beyond the abatis line; no American fires, no lanterns, nothing but the distant faint glow of British camp.",
+    "The physical sensation of standing at the outermost point of safety, knowing that the ground behind you is empty.",
+    "The occasional distant sound of a British sentry calling the hour, carried on the shifting wind."
+  ],
+  "linkedCharacterIds": [
+    "char_mifflin",
+    "char_nathaniel_stacey"
+  ]
+}

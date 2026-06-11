@@ -1,0 +1,53 @@
+{
+  "id": "role_sentry_decoy",
+  "name": "The Sentry Decoy",
+  "opening": {
+    "choices": [
+      "Order maximum fire loading at all stations immediately, burning bright and hot to maximize Campfire_Decoy_Luminance regardless of fuel cost.",
+      "Inspect the left flank station personally to assess the fuel situation before committing to a burn rate.",
+      "Position men along the abatis line in an ambush pattern now, before the fuel runs out, so that a defensive response is ready if the deception fails."
+    ],
+    "narrative": "The parapet is yours, and it is empty. The regiment that held this section of line filed off to the ferry slip forty minutes ago, and you watched them go in the dark, regiment by regiment, until the sound of their boots faded into the mud road below. What remains is fire, noise, and the performance of an occupied garrison. The British are two hundred yards south. The ferry slip is a quarter mile north. Between those two facts, you have fewer than two hundred men, a dwindling wood supply, and a night that has to last until dawn without the enemy noticing that the army has left. The first decision of your watch is already pressing.",
+    "npcMoments": []
+  },
+  "briefing": "You are standing on the high clay parapet of Brooklyn Heights with a fire grate snapping green pine six inches from your face and an empty fortification stretching three hundred yards behind you in every direction. The heat on your cheeks is real; the cold at your back is the cold of abandoned earthworks and the knowledge that the nearest American soldier behind you is already at the ferry slip a quarter mile away. Your men—fewer than two hundred of them—are spread along four hundred yards of parapet, striking spades against the earth, feeding the grates, moving between fire stations to simulate the activity of thousands. Two hundred yards south, across the abatis line, British pickets are walking their posts. You heard one shout a challenge into the dark forty minutes ago; nothing came of it, but the proximity was closer than before. The fuel at the left station is nearly gone, and Stacey has been rationing without telling you. You received a misdirected recall order two hours ago that marched your men halfway to the slip and back; they are running on nothing now. The embarkation signal has not come. The fires must keep burning. You press your back against the parapet timber and listen to the dark.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.168Z",
+  "represents": "",
+  "scenarioId": "fog_and_oar_1776",
+  "accessLevel": "staff",
+  "description": "You are the officer commanding the rear guard on Brooklyn Heights—a hollow shell of fewer than two hundred men maintaining the illusion of a fully occupied garrison while the army disappears behind you.",
+  "perspective": "Write from the perspective of a commander performing a deception under existential pressure, with the constant physical awareness of enemy proximity and the hollow silence behind him. Emphasize the theatrical discipline required to simulate a garrison with a skeleton crew, and the specific terror of being the last man at a position everyone else has already left.",
+  "character_id": "char_mifflin",
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The torch six inches from your face is burning green.",
+  "character_hooks": [
+    "I have not told Washington that the premature recall march cost my men nearly an hour of physical reserves; if the embarkation signal is delayed past 4:00 AM, I am not certain my unit can maintain the deception activity without men collapsing at their posts.",
+    "The right flank fire station has been silent for the last ten minutes—I sent a runner to check and he has not come back; I do not know if the station is simply running low on fuel or if something else has happened.",
+    "I have been listening to the British picket rotation pattern for three hours and I believe I know the gap in their timing—a twelve-minute window between rotations when a small patrol could move along the abatis line without being heard—but acting on this knowledge means committing men I cannot afford to lose."
+  ],
+  "startLocationId": "loc_brooklyn_heights_parapet",
+  "context_sentence": "You are the Sentry Decoy, holding a ghost garrison on Brooklyn Heights, and the fires behind you are going out.",
+  "roleInitialState": {
+    "flags": {
+      "ambush_pattern_prepared": false,
+      "fuel_inventory_assessed": false,
+      "embarkation_signal_received": false,
+      "premature_recall_reported_to_washington": false
+    },
+    "inventory": [
+      "officer's commission document",
+      "countersign for the night: 'Providence'",
+      "written parapet assignment roster",
+      "entrenching spade"
+    ]
+  },
+  "suggested_secret": "",
+  "startingKnowledge": [
+    "The fortifications behind you are completely empty; you are the last Americans on Brooklyn Heights.",
+    "The fuel supply at the left parapet fire station is critically low.",
+    "A premature recall order sent your men on a half-mile march and back two hours ago; they are more exhausted than they should be."
+  ],
+  "entry_paragraph_flags": []
+}

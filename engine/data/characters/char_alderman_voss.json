@@ -1,38 +1,38 @@
 {
   "id": "char_alderman_voss",
-  "scenarioIds": [
-    "artesian_height_1892"
-  ],
+  "fear": "That the forged cost certificate will be traced back to him before the bond vote — he is the one who commissioned it, though he used an intermediary.",
   "name": "Corey Voss",
   "role": "Village Alderman, Bond Committee Member",
-  "publicFace": "A heavyset man in his early fifties, a hardware merchant by trade, who has sat on the village board since incorporation and regards himself as the project's most rigorous fiscal watchdog.",
-  "privateGoal": "To force the project over budget on paper, trigger a bond freeze, and then position himself as the man who saves the village by brokering a renegotiated contract — one that quietly benefits Harlan Stede's Chicago utility interests and, through them, Voss himself.",
-  "fear": "That the forged cost certificate will be traced back to him before the bond vote — he is the one who commissioned it, though he used an intermediary.",
+  "voice": "Deliberate, self-important, fond of the phrase 'as a matter of fiduciary responsibility' — speaks slowly to imply that others are not thinking carefully enough.",
+  "secrets": [
+    "He paid Silas Greer three dollars to tighten the brake collar and a further two dollars to leave the lower office door unlocked.",
+    "His arrangement with Harlan Stede would net him a private commission of $1,800 if the bond issue is frozen and the project renegotiated — more than twice his annual aldermanic stipend."
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
   "knowledge": [
     "He commissioned the falsified cost certificate through a Chicago printing clerk named Rudd, who he believes cannot be connected to him.",
     "He knows the real project cost is within budget — he has seen Benezette's actual field accounts — but he has been suppressing that knowledge from the rest of the board.",
     "He is aware that the brake collar on the rotary table was tampered with, because he paid a night laborer named Silas Greer to do it."
   ],
-  "voice": "Deliberate, self-important, fond of the phrase 'as a matter of fiduciary responsibility' — speaks slowly to imply that others are not thinking carefully enough.",
+  "updatedAt": "2026-05-22T22:09:01.844Z",
+  "publicFace": "A heavyset man in his early fifties, a hardware merchant by trade, who has sat on the village board since incorporation and regards himself as the project's most rigorous fiscal watchdog.",
+  "represents": "",
   "trustLogic": "Responds to deference and to any suggestion that his fiscal expertise is being recognized. Becomes hostile the moment anyone implies the cost figures are being questioned rather than accepted.",
-  "secrets": [
-    "He paid Silas Greer three dollars to tighten the brake collar and a further two dollars to leave the lower office door unlocked.",
-    "His arrangement with Harlan Stede would net him a private commission of $1,800 if the bond issue is frozen and the project renegotiated — more than twice his annual aldermanic stipend."
+  "description": "",
+  "privateGoal": "To force the project over budget on paper, trigger a bond freeze, and then position himself as the man who saves the village by brokering a renegotiated contract — one that quietly benefits Harlan Stede's Chicago utility interests and, through them, Voss himself.",
+  "scenarioIds": [
+    "artesian_height_1892"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Invokes his board authority and demands to know by what right the questioner is challenging an official document.",
-    "heavyPressure": "Threatens to call a special session of the board and have the questioner's access to the construction site formally revoked.",
-    "breakingPoint": "He will never name Silas Greer or Harlan Stede voluntarily. He will admit the falsified certificate if the signed assessment roll is produced in front of Wickerson.",
-    "fleeCondition": "If the Night Marshal presents both key evidence items simultaneously in a public setting.",
     "fleeStyle": "Stands abruptly, declares the meeting adjourned, and attempts to leave through the Block A perimeter gate toward the street.",
     "chaseStyle": "Moves surprisingly fast for his build, shouting that he is being persecuted and that the board will hear about this.",
-    "capturedBehavior": "Demands a lawyer, refuses to speak further, and sits with his arms crossed — but his eyes go to the document satchel if Edgar Williams is in the room.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.844Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Invokes his board authority and demands to know by what right the questioner is challenging an official document.",
+    "breakingPoint": "He will never name Silas Greer or Harlan Stede voluntarily. He will admit the falsified certificate if the signed assessment roll is produced in front of Wickerson.",
+    "fleeCondition": "If the Night Marshal presents both key evidence items simultaneously in a public setting.",
+    "heavyPressure": "Threatens to call a special session of the board and have the questioner's access to the construction site formally revoked.",
+    "capturedBehavior": "Demands a lawyer, refuses to speak further, and sits with his arms crossed — but his eyes go to the document satchel if Edgar Williams is in the room."
+  }
 }

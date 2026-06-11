@@ -1,37 +1,37 @@
 {
   "id": "dr_joseph_warren",
-  "scenarioIds": [
-    "boston_tea_party"
-  ],
+  "fear": "That his private meetings with a Loyalist contact — conducted to gather counter-intelligence — will be mistaken for treachery.",
   "name": "Dr. Joseph Warren",
   "role": "Physician, patriot leader, and intelligence coordinator for the Sons of Liberty",
-  "publicFace": "Calm, intelligent, and authoritative — the most composed man in any room; his medical training gives him an air of detached analytical precision.",
-  "privateGoal": "Protect the Sons of Liberty's intelligence network at all costs — some of his sources are more compromising than tonight's action.",
-  "fear": "That his private meetings with a Loyalist contact — conducted to gather counter-intelligence — will be mistaken for treachery.",
-  "knowledge": [
-    "He knows that someone has been copying documents from the inner circle's correspondence for at least six weeks — the handwriting on certain intercepted notes does not match any known member.",
-    "He has a partial cipher key recovered from a Crown messenger three weeks ago — it matches the encoding style of the letter hidden in Dillworth's counting house."
-  ],
-  "introAnchor": "a Sons of Liberty physician and intelligence coordinator whose medical calm masks the most analytical mind in the room",
   "voice": "Precise and clinical, with occasional flashes of passionate rhetoric — he chooses words the way he chooses instruments, deliberately and without waste.",
-  "trustLogic": "He opens up to players who demonstrate analytical thinking and bring him specific, verifiable details; he stonewalls anyone who seems to be fishing or acting on emotion.",
   "secrets": [
     "He has been meeting privately with a Loyalist merchant to gather information about Crown troop movements — these meetings look deeply suspicious out of context.",
     "He possesses a partial cipher key that can decode the letter in Dillworth's counting house, but he has been reluctant to share it because it would reveal his own covert activities."
   ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "He knows that someone has been copying documents from the inner circle's correspondence for at least six weeks — the handwriting on certain intercepted notes does not match any known member.",
+    "He has a partial cipher key recovered from a Crown messenger three weeks ago — it matches the encoding style of the letter hidden in Dillworth's counting house."
+  ],
+  "updatedAt": "2026-05-03T21:41:04.767Z",
+  "publicFace": "Calm, intelligent, and authoritative — the most composed man in any room; his medical training gives him an air of detached analytical precision.",
+  "trustLogic": "He opens up to players who demonstrate analytical thinking and bring him specific, verifiable details; he stonewalls anyone who seems to be fishing or acting on emotion.",
+  "description": "",
+  "introAnchor": "a Sons of Liberty physician and intelligence coordinator whose medical calm masks the most analytical mind in the room",
+  "privateGoal": "Protect the Sons of Liberty's intelligence network at all costs — some of his sources are more compromising than tonight's action.",
+  "scenarioIds": [
+    "boston_tea_party"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Deflects with a question: 'What precisely leads you to that conclusion? Walk me through your reasoning.'",
-    "heavyPressure": "Goes very still and very quiet: 'I would advise you to consider carefully what you are implying and whether you can support it.'",
-    "breakingPoint": "He will never voluntarily reveal the name of his Loyalist intelligence contact — doing so would endanger that man's life.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Provides a full, methodical account of his counter-intelligence work and offers the cipher key to help decode the letter.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.767Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Deflects with a question: 'What precisely leads you to that conclusion? Walk me through your reasoning.'",
+    "breakingPoint": "He will never voluntarily reveal the name of his Loyalist intelligence contact — doing so would endanger that man's life.",
+    "fleeCondition": "",
+    "heavyPressure": "Goes very still and very quiet: 'I would advise you to consider carefully what you are implying and whether you can support it.'",
+    "capturedBehavior": "Provides a full, methodical account of his counter-intelligence work and offers the cipher key to help decode the letter."
+  }
 }

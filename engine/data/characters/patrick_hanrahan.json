@@ -1,40 +1,40 @@
 {
   "id": "patrick_hanrahan",
-  "scenarioIds": [
-    "chicago_1893_v1"
-  ],
+  "fear": "Being made the public scapegoat",
   "name": "Patrick Hanrahan",
   "role": "Ward-connected local fixer and procurement intermediary",
-  "publicFace": "Jovial, connected, evasive",
-  "privateGoal": "Profit from contracts while staying well clear of the wreckage if things go wrong",
-  "fear": "Being made the public scapegoat",
+  "voice": "earthy, persuasive, half-confessional",
+  "secrets": [
+    "He does not know the full sabotage target, only the logistics behind access"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He arranged unofficial labor and after-hours deliveries",
     "He knows which watchmen can be bribed",
     "He suspects foreign involvement but cares more about money"
   ],
-  "introAnchor": "a ward-connected local fixer who arranged labor and deliveries for the fair through channels no official would ask about",
-  "voice": "earthy, persuasive, half-confessional",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "publicFace": "Jovial, connected, evasive",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
   "trustLogic": "He opens up to practical deals, not moral appeals.",
-  "secrets": [
-    "He does not know the full sabotage target, only the logistics behind access"
+  "introAnchor": "a ward-connected local fixer who arranged labor and deliveries for the fair through channels no official would ask about",
+  "privateGoal": "Profit from contracts while staying well clear of the wreckage if things go wrong",
+  "scenarioIds": [
+    "chicago_1893_v1"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Deflects with humor and partial truths. Redirects suspicion toward someone else.",
-    "heavyPressure": "Threatens to make noise. Calls loudly for dock workers or supervisors nearby. Uses his ward connections as a threat.",
-    "strikeFirst": {
-      "condition": "Only if the player physically grabs or strikes him first — Hanrahan shoves back instinctively.",
-      "action": "A hard shove and a shout for the nearest worker. Not a fighter — creates a scene to draw witnesses."
-    },
-    "fleeCondition": "If the player produces direct evidence AND threatens arrest or Burnham's authority — OR if the player physically blocks his exit, grabs him, or takes any action that cuts off his escape route. Physical blocking is sufficient on its own; Hanrahan does not need to be caught with evidence to run.",
     "fleeStyle": "Heavy and slow. Heads toward groups of dock workers where he has authority and protection.",
     "chaseStyle": "Calls for help from the crew. Uses his bulk to block and deflect rather than outrun. Counts on allies slowing the player.",
+    "strikeFirst": {
+      "action": "A hard shove and a shout for the nearest worker. Not a fighter — creates a scene to draw witnesses.",
+      "condition": "Only if the player physically grabs or strikes him first — Hanrahan shoves back instinctively."
+    },
+    "mildPressure": "Deflects with humor and partial truths. Redirects suspicion toward someone else.",
     "breakingPoint": "Will give up operational details — what was moved, where, when — to avoid being the fall guy. Will not name Mercier voluntarily.",
+    "fleeCondition": "If the player produces direct evidence AND threatens arrest or Burnham's authority — OR if the player physically blocks his exit, grabs him, or takes any action that cuts off his escape route. Physical blocking is sufficient on its own; Hanrahan does not need to be caught with evidence to run.",
+    "heavyPressure": "Threatens to make noise. Calls loudly for dock workers or supervisors nearby. Uses his ward connections as a threat.",
     "capturedBehavior": "Negotiates immediately. Offers a deal. Blames the French contact for the plan and positions himself as a naive middleman."
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2025-01-01T00:00:00Z",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
-  "fact_checked": false
+  }
 }

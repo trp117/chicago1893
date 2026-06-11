@@ -1,38 +1,38 @@
 {
   "id": "elias_cole",
-  "scenarioIds": [
-    "singing_wires"
-  ],
+  "fear": "That his twenty years of work will end not in a fight but in a betrayal he should have seen coming — and that his son's involvement in the telegraph system makes Thomas both his greatest asset and his greatest liability.",
   "name": "Elias Cole",
   "role": "Underground Railroad Conductor, former teamster",
-  "publicFace": "A weathered hauling man who moves freight between the Lake Shore farms and the Sandusky market; known for keeping odd hours and asking few questions.",
-  "privateGoal": "Deliver his seven passengers — including two children — to the Lake Erie shore vessel before dawn, and learn whether the network has been betrayed before he leads another group into a trap.",
-  "fear": "That his twenty years of work will end not in a fight but in a betrayal he should have seen coming — and that his son's involvement in the telegraph system makes Thomas both his greatest asset and his greatest liability.",
+  "voice": "Spare, deliberate, physical — speaks in short declarative sentences, uses railroad and hauling language instinctively, rarely names a thing directly when a description will do.",
+  "secrets": [
+    "He has been corresponding with a free Black stationmaster in Windsor, Ontario, who has offered him passage and a new life — he has not told his son, and he is considering taking it after this run.",
+    "Three years ago he left a passenger behind at a station south of Norwalk when catchers came too fast; the man was recaptured and sold south. Elias has never spoken of it and it governs every decision he makes about pace and risk."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the location of three safe houses between the Huron River and the Erie shore that are not written down anywhere.",
     "He knows that the last three groups he moved north were watched — small signs, a broken branch at the wrong angle, a lantern that wasn't where it should be — but he told no one because he had no proof.",
     "He knows a book cipher keyed to the 1844 edition of Cruden's Concordance that he shares only with Mercy Voss and his son."
   ],
-  "voice": "Spare, deliberate, physical — speaks in short declarative sentences, uses railroad and hauling language instinctively, rarely names a thing directly when a description will do.",
+  "updatedAt": "2026-05-09T21:12:00.475Z",
+  "publicFace": "A weathered hauling man who moves freight between the Lake Shore farms and the Sandusky market; known for keeping odd hours and asking few questions.",
+  "represents": "Underground Railroad conductors operating in the Ohio corridor, 1850-1860",
   "trustLogic": "Opens to people who demonstrate knowledge of the network's physical geography — safe house locations, route landmarks, the specific wording of recognition phrases. Closes immediately at any mention of the telegraph or anyone who seems too comfortable with the law.",
-  "secrets": [
-    "He has been corresponding with a free Black stationmaster in Windsor, Ontario, who has offered him passage and a new life — he has not told his son, and he is considering taking it after this run.",
-    "Three years ago he left a passenger behind at a station south of Norwalk when catchers came too fast; the man was recaptured and sold south. Elias has never spoken of it and it governs every decision he makes about pace and risk."
+  "description": "",
+  "privateGoal": "Deliver his seven passengers — including two children — to the Lake Erie shore vessel before dawn, and learn whether the network has been betrayed before he leads another group into a trap.",
+  "scenarioIds": [
+    "singing_wires"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Becomes very still, answers questions with questions, gives nothing that wasn't asked for directly.",
-    "heavyPressure": "Denies everything with a calm that reads as either innocence or long practice; does not raise his voice.",
-    "breakingPoint": "He will never give a passenger's name or current location under any pressure short of physical violence to a child.",
-    "fleeCondition": "If Deputy Crane or any known catcher comes within sight of him while he has passengers in his care.",
     "fleeStyle": "Moves into the nearest cover immediately and silently, splitting the group into pairs along pre-arranged alternate routes.",
     "chaseStyle": "Does not run — moves at a steady walk through terrain he knows and his pursuer does not, using darkness and knowledge of the bottomland to disappear.",
-    "capturedBehavior": "Gives his own name freely, claims to be alone and lost, buys time with cooperation on every question that does not involve passengers or network members.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.475Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Underground Railroad conductors operating in the Ohio corridor, 1850-1860",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Becomes very still, answers questions with questions, gives nothing that wasn't asked for directly.",
+    "breakingPoint": "He will never give a passenger's name or current location under any pressure short of physical violence to a child.",
+    "fleeCondition": "If Deputy Crane or any known catcher comes within sight of him while he has passengers in his care.",
+    "heavyPressure": "Denies everything with a calm that reads as either innocence or long practice; does not raise his voice.",
+    "capturedBehavior": "Gives his own name freely, claims to be alone and lost, buys time with cooperation on every question that does not involve passengers or network members."
+  }
 }

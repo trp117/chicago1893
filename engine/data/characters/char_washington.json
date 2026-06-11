@@ -1,0 +1,32 @@
+{
+  "id": "char_washington",
+  "fear": "That the deception will collapse before the rear guard can embark, and that his decision to remain on the shore will result in his own capture—ending the rebellion's symbolic leadership.",
+  "name": "General George Washington",
+  "role": "Commander-in-Chief, Continental Army",
+  "voice": "Deliberate, formal, economical with words; gives orders as statements of fact rather than requests.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The total number of troops requiring evacuation is approximately 9,000, but regimental returns are incomplete and unreliable.",
+    "The British have not yet launched a night assault, suggesting Howe is waiting for daylight—but this assumption could break at any moment.",
+    "The field artillery represents months of procurement effort; losing it weakens every future defensive position on Manhattan."
+  ],
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "publicFace": "Composed, physically imposing, speaking in measured cadences even under extreme duress; his presence at the slip stabilizes the men around him.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Acknowledges the concern with a single nod and redirects to the immediate operational question.",
+    "breakingPoint": "Will not discuss the possibility of personal surrender or abandonment of the rear guard; these are not options he will entertain aloud.",
+    "heavyPressure": "States his reasoning plainly and without apology; does not raise his voice but his stillness becomes pointed."
+  },
+  "privateConstraint": "Washington is operating on no sleep for thirty-six hours, receiving contradictory reports from multiple brigade commanders, and must make irreversible loading priority decisions without complete information about how many men remain on the parapets."
+}

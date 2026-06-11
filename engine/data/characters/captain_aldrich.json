@@ -1,38 +1,38 @@
 {
   "id": "captain_aldrich",
-  "scenarioIds": [
-    "midnight_errand_boston"
-  ],
+  "fear": "That he will make an arrest that turns a tradesman into a martyr and a street into a riot.",
   "name": "Captain James Aldrich",
   "role": "Officer of His Majesty's 10th Regiment of Foot, checkpoint commander",
-  "publicFace": "A correct, professional soldier maintaining order with minimum friction — he is polite until he isn't.",
-  "privateGoal": "To intercept the Sons of Liberty dispatch he has been told is moving through the North End tonight, and to do it quietly so as not to alert the broader network.",
-  "fear": "That he will make an arrest that turns a tradesman into a martyr and a street into a riot.",
+  "voice": "Clipped, courteous, precise — he speaks as if every word will be read back to him at an inquiry.",
+  "secrets": [
+    "His informer is Owen Pryce, whom he pays in coin and protection.",
+    "He has orders to let the march proceed regardless of what the colonists learn tonight — his superiors believe the show of force will end the unrest. He is not certain they are right."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He has been told by an informer that a dispatch is moving through the North End tonight — he does not know the carrier or the route.",
     "He knows Gill's Print Shop by reputation and has it on a list of establishments to watch.",
     "He knows the Green Dragon Tavern is a Patriot meeting place but lacks evidence to justify a search tonight."
   ],
-  "voice": "Clipped, courteous, precise — he speaks as if every word will be read back to him at an inquiry.",
+  "updatedAt": "2026-05-10T03:09:06.910Z",
+  "publicFace": "A correct, professional soldier maintaining order with minimum friction — he is polite until he isn't.",
+  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
   "trustLogic": "He responds to deference and legitimate-seeming paperwork or trade credentials. He is suspicious of anyone who volunteers information too eagerly.",
-  "secrets": [
-    "His informer is Owen Pryce, whom he pays in coin and protection.",
-    "He has orders to let the march proceed regardless of what the colonists learn tonight — his superiors believe the show of force will end the unrest. He is not certain they are right."
+  "description": "",
+  "privateGoal": "To intercept the Sons of Liberty dispatch he has been told is moving through the North End tonight, and to do it quietly so as not to alert the broader network.",
+  "scenarioIds": [
+    "midnight_errand_boston"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "He nods, asks for name and trade, and writes something in a small notebook.",
-    "heavyPressure": "He signals his two soldiers to flank the subject and says: 'You'll come with me while we sort this out.'",
-    "breakingPoint": "He will not admit he has an informer in the Patriot network — it would compromise every future operation.",
-    "fleeCondition": "If the crowd around the checkpoint grows hostile and his soldiers are outnumbered.",
     "fleeStyle": "He withdraws in formation, covering his men — he does not run alone.",
     "chaseStyle": "He calls for reinforcement rather than pursuing personally.",
-    "capturedBehavior": "He identifies himself formally by rank and regiment and demands to be taken to his commanding officer. He says nothing further.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.910Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "He nods, asks for name and trade, and writes something in a small notebook.",
+    "breakingPoint": "He will not admit he has an informer in the Patriot network — it would compromise every future operation.",
+    "fleeCondition": "If the crowd around the checkpoint grows hostile and his soldiers are outnumbered.",
+    "heavyPressure": "He signals his two soldiers to flank the subject and says: 'You'll come with me while we sort this out.'",
+    "capturedBehavior": "He identifies himself formally by rank and regiment and demands to be taken to his commanding officer. He says nothing further."
+  }
 }

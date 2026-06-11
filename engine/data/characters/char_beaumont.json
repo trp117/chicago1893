@@ -1,37 +1,37 @@
 {
   "id": "char_beaumont",
-  "scenarioIds": [
-    "zero_hour_cantigny"
-  ],
+  "fear": "That he will be accused of the substitution because he was the last person seen near the map-table case before the discrepancy was discovered",
   "name": "Corporal James Beaumont",
   "role": "Telephone Operator, Artillery Fire Direction, 1st Battalion 5th Field Artillery",
-  "publicFace": "A quiet, bespectacled former telegraph operator from Cincinnati who has the slightly distracted air of a man who is always listening to something no one else can hear. He is the only person in the dugout who was present when the fire table case was last opened.",
-  "privateGoal": "To accurately record everything that happens in this dugout today, because he intends to write a book about the war when he gets home and he knows he is sitting at the center of something important.",
-  "fear": "That he will be accused of the substitution because he was the last person seen near the map-table case before the discrepancy was discovered",
+  "voice": "Precise, observational, slightly formal. Speaks as if dictating to himself. Has a habit of repeating the last word of a sentence quietly, as if filing it.",
+  "secrets": [
+    "He has already written three pages of notes about the morning's events in a small notebook he keeps in his breast pocket — notes that would constitute a near-complete record of Farrow's movements"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He saw Lieutenant Farrow open the map-table case at approximately 04:45 under the pretext of checking the barrage schedule against the telephone log",
     "He heard Farrow speaking French quietly on the field telephone at 04:50 — a call Farrow logged as a 'French liaison coordination check'",
     "He has the telephone log for the entire night, which shows every call in and out of the dugout with timestamps"
   ],
-  "voice": "Precise, observational, slightly formal. Speaks as if dictating to himself. Has a habit of repeating the last word of a sentence quietly, as if filing it.",
+  "updatedAt": "2026-05-20T23:57:44.092Z",
+  "publicFace": "A quiet, bespectacled former telegraph operator from Cincinnati who has the slightly distracted air of a man who is always listening to something no one else can hear. He is the only person in the dugout who was present when the fire table case was last opened.",
+  "represents": "Signal Corps corporals of the 1st Division who operated communications during the Battle of Cantigny, May 1918",
   "trustLogic": "Opens immediately to anyone who asks him what he observed rather than what he thinks. He is a witness, not an analyst, and he knows the difference.",
-  "secrets": [
-    "He has already written three pages of notes about the morning's events in a small notebook he keeps in his breast pocket — notes that would constitute a near-complete record of Farrow's movements"
+  "description": "",
+  "privateGoal": "To accurately record everything that happens in this dugout today, because he intends to write a book about the war when he gets home and he knows he is sitting at the center of something important.",
+  "scenarioIds": [
+    "zero_hour_cantigny"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Produces his notebook. Reads from it. Offers to let the questioner read it themselves.",
-    "heavyPressure": "Becomes alarmed and asks whether he is being accused — if reassured, immediately provides everything he knows",
-    "breakingPoint": "There is no breaking point. He wants to tell someone. He has been waiting to be asked.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Hands over the notebook without being asked",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.092Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Signal Corps corporals of the 1st Division who operated communications during the Battle of Cantigny, May 1918",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Produces his notebook. Reads from it. Offers to let the questioner read it themselves.",
+    "breakingPoint": "There is no breaking point. He wants to tell someone. He has been waiting to be asked.",
+    "fleeCondition": "",
+    "heavyPressure": "Becomes alarmed and asks whether he is being accused — if reassured, immediately provides everything he knows",
+    "capturedBehavior": "Hands over the notebook without being asked"
+  }
 }

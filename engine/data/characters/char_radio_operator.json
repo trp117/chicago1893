@@ -1,39 +1,39 @@
 {
   "id": "char_radio_operator",
-  "scenarioIds": [
-    "dead_reckoning_ninth_ward"
-  ],
+  "fear": "That the voltage drift she can already hear in the carrier wave will force a retune at exactly the wrong moment, corrupting the coordinate string mid-transmission",
   "name": "Ida Broussard",
   "role": "Amateur radio operator, Algiers attic station",
-  "publicFace": "A licensed ham operator in her early sixties who has been running the only functional communications node in this sector since August 30; people at the bridge camp know her voice but have never seen her face",
-  "privateGoal": "Transmit an accurate SITREP and coordinate package to Sergeant Duplessis at the operations post before the battery cuts out — and do it without the transposition error that cost the Gentilly sector six hours of misdirected rescue assets on September 1",
-  "fear": "That the voltage drift she can already hear in the carrier wave will force a retune at exactly the wrong moment, corrupting the coordinate string mid-transmission",
+  "voice": "Clipped, frequency-disciplined — speaks in the compressed shorthand of someone who has internalized that every word costs power and time",
+  "secrets": [
+    "She made a transposition error in a coordinate transmission on September 1 that sent a rescue boat to the wrong block in Gentilly; she has not told anyone and she has been checking her work obsessively since",
+    "She has a second battery — a smaller one, 7 amp-hours, salvaged from a marine bilge pump — that she has not disclosed because she is saving it for the transmission she is most afraid of getting wrong"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The mirror array on her rooftop has been 22 degrees off optimal alignment since 3:00 PM — she knocked it adjusting the conduit prop and has not been able to reach it safely; anything the bridge camp read from this position in the last two hours may be wrong",
     "The triage sheets from Theo Delacroix and the unidentified runner show two different casualty counts for the same Flood Street address",
     "The voltage arithmetic gives her between 90 and 100 minutes before cutout — she has done it eleven times and the answer does not change",
     "VHF Channel 22A is the Coast Guard coordination frequency; Channel 16 is distress and calling; she has been monitoring both and the traffic pattern suggests a reconnaissance airframe is scheduled in this sector within the next forty minutes"
   ],
-  "voice": "Clipped, frequency-disciplined — speaks in the compressed shorthand of someone who has internalized that every word costs power and time",
+  "updatedAt": "2026-06-04T03:22:30.329Z",
+  "publicFace": "A licensed ham operator in her early sixties who has been running the only functional communications node in this sector since August 30; people at the bridge camp know her voice but have never seen her face",
+  "represents": "",
   "trustLogic": "Opens immediately to anyone who demonstrates radio discipline and accurate information; shuts down hard when someone gives her a number she cannot verify",
-  "secrets": [
-    "She made a transposition error in a coordinate transmission on September 1 that sent a rescue boat to the wrong block in Gentilly; she has not told anyone and she has been checking her work obsessively since",
-    "She has a second battery — a smaller one, 7 amp-hours, salvaged from a marine bilge pump — that she has not disclosed because she is saving it for the transmission she is most afraid of getting wrong"
+  "description": "",
+  "privateGoal": "Transmit an accurate SITREP and coordinate package to Sergeant Duplessis at the operations post before the battery cuts out — and do it without the transposition error that cost the Gentilly sector six hours of misdirected rescue assets on September 1",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Asks for the information to be repeated in phonetic alphabet before she accepts it",
-    "heavyPressure": "Stops transmitting and goes to receive-only until she can verify the disputed data",
-    "breakingPoint": "Will not admit the September 1 transposition error to anyone in the operations chain",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Gives full technical status — voltage, frequency, traffic log — without prompting; withholds the September 1 error",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.329Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Asks for the information to be repeated in phonetic alphabet before she accepts it",
+    "breakingPoint": "Will not admit the September 1 transposition error to anyone in the operations chain",
+    "fleeCondition": "",
+    "heavyPressure": "Stops transmitting and goes to receive-only until she can verify the disputed data",
+    "capturedBehavior": "Gives full technical status — voltage, frequency, traffic log — without prompting; withholds the September 1 error"
+  }
 }

@@ -1,35 +1,35 @@
 {
   "id": "clara_hale",
-  "scenarioIds": [
-    "chicago_1893_v1"
-  ],
+  "fear": "Being fed a false story and losing credibility",
   "name": "Clara Hale",
   "role": "Journalist with unofficial access to fair gossip and city politics",
-  "publicFace": "Bright, observant, sharper than she first appears",
-  "privateGoal": "Land a major story without being frozen out by fair officials",
-  "fear": "Being fed a false story and losing credibility",
+  "voice": "quick, incisive, lightly teasing",
+  "secrets": [
+    "She has one source inside a hotel frequented by foreign delegates"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "A rumor links Paris interests to embarrassment schemes against Chicago",
     "A missing worker may have seen restricted activity after dark",
     "Political allies of the fair want scandals buried"
   ],
-  "introAnchor": "a journalist with unofficial access to fair gossip and city politics, sharper than she first appears and better connected than she lets on",
-  "voice": "quick, incisive, lightly teasing",
-  "trustLogic": "She rewards candor and punishes manipulation. If involved, she becomes a force multiplier but also a risk.",
-  "secrets": [
-    "She has one source inside a hotel frequented by foreign delegates"
-  ],
-  "aggressionProfile": {
-    "mildPressure": "Goes cold and professional. Reminds the player of her access and what she could print.",
-    "heavyPressure": "Threatens to publish what she already knows — which may be more than the player assumes. Withdraws access entirely.",
-    "strikeFirst": null,
-    "fleeCondition": null,
-    "breakingPoint": "Cannot be intimidated physically. Information is her only weapon and her only shield.",
-    "capturedBehavior": "N/A — not a conspirator. Treating her as one makes her a permanent enemy with a printing press."
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2025-01-01T00:00:00Z",
-  "character_type": "fictional",
+  "publicFace": "Bright, observant, sharper than she first appears",
   "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the World's Columbian Exposition, Chicago, 1893",
-  "fact_checked": false
+  "trustLogic": "She rewards candor and punishes manipulation. If involved, she becomes a force multiplier but also a risk.",
+  "introAnchor": "a journalist with unofficial access to fair gossip and city politics, sharper than she first appears and better connected than she lets on",
+  "privateGoal": "Land a major story without being frozen out by fair officials",
+  "scenarioIds": [
+    "chicago_1893_v1"
+  ],
+  "fact_checked": false,
+  "character_type": "fictional",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Goes cold and professional. Reminds the player of her access and what she could print.",
+    "breakingPoint": "Cannot be intimidated physically. Information is her only weapon and her only shield.",
+    "fleeCondition": null,
+    "heavyPressure": "Threatens to publish what she already knows — which may be more than the player assumes. Withdraws access entirely.",
+    "capturedBehavior": "N/A — not a conspirator. Treating her as one makes her a permanent enemy with a printing press."
+  }
 }

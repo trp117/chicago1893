@@ -1,37 +1,37 @@
 {
   "id": "samuel_adams",
-  "scenarioIds": [
-    "boston_tea_party"
-  ],
+  "fear": "That the spy will be someone he personally vouched for, destroying his credibility and fracturing the movement.",
   "name": "Samuel Adams",
   "role": "Patriot leader and chief organizer of the Sons of Liberty",
-  "publicFace": "A fiery, principled agitator who speaks in the language of liberty and God-given rights; commands the room with moral authority.",
-  "privateGoal": "Ensure tonight's action succeeds without a single man being arrested — the cause cannot afford martyrs yet.",
-  "fear": "That the spy will be someone he personally vouched for, destroying his credibility and fracturing the movement.",
-  "knowledge": [
-    "He knows the exact manifest of the three tea ships — Dartmouth, Eleanor, and Beaver — and who has access to that information.",
-    "He received an anonymous warning note two hours ago and has been quietly watching his inner circle ever since."
-  ],
-  "introAnchor": "the fiery chief organizer of the Sons of Liberty, whose moral authority commands every room he enters",
   "voice": "Measured, oratorical, occasionally thunderous — he speaks in complete sentences and never wastes words; every phrase sounds like it belongs in a pamphlet.",
-  "trustLogic": "He opens up to players who demonstrate loyalty to the cause and bring him concrete evidence rather than gossip; he shuts down anyone who seems to be fishing for names without proof.",
   "secrets": [
     "He already suspects Thomas Dillworth but lacks proof and fears a false accusation will tear the group apart.",
     "He has authorized a secondary escape route for the men in case the operation is compromised — only he and Paul Revere know it."
   ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "He knows the exact manifest of the three tea ships — Dartmouth, Eleanor, and Beaver — and who has access to that information.",
+    "He received an anonymous warning note two hours ago and has been quietly watching his inner circle ever since."
+  ],
+  "updatedAt": "2026-05-03T21:41:04.769Z",
+  "publicFace": "A fiery, principled agitator who speaks in the language of liberty and God-given rights; commands the room with moral authority.",
+  "trustLogic": "He opens up to players who demonstrate loyalty to the cause and bring him concrete evidence rather than gossip; he shuts down anyone who seems to be fishing for names without proof.",
+  "description": "",
+  "introAnchor": "the fiery chief organizer of the Sons of Liberty, whose moral authority commands every room he enters",
+  "privateGoal": "Ensure tonight's action succeeds without a single man being arrested — the cause cannot afford martyrs yet.",
+  "scenarioIds": [
+    "boston_tea_party"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Responds with patient, probing questions — he wants to understand your reasoning before committing to anything.",
-    "heavyPressure": "Grows cold and formal, invoking the gravity of the moment: 'Every accusation you make tonight may cost a man his life or his freedom. Choose your words with care.'",
-    "breakingPoint": "He will never admit he suspected Dillworth before having proof — he cannot be seen as having failed to act sooner.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Stands firm, demands to know the charge, and begins composing his defense aloud in the manner of a public address.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.769Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Responds with patient, probing questions — he wants to understand your reasoning before committing to anything.",
+    "breakingPoint": "He will never admit he suspected Dillworth before having proof — he cannot be seen as having failed to act sooner.",
+    "fleeCondition": "",
+    "heavyPressure": "Grows cold and formal, invoking the gravity of the moment: 'Every accusation you make tonight may cost a man his life or his freedom. Choose your words with care.'",
+    "capturedBehavior": "Stands firm, demands to know the charge, and begins composing his defense aloud in the manner of a public address."
+  }
 }

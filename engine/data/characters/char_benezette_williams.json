@@ -1,38 +1,38 @@
 {
   "id": "char_benezette_williams",
-  "scenarioIds": [
-    "artesian_height_1892"
-  ],
+  "fear": "That the drill string will snap inside the hole and the well will have to be abandoned — a failure that cannot be engineered around and cannot be explained away to a bond committee.",
   "name": "Benezette Williams",
   "role": "Chief Civil Engineer, Williams and Williams",
-  "publicFace": "A precise, quietly authoritative man in his mid-forties who speaks in measurements and tolerances and rarely raises his voice. He projects unwavering confidence in the project's geology and engineering assumptions.",
-  "privateGoal": "To complete the tower exactly as designed, at or under the bonded cost, and to prove that his survey of the St. Peter Sandstone formation was correct — not because his reputation demands it, but because he believes the village genuinely needs this water.",
-  "fear": "That the drill string will snap inside the hole and the well will have to be abandoned — a failure that cannot be engineered around and cannot be explained away to a bond committee.",
+  "voice": "Measured, exact, habitually quantitative — he says 'approximately' only when he means it and 'precisely' when he is certain.",
+  "secrets": [
+    "He made a minor error in his original depth estimate — the sandstone is at 2,060 feet, not 1,980 feet as filed — and has quietly adjusted the drill program without amending the official survey record.",
+    "He knows that the shale fault at 1,800 feet was visible in the core samples three weeks ago and chose not to flag it to the board because he believed the drill string could handle it."
+  ],
+  "createdAt": "2025-07-14T00:00:00Z",
   "knowledge": [
     "The original Well_Drill_Torque baseline reading was 41 before the overnight tampering — the current reading of 62 is artificially elevated.",
     "The true project cost to date is $71,340.22, not the $84,900.00 appearing in the falsified certificate circulating among board members.",
     "His brother Edgar Williams has recently been involved in discussions with outside financial interests connected to the bond issue offering to buy out the project's remaining bond tranche at a significant discount — Edgar has not yet told Benezette whether he accepted."
   ],
-  "voice": "Measured, exact, habitually quantitative — he says 'approximately' only when he means it and 'precisely' when he is certain.",
+  "updatedAt": "2026-05-22T22:09:01.843Z",
+  "publicFace": "A precise, quietly authoritative man in his mid-forties who speaks in measurements and tolerances and rarely raises his voice. He projects unwavering confidence in the project's geology and engineering assumptions.",
+  "represents": "",
   "trustLogic": "Opens up when shown physical evidence or raw data; shuts down completely when he suspects someone is speculating rather than observing. Respects anyone who has done the arithmetic.",
-  "secrets": [
-    "He made a minor error in his original depth estimate — the sandstone is at 2,060 feet, not 1,980 feet as filed — and has quietly adjusted the drill program without amending the official survey record.",
-    "He knows that the shale fault at 1,800 feet was visible in the core samples three weeks ago and chose not to flag it to the board because he believed the drill string could handle it."
+  "description": "",
+  "privateGoal": "To complete the tower exactly as designed, at or under the bonded cost, and to prove that his survey of the St. Peter Sandstone formation was correct — not because his reputation demands it, but because he believes the village genuinely needs this water.",
+  "scenarioIds": [
+    "artesian_height_1892"
   ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Pulls out his field notebook and begins reading figures aloud, calmly, as if the questioner simply lacks the data to understand the situation.",
-    "heavyPressure": "Goes very still, sets down whatever he is holding, and asks a single precise question in return — usually the one the accuser cannot answer.",
-    "breakingPoint": "He will never admit the depth-estimate discrepancy to the bond committee. He will admit it privately to the Night Marshal if it becomes the only way to save the project.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Sits down, opens his notebook to the relevant page, and begins explaining from first principles. He does not panic. He does not beg.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.843Z",
-  "description": "",
-  "character_type": "real",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Pulls out his field notebook and begins reading figures aloud, calmly, as if the questioner simply lacks the data to understand the situation.",
+    "breakingPoint": "He will never admit the depth-estimate discrepancy to the bond committee. He will admit it privately to the Night Marshal if it becomes the only way to save the project.",
+    "fleeCondition": "",
+    "heavyPressure": "Goes very still, sets down whatever he is holding, and asks a single precise question in return — usually the one the accuser cannot answer.",
+    "capturedBehavior": "Sits down, opens his notebook to the relevant page, and begins explaining from first principles. He does not panic. He does not beg."
+  }
 }

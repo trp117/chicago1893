@@ -1,37 +1,37 @@
 {
   "id": "char_glynn_lunney",
-  "scenarioIds": [
-    "apollo_13_lifeboat"
-  ],
+  "fear": "That a decision made by the White Team has a flaw that only becomes visible on his shift — and that by the time he sees it, there will be no way to correct it.",
   "name": "Glynn Lunney",
   "role": "Flight Director, Black Team — relieving Kranz during the crisis rotation",
-  "publicFace": "Calm, institutional, the man who took the handoff from Kranz at the worst possible moment and held the room together through the first night.",
-  "privateGoal": "Maintain the continuity of the mission plan across the shift change without losing any of the decisions Kranz's team made — a handoff in the dark with lives on the line.",
-  "fear": "That a decision made by the White Team has a flaw that only becomes visible on his shift — and that by the time he sees it, there will be no way to correct it.",
+  "voice": "Measured, institutional; uses 'we' rather than 'I'; speaks as though his words are being recorded, because they are",
+  "secrets": [
+    "He disagreed with one of Kranz's power-down decisions and said nothing during the handoff because the moment had passed — he is monitoring the consequences quietly"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The Free Return Trajectory burn that Kranz's team calculated has a 0.3-second margin of error that Lunney considers acceptable but has not independently verified",
     "He has a controller on his team who flagged a concern about the thruster anomaly Haise noticed — the concern was logged but not escalated",
     "The shift rotation means Kranz will be back on console for the re-entry; Lunney's job is to deliver the ship to that moment intact"
   ],
-  "voice": "Measured, institutional; uses 'we' rather than 'I'; speaks as though his words are being recorded, because they are",
+  "updatedAt": "2026-05-25T14:53:42.949Z",
+  "publicFace": "Calm, institutional, the man who took the handoff from Kranz at the worst possible moment and held the room together through the first night.",
+  "represents": "",
   "trustLogic": "Trusts the process above individuals. Opens to anyone who works within the established chain. Skeptical of improvisation that has not been reviewed by at least two engineers.",
-  "secrets": [
-    "He disagreed with one of Kranz's power-down decisions and said nothing during the handoff because the moment had passed — he is monitoring the consequences quietly"
+  "description": "",
+  "privateGoal": "Maintain the continuity of the mission plan across the shift change without losing any of the decisions Kranz's team made — a handoff in the dark with lives on the line.",
+  "scenarioIds": [
+    "apollo_13_lifeboat"
   ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Acknowledges the question; routes it to the appropriate controller for the technical answer",
-    "heavyPressure": "Defends the institutional process; will not criticize Kranz's decisions on the record",
-    "breakingPoint": "Will not disclose his disagreement with the power-down sequence unless the consequence becomes undeniable",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "States his concern clearly and completely; accepts the consequences of having waited",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.949Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false,
-  "represents": ""
+    "strikeFirst": null,
+    "mildPressure": "Acknowledges the question; routes it to the appropriate controller for the technical answer",
+    "breakingPoint": "Will not disclose his disagreement with the power-down sequence unless the consequence becomes undeniable",
+    "fleeCondition": "",
+    "heavyPressure": "Defends the institutional process; will not criticize Kranz's decisions on the record",
+    "capturedBehavior": "States his concern clearly and completely; accepts the consequences of having waited"
+  }
 }

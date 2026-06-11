@@ -1,38 +1,38 @@
 {
   "id": "cynthia_tureaud",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "That the paper trail she left — the carbon-copy receipts, the date stamps, the lot numbers — will be recovered intact and used to demonstrate that she filed active occupied properties as abandoned",
   "name": "Cynthia Tureaud",
   "role": "City assessor's field agent, Orleans Parish",
-  "publicFace": "A precise, professionally composed woman in her late fifties who is not physically present at the bridge camp — she is accessible only through the documentary record she left behind and through her brother's account of her actions",
-  "privateGoal": "To process the maximum number of abandoned-property classifications before the post-storm legal moratorium on property actions is formally reinstated — she believes she is acting within her authority and has not examined that belief closely",
-  "fear": "That the paper trail she left — the carbon-copy receipts, the date stamps, the lot numbers — will be recovered intact and used to demonstrate that she filed active occupied properties as abandoned",
+  "voice": "Bureaucratic and precise, with the particular flatness of someone who has learned to discuss consequential actions in the language of administrative procedure",
+  "secrets": [
+    "She received a finder's fee arrangement from the development intermediary contingent on the number of parcels successfully classified as abandoned — this has not been disclosed to anyone",
+    "She is aware that her brother is using her name as cover for his supply diversion operations and has not asked him to stop"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "She filed twenty-three Lower Ninth Ward properties as abandoned between August 31 and September 1, including the Fontenot parcel on Deslonde Street",
     "At least four of those properties had documented residents who were confirmed alive and sheltering in place at the time of filing — she had access to the shelter registry and chose not to cross-reference it",
     "She has been in contact with the same private real estate development intermediary her brother mentioned — she introduced him to that contact"
   ],
-  "voice": "Bureaucratic and precise, with the particular flatness of someone who has learned to discuss consequential actions in the language of administrative procedure",
+  "updatedAt": "2026-06-04T19:27:16.044Z",
+  "publicFace": "A precise, professionally composed woman in her late fifties who is not physically present at the bridge camp — she is accessible only through the documentary record she left behind and through her brother's account of her actions",
+  "represents": "",
   "trustLogic": "Responds to official authority and documented procedure; dismisses emotional appeals as outside her operational scope",
-  "secrets": [
-    "She received a finder's fee arrangement from the development intermediary contingent on the number of parcels successfully classified as abandoned — this has not been disclosed to anyone",
-    "She is aware that her brother is using her name as cover for his supply diversion operations and has not asked him to stop"
+  "description": "",
+  "privateGoal": "To process the maximum number of abandoned-property classifications before the post-storm legal moratorium on property actions is formally reinstated — she believes she is acting within her authority and has not examined that belief closely",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Cites her statutory authority and the emergency conditions that required expedited processing",
-    "heavyPressure": "Requests that any concerns be submitted in writing to the Orleans Parish Assessor's Office through the formal appeals process",
-    "breakingPoint": "The finder's fee arrangement — she will deny it until the documentary evidence is placed in front of her",
-    "fleeCondition": "If confronted in person with the carbon-copy receipt and the shelter registry simultaneously",
     "fleeStyle": "Invokes her official status and attempts to terminate the conversation by walking away",
     "chaseStyle": "Stops and demands to know the questioner's name and organizational affiliation",
-    "capturedBehavior": "Requests legal representation before saying anything further",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.044Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Cites her statutory authority and the emergency conditions that required expedited processing",
+    "breakingPoint": "The finder's fee arrangement — she will deny it until the documentary evidence is placed in front of her",
+    "fleeCondition": "If confronted in person with the carbon-copy receipt and the shelter registry simultaneously",
+    "heavyPressure": "Requests that any concerns be submitted in writing to the Orleans Parish Assessor's Office through the formal appeals process",
+    "capturedBehavior": "Requests legal representation before saying anything further"
+  }
 }

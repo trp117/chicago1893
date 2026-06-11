@@ -1,0 +1,21 @@
+{
+  "id": "loc_artillery_park",
+  "mood": "contested, logistically fraught, symbolically heavy",
+  "name": "Artillery Park, Brooklyn Ferry Approach Road",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "Four field cannon on their limbers, staged on the road above the ferry slip, their draft horses stamping and blowing in the dark. The question of whether these guns cross tonight or are spiked and abandoned has not been answered.",
+  "atmosphericDetails": [
+    "The smell of horse sweat and iron grease from the cannon limbers, mixed with the river mud churned up by iron-shod wheels.",
+    "The stamping and snorting of the draft horses, which have not been watered in six hours and are becoming difficult to manage quietly.",
+    "The visual bulk of the cannon barrels against the dark sky—each one representing months of procurement and transport.",
+    "The voices of artillery officers arguing in hushed, urgent tones about loading priority with the slip master."
+  ],
+  "linkedCharacterIds": [
+    "char_cortelyou",
+    "char_glover"
+  ]
+}

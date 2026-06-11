@@ -1,38 +1,38 @@
 {
   "id": "char_sgt_kowalski",
-  "scenarioIds": [
-    "dog_green_sector"
-  ],
+  "fear": "That the wire will not be reached before the tide forces everyone off the beach, and that the second wave will die in the same water.",
   "name": "Staff Sergeant Thomas Kowalski",
   "role": "Squad Leader, 2nd Ranger Battalion, Dog Company",
-  "publicFace": "A quiet, economical man who does not waste words or motion — the soldiers around him trust him because he has never told them something was safe when it was not.",
-  "privateGoal": "To get the Bangalore to the wire and detonate it, regardless of who gives the order or who is left to do it.",
-  "fear": "That the wire will not be reached before the tide forces everyone off the beach, and that the second wave will die in the same water.",
+  "voice": "Sparse, declarative, never raises his voice — communicates urgency through pace and physical action rather than volume.",
+  "secrets": [
+    "He has already decided he will push the Bangalore himself if no one else will, and he does not expect to survive the approach.",
+    "He has a cricket in his pocket that he has been clicking compulsively since the ramp dropped — a habit he developed in training that he cannot stop under fire."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the Bangalore Torpedo requires two full sections to guarantee a breach wide enough for men to pass through — one section will only partially cut the wire.",
     "He has crawled close enough to the draw to observe that the MG-42 in WN-71 has a fixed traverse limit — there is a dead zone fifteen yards to the left of the wire that the gun cannot reach.",
     "He knows Corporal Drennan is carrying the second Bangalore section and was last seen going down in the surf fifty yards east."
   ],
-  "voice": "Sparse, declarative, never raises his voice — communicates urgency through pace and physical action rather than volume.",
+  "updatedAt": "2026-05-24T03:10:26.279Z",
+  "publicFace": "A quiet, economical man who does not waste words or motion — the soldiers around him trust him because he has never told them something was safe when it was not.",
+  "represents": "Non-commissioned officers of the 28th Infantry Regiment, 1st Division, who participated in the assault on Cantigny on May 28, 1918",
   "trustLogic": "Trusts anyone who demonstrates they have looked at the problem honestly; distrusts anyone who uses rank as a substitute for observation.",
-  "secrets": [
-    "He has already decided he will push the Bangalore himself if no one else will, and he does not expect to survive the approach.",
-    "He has a cricket in his pocket that he has been clicking compulsively since the ramp dropped — a habit he developed in training that he cannot stop under fire."
+  "description": "",
+  "privateGoal": "To get the Bangalore to the wire and detonate it, regardless of who gives the order or who is left to do it.",
+  "scenarioIds": [
+    "dog_green_sector"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers directly and moves on — does not elaborate unless asked specifically.",
-    "heavyPressure": "Stops, looks at the person pressing him, and says exactly what he knows without softening it.",
-    "breakingPoint": "He will not discuss the men he watched drown in the surf on the run-in — he has filed that away in a place he will not open today.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Cooperative to the minimum degree required; watches for opportunity.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.279Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Non-commissioned officers of the 28th Infantry Regiment, 1st Division, who participated in the assault on Cantigny on May 28, 1918",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers directly and moves on — does not elaborate unless asked specifically.",
+    "breakingPoint": "He will not discuss the men he watched drown in the surf on the run-in — he has filed that away in a place he will not open today.",
+    "fleeCondition": "",
+    "heavyPressure": "Stops, looks at the person pressing him, and says exactly what he knows without softening it.",
+    "capturedBehavior": "Cooperative to the minimum degree required; watches for opportunity."
+  }
 }

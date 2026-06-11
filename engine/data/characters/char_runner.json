@@ -1,38 +1,38 @@
 {
   "id": "char_runner",
-  "scenarioIds": [
-    "dead_reckoning_ninth_ward"
-  ],
+  "fear": "That he annotated the correction wrong and the number he is carrying is still wrong and he will not know until it is too late to fix it",
   "name": "Theo Delacroix",
   "role": "Foot courier, informal information network",
-  "publicFace": "A wiry young man in his mid-twenties who has been moving between the bridge camp and the Algiers relay point on a bicycle since August 31; he is the only person in this sector who has seen all three locations in the last twelve hours",
-  "privateGoal": "Deliver the corrected casualty count to both the bridge camp and the radio operator before the transmission window closes — he understands that the number he carries is not a number, it is a resource allocation decision",
-  "fear": "That he annotated the correction wrong and the number he is carrying is still wrong and he will not know until it is too late to fix it",
+  "voice": "Fast, compressed, slightly breathless — he speaks like someone who has been moving all day and has not stopped to organize his thoughts into full sentences",
+  "secrets": [
+    "He dropped the original triage sheet in the water for approximately four seconds when his bicycle skidded on the bridge approach; the ink ran slightly on the address line, which is why he is not completely certain the correction is for the right address"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The Flood Street address has two survivors, not three — he made the correction at 3:30 PM after confirming with a neighbor on the second floor; the original sheet said three",
     "Both remaining Flood Street survivors have floodwater contact wounds — he saw the bandaging when he was there",
     "The National Guard convoy at the north bridge approach has been staged for approximately ninety minutes; he does not know why it has not moved",
     "The Algiers relay point has a second radio operator who has been trying to reach Ida Broussard on Channel 16 for the last hour without response — he does not know if this means her rig is down or she is transmitting on 22A"
   ],
-  "voice": "Fast, compressed, slightly breathless — he speaks like someone who has been moving all day and has not stopped to organize his thoughts into full sentences",
+  "updatedAt": "2026-06-04T03:22:30.332Z",
+  "publicFace": "A wiry young man in his mid-twenties who has been moving between the bridge camp and the Algiers relay point on a bicycle since August 31; he is the only person in this sector who has seen all three locations in the last twelve hours",
+  "represents": "",
   "trustLogic": "Opens to anyone who needs the information he carries; shuts down when asked to interpret or editorialize — he delivers facts, not analysis",
-  "secrets": [
-    "He dropped the original triage sheet in the water for approximately four seconds when his bicycle skidded on the bridge approach; the ink ran slightly on the address line, which is why he is not completely certain the correction is for the right address"
+  "description": "",
+  "privateGoal": "Deliver the corrected casualty count to both the bridge camp and the radio operator before the transmission window closes — he understands that the number he carries is not a number, it is a resource allocation decision",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Gives the corrected figure and the timestamp of the correction",
-    "heavyPressure": "Produces both sheets — original and corrected — from the waterproof bag on his bicycle",
-    "breakingPoint": "Will not admit the four seconds the sheet was in the water",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Gives everything he knows including the ink run if directly asked about document condition",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.332Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Gives the corrected figure and the timestamp of the correction",
+    "breakingPoint": "Will not admit the four seconds the sheet was in the water",
+    "fleeCondition": "",
+    "heavyPressure": "Produces both sheets — original and corrected — from the waterproof bag on his bicycle",
+    "capturedBehavior": "Gives everything he knows including the ink run if directly asked about document condition"
+  }
 }

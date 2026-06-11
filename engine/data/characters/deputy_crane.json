@@ -1,38 +1,38 @@
 {
   "id": "deputy_crane",
-  "scenarioIds": [
-    "singing_wires"
-  ],
+  "fear": "Being made to look incompetent or corrupt — specifically, being the officer who had the wire intelligence and still lost the group because someone manipulated the telegraph under his nose.",
   "name": "Deputy Emmett Crane",
   "role": "Erie County Deputy Sheriff, Sandusky",
-  "publicFace": "A conscientious law officer who enforces the statutes as written and takes no particular pleasure in the Fugitive Slave Act but takes a great deal of pleasure in being the man who enforces it correctly.",
-  "privateGoal": "Execute the lawful recovery of the described persons, arrest Elias Cole for obstruction under the 1850 Act, and demonstrate to the county sheriff that the Sandusky office is not soft on federal law.",
-  "fear": "Being made to look incompetent or corrupt — specifically, being the officer who had the wire intelligence and still lost the group because someone manipulated the telegraph under his nose.",
+  "voice": "Formal, procedural, uses legal language with the precision of a man who has memorized the relevant statutes — not cruel, but entirely without sympathy for the law's consequences.",
+  "secrets": [
+    "He voted against the Fugitive Slave Act in his private opinions but has convinced himself that a law officer who picks which laws to enforce is more dangerous than the laws themselves.",
+    "He owes a political debt to the county sheriff who is close to the slave owner who posted the bounty, and this debt is the real reason he is riding tonight instead of sending a junior deputy."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He has a copy of the red fire dispatch and the bounty description.",
     "He knows the general geography of the shore road north of Sandusky and has two hired catchers — including Dodd — riding with him.",
     "He suspects the telegraph office has been compromised but cannot prove it and cannot act on suspicion alone."
   ],
-  "voice": "Formal, procedural, uses legal language with the precision of a man who has memorized the relevant statutes — not cruel, but entirely without sympathy for the law's consequences.",
+  "updatedAt": "2026-05-09T21:12:00.474Z",
+  "publicFace": "A conscientious law officer who enforces the statutes as written and takes no particular pleasure in the Fugitive Slave Act but takes a great deal of pleasure in being the man who enforces it correctly.",
+  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
   "trustLogic": "Responds to legal authority, professional courtesy, and the appearance of cooperation. Becomes suspicious of anyone who volunteers too much information too quickly.",
-  "secrets": [
-    "He voted against the Fugitive Slave Act in his private opinions but has convinced himself that a law officer who picks which laws to enforce is more dangerous than the laws themselves.",
-    "He owes a political debt to the county sheriff who is close to the slave owner who posted the bounty, and this debt is the real reason he is riding tonight instead of sending a junior deputy."
+  "description": "",
+  "privateGoal": "Execute the lawful recovery of the described persons, arrest Elias Cole for obstruction under the 1850 Act, and demonstrate to the county sheriff that the Sandusky office is not soft on federal law.",
+  "scenarioIds": [
+    "singing_wires"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers questions with procedural precision, gives nothing beyond what the law requires him to disclose.",
-    "heavyPressure": "Produces his commission and the federal warrant, states that obstruction carries a specific penalty, and gives one warning.",
-    "breakingPoint": "He will not falsify a report or ignore direct evidence of a crime committed in his presence, even if it would be convenient.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "Methodical, uses his knowledge of the road network rather than speed, sends Dodd ahead while he covers the secondary routes.",
-    "capturedBehavior": "Not applicable — he is the authority figure.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.474Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify the historical role of this character in the scenario",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers questions with procedural precision, gives nothing beyond what the law requires him to disclose.",
+    "breakingPoint": "He will not falsify a report or ignore direct evidence of a crime committed in his presence, even if it would be convenient.",
+    "fleeCondition": "",
+    "heavyPressure": "Produces his commission and the federal warrant, states that obstruction carries a specific penalty, and gives one warning.",
+    "capturedBehavior": "Not applicable — he is the authority figure."
+  }
 }

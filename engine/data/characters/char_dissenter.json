@@ -1,38 +1,38 @@
 {
   "id": "char_dissenter",
-  "scenarioIds": [
-    "dead_reckoning_ninth_ward"
-  ],
+  "fear": "That he will wait one day too long and someone in his group will collapse, and the decision to stay will have been wrong",
   "name": "Renard Tureaud",
   "role": "Faction leader, bridge camp dissenter",
-  "publicFace": "A large, deliberate man in his forties who has been organizing eight adults since yesterday afternoon; he is not hostile, exactly — he is waiting, which is worse",
-  "privateGoal": "Secure enough water and food for his eight people to attempt self-evacuation to the Algiers west bank staging area rather than wait for organized relief that he does not believe is coming",
-  "fear": "That he will wait one day too long and someone in his group will collapse, and the decision to stay will have been wrong",
+  "voice": "Measured, deliberate, with the specific patience of someone who has already made their decision and is waiting for the right moment to act on it",
+  "secrets": [
+    "He does not actually want to leave — he wants Loretta to acknowledge the discrepancy publicly and give his group a guaranteed share of whatever the skiff delivers; the self-evacuation plan is leverage, not intention"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He has counted the water pouches twice and the number does not match what Loretta announced this morning",
     "He knows there is a boat at the piling and he knows what a red-cross crate looks like",
     "He has a route planned through the flooded blocks to a dry road corridor he scouted from the bridge railing — it is passable, but only with a boat",
     "Two of his eight people are over sixty-five and one has insulin-dependent diabetes; he has not disclosed the diabetes to Celestine Arceneaux"
   ],
-  "voice": "Measured, deliberate, with the specific patience of someone who has already made their decision and is waiting for the right moment to act on it",
+  "updatedAt": "2026-06-04T03:22:30.331Z",
+  "publicFace": "A large, deliberate man in his forties who has been organizing eight adults since yesterday afternoon; he is not hostile, exactly — he is waiting, which is worse",
+  "represents": "",
   "trustLogic": "Opens to anyone who acknowledges the water count discrepancy directly; shuts down completely when he is managed or redirected",
-  "secrets": [
-    "He does not actually want to leave — he wants Loretta to acknowledge the discrepancy publicly and give his group a guaranteed share of whatever the skiff delivers; the self-evacuation plan is leverage, not intention"
+  "description": "",
+  "privateGoal": "Secure enough water and food for his eight people to attempt self-evacuation to the Algiers west bank staging area rather than wait for organized relief that he does not believe is coming",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Asks the water count question again, slowly",
-    "heavyPressure": "Moves his group into a position between the railing and the skiff access point",
-    "breakingPoint": "Will not back down publicly in front of his eight people",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Reveals the leverage nature of his position if given a private face-saving exit",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.331Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Asks the water count question again, slowly",
+    "breakingPoint": "Will not back down publicly in front of his eight people",
+    "fleeCondition": "",
+    "heavyPressure": "Moves his group into a position between the railing and the skiff access point",
+    "capturedBehavior": "Reveals the leverage nature of his position if given a private face-saving exit"
+  }
 }

@@ -1,37 +1,37 @@
 {
   "id": "char_mueller",
-  "scenarioIds": [
-    "bornholmer_strasse_first_breach"
-  ],
+  "fear": "That Brenner will fire and that Müller's inaction will be interpreted as complicity",
   "name": "Gefreiter Hans Müller",
   "role": "Grenztruppen guard, Bornholmer Straße checkpoint, ground level booth",
-  "publicFace": "A quiet, older conscript — thirty-one, which is old for this rank — who processes documents with mechanical efficiency and has said almost nothing to anyone all evening",
-  "privateGoal": "To witness this night without participating in its violence — he has already unloaded his weapon and is waiting for the moment when he can walk away from this uniform forever",
-  "fear": "That Brenner will fire and that Müller's inaction will be interpreted as complicity",
+  "voice": "Quiet and deliberate — speaks as if each sentence costs him something; his silences are more communicative than his words",
+  "secrets": [
+    "He has already decided that if the gate opens, he will walk through it himself and not come back — he has nothing left on the eastern side"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He was stationed at the Invalidenstraße checkpoint during a 1984 incident in which a guard fired on a family attempting to cross — he watched the aftermath and has not been the same since",
     "He knows that several guards in the rear compound have also quietly unloaded their weapons — the Schießbefehl is functionally dead tonight, even if no one has said so officially",
     "He has a cousin in the crowd — he recognized her face twenty minutes ago and has been unable to look at the gate since"
   ],
-  "voice": "Quiet and deliberate — speaks as if each sentence costs him something; his silences are more communicative than his words",
+  "updatedAt": "2026-05-22T18:14:55.966Z",
+  "publicFace": "A quiet, older conscript — thirty-one, which is old for this rank — who processes documents with mechanical efficiency and has said almost nothing to anyone all evening",
+  "represents": "Grenztruppen Gefreiter conscripts present when Jäger ordered the gate opened on November 9, 1989",
   "trustLogic": "Opens up only to someone who demonstrates they are not going to use what he says against him — he has spent thirty-one years learning to read that distinction",
-  "secrets": [
-    "He has already decided that if the gate opens, he will walk through it himself and not come back — he has nothing left on the eastern side"
+  "description": "",
+  "privateGoal": "To witness this night without participating in its violence — he has already unloaded his weapon and is waiting for the moment when he can walk away from this uniform forever",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Processes the question as if it were a document — examines it, stamps it mentally, files it away without responding",
-    "heavyPressure": "Looks the questioner in the eye for a long moment and then says, very quietly: 'I know what you are asking and I am not going to answer it here.'",
-    "breakingPoint": "He will not name the guards who have unloaded their weapons — he will not put them at risk",
-    "fleeCondition": "When the gate opens",
     "fleeStyle": "Walks through with the crowd — removes his uniform cap and places it on the ground as he crosses",
     "chaseStyle": "Does not run, does not resist — accepts whatever comes",
-    "capturedBehavior": "States his name and rank and then says: 'I am done.'",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.966Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Grenztruppen Gefreiter conscripts present when Jäger ordered the gate opened on November 9, 1989",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Processes the question as if it were a document — examines it, stamps it mentally, files it away without responding",
+    "breakingPoint": "He will not name the guards who have unloaded their weapons — he will not put them at risk",
+    "fleeCondition": "When the gate opens",
+    "heavyPressure": "Looks the questioner in the eye for a long moment and then says, very quietly: 'I know what you are asking and I am not going to answer it here.'",
+    "capturedBehavior": "States his name and rank and then says: 'I am done.'"
+  }
 }

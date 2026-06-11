@@ -1,0 +1,20 @@
+{
+  "id": "loc_east_river_crossing",
+  "mood": "isolating, physically punishing, acoustically treacherous",
+  "name": "East River Mid-Channel Crossing Lane",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A mile of black, pitching water between two dark shores, navigated entirely by feel and the faint loom of Manhattan's lanterns ahead. The tidal current runs northeast at the channel's center, pulling bateaux off-course toward the harbor mouth and the anchored British fleet.",
+  "atmosphericDetails": [
+    "The rhythmic grunt of oarsmen pulling in unison, punctuated by the creak of greased iron locks and the hiss of water past the hull.",
+    "The distant silhouette of a British man-of-war riding at anchor to the south, her riding light a single amber point in the dark.",
+    "The physical sensation of the tidal current grabbing the bateau's flat bottom and pushing it sideways off the intended heading.",
+    "Patches of fog rolling in from the harbor, alternately blinding and revealing the far shore."
+  ],
+  "linkedCharacterIds": [
+    "char_ezra_pedrick"
+  ]
+}

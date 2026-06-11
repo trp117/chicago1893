@@ -1,0 +1,32 @@
+{
+  "id": "char_glover",
+  "fear": "That a bateau will be lost to the current near the British warships, alerting the fleet and triggering an interception that collapses the entire operation.",
+  "name": "Colonel John Glover",
+  "role": "Commanding Officer, 14th Continental Regiment (Marblehead)",
+  "voice": "Clipped, nautical, impatient with landlocked officers who give him infantry commands when he needs seamanship decisions.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The tidal schedule for the East River on this date, including the early reversal that will push bateaux downstream after approximately 2:00 AM.",
+    "Which of his oarsmen are at the edge of physical exhaustion and which still have reserves.",
+    "The acoustic range of a squeaking iron oarlock on a still night—and exactly how close the British sentinel posts are to the crossing lanes."
+  ],
+  "updatedAt": "2026-06-10T22:40:42.165Z",
+  "publicFace": "A compact, weathered man who speaks in the flat vowels of coastal Essex County; treats the East River crossing as a seamanship problem, not a military one.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Explains the hydraulic reality in plain terms, as if to a man who has never been on water.",
+    "breakingPoint": "Will not promise a crossing time he cannot guarantee; refuses to give Washington a false schedule.",
+    "heavyPressure": "Points at the river and says what will happen if the order is followed; lets the facts argue for him."
+  },
+  "privateConstraint": "Glover's regiment has been rowing since before midnight and the men's physical reserves are finite; he cannot order maximum stroke rates indefinitely without destroying his crews' ability to complete the final crossings."
+}

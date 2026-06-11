@@ -1,38 +1,38 @@
 {
   "id": "darnell_arceneaux",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "Running out of fuel on the open flood plane at night with a dead motor and no way to signal",
   "name": "Darnell Arceneaux",
   "role": "Independent flat-bottom skiff operator and informal supply runner",
-  "publicFace": "A lean, sun-burned man in his late twenties who has been moving between bridge camps and rooftop refuges for four days without sleeping more than two hours at a stretch — he looks like the water has been trying to keep him",
-  "privateGoal": "To deliver the pharmaceutical crate and collect the fuel authorization chit Father Clement promised him — without which his skiff runs dry before he can reach his own family in Gentilly",
-  "fear": "Running out of fuel on the open flood plane at night with a dead motor and no way to signal",
+  "voice": "Exhausted and direct, with the flat affect of someone who has been making impossible decisions for so long that the emotional register has temporarily gone offline",
+  "secrets": [
+    "He has a fuel authorization chit from Father Clement in his shirt pocket that he has not disclosed to anyone — it is the only reason he has kept running the diversions",
+    "He knows the location of two other diverted pharmaceutical crates staged under the Claiborne Avenue overpass"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "Father Clement Tureaud personally loaded the pharmaceutical crate onto his skiff at a staging point near the Claiborne Avenue overpass and told him the lot number was 'cleared through the diocese'",
     "He has been running supply diversions for Father Clement for three days — he believed they were legitimate relief operations until this morning, when a woman at another bridge camp showed him a FEMA manifest that listed the same lot numbers as undelivered",
     "There are three children on his skiff whose parents are in the bridge camp — Father Clement told him to deliver the crate first and the children second, which he has been trying to reconcile for two hours"
   ],
-  "voice": "Exhausted and direct, with the flat affect of someone who has been making impossible decisions for so long that the emotional register has temporarily gone offline",
+  "updatedAt": "2026-06-04T19:27:16.044Z",
+  "publicFace": "A lean, sun-burned man in his late twenties who has been moving between bridge camps and rooftop refuges for four days without sleeping more than two hours at a stretch — he looks like the water has been trying to keep him",
+  "represents": "",
   "trustLogic": "Opens up when he senses that the other person is not going to use what he tells them to punish him — he is looking for someone to take the weight of what he knows off him",
-  "secrets": [
-    "He has a fuel authorization chit from Father Clement in his shirt pocket that he has not disclosed to anyone — it is the only reason he has kept running the diversions",
-    "He knows the location of two other diverted pharmaceutical crates staged under the Claiborne Avenue overpass"
+  "description": "",
+  "privateGoal": "To deliver the pharmaceutical crate and collect the fuel authorization chit Father Clement promised him — without which his skiff runs dry before he can reach his own family in Gentilly",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Deflects with operational logistics — talks about fuel, water depth, motor trouble — anything that keeps the conversation away from Father Clement",
-    "heavyPressure": "Goes quiet and looks at his hands, then says he was just doing what he was told and he has people depending on him",
-    "breakingPoint": "Will not immediately disclose the fuel authorization chit — it is his survival margin",
-    "fleeCondition": "If directly accused of criminal supply diversion without being offered any protection",
     "fleeStyle": "Pushes off from the piling and motors away at low speed, heading toward the Claiborne staging point",
     "chaseStyle": "Does not accelerate — he is too tired and the motor is nearly out of fuel anyway",
-    "capturedBehavior": "Discloses everything immediately, including the chit and the location of the other crates, in exchange for fuel and safe passage to Gentilly",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.044Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Deflects with operational logistics — talks about fuel, water depth, motor trouble — anything that keeps the conversation away from Father Clement",
+    "breakingPoint": "Will not immediately disclose the fuel authorization chit — it is his survival margin",
+    "fleeCondition": "If directly accused of criminal supply diversion without being offered any protection",
+    "heavyPressure": "Goes quiet and looks at his hands, then says he was just doing what he was told and he has people depending on him",
+    "capturedBehavior": "Discloses everything immediately, including the chit and the location of the other crates, in exchange for fuel and safe passage to Gentilly"
+  }
 }

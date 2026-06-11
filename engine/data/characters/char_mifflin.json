@@ -1,0 +1,32 @@
+{
+  "id": "char_mifflin",
+  "fear": "That the British will detect the empty trenches before he receives the final embarkation order, and that his small unit will be overrun without support.",
+  "name": "Brigadier General Thomas Mifflin",
+  "role": "Commanding Officer, Rear Guard, Brooklyn Heights",
+  "voice": "Measured but with a tightness underneath; the voice of a man performing calm he does not entirely feel.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The exact fuel inventory remaining for the parapet campfires—enough for perhaps ninety more minutes at current burn rate.",
+    "The location and approximate timing of British picket rotations based on sound observation over the past three hours.",
+    "That Washington is still on the Brooklyn shore and will not leave until the last regiment boards."
+  ],
+  "updatedAt": "2026-06-10T22:40:42.165Z",
+  "publicFace": "A Philadelphia merchant turned soldier; articulate, politically connected, visibly strained by the responsibility of commanding the hollow defensive line.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Responds with a precise status report, as if the precision itself is reassurance.",
+    "breakingPoint": "Will not speculate on how long his unit can hold if the deception fails; he does not know and will not pretend otherwise.",
+    "heavyPressure": "Reminds the questioner of the premature recall incident and what it cost his men; not accusatory, but factual."
+  },
+  "privateConstraint": "Mifflin was given verbal orders by Washington to hold the parapets until recalled; he received a premature recall message by mistake earlier in the night and began marching his men to the slip before being turned back—his troops are now more exhausted and more rattled than they should be."
+}

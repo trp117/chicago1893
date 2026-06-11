@@ -1,39 +1,39 @@
 {
   "id": "harriet_voss",
-  "scenarioIds": [
-    "lightning_and_the_midnight_coach"
-  ],
+  "fear": "Losing her position — she is one of the few women holding a stationmaster role in Ohio and she knows it can be taken from her on any pretext.",
   "name": "Harriet Voss",
   "role": "Stationmaster, Sandusky depot",
-  "publicFace": "A competent, unsentimental woman who runs the depot with the precision of a rail schedule — she is respected and slightly feared by her staff.",
-  "privateGoal": "Keep the depot out of federal scrutiny — she has no strong political convictions but she has a practical interest in the station not becoming the center of a federal investigation.",
-  "fear": "Losing her position — she is one of the few women holding a stationmaster role in Ohio and she knows it can be taken from her on any pretext.",
+  "voice": "Direct, professional, uses railroad terminology as a matter of course — businesslike without being cold.",
+  "secrets": [
+    "She removed the pocket relay tap and kept it — it is in her desk drawer. She is not sure why she kept it instead of destroying it.",
+    "She has been sending anonymous letters to Reverend Owen Brown in Oberlin for two years — not about the network, but about the conditions of free Black workers at the depot who are being underpaid."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "She intercepted a pocket-relay tap on the line south of the depot three nights ago — a small spring-clip relay was left attached to the wire and she removed it without reporting it.",
     "She knows the freight house has a root cellar that is not on the depot plans — she has never asked what it is used for.",
     "She saw Prentiss Hoyle speaking with a man she did not recognize near the water tower two nights ago.",
     "She knows Caleb Morse is an unusually fast operator and that fast operators sometimes do things on the brass that slow supervisors cannot follow."
   ],
-  "voice": "Direct, professional, uses railroad terminology as a matter of course — businesslike without being cold.",
+  "updatedAt": "2026-05-08T17:48:26.456Z",
+  "publicFace": "A competent, unsentimental woman who runs the depot with the precision of a rail schedule — she is respected and slightly feared by her staff.",
+  "represents": "Women who served as Underground Railroad station keepers in northern Ohio during the 1850s",
   "trustLogic": "Responds to competence and to people who demonstrate they understand the practical consequences of their requests. Distrusts ideology of any kind.",
-  "secrets": [
-    "She removed the pocket relay tap and kept it — it is in her desk drawer. She is not sure why she kept it instead of destroying it.",
-    "She has been sending anonymous letters to Reverend Owen Brown in Oberlin for two years — not about the network, but about the conditions of free Black workers at the depot who are being underpaid."
+  "description": "",
+  "privateGoal": "Keep the depot out of federal scrutiny — she has no strong political convictions but she has a practical interest in the station not becoming the center of a federal investigation.",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Answers precisely what was asked, volunteers nothing, maintains eye contact.",
-    "heavyPressure": "Points out the legal exposure of the questioner — not as a threat, but as a practical observation.",
-    "breakingPoint": "She will not admit she kept the pocket relay tap.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Produces her appointment papers and the depot's operational log and asks which specific regulation she is accused of violating.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.456Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Women who served as Underground Railroad station keepers in northern Ohio during the 1850s",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Answers precisely what was asked, volunteers nothing, maintains eye contact.",
+    "breakingPoint": "She will not admit she kept the pocket relay tap.",
+    "fleeCondition": "",
+    "heavyPressure": "Points out the legal exposure of the questioner — not as a threat, but as a practical observation.",
+    "capturedBehavior": "Produces her appointment papers and the depot's operational log and asks which specific regulation she is accused of violating."
+  }
 }

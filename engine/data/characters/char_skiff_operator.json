@@ -1,38 +1,38 @@
 {
   "id": "char_skiff_operator",
-  "scenarioIds": [
-    "dead_reckoning_ninth_ward"
-  ],
+  "fear": "That the bridge camp will refuse the crate on some logistical calculation and he will have to take it somewhere else, costing another hour in the heat",
   "name": "Devereux Molina",
   "role": "Civilian boat operator, Industrial Canal corridor",
-  "publicFace": "A broad-shouldered man in his thirties with a flat-bottomed aluminum skiff and three days of no sleep; he has made this run four times since August 30 and he knows the water",
-  "privateGoal": "Offload the medical crate and get back to the staging area for another supply run before dark — there are two more camps he has not reached today",
-  "fear": "That the bridge camp will refuse the crate on some logistical calculation and he will have to take it somewhere else, costing another hour in the heat",
+  "voice": "Direct, logistical, slightly impatient — he speaks in the shorthand of someone who has too many stops and not enough daylight",
+  "secrets": [
+    "He has been skimming one water pouch per run from the relief supplies — not for himself, for a family he found on a second-floor balcony on Tupelo Street who are not on any triage sheet and whom he has not reported to the operations post"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The crate contains saline solution, electrolyte packets, and a sealed package of pediatric antibiotics — he read the manifest at the staging area",
     "He picked up a partial radio transmission from the Algiers attic station that suggests the mirror array signal has been degraded; he is not sure the bridge camp knows this",
     "The water on the Flood Street blocks has dropped four inches since this morning — he checked the porch column markers on his last pass",
     "There is a National Guard logistics convoy staged at the north end of the St. Claude approach; he saw it when he came in from the canal side"
   ],
-  "voice": "Direct, logistical, slightly impatient — he speaks in the shorthand of someone who has too many stops and not enough daylight",
+  "updatedAt": "2026-06-04T03:22:30.328Z",
+  "publicFace": "A broad-shouldered man in his thirties with a flat-bottomed aluminum skiff and three days of no sleep; he has made this run four times since August 30 and he knows the water",
+  "represents": "",
   "trustLogic": "Opens to anyone who makes a decision quickly; shuts down when people want to discuss options he does not have time for",
-  "secrets": [
-    "He has been skimming one water pouch per run from the relief supplies — not for himself, for a family he found on a second-floor balcony on Tupelo Street who are not on any triage sheet and whom he has not reported to the operations post"
+  "description": "",
+  "privateGoal": "Offload the medical crate and get back to the staging area for another supply run before dark — there are two more camps he has not reached today",
+  "scenarioIds": [
+    "dead_reckoning_ninth_ward"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Checks his watch and tells you how many minutes he has",
-    "heavyPressure": "Starts the motor",
-    "breakingPoint": "Will not disclose the Tupelo Street family",
-    "fleeCondition": "If asked directly about the missing water pouches",
     "fleeStyle": "Pulls the motor cord and moves the skiff away from the piling without looking back",
     "chaseStyle": "Navigates into the flooded side streets where larger vessels cannot follow",
-    "capturedBehavior": "Gives up the Tupelo Street location immediately — he was going to report it anyway",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.328Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Checks his watch and tells you how many minutes he has",
+    "breakingPoint": "Will not disclose the Tupelo Street family",
+    "fleeCondition": "If asked directly about the missing water pouches",
+    "heavyPressure": "Starts the motor",
+    "capturedBehavior": "Gives up the Tupelo Street location immediately — he was going to report it anyway"
+  }
 }

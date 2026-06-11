@@ -1,0 +1,18 @@
+{
+  "id": "clue_premature_recall_incident",
+  "title": "Mifflin's Premature Recall",
+  "unlocks": [],
+  "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.167Z",
+  "locationId": "",
+  "scenarioId": "fog_and_oar_1776",
+  "description": "Mifflin pulls you aside and tells you what happened two hours ago: he received a verbal message, relayed through a staff officer, ordering the rear guard to march to the ferry slip immediately. He began moving his men before Washington himself—still at the command post—stopped them and sent them back to the parapets. The staff officer who relayed the order cannot be identified; the message was not in writing. Mifflin's men walked half a mile in the dark, turned around, and walked back. They are measurably more exhausted than they should be at this stage of the night.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_washington_command_post",
+  "implicatesCharacterIds": [
+    "char_mifflin",
+    "char_washington"
+  ]
+}

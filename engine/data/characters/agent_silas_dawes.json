@@ -1,38 +1,38 @@
 {
   "id": "agent_silas_dawes",
-  "scenarioIds": [
-    "boston_tea_party_version_2"
-  ],
+  "fear": "That his informer will be exposed before the trap is set — if the Patriots learn who talked, they will abort the operation and he will have nothing to show for months of work.",
   "name": "Agent Silas Dawes",
   "role": "Royal customs officer assigned to Griffin's Wharf",
-  "publicFace": "A cold, watchful man in a dark coat who patrols the dock with the quiet authority of someone who believes the law is entirely on his side.",
-  "privateGoal": "He wants to catch the Sons of Liberty in the act tonight — he has received intelligence from his informer and is positioning his men accordingly, waiting for the right moment to spring the trap.",
-  "fear": "That his informer will be exposed before the trap is set — if the Patriots learn who talked, they will abort the operation and he will have nothing to show for months of work.",
+  "voice": "Clipped, formal, and faintly contemptuous — he speaks to colonists the way a schoolmaster speaks to slow students, with exaggerated patience masking deep disdain.",
+  "secrets": [
+    "He has already sent a rider to the garrison — redcoats are on their way to the wharf and will arrive within the hour.",
+    "He has a copy of the intelligence letter in his coat pocket — it is the customs receipt that records the payment made to his informer."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the name of his informer and the precise time the boarding is planned — he will not reveal either under any circumstances.",
     "He knows that the intelligence he received was written in a distinctive cipher, which he found unusual for a simple merchant.",
     "He is aware that one of the Patriots is currently investigating the leak — he has been watching the player's movements."
   ],
-  "introAnchor": "a Crown customs officer posted to Griffin's Wharf with the quiet authority of a man who believes the trap is already set",
-  "voice": "Clipped, formal, and faintly contemptuous — he speaks to colonists the way a schoolmaster speaks to slow students, with exaggerated patience masking deep disdain.",
+  "updatedAt": "2026-04-29T00:08:14.438Z",
+  "publicFace": "A cold, watchful man in a dark coat who patrols the dock with the quiet authority of someone who believes the law is entirely on his side.",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Sons of Liberty intelligence network, 1773-1775",
   "trustLogic": "He does not trust Patriots under any circumstances. He will speak to the player only if they approach with an air of authority or claim to have information useful to the Crown. He is most forthcoming when he believes he has the upper hand.",
-  "secrets": [
-    "He has already sent a rider to the garrison — redcoats are on their way to the wharf and will arrive within the hour.",
-    "He has a copy of the intelligence letter in his coat pocket — it is the customs receipt that records the payment made to his informer."
+  "introAnchor": "a Crown customs officer posted to Griffin's Wharf with the quiet authority of a man who believes the trap is already set",
+  "privateGoal": "He wants to catch the Sons of Liberty in the act tonight — he has received intelligence from his informer and is positioning his men accordingly, waiting for the right moment to spring the trap.",
+  "scenarioIds": [
+    "boston_tea_party_version_2"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "He smiles thinly and reminds the player that obstructing a customs officer is a criminal offense.",
-    "heavyPressure": "He signals to a nearby constable and warns the player they are on the edge of arrest.",
-    "breakingPoint": "He will never reveal his informer's name — protecting sources is a matter of professional survival.",
-    "fleeCondition": "If the player reveals that the Sons of Liberty know his position and are moving to expose him publicly, Dawes retreats to the Customs House to summon reinforcements.",
     "fleeStyle": "He walks briskly and deliberately, not running — he refuses to appear frightened.",
     "chaseStyle": "He shouts for the constable and threatens arrest for anyone who follows him.",
-    "capturedBehavior": "He becomes icily formal, states his name and rank, and demands to speak to the Governor — he will say nothing else.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.438Z",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented historical individual from the Sons of Liberty intelligence network, 1773-1775",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "He smiles thinly and reminds the player that obstructing a customs officer is a criminal offense.",
+    "breakingPoint": "He will never reveal his informer's name — protecting sources is a matter of professional survival.",
+    "fleeCondition": "If the player reveals that the Sons of Liberty know his position and are moving to expose him publicly, Dawes retreats to the Customs House to summon reinforcements.",
+    "heavyPressure": "He signals to a nearby constable and warns the player they are on the edge of arrest.",
+    "capturedBehavior": "He becomes icily formal, states his name and rank, and demands to speak to the Governor — he will say nothing else."
+  }
 }

@@ -1,38 +1,38 @@
 {
   "id": "char_protester",
-  "scenarioIds": [
-    "bornholmer_strasse_first_breach"
-  ],
+  "fear": "That she will do something — shout the wrong word, move at the wrong moment — that triggers the guard across the turnstile into firing, and that the deaths will be her fault",
   "name": "Anna Schreiber",
   "role": "East Berlin university student, Humboldt University, second year",
-  "publicFace": "A young woman in a dark wool coat, her face flushed from cold and exertion, who has positioned herself at the front of the crowd with a calm that the people behind her mistake for courage",
-  "privateGoal": "To reach her mother, who crossed to West Berlin on a day visa three weeks ago and has been unable to return — Anna has had no contact since and does not know if she is alive",
-  "fear": "That she will do something — shout the wrong word, move at the wrong moment — that triggers the guard across the turnstile into firing, and that the deaths will be her fault",
+  "voice": "Direct and physical — speaks in short declarative sentences, uses her body as punctuation, rarely raises her voice because she knows the crowd will amplify whatever she projects",
+  "secrets": [
+    "She is three months pregnant — the father is a fellow student who does not know, and she has told no one; the physical compression at the front of the crowd is genuinely dangerous for her",
+    "She was a registered informant for the Stasi for eight months in her first year at university — she reported nothing of consequence, but the file exists and she lives in terror of it surfacing"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "She has been attending Monday demonstrations in Leipzig since October and has developed an instinct for crowd psychology — she can feel a surge building before it starts",
     "The guard directly opposite her, a young man of perhaps twenty, has been making eye contact with her for the past twenty minutes — she believes he is as frightened as she is",
     "Her mother left a message with a neighbor three days ago: she is staying at an address in Prenzlauer Berg on the western side — Anna has the address memorized"
   ],
-  "voice": "Direct and physical — speaks in short declarative sentences, uses her body as punctuation, rarely raises her voice because she knows the crowd will amplify whatever she projects",
+  "updatedAt": "2026-05-22T18:14:55.965Z",
+  "publicFace": "A young woman in a dark wool coat, her face flushed from cold and exertion, who has positioned herself at the front of the crowd with a calm that the people behind her mistake for courage",
+  "represents": "East Berlin civilians who pressed against the Bornholmer Straße checkpoint on the night of November 9, 1989 — specifically those with family members stranded on the other side",
   "trustLogic": "Trusts anyone who demonstrates they are thinking about the people around them rather than themselves; immediately suspicious of anyone who seems to be performing bravery for an audience",
-  "secrets": [
-    "She is three months pregnant — the father is a fellow student who does not know, and she has told no one; the physical compression at the front of the crowd is genuinely dangerous for her",
-    "She was a registered informant for the Stasi for eight months in her first year at university — she reported nothing of consequence, but the file exists and she lives in terror of it surfacing"
+  "description": "",
+  "privateGoal": "To reach her mother, who crossed to West Berlin on a day visa three weeks ago and has been unable to return — Anna has had no contact since and does not know if she is alive",
+  "scenarioIds": [
+    "bornholmer_strasse_first_breach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Asks a clarifying question — who told you that, when did that happen — buying time while she assesses",
-    "heavyPressure": "Turns to face whoever is pressuring her so that the crowd can see the exchange; makes the confrontation public, which usually de-escalates it",
-    "breakingPoint": "She will never acknowledge the Stasi informant file — she has constructed an internal narrative in which those eight months did not happen",
-    "fleeCondition": "If the crowd surges and she loses her footing — her survival instinct will override her position at the front",
     "fleeStyle": "Sideways — she has identified two gaps in the crowd that lead back toward the Trabant queue",
     "chaseStyle": "Does not run; uses the crowd as cover, moving with the flow rather than against it",
-    "capturedBehavior": "Goes completely quiet and cooperative — she knows what Stasi detention looks like and will not give them a reason to escalate",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.965Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "East Berlin civilians who pressed against the Bornholmer Straße checkpoint on the night of November 9, 1989 — specifically those with family members stranded on the other side",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Asks a clarifying question — who told you that, when did that happen — buying time while she assesses",
+    "breakingPoint": "She will never acknowledge the Stasi informant file — she has constructed an internal narrative in which those eight months did not happen",
+    "fleeCondition": "If the crowd surges and she loses her footing — her survival instinct will override her position at the front",
+    "heavyPressure": "Turns to face whoever is pressuring her so that the crowd can see the exchange; makes the confrontation public, which usually de-escalates it",
+    "capturedBehavior": "Goes completely quiet and cooperative — she knows what Stasi detention looks like and will not give them a reason to escalate"
+  }
 }

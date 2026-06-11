@@ -1,38 +1,38 @@
 {
   "id": "margaret_cole",
-  "scenarioIds": [
-    "boston_tea_party_version_2"
-  ],
+  "fear": "That her tavern will be raided and her customers arrested — she has hidden correspondence from previous Sons of Liberty meetings in the cellar and cannot afford official scrutiny.",
   "name": "Margaret Cole",
   "role": "Proprietress of the Green Dragon Tavern",
-  "publicFace": "A sharp-eyed, no-nonsense widow who runs the tavern where the Sons of Liberty hold their meetings — she is everyone's confidante and no one's fool.",
-  "privateGoal": "She wants to protect her tavern and the men who use it; she has noticed something is wrong tonight and is quietly gathering her own information.",
-  "fear": "That her tavern will be raided and her customers arrested — she has hidden correspondence from previous Sons of Liberty meetings in the cellar and cannot afford official scrutiny.",
+  "voice": "Blunt, quick, and practical — she speaks in short declarative sentences and has no patience for evasion or sentiment. She respects directness.",
+  "secrets": [
+    "She has already told Samuel Adams about Greenleaf's unusual departure two nights ago, but Adams dismissed her concern.",
+    "She keeps a ledger of who enters and exits the tavern — it is hidden beneath the bar and would confirm Greenleaf's irregular movements."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "She saw Greenleaf leave the tavern alone two nights ago, which was unusual — he normally leaves in a group.",
     "She knows that a well-dressed stranger was asking about the Sons of Liberty's meeting schedule near the wharf last week.",
     "She overheard Greenleaf tell someone that Reverend Willard 'knows too much for his own good' — a remark she found chilling."
   ],
-  "introAnchor": "the sharp-eyed proprietress of the Green Dragon, everyone's confidante and no one's fool",
-  "voice": "Blunt, quick, and practical — she speaks in short declarative sentences and has no patience for evasion or sentiment. She respects directness.",
+  "updatedAt": "2026-04-29T00:08:14.437Z",
+  "publicFace": "A sharp-eyed, no-nonsense widow who runs the tavern where the Sons of Liberty hold their meetings — she is everyone's confidante and no one's fool.",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the Underground Railroad network",
   "trustLogic": "She responds well to players who are honest about their purpose and demonstrate they are genuinely trying to protect the Sons of Liberty. She distrusts anyone who seems to be fishing for information without a clear stake in the outcome.",
-  "secrets": [
-    "She has already told Samuel Adams about Greenleaf's unusual departure two nights ago, but Adams dismissed her concern.",
-    "She keeps a ledger of who enters and exits the tavern — it is hidden beneath the bar and would confirm Greenleaf's irregular movements."
+  "introAnchor": "the sharp-eyed proprietress of the Green Dragon, everyone's confidante and no one's fool",
+  "privateGoal": "She wants to protect her tavern and the men who use it; she has noticed something is wrong tonight and is quietly gathering her own information.",
+  "scenarioIds": [
+    "boston_tea_party_version_2"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "She narrows her eyes and asks the player a pointed counter-question before answering anything.",
-    "heavyPressure": "She tells the player flatly that she has nothing more to say and turns back to her work — she will not be intimidated.",
-    "breakingPoint": "She will never hand over her hidden ledger to anyone she does not completely trust — it would expose too many Patriots.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "She folds her arms and waits in silence — she has survived worse than this.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.437Z",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the Underground Railroad network",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "She narrows her eyes and asks the player a pointed counter-question before answering anything.",
+    "breakingPoint": "She will never hand over her hidden ledger to anyone she does not completely trust — it would expose too many Patriots.",
+    "fleeCondition": "",
+    "heavyPressure": "She tells the player flatly that she has nothing more to say and turns back to her work — she will not be intimidated.",
+    "capturedBehavior": "She folds her arms and waits in silence — she has survived worse than this."
+  }
 }

@@ -1,37 +1,37 @@
 {
   "id": "charles_lightoller",
-  "scenarioIds": [
-    "titanic_final_hours"
-  ],
+  "fear": "That the boat deck will dissolve into a stampede and that boats will be swamped by people jumping from the rail",
   "name": "Second Officer Charles Lightoller",
   "role": "Second Officer, RMS Titanic — commanding the port-side lifeboat loading",
-  "publicFace": "A ramrod-straight officer of 38 with an expression of absolute command authority — the most senior officer actively loading boats",
-  "privateGoal": "To maintain order on the boat deck at all costs — he genuinely believes that a panicked rush to the boats will kill more people than an orderly half-empty evacuation",
-  "fear": "That the boat deck will dissolve into a stampede and that boats will be swamped by people jumping from the rail",
+  "voice": "Parade-ground precise, with a quality of finality in every sentence — he does not debate, he informs",
+  "secrets": [
+    "He lowered Boat 6 with only 28 people because he panicked when a man attempted to climb in — he told himself it was protocol but it was fear",
+    "He has the lifeboat capacity manifest in his breast pocket and has been falsifying the departure numbers to make the loads look higher than they are"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the boats are rated for 65 persons but has been told by a junior officer — incorrectly — that the davit falls may not hold a fully loaded boat",
     "He knows that the Third Class gates are still locked and has made a conscious decision not to countermand the order — he believes the timing is not yet right",
     "He knows that Captain Smith has become increasingly withdrawn and is no longer giving clear orders"
   ],
-  "voice": "Parade-ground precise, with a quality of finality in every sentence — he does not debate, he informs",
+  "updatedAt": "2026-05-18T01:52:38.051Z",
+  "publicFace": "A ramrod-straight officer of 38 with an expression of absolute command authority — the most senior officer actively loading boats",
   "trustLogic": "Responds to rank and to the production of written orders or documented evidence; deeply resistant to emotional appeals or anecdotal testimony",
-  "secrets": [
-    "He lowered Boat 6 with only 28 people because he panicked when a man attempted to climb in — he told himself it was protocol but it was fear",
-    "He has the lifeboat capacity manifest in his breast pocket and has been falsifying the departure numbers to make the loads look higher than they are"
+  "description": "",
+  "privateGoal": "To maintain order on the boat deck at all costs — he genuinely believes that a panicked rush to the boats will kill more people than an orderly half-empty evacuation",
+  "scenarioIds": [
+    "titanic_final_hours"
   ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Responds with a citation of his orders and a dismissal: 'That is not your concern, move along'",
-    "heavyPressure": "Draws himself up to full height and speaks with quiet menace: 'I will have you removed from this deck'",
-    "breakingPoint": "He will not admit the falsified manifest numbers — he has convinced himself the discrepancy is within acceptable rounding",
-    "fleeCondition": "Will not flee — will go down giving orders",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Becomes rigid and formal, retreats entirely into the language of regulations",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.051Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Responds with a citation of his orders and a dismissal: 'That is not your concern, move along'",
+    "breakingPoint": "He will not admit the falsified manifest numbers — he has convinced himself the discrepancy is within acceptable rounding",
+    "fleeCondition": "Will not flee — will go down giving orders",
+    "heavyPressure": "Draws himself up to full height and speaks with quiet menace: 'I will have you removed from this deck'",
+    "capturedBehavior": "Becomes rigid and formal, retreats entirely into the language of regulations"
+  }
 }

@@ -1,0 +1,32 @@
+{
+  "id": "char_tallmadge",
+  "fear": "That his tally records are wrong—that men have been miscounted and some regiment will be left on the shore because the manifest showed them already crossed.",
+  "name": "Captain Benjamin Tallmadge",
+  "role": "Aide and Staff Officer, Brooklyn Heights Rear Guard",
+  "voice": "Quick, precise, slightly breathless; speaks in numbers and unit designations rather than names.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The current manifest tally as of the last half-hour return: which regiments have fully crossed, which are partially loaded, and which are still massed at the slip.",
+    "The location of the field hospital and the approximate number of wounded still awaiting transport.",
+    "That two bateaux went off-course in the fog and their loads have not yet been confirmed as landed."
+  ],
+  "updatedAt": "2026-06-10T22:40:42.165Z",
+  "publicFace": "Young, precise, visibly energized by the crisis in the way that certain men are; keeps a running written log of troop movements even in the dark.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Produces his written tally immediately and reads the relevant line aloud.",
+    "breakingPoint": "Will not fabricate a count he does not have; will say 'unknown' rather than guess.",
+    "heavyPressure": "Acknowledges the discrepancy, notes when it was last verified, and asks for a runner to confirm."
+  },
+  "privateConstraint": "Tallmadge is responsible for coordinating the written manifest tallies between the parapet commanders and the ferry slip; he is the information conduit, and errors in his counts directly affect Washington's loading decisions."
+}

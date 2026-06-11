@@ -1,38 +1,38 @@
 {
   "id": "loretta_sainte_claire",
-  "scenarioIds": [
-    "high_water_reckoning"
-  ],
+  "fear": "That she will make the correct triage decision by every clinical measure and still watch someone die because of it — and that she will have to keep living inside that arithmetic",
   "name": "Loretta Sainte-Claire",
   "role": "Informal triage coordinator and community elder, St. Claude Avenue Bridge camp",
-  "publicFace": "A composed, authoritative woman in her late fifties who speaks in measured sentences and has not raised her voice once in five days — which the people around her find more frightening than shouting",
-  "privateGoal": "To get every one of the eighty people on this bridge off it alive, and to document exactly what resources were withheld and by whom, so that the accounting cannot be buried",
-  "fear": "That she will make the correct triage decision by every clinical measure and still watch someone die because of it — and that she will have to keep living inside that arithmetic",
+  "voice": "Precise and unhurried, with the cadence of someone who learned long ago that the loudest voice in the room is rarely the most accurate one",
+  "secrets": [
+    "She has not slept in sixty-one hours and her hands have been shaking since yesterday morning — she has been hiding this by keeping them occupied with tasks at all times",
+    "She recognized Father Clement's authorization code as a forgery on day two but said nothing because the supplies he was moving were keeping people alive and she did not yet know the full cost"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The bridge deck's structural load tolerance is already exceeded by eleven people based on the posted weight rating she read off the maintenance placard three days ago",
     "The pharmaceutical lot number on the incoming crate matches a FEMA regional manifest she memorized from a radio broadcast two days before the storm — which means it was diverted from an official channel",
     "Father Clement Tureaud has been signing off on supply receipts for the camp using an authorization code that does not correspond to any official relief organization she can identify"
   ],
-  "voice": "Precise and unhurried, with the cadence of someone who learned long ago that the loudest voice in the room is rarely the most accurate one",
+  "updatedAt": "2026-06-04T19:27:16.046Z",
+  "publicFace": "A composed, authoritative woman in her late fifties who speaks in measured sentences and has not raised her voice once in five days — which the people around her find more frightening than shouting",
+  "represents": "",
   "trustLogic": "Opens up when addressed with specific facts rather than appeals to emotion; shuts down completely when she detects evasion or the reframing of a concrete problem into an abstract principle",
-  "secrets": [
-    "She has not slept in sixty-one hours and her hands have been shaking since yesterday morning — she has been hiding this by keeping them occupied with tasks at all times",
-    "She recognized Father Clement's authorization code as a forgery on day two but said nothing because the supplies he was moving were keeping people alive and she did not yet know the full cost"
+  "description": "",
+  "privateGoal": "To get every one of the eighty people on this bridge off it alive, and to document exactly what resources were withheld and by whom, so that the accounting cannot be buried",
+  "scenarioIds": [
+    "high_water_reckoning"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Asks a clarifying question in return — precise, without hostility, but designed to make the other person account for exactly what they just said",
-    "heavyPressure": "Goes very still and speaks more slowly, making direct eye contact, stating the factual discrepancy without interpretation and waiting for a response",
-    "breakingPoint": "Will never admit that she knew about Clement's authorization forgery earlier than she disclosed — she believes, correctly, that the delay was justified, and she will not surrender that judgment to anyone",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Cooperates fully with any legitimate authority while simultaneously documenting everything in her memory for future testimony",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.046Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Asks a clarifying question in return — precise, without hostility, but designed to make the other person account for exactly what they just said",
+    "breakingPoint": "Will never admit that she knew about Clement's authorization forgery earlier than she disclosed — she believes, correctly, that the delay was justified, and she will not surrender that judgment to anyone",
+    "fleeCondition": "",
+    "heavyPressure": "Goes very still and speaks more slowly, making direct eye contact, stating the factual discrepancy without interpretation and waiting for a response",
+    "capturedBehavior": "Cooperates fully with any legitimate authority while simultaneously documenting everything in her memory for future testimony"
+  }
 }

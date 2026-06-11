@@ -1,0 +1,18 @@
+{
+  "id": "clue_oarlock_grease_decision",
+  "title": "The Salt-Pork Tin",
+  "unlocks": [],
+  "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.167Z",
+  "locationId": "",
+  "scenarioId": "fog_and_oar_1776",
+  "description": "Pedrick produces a small tin of salt-pork fat from his coat pocket—enough to grease the oarlocks of three bateaux. He explains the trade-off in flat, factual terms: greased locks reduce acoustic signature to near-zero near the British warships but require a feathering stroke that cuts speed by roughly a third. Un-greased locks are faster but audible at fifty yards on a calm stretch. The choice determines whether the mid-channel lane runs fast and loud or slow and silent for the next two hours.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_east_river_crossing",
+  "implicatesCharacterIds": [
+    "char_ezra_pedrick",
+    "char_glover"
+  ]
+}

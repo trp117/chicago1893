@@ -1,37 +1,37 @@
 {
   "id": "hannah_cross",
-  "scenarioIds": [],
+  "fear": "That her young son will be left alone if she is arrested tonight.",
   "name": "Hannah Cross",
   "role": "Seamstress and Sons of Liberty courier",
-  "publicFace": "A quiet widow who takes in mending and keeps to herself in the North End.",
-  "privateGoal": "To see the dispatch safely delivered and vanish back into anonymity before anyone can connect her to the network.",
-  "fear": "That her young son will be left alone if she is arrested tonight.",
+  "voice": "Soft, clipped, never a word more than necessary — she speaks like someone used to being overheard.",
+  "secrets": [
+    "She has already memorized the contents of the dispatch in case it is destroyed.",
+    "She is not a widow — her husband is a prisoner in Boston Gaol and she is doing this to buy his release through a Patriot promise."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The dispatch contains the confirmed count of Regulars assembling on the Common.",
     "Thomas Wren at the Green Dragon is the only authorized recipient — she will not name a backup.",
     "The network has a second courier, but she does not know who it is.",
     "Owen Pryce came to her door three days ago asking questions she did not answer."
   ],
-  "voice": "Soft, clipped, never a word more than necessary — she speaks like someone used to being overheard.",
+  "updatedAt": "2026-05-03T21:38:05.683Z",
+  "publicFace": "A quiet widow who takes in mending and keeps to herself in the North End.",
+  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the Underground Railroad network",
   "trustLogic": "She opens up when shown the Sons of Liberty recognition phrase ('the tide sets east tonight') or when the player demonstrates they already know part of the plan. She shuts down at any mention of names she hasn't offered first.",
-  "secrets": [
-    "She has already memorized the contents of the dispatch in case it is destroyed.",
-    "She is not a widow — her husband is a prisoner in Boston Gaol and she is doing this to buy his release through a Patriot promise."
-  ],
+  "description": "",
+  "privateGoal": "To see the dispatch safely delivered and vanish back into anonymity before anyone can connect her to the network.",
+  "scenarioIds": [],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "She goes still and studies the player's face for several seconds before answering anything.",
-    "heavyPressure": "She denies everything quietly and moves toward the nearest exit without raising her voice.",
-    "breakingPoint": "She will never give the name of the second courier, even under arrest.",
-    "fleeCondition": "If Captain Aldrich's name is spoken near her in an unfamiliar context, or if she hears boots on cobblestone close by.",
     "fleeStyle": "She wraps her shawl tight and walks — never runs — toward the rope-walk alley, where she knows every shadow.",
     "chaseStyle": "She ducks into a doorway and waits, utterly still, until the pursuer passes.",
-    "capturedBehavior": "She gives her name, her trade, and nothing else. She looks at her hands.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:38:05.683Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "REQUIRES FACT-CHECK — verify whether this is a documented individual from the Underground Railroad network",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "She goes still and studies the player's face for several seconds before answering anything.",
+    "breakingPoint": "She will never give the name of the second courier, even under arrest.",
+    "fleeCondition": "If Captain Aldrich's name is spoken near her in an unfamiliar context, or if she hears boots on cobblestone close by.",
+    "heavyPressure": "She denies everything quietly and moves toward the nearest exit without raising her voice.",
+    "capturedBehavior": "She gives her name, her trade, and nothing else. She looks at her hands."
+  }
 }

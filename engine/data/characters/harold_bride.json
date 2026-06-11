@@ -1,37 +1,37 @@
 {
   "id": "harold_bride",
-  "scenarioIds": [
-    "titanic_final_hours"
-  ],
+  "fear": "That the power will fail before Carpathia confirms her ETA, leaving him with the knowledge that he transmitted into silence",
   "name": "Harold Bride",
   "role": "Junior Wireless Operator, Marconi International Marine Communication Company",
-  "publicFace": "A cheerful, efficient young man of 22 who has spent the day sending passenger Marconigrams and seems almost unnervingly calm in the crisis",
-  "privateGoal": "To stay at the key long enough to ensure Carpathia has an accurate course — but also to survive, something he will not admit to his senior operator",
-  "fear": "That the power will fail before Carpathia confirms her ETA, leaving him with the knowledge that he transmitted into silence",
+  "voice": "Clipped, precise, with occasional dark humor — speaks in operator's shorthand even in conversation",
+  "secrets": [
+    "He copied an ice warning from the Mesaba at 9:40 PM that he never delivered to the bridge — he handed it to Phillips, who set it under a paperweight and forgot it",
+    "He has already decided he will not leave the room until Phillips does, a decision he has not shared with anyone"
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "He knows the Frankfurt operator initially misidentified the distress signal and wasted six minutes of transmission time",
     "He knows the ship's position as of 11:40 PM was 41°46'N 50°14'W — slightly different from what was transmitted in the first CQD, a discrepancy that could affect Carpathia's intercept course",
     "He knows that Senior Operator Phillips has not eaten since morning and is showing signs of fatigue at the key"
   ],
-  "voice": "Clipped, precise, with occasional dark humor — speaks in operator's shorthand even in conversation",
+  "updatedAt": "2026-05-18T01:52:38.049Z",
+  "publicFace": "A cheerful, efficient young man of 22 who has spent the day sending passenger Marconigrams and seems almost unnervingly calm in the crisis",
   "trustLogic": "Opens up to anyone who demonstrates technical competence or who brings him factual information he can act on; shuts down in the presence of panic or vagueness",
-  "secrets": [
-    "He copied an ice warning from the Mesaba at 9:40 PM that he never delivered to the bridge — he handed it to Phillips, who set it under a paperweight and forgot it",
-    "He has already decided he will not leave the room until Phillips does, a decision he has not shared with anyone"
+  "description": "",
+  "privateGoal": "To stay at the key long enough to ensure Carpathia has an accurate course — but also to survive, something he will not admit to his senior operator",
+  "scenarioIds": [
+    "titanic_final_hours"
   ],
+  "fact_checked": false,
+  "character_type": "real",
   "aggressionProfile": {
-    "mildPressure": "Continues tapping the key while answering, barely looking up — answers are accurate but minimal",
-    "heavyPressure": "Stops transmitting, turns fully around, speaks with flat precision: 'I need you to tell me something I can use or I need you to leave this room'",
-    "breakingPoint": "He will never admit the Mesaba warning was not delivered — he believes it would not have changed the outcome and he cannot afford to believe otherwise",
-    "fleeCondition": "Will not flee until Phillips orders him out or the room begins to flood",
     "fleeStyle": "Moves quickly and without ceremony, takes nothing except his lifebelt",
     "chaseStyle": "Does not run — walks with purpose, which in the chaos looks like running",
-    "capturedBehavior": "Answers every question directly and without affect — he has already made his peace",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.049Z",
-  "description": "",
-  "character_type": "real",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Continues tapping the key while answering, barely looking up — answers are accurate but minimal",
+    "breakingPoint": "He will never admit the Mesaba warning was not delivered — he believes it would not have changed the outcome and he cannot afford to believe otherwise",
+    "fleeCondition": "Will not flee until Phillips orders him out or the room begins to flood",
+    "heavyPressure": "Stops transmitting, turns fully around, speaks with flat precision: 'I need you to tell me something I can use or I need you to leave this room'",
+    "capturedBehavior": "Answers every question directly and without affect — he has already made his peace"
+  }
 }

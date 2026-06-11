@@ -1,0 +1,21 @@
+{
+  "id": "loc_washington_command_post",
+  "mood": "austere, pressurized, the still center of a moving storm",
+  "name": "Washington's Forward Command Post, Brooklyn Ferry Road",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "fog_and_oar_1776",
+  "description": "A shuttered lantern on a wooden crate beside the road to the ferry slip, where Washington receives runners and scratches tally marks on damp paper. The command post is a man standing in the mud with a quill, not a tent.",
+  "atmosphericDetails": [
+    "The scratch of a quill on damp paper as Washington updates his running count of regiments crossed.",
+    "The sound of boots on the muddy road as runners arrive from the parapet and the slip in alternating sequence.",
+    "The cold weight of a rain-soaked wool coat and the smell of wet horse from the tethered mounts nearby.",
+    "The faint, recurring sound of the gale gusting off the river, rattling the shuttered lantern on its hook."
+  ],
+  "linkedCharacterIds": [
+    "char_washington",
+    "char_tallmadge"
+  ]
+}

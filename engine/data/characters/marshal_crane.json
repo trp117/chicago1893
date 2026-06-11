@@ -1,39 +1,39 @@
 {
   "id": "marshal_crane",
-  "scenarioIds": [
-    "lightning_and_the_midnight_coach"
-  ],
+  "fear": "Being made to look incompetent in front of the slave catcher Greer, who he privately despises but professionally depends on.",
   "name": "Deputy Marshal Josiah Crane",
   "role": "Federal deputy marshal, operating under the Fugitive Slave Act of 1850",
-  "publicFace": "A methodical, courteous man who presents himself as a servant of federal law — he does not threaten, he simply explains consequences.",
-  "privateGoal": "Execute the warrant, collect the federal fee for returned fugitives, and demonstrate to his superiors in Columbus that the Erie corridor can be controlled.",
-  "fear": "Being made to look incompetent in front of the slave catcher Greer, who he privately despises but professionally depends on.",
+  "voice": "Measured, formal, never raises his voice — uses legal language precisely and never uses slang.",
+  "secrets": [
+    "He has a cousin in Oberlin who is known to be a conductor — he has never acted on this information and never intends to.",
+    "He does not believe the Fugitive Slave Act is enforceable in northern Ohio and is going through the motions to protect his position."
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
   "knowledge": [
     "The red fire dispatch was filed by Aldous Greer and Crane received a copy by separate wire two hours ago.",
     "He has a confidential informant somewhere in the Sandusky network — he does not know the informant's name, only a drop-point.",
     "The ferry captain at Marblehead has been warned that running fugitives is a federal offense — Crane believes this warning will hold.",
     "He suspects the Sandusky junction operator may be sympathetic to the network but has no evidence yet."
   ],
-  "voice": "Measured, formal, never raises his voice — uses legal language precisely and never uses slang.",
+  "updatedAt": "2026-05-08T17:48:26.455Z",
+  "publicFace": "A methodical, courteous man who presents himself as a servant of federal law — he does not threaten, he simply explains consequences.",
+  "represents": "Federal marshals and law enforcement officers enforcing the Fugitive Slave Act in Ohio during the 1850s",
   "trustLogic": "Responds well to deference and official-seeming paperwork. Becomes suspicious of anyone who is too helpful or too knowledgeable about his investigation.",
-  "secrets": [
-    "He has a cousin in Oberlin who is known to be a conductor — he has never acted on this information and never intends to.",
-    "He does not believe the Fugitive Slave Act is enforceable in northern Ohio and is going through the motions to protect his position."
+  "description": "",
+  "privateGoal": "Execute the warrant, collect the federal fee for returned fugitives, and demonstrate to his superiors in Columbus that the Erie corridor can be controlled.",
+  "scenarioIds": [
+    "lightning_and_the_midnight_coach"
   ],
+  "fact_checked": false,
+  "character_type": "fictional",
   "aggressionProfile": {
-    "mildPressure": "Nods politely, takes notes, asks follow-up questions that reveal he already knows more than he let on.",
-    "heavyPressure": "Produces the federal warrant and reads the relevant statute aloud — slowly, making eye contact.",
-    "breakingPoint": "He will not admit that his informant exists or that he received advance intelligence.",
-    "fleeCondition": "",
     "fleeStyle": "",
     "chaseStyle": "",
-    "capturedBehavior": "Invokes federal authority and demands to speak with the nearest federal judge.",
-    "strikeFirst": null
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.455Z",
-  "description": "",
-  "character_type": "fictional",
-  "represents": "Federal marshals and law enforcement officers enforcing the Fugitive Slave Act in Ohio during the 1850s",
-  "fact_checked": false
+    "strikeFirst": null,
+    "mildPressure": "Nods politely, takes notes, asks follow-up questions that reveal he already knows more than he let on.",
+    "breakingPoint": "He will not admit that his informant exists or that he received advance intelligence.",
+    "fleeCondition": "",
+    "heavyPressure": "Produces the federal warrant and reads the relevant statute aloud — slowly, making eye contact.",
+    "capturedBehavior": "Invokes federal authority and demands to speak with the nearest federal judge."
+  }
 }
