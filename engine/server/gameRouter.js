@@ -1383,10 +1383,27 @@ Do not open with the historical context. Open inside the character's body. Let t
         console.warn(`[EPILOGUE] Skipped for session ${sessionId} — epilogue data not reviewed on scenario "${scenarioId}"`);
       }
 
-      const compositeDisclosure = (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed)
+      // Epilogue-derived composites (requires a reviewed epilogue block)
+      const epilogueComposites = (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed)
         ? getCompositeDisclosure(scenarioData.epilogue, buildEpilogueSummary(sessionState, endResult))
         : [];
-      console.log('[EPILOGUE-CLOSE] composite_disclosure — count:', compositeDisclosure.length);
+
+      // Scenario-level fallback: top-level composite_disclosure array produced by the generator.
+      // Filter to characters the player interacted with; if session data is missing send the full list.
+      // Deduplicate against any epilogue-derived entries by name.
+      const interactedNames = new Set(
+        (sessionState?.introducedNpcs || [])
+          .map(id => { const c = characters.find(ch => ch.id === id); return c?.name || null; })
+          .filter(Boolean)
+      );
+      const epilogueNames = new Set(epilogueComposites.map(c => c.name));
+      const scenarioComposites = (scenarioData?.composite_disclosure || [])
+        .filter(name => interactedNames.size === 0 || interactedNames.has(name))
+        .filter(name => !epilogueNames.has(name))
+        .map(name => ({ name }));
+
+      const compositeDisclosure = [...epilogueComposites, ...scenarioComposites];
+      console.log('[EPILOGUE-CLOSE] composite_disclosure — count:', compositeDisclosure.length, '(epilogue:', epilogueComposites.length, ', scenario:', scenarioComposites.length, ')');
 
       sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult, bibliography, composite_disclosure: compositeDisclosure });
       res.end();

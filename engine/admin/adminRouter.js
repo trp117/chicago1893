@@ -587,6 +587,8 @@ OUTPUT RULES:
 11. Do NOT invent conspiracies, traitors, saboteurs, secret agendas, or concealed villains. The antagonist in every scenario is the SITUATION — physics, materials, time, weather, chain of command, equipment failure, documented human decisions. If historical concealment is documented (e.g., Lightoller's under-loading of lifeboats, the Mesaba ice warning never reaching the bridge), include it. If concealment is not documented, it does not exist in this scenario.
 12. Obstacles come from documented constraints: equipment failing under documented conditions, information not reaching the right person through documented communication breakdowns, time pressure from documented timelines, conflicting documented orders or regulations. Never from invented human malice. Example — Cantigny 1918: the communication wire grounded out because stripped insulation met wet mud; a low-powder shell batch dropped the barrage short. NOT a traitor who sabotaged the wire.
 13. Use period-appropriate, unit-appropriate names drawn from documented rosters or period census data for the relevant nationality, service branch, and era. Do not reuse character names across scenarios. Avoid stock generic names unless documented.
+14. Generate a composite_disclosure array on the scenario object listing the names of all fictional composite characters. Format: ["Name One", "Name Two"]. Include ONLY fictional/composite characters — do NOT include real historical figures (Washington, Glover, Tallmadge, and anyone else with a documented individual historical record). If all characters are real historical figures, set composite_disclosure to an empty array [].
+15. Set character_type to "real" for documented historical individuals and "fictional" for composite or invented characters. Every character in the characters array must have this field.
 
 INTRODUCTION RULES (required on scenario):
 Write a 4-section pre-game reading experience in the style of a serious narrative historian — specific, cinematic, grounded in concrete detail. No genre clichés.
@@ -654,6 +656,7 @@ REQUIRED JSON STRUCTURE:
     "winConditions": ["win condition"],
     "failConditions": ["fail condition"],
     "partialSuccessExamples": ["partial example"],
+    "composite_disclosure": ["Fictional Name One", "Fictional Name Two"],
     "introduction": {
       "enabled": true,
       "skippable": true,
@@ -697,6 +700,7 @@ REQUIRED JSON STRUCTURE:
       "scenarioIds": ["your_scenario_slug"],
       "name": "Full Name",
       "role": "Official role or occupation",
+      "character_type": "real | fictional",
       "publicFace": "How they appear to strangers",
       "privateConstraint": "What limits this person — documented orders, professional obligation, physical condition, equipment state, conflicting loyalties grounded in their documented position. NOT a hidden agenda.",
       "fear": "Their greatest vulnerability",
