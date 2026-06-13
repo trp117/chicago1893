@@ -111,7 +111,7 @@ app.get('/api/categories', async (req, res) => {
     scenarios
       .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0)
       .forEach(s => {
-        const slug = CATEGORY_MAP[s.id];
+        const slug = s.category || CATEGORY_MAP[s.id];
         if (slug) countBySlug[slug] = (countBySlug[slug] || 0) + 1;
       });
     const result = Object.entries(CATEGORIES)
@@ -140,9 +140,9 @@ app.get('/api/stories', async (req, res) => {
         id:          s.id,
         title:       s.title,
         description: s.description,
-        era:         CATEGORY_LABELS[CATEGORY_MAP[s.id]] || deriveEra(s),
+        era:         CATEGORY_LABELS[s.category || CATEGORY_MAP[s.id]] || deriveEra(s),
         duration:    s.sessionTargetMinutes ? `~${s.sessionTargetMinutes} min` : null,
-        category:    CATEGORY_MAP[s.id] || null,
+        category:    s.category || CATEGORY_MAP[s.id] || null,
         image_url:   s.image?.url || null,
         roles:       roleNamesBy[s.id] || [],
         cost_tracked: s.costTracked || null,
