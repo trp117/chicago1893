@@ -30,6 +30,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "civil-rights",
   "epilogue": {
     "reviewed": true,
     "generated": true,
@@ -668,5 +669,6 @@
     "Two of the four stools are held through closing; Counter_Saturation drops to half, diluting the symbolic power of the full occupation"
   ],
   "structured_endings_enabled": false,
-  "category": "civil-rights"
+  "status": "published",
+  "displayOrder": 3
 }

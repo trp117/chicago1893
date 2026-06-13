@@ -37,6 +37,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "underground",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.471Z",
   "playerGoal": "Identify the informant, misdirect the catchers \nusing the telegraph, and move seven passengers to a Lake Erie \nvessel before half past eleven.",
@@ -284,5 +285,6 @@
     "The informant is exposed but escapes before capture; the passengers are safe but the network's Sandusky route must be abandoned.",
     "Thomas Cole successfully phantoms a false trail on the wire, but Deputy Crane has already left Sandusky on the correct road; the group reaches the shore with minutes to spare but one passenger is separated in the dark."
   ],
-  "category": "underground"
+  "status": "published",
+  "displayOrder": 99
 }

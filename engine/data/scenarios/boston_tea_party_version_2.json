@@ -1,41 +1,24 @@
 {
   "id": "boston_tea_party_version_2",
-  "order": 11,
-  "hidden": true,
-  "version": "1.0.0",
-  "title": "boston tea party version 2",
-  "setting": "Boston, 1773",
-  "premise": "[NEEDS PREMISE] Boston, 1773",
-  "description": "Boston, December 16, 1773. The Sons of Liberty stand hours away from their boldest act of defiance — the destruction of 342 chests of East India Company tea aboard the Dartmouth. But a spy has whispered the plan to the customs men, and if the traitor is not unmasked before the ships are boarded, the ringleaders will hang before dawn. You must move through the fog-choked streets of Boston, question allies and suspects alike, and expose the informer before the operation — and the cause of liberty — is crushed forever.",
   "genre": [
     "historical thriller"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 15,
-  "storyArcIds": [
-    "boston_tea_party_version_2_main_arc"
-  ],
-  "playerRoleIds": [
-    "role_patriot_organizer",
-    "role_dockworker",
-    "role_tavern_spy"
-  ],
-  "keyEvidenceClueIds": [
-    "clue_coded_letter",
-    "clue_customs_receipt"
-  ],
+  "order": 11,
+  "title": "boston tea party version 2",
+  "hidden": true,
+  "status": "archived",
+  "premise": "[NEEDS PREMISE] Boston, 1773",
+  "setting": "Boston, 1773",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -43,8 +26,22 @@
       "A customs officer is spotted near Griffin's Wharf — the threat scale rises by 2 and all NPC suspicion thresholds tighten.",
       "A rider arrives at the Green Dragon Tavern with word that Governor Hutchinson has refused to let the ships leave — panic spreads and one random NPC becomes evasive until reassured.",
       "Church bells begin to toll from the Old South Meeting House — the final rally has begun, and the boarding party will move in 5 minutes regardless of the investigation's outcome."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:47:27.314Z",
+  "description": "Boston, December 16, 1773. The Sons of Liberty stand hours away from their boldest act of defiance — the destruction of 342 chests of East India Company tea aboard the Dartmouth. But a spy has whispered the plan to the customs men, and if the traitor is not unmasked before the ships are boarded, the ringleaders will hang before dawn. You must move through the fog-choked streets of Boston, question allies and suspects alike, and expose the informer before the operation — and the cause of liberty — is crushed forever.",
+  "storyArcIds": [
+    "boston_tea_party_version_2_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "playerRoleIds": [
+    "role_patriot_organizer",
+    "role_dockworker",
+    "role_tavern_spy"
+  ],
   "winConditions": [
     "Correctly accuse the spy before time expires, presenting at least one key evidence clue to support the accusation.",
     "Present both key evidence clues and confront the spy directly, triggering a full confession that protects all ringleaders."
@@ -53,16 +50,11 @@
     "Time expires without a final accusation — the customs men are tipped off and the boarding party is arrested on the dock.",
     "The player makes a false accusation against an innocent character — the real spy escapes and alerts the authorities in time to stop the operation."
   ],
-  "partialSuccessExamples": [
-    "The player correctly names the spy but possesses only one key evidence clue — the spy is expelled from the Sons of Liberty but escapes prosecution, and the tea party proceeds under a cloud of uncertainty."
-  ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:47:27.314Z",
+  "historicalRealism": "high",
   "period_vocabulary": {
     "categories": [
       {
         "name": "Sons of Liberty Codes",
-        "context": "Used by Patriots and Sons of Liberty members when speaking in guarded company or passing messages through trusted hands at meeting houses and taverns.",
         "terms": [
           {
             "term": "the Mohawks are ready",
@@ -92,11 +84,11 @@
             "term": "the twenty-day clause",
             "meaning": "The legal deadline by which the Dartmouth must clear customs or the Crown may seize both ship and cargo — the ticking clock forcing the Patriots' hand"
           }
-        ]
+        ],
+        "context": "Used by Patriots and Sons of Liberty members when speaking in guarded company or passing messages through trusted hands at meeting houses and taverns."
       },
       {
         "name": "Customs House Cant",
-        "context": "Employed by royal customs officers, tide waiters, and Crown agents such as Agent Silas Dawes when conducting official business or communicating covertly with informants.",
         "terms": [
           {
             "term": "tide waiter",
@@ -126,11 +118,11 @@
             "term": "a general warrant",
             "meaning": "A broad search authority despised by colonists as it allowed officers to search any premises without naming a specific target"
           }
-        ]
+        ],
+        "context": "Employed by royal customs officers, tide waiters, and Crown agents such as Agent Silas Dawes when conducting official business or communicating covertly with informants."
       },
       {
         "name": "Dockworkers' and Mariners' Argot",
-        "context": "Spoken by sailors, longshoremen, and wharf hands at Griffin's Wharf and along the waterfront, including those employed aboard the Dartmouth under Captain Rotch.",
         "terms": [
           {
             "term": "the Dartmouth's riding at single anchor",
@@ -156,11 +148,11 @@
             "term": "heave and be done",
             "meaning": "Dockworker shorthand for dumping cargo overboard quickly — repurposed that night for the tea destruction itself"
           }
-        ]
+        ],
+        "context": "Spoken by sailors, longshoremen, and wharf hands at Griffin's Wharf and along the waterfront, including those employed aboard the Dartmouth under Captain Rotch."
       },
       {
         "name": "Tavern and Street Slang",
-        "context": "Common vernacular of Boston tradesmen, apprentices, and tavern-goers heard nightly at the Green Dragon Tavern under Margaret Cole's roof, where rumor and sedition flow as freely as ale.",
         "terms": [
           {
             "term": "a dish of tea",
@@ -190,11 +182,11 @@
             "term": "a long face at the wharf",
             "meaning": "Local slang for someone behaving suspiciously nervous near the docks, possibly guilty of betrayal or forewarning the authorities"
           }
-        ]
+        ],
+        "context": "Common vernacular of Boston tradesmen, apprentices, and tavern-goers heard nightly at the Green Dragon Tavern under Margaret Cole's roof, where rumor and sedition flow as freely as ale."
       },
       {
         "name": "Congregationalist and Pulpit Rhetoric",
-        "context": "The elevated moral and scriptural language used by Reverend Ezra Willard and other clergy when addressing their congregations or justifying — or condemning — Patriot actions in private counsel.",
         "terms": [
           {
             "term": "a covenant people",
@@ -220,8 +212,18 @@
             "term": "the fast day sermon",
             "meaning": "A politically charged religious address delivered on days of fasting and prayer, often serving as thinly veiled Patriot propaganda from the pulpit"
           }
-        ]
+        ],
+        "context": "The elevated moral and scriptural language used by Reverend Ezra Willard and other clergy when addressing their congregations or justifying — or condemning — Patriot actions in private counsel."
       }
     ]
-  }
+  },
+  "keyEvidenceClueIds": [
+    "clue_coded_letter",
+    "clue_customs_receipt"
+  ],
+  "sessionTargetMinutes": 15,
+  "partialSuccessExamples": [
+    "The player correctly names the spy but possesses only one key evidence clue — the spy is expelled from the Sons of Liberty but escapes prosecution, and the tea party proceeds under a cloud of uncertainty."
+  ],
+  "displayOrder": 99
 }

@@ -54,6 +54,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "space",
   "epilogue": {
     "reviewed": false,
     "generated": true,
@@ -705,5 +706,6 @@
   "char_savitsky_secret_transmission": "He believes communications with Moscow may have been missed or misunderstood during prolonged submerged operations, but no reliable confirmation has reached the command compartment.",
   "pressureevent_depthcharge_buckles": "A signaling depth charge detonates close enough to violently rattle the hull and throw crewmen off balance",
   "char_maslennikov_unopened_envelope": "The sealed envelope contains political guidance from naval authorities issued before the crisis peaked; Maslennikov has delayed opening it because he fears it may complicate the chain-of-command situation aboard the boat.",
-  "category": "space"
+  "status": "published",
+  "displayOrder": 4
 }

@@ -1,5 +1,5 @@
 {
-  "id": "dead_reckoning_ninth_ward",
+  "id": "dead_reckoning_ninth_ward_old",
   "tone": [],
   "genre": [
     "survival",
@@ -53,7 +53,6 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
-  "category": "industrial",
   "epilogue": {
     "reviewed": true,
     "generated": true,

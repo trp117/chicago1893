@@ -122,53 +122,53 @@
     ],
     "character_fates": [
       {
-        "character_id": "celestine_fontenot",
         "name": "Celestine Fontenot",
         "outcome": "unknown",
-        "historical_record": "The Orleans Parish Clerk of Court's office sustained severe damage during Hurricane Katrina in August 2005. Title researchers and clerks who worked there faced the loss of physical records, disrupted employment, and in many cases displacement from New Orleans. The office worked for years after the storm to reconstruct damaged or destroyed property records. Women in clerical and research roles at Louisiana parish courthouses were among the municipal workers who navigated both personal displacement and the institutional crisis of record recovery. Many Lower Ninth Ward residents with family ties to disputed property never recovered clear title; others spent years in administrative proceedings attempting to establish ownership of land their families had held for generations.",
-        "primary_source": null
+        "character_id": "celestine_fontenot",
+        "primary_source": null,
+        "historical_record": "The Orleans Parish Clerk of Court's office sustained severe damage during Hurricane Katrina in August 2005. Title researchers and clerks who worked there faced the loss of physical records, disrupted employment, and in many cases displacement from New Orleans. The office worked for years after the storm to reconstruct damaged or destroyed property records. Women in clerical and research roles at Louisiana parish courthouses were among the municipal workers who navigated both personal displacement and the institutional crisis of record recovery. Many Lower Ninth Ward residents with family ties to disputed property never recovered clear title; others spent years in administrative proceedings attempting to establish ownership of land their families had held for generations."
       },
       {
-        "character_id": "deacon_arceneaux",
         "name": "Deacon Arceneaux",
         "outcome": "unknown",
-        "historical_record": "In the days following Hurricane Katrina's landfall on August 29, 2005, private individuals operating flat-bottom boats and other small watercraft conducted a significant portion of the immediate water rescues in flooded New Orleans neighborhoods, including the Lower Ninth Ward. This informal rescue and supply network operated without coordination from official emergency management structures in many instances. Federal investigators and journalists later documented cases in which individuals used the disaster to divert or misrepresent the origin of relief supplies. The Government Accountability Office reported in 2006 that FEMA experienced substantial fraud and waste in its disaster relief contracting and direct assistance programs following Katrina, with improper payments estimated in the hundreds of millions of dollars.",
-        "primary_source": null
+        "character_id": "deacon_arceneaux",
+        "primary_source": null,
+        "historical_record": "In the days following Hurricane Katrina's landfall on August 29, 2005, private individuals operating flat-bottom boats and other small watercraft conducted a significant portion of the immediate water rescues in flooded New Orleans neighborhoods, including the Lower Ninth Ward. This informal rescue and supply network operated without coordination from official emergency management structures in many instances. Federal investigators and journalists later documented cases in which individuals used the disaster to divert or misrepresent the origin of relief supplies. The Government Accountability Office reported in 2006 that FEMA experienced substantial fraud and waste in its disaster relief contracting and direct assistance programs following Katrina, with improper payments estimated in the hundreds of millions of dollars."
       },
       {
-        "character_id": "elroy_tureaud",
         "name": "Elroy Tureaud",
         "outcome": "unknown",
-        "historical_record": "FEMA's regional contracting and logistics workforce in the Gulf Coast region was substantially disrupted by Hurricane Katrina. Former and current FEMA contractors who were themselves displaced by the storm occupied an ambiguous position: possessing institutional knowledge of emergency logistics while lacking official standing or resources in the immediate aftermath. Congressional investigations and the House Select Committee report 'A Failure of Initiative' (February 2006) documented systemic breakdowns in FEMA's logistics coordination, including failures to pre-position supplies and to track contracted resources during the response period.",
-        "primary_source": null
+        "character_id": "elroy_tureaud",
+        "primary_source": null,
+        "historical_record": "FEMA's regional contracting and logistics workforce in the Gulf Coast region was substantially disrupted by Hurricane Katrina. Former and current FEMA contractors who were themselves displaced by the storm occupied an ambiguous position: possessing institutional knowledge of emergency logistics while lacking official standing or resources in the immediate aftermath. Congressional investigations and the House Select Committee report 'A Failure of Initiative' (February 2006) documented systemic breakdowns in FEMA's logistics coordination, including failures to pre-position supplies and to track contracted resources during the response period."
       },
       {
-        "character_id": "ida_broussard",
         "name": "Ida Broussard",
         "outcome": "unknown",
-        "historical_record": "Amateur Radio Emergency Service (ARES) volunteers played a documented role in emergency communications during and after Hurricane Katrina. With commercial telecommunications infrastructure severely damaged across the Gulf Coast, licensed amateur radio operators provided communications links between shelters, hospitals, and emergency operations centers. The American Radio Relay League documented ARES activations across Louisiana, Mississippi, and Alabama in the weeks following landfall. Extra Class licensees, holding the highest amateur radio license class, were among those operating on frequencies and modes that could reach distant net control stations. Civilian operators attempting to pass traffic on frequencies monitored by military or government net control stations faced authentication and protocol barriers that were not uniformly resolved during the chaotic early response period.",
-        "primary_source": null
+        "character_id": "ida_broussard",
+        "primary_source": null,
+        "historical_record": "Amateur Radio Emergency Service (ARES) volunteers played a documented role in emergency communications during and after Hurricane Katrina. With commercial telecommunications infrastructure severely damaged across the Gulf Coast, licensed amateur radio operators provided communications links between shelters, hospitals, and emergency operations centers. The American Radio Relay League documented ARES activations across Louisiana, Mississippi, and Alabama in the weeks following landfall. Extra Class licensees, holding the highest amateur radio license class, were among those operating on frequencies and modes that could reach distant net control stations. Civilian operators attempting to pass traffic on frequencies monitored by military or government net control stations faced authentication and protocol barriers that were not uniformly resolved during the chaotic early response period."
       },
       {
-        "character_id": "loretta_sainte_claire",
         "name": "Loretta Sainte-Claire",
         "outcome": "unknown",
-        "historical_record": "In the absence of organized official relief in the first days after Hurricane Katrina, improvised community leadership emerged at gathering points including elevated roadways, bridges, and rooftops across New Orleans. Survivors who took on coordination roles — managing space, supplies, and medical triage — did so without training, authority, or resources. The St. Claude Avenue Bridge and the Claiborne Avenue overpass were among the elevated structures where displaced residents gathered. Oral histories collected by the Katrina Research Center and the Louisiana State Museum document the roles that community members, often women, played in organizing these informal camps. Many of these individuals received no official recognition and were not included in after-action reports.",
-        "primary_source": null
+        "character_id": "loretta_sainte_claire",
+        "primary_source": null,
+        "historical_record": "In the absence of organized official relief in the first days after Hurricane Katrina, improvised community leadership emerged at gathering points including elevated roadways, bridges, and rooftops across New Orleans. Survivors who took on coordination roles — managing space, supplies, and medical triage — did so without training, authority, or resources. The St. Claude Avenue Bridge and the Claiborne Avenue overpass were among the elevated structures where displaced residents gathered. Oral histories collected by the Katrina Research Center and the Louisiana State Museum document the roles that community members, often women, played in organizing these informal camps. Many of these individuals received no official recognition and were not included in after-action reports."
       },
       {
-        "character_id": "marcus_fontenot",
         "name": "Marcus Fontenot",
         "outcome": "unknown",
-        "historical_record": "The Lower Ninth Ward sustained some of the most severe flooding in New Orleans following the failure of the Industrial Canal levee on August 29, 2005. Many longtime residents of the neighborhood, including retired workers and elderly homeowners, remained in the area or returned to find their homes and the physical records they contained destroyed or severely damaged. Property records held by individuals — deeds, titles, tax receipts — were critical to post-storm land claims and Road Home Program applications. The Louisiana Recovery Authority and legal aid organizations documented widespread cases in which the loss of physical title documents complicated or prevented recovery assistance. Post-storm opportunistic title fraud and tax-sale acquisitions of flooded properties were subsequently documented by investigative journalists and legal researchers.",
-        "primary_source": null
+        "character_id": "marcus_fontenot",
+        "primary_source": null,
+        "historical_record": "The Lower Ninth Ward sustained some of the most severe flooding in New Orleans following the failure of the Industrial Canal levee on August 29, 2005. Many longtime residents of the neighborhood, including retired workers and elderly homeowners, remained in the area or returned to find their homes and the physical records they contained destroyed or severely damaged. Property records held by individuals — deeds, titles, tax receipts — were critical to post-storm land claims and Road Home Program applications. The Louisiana Recovery Authority and legal aid organizations documented widespread cases in which the loss of physical title documents complicated or prevented recovery assistance. Post-storm opportunistic title fraud and tax-sale acquisitions of flooded properties were subsequently documented by investigative journalists and legal researchers."
       },
       {
-        "character_id": "sergeant_yolanda_pryce",
         "name": "Sergeant Yolanda Pryce",
         "outcome": "unknown",
-        "historical_record": "The Louisiana National Guard was activated in response to Hurricane Katrina and played a role in communications, security, and logistics operations during the disaster response. National Guard communications NCOs operated joint operations center networks that interfaced imperfectly with civilian emergency management and informal civilian communications. The House Select Committee's 'A Failure of Initiative' report and the Senate Homeland Security Committee's 'Hurricane Katrina: A Nation Still Unprepared' report both documented interoperability failures between military, National Guard, FEMA, and civilian communications systems during the Katrina response. Authentication and access protocols created friction between military net control operators and civilian communicators attempting to pass rescue-critical traffic.",
-        "primary_source": null
+        "character_id": "sergeant_yolanda_pryce",
+        "primary_source": null,
+        "historical_record": "The Louisiana National Guard was activated in response to Hurricane Katrina and played a role in communications, security, and logistics operations during the disaster response. National Guard communications NCOs operated joint operations center networks that interfaced imperfectly with civilian emergency management and informal civilian communications. The House Select Committee's 'A Failure of Initiative' report and the Senate Homeland Security Committee's 'Hurricane Katrina: A Nation Still Unprepared' report both documented interoperability failures between military, National Guard, FEMA, and civilian communications systems during the Katrina response. Authentication and access protocols created friction between military net control operators and civilian communicators attempting to pass rescue-critical traffic."
       }
     ],
     "historical_frame": [
@@ -218,171 +218,171 @@
   "glossary": [
     {
       "term": "petroleum distillate",
-      "definition": "Refined oil products like gasoline or diesel that escape into floodwater from ruptured underground storage tanks — the air above the St. Claude Avenue Bridge carried the smell of petroleum distillate mixed with decomposing organic material.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Refined oil products like gasoline or diesel that escape into floodwater from ruptured underground storage tanks — the air above the St. Claude Avenue Bridge carried the smell of petroleum distillate mixed with decomposing organic material."
     },
     {
       "term": "aluminum skiff",
-      "definition": "A small, flat-bottomed boat made of lightweight metal — in the flooded Lower Ninth Ward, aluminum skiffs were the primary waterborne craft for search and rescue through residential intersections.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A small, flat-bottomed boat made of lightweight metal — in the flooded Lower Ninth Ward, aluminum skiffs were the primary waterborne craft for search and rescue through residential intersections."
     },
     {
       "term": "crowbar",
-      "definition": "A metal tool used to pry open or lift heavy objects — in a flooded shotgun house, a crowbar becomes the instrument for reaching a waterlogged iron box trapped under a collapsed ceiling.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A metal tool used to pry open or lift heavy objects — in a flooded shotgun house, a crowbar becomes the instrument for reaching a waterlogged iron box trapped under a collapsed ceiling."
     },
     {
       "term": "Louisiana Department of Health",
-      "definition": "The state agency responsible for public health and medical disaster response — this department later classified the Superdome conditions as a mass casualty environment, a designation that came too late.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The state agency responsible for public health and medical disaster response — this department later classified the Superdome conditions as a mass casualty environment, a designation that came too late."
     },
     {
       "term": "Louisiana Superdome",
-      "definition": "A large municipal arena in New Orleans designated as an emergency shelter during hurricanes — by September 2, it held approximately 20,000 people in conditions later classified as a mass casualty environment.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A large municipal arena in New Orleans designated as an emergency shelter during hurricanes — by September 2, it held approximately 20,000 people in conditions later classified as a mass casualty environment."
     },
     {
       "term": "dry stock",
-      "definition": "Supplies and equipment stored in a location that remained above floodwater — in the Lower Ninth Ward, dry stock was survival currency, and access to it determined who could hold position until rescue arrived.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Supplies and equipment stored in a location that remained above floodwater — in the Lower Ninth Ward, dry stock was survival currency, and access to it determined who could hold position until rescue arrived."
     },
     {
       "term": "rooftop signal",
-      "definition": "A visual marker or sign placed on a roof to indicate trapped survivors to passing helicopters and boats — in the Lower Ninth Ward, rooftop signals were the primary way to alert rescuers to people stranded in attics.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A visual marker or sign placed on a roof to indicate trapped survivors to passing helicopters and boats — in the Lower Ninth Ward, rooftop signals were the primary way to alert rescuers to people stranded in attics."
     },
     {
       "term": "voltage",
-      "definition": "The electrical potential that powers a battery or device — the radio operator's battery is losing voltage with every second she does not transmit, turning time itself into a measured resource.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The electrical potential that powers a battery or device — the radio operator's battery is losing voltage with every second she does not transmit, turning time itself into a measured resource."
     },
     {
       "term": "radio transmission",
-      "definition": "The broadcast of a signal over a specific frequency — a failed radio transmission in this moment meant a rooftop signal would never reach rescue coordinators, and a specific person would not be found.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The broadcast of a signal over a specific frequency — a failed radio transmission in this moment meant a rooftop signal would never reach rescue coordinators, and a specific person would not be found."
     },
     {
       "term": "dehydration",
-      "definition": "Life-threatening loss of body fluids — by September 2, the 30,000 people sheltering in the Superdome and Convention Center faced arithmetic of dehydration along with hyperthermia and septic exposure.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Life-threatening loss of body fluids — by September 2, the 30,000 people sheltering in the Superdome and Convention Center faced arithmetic of dehydration along with hyperthermia and septic exposure."
     },
     {
       "term": "search-and-rescue helicopter",
-      "definition": "Military or civilian rotary-wing aircraft equipped for extracting people from disaster zones — 400 of these were staged and fueled by September 2 but not yet deployed into the flooded city at scale.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Military or civilian rotary-wing aircraft equipped for extracting people from disaster zones — 400 of these were staged and fueled by September 2 but not yet deployed into the flooded city at scale."
     },
     {
       "term": "sequential failure",
-      "definition": "When engineered structures collapse one after another in cascade rather than all at once — the 53 levee and floodwall segments failed sequentially over eighteen hours, turning a storm surge into a sustained inundation.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "When engineered structures collapse one after another in cascade rather than all at once — the 53 levee and floodwall segments failed sequentially over eighteen hours, turning a storm surge into a sustained inundation."
     },
     {
       "term": "bascule",
-      "definition": "A drawbridge that pivots on a horizontal axis, with one end rising while the other sinks — the St. Claude Avenue Bridge is a concrete bascule span that still holds its full weight even in flood conditions.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A drawbridge that pivots on a horizontal axis, with one end rising while the other sinks — the St. Claude Avenue Bridge is a concrete bascule span that still holds its full weight even in flood conditions."
     },
     {
       "term": "amp-hour",
-      "definition": "A unit measuring battery capacity — the specific technical measurement of how much electrical power remains available before a battery is completely depleted.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A unit measuring battery capacity — the specific technical measurement of how much electrical power remains available before a battery is completely depleted."
     },
     {
       "term": "frequency drift",
-      "definition": "The gradual shift of a radio signal away from its intended transmission frequency, making communication increasingly difficult — a radio operator with a drifting frequency risked losing contact with net control and becoming isolated.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The gradual shift of a radio signal away from its intended transmission frequency, making communication increasingly difficult — a radio operator with a drifting frequency risked losing contact with net control and becoming isolated."
     },
     {
       "term": "septic exposure",
-      "definition": "Contact with or consumption of water and material contaminated by sewage and harmful bacteria — in flooded New Orleans, septic exposure became a critical health threat as sanitation systems failed.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Contact with or consumption of water and material contaminated by sewage and harmful bacteria — in flooded New Orleans, septic exposure became a critical health threat as sanitation systems failed."
     },
     {
       "term": "brackish",
-      "definition": "Water that is a mixture of salt and fresh water, neither fully saline nor drinkable — the standing floodwater became brackish as it mixed with ocean surge and decomposing material.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Water that is a mixture of salt and fresh water, neither fully saline nor drinkable — the standing floodwater became brackish as it mixed with ocean surge and decomposing material."
     },
     {
       "term": "bascule span",
-      "definition": "A bridge section that pivots up and down on a horizontal axis to allow boats to pass — the St. Claude Avenue Bridge's concrete bascule span retained solar heat and became a dangerous feature in the flooded landscape.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A bridge section that pivots up and down on a horizontal axis to allow boats to pass — the St. Claude Avenue Bridge's concrete bascule span retained solar heat and became a dangerous feature in the flooded landscape."
     },
     {
       "term": "National Guard",
-      "definition": "State-based military units that can be activated by governors or the federal government for emergencies — 58,000 National Guard troops were assembled in regional staging areas during the Katrina response.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "State-based military units that can be activated by governors or the federal government for emergencies — 58,000 National Guard troops were assembled in regional staging areas during the Katrina response."
     },
     {
       "term": "staging area",
-      "definition": "A holding location where military personnel, equipment, and supplies are gathered and organized before deployment — by September 2, federal rescue assets were accumulated in regional staging areas but had not yet been deployed into the flooded city.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A holding location where military personnel, equipment, and supplies are gathered and organized before deployment — by September 2, federal rescue assets were accumulated in regional staging areas but had not yet been deployed into the flooded city."
     },
     {
       "term": "dialysis patient",
-      "definition": "A person with kidney failure requiring regular machine treatment to filter waste from their blood — these patients among the stranded could not survive without access to dialysis equipment, making evacuation medically urgent.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A person with kidney failure requiring regular machine treatment to filter waste from their blood — these patients among the stranded could not survive without access to dialysis equipment, making evacuation medically urgent."
     },
     {
       "term": "hyperthermia",
-      "definition": "A dangerous rise in body temperature caused by exposure to heat — in the flooded city with no shade, water, or air conditioning, hyperthermia was a lethal threat to evacuees, especially infants and the elderly.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A dangerous rise in body temperature caused by exposure to heat — in the flooded city with no shade, water, or air conditioning, hyperthermia was a lethal threat to evacuees, especially infants and the elderly."
     },
     {
       "term": "mass casualty environment",
-      "definition": "An official designation for a location where the number of injured or sick people exceeds the capacity of normal medical response — the Louisiana Department of Health used this term to describe the conditions inside the Superdome.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "An official designation for a location where the number of injured or sick people exceeds the capacity of normal medical response — the Louisiana Department of Health used this term to describe the conditions inside the Superdome."
     },
     {
       "term": "Category 3 storm",
-      "definition": "A hurricane with sustained winds between 111 and 129 miles per hour — Katrina made landfall as a Category 3 with 125 mph winds, powerful enough to cause catastrophic damage.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A hurricane with sustained winds between 111 and 129 miles per hour — Katrina made landfall as a Category 3 with 125 mph winds, powerful enough to cause catastrophic damage."
     },
     {
       "term": "storm surge",
-      "definition": "The rise in water level caused by a hurricane's winds and low pressure pushing ocean water onto land — Katrina's surge reached twenty-eight feet along the Mississippi Gulf Coast.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The rise in water level caused by a hurricane's winds and low pressure pushing ocean water onto land — Katrina's surge reached twenty-eight feet along the Mississippi Gulf Coast."
     },
     {
       "term": "United States Army Corps of Engineers",
-      "definition": "The federal agency responsible for designing, building, and maintaining the levees and floodwalls that protect New Orleans — their certification of these structures made their failure a federal responsibility.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The federal agency responsible for designing, building, and maintaining the levees and floodwalls that protect New Orleans — their certification of these structures made their failure a federal responsibility."
     },
     {
       "term": "floodwall",
-      "definition": "A vertical concrete structure designed to block water from entering a protected area — distinct from levees, these were built and certified by the Army Corps of Engineers to withstand hurricane storm surge.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A vertical concrete structure designed to block water from entering a protected area — distinct from levees, these were built and certified by the Army Corps of Engineers to withstand hurricane storm surge."
     },
     {
       "term": "levee",
-      "definition": "An earthen or concrete barrier built to contain water and prevent flooding — in New Orleans, these federal structures were supposed to hold back storm surge, but 53 separate segments failed during Katrina.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "An earthen or concrete barrier built to contain water and prevent flooding — in New Orleans, these federal structures were supposed to hold back storm surge, but 53 separate segments failed during Katrina."
     }
   ],
   "createdAt": "2025-01-01T00:00:00Z",
@@ -440,218 +440,218 @@
   "technical_facts": {
     "facts": [
       {
-        "fact_id": "hurricane_katrina_landfall_time",
-        "content": "Hurricane Katrina made landfall near Buras-Triumph, Louisiana at approximately 6:10 AM CDT on Monday, August 29, 2005, as a Category 3 hurricane with maximum sustained winds of 125 mph.",
         "domain": "timing",
         "source": {
-          "citation": "National Hurricane Center, Tropical Cyclone Report: Hurricane Katrina, AL122005, Knabb et al., 2005",
           "url": null,
+          "citation": "National Hurricane Center, Tropical Cyclone Report: Hurricane Katrina, AL122005, Knabb et al., 2005",
           "access_note": null
         },
+        "content": "Hurricane Katrina made landfall near Buras-Triumph, Louisiana at approximately 6:10 AM CDT on Monday, August 29, 2005, as a Category 3 hurricane with maximum sustained winds of 125 mph.",
+        "fact_id": "hurricane_katrina_landfall_time",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lower_ninth_ward_levee_breach_timing",
-        "content": "The Industrial Canal levee breached on the morning of August 29, 2005, with floodwaters reaching the Lower Ninth Ward within hours of the breach; water levels in the Lower Ninth Ward reached as high as 12 feet in some areas.",
         "domain": "flooding",
         "source": {
-          "citation": "IPET (Interagency Performance Evaluation Task Force), Performance Evaluation of the New Orleans and Southeast Louisiana Hurricane Protection System, Volume IV, 2007",
           "url": null,
+          "citation": "IPET (Interagency Performance Evaluation Task Force), Performance Evaluation of the New Orleans and Southeast Louisiana Hurricane Protection System, Volume IV, 2007",
           "access_note": null
         },
+        "content": "The Industrial Canal levee breached on the morning of August 29, 2005, with floodwaters reaching the Lower Ninth Ward within hours of the breach; water levels in the Lower Ninth Ward reached as high as 12 feet in some areas.",
+        "fact_id": "lower_ninth_ward_levee_breach_timing",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "st_claude_avenue_bridge_elevation",
-        "content": "The St. Claude Avenue Bridge (also designated the St. Claude Avenue Drawbridge) spans the Industrial Canal and its roadway deck sits approximately 20 to 22 feet above mean sea level at its highest point, placing it above the peak flood levels recorded in the surrounding Lower Ninth Ward.",
         "domain": "navigation",
         "source": {
+          "url": null,
           "citation": "Louisiana Department of Transportation and Development bridge inventory records; IPET Volume IV flood elevation data, 2007",
-          "url": null,
           "access_note": null
         },
+        "content": "The St. Claude Avenue Bridge (also designated the St. Claude Avenue Drawbridge) spans the Industrial Canal and its roadway deck sits approximately 20 to 22 feet above mean sea level at its highest point, placing it above the peak flood levels recorded in the surrounding Lower Ninth Ward.",
+        "fact_id": "st_claude_avenue_bridge_elevation",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lower_ninth_ward_flood_peak_elevation",
-        "content": "Peak flood elevations in the Lower Ninth Ward following the August 29 Industrial Canal breach reached between 10 and 14 feet above grade in the blocks immediately adjacent to the canal, with elevations decreasing with distance from the breach point.",
         "domain": "flooding",
         "source": {
+          "url": null,
           "citation": "IPET Performance Evaluation of the New Orleans and Southeast Louisiana Hurricane Protection System, Volume IV, Figure IV-4-12, 2007",
-          "url": null,
           "access_note": null
         },
+        "content": "Peak flood elevations in the Lower Ninth Ward following the August 29 Industrial Canal breach reached between 10 and 14 feet above grade in the blocks immediately adjacent to the canal, with elevations decreasing with distance from the breach point.",
+        "fact_id": "lower_ninth_ward_flood_peak_elevation",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "ares_extra_class_frequency_privileges",
-        "content": "An Amateur Radio Emergency Service (ARES) volunteer holding an FCC Extra Class license has full privileges on all amateur frequency allocations, including HF bands used for long-distance emergency traffic; the 40-meter band (7.000–7.300 MHz) and 80-meter band (3.500–4.000 MHz) were primary ARES emergency traffic bands during Katrina operations.",
         "domain": "other",
         "source": {
-          "citation": "FCC Part 97 Amateur Radio Regulations; ARRL ARES Field Resources Manual, 2004 edition",
           "url": null,
+          "citation": "FCC Part 97 Amateur Radio Regulations; ARRL ARES Field Resources Manual, 2004 edition",
           "access_note": null
         },
+        "content": "An Amateur Radio Emergency Service (ARES) volunteer holding an FCC Extra Class license has full privileges on all amateur frequency allocations, including HF bands used for long-distance emergency traffic; the 40-meter band (7.000–7.300 MHz) and 80-meter band (3.500–4.000 MHz) were primary ARES emergency traffic bands during Katrina operations.",
+        "fact_id": "ares_extra_class_frequency_privileges",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "marine_deep_cycle_battery_terminal_cutoff_voltage",
-        "content": "A standard 12-volt marine deep-cycle lead-acid battery reaches its terminal cutoff voltage at approximately 10.5 volts under load; discharging below this threshold causes irreversible sulfation damage and renders the battery unable to sustain transmission loads.",
         "domain": "power",
         "source": {
+          "url": null,
           "citation": "Battery Council International, Battery Service Manual, 13th edition; standard lead-acid electrochemistry specifications",
-          "url": null,
           "access_note": null
         },
+        "content": "A standard 12-volt marine deep-cycle lead-acid battery reaches its terminal cutoff voltage at approximately 10.5 volts under load; discharging below this threshold causes irreversible sulfation damage and renders the battery unable to sustain transmission loads.",
+        "fact_id": "marine_deep_cycle_battery_terminal_cutoff_voltage",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "fema_supply_routing_pre_landfall_timeline",
-        "content": "FEMA pre-positioned emergency supplies in the Gulf Coast region beginning August 27, 2005, two days before Katrina landfall; staging areas included the Louisiana Superdome, which was designated as a shelter of last resort and a supply distribution node prior to the storm.",
         "domain": "timing",
         "source": {
+          "url": null,
           "citation": "U.S. Senate Committee on Homeland Security and Governmental Affairs, Hurricane Katrina: A Nation Still Unprepared, Chapter 22, 2006",
-          "url": null,
           "access_note": null
         },
+        "content": "FEMA pre-positioned emergency supplies in the Gulf Coast region beginning August 27, 2005, two days before Katrina landfall; staging areas included the Louisiana Superdome, which was designated as a shelter of last resort and a supply distribution node prior to the storm.",
+        "fact_id": "fema_supply_routing_pre_landfall_timeline",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "quiet_title_action_louisiana_procedure",
-        "content": "Under Louisiana law (La. R.S. 13:5062 and related provisions), a quiet title action (action en revendication) filed in Orleans Parish Civil District Court requires service on all known heirs; a default judgment can be entered if defendants fail to respond within the legally prescribed period, which for in-state parties is typically 15 days after service under Louisiana Code of Civil Procedure Article 1001.",
         "domain": "other",
         "source": {
-          "citation": "Louisiana Code of Civil Procedure, Articles 1001, 3651–3664; Louisiana Revised Statutes Title 13",
           "url": null,
+          "citation": "Louisiana Code of Civil Procedure, Articles 1001, 3651–3664; Louisiana Revised Statutes Title 13",
           "access_note": null
         },
+        "content": "Under Louisiana law (La. R.S. 13:5062 and related provisions), a quiet title action (action en revendication) filed in Orleans Parish Civil District Court requires service on all known heirs; a default judgment can be entered if defendants fail to respond within the legally prescribed period, which for in-state parties is typically 15 days after service under Louisiana Code of Civil Procedure Article 1001.",
+        "fact_id": "quiet_title_action_louisiana_procedure",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "new_orleans_communications_failure_timeline",
-        "content": "The majority of New Orleans area 911 call centers and commercial telephone infrastructure failed within 24 hours of Katrina landfall on August 29, 2005; amateur radio operators and ARES volunteers provided the primary communications link for many isolated communities through at least September 5, 2005.",
         "domain": "timing",
         "source": {
-          "citation": "FCC Report on the Impact of the August 2005 Hurricanes on Communications Networks, 2006; ARRL Katrina After-Action Report, 2005",
           "url": null,
+          "citation": "FCC Report on the Impact of the August 2005 Hurricanes on Communications Networks, 2006; ARRL Katrina After-Action Report, 2005",
           "access_note": null
         },
+        "content": "The majority of New Orleans area 911 call centers and commercial telephone infrastructure failed within 24 hours of Katrina landfall on August 29, 2005; amateur radio operators and ARES volunteers provided the primary communications link for many isolated communities through at least September 5, 2005.",
+        "fact_id": "new_orleans_communications_failure_timeline",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "national_guard_joint_operations_net_control",
-        "content": "The Louisiana National Guard Joint Operations Center during Katrina response operated communications nets requiring unit authentication procedures; civilian traffic was generally not accepted on military tactical frequencies without coordination through an established liaison or authentication protocol.",
         "domain": "other",
         "source": {
-          "citation": "Louisiana National Guard After-Action Report, Hurricane Katrina, 2006; U.S. Senate Katrina Report, Chapter 24, 2006",
           "url": null,
+          "citation": "Louisiana National Guard After-Action Report, Hurricane Katrina, 2006; U.S. Senate Katrina Report, Chapter 24, 2006",
           "access_note": null
         },
+        "content": "The Louisiana National Guard Joint Operations Center during Katrina response operated communications nets requiring unit authentication procedures; civilian traffic was generally not accepted on military tactical frequencies without coordination through an established liaison or authentication protocol.",
+        "fact_id": "national_guard_joint_operations_net_control",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "algiers_flooding_differential",
-        "content": "The Algiers neighborhood on the west bank of the Mississippi River did not experience significant flooding from Hurricane Katrina because it is protected by the Mississippi River levee system and sits on relatively higher ground; Algiers sustained wind damage but not the catastrophic inundation that affected the Lower Ninth Ward.",
         "domain": "flooding",
         "source": {
-          "citation": "IPET Volume IV; Louisiana Recovery Authority damage assessment data, 2005",
           "url": null,
+          "citation": "IPET Volume IV; Louisiana Recovery Authority damage assessment data, 2005",
           "access_note": null
         },
+        "content": "The Algiers neighborhood on the west bank of the Mississippi River did not experience significant flooding from Hurricane Katrina because it is protected by the Mississippi River levee system and sits on relatively higher ground; Algiers sustained wind damage but not the catastrophic inundation that affected the Lower Ninth Ward.",
+        "fact_id": "algiers_flooding_differential",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "floodwater_contamination_katrina",
-        "content": "Floodwater samples collected in New Orleans following Hurricane Katrina contained elevated levels of E. coli, heavy metals including lead and arsenic, diesel fuel, and raw sewage; the Louisiana Department of Health and Hospitals issued advisories warning that direct skin contact with floodwater posed significant infection and toxicity risks.",
         "domain": "other",
         "source": {
-          "citation": "Louisiana Department of Health and Hospitals, Environmental Surveillance After Hurricane Katrina, 2005; EPA Emergency Response Team sampling data, September 2005",
           "url": null,
+          "citation": "Louisiana Department of Health and Hospitals, Environmental Surveillance After Hurricane Katrina, 2005; EPA Emergency Response Team sampling data, September 2005",
           "access_note": null
         },
+        "content": "Floodwater samples collected in New Orleans following Hurricane Katrina contained elevated levels of E. coli, heavy metals including lead and arsenic, diesel fuel, and raw sewage; the Louisiana Department of Health and Hospitals issued advisories warning that direct skin contact with floodwater posed significant infection and toxicity risks.",
+        "fact_id": "floodwater_contamination_katrina",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "mold_growth_rate_post_flood",
-        "content": "Under post-flood conditions with standing water, high humidity, and temperatures above 70°F, mold colonies can begin visible growth on paper documents within 24 to 48 hours; significant structural degradation of paper and ink begins within 72 hours under these conditions, with accelerated deterioration if documents are in direct contact with floodwater.",
         "domain": "timing",
         "source": {
-          "citation": "National Archives and Records Administration, Salvage of Water-Damaged Records, NARA Technical Information Paper No. 16, 2003",
           "url": null,
+          "citation": "National Archives and Records Administration, Salvage of Water-Damaged Records, NARA Technical Information Paper No. 16, 2003",
           "access_note": null
         },
+        "content": "Under post-flood conditions with standing water, high humidity, and temperatures above 70°F, mold colonies can begin visible growth on paper documents within 24 to 48 hours; significant structural degradation of paper and ink begins within 72 hours under these conditions, with accelerated deterioration if documents are in direct contact with floodwater.",
+        "fact_id": "mold_growth_rate_post_flood",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "orleans_parish_clerk_of_court_records",
-        "content": "The Orleans Parish Clerk of Court maintained land title records, Acts of Sale, and civil court filings including quiet title actions; the Clerk of Court office at 421 Loyola Avenue sustained damage during Katrina and was closed for an extended period beginning August 29, 2005, making physical access to filed documents impossible during the immediate post-storm period.",
         "domain": "other",
         "source": {
-          "citation": "Orleans Parish Clerk of Court office records; Louisiana Supreme Court emergency orders, August–September 2005",
           "url": null,
+          "citation": "Orleans Parish Clerk of Court office records; Louisiana Supreme Court emergency orders, August–September 2005",
           "access_note": null
         },
+        "content": "The Orleans Parish Clerk of Court maintained land title records, Acts of Sale, and civil court filings including quiet title actions; the Clerk of Court office at 421 Loyola Avenue sustained damage during Katrina and was closed for an extended period beginning August 29, 2005, making physical access to filed documents impossible during the immediate post-storm period.",
+        "fact_id": "orleans_parish_clerk_of_court_records",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "compressed_burst_transmission_duration",
-        "content": "A compressed digital burst transmission of a standard military grid reference or geographic coordinate set (latitude/longitude to four decimal places, plus authentication header) transmitted via amateur radio packet or voice encoding typically requires between 30 seconds and 2 minutes of continuous transmission time depending on encoding method and band conditions.",
         "domain": "power",
         "source": {
-          "citation": "ARRL Handbook for Radio Communications, 2005 edition; APRS (Automatic Packet Reporting System) technical specifications",
           "url": null,
+          "citation": "ARRL Handbook for Radio Communications, 2005 edition; APRS (Automatic Packet Reporting System) technical specifications",
           "access_note": null
         },
+        "content": "A compressed digital burst transmission of a standard military grid reference or geographic coordinate set (latitude/longitude to four decimal places, plus authentication header) transmitted via amateur radio packet or voice encoding typically requires between 30 seconds and 2 minutes of continuous transmission time depending on encoding method and band conditions.",
+        "fact_id": "compressed_burst_transmission_duration",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "katrina_rescue_coordination_failures_documented",
-        "content": "The U.S. Senate investigation documented that during the period August 29 through September 3, 2005, rescue coordination in New Orleans was impaired by the absence of a unified command structure, with FEMA, the Louisiana National Guard, the Coast Guard, and local agencies operating on separate communications nets without consistent location data reconciliation.",
         "domain": "other",
         "source": {
-          "citation": "U.S. Senate Committee on Homeland Security and Governmental Affairs, Hurricane Katrina: A Nation Still Unprepared, Chapter 20, 2006",
           "url": null,
+          "citation": "U.S. Senate Committee on Homeland Security and Governmental Affairs, Hurricane Katrina: A Nation Still Unprepared, Chapter 20, 2006",
           "access_note": null
         },
+        "content": "The U.S. Senate investigation documented that during the period August 29 through September 3, 2005, rescue coordination in New Orleans was impaired by the absence of a unified command structure, with FEMA, the Louisiana National Guard, the Coast Guard, and local agencies operating on separate communications nets without consistent location data reconciliation.",
+        "fact_id": "katrina_rescue_coordination_failures_documented",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "flat_bottom_skiff_load_capacity",
-        "content": "A standard aluminum flat-bottom skiff of 14 to 16 feet in length, as commonly used in Louisiana flood rescue operations during Katrina, has a rated load capacity of approximately 800 to 1,200 pounds depending on hull gauge and beam width; overloading in debris-laden floodwater significantly increases swamping risk.",
         "domain": "capacity",
         "source": {
-          "citation": "U.S. Coast Guard small vessel load capacity standards (33 CFR Part 183); Louisiana Department of Wildlife and Fisheries vessel specifications",
           "url": null,
+          "citation": "U.S. Coast Guard small vessel load capacity standards (33 CFR Part 183); Louisiana Department of Wildlife and Fisheries vessel specifications",
           "access_note": null
         },
+        "content": "A standard aluminum flat-bottom skiff of 14 to 16 feet in length, as commonly used in Louisiana flood rescue operations during Katrina, has a rated load capacity of approximately 800 to 1,200 pounds depending on hull gauge and beam width; overloading in debris-laden floodwater significantly increases swamping risk.",
+        "fact_id": "flat_bottom_skiff_load_capacity",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "fema_contractor_credentialing_2005",
-        "content": "FEMA logistics contractors operating during the Katrina response in 2005 were issued laminated photo credentials through the FEMA Logistics Management Directorate; contractor credentials issued before the storm remained valid for their printed expiration dates and were used as access authorization at staging areas and distribution nodes during the response period.",
         "domain": "other",
         "source": {
-          "citation": "U.S. House of Representatives Select Bipartisan Committee, A Failure of Initiative, Chapter 7 (Logistics), 2006",
           "url": null,
+          "citation": "U.S. House of Representatives Select Bipartisan Committee, A Failure of Initiative, Chapter 7 (Logistics), 2006",
           "access_note": null
         },
+        "content": "FEMA logistics contractors operating during the Katrina response in 2005 were issued laminated photo credentials through the FEMA Logistics Management Directorate; contractor credentials issued before the storm remained valid for their printed expiration dates and were used as access authorization at staging areas and distribution nodes during the response period.",
+        "fact_id": "fema_contractor_credentialing_2005",
         "valid_from": null,
         "valid_until": null
       }
@@ -663,32 +663,32 @@
   "openingSituation": "",
   "review_checklist": {
     "beat_count": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "sequence_check": {
-      "checked": false,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "final_beat_spec": {
-      "checked": false,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "reviewer_summary": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
     },
     "manual_playthrough": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     }
   },
   "historicalRealism": "high",
@@ -826,5 +826,6 @@
     "The medical crate is accepted and the electrolyte packages distributed, but the three displaced children develop heat exhaustion on the concrete span before shade materials can be improvised — survival secured, suffering not prevented",
     "The land deed box is opened but the moisture-saturated parchment tears along two fold lines — the documents are partially legible, enough to establish a claim but insufficient to survive a title dispute without corroborating testimony"
   ],
-  "structured_endings_enabled": false
+  "structured_endings_enabled": false,
+  "displayOrder": 99
 }

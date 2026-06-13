@@ -1,42 +1,25 @@
 {
   "id": "chicago_1893_v1",
-  "order": 2,
-  "hidden": true,
-  "version": "1.0.0",
-  "title": "Chicago, 1893: Shadows of the White City",
-  "setting": "Chicago, 1893",
-  "premise": "[NEEDS PREMISE] Chicago, 1893",
-  "description": "A 20-minute historical thriller set during the World's Columbian Exposition. A conspiracy threatens to sabotage the fair's opening night lighting demonstration.",
   "genre": [
     "historical thriller",
     "mystery"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 20,
-  "storyArcIds": [
-    "chicago1893_main_arc"
-  ],
-  "playerRoleIds": [
-    "burnhams_assistant",
-    "daniel_burnham",
-    "watchman_murphy"
-  ],
-  "keyEvidenceClueIds": [
-    "tampered_wiring_diagrams",
-    "opening_night_note"
-  ],
+  "order": 2,
+  "title": "Chicago, 1893: Shadows of the White City",
+  "hidden": true,
+  "status": "archived",
+  "premise": "[NEEDS PREMISE] Chicago, 1893",
+  "setting": "Chicago, 1893",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "burnhamTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -45,8 +28,22 @@
       "A key witness disappears",
       "A guard reports movement near restricted electrical equipment",
       "A newspaper man gets wind of a scandal"
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:42:16.501Z",
+  "description": "A 20-minute historical thriller set during the World's Columbian Exposition. A conspiracy threatens to sabotage the fair's opening night lighting demonstration.",
+  "storyArcIds": [
+    "chicago1893_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "playerRoleIds": [
+    "burnhams_assistant",
+    "daniel_burnham",
+    "watchman_murphy"
+  ],
   "winConditions": [
     "The true sabotage method is identified",
     "The player prevents or neutralizes the sabotage",
@@ -57,18 +54,11 @@
     "The player accuses the wrong person and loses critical support",
     "The sabotage succeeds sufficiently to damage the fair's opening or reputation"
   ],
-  "partialSuccessExamples": [
-    "The immediate sabotage is stopped, but the conspirators escape",
-    "The fair opens safely, but scandal reaches the newspapers",
-    "Burnham is saved political embarrassment, but the player sacrifices an ally"
-  ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:42:16.501Z",
+  "historicalRealism": "high",
   "period_vocabulary": {
     "categories": [
       {
         "name": "White City Construction & Fair Administration Argot",
-        "context": "Used by Burnham, his engineers, and senior fair staff when discussing logistics, infrastructure, and the exposition's internal operations.",
         "terms": [
           {
             "term": "the Court",
@@ -98,11 +88,11 @@
             "term": "the lakefront problem",
             "meaning": "Any logistical or structural issue caused by the exposition's proximity to Lake Michigan — flooding, wind, unstable ground — used broadly for any crisis with no clean solution."
           }
-        ]
+        ],
+        "context": "Used by Burnham, his engineers, and senior fair staff when discussing logistics, infrastructure, and the exposition's internal operations."
       },
       {
         "name": "Chicago Ward Politics & Fixer Cant",
-        "context": "Used by Hanrahan and his network of aldermen, precinct captains, and procurement contacts when conducting informal business around the fair.",
         "terms": [
           {
             "term": "the combine",
@@ -136,11 +126,11 @@
             "term": "the precinct captain's nod",
             "meaning": "Tacit approval from ward-level political authority — without it, no significant business in a given neighborhood proceeds safely."
           }
-        ]
+        ],
+        "context": "Used by Hanrahan and his network of aldermen, precinct captains, and procurement contacts when conducting informal business around the fair."
       },
       {
         "name": "Electrical Trade Shorthand",
-        "context": "Used by Mercier and the fair's electrical engineers when discussing the Tesla-Westinghouse AC lighting system powering the exposition's opening-night demonstration.",
         "terms": [
           {
             "term": "the alternating current",
@@ -170,11 +160,11 @@
             "term": "the load",
             "meaning": "The total electrical demand of the fairgrounds at any given moment; 'carrying the load' on opening night is the central engineering challenge and point of vulnerability."
           }
-        ]
+        ],
+        "context": "Used by Mercier and the fair's electrical engineers when discussing the Tesla-Westinghouse AC lighting system powering the exposition's opening-night demonstration."
       },
       {
         "name": "Press & Society Reporter's Vernacular",
-        "context": "Used by Clara Hale and her journalistic peers when discussing sources, stories, and the social intelligence network surrounding the exposition.",
         "terms": [
           {
             "term": "the morgue",
@@ -204,11 +194,11 @@
             "term": "the wires",
             "meaning": "The telegraph news services — Associated Press and United Press — whose correspondents Clara both competes with and occasionally feeds selective information to shape a story's national framing."
           }
-        ]
+        ],
+        "context": "Used by Clara Hale and her journalistic peers when discussing sources, stories, and the social intelligence network surrounding the exposition."
       },
       {
         "name": "Fair Security & Chicago Police Cant",
-        "context": "Used by O'Donnell and the Columbian Guard officers when coordinating patrols, reporting incidents, and navigating the uneasy boundary between fair jurisdiction and city police authority.",
         "terms": [
           {
             "term": "the Guard",
@@ -238,8 +228,20 @@
             "term": "close the gate",
             "meaning": "To lock down a section of the fairgrounds and restrict movement — a drastic measure O'Donnell resists using because it draws press attention and requires Burnham's authorization."
           }
-        ]
+        ],
+        "context": "Used by O'Donnell and the Columbian Guard officers when coordinating patrols, reporting incidents, and navigating the uneasy boundary between fair jurisdiction and city police authority."
       }
     ]
-  }
+  },
+  "keyEvidenceClueIds": [
+    "tampered_wiring_diagrams",
+    "opening_night_note"
+  ],
+  "sessionTargetMinutes": 20,
+  "partialSuccessExamples": [
+    "The immediate sabotage is stopped, but the conspirators escape",
+    "The fair opens safely, but scandal reaches the newspapers",
+    "Burnham is saved political embarrassment, but the player sacrifices an ally"
+  ],
+  "displayOrder": 99
 }

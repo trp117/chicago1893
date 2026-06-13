@@ -1,40 +1,28 @@
 {
   "id": "boston_tea_party",
-  "order": 3,
-  "hidden": true,
-  "version": "1.0.0",
-  "title": "boston tea party",
-  "setting": "Boston, 1773",
-  "description": "December 16, 1773. Tonight the Sons of Liberty will dump 342 chests of East India Company tea into Boston Harbor — but a spy has already whispered the plan to the Crown's men. Before the first chest hits the water, the traitor must be unmasked or the entire operation, and every man in it, will be lost.",
+  "tone": [],
   "genre": [
     "historical thriller"
   ],
-  "historicalRealism": "medium",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 15,
-  "storyArcIds": [
-    "boston_tea_party_main_arc"
-  ],
-  "playerRoleIds": [
-    "role_patriot_organizer",
-    "role_dockworker",
-    "role_merchant_observer"
-  ],
-  "keyEvidenceClueIds": [
-    "clue_coded_letter",
-    "clue_payment_receipt"
-  ],
+  "image": {
+    "generation_prompt": "The night of December 16, 1773 presses down on Griffin's Wharf like a held breath. It is past seven in the evening, and the cold off Boston Harbor cuts through wool coats as though they were cheesecloth. The three ships — Dartmouth, Eleanor, and Beaver — sit low and dark at their moorings, their masts scratching at a sky bruised purple and black, offering no moon worth speaking of. Torchlight from the wharf gutters in the harbor wind, throwing long amber shadows across the salt-bleached planking and the frozen coils of rope at every bollard.\n\nA crowd of several thousand has gathered at Old South Meeting House, their voices carrying faintly over the water — righteous, dangerous, close to something that cannot be taken back. But here on the wharf, the silence is surgical. Forty-odd men move in the torchlight, their faces smeared with burnt cork and red ochre, their heads wrapped in rough blankets fashioned after Mohawk dress — a disguise that convinces no one, least of all the men wearing it, but makes a statement all the same. They carry boarding axes and block and tackle, their breath visible in short white bursts, eyes sharp above darkened cheeks.\n\nAmong them stands John, the Merchant Observer — coat of dark broadcloth, beaver hat pulled low, boots already salt-stained from the dock. He has positioned himself near a stack of crates where lamplight barely reaches, watching the organized chaos of men forming human chains to haul chests from the hold. His expression carries the particular tension of a man who knows something the others do not, or fears that someone else does. His jaw is set. His hands are still.\n\nSomewhere in this knot of conspirators, a face is turned two ways at once. The knowledge of it hangs in the cold air like fog off the water — unseen but felt against the skin.\n\nThe scene should feel like a slow fuse burning in a dark room. The viewer should sense imminent catastrophe dressed in the costume of revolution, and understand that history's most celebrated act of defiance is also, tonight, a trap waiting to close."
+  },
+  "order": 3,
+  "title": "boston tea party",
+  "hidden": true,
+  "status": "archived",
+  "premise": "[NEEDS PREMISE] Boston, 1773",
+  "setting": "Boston, 1773",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -42,8 +30,48 @@
       "A British naval cutter is spotted rowing slowly past Griffin's Wharf — the crew is watching the docks with lanterns raised.",
       "Word spreads through the crowd that Customs Officer Hartwell has sent a rider north — someone is summoning reinforcements.",
       "Samuel Adams receives an anonymous note warning him the redcoats know the exact hour of the action — the spy is still active."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:46:40.303Z",
+  "playerGoal": "",
+  "description": "December 16, 1773. Tonight the Sons of Liberty will dump 342 chests of East India Company tea into Boston Harbor — but a spy has already whispered the plan to the Crown's men. Before the first chest hits the water, the traitor must be unmasked or the entire operation, and every man in it, will be lost.",
+  "storyArcIds": [
+    "boston_tea_party_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": false,
+    "sections": [
+      {
+        "text": "",
+        "type": "world"
+      },
+      {
+        "text": "",
+        "type": "stakes"
+      },
+      {
+        "text": "",
+        "type": "scene"
+      },
+      {
+        "text": "",
+        "type": "entry",
+        "character_entries": {
+          "role_merchant_observer": "The cold comes off the harbor in layers tonight — brine and tar and something sharper underneath, the particular smell of consequence. You stand at the upper window of Hutchinson's counting house, a borrowed vantage point secured through a favor you will repay later and think about never, watching the torchlight move along Griffin's Wharf below like a slow fire that has not yet decided what to burn. Your ledger instincts are running even now: you count the figures, estimate the crowd, note who stands nearest the gangplanks and who hangs back. Dillworth is down there somewhere, and that is the thing that will not leave you alone. A man whose accounts have been quietly swelling for three months despite every public complaint about ruin, a man who last week recited ship manifests with the fluency of someone who had read them privately and at leisure. You have said nothing to Adams yet. You have been waiting to be certain, which is perhaps another way of saying you have been waiting to be brave. The torches are moving toward the Dartmouth now. Your hand rests on the window latch."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_patriot_organizer",
+    "role_dockworker",
+    "role_merchant_observer"
+  ],
   "winConditions": [
     "Correctly accuse the spy with at least one key evidence clue presented before time expires, preventing the British from intercepting the operation.",
     "Present both key evidence clues to Samuel Adams, triggering his formal denunciation of the traitor and allowing the tea party to proceed safely."
@@ -52,45 +80,12 @@
     "Time expires at 15 minutes without a final accusation — British troops arrive and arrest the organizers at Griffin's Wharf.",
     "The player makes a false accusation against an innocent character, destroying trust within the Sons of Liberty and causing the operation to collapse."
   ],
-  "partialSuccessExamples": [
-    "The player identifies the spy but possesses only circumstantial clues — the spy is expelled from the group but escapes prosecution, and the tea party proceeds under heightened risk."
-  ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:46:40.303Z",
-  "premise": "[NEEDS PREMISE] Boston, 1773",
-  "playerGoal": "",
   "openingSituation": "",
-  "tone": [],
-  "introduction": {
-    "enabled": false,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": ""
-      },
-      {
-        "type": "stakes",
-        "text": ""
-      },
-      {
-        "type": "scene",
-        "text": ""
-      },
-      {
-        "type": "entry",
-        "text": "",
-        "character_entries": {
-          "role_merchant_observer": "The cold comes off the harbor in layers tonight — brine and tar and something sharper underneath, the particular smell of consequence. You stand at the upper window of Hutchinson's counting house, a borrowed vantage point secured through a favor you will repay later and think about never, watching the torchlight move along Griffin's Wharf below like a slow fire that has not yet decided what to burn. Your ledger instincts are running even now: you count the figures, estimate the crowd, note who stands nearest the gangplanks and who hangs back. Dillworth is down there somewhere, and that is the thing that will not leave you alone. A man whose accounts have been quietly swelling for three months despite every public complaint about ruin, a man who last week recited ship manifests with the fluency of someone who had read them privately and at leisure. You have said nothing to Adams yet. You have been waiting to be certain, which is perhaps another way of saying you have been waiting to be brave. The torches are moving toward the Dartmouth now. Your hand rests on the window latch."
-        }
-      }
-    ]
-  },
+  "historicalRealism": "medium",
   "period_vocabulary": {
     "categories": [
       {
         "name": "Sons of Liberty Operational Codes",
-        "context": "Used by patriot organizers such as Samuel Adams, Dr. Joseph Warren, and Paul Revere when coordinating clandestine actions, passing intelligence, or speaking near untrusted ears.",
         "terms": [
           {
             "term": "the body of the people",
@@ -120,11 +115,11 @@
             "term": "the express",
             "meaning": "An urgent mounted message, or the rider who carries it; synonymous with Revere's role and used to signal that word must travel fast."
           }
-        ]
+        ],
+        "context": "Used by patriot organizers such as Samuel Adams, Dr. Joseph Warren, and Paul Revere when coordinating clandestine actions, passing intelligence, or speaking near untrusted ears."
       },
       {
         "name": "Boston Dockworkers' Argot",
-        "context": "Used by laborers like Elias Croft along the Long Wharf and Griffin's Wharf when handling cargo, speaking of the ships, or concealing their nighttime loyalties from overseers and customs men.",
         "terms": [
           {
             "term": "the chest",
@@ -158,11 +153,11 @@
             "term": "the wharf rats",
             "meaning": "Informal term for the regular dock laborers who know every plank, rope, and shadow of Griffin's Wharf — trusted insiders by night."
           }
-        ]
+        ],
+        "context": "Used by laborers like Elias Croft along the Long Wharf and Griffin's Wharf when handling cargo, speaking of the ships, or concealing their nighttime loyalties from overseers and customs men."
       },
       {
         "name": "Crown Loyalist and Military Parlance",
-        "context": "Used by British officers, customs officials, and loyalist informants when discussing the political situation, suspected seditionists, or plans to intercept the patriots — language that marks a speaker's allegiance to the Crown.",
         "terms": [
           {
             "term": "the rabble",
@@ -192,11 +187,11 @@
             "term": "the Act",
             "meaning": "The Tea Act of 1773; loyalists cite it as lawful authority while patriots cite it as tyranny — the same two words carrying opposite moral weight."
           }
-        ]
+        ],
+        "context": "Used by British officers, customs officials, and loyalist informants when discussing the political situation, suspected seditionists, or plans to intercept the patriots — language that marks a speaker's allegiance to the Crown."
       },
       {
         "name": "Patriot Tavern Slang",
-        "context": "Used in establishments such as the Green Dragon Tavern by ordinary Boston citizens, tradesmen, and junior Sons of Liberty members when speaking freely among presumed allies, toasting, or passing rumors.",
         "terms": [
           {
             "term": "liberty water",
@@ -226,11 +221,11 @@
             "term": "the meeting",
             "meaning": "The mass public assembly at Old South Meeting House; the legitimate political cover under which the evening's true plan is being finalized."
           }
-        ]
+        ],
+        "context": "Used in establishments such as the Green Dragon Tavern by ordinary Boston citizens, tradesmen, and junior Sons of Liberty members when speaking freely among presumed allies, toasting, or passing rumors."
       },
       {
         "name": "Merchant and Counting-House Trade Language",
-        "context": "Used by figures like Thomas Dillworth when discussing commerce, cargo, and finances — a vocabulary that can mask conspiratorial dealings inside the ordinary language of legitimate trade.",
         "terms": [
           {
             "term": "the Company",
@@ -256,8 +251,18 @@
             "term": "a factor",
             "meaning": "A merchant's agent who buys and sells on his behalf; a man in this role moves between factions and is naturally suspected of carrying intelligence to both sides."
           }
-        ]
+        ],
+        "context": "Used by figures like Thomas Dillworth when discussing commerce, cargo, and finances — a vocabulary that can mask conspiratorial dealings inside the ordinary language of legitimate trade."
       }
     ]
-  }
+  },
+  "keyEvidenceClueIds": [
+    "clue_coded_letter",
+    "clue_payment_receipt"
+  ],
+  "sessionTargetMinutes": 15,
+  "partialSuccessExamples": [
+    "The player identifies the spy but possesses only circumstantial clues — the spy is expelled from the group but escapes prosecution, and the tea party proceeds under heightened risk."
+  ],
+  "displayOrder": 99
 }

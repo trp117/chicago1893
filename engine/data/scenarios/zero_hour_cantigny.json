@@ -57,6 +57,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "military",
   "epilogue": {
     "reviewed": true,
     "generated": true,
@@ -773,5 +774,5 @@
   },
   "[5th_field_artillery_gun_type]": "The 5th Field Artillery Regiment, 1st Division, AEF, was equipped with French 155mm Schneider howitzers (Canon de 155 C modèle 1917 Schneider) as the heavy artillery component of the division during the Cantigny operation.",
   "Act 1: The Creeping Curtain [0–8 min]": "[the_discrepancy_between] The discrepancy between the two fire table fragments is discovered — players must determine which version is authentic and who had access to the originals [the_barrage_opens] The preparatory barrage opens at 04:45; Barrage_Sync begins degrading as the falsified tracking threatens the upcoming rolling barrage synchronization [the_signaler_advances] The Signaler advances into No Man's Land uncoiling wire; the Doughboy prepares along the fire-step amidst gas residue [first_contact_with] First contact with Sergeant Voss at the jump-off trench — he is evasive about his movements before dawn",
-  "category": "military"
+  "displayOrder": 5
 }

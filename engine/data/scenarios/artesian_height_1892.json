@@ -6,7 +6,14 @@
     "thriller",
     "mystery"
   ],
+  "image": {
+    "url": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_wide.jpg",
+    "shortUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_short.jpg",
+    "sourceUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_source.jpg",
+    "generation_prompt": "The late afternoon sun of August 1892 burns low and amber across the flat Illinois prairie, casting long copper shadows over the construction site at Western Springs. At the center of the scene rises the nearly-finished artesian water tower — a commanding cylindrical structure of rough-cut limestone blocks, its crenellated parapet still raw and pale against the darkening sky, scaffold planking clinging to its upper third like the ribs of an unfinished cage. A derrick arm juts from the summit at a fractured angle, rope tackle hanging slack and motionless, betraying the stillness of a mechanism that should be turning.\n\nThirty feet below ground level, invisible but felt in every man's posture, the drill string sits bound fast in two thousand feet of black earth.\n\nThree figures occupy the foreground in attitudes of barely controlled tension. The Chief Engineer — a broad-shouldered man of fifty in a sweat-darkened linen vest and rolled shirtsleeves, his leather-bound ledger pressed against his chest like a shield — stands at the pressure gauge mounted to the wellhead housing, his jaw set, eyes narrowed at a reading that refuses to lie for him. Beside the stone pump house wall, the Plant Engineer crouches over a scatter of technical drawings weighted down by pipe couplings, his young face pale beneath its grime, one finger tracing a calculation he's made three times and will make again. Slightly apart from both, the Night Marshal stands with his thumbs hooked at his belt, a silver star catching the last of the daylight, watching the engineers the way a man watches a bridge he isn't sure will hold.\n\nThe air smells of mineral water, machine oil, and coming storm. Thunderheads are building in the northwest, their undersides bruised purple-green, and the wind has begun lifting loose shavings from the scaffold boards. A single kerosene work lantern hung from the derrick's lower strut swings in that wind, sending shadows crawling across the limestone face of the tower in slow, uncertain arcs.\n\nThe mood is one of compressed catastrophe — the precise, suffocating stillness before something gives way. The viewer should feel the weight of reputation, public money, and geological pressure converging on this single half-hour, and understand that the tower's beauty and the crisis below it are entirely inseparable."
+  },
   "title": "The Artesian Height",
+  "status": "published",
   "premise": "The strongbox has been forced. Three pages of bore log records are missing. The midnight freight consist rolls out in less than an hour. Someone who knew the schedule came through that door — and one of the people standing in this room right now is watching you figure out who.",
   "setting": "Western Springs, Illinois, 1892",
   "systems": {
@@ -111,65 +118,65 @@
     ],
     "character_fates": [
       {
-        "character_id": "char_benezette_williams",
         "name": "Benezette Williams",
         "outcome": "unknown",
-        "historical_record": "Benezette Williams was a real civil engineer who served as chief engineer for the Western Springs, Illinois artesian well project, completed in 1892. Williams and Williams, the firm he led with his brother Edgar, was contracted by the village to design and oversee the drilling. The well reportedly reached the St. Peter Sandstone aquifer at a depth of approximately 1,800 feet, though surviving published depth figures vary somewhat across later historical summaries and became the primary water supply for Western Springs. Historical records confirm Williams certified the project's engineering work. His subsequent career and the full scope of his professional biography beyond this project are not documented in sources presently available.",
+        "character_id": "char_benezette_williams",
         "primary_source": {
-          "citation": "Village of Western Springs Annual Report, 1892; Cook County, Illinois municipal infrastructure records",
           "url": null,
+          "citation": "Village of Western Springs Annual Report, 1892; Cook County, Illinois municipal infrastructure records",
           "access_note": null
-        }
+        },
+        "historical_record": "Benezette Williams was a real civil engineer who served as chief engineer for the Western Springs, Illinois artesian well project, completed in 1892. Williams and Williams, the firm he led with his brother Edgar, was contracted by the village to design and oversee the drilling. The well reportedly reached the St. Peter Sandstone aquifer at a depth of approximately 1,800 feet, though surviving published depth figures vary somewhat across later historical summaries and became the primary water supply for Western Springs. Historical records confirm Williams certified the project's engineering work. His subsequent career and the full scope of his professional biography beyond this project are not documented in sources presently available."
       },
       {
-        "character_id": "char_edgar_williams",
         "name": "Edgar Williams",
         "outcome": "unknown",
-        "historical_record": "Edgar Williams served as the business partner and project manager for Williams and Williams during the Western Springs artesian well project. His role was primarily administrative and financial rather than field engineering. The firm's involvement in the Western Springs project is documented in village records. His individual post-project biography is not established in sources presently available.",
+        "character_id": "char_edgar_williams",
         "primary_source": {
-          "citation": "Village of Western Springs municipal contract records, 1891–1892",
           "url": null,
+          "citation": "Village of Western Springs municipal contract records, 1891–1892",
           "access_note": null
-        }
+        },
+        "historical_record": "Edgar Williams served as the business partner and project manager for Williams and Williams during the Western Springs artesian well project. His role was primarily administrative and financial rather than field engineering. The firm's involvement in the Western Springs project is documented in village records. His individual post-project biography is not established in sources presently available."
       },
       {
-        "character_id": "char_wickerson",
         "name": "Aldous Wickerson",
         "outcome": "unknown",
-        "historical_record": "A village president of Western Springs presided over the municipal bond process and infrastructure development that funded the artesian well project in the early 1890s. The specific individual holding that office during the 1891–1892 drilling period and the details of their subsequent tenure are not confirmed in sources presently available. Western Springs was incorporated as a village in 1886, and its early elected leadership oversaw the transition from private cisterns and shallow wells to a centralized municipal water system.",
+        "character_id": "char_wickerson",
         "primary_source": {
-          "citation": "Village of Western Springs incorporation and municipal records, 1886–1895",
           "url": null,
+          "citation": "Village of Western Springs incorporation and municipal records, 1886–1895",
           "access_note": null
-        }
+        },
+        "historical_record": "A village president of Western Springs presided over the municipal bond process and infrastructure development that funded the artesian well project in the early 1890s. The specific individual holding that office during the 1891–1892 drilling period and the details of their subsequent tenure are not confirmed in sources presently available. Western Springs was incorporated as a village in 1886, and its early elected leadership oversaw the transition from private cisterns and shallow wells to a centralized municipal water system."
       },
       {
-        "character_id": "char_alderman_voss",
         "name": "Corey Voss",
         "outcome": "unknown",
-        "historical_record": "Corey Voss is a fictional character. He represents the category of village aldermen and bond committee members who served on municipal finance bodies in small Illinois incorporated villages during the 1880s and 1890s. Such officials were responsible for approving infrastructure bonds, reviewing contractor cost certifications, and voting on public works expenditures. Illinois municipal bond law of this period required committee approval before bonds could be issued for capital projects. Corruption and falsification of cost records in municipal infrastructure contracting were documented concerns in Illinois during this era, and several Cook County municipalities experienced contested bond proceedings in the 1890s. The names and outcomes of individual aldermen in Western Springs during this period are not fully preserved in accessible records.",
-        "primary_source": null
+        "character_id": "char_alderman_voss",
+        "primary_source": null,
+        "historical_record": "Corey Voss is a fictional character. He represents the category of village aldermen and bond committee members who served on municipal finance bodies in small Illinois incorporated villages during the 1880s and 1890s. Such officials were responsible for approving infrastructure bonds, reviewing contractor cost certifications, and voting on public works expenditures. Illinois municipal bond law of this period required committee approval before bonds could be issued for capital projects. Corruption and falsification of cost records in municipal infrastructure contracting were documented concerns in Illinois during this era, and several Cook County municipalities experienced contested bond proceedings in the 1890s. The names and outcomes of individual aldermen in Western Springs during this period are not fully preserved in accessible records."
       },
       {
-        "character_id": "char_dolan_marsh",
         "name": "Dolan Marsh",
         "outcome": "unknown",
-        "historical_record": "Dolan Marsh is a fictional character. He represents the category of Chicago, Burlington and Quincy Railroad firemen who worked the line through Western Springs, Illinois during the early 1890s. The CBQ main line passed through Western Springs, and railroad workers were a consistent presence in the village. Firemen on steam locomotives of this period worked shifts that included overnight runs and yard duties, placing them near infrastructure sites along the right-of-way at irregular hours. Their observations were occasionally recorded in inquest and municipal proceedings when they witnessed events near the tracks, though most such testimony was never formally preserved.",
-        "primary_source": null
+        "character_id": "char_dolan_marsh",
+        "primary_source": null,
+        "historical_record": "Dolan Marsh is a fictional character. He represents the category of Chicago, Burlington and Quincy Railroad firemen who worked the line through Western Springs, Illinois during the early 1890s. The CBQ main line passed through Western Springs, and railroad workers were a consistent presence in the village. Firemen on steam locomotives of this period worked shifts that included overnight runs and yard duties, placing them near infrastructure sites along the right-of-way at irregular hours. Their observations were occasionally recorded in inquest and municipal proceedings when they witnessed events near the tracks, though most such testimony was never formally preserved."
       },
       {
-        "character_id": "char_ethan_philbrick",
         "name": "Ethan Philbrick",
         "outcome": "unknown",
-        "historical_record": "Ethan Philbrick is a fictional character. He represents the category of local engineers and village infrastructure liaisons who served as intermediaries between municipal governments and outside engineering contractors in small Illinois villages during the 1880s and 1890s. Such individuals were typically trained in practical engineering or surveying, held informal or formally appointed positions with the village, and were responsible for day-to-day oversight of construction projects on behalf of elected officials. Their access to both the contractor's technical records and the village's financial documents made them uniquely positioned within infrastructure projects. The historical record of individuals in this role is fragmentary, as their appointments were often informal and their correspondence rarely archived.",
-        "primary_source": null
+        "character_id": "char_ethan_philbrick",
+        "primary_source": null,
+        "historical_record": "Ethan Philbrick is a fictional character. He represents the category of local engineers and village infrastructure liaisons who served as intermediaries between municipal governments and outside engineering contractors in small Illinois villages during the 1880s and 1890s. Such individuals were typically trained in practical engineering or surveying, held informal or formally appointed positions with the village, and were responsible for day-to-day oversight of construction projects on behalf of elected officials. Their access to both the contractor's technical records and the village's financial documents made them uniquely positioned within infrastructure projects. The historical record of individuals in this role is fragmentary, as their appointments were often informal and their correspondence rarely archived."
       },
       {
-        "character_id": "char_silas_greer",
         "name": "Silas Greer",
         "outcome": "unknown",
-        "historical_record": "Silas Greer is a fictional character. He represents the category of night laborers employed on municipal well-drilling and infrastructure construction sites in Illinois during the 1890s. Such workers were typically hired on a day-wage or shift basis, worked without formal contracts, and were among the most economically vulnerable participants in public works projects. Their names were rarely recorded in surviving project documents. Night laborers on drilling sites performed tasks including spoil removal, equipment monitoring, fuel handling, and site security. Their testimony in disputes over project conduct was seldom solicited and rarely preserved in official records.",
-        "primary_source": null
+        "character_id": "char_silas_greer",
+        "primary_source": null,
+        "historical_record": "Silas Greer is a fictional character. He represents the category of night laborers employed on municipal well-drilling and infrastructure construction sites in Illinois during the 1890s. Such workers were typically hired on a day-wage or shift basis, worked without formal contracts, and were among the most economically vulnerable participants in public works projects. Their names were rarely recorded in surviving project documents. Night laborers on drilling sites performed tasks including spoil removal, equipment monitoring, fuel handling, and site security. Their testimony in disputes over project conduct was seldom solicited and rarely preserved in official records."
       }
     ],
     "historical_frame": [
@@ -220,6 +227,7 @@
       ]
     }
   },
+  "glossary": [],
   "createdAt": "2025-07-14T00:00:00Z",
   "updatedAt": "2026-05-22T22:09:01.841Z",
   "playerGoal": "",
@@ -275,218 +283,218 @@
   "technical_facts": {
     "facts": [
       {
-        "fact_id": "st_peter_sandstone_depth_illinois",
-        "content": "The St. Peter Sandstone aquifer in northeastern Illinois lies at depths ranging from approximately 1,400 to 2,000 feet below surface, depending on local geology, and was the primary artesian target for deep municipal wells drilled in the Chicago metropolitan region during the 1880s and 1890s.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); U.S. Geological Survey Water-Supply Paper No. 114 (1905)",
-          "url": null,
           "access_note": null
         },
+        "content": "The St. Peter Sandstone aquifer in northeastern Illinois lies at depths ranging from approximately 1,400 to 2,000 feet below surface, depending on local geology, and was the primary artesian target for deep municipal wells drilled in the Chicago metropolitan region during the 1880s and 1890s.",
+        "fact_id": "st_peter_sandstone_depth_illinois",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "artesian_pressure_st_peter",
-        "content": "Artesian wells completed in the St. Peter Sandstone in the Chicago region during the late nineteenth century typically exhibited static head pressures sufficient to raise water 50 to 200 feet above the surface casing collar, with flow rates at completion ranging from 50,000 to over 500,000 gallons per day depending on bore diameter and local aquifer conditions.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "U.S. Geological Survey Water-Supply Paper No. 114 (1905); Illinois State Water Survey, Historical Well Records",
-          "url": null,
           "access_note": null
         },
+        "content": "Artesian wells completed in the St. Peter Sandstone in the Chicago region during the late nineteenth century typically exhibited static head pressures sufficient to raise water 50 to 200 feet above the surface casing collar, with flow rates at completion ranging from 50,000 to over 500,000 gallons per day depending on bore diameter and local aquifer conditions.",
+        "fact_id": "artesian_pressure_st_peter",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "western_springs_village_incorporation",
-        "content": "Western Springs, Illinois was incorporated as a village in 1886, placing its early municipal infrastructure projects — including water supply development — within the governance framework of a village board with elected aldermen and a village president.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Village of Western Springs, Illinois, Municipal Records; Cook County incorporation filings, 1886",
-          "url": null,
           "access_note": null
         },
+        "content": "Western Springs, Illinois was incorporated as a village in 1886, placing its early municipal infrastructure projects — including water supply development — within the governance framework of a village board with elected aldermen and a village president.",
+        "fact_id": "western_springs_village_incorporation",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "cable_tool_vs_rotary_drill_1890s",
-        "content": "Deep artesian well drilling in Illinois during the 1880s and 1890s was performed primarily by cable-tool (percussion) methods; rotary drilling technology was not in widespread use for municipal water wells in the Midwest until after 1900, meaning a rotary table and associated torque gauge on an 1890s Illinois well project represents an advanced or experimental installation for the period.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); E.E. Brainerd, 'Deep Well Drilling in Illinois,' Engineering News, 1893",
-          "url": null,
           "access_note": null
         },
+        "content": "Deep artesian well drilling in Illinois during the 1880s and 1890s was performed primarily by cable-tool (percussion) methods; rotary drilling technology was not in widespread use for municipal water wells in the Midwest until after 1900, meaning a rotary table and associated torque gauge on an 1890s Illinois well project represents an advanced or experimental installation for the period.",
+        "fact_id": "cable_tool_vs_rotary_drill_1890s",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "drill_string_failure_torque_threshold",
-        "content": "Wrought iron drill pipe used in deep well boring during the late nineteenth century was rated for tensile loads but was vulnerable to torsional failure when rotary torque exceeded the pipe's yield point; excessive brake resistance on a rotary table transmitted directly to the drill string as torsional stress, and a sudden release after over-torquing could snap the string at a tool joint.",
         "domain": "other",
         "source": {
-          "citation": "C.A. Ashburner, 'Notes on Rotary Drilling,' Transactions of the American Institute of Mining Engineers, 1896",
           "url": null,
+          "citation": "C.A. Ashburner, 'Notes on Rotary Drilling,' Transactions of the American Institute of Mining Engineers, 1896",
           "access_note": null
         },
+        "content": "Wrought iron drill pipe used in deep well boring during the late nineteenth century was rated for tensile loads but was vulnerable to torsional failure when rotary torque exceeded the pipe's yield point; excessive brake resistance on a rotary table transmitted directly to the drill string as torsional stress, and a sudden release after over-torquing could snap the string at a tool joint.",
+        "fact_id": "drill_string_failure_torque_threshold",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "boiler_operating_pressure_1890s_field",
-        "content": "Portable and semi-portable steam boilers used to power well-drilling equipment in the 1890s typically operated at working pressures between 60 and 100 PSI; relief valves were set at or near the maximum allowable working pressure stamped on the boiler shell, and sustained operation above that threshold risked seam failure or fitting rupture.",
         "domain": "power",
         "source": {
-          "citation": "ASME Boiler Code predecessor standards; Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition",
           "url": null,
+          "citation": "ASME Boiler Code predecessor standards; Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition",
           "access_note": null
         },
+        "content": "Portable and semi-portable steam boilers used to power well-drilling equipment in the 1890s typically operated at working pressures between 60 and 100 PSI; relief valves were set at or near the maximum allowable working pressure stamped on the boiler shell, and sustained operation above that threshold risked seam failure or fitting rupture.",
+        "fact_id": "boiler_operating_pressure_1890s_field",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "municipal_bond_issuance_illinois_villages",
-        "content": "Under Illinois law in the 1890s, a village could issue general obligation bonds for public works — including water supply infrastructure — only upon approval by the village board and, for amounts above specified thresholds, subject to a public petition or referendum process; bond certificates required the signatures of the village president and attesting officers.",
         "domain": "other",
         "source": {
-          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), 1891 edition; Illinois Supreme Court, Village of Hyde Park v. Blair, 1890",
           "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), 1891 edition; Illinois Supreme Court, Village of Hyde Park v. Blair, 1890",
           "access_note": null
         },
+        "content": "Under Illinois law in the 1890s, a village could issue general obligation bonds for public works — including water supply infrastructure — only upon approval by the village board and, for amounts above specified thresholds, subject to a public petition or referendum process; bond certificates required the signatures of the village president and attesting officers.",
+        "fact_id": "municipal_bond_issuance_illinois_villages",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "benezette_williams_engineer_record",
-        "content": "Benezette Williams was a practicing civil engineer in Illinois during the late nineteenth century; Benezette Williams operated an independent civil engineering practice in the Chicago metropolitan region, serving as the sole Chief Engineer for the Western Springs municipal infrastructure and water supply projects of 1892.",
         "domain": "personnel",
         "source": {
-          "citation": "Illinois Society of Civil Engineers membership records; Chicago city directories, 1880s–1890s",
           "url": null,
+          "citation": "Illinois Society of Civil Engineers membership records; Chicago city directories, 1880s–1890s",
           "access_note": null
         },
+        "content": "Benezette Williams was a practicing civil engineer in Illinois during the late nineteenth century; Benezette Williams operated an independent civil engineering practice in the Chicago metropolitan region, serving as the sole Chief Engineer for the Western Springs municipal infrastructure and water supply projects of 1892.",
+        "fact_id": "benezette_williams_engineer_record",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "cbq_railroad_western_springs_service",
-        "content": "The Chicago, Burlington and Quincy Railroad (CBQ) operated a line through Western Springs, Illinois, with the Western Springs depot serving as a regular stop; CBQ locomotive crews on the Aurora branch ran overnight freight and early morning passenger consists through the village, placing a CBQ fireman in a position to observe the station and adjacent properties during nighttime hours.",
         "domain": "navigation",
         "source": {
+          "url": null,
           "citation": "Chicago, Burlington and Quincy Railroad, Annual Report, 1890; Illinois Railroad and Warehouse Commission records",
-          "url": null,
           "access_note": null
         },
+        "content": "The Chicago, Burlington and Quincy Railroad (CBQ) operated a line through Western Springs, Illinois, with the Western Springs depot serving as a regular stop; CBQ locomotive crews on the Aurora branch ran overnight freight and early morning passenger consists through the village, placing a CBQ fireman in a position to observe the station and adjacent properties during nighttime hours.",
+        "fact_id": "cbq_railroad_western_springs_service",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "shale_fault_core_sample_identification",
-        "content": "During deep well drilling in Illinois, shale interbeds and fault zones within the Cambrian and Ordovician sequence above the St. Peter Sandstone were identifiable in core and cutting samples by the presence of dark grey to black fissile shale fragments and by anomalous increases in drilling resistance; competent field engineers were expected to log these occurrences and adjust the drill program accordingly.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Illinois State Geological Survey, Bulletin No. 8 (1906); Stuart Weller, 'Geology of the Chicago Area,' 1900",
-          "url": null,
           "access_note": null
         },
+        "content": "During deep well drilling in Illinois, shale interbeds and fault zones within the Cambrian and Ordovician sequence above the St. Peter Sandstone were identifiable in core and cutting samples by the presence of dark grey to black fissile shale fragments and by anomalous increases in drilling resistance; competent field engineers were expected to log these occurrences and adjust the drill program accordingly.",
+        "fact_id": "shale_fault_core_sample_identification",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "bore_log_legal_status_illinois",
-        "content": "In Illinois municipal well projects of the 1890s, the daily bore log maintained by the supervising engineer constituted the primary technical record of the work and was the evidentiary basis for certifying completion and authorizing payment under the construction contract; alteration or destruction of bore log entries could constitute fraud against the municipality.",
         "domain": "other",
         "source": {
-          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), forgery provisions, 1891; standard municipal engineering contract language of the period",
           "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), forgery provisions, 1891; standard municipal engineering contract language of the period",
           "access_note": null
         },
+        "content": "In Illinois municipal well projects of the 1890s, the daily bore log maintained by the supervising engineer constituted the primary technical record of the work and was the evidentiary basis for certifying completion and authorizing payment under the construction contract; alteration or destruction of bore log entries could constitute fraud against the municipality.",
+        "fact_id": "bore_log_legal_status_illinois",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "coal_feed_valve_boiler_function",
-        "content": "On a fire-tube boiler of the 1890s, the coal-feed or stoker-feed valve controlled the rate of fuel delivery to the firebox; holding this valve artificially open beyond the operator's set position would cause the fire to burn hotter than intended, accelerating steam generation and driving boiler pressure upward toward the relief valve setting over a period of one to three hours depending on boiler size and initial water temperature.",
         "domain": "power",
         "source": {
+          "url": null,
           "citation": "Babcock & Wilcox, 'Steam: Its Generation and Use,' 1889 edition; Kent's Mechanical Engineers' Pocket-Book, 1895",
-          "url": null,
           "access_note": null
         },
+        "content": "On a fire-tube boiler of the 1890s, the coal-feed or stoker-feed valve controlled the rate of fuel delivery to the firebox; holding this valve artificially open beyond the operator's set position would cause the fire to burn hotter than intended, accelerating steam generation and driving boiler pressure upward toward the relief valve setting over a period of one to three hours depending on boiler size and initial water temperature.",
+        "fact_id": "coal_feed_valve_boiler_function",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "white_oak_identification_grain",
-        "content": "White oak (Quercus alba) is identifiable by its straight, coarse grain, light tan to pale brown color, and the presence of tyloses in the pores, which give it a characteristic ray-fleck pattern on radial surfaces; it was a standard material for office furniture manufacture in the Midwest during the 1880s and 1890s and was readily distinguishable from red oak or other species by a trained observer.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "U.S. Department of Agriculture, Division of Forestry, Bulletin No. 10 (1891); standard cabinet-making references of the period",
-          "url": null,
           "access_note": null
         },
+        "content": "White oak (Quercus alba) is identifiable by its straight, coarse grain, light tan to pale brown color, and the presence of tyloses in the pores, which give it a characteristic ray-fleck pattern on radial surfaces; it was a standard material for office furniture manufacture in the Midwest during the 1880s and 1890s and was readily distinguishable from red oak or other species by a trained observer.",
+        "fact_id": "white_oak_identification_grain",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "document_forgery_signature_analysis",
-        "content": "Questioned document examination in the nineteenth century relied on direct visual comparison of letter forms, pen pressure, and habitual writing characteristics; courts and investigators of the period accepted testimony from individuals familiar with a signatory's habitual hand as evidence of forgery, and differences in specific letterforms — such as the construction of capital B or the crossbar length of lowercase t — were treated as material indicators.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "William E. Hagan, 'Disputed Handwriting,' 1894; standard legal practice in Illinois courts, 1890s",
-          "url": null,
           "access_note": null
         },
+        "content": "Questioned document examination in the nineteenth century relied on direct visual comparison of letter forms, pen pressure, and habitual writing characteristics; courts and investigators of the period accepted testimony from individuals familiar with a signatory's habitual hand as evidence of forgery, and differences in specific letterforms — such as the construction of capital B or the crossbar length of lowercase t — were treated as material indicators.",
+        "fact_id": "document_forgery_signature_analysis",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "pipe_wrench_jaw_diameter_matching",
-        "content": "A Stillson-pattern pipe wrench of the 1890s had adjustable jaws set by a knurled nut; once set to grip a specific diameter, the jaw opening remained fixed until readjusted, and the jaw width could be measured and compared to the diameter of any fitting it had been used on — a standard investigative technique for connecting a tool to a specific point of use.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Daniel C. Stillson patent (U.S. Patent No. 95,744, 1869); standard mechanical engineering reference practice",
-          "url": null,
           "access_note": null
         },
+        "content": "A Stillson-pattern pipe wrench of the 1890s had adjustable jaws set by a knurled nut; once set to grip a specific diameter, the jaw opening remained fixed until readjusted, and the jaw width could be measured and compared to the diameter of any fitting it had been used on — a standard investigative technique for connecting a tool to a specific point of use.",
+        "fact_id": "pipe_wrench_jaw_diameter_matching",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "chicago_financial_agency_retainer_practice",
-        "content": "Chicago-based financial agencies and bond underwriting firms in the 1890s routinely paid retainers to local engineers, attorneys, or officials who could provide inside information on municipal bond issuances or influence the terms of bond certifications; such payments were not per se illegal under Illinois law of the period but could constitute bribery or fraud if connected to the falsification of public documents.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Illinois Revised Statutes, Chapter 38 (Criminal Code), bribery provisions, 1891; contemporary accounts of municipal bond market practices in the Chicago Tribune, 1890s",
-          "url": null,
           "access_note": null
         },
+        "content": "Chicago-based financial agencies and bond underwriting firms in the 1890s routinely paid retainers to local engineers, attorneys, or officials who could provide inside information on municipal bond issuances or influence the terms of bond certifications; such payments were not per se illegal under Illinois law of the period but could constitute bribery or fraud if connected to the falsification of public documents.",
+        "fact_id": "chicago_financial_agency_retainer_practice",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "trench_collapse_soil_conditions_illinois",
-        "content": "Shallow trenching in the glacial till and lacustrine clay soils characteristic of northeastern Illinois presented a recognized collapse hazard in the 1890s, particularly when trench walls were unsupported and soil moisture was elevated; a trench collapse in a construction perimeter zone was a foreseeable emergency requiring immediate response from site supervisory personnel.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Engineering News, 'Trench Accidents in Clay Soils,' 1893; Illinois Bureau of Labor Statistics, Annual Report, 1894",
-          "url": null,
           "access_note": null
         },
+        "content": "Shallow trenching in the glacial till and lacustrine clay soils characteristic of northeastern Illinois presented a recognized collapse hazard in the 1890s, particularly when trench walls were unsupported and soil moisture was elevated; a trench collapse in a construction perimeter zone was a foreseeable emergency requiring immediate response from site supervisory personnel.",
+        "fact_id": "trench_collapse_soil_conditions_illinois",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "night_marshal_authority_illinois_village",
-        "content": "Under Illinois village law of the 1890s, a night marshal or night watchman appointed by the village board had authority to detain persons found on village property under suspicious circumstances, to secure evidence of crimes against village property, and to swear complaints before a justice of the peace; the night marshal's sworn complaint was sufficient to authorize a search of a private person's effects when probable cause was stated.",
         "domain": "other",
         "source": {
-          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), police powers provisions, 1891",
           "url": null,
+          "citation": "Illinois Revised Statutes, Chapter 24 (Municipal Code), police powers provisions, 1891",
           "access_note": null
         },
+        "content": "Under Illinois village law of the 1890s, a night marshal or night watchman appointed by the village board had authority to detain persons found on village property under suspicious circumstances, to secure evidence of crimes against village property, and to swear complaints before a justice of the peace; the night marshal's sworn complaint was sufficient to authorize a search of a private person's effects when probable cause was stated.",
+        "fact_id": "night_marshal_authority_illinois_village",
         "valid_from": null,
         "valid_until": null
       }
@@ -498,32 +506,32 @@
   "openingSituation": "",
   "review_checklist": {
     "beat_count": {
-      "checked": true,
-      "notes": ""
+      "notes": "",
+      "checked": true
     },
     "sequence_check": {
-      "checked": true,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": true,
-      "notes": ""
+      "notes": "",
+      "checked": true
     },
     "final_beat_spec": {
-      "checked": true,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": true,
-      "notes": ""
+      "notes": "",
+      "checked": true
     },
     "reviewer_summary": {
-      "checked": true,
-      "notes": ""
+      "notes": "",
+      "checked": true
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": true
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": true
     },
     "manual_playthrough": {
-      "checked": true,
-      "notes": ""
+      "notes": "",
+      "checked": true
     }
   },
   "historicalRealism": "high",
@@ -700,12 +708,5 @@
     "The pressure test is certified at only 52,000 gallons — technically a pass, but the board imposes a reduced bond allocation that leaves the tower's upper iron tank only half-fitted."
   ],
   "structured_endings_enabled": false,
-  "image": {
-    "url": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_wide.jpg",
-    "shortUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_short.jpg",
-    "sourceUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/artesian_height_1892_source.jpg",
-    "generation_prompt": "The late afternoon sun of August 1892 burns low and amber across the flat Illinois prairie, casting long copper shadows over the construction site at Western Springs. At the center of the scene rises the nearly-finished artesian water tower — a commanding cylindrical structure of rough-cut limestone blocks, its crenellated parapet still raw and pale against the darkening sky, scaffold planking clinging to its upper third like the ribs of an unfinished cage. A derrick arm juts from the summit at a fractured angle, rope tackle hanging slack and motionless, betraying the stillness of a mechanism that should be turning.\n\nThirty feet below ground level, invisible but felt in every man's posture, the drill string sits bound fast in two thousand feet of black earth.\n\nThree figures occupy the foreground in attitudes of barely controlled tension. The Chief Engineer — a broad-shouldered man of fifty in a sweat-darkened linen vest and rolled shirtsleeves, his leather-bound ledger pressed against his chest like a shield — stands at the pressure gauge mounted to the wellhead housing, his jaw set, eyes narrowed at a reading that refuses to lie for him. Beside the stone pump house wall, the Plant Engineer crouches over a scatter of technical drawings weighted down by pipe couplings, his young face pale beneath its grime, one finger tracing a calculation he's made three times and will make again. Slightly apart from both, the Night Marshal stands with his thumbs hooked at his belt, a silver star catching the last of the daylight, watching the engineers the way a man watches a bridge he isn't sure will hold.\n\nThe air smells of mineral water, machine oil, and coming storm. Thunderheads are building in the northwest, their undersides bruised purple-green, and the wind has begun lifting loose shavings from the scaffold boards. A single kerosene work lantern hung from the derrick's lower strut swings in that wind, sending shadows crawling across the limestone face of the tower in slow, uncertain arcs.\n\nThe mood is one of compressed catastrophe — the precise, suffocating stillness before something gives way. The viewer should feel the weight of reputation, public money, and geological pressure converging on this single half-hour, and understand that the tower's beauty and the crisis below it are entirely inseparable."
-  },
-  "status": "published",
-  "glossary": []
+  "displayOrder": 99
 }

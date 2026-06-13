@@ -1,0 +1,766 @@
+{
+  "id": "breach_of_the_sacred_house",
+  "tone": [],
+  "genre": [
+    "historical",
+    "thriller",
+    "survival"
+  ],
+  "title": "Breach of the Sacred House",
+  "premise": "Three people — a Capitol Police officer, a Senate staffer, and a photojournalist — must navigate the catastrophic security collapse of the U.S. Capitol on January 6, 2021, between 2:10 and 2:40 PM. Each carries knowledge the others lack. Together or separately, they must protect lives, preserve evidence, and survive the most violent breach of the legislative building since 1814.",
+  "systems": {
+    "scales": {
+      "threat": {
+        "max": 10,
+        "min": 0,
+        "default": 4
+      },
+      "authorityTrust": {
+        "max": 5,
+        "min": -3,
+        "default": 1
+      },
+      "perimeter_integrity_pct": {
+        "max": 100,
+        "min": 0,
+        "default": 72
+      },
+      "tactical_friction_level": {
+        "max": 2,
+        "min": 0,
+        "labels": [
+          "Low",
+          "Moderate",
+          "Extreme"
+        ],
+        "default": 1
+      },
+      "evacuation_progress_index": {
+        "max": 100,
+        "min": 1,
+        "default": 18
+      }
+    },
+    "pressureEvents": [
+      "At 2:14 PM the bicycle-rack perimeter on the Lower West Terrace collapses under crowd pressure; Perimeter_Integrity_Pct drops 22 points automatically.",
+      "By approximately 2:20 PM multiple Senate Wing access points and window areas had been breached or compromised; Tactical_Friction_Level escalates to Extreme as bear spray and glass dust saturate the interior air.",
+      "At 2:28 PM the Capitol Police radio network fragments into overlapping distress calls; all NPC coordination actions cost double time tokens until the end of Act III.",
+      "At 2:33 PM the hideaway corridor maglocks lose power during a partial electrical surge; locked doors in the Senate Wing default to unsecured.",
+      "At 2:38 PM the Vice President's motorcade departs the Senate Chamber; Evacuation_Progress_Index receives a forced +30 bonus but the player's window for influencing routing closes permanently."
+    ],
+    "timePerTurnDefault": 2
+  },
+  "version": "1.0.0",
+  "epilogue": {
+    "reviewed": true,
+    "generated": true,
+    "open_threads": [
+      {
+        "thread_id": "210_pm_each",
+        "historical_record": "The precise deployment positions of individual Capitol Police officers and Senate staff at 2:10 PM on January 6, 2021 were not comprehensively reconstructed in the public record. The Senate Select Committee established a general timeline of the breach but did not publish a granular account of every officer's or staffer's position at the moment the joint session was underway. The Capitol Police After-Action Review, portions of which remain non-public, addressed deployment gaps but its full findings have not been released."
+      },
+      {
+        "thread_id": "212_pm_the",
+        "historical_record": "Video and photographic evidence confirmed that bicycle rack barriers and snow fencing on the Capitol grounds were breached beginning in the early afternoon of January 6, 2021. The Senate Select Committee established that Capitol Police were aware of crowd pressure on the perimeter barriers before 2:12 PM. Whether and when specific warnings about imminent perimeter failure were communicated to officers inside the building was a subject of the Select Committee's inquiry into command-and-control failures. The Committee found that Capitol Police leadership did not request National Guard assistance until after the building had been breached."
+      },
+      {
+        "thread_id": "214_pm_the",
+        "historical_record": "The outer perimeter of the Capitol building was breached at approximately 2:12 PM on January 6, 2021. Video evidence confirmed that rioters entered the Capitol through the Senate Wing door at approximately 2:12 to 2:13 PM. The Senate Select Committee documented that officers at exterior positions faced the choice of holding or falling back as the crowd surged. The Committee found that no coherent fallback order was issued to officers at exterior positions before the building was entered. Individual officer decisions at this moment were not reconstructed in the public record."
+      },
+      {
+        "thread_id": "216_pm_jenkins",
+        "historical_record": "The Select Committee documented that rioters moved through Senate Wing corridors beginning at approximately 2:13 PM. Hideaway offices in the Senate Wing were used by staff and members for shelter during the breach. Whether specific doors in the hideaway corridor were locked, barricaded, or left unsecured at this time was not addressed in the public portions of the Select Committee's findings. The Committee did document that some staff sheltered in locked offices while others evacuated through service corridors."
+      },
+      {
+        "thread_id": "218_pm_the",
+        "historical_record": "The Senate Wing window on the northwest side of the Capitol was broken by rioters on January 6, 2021. Video evidence confirmed this breach. The precise time at which the window was broken was documented in the Select Committee's timeline. The Committee did not publish a comprehensive account of the tactical effect of this breach on officer positioning or staff evacuation routing in the immediate minutes following."
+      },
+      {
+        "thread_id": "220_pm_vances",
+        "historical_record": "Capitol Police officers encountered rioters in interior corridors of the Capitol beginning at approximately 2:13 PM on January 6, 2021. The Select Committee documented multiple instances of officers being separated from their units due to crowd pressure and radio failure. Officer Eugene Goodman, a Capitol Police officer, was documented on video redirecting a crowd of rioters away from the Senate chamber at approximately 2:14 PM. The Committee found that unit cohesion among Capitol Police broke down in multiple locations during the breach. The specific decisions made by individual officers regarding unit separation were not reconstructed in the public record."
+      },
+      {
+        "thread_id": "222_pm_jenkins",
+        "historical_record": "The physical custody and routing of the electoral certificates during the evacuation of the Senate on January 6, 2021 was addressed in the Select Committee's findings. The Committee confirmed that the certificates were evacuated with Senate staff and were not seized. The specific individuals responsible for carrying the certificates during the evacuation and the routes they used were not detailed in the public portions of the Committee's report. The Senate Parliamentarian and senior clerks were among those involved in the evacuation of the Senate chamber."
+      },
+      {
+        "thread_id": "224_pm_aris",
+        "historical_record": "Journalists and credentialed press were present inside and outside the Capitol on January 6, 2021. Some journalists entered the building as the crowd breached it. The Select Committee and the Department of Justice both investigated the presence of individuals who photographed security infrastructure, door mechanisms, and restricted areas inside the Capitol. The Committee found evidence of coordination among some participants but did not publish a comprehensive account of every individual who engaged in this activity. The question of which individuals inside the Capitol on January 6 were acting in a coordinated capacity versus acting spontaneously remained a subject of ongoing DOJ prosecution through 2024."
+      },
+      {
+        "thread_id": "226_pm_the",
+        "historical_record": "The Senate Select Committee found that Capitol Police radio communications experienced significant failures on January 6, 2021. The Committee documented that officers were unable to reach dispatch or command on primary radio channels during the breach. A Washington Post and ProPublica investigation published in 2021 reported that Capitol Police radio channels were overwhelmed and that some officers switched to backup channels that were not monitored by all units. The precise time at which radio coordination became non-functional across the Senate Wing was not established with specificity in the public record. The Capitol Police After-Action Review addressed radio failures but its full findings have not been publicly released."
+      },
+      {
+        "thread_id": "228_pm_the",
+        "historical_record": "The Select Committee documented that the Capitol's security systems, including electronic access controls, experienced disruptions during the breach on January 6, 2021. Whether and when maglocks or electronic door locks in the Senate Wing lost power or defaulted to an unsecured state was not addressed with specificity in the public portions of the Committee's findings. The question of whether any security system failures facilitated access to restricted areas was raised in the Committee's inquiry but was not resolved in the public record. The Capitol Police After-Action Review addressed security system performance but its full findings have not been released."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "210_pm_each",
+        "historical_record": "At approximately 2:10 PM on January 6, 2021, the joint session of Congress was underway in the House chamber, having convened at 1:00 PM. Vice President Mike Pence had gaveled the session to order. Capitol Police were deployed at exterior and interior positions. The Senate Wing of the Capitol was staffed by officers on the Senate Wing Detail. Rioters had already breached the outer grounds perimeter and were on the Capitol steps. No general evacuation order had been issued at this time."
+      },
+      {
+        "beat_id": "212_pm_the",
+        "historical_record": "At approximately 2:12 PM on January 6, 2021, rioters breached the Capitol building through the Senate Wing door on the northwest side. Video evidence confirmed the sound and sight of barriers failing and crowds surging onto the terrace steps in the minutes preceding this breach. Capitol Police were present at the door and were overwhelmed by the crowd. This was the first physical entry into the Capitol building by rioters on January 6, 2021."
+      },
+      {
+        "beat_id": "214_pm_the",
+        "historical_record": "Following the breach of the Senate Wing door at approximately 2:12 to 2:13 PM, rioters moved into the Senate Wing corridors. Video evidence documented Capitol Police officers falling back from exterior positions as the crowd entered. No coordinated fallback order was documented as having been issued to exterior officers before the breach. Officer Eugene Goodman was documented redirecting a crowd away from the Senate chamber at approximately 2:14 PM, a decision made without a direct order from command."
+      },
+      {
+        "beat_id": "216_pm_jenkins",
+        "historical_record": "Rioters were documented moving through Senate Wing corridors beginning at approximately 2:13 PM on January 6, 2021. The Select Committee documented that some staff and members sheltered in locked offices in the Senate Wing while others evacuated. Senator Mitt Romney was documented on video being redirected away from the Senate chamber toward the rioters by Officer Goodman at approximately 2:14 PM. The Senate chamber itself was not entered by rioters until approximately 2:44 PM."
+      },
+      {
+        "beat_id": "218_pm_the",
+        "historical_record": "A window in the Senate Wing of the Capitol was broken by rioters on January 6, 2021. Video evidence confirmed this breach. Rioters entered through broken windows in addition to doors during the breach. The Select Committee's timeline placed window breaches in the Senate Wing area in the period between approximately 2:13 PM and 2:30 PM. The specific time of the Senate Wing window breach was documented in video evidence reviewed by the Committee."
+      },
+      {
+        "beat_id": "220_pm_vances",
+        "historical_record": "Capitol Police officers encountered rioters in interior corridors beginning at approximately 2:13 PM on January 6, 2021. Officer Eugene Goodman was documented alone in a Senate corridor redirecting rioters at approximately 2:14 PM. The Select Committee found that unit cohesion broke down in multiple locations. More than 140 officers were reported injured. The Committee documented that officers made individual decisions about positioning and engagement without coordinated command direction during the breach."
+      },
+      {
+        "beat_id": "222_pm_jenkins",
+        "historical_record": "The Senate was gaveled into recess and evacuated at approximately 2:30 PM on January 6, 2021. The electoral certificates were evacuated with Senate staff. The Select Committee confirmed the certificates were not seized or destroyed. Senior Senate clerks and Sergeant at Arms staff were involved in the evacuation of the chamber. The certificates were used when the joint session resumed at approximately 8:00 PM and certification was completed at approximately 3:40 AM on January 7, 2021."
+      },
+      {
+        "beat_id": "224_pm_aris",
+        "historical_record": "Journalists were present inside the Capitol during the breach on January 6, 2021. The Department of Justice investigated individuals who photographed security infrastructure inside the Capitol. As of 2024, DOJ had charged more than 1,200 individuals in connection with January 6, with charges including obstruction of an official proceeding, civil disorder, and seditious conspiracy. Individuals documented photographing door mechanisms and security features were among those investigated. The presence of credentialed press inside the building during the breach was documented in video and photographic evidence reviewed by the Select Committee."
+      },
+      {
+        "beat_id": "226_pm_the",
+        "historical_record": "Capitol Police radio transmissions experienced severe operational degradation due to emergency traffic saturation, preventing systemic coordination within the Senate Wing. The Department of Defense timeline and subsequent congressional reports confirm that the first detachment of the District of Columbia National Guard arrived at the Capitol complex at 5:40 PM, following the signing of the operational execution order by the Acting Secretary of Defense. The building was officially declared secure at 8:00 PM."
+      },
+      {
+        "beat_id": "228_pm_the",
+        "historical_record": "The Select Committee documented disruptions to Capitol security systems during the breach on January 6, 2021. The question of whether electronic access controls defaulted to an unsecured state during the breach was raised in the Committee's inquiry. The Capitol Police After-Action Review addressed security system performance. Rioters were documented accessing areas of the Capitol that were normally secured, including Senate offices and the Senate chamber floor, which rioters entered at 2:50 PM on January 6, 2021."
+      }
+    ],
+    "character_fates": [
+      {
+        "name": "Corporal Dana Reyes",
+        "outcome": "unknown",
+        "character_id": "npc_corporal_reyes",
+        "primary_source": null,
+        "historical_record": "Capitol Police officers assigned to the Senate Wing Detail on January 6, 2021 faced direct physical confrontation as the building was breached beginning at approximately 2:12 PM. Officers in the Lower West Terrace and Senate Wing areas were among those who sustained injuries, were separated from their units, or were forced to fall back through interior corridors as the perimeter collapsed. The Senate Select Committee to Investigate the January 6th Attack documented that Capitol Police were significantly outnumbered and that radio communications failed during the critical window between approximately 2:25 PM and 3:00 PM, leaving individual officers without coordinated command. More than 140 police officers were reported injured on January 6, 2021. The names and specific assignments of individual officers below the rank of lieutenant were not comprehensively entered into the public record."
+      },
+      {
+        "name": "Deputy Clerk Miriam Osei",
+        "outcome": "unknown",
+        "character_id": "npc_deputy_clerk_osei",
+        "primary_source": null,
+        "historical_record": "Senate clerks and certification staff present in the Capitol on January 6, 2021 were responsible for the physical custody of the electoral certificates submitted by the states. When the Senate chamber was evacuated at approximately 2:30 PM, staff carried the mahogany boxes containing the electoral certificates with them. Senate Sergeant at Arms staff and clerks were evacuated through secure corridors. The Senate Parliamentarian and senior clerks were among those who ensured the certificates were not left behind during the evacuation. The Senate resumed the joint session and completed certification at approximately 3:40 AM on January 7, 2021, with the certificates intact. The names of individual deputy clerks and their specific movements during the evacuation were not entered into the public congressional record."
+      },
+      {
+        "name": "Gregory Whitmore",
+        "outcome": "unknown",
+        "character_id": "npc_senator_aide_whitmore",
+        "primary_source": null,
+        "historical_record": "Senior legislative staff and Senate aides present in the Capitol complex on January 6, 2021 were evacuated through a combination of secure corridors, hideaway offices, and Capitol Police-directed routes. Some staff sheltered in place in locked offices for periods exceeding two hours. The Senate Select Committee documented that staff in the Senate wing were among the last to receive coherent evacuation guidance due to radio network fragmentation. Several aides to Republican senators who had publicly supported objections to certification were later interviewed by the Select Committee. The specific movements and decisions of individual legislative directors during the breach were not comprehensively documented in the public record."
+      },
+      {
+        "name": "Pete Kowalski",
+        "outcome": "unknown",
+        "character_id": "npc_facilities_worker_kowalski",
+        "primary_source": null,
+        "historical_record": "Capitol facilities and maintenance workers were present in the building on January 6, 2021 and were not part of standard evacuation protocols designed for members, staff, or law enforcement. The Senate Select Committee and the Capitol Police After-Action Review both noted gaps in emergency communication that affected non-law-enforcement building personnel. Maintenance workers in the Capitol complex on that date were in some cases sheltered in place in utility corridors and service areas without direct law enforcement escort. Their names and specific experiences were not entered into the public congressional or investigative record."
+      },
+      {
+        "name": "Raymond Cho",
+        "outcome": "unknown",
+        "character_id": "npc_raymond_cho",
+        "primary_source": null,
+        "historical_record": "Among the individuals who entered the Capitol on January 6, 2021, investigators documented a subset who engaged in what the Department of Justice described as organized or coordinated activity, including photographing security infrastructure, door mechanisms, and restricted areas. As of the public record available through 2024, the Department of Justice had charged more than 1,200 individuals in connection with the January 6 breach. Charges ranged from misdemeanor trespassing to seditious conspiracy. Individuals documented photographing security features inside the Capitol were among those charged with obstruction of an official proceeding and other felonies. The specific identities of all individuals who engaged in this activity were not fully established in the public record."
+      },
+      {
+        "name": "Sergeant Felix Delgado",
+        "outcome": "unknown",
+        "character_id": "npc_sergeant_delgado",
+        "primary_source": null,
+        "historical_record": "Capitol Police sergeants assigned to the Senate Wing Detail on January 6, 2021 were among the officers who experienced direct physical confrontation and unit separation as the building was breached. The Senate Select Committee documented that the Capitol Police radio network experienced significant fragmentation beginning at approximately 2:25 PM, which resulted in officers losing contact with their units and with command. Officer separation was documented in multiple after-action accounts. More than 140 officers were reported injured. The U.S. Capitol Police After-Action Review, portions of which were released publicly, noted command-and-control failures that left sergeants and corporals without reliable communication during the critical breach window. The names and specific fates of individual sergeants were not comprehensively entered into the public record."
+      }
+    ],
+    "historical_frame": [
+      "January 6, 2021 was the first time the United States Capitol had been breached by a hostile force since British troops burned the building on August 24, 1814.",
+      "The joint session of Congress convened on January 6, 2021 to certify the Electoral College results under the Electoral Count Act of 1887, a process that had proceeded without interruption since the act's passage.",
+      "The Senate Select Committee to Investigate the January 6th Attack on the United States Capitol, established by Senate Resolution 503 on June 30, 2021, conducted more than 1,000 witness interviews and reviewed more than one million documents before issuing its final report on December 22, 2022."
+    ],
+    "immediate_outcome": {
+      "summary": "On January 6, 2021, a crowd breached the United States Capitol beginning at approximately 2:12 PM while a Joint Session of Congress was in the process of certifying the Electoral College results of the 2020 presidential election. Both chambers suspended their proceedings and were evacuated. The Capitol was secured and the joint session resumed at approximately 8:00 PM, with certification of the electoral votes completed at approximately 3:40 AM on January 7, 2021.",
+      "key_facts": [
+        "The outer perimeter of the Capitol grounds was breached at approximately 12:53 PM on January 6, 2021.",
+        "Rioters first entered the Capitol building at approximately 2:12 PM on January 6, 2021, through the Senate Wing door on the northwest side.",
+        "The Senate was gaveled into recess and evacuated at approximately 2:30 PM on January 6, 2021.",
+        "The House chamber entered lockdown and evacuation procedures during the breach escalation around 2:30 PM.",
+        "A citywide curfew was imposed in Washington, D.C. beginning at 6:00 PM on January 6, 2021.",
+        "Law enforcement announced that the Capitol had been secured by early evening on January 6, 2021, though isolated security sweeps and investigations continued afterward.",
+        "The joint session of Congress resumed at approximately 8:00 PM on January 6, 2021.",
+        "Certification of the 2020 presidential electoral vote was completed at approximately 3:40 AM on January 7, 2021.",
+        "More than 140 police officers were reported injured on January 6, 2021.",
+        "As of 2024, the Department of Justice had charged more than 1,200 individuals in connection with the events of January 6, 2021.",
+        "Five people died in connection with the events of January 6, 2021, including Capitol Police Officer Brian Sicknick, who died on January 7, 2021.",
+        "The mahogany boxes containing the electoral certificates were evacuated with Senate staff and were not seized or destroyed."
+      ]
+    }
+  },
+  "glossary": [
+    {
+      "term": "Standing Committee of Correspondents",
+      "source": "",
+      "approved": true,
+      "definition": "The body that issues press credentials for Capitol access, which include provisions for wireless network access within the building."
+    },
+    {
+      "term": "Capitol Police Chief",
+      "source": "",
+      "approved": true,
+      "definition": "The commanding officer of the United States Capitol Police — Steven Sund held this position on January 6 and bore responsibility for the force of approximately 2,300 sworn officers."
+    },
+    {
+      "term": "District of Columbia National Guard",
+      "source": "",
+      "approved": true,
+      "definition": "The military reserve force for the nation's capital, not authorized to deploy to the Capitol until 3:00 PM and not arriving in force until after 5:00 PM on January 6."
+    },
+    {
+      "term": "Senate Wing Door",
+      "source": "",
+      "approved": true,
+      "definition": "The entry point to the Senate Wing interior, adjacent to where a window was shattered to allow the first confirmed entry into the Capitol building's interior at 2:13 PM."
+    },
+    {
+      "term": "West Front",
+      "source": "",
+      "approved": true,
+      "definition": "The western perimeter of the Capitol building facing the National Mall, where the outer security fencing was initially breached at 1:00 PM on January 6."
+    },
+    {
+      "term": "ANSI/BHMA Grade 1 padlock",
+      "source": "",
+      "approved": true,
+      "definition": "A high-security padlock standard used on secondary Capitol security doors; the shackles can be cut by bolt cutters with a 9/16-inch jaw capacity or larger."
+    },
+    {
+      "term": "Objection to an electoral vote",
+      "source": "",
+      "approved": true,
+      "definition": "A formal written challenge to a state's electoral votes, requiring signatures from at least one Senator and one Representative, which triggers a two-hour recess for each chamber to deliberate separately."
+    },
+    {
+      "term": "Tellers",
+      "source": "",
+      "approved": true,
+      "definition": "Designated members of Congress appointed to announce each state's electoral votes in alphabetical order during the Joint Session count — the count cannot proceed without them."
+    },
+    {
+      "term": "3 U.S.C. § 15",
+      "source": "",
+      "approved": true,
+      "definition": "The federal statute governing the Joint Session electoral count, requiring the physical presence of electoral certificates and specifying how objections must be submitted and considered."
+    },
+    {
+      "term": "House Sergeant at Arms",
+      "source": "",
+      "approved": true,
+      "definition": "The officer responsible for House security and administrative oversight, sharing joint responsibility with the Senate Sergeant at Arms for Capitol Police operations — Paul Irving held this position on January 6."
+    },
+    {
+      "term": "Senate Sergeant at Arms",
+      "source": "",
+      "approved": true,
+      "definition": "The officer responsible for Senate security and administrative oversight, including control of hideaway offices and coordination with Capitol Police — Michael Stenger held this position on January 6."
+    },
+    {
+      "term": "Lower West Terrace",
+      "source": "",
+      "approved": true,
+      "definition": "The outdoor steps descending from the Capitol's west front facing the National Mall — the primary point where the crowd concentrated and where the initial perimeter breach occurred."
+    },
+    {
+      "term": "Senate hideaway offices",
+      "source": "",
+      "approved": true,
+      "definition": "Secure first and second-floor offices in the Senate Wing whose locations and assignments are kept confidential by the Senate Sergeant at Arms — used by senior senators during lengthy sessions."
+    },
+    {
+      "term": "Capitol Police Senate Division",
+      "source": "",
+      "approved": true,
+      "definition": "The dedicated security unit responsible for Senate operations, communicating on a designated tactical radio channel that experienced critical failures during the breach."
+    },
+    {
+      "term": "Electromagnetic locks (maglocks)",
+      "source": "",
+      "approved": true,
+      "definition": "Security doors that require continuous electrical power to stay locked; if power fails, they automatically unlock as a life-safety measure — a critical vulnerability on January 6."
+    },
+    {
+      "term": "Joint Session",
+      "source": "",
+      "approved": true,
+      "definition": "A formal meeting of both the Senate and House of Representatives convened to count and certify the electoral votes for president — presided over by the Vice President as President of the Senate."
+    },
+    {
+      "term": "Electoral vote certificates",
+      "source": "",
+      "approved": true,
+      "definition": "Official mahogany trunks containing each state's certified electoral votes, required by federal law to be physically present during the Joint Session count — these are the actual legal record of the election."
+    }
+  ],
+  "createdAt": "2025-01-06T14:10:00Z",
+  "updatedAt": "2025-01-06T14:10:00Z",
+  "playerGoal": "",
+  "description": "Three people — a Capitol Police officer, a Senate staffer, and a photojournalist — must navigate the catastrophic security collapse of the U.S. Capitol on January 6, 2021, between 2:10 and 2:40 PM. Each carries knowledge the others lack. Together or separately, they must protect lives, preserve evidence, and survive the most violent breach of the legislative building since 1814.",
+  "storyArcIds": [
+    "breach_of_the_sacred_house_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "By noon on January 6, 2021, an estimated 30,000 people had gathered on the National Mall between the Washington Monument and the Capitol reflecting pool, responding to a rally that had been advertised for weeks under the banner of contesting the certified results of the November presidential election. The Joint Session of Congress, convened under Article II and the Twelfth Amendment, had begun at 1:00 PM with Vice President Mike Pence presiding over what was constitutionally a ministerial function — the counting and formal certification of 538 electoral votes already validated by fifty state legislatures. The U.S. Capitol Police force consisted of roughly 2,000 sworn officers overall, though only a fraction were deployed directly to the Capitol grounds during the breach window., a figure that had not been augmented by the National Guard despite documented intelligence warnings dating back to late December. What was about to happen had no precedent in modern American legislative history and marked the first violent disruption of the electoral count at the Capitol since the War of 1812 era.",
+        "type": "world"
+      },
+      {
+        "text": "The physical certification of the electoral vote is not symbolic — it is the constitutional mechanism by which a presidential election becomes legally binding, and its interruption creates a procedural vacuum with no clear historical precedent for resolution. The mahogany electoral boxes carried into the House Chamber contained the official electoral certificates submitted by the states for the Joint Session count.; their destruction or seizure could have triggered a major constitutional and procedural crisis during the certification process. For the men and women inside the building — officers, clerks, staffers, journalists — the stakes are simultaneously national and brutally personal: a broken window frame, a jammed fire door, a dead radio battery are the difference between escape and entrapment. This is the thirty-minute window in which the outcome of that calculus is decided, corridor by corridor, room by room.",
+        "type": "stakes"
+      },
+      {
+        "text": "The temperature on the Lower West Terrace is 37 degrees Fahrenheit, and the wind off the Potomac is cutting northeast at twelve miles per hour, carrying with it the acrid chemical signature of bear spray and other chemical irritants — including capsaicin-based deterrents — were being deployed amid the crowd confrontation on marble steps designed for ceremonial processions. Inside portions of the Senate Wing, emergency lighting and alarm systems created intermittent low-light conditions during the evacuation, and the remaining fluorescent panels cast a greenish, stuttering light across walls hung with nineteenth-century oil portraits of legislators who have been dead for a hundred years. The sound is not what you would expect from a riot: it is rhythmic, percussive, almost architectural — the deep structural groan of a building being asked to absorb forces it was never engineered to resist.",
+        "type": "scene"
+      },
+      {
+        "text": "You have been in this building before — perhaps many times, perhaps only once — but you have never felt it move the way it is moving now, transmitting crowd pressure through its limestone foundations like a tuning fork struck against concrete. Somewhere above you or below you or directly on the other side of a wall, a decision is being made that will determine whether the people in this building get out, whether the documents they are carrying survive, and whether anyone will be able to prove, with the kind of evidence that holds in a courtroom or a history book, exactly what happened here and how. The radio is useless. The cell network is saturated. The door in front of you is the only variable you control. You are standing at the threshold of the next thirty minutes, and they have already begun.",
+        "type": "entry",
+        "character_entries": {
+          "role_officer_vance": "The top step is a threshold in the architectural sense — a designed boundary between exterior and interior, ceremonial and functional — and your body understands this even if the crowd in front of you does not, and the barrier is groaning in that low, structural register that means it has stopped being a barrier and started being a delay. Your visor gives you forty percent visibility and you are using all of it: front rank, compression pattern, the north corner where the sandbag anchor shifted at 2:11 and has not shifted back because there is nothing left for it to shift against. The people behind you — Jenkins, the staffers moving through the corridor at your six — do not know about the anchor. Your radio gives you noise in seven frequencies simultaneously and one bar of battery in air that is thirty-seven degrees and dropping, and somewhere in the noise there may be a coordinate, a relief unit, a number that changes the math, but the math keeps resolving to the same answer: four officers, one compromised perimeter, a stairwell behind the Senate cloakroom that Delgado mentioned once and that does not exist on any evacuation map you have ever seen. The barrier groans again. You take one breath — procedural, measured, the kind your training built for situations one-tenth this size — and your hand moves.",
+          "role_journalist_aris": "Your left boot has just found the window frame, and for one second the crowd's pressure redistributes itself across your body in a way that feels almost like stillness — your sternum separating from the camera body by perhaps two inches, enough to breathe, enough to think in the specific compressed language that is the only language you have ever fully trusted: foreground, background, light. The strobe alarms are running at 2.4 pulses per second and you know, without doing the arithmetic, that anything moving inside this building is going to be a ghost, a smear, a liturgical blur — extraordinary or unusable, no middle register. Your lens is compromised on the left third and your buffer is at 78% and somewhere on your card at full resolution is a man in a tactical vest moving against the crowd's general momentum with the particular unhurried focus of someone who arrived here knowing exactly where he was going, and you photographed him, and he does not know that, and right now that asymmetry is the most important fact in this building. The crowd behind you is not a surge anymore — it has achieved a new physics, a new density, and the chemical smell coming off your own sleeve is your body's evidence of something your mind has not yet agreed to process. One second of near-stillness. Your finger is already on the shutter. You can move deeper into the Senate Wing, toward the strobing dark and whatever is happening in it, or you can turn — and the credential in your vest pocket is suddenly not just a credential, it is a transmission mechanism, it is a question about what documentation means when the thing being documented is still in motion. The crowd shifts again. The second is almost gone.",
+          "role_staffer_jenkins": "Your back is against the mahogany desk and your hands are on the brass handles of both trunks, and what you are doing right now — the thing your training has no protocol for — is counting breaths that are not yours. The second trunk's broken latch is three inches from your left thumb. You know this the way you know the chain-of-custody sequence, the way you know the seven leather sleeves by weight and order: not as knowledge but as the architecture of your body in the dark. What you know that the breathing outside the door does not know is that you are in here. What you know that no one else in this building knows is what you moved at 7:00 AM, and why, and that the documentation for that decision exists nowhere except inside your own chest, which is currently performing a function it was not designed to perform quietly. The handle rotates — deliberate, testing, the action of someone who is not guessing — and stops. The footsteps do not continue. The corridor outside SHO-14 is not empty and is not moving and the line of emergency light under the door is unbroken, which means nothing yet, and the desk behind you cannot be moved by one person, which means the cloakroom stairwell is the only variable that remains open, and the corridor is not empty, and your hands are still on the handles, and you have not yet decided."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_officer_vance",
+    "role_staffer_jenkins",
+    "role_journalist_aris"
+  ],
+  "winConditions": [
+    "The electoral trunks are physically secured in a subterranean transit tunnel or confirmed in the custody of a verified Senate sergeant-at-arms deputy before interior evacuation routes became fully compromised.",
+    "Officer Vance's squad establishes a functioning internal bottleneck that holds at least one corridor clear for evacuation traffic.",
+    "Thomas Aris successfully transmits or physically preserves photographic documentation of the structural breach with sufficient image resolution to constitute primary historical evidence.",
+    "At least three of the five named NPCs survive the scenario with their stated objectives intact or partially intact."
+  ],
+  "failConditions": [
+    "Evacuation_Progress_Index reaches 0 — evacuation routes are fully compromised and lawmakers cannot be moved.",
+    "Both electoral trunks are physically seized or destroyed without any documentary record of their contents surviving.",
+    "Officer Vance's entire squad is incapacitated or dispersed, leaving the internal stairwell bottleneck undefended.",
+    "The 2:40 PM hard cutoff expires with no player having reached a decision threshold in Act IV."
+  ],
+  "technical_facts": {
+    "facts": [
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "U.S. Senate Sergeant at Arms After-Action Report; Senate Rules Committee Investigation, 2021",
+          "access_note": null
+        },
+        "content": "The first breach of the Capitol building's perimeter defenses occurred at 1:00 PM EST on January 6, 2021, when the outer security fencing at the West Front was initially toppled by crowd elements.",
+        "fact_id": "breach_initial_timestamp",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "U.S. Senate Sergeant at Arms After-Action Report; Senate Rules Committee Investigation, 2021",
+          "access_note": null
+        },
+        "content": "Rioters first entered the interior structures of the Senate Wing of the Capitol at 2:13 PM EST on January 6, 2021, via a shattered window adjacent to the Senate Wing Door.",
+        "fact_id": "senate_wing_entry_timestamp",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Congressional Record, 117th Congress, January 6, 2021; Senate Proceedings Journal",
+          "access_note": null
+        },
+        "content": "The Senate chamber was gaveled into an immediate recess at 2:13 PM EST on January 6, 2021, as the internal building perimeter was compromised.",
+        "fact_id": "joint_session_recess_timestamp",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "3 U.S.C. § 15; Senate Procedure and Practice, Riddick's Senate Procedure",
+          "access_note": null
+        },
+        "content": "Electoral vote certificates are transported to the Joint Session in mahogany trunks carried by designated Senate and House tellers; the certificates are the official record of each state's certified electoral vote and are required by 3 U.S.C. § 15 to be present for the count.",
+        "fact_id": "electoral_certificate_custody_procedure",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "U.S. Senate Sergeant at Arms After-Action Report, 2021; Senate Rules and Administration Committee Hearing, February 23, 2021",
+          "access_note": null
+        },
+        "content": "The Capitol Police Senate Division operated on a designated tactical radio channel; radio communication failures on January 6, 2021 were documented as a significant operational deficiency in the Senate Sergeant at Arms After-Action Report.",
+        "fact_id": "capitol_police_radio_frequency_senate_wing",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "capacity",
+        "source": {
+          "url": null,
+          "citation": "Senate Rules and Administration Committee Hearing, February 23, 2021; Capitol Police Inspector General Report, 2021",
+          "access_note": null
+        },
+        "content": "Approximately 1,200 Capitol Police officers were on duty or called in on January 6, 2021, out of a total force of approximately 2,300 sworn officers.",
+        "fact_id": "capitol_police_officer_count_january6",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "capacity",
+        "source": {
+          "url": null,
+          "citation": "Department of Justice Capitol Breach Investigation Summary, 2022; Select Committee to Investigate January 6th Attack, Final Report, 2022",
+          "access_note": null
+        },
+        "content": "Law enforcement and investigative estimates placed the number of individuals who entered restricted Capitol grounds on January 6, 2021 at over 10,000, with more than 800 individuals documented as having entered the Capitol building itself.",
+        "fact_id": "crowd_size_capitol_grounds",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "power",
+        "source": {
+          "url": null,
+          "citation": "NFPA 101 Life Safety Code; IBC Section 1010.1.9.9; Capitol Architect Security Infrastructure Documentation",
+          "access_note": null
+        },
+        "content": "Electromagnetic locks (maglocks) used on Capitol security doors require continuous electrical power to remain locked; a power interruption causes them to default to the unlocked (fail-safe) position, consistent with life-safety code requirements for egress.",
+        "fact_id": "maglock_power_dependency",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Senate Sergeant at Arms Office; Congressional Research Service, Capitol Building Overview",
+          "access_note": null
+        },
+        "content": "Senate hideaway offices are located on the first and second floors of the Capitol building in the Senate Wing, in corridors adjacent to the Senate Chamber; their room designations and locations are not publicly disclosed and are assigned by the Senate Sergeant at Arms.",
+        "fact_id": "senate_hideaway_offices_location",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Architect of the Capitol Building Survey; Select Committee to Investigate January 6th Attack, Final Report, 2022",
+          "access_note": null
+        },
+        "content": "The Lower West Terrace of the Capitol faces the National Mall; the terrace steps descend from the building's west front and were the primary point of crowd concentration and initial breach on January 6, 2021.",
+        "fact_id": "lower_west_terrace_geography",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "3 U.S.C. § 15; Congressional Research Service, Counting Electoral Votes, RL32717",
+          "access_note": null
+        },
+        "content": "Under 3 U.S.C. § 15, the Joint Session to count electoral votes is presided over by the President of the Senate (the Vice President); tellers appointed from each chamber announce the votes of each state in alphabetical order, and the presiding officer declares the result.",
+        "fact_id": "joint_session_certification_procedure_3usc",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Senate Armed Services Committee Hearing, March 3, 2021; Select Committee to Investigate January 6th Attack, Final Report, 2022",
+          "access_note": null
+        },
+        "content": "The District of Columbia National Guard was not authorized for deployment to the Capitol until approximately 3:00 PM EST on January 6, 2021; Guard elements did not arrive at the Capitol in force until after 5:00 PM EST.",
+        "fact_id": "national_guard_activation_delay",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Senate Sergeant at Arms Technology Services; House CAO Technology Policy; Standing Committee of Correspondents Press Gallery Rules",
+          "access_note": null
+        },
+        "content": "The Capitol building operates a managed internal wireless network administered by the Office of the Chief Administrative Officer (House) and the Senate Sergeant at Arms (Senate); press credentials issued by the Standing Committee of Correspondents include provisions for Capitol network access.",
+        "fact_id": "capitol_building_wifi_infrastructure",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "3 U.S.C. § 15; Congressional Research Service, Counting Electoral Votes, RL32717",
+          "access_note": null
+        },
+        "content": "Under 3 U.S.C. § 15, an objection to an electoral vote must be submitted in writing signed by at least one Senator and one Representative; when a valid objection is received, the Joint Session recesses and each chamber retires separately to consider the objection for a maximum of two hours.",
+        "fact_id": "electoral_objection_procedure_timing",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Senate Rules and Administration Committee Hearing, February 23, 2021; Capitol Police Inspector General Report, 2021",
+          "access_note": null
+        },
+        "content": "On January 6, 2021, Capitol Police Chief Steven Sund was the commanding officer of the United States Capitol Police; Senate Sergeant at Arms Michael Stenger and House Sergeant at Arms Paul Irving held oversight authority over Capitol security operations.",
+        "fact_id": "capitol_police_chain_of_command_january6",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Congressional Record, 117th Congress, January 6–7, 2021; Senate Proceedings Journal",
+          "access_note": null
+        },
+        "content": "The Joint Session of Congress resumed and completed the certification of the 2020 presidential election results at approximately 3:41 AM EST on January 7, 2021.",
+        "fact_id": "joint_session_resumed_timestamp",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "ANSI/BHMA A156.30 High Security Padlock Standard; Architect of the Capitol Security Hardware Specifications",
+          "access_note": null
+        },
+        "content": "Secondary security doors in the Capitol complex use padlocks rated to ANSI/BHMA Grade 1 standards; bolt cutters with a jaw capacity of 9/16 inch or greater are capable of cutting the shackle of a standard Grade 1 padlock of the type used on secondary Capitol doors.",
+        "fact_id": "bolt_cutter_door_hardware_specification",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "U.S. Senate Sergeant at Arms After-Action Report, 2021; Select Committee to Investigate January 6th Attack, Final Report, 2022",
+          "access_note": null
+        },
+        "content": "The Senate Chamber was evacuated at approximately 2:15 PM EST on January 6, 2021, after Capitol Police advised the presiding officer that the building perimeter had been breached.",
+        "fact_id": "senate_chamber_evacuation_timestamp",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ],
+    "reviewed": true,
+    "generated": true
+  },
+  "allow_free_input": true,
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": false
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": false
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": false
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": false
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Capitol Police Tactical Shorthand",
+        "terms": [
+          {
+            "term": "hard perimeter",
+            "meaning": "A physical barrier line — fencing, bicycle racks, jersey barriers — designated as the outermost boundary of a secured zone; its breach triggers automatic escalation protocols."
+          },
+          {
+            "term": "soft perimeter",
+            "meaning": "A secondary boundary maintained by officer presence alone, with no physical infrastructure; considered tactically expendable when hard perimeter fails."
+          },
+          {
+            "term": "stack up",
+            "meaning": "To form a close-order line of officers at a threshold, door, or corridor junction in preparation for a push or a hold."
+          },
+          {
+            "term": "code red interior",
+            "meaning": "An emergency-status phrase indicating unauthorized individuals had entered a secured section of the Capitol complex."
+          },
+          {
+            "term": "blast ball deployment",
+            "meaning": "Authorization to use rubber-coated flash-bang devices; requires supervisor verbal sign-off under Capitol Police use-of-force policy."
+          },
+          {
+            "term": "fallback to the tunnel",
+            "meaning": "The standing order to route protected persons — lawmakers, staff with sensitive materials — toward the underground Capitol subway and connecting tunnel network."
+          },
+          {
+            "term": "radio saturation",
+            "meaning": "Condition in which so many simultaneous transmissions overwhelm a frequency channel that no individual message is intelligible; effectively renders tactical radio communication non-functional."
+          }
+        ],
+        "context": "Used by Capitol Police officers and sergeants-at-arms deputies during radio transmissions and face-to-face field coordination under high-noise, high-stress conditions."
+      },
+      {
+        "name": "Senate Floor and Staff Protocol Language",
+        "terms": [
+          {
+            "term": "the trunks",
+            "meaning": "Informal shorthand among Senate staff for the electoral trunks — the brass-bound leather boxes carrying certified state electoral vote certificates."
+          },
+          {
+            "term": "recess the chamber",
+            "meaning": "The formal parliamentary action by which the presiding officer suspends a Joint Session; requires a specific verbal declaration and is distinct from adjournment."
+          },
+          {
+            "term": "hideaway",
+            "meaning": "Any of the unmarked, unlisted private offices assigned to senior senators and leadership staff within the Capitol's interior corridors, not appearing on public building maps."
+          },
+          {
+            "term": "secure the record",
+            "meaning": "The standing emergency instruction to physically remove and protect the official session journal, the electoral certificates, and any pending legislative instruments from the chamber floor."
+          },
+          {
+            "term": "maglock override",
+            "meaning": "A centralized electronic command issued from the Capitol Police command post that either locks or releases all electromagnetically secured doors in a designated zone simultaneously."
+          },
+          {
+            "term": "the cloakroom",
+            "meaning": "The private anteroom directly adjacent to the Senate Chamber floor, accessible only to members and credentialed staff, used as a staging area during emergency evacuations."
+          },
+          {
+            "term": "joint session quorum",
+            "meaning": "The minimum number of Representatives and Senators required to be physically present for the electoral count to proceed; disruption of quorum can prevent continuation of the Joint Session until members safely reconvene."
+          }
+        ],
+        "context": "Used by Senate clerks, floor staff, legislative directors, and sergeant-at-arms personnel during formal session and emergency procedures."
+      },
+      {
+        "name": "Press Corps Field Language",
+        "terms": [
+          {
+            "term": "wire it now",
+            "meaning": "An editor's instruction to transmit images immediately via cellular data regardless of image quality or editorial review; used when speed of publication supersedes resolution."
+          },
+          {
+            "term": "the crush",
+            "meaning": "Photojournalist field term for a crowd-pressure event severe enough to lift individuals off the ground; considered an acute physical danger to equipment and operator."
+          },
+          {
+            "term": "shooting blind",
+            "meaning": "Operating a camera without the ability to review the viewfinder or screen, typically due to chemical contamination of the lens or physical obstruction; images are composed by instinct and field experience."
+          },
+          {
+            "term": "primary evidence standard",
+            "meaning": "An image or video sequence of sufficient resolution, metadata integrity, and contextual framing to be admissible as documentary evidence in a legal or congressional proceeding."
+          },
+          {
+            "term": "buffer full",
+            "meaning": "The condition in which a digital camera's internal memory card has reached capacity; the camera stops writing new images until existing files are cleared or transferred."
+          },
+          {
+            "term": "pool position",
+            "meaning": "A formally assigned press location inside a restricted area, shared among multiple outlets; on January 6, most pool positions were abandoned as the situation escalated beyond planned parameters."
+          },
+          {
+            "term": "go wide",
+            "meaning": "The instruction or decision to switch to a wide-angle lens or setting to capture spatial context — the scale of a crowd, the geometry of a breach — rather than close detail."
+          }
+        ],
+        "context": "Used by photojournalists, wire service reporters, and documentary camera operators working the Capitol beat on January 6, communicating with editors and fixers via encrypted messaging apps when cell service permitted."
+      },
+      {
+        "name": "Crowd Tactical and Organizational Language",
+        "terms": [
+          {
+            "term": "hold the line",
+            "meaning": "A call-and-response phrase used to maintain crowd cohesion at a barrier or threshold, borrowed from military and law enforcement terminology and repurposed as a crowd-pressure command."
+          },
+          {
+            "term": "push through",
+            "meaning": "A directional instruction to advance collectively against a physical obstacle — a fence, a door, a line of officers — using mass body weight rather than individual force."
+          },
+          {
+            "term": "the breach",
+            "meaning": "Any point at which a physical security barrier has been overcome; used as both a noun (a specific location) and a verb (the act of overcoming it)."
+          },
+          {
+            "term": "scout ahead",
+            "meaning": "An instruction for a smaller, faster-moving element to advance into an interior space and report back on officer positions, locked doors, and available routes."
+          },
+          {
+            "term": "zip ties",
+            "meaning": "Referenced in contemporaneous accounts as items carried by specific individuals inside the building; their presence became a subject of congressional investigation regarding intent."
+          }
+        ],
+        "context": "Language documented in contemporaneous social media posts, encrypted messaging channels, and later congressional testimony, used by organized elements within the larger crowd to coordinate movement inside and around the Capitol."
+      }
+    ]
+  },
+  "keyEvidenceClueIds": [
+    "clue_electoral_trunk_seal",
+    "clue_radio_log_fragment"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The electoral trunks are recovered but one state certificate is physically damaged; the Joint Session can reconvene but faces procedural challenge.",
+    "Aris's photographs survive but his camera is destroyed before transmission; the images exist but are delayed from publication by days.",
+    "Vance holds the bottleneck but loses two squad members to chemical exposure; the corridor holds but at severe human cost.",
+    "Jenkins evacuates her team but leaves the hideaway office unsecured; sensitive staffing documents are later found scattered in the corridor."
+  ],
+  "structured_endings_enabled": false,
+  "status": "published",
+  "displayOrder": 99
+}

@@ -35,6 +35,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "military",
   "epilogue": {
     "reviewed": true,
     "generated": true,
@@ -619,5 +620,6 @@
     "The bluffs are taken but the draw remains blocked by a disabled tank; the second wave must fight through the surf as the first wave did."
   ],
   "structured_endings_enabled": true,
-  "category": "military"
+  "status": "published",
+  "displayOrder": 1
 }

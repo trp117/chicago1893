@@ -34,6 +34,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "space",
   "epilogue": {
     "reviewed": true,
     "generated": true,
@@ -866,5 +867,6 @@
     "The burn is slightly off — the ship enters the re-entry corridor at the shallow edge, skipping once before catching the atmosphere; recovery is possible but the heat shield is stressed"
   ],
   "structured_endings_enabled": false,
-  "category": "space"
+  "status": "published",
+  "displayOrder": 2
 }

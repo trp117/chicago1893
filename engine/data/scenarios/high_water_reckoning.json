@@ -33,6 +33,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "industrial",
   "epilogue": {
     "reviewed": true,
     "generated": true,
@@ -122,53 +123,53 @@
     ],
     "character_fates": [
       {
-        "character_id": "loretta_sainte_claire",
         "name": "Loretta Sainte-Claire",
         "outcome": "unknown",
-        "historical_record": "Community elders and informal triage coordinators at bridge camps and elevated gathering points throughout New Orleans in the days following August 29, 2005 performed functions that no official emergency management structure had assigned to anyone. The Louisiana Department of Health and Hospitals later documented that in the absence of formal medical personnel, community members with no clinical credentials made triage decisions affecting hundreds of survivors at informal camps including those at the Claiborne Avenue overpass, the St. Claude Avenue bridge, and the Superdome perimeter. Many of these individuals were never identified by name in any official after-action report. The House Select Committee investigating the federal response noted in February 2006 that the contributions of informal community coordinators were systematically underdocumented.",
-        "primary_source": null
+        "character_id": "loretta_sainte_claire",
+        "primary_source": null,
+        "historical_record": "Community elders and informal triage coordinators at bridge camps and elevated gathering points throughout New Orleans in the days following August 29, 2005 performed functions that no official emergency management structure had assigned to anyone. The Louisiana Department of Health and Hospitals later documented that in the absence of formal medical personnel, community members with no clinical credentials made triage decisions affecting hundreds of survivors at informal camps including those at the Claiborne Avenue overpass, the St. Claude Avenue bridge, and the Superdome perimeter. Many of these individuals were never identified by name in any official after-action report. The House Select Committee investigating the federal response noted in February 2006 that the contributions of informal community coordinators were systematically underdocumented."
       },
       {
-        "character_id": "marcus_fontenot",
         "name": "Marcus Fontenot",
         "outcome": "unknown",
-        "historical_record": "Lower Ninth Ward property owners who remained in or returned to the flood zone in the days immediately following the Industrial Canal breaches faced compounding legal and physical hazards. The Greater New Orleans Fair Housing Action Center documented numerous cases in which properties in the Lower Ninth Ward were administratively classified as abandoned during the period when residents were legally sheltering in place or under mandatory evacuation orders, creating title and insurance complications that persisted for years. Salvage operations by property owners in the flooded Lower Ninth Ward during the first two weeks of September 2005 were conducted in water containing elevated levels of E. coli, heavy metals, and petroleum hydrocarbons, as documented by the Environmental Protection Agency's post-Katrina water quality sampling reports released in October 2005.",
-        "primary_source": null
+        "character_id": "marcus_fontenot",
+        "primary_source": null,
+        "historical_record": "Lower Ninth Ward property owners who remained in or returned to the flood zone in the days immediately following the Industrial Canal breaches faced compounding legal and physical hazards. The Greater New Orleans Fair Housing Action Center documented numerous cases in which properties in the Lower Ninth Ward were administratively classified as abandoned during the period when residents were legally sheltering in place or under mandatory evacuation orders, creating title and insurance complications that persisted for years. Salvage operations by property owners in the flooded Lower Ninth Ward during the first two weeks of September 2005 were conducted in water containing elevated levels of E. coli, heavy metals, and petroleum hydrocarbons, as documented by the Environmental Protection Agency's post-Katrina water quality sampling reports released in October 2005."
       },
       {
-        "character_id": "ida_broussard",
         "name": "Ida Broussard",
         "outcome": "unknown",
-        "historical_record": "Licensed amateur radio operators affiliated with the Amateur Radio Emergency Service (ARES) and the Radio Amateur Civil Emergency Service (RACES) provided critical communications infrastructure in the New Orleans metropolitan area following Hurricane Katrina. The American Radio Relay League documented that ARES operators in Louisiana activated on August 29, 2005 and that operators in Algiers and on the West Bank maintained net operations when commercial and government communications infrastructure had failed. Frequency drift and battery management under sustained emergency net operations were documented technical challenges. The ARRL's after-action report noted that operators frequently worked with degraded equipment and improvised power sources for periods exceeding 72 hours.",
-        "primary_source": null
+        "character_id": "ida_broussard",
+        "primary_source": null,
+        "historical_record": "Licensed amateur radio operators affiliated with the Amateur Radio Emergency Service (ARES) and the Radio Amateur Civil Emergency Service (RACES) provided critical communications infrastructure in the New Orleans metropolitan area following Hurricane Katrina. The American Radio Relay League documented that ARES operators in Louisiana activated on August 29, 2005 and that operators in Algiers and on the West Bank maintained net operations when commercial and government communications infrastructure had failed. Frequency drift and battery management under sustained emergency net operations were documented technical challenges. The ARRL's after-action report noted that operators frequently worked with degraded equipment and improvised power sources for periods exceeding 72 hours."
       },
       {
-        "character_id": "darnell_arceneaux",
         "name": "Darnell Arceneaux",
         "outcome": "unknown",
-        "historical_record": "Civilian flat-bottom skiff and pirogue operators conducted a substantial portion of the water rescues in the New Orleans metropolitan area in the days following August 29, 2005. The Louisiana Department of Wildlife and Fisheries coordinated some of these operators, but a significant number operated independently. The Louisiana Department of Wildlife and Fisheries reported that its agents and affiliated civilian operators rescued approximately 21,000 people in the first week following the storm. Civilian operators navigating the flooded streets faced hazards including submerged power lines, debris fields, and contaminated water. Many informal supply runners and rescue operators were never registered with any coordinating authority and their contributions were not captured in official tallies.",
-        "primary_source": null
+        "character_id": "darnell_arceneaux",
+        "primary_source": null,
+        "historical_record": "Civilian flat-bottom skiff and pirogue operators conducted a substantial portion of the water rescues in the New Orleans metropolitan area in the days following August 29, 2005. The Louisiana Department of Wildlife and Fisheries coordinated some of these operators, but a significant number operated independently. The Louisiana Department of Wildlife and Fisheries reported that its agents and affiliated civilian operators rescued approximately 21,000 people in the first week following the storm. Civilian operators navigating the flooded streets faced hazards including submerged power lines, debris fields, and contaminated water. Many informal supply runners and rescue operators were never registered with any coordinating authority and their contributions were not captured in official tallies."
       },
       {
-        "character_id": "father_clement_tureaud",
         "name": "Father Clement Tureaud",
         "outcome": "unknown",
-        "historical_record": "Roman Catholic clergy in New Orleans played documented roles as informal camp chaplains and community organizers at survivor gathering points in the days following Hurricane Katrina. The Archdiocese of New Orleans remained partially operational during and after the storm, and individual priests at parishes throughout the city acted as de facto community coordinators. The diversion and misappropriation of emergency relief supplies was a documented problem in the Katrina response. The Government Accountability Office reported in 2006 that FEMA's supply chain management failures created conditions in which supplies were diverted, misdirected, or misappropriated, though the GAO's findings focused primarily on systemic failures rather than individual actors at the community level.",
-        "primary_source": null
+        "character_id": "father_clement_tureaud",
+        "primary_source": null,
+        "historical_record": "Roman Catholic clergy in New Orleans played documented roles as informal camp chaplains and community organizers at survivor gathering points in the days following Hurricane Katrina. The Archdiocese of New Orleans remained partially operational during and after the storm, and individual priests at parishes throughout the city acted as de facto community coordinators. The diversion and misappropriation of emergency relief supplies was a documented problem in the Katrina response. The Government Accountability Office reported in 2006 that FEMA's supply chain management failures created conditions in which supplies were diverted, misdirected, or misappropriated, though the GAO's findings focused primarily on systemic failures rather than individual actors at the community level."
       },
       {
-        "character_id": "cynthia_tureaud",
         "name": "Cynthia Tureaud",
         "outcome": "unknown",
-        "historical_record": "The fraudulent or premature classification of occupied or legally sheltered properties as abandoned was a documented phenomenon in Orleans Parish following Hurricane Katrina. The Greater New Orleans Fair Housing Action Center and the Lawyers' Committee for Civil Rights Under Law both documented cases in which properties, particularly in predominantly Black neighborhoods including the Lower Ninth Ward, were administratively processed as abandoned during the period of mandatory evacuation, affecting owners' ability to claim insurance, contest demolition orders, and establish title. Louisiana's emergency property statutes were tested repeatedly in post-Katrina litigation. The Louisiana Supreme Court addressed questions of property rights and emergency classification in several cases between 2006 and 2010.",
-        "primary_source": null
+        "character_id": "cynthia_tureaud",
+        "primary_source": null,
+        "historical_record": "The fraudulent or premature classification of occupied or legally sheltered properties as abandoned was a documented phenomenon in Orleans Parish following Hurricane Katrina. The Greater New Orleans Fair Housing Action Center and the Lawyers' Committee for Civil Rights Under Law both documented cases in which properties, particularly in predominantly Black neighborhoods including the Lower Ninth Ward, were administratively processed as abandoned during the period of mandatory evacuation, affecting owners' ability to claim insurance, contest demolition orders, and establish title. Louisiana's emergency property statutes were tested repeatedly in post-Katrina litigation. The Louisiana Supreme Court addressed questions of property rights and emergency classification in several cases between 2006 and 2010."
       },
       {
-        "character_id": "terrence_guidry",
         "name": "Terrence Guidry",
         "outcome": "unknown",
-        "historical_record": "Informal volunteer runners and messengers operating between survivor camps and communications posts in the New Orleans metropolitan area in the days following August 29, 2005 filled a gap created by the collapse of commercial communications infrastructure. Because these individuals operated outside any formal emergency management structure, their activities were not systematically documented. The House Select Committee's February 2006 report on the Katrina response noted that the absence of interoperable communications systems forced improvised human courier networks at multiple points during the disaster response, and that information transmitted through these networks was subject to transcription and relay errors with potentially serious operational consequences.",
-        "primary_source": null
+        "character_id": "terrence_guidry",
+        "primary_source": null,
+        "historical_record": "Informal volunteer runners and messengers operating between survivor camps and communications posts in the New Orleans metropolitan area in the days following August 29, 2005 filled a gap created by the collapse of commercial communications infrastructure. Because these individuals operated outside any formal emergency management structure, their activities were not systematically documented. The House Select Committee's February 2006 report on the Katrina response noted that the absence of interoperable communications systems forced improvised human courier networks at multiple points during the disaster response, and that information transmitted through these networks was subject to transcription and relay errors with potentially serious operational consequences."
       }
     ],
     "historical_frame": [
@@ -218,147 +219,147 @@
   "glossary": [
     {
       "term": "non-transferable capability",
-      "definition": "A skill or authority that belongs only to you and cannot be handed to someone else — you cannot delegate this decision or task.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A skill or authority that belongs only to you and cannot be handed to someone else — you cannot delegate this decision or task."
     },
     {
       "term": "the parish",
-      "definition": "In Louisiana, a parish is the local governmental unit equivalent to a county elsewhere — this one is Orleans Parish, which includes New Orleans.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "In Louisiana, a parish is the local governmental unit equivalent to a county elsewhere — this one is Orleans Parish, which includes New Orleans."
     },
     {
       "term": "petroleum products leaching from flooded storage tanks",
-      "definition": "Gasoline, diesel, and crude oil seeping from industrial facilities submerged in floodwater, creating a slick toxic layer across the water's surface.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Gasoline, diesel, and crude oil seeping from industrial facilities submerged in floodwater, creating a slick toxic layer across the water's surface."
     },
     {
       "term": "concrete deck baking at 140 degrees",
-      "definition": "The exposed surface of a bridge or platform heating up under direct sunlight to temperatures that cause heat exhaustion and death in unshaded survivors.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The exposed surface of a bridge or platform heating up under direct sunlight to temperatures that cause heat exhaustion and death in unshaded survivors."
     },
     {
       "term": "dying battery",
-      "definition": "A communication device with limited power remaining — once it dies, the ability to transmit coordinates or receive orders from Net Control is gone.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A communication device with limited power remaining — once it dies, the ability to transmit coordinates or receive orders from Net Control is gone."
     },
     {
       "term": "institutional acquisition",
-      "definition": "The city or state government claiming ownership of land marked as abandoned, converting private property to public or corporate control.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The city or state government claiming ownership of land marked as abandoned, converting private property to public or corporate control."
     },
     {
       "term": "legal standing",
-      "definition": "Documented proof of property ownership — without it, you have no claim to your land in the eyes of the city, and the city can seize it.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Documented proof of property ownership — without it, you have no claim to your land in the eyes of the city, and the city can seize it."
     },
     {
       "term": "chemically saturated water",
-      "definition": "Floodwater mixed with industrial runoff, sewage, and petroleum products from the refineries and storage tanks along the canal — toxic enough that skin contact carried disease risk.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Floodwater mixed with industrial runoff, sewage, and petroleum products from the refineries and storage tanks along the canal — toxic enough that skin contact carried disease risk."
     },
     {
       "term": "structurally breached",
-      "definition": "The floodwalls didn't overflow the top — they failed at their foundation or joints, letting water pour through the broken wall itself rather than over it.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The floodwalls didn't overflow the top — they failed at their foundation or joints, letting water pour through the broken wall itself rather than over it."
     },
     {
       "term": "Category 3 storm carrying a Category 5 surge",
-      "definition": "A hurricane rated Category 3 by wind speed, but with storm surge waters classified at Category 5 intensity — meaning the water came in with far more destructive force than the winds alone would suggest.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A hurricane rated Category 3 by wind speed, but with storm surge waters classified at Category 5 intensity — meaning the water came in with far more destructive force than the winds alone would suggest."
     },
     {
       "term": "communication blackout",
-      "definition": "A total or near-total failure of communication systems — after Katrina, the loss of power, cell towers, and radio infrastructure meant that knowledge of where people were stranded rarely reached rescue coordinators.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A total or near-total failure of communication systems — after Katrina, the loss of power, cell towers, and radio infrastructure meant that knowledge of where people were stranded rarely reached rescue coordinators."
     },
     {
       "term": "staging areas",
-      "definition": "Temporary assembly points where resources and personnel are positioned before deployment — 500 buses had been gathered in staging areas by September 2, but bureaucratic breakdown prevented them from reaching stranded survivors.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Temporary assembly points where resources and personnel are positioned before deployment — 500 buses had been gathered in staging areas by September 2, but bureaucratic breakdown prevented them from reaching stranded survivors."
     },
     {
       "term": "National Guard troops",
-      "definition": "State-based military units that can be mobilized for disaster response and law enforcement — by September 2, over 58,000 had been positioned in the New Orleans area, yet communication failures meant many stranded people never reached them.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "State-based military units that can be mobilized for disaster response and law enforcement — by September 2, over 58,000 had been positioned in the New Orleans area, yet communication failures meant many stranded people never reached them."
     },
     {
       "term": "abandoned classification",
-      "definition": "A legal designation the city could apply to properties after the storm, marking them for institutional acquisition — without land records to prove ownership, even occupied homes could receive this classification.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A legal designation the city could apply to properties after the storm, marking them for institutional acquisition — without land records to prove ownership, even occupied homes could receive this classification."
     },
     {
       "term": "frequency drift",
-      "definition": "When a radio transmitter's signal gradually shifts away from its assigned frequency, making communication unreliable — on September 2, emergency frequencies in New Orleans were already beginning to drift, further hindering rescue coordination.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "When a radio transmitter's signal gradually shifts away from its assigned frequency, making communication unreliable — on September 2, emergency frequencies in New Orleans were already beginning to drift, further hindering rescue coordination."
     },
     {
       "term": "second stage of decomposition",
-      "definition": "The phase of organic decay where material has begun to break down and release gases and odors — the smell of a submerged city on September 2 included the sweet-rot of matter in this stage.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The phase of organic decay where material has begun to break down and release gases and odors — the smell of a submerged city on September 2 included the sweet-rot of matter in this stage."
     },
     {
       "term": "brackish water",
-      "definition": "Water that is a mixture of salt and fresh water — the brown floodwater covering New Orleans after Katrina was brackish, chemically saturated, and dangerous to consume or remain in for extended periods.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Water that is a mixture of salt and fresh water — the brown floodwater covering New Orleans after Katrina was brackish, chemically saturated, and dangerous to consume or remain in for extended periods."
     },
     {
       "term": "extraction helicopter",
-      "definition": "A rescue aircraft capable of lifting people to safety — on September 2, 2005, the difference between finding stranded survivors and flying past them was often just a set of coordinates transmitted via radio.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A rescue aircraft capable of lifting people to safety — on September 2, 2005, the difference between finding stranded survivors and flying past them was often just a set of coordinates transmitted via radio."
     },
     {
       "term": "post-storm redevelopment machinery",
-      "definition": "The institutional and bureaucratic systems that cities activate to rebuild after major disasters — in New Orleans, this machinery actively worked to dispossess residents by classifying their properties as abandoned.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The institutional and bureaucratic systems that cities activate to rebuild after major disasters — in New Orleans, this machinery actively worked to dispossess residents by classifying their properties as abandoned."
     },
     {
       "term": "land records",
-      "definition": "The documented proof of property ownership in a specific location — after Katrina, losing these records meant the city could classify your property as abandoned and seize it for institutional acquisition, regardless of whether you still owned it.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The documented proof of property ownership in a specific location — after Katrina, losing these records meant the city could classify your property as abandoned and seize it for institutional acquisition, regardless of whether you still owned it."
     },
     {
       "term": "potable water",
-      "definition": "Water safe enough to drink — in the hours after Katrina, stranded survivors had no access to it, which became a life-or-death medical concern in 95-degree heat.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "Water safe enough to drink — in the hours after Katrina, stranded survivors had no access to it, which became a life-or-death medical concern in 95-degree heat."
     },
     {
       "term": "Lower Ninth Ward",
-      "definition": "A historically African American neighborhood in New Orleans that has stood since the early twentieth century — it was among the first and most severely flooded areas when the floodwalls failed on August 29, 2005.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A historically African American neighborhood in New Orleans that has stood since the early twentieth century — it was among the first and most severely flooded areas when the floodwalls failed on August 29, 2005."
     },
     {
       "term": "Industrial Canal",
-      "definition": "The waterway that runs along the Lower Ninth Ward in New Orleans, lined with storage tanks and industrial facilities — during Katrina, it became the vector for catastrophic flooding and chemical contamination into surrounding neighborhoods.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "The waterway that runs along the Lower Ninth Ward in New Orleans, lined with storage tanks and industrial facilities — during Katrina, it became the vector for catastrophic flooding and chemical contamination into surrounding neighborhoods."
     },
     {
       "term": "floodwall",
-      "definition": "A reinforced embankment built to hold back water during storms — in New Orleans, these were supposed to protect neighborhoods from surge, but the ones along the Industrial Canal failed structurally on August 29, 2005, rather than being overtopped.",
       "source": "",
-      "approved": true
+      "approved": true,
+      "definition": "A reinforced embankment built to hold back water during storms — in New Orleans, these were supposed to protect neighborhoods from surge, but the ones along the Industrial Canal failed structurally on August 29, 2005, rather than being overtopped."
     }
   ],
   "createdAt": "2025-01-01T00:00:00Z",
@@ -416,242 +417,242 @@
   "technical_facts": {
     "facts": [
       {
-        "fact_id": "industrial_canal_breach_date",
-        "content": "The Industrial Canal (Inner Harbor Navigation Canal) floodwall breached on August 29, 2005, with major failures occurring at the north and south ends of the canal, inundating the Lower Ninth Ward and St. Claude Avenue corridor.",
         "domain": "flooding",
         "source": {
+          "url": null,
           "citation": "IPET (Interagency Performance Evaluation Task Force) Final Report, Volume IV, 2006; Louisiana Department of Transportation and Development post-storm survey",
-          "url": null,
           "access_note": null
         },
+        "content": "The Industrial Canal (Inner Harbor Navigation Canal) floodwall breached on August 29, 2005, with major failures occurring at the north and south ends of the canal, inundating the Lower Ninth Ward and St. Claude Avenue corridor.",
+        "fact_id": "industrial_canal_breach_date",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lower_ninth_ward_flood_depth",
-        "content": "Flood depths in the Lower Ninth Ward following the Industrial Canal breaches reached between 6 and 12 feet in the Deslonde Street corridor, with the deepest inundation occurring within the first six hours of the breach.",
         "domain": "flooding",
         "source": {
+          "url": null,
           "citation": "IPET Final Report, Volume IV, Figure 4-47; FEMA Flood Recovery Maps, Orleans Parish, September 2005",
-          "url": null,
           "access_note": null
         },
+        "content": "Flood depths in the Lower Ninth Ward following the Industrial Canal breaches reached between 6 and 12 feet in the Deslonde Street corridor, with the deepest inundation occurring within the first six hours of the breach.",
+        "fact_id": "lower_ninth_ward_flood_depth",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "st_claude_bridge_elevation",
-        "content": "The St. Claude Avenue Bridge (Claiborne-St. Claude bascule bridge) deck sits approximately 18 feet above mean sea level, placing it above the flood line during the post-Katrina inundation of the surrounding corridor.",
         "domain": "navigation",
         "source": {
-          "citation": "Louisiana DOTD Bridge Inventory Records; USACE New Orleans District survey data",
           "url": null,
+          "citation": "Louisiana DOTD Bridge Inventory Records; USACE New Orleans District survey data",
           "access_note": null
         },
+        "content": "The St. Claude Avenue Bridge (Claiborne-St. Claude bascule bridge) deck sits approximately 18 feet above mean sea level, placing it above the flood line during the post-Katrina inundation of the surrounding corridor.",
+        "fact_id": "st_claude_bridge_elevation",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "fema_region_vi_staging_superdome",
-        "content": "FEMA Region VI designated the Louisiana Superdome as a primary staging and distribution point for emergency supplies during the Hurricane Katrina response, with confirmed deliveries logged as of August 31, 2005.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "U.S. House Select Bipartisan Committee Report, 'A Failure of Initiative,' February 2006, Chapter 7; DHS Inspector General Report OIG-06-32",
-          "url": null,
           "access_note": null
         },
+        "content": "FEMA Region VI designated the Louisiana Superdome as a primary staging and distribution point for emergency supplies during the Hurricane Katrina response, with confirmed deliveries logged as of August 31, 2005.",
+        "fact_id": "fema_region_vi_staging_superdome",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "ares_emergency_net_frequency",
-        "content": "The Louisiana ARES (Amateur Radio Emergency Service) primary emergency net operated on 146.520 MHz simplex as the statewide calling frequency during the Katrina response, with secondary nets on 147.015 MHz and 3.873 MHz HF.",
         "domain": "power",
         "source": {
+          "url": null,
           "citation": "ARRL Louisiana Section Emergency Plan, 2005; ARRL After-Action Report, Hurricane Katrina Amateur Radio Response, October 2005",
-          "url": null,
           "access_note": null
         },
+        "content": "The Louisiana ARES (Amateur Radio Emergency Service) primary emergency net operated on 146.520 MHz simplex as the statewide calling frequency during the Katrina response, with secondary nets on 147.015 MHz and 3.873 MHz HF.",
+        "fact_id": "ares_emergency_net_frequency",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "amateur_radio_battery_voltage_12v",
-        "content": "Standard field-deployed amateur radio transceivers of the 2005 period (including the Kenwood TM-D700 and Icom IC-706 series commonly used in ARES deployments) operated on 12-volt DC nominal power, with a functional transmission floor of approximately 10.5 volts before output power degradation became operationally significant.",
         "domain": "power",
         "source": {
-          "citation": "Kenwood TM-D700A Instruction Manual, 2003 edition; Icom IC-706MKIIG Instruction Manual; ARRL Handbook for Radio Communications, 2005 edition",
           "url": null,
+          "citation": "Kenwood TM-D700A Instruction Manual, 2003 edition; Icom IC-706MKIIG Instruction Manual; ARRL Handbook for Radio Communications, 2005 edition",
           "access_note": null
         },
+        "content": "Standard field-deployed amateur radio transceivers of the 2005 period (including the Kenwood TM-D700 and Icom IC-706 series commonly used in ARES deployments) operated on 12-volt DC nominal power, with a functional transmission floor of approximately 10.5 volts before output power degradation became operationally significant.",
+        "fact_id": "amateur_radio_battery_voltage_12v",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "shelter_in_place_order_lower_ninth",
-        "content": "A mandatory shelter-in-place and evacuation order covering the Lower Ninth Ward, including the Deslonde Street corridor, was in effect from August 28, 2005, and was not formally lifted for civilian re-entry to that sector until September 2005, with the earliest documented re-entry authorizations for residents occurring no earlier than September 3, 2005.",
         "domain": "timing",
         "source": {
+          "url": null,
           "citation": "City of New Orleans Emergency Declarations, August 28, 2005; Louisiana Governor's Office Emergency Orders; Times-Picayune reporting, September 3–5, 2005",
-          "url": null,
           "access_note": null
         },
+        "content": "A mandatory shelter-in-place and evacuation order covering the Lower Ninth Ward, including the Deslonde Street corridor, was in effect from August 28, 2005, and was not formally lifted for civilian re-entry to that sector until September 2005, with the earliest documented re-entry authorizations for residents occurring no earlier than September 3, 2005.",
+        "fact_id": "shelter_in_place_order_lower_ninth",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "orleans_parish_assessor_abandoned_property_procedure",
-        "content": "Under Louisiana Revised Statutes and Orleans Parish Assessor's Office procedure, a property could not be lawfully classified as abandoned without documented evidence of owner non-contact and confirmation that no mandatory evacuation or shelter-in-place order was preventing occupant access at the time of filing.",
         "domain": "other",
         "source": {
+          "url": null,
           "citation": "Louisiana Revised Statutes Title 9, Property Law; Orleans Parish Assessor's Office Standard Operating Procedures; Louisiana Civil Code Article 3418",
-          "url": null,
           "access_note": null
         },
+        "content": "Under Louisiana Revised Statutes and Orleans Parish Assessor's Office procedure, a property could not be lawfully classified as abandoned without documented evidence of owner non-contact and confirmation that no mandatory evacuation or shelter-in-place order was preventing occupant access at the time of filing.",
+        "fact_id": "orleans_parish_assessor_abandoned_property_procedure",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "utm_grid_northing_new_orleans",
-        "content": "New Orleans falls within UTM Zone 15N. The St. Claude Avenue Bridge is located at approximately UTM northing 3,318,000 meters (NAD83), while coordinates in the 3,001,000–3,007,000 meter northing range would fall well outside the New Orleans metropolitan area entirely, consistent with a significant positional error if a six-digit northing is truncated or transposed.",
         "domain": "navigation",
         "source": {
+          "url": null,
           "citation": "USGS National Map, UTM Zone 15N grid; NAD83 datum reference; USACE New Orleans District survey coordinates",
-          "url": null,
           "access_note": null
         },
+        "content": "New Orleans falls within UTM Zone 15N. The St. Claude Avenue Bridge is located at approximately UTM northing 3,318,000 meters (NAD83), while coordinates in the 3,001,000–3,007,000 meter northing range would fall well outside the New Orleans metropolitan area entirely, consistent with a significant positional error if a six-digit northing is truncated or transposed.",
+        "fact_id": "utm_grid_northing_new_orleans",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "industrial_canal_width",
-        "content": "The Inner Harbor Navigation Canal (Industrial Canal) measures approximately 150 meters (500 feet) in width at the St. Claude Avenue Bridge crossing.",
         "domain": "navigation",
         "source": {
-          "citation": "USACE New Orleans District, Industrial Canal Project Records; IPET Final Report, Volume I, Figure 1-2",
           "url": null,
+          "citation": "USACE New Orleans District, Industrial Canal Project Records; IPET Final Report, Volume I, Figure 1-2",
           "access_note": null
         },
+        "content": "The Inner Harbor Navigation Canal (Industrial Canal) measures approximately 150 meters (500 feet) in width at the St. Claude Avenue Bridge crossing.",
+        "fact_id": "industrial_canal_width",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "mold_growth_rate_flooded_documents",
-        "content": "Under post-flood conditions with standing water, high humidity, and temperatures above 80°F, mold colonization of paper documents begins within 24 to 48 hours of water exposure; active mold liquefaction of paper fiber (cellulose degradation) becomes irreversible within 72 to 96 hours under sustained wet conditions at temperatures above 85°F.",
         "domain": "other",
         "source": {
-          "citation": "FEMA 234: Repairing Your Flooded Home, 1992; National Archives and Records Administration, 'Salvage of Water-Damaged Records,' 2005; Northeast Document Conservation Center Preservation Leaflet 3.6",
           "url": null,
+          "citation": "FEMA 234: Repairing Your Flooded Home, 1992; National Archives and Records Administration, 'Salvage of Water-Damaged Records,' 2005; Northeast Document Conservation Center Preservation Leaflet 3.6",
           "access_note": null
         },
+        "content": "Under post-flood conditions with standing water, high humidity, and temperatures above 80°F, mold colonization of paper documents begins within 24 to 48 hours of water exposure; active mold liquefaction of paper fiber (cellulose degradation) becomes irreversible within 72 to 96 hours under sustained wet conditions at temperatures above 85°F.",
+        "fact_id": "mold_growth_rate_flooded_documents",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "algiers_flooding_status",
-        "content": "The Algiers neighborhood on the west bank of the Mississippi River did not flood during Hurricane Katrina; it sustained wind damage but remained above water, making it a functional base for communications and staging operations in the immediate post-storm period.",
         "domain": "flooding",
         "source": {
-          "citation": "IPET Final Report, Volume IV; Louisiana Recovery Authority post-storm damage assessment maps; Times-Picayune, September 1, 2005",
           "url": null,
+          "citation": "IPET Final Report, Volume IV; Louisiana Recovery Authority post-storm damage assessment maps; Times-Picayune, September 1, 2005",
           "access_note": null
         },
+        "content": "The Algiers neighborhood on the west bank of the Mississippi River did not flood during Hurricane Katrina; it sustained wind damage but remained above water, making it a functional base for communications and staging operations in the immediate post-storm period.",
+        "fact_id": "algiers_flooding_status",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "claiborne_avenue_overpass_elevation",
-        "content": "The Claiborne Avenue overpass (I-10 elevated section over North Claiborne Avenue) was used as an informal refuge and staging point during the Katrina response; its elevated deck sits approximately 20 feet above street grade, placing it above the flood line in the surrounding corridor.",
         "domain": "navigation",
         "source": {
+          "url": null,
           "citation": "Louisiana DOTD highway elevation records; documented survivor accounts, Times-Picayune, September 2005; FEMA damage assessment reports",
-          "url": null,
           "access_note": null
         },
+        "content": "The Claiborne Avenue overpass (I-10 elevated section over North Claiborne Avenue) was used as an informal refuge and staging point during the Katrina response; its elevated deck sits approximately 20 feet above street grade, placing it above the flood line in the surrounding corridor.",
+        "fact_id": "claiborne_avenue_overpass_elevation",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "oral_rehydration_salts_who_formula",
-        "content": "WHO-standard oral rehydration salts (ORS) packets in 2005 FEMA emergency stockpiles were formulated to produce one liter of solution per packet, with each packet containing 2.6g sodium chloride, 1.5g potassium chloride, 2.9g trisodium citrate dihydrate, and 13.5g anhydrous glucose.",
         "domain": "capacity",
         "source": {
+          "url": null,
           "citation": "WHO/UNICEF Joint Statement on ORS Formula, 2004; FEMA Emergency Supply Cache Specifications, Region VI, 2005; CDC Emergency Preparedness Supply Standards",
-          "url": null,
           "access_note": null
         },
+        "content": "WHO-standard oral rehydration salts (ORS) packets in 2005 FEMA emergency stockpiles were formulated to produce one liter of solution per packet, with each packet containing 2.6g sodium chloride, 1.5g potassium chloride, 2.9g trisodium citrate dihydrate, and 13.5g anhydrous glucose.",
+        "fact_id": "oral_rehydration_salts_who_formula",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "katrina_ambient_air_toxicity_post_flood",
-        "content": "EPA air quality monitoring in New Orleans following Katrina detected elevated levels of hydrogen sulfide, volatile organic compounds, and particulate matter in flooded areas; the EPA declared air quality in portions of New Orleans as 'unhealthy' to 'hazardous' for sensitive groups during the first two weeks of September 2005, with readings worsening near ruptured fuel storage and industrial sites.",
         "domain": "other",
         "source": {
-          "citation": "EPA Emergency Response Team Air Monitoring Reports, New Orleans, September 2005; EPA Region 6 Katrina Response Documentation; GAO Report GAO-07-651",
           "url": null,
+          "citation": "EPA Emergency Response Team Air Monitoring Reports, New Orleans, September 2005; EPA Region 6 Katrina Response Documentation; GAO Report GAO-07-651",
           "access_note": null
         },
+        "content": "EPA air quality monitoring in New Orleans following Katrina detected elevated levels of hydrogen sulfide, volatile organic compounds, and particulate matter in flooded areas; the EPA declared air quality in portions of New Orleans as 'unhealthy' to 'hazardous' for sensitive groups during the first two weeks of September 2005, with readings worsening near ruptured fuel storage and industrial sites.",
+        "fact_id": "katrina_ambient_air_toxicity_post_flood",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "flat_bottom_skiff_fuel_consumption",
-        "content": "A typical flat-bottom aluminum skiff of 14–16 feet length, powered by a 25–40 horsepower outboard motor as commonly used for post-Katrina navigation in flooded New Orleans streets, consumed approximately 2–3 gallons of gasoline per hour at moderate speed in debris-laden shallow water.",
         "domain": "capacity",
         "source": {
-          "citation": "USCG Auxiliary Boating Safety documentation; manufacturer specifications for Mercury and Evinrude 25–40 HP outboards, 2005; documented accounts of post-Katrina boat operations, Louisiana Wildlife and Fisheries records",
           "url": null,
+          "citation": "USCG Auxiliary Boating Safety documentation; manufacturer specifications for Mercury and Evinrude 25–40 HP outboards, 2005; documented accounts of post-Katrina boat operations, Louisiana Wildlife and Fisheries records",
           "access_note": null
         },
+        "content": "A typical flat-bottom aluminum skiff of 14–16 feet length, powered by a 25–40 horsepower outboard motor as commonly used for post-Katrina navigation in flooded New Orleans streets, consumed approximately 2–3 gallons of gasoline per hour at moderate speed in debris-laden shallow water.",
+        "fact_id": "flat_bottom_skiff_fuel_consumption",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "diocesan_emergency_relief_fund_structure",
-        "content": "The Archdiocese of New Orleans maintained a formal emergency relief fund with a designated fund number used for authorizing disbursements; any authorization code used on receipts or supply manifests that did not match the official archdiocesan fund number would carry no institutional financial backing and could not be redeemed against archdiocesan accounts.",
         "domain": "other",
         "source": {
-          "citation": "Archdiocese of New Orleans Financial Policies and Procedures Manual; Catholic Charities Archdiocese of New Orleans Katrina Response Documentation, 2005–2006",
           "url": null,
+          "citation": "Archdiocese of New Orleans Financial Policies and Procedures Manual; Catholic Charities Archdiocese of New Orleans Katrina Response Documentation, 2005–2006",
           "access_note": null
         },
+        "content": "The Archdiocese of New Orleans maintained a formal emergency relief fund with a designated fund number used for authorizing disbursements; any authorization code used on receipts or supply manifests that did not match the official archdiocesan fund number would carry no institutional financial backing and could not be redeemed against archdiocesan accounts.",
+        "fact_id": "diocesan_emergency_relief_fund_structure",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "katrina_landfall_date_time",
-        "content": "Hurricane Katrina made landfall near Buras, Louisiana at 6:10 AM CDT on August 29, 2005, as a Category 3 hurricane with maximum sustained winds of 125 mph at landfall.",
         "domain": "timing",
         "source": {
+          "url": null,
           "citation": "National Hurricane Center Tropical Cyclone Report, Hurricane Katrina, December 20, 2005 (Knabb, Rhome, Brown)",
-          "url": null,
           "access_note": null
         },
+        "content": "Hurricane Katrina made landfall near Buras, Louisiana at 6:10 AM CDT on August 29, 2005, as a Category 3 hurricane with maximum sustained winds of 125 mph at landfall.",
+        "fact_id": "katrina_landfall_date_time",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "lower_ninth_ward_deslonde_street_location",
-        "content": "Deslonde Street in the Lower Ninth Ward runs north–south between the Mississippi River levee and Florida Avenue, crossing St. Claude Avenue several blocks east of the Industrial Canal, placing properties on that street within the zone of maximum inundation from the Industrial Canal breaches.",
         "domain": "navigation",
         "source": {
+          "url": null,
           "citation": "IPET Final Report, Volume IV, breach location mapping; USGS post-Katrina flood extent mapping; Orleans Parish street grid records",
-          "url": null,
           "access_note": null
         },
+        "content": "Deslonde Street in the Lower Ninth Ward runs north–south between the Mississippi River levee and Florida Avenue, crossing St. Claude Avenue several blocks east of the Industrial Canal, placing properties on that street within the zone of maximum inundation from the Industrial Canal breaches.",
+        "fact_id": "lower_ninth_ward_deslonde_street_location",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "fact_id": "algiers_point_ferry_landing_location",
-        "content": "The Algiers Point ferry landing is located on the west bank of the Mississippi River at the foot of Delaronde Street, directly across the river from the Canal Street ferry terminal in downtown New Orleans, approximately 0.9 miles across the river.",
         "domain": "navigation",
         "source": {
-          "citation": "New Orleans Regional Transit Authority ferry route documentation; USACE Mississippi River navigation charts, New Orleans District; Orleans Parish GIS records",
           "url": null,
+          "citation": "New Orleans Regional Transit Authority ferry route documentation; USACE Mississippi River navigation charts, New Orleans District; Orleans Parish GIS records",
           "access_note": null
         },
+        "content": "The Algiers Point ferry landing is located on the west bank of the Mississippi River at the foot of Delaronde Street, directly across the river from the Canal Street ferry terminal in downtown New Orleans, approximately 0.9 miles across the river.",
+        "fact_id": "algiers_point_ferry_landing_location",
         "valid_from": null,
         "valid_until": null
       }
@@ -663,32 +664,32 @@
   "openingSituation": "",
   "review_checklist": {
     "beat_count": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "sequence_check": {
-      "checked": false,
-      "notes": ""
-    },
-    "path_independence": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "final_beat_spec": {
-      "checked": false,
-      "notes": ""
-    },
-    "tense_attribution": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     },
     "reviewer_summary": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
     },
     "manual_playthrough": {
-      "checked": false,
-      "notes": ""
+      "notes": "",
+      "checked": false
     }
   },
   "historicalRealism": "high",
@@ -827,5 +828,5 @@
     "Marcus forces the iron box and recovers the deed, but the paper fibers are shredded along the property boundary description, leaving the acreage claim legally ambiguous"
   ],
   "structured_endings_enabled": false,
-  "category": "industrial"
+  "displayOrder": 7
 }

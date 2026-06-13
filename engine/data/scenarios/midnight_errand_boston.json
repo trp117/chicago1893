@@ -32,6 +32,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "underground",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-10T03:09:06.908Z",
   "playerGoal": "",
@@ -193,5 +194,6 @@
     "The player delivers the letter but cannot confirm the route map, leaving the warning incomplete."
   ],
   "structured_endings_enabled": true,
-  "category": "underground"
+  "status": "published",
+  "displayOrder": 99
 }

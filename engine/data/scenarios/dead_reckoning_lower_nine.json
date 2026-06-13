@@ -1,0 +1,448 @@
+{
+  "id": "dead_reckoning_lower_nine",
+  "tone": [],
+  "genre": [
+    "survival",
+    "historical",
+    "crisis-management"
+  ],
+  "image": {
+    "generation_prompt": ""
+  },
+  "title": "Dead Reckoning: Lower Nine",
+  "status": "archived",
+  "premise": "",
+  "systems": {
+    "scales": {
+      "threat": {
+        "max": 10,
+        "min": 0,
+        "default": 3
+      },
+      "authorityTrust": {
+        "max": 5,
+        "min": -3,
+        "default": 0
+      }
+    },
+    "pressureEvents": [
+      "Community_Resource_Reserve drops below 40% — infant formula ration cut in half, compounding endurance penalty applied to bridge population",
+      "Ambient_Toxicity_Index shifts from Hazardous to Lethal — all water-contact actions now trigger immediate medical emergency flags",
+      "Deep-cycle battery voltage floor reaches critical threshold — ham radio transmit window reduces to 90 seconds before automatic system cutout"
+    ],
+    "timePerTurnDefault": 2
+  },
+  "version": "1.0.0",
+  "epilogue": {
+    "reviewed": false,
+    "generated": false
+  },
+  "glossary": [
+    {
+      "term": "black water",
+      "source": "",
+      "approved": true,
+      "definition": "Floodwater contaminated with sewage and raw waste — exposure causes dysentery, cholera, and typhoid; untreated wounds become infected almost immediately."
+    },
+    {
+      "term": "hydrostatic pressure",
+      "source": "",
+      "approved": true,
+      "definition": "The downward force created by standing water — at twelve feet deep, this pressure is severe enough to collapse structures not designed to resist it."
+    },
+    {
+      "term": "freeboard",
+      "source": "",
+      "approved": true,
+      "definition": "The vertical distance between the water level and the top of a levee or canal wall — when this distance became zero, overflow was inevitable."
+    },
+    {
+      "term": "FEMA",
+      "source": "",
+      "approved": true,
+      "definition": "Federal Emergency Management Agency — the federal organization responsible for disaster response, whose director testified he was unaware of conditions at the Superdome until September 1st."
+    },
+    {
+      "term": "simplex transmission",
+      "source": "",
+      "approved": true,
+      "definition": "Radio communication where one person speaks at a time on a single frequency — when the operator transmits, they cannot simultaneously receive responses."
+    },
+    {
+      "term": "weight limit",
+      "source": "",
+      "approved": true,
+      "definition": "The maximum load a structure can safely support — the St. Claude Avenue Bridge was engineered for vehicle traffic, not hundreds of people standing on it simultaneously."
+    },
+    {
+      "term": "voltage meter needle",
+      "source": "",
+      "approved": true,
+      "definition": "The indicator on a radio operator's power supply showing how much battery capacity remains — when it approaches the red line, transmission time is measured in minutes, not hours."
+    },
+    {
+      "term": "redevelopment corridors",
+      "source": "",
+      "approved": true,
+      "definition": "Zones designated by city planning for major reconstruction and urban renewal — properties in these corridors could be seized under eminent domain, regardless of pre-flood ownership."
+    },
+    {
+      "term": "land deeds",
+      "source": "",
+      "approved": true,
+      "definition": "Legal documents that prove ownership of property — without them after a disaster, families had no proof their home was theirs and could not prevent foreclosure or redevelopment."
+    },
+    {
+      "term": "parish",
+      "source": "",
+      "approved": true,
+      "definition": "In Louisiana, the equivalent of a county — the Lower Ninth Ward sits within the parish system that determines jurisdiction and property records."
+    },
+    {
+      "term": "grid sweeps",
+      "source": "",
+      "approved": true,
+      "definition": "Systematic aerial reconnaissance flights that divide an area into sections and search each one methodically — without radio contact reporting your location, your sector remains invisible to these sweeps."
+    },
+    {
+      "term": "EPA classification",
+      "source": "",
+      "approved": true,
+      "definition": "The Environmental Protection Agency's formal designation of floodwater as hazardous — once classified, it becomes a federal matter requiring specific containment and disposal protocols."
+    },
+    {
+      "term": "heat index",
+      "source": "",
+      "approved": true,
+      "definition": "The apparent temperature when humidity is factored in — at 108 degrees, it was lethal for people without shelter or access to water."
+    },
+    {
+      "term": "Industrial Canal's full breach load",
+      "source": "",
+      "approved": true,
+      "definition": "The total volume of water that poured through the Industrial Canal when its levee failed — in this case, enough to move entire houses off their foundations."
+    },
+    {
+      "term": "London Avenue Canal walls",
+      "source": "",
+      "approved": true,
+      "definition": "One of two major canal systems that failed during Katrina; its breach sent water directly into the Lower Ninth Ward with catastrophic force."
+    },
+    {
+      "term": "Category 3 storm",
+      "source": "",
+      "approved": true,
+      "definition": "A hurricane with sustained winds of 111-129 mph — dangerous enough to cause severe damage, but Katrina's storm surge behaved like a Category 5, the strongest classification."
+    },
+    {
+      "term": "Category 5 surge",
+      "source": "",
+      "approved": true,
+      "definition": "A storm surge generated by the most powerful hurricane winds, capable of pushing water 18+ feet above normal sea level — in Katrina's case, it overtopped levees designed for much lower water."
+    },
+    {
+      "term": "17th Street Canal levee",
+      "source": "",
+      "approved": true,
+      "definition": "One of the primary flood barriers protecting New Orleans from Lake Pontchartrain; its failure on August 29th allowed water to pour into the city's interior."
+    },
+    {
+      "term": "Lake Pontchartrain",
+      "source": "",
+      "approved": true,
+      "definition": "A large brackish lake north of New Orleans that the failed levee system was supposed to contain; when the 17th Street Canal and London Avenue Canal walls gave way, it became the source of the water that flooded the Lower Ninth Ward."
+    },
+    {
+      "term": "the Lower Ninth Ward",
+      "source": "",
+      "approved": true,
+      "definition": "The lowest-lying residential neighborhood in New Orleans, positioned in a bowl-like depression that made it especially vulnerable to flooding and the first to receive the full force of the Industrial Canal's breach."
+    },
+    {
+      "term": "reconnaissance aircraft running grid sweeps",
+      "source": "",
+      "approved": true,
+      "definition": "Military or government planes systematically flying over mapped sections of the flooded area to locate survivors and assess conditions, but only if they receive radio coordinates confirming where to look."
+    },
+    {
+      "term": "hazardous chemical mixture",
+      "source": "",
+      "approved": true,
+      "definition": "The EPA's classification for the floodwater in New Orleans after Katrina — a combination of raw sewage, petroleum products, heavy metals, and decomposing organic matter that became toxic within days."
+    },
+    {
+      "term": "radio antenna",
+      "source": "",
+      "approved": true,
+      "definition": "A tall metal structure that transmits and receives radio signals; in this scenario, mounted on a roof in Algiers and the only means of contact with the outside world."
+    },
+    {
+      "term": "concrete span",
+      "source": "",
+      "approved": true,
+      "definition": "A bridge made of poured concrete; in this case, the St. Claude Avenue Bridge, not designed to support the weight of hundreds of refugee survivors crowded on its surface."
+    },
+    {
+      "term": "St. Claude Avenue Bridge",
+      "source": "",
+      "approved": true,
+      "definition": "A bridge in the Lower Ninth Ward that becomes a makeshift refuge point after the flooding, serving as a gathering place where the bridge captain must monitor weight distribution."
+    },
+    {
+      "term": "archivist",
+      "source": "",
+      "approved": true,
+      "definition": "A person responsible for preserving documents and records — in this case, attempting to salvage land deeds and other proof of property ownership from a flooded house."
+    },
+    {
+      "term": "net control",
+      "source": "",
+      "approved": true,
+      "definition": "The person managing radio communications on a given frequency, responsible for coordinating all transmissions and ensuring orderly traffic flow."
+    },
+    {
+      "term": "Superdome",
+      "source": "",
+      "approved": true,
+      "definition": "The Louisiana Superdome in downtown New Orleans, hastily converted into a shelter of last resort for those who could not evacuate; it became a crisis point with thousands of people trapped inside without adequate food, water, or sanitation."
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "playerGoal": "",
+  "description": "September 2, 2005. Five days after Katrina's levees failed, a pocket of survivors in New Orleans' Lower Ninth Ward fights to stay alive on a concrete bridge, in a flooded house, and in a sweltering attic. Three people must coordinate across broken infrastructure to secure medical supplies, preserve irreplaceable land records, and transmit coordinates to the outside world before the battery dies, the water turns lethal, and the heat breaks the last of them.",
+  "storyArcIds": [
+    "dead_reckoning_lower_nine_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "On August 29, 2005, Hurricane Katrina made landfall near Buras, Louisiana, as a Category 3 storm carrying a Category 5 surge. Within hours, the 17th Street Canal levee and the London Avenue Canal walls failed in sequence, sending twelve feet of Lake Pontchartrain pouring into the bowl of New Orleans. The Lower Ninth Ward, already the lowest-lying residential district in the city, received the Industrial Canal's full breach load — a wall of water that moved fast enough to carry houses off their foundations. By September 2nd, the National Weather Service was recording a heat index of 108 degrees Fahrenheit over the metro area, and the EPA had already classified the standing floodwater as a hazardous chemical mixture of raw sewage, petroleum distillates, heavy metals, and biological decomposition. FEMA's Director Michael Brown would later testify that he did not learn the Superdome had become a crisis point until the evening of September 1st. Roughly 100,000 people who lacked the means to evacuate remained inside the flooded city.",
+        "type": "world"
+      },
+      {
+        "text": "What is at stake tonight is not dramatic in the way that word is usually applied — it is administrative, procedural, and therefore total. The people trapped in this sector of the Lower Ninth Ward do not need a hero; they need a frequency, a coordinate, and a signed document that proves they own the ground they are standing on. Without the radio transmission, the sector remains invisible to the reconnaissance aircraft running grid sweeps over the parish. Without the land deeds, the families who survive will return to find their properties condemned, auctioned, or absorbed into redevelopment corridors before the silt has dried. Without the antibiotics, three children already running fevers in the 90-degree heat on the St. Claude Bridge will not make it to the week's end. Each of these failures is quiet, bureaucratic, and irreversible.",
+        "type": "stakes"
+      },
+      {
+        "text": "The St. Claude Avenue Bridge smells like hot iron and standing water and something older underneath — the particular sweetness of organic matter that has been wet for five days in September heat. The flood plane surrounding it is glassy and still, broken only by the slow rotation of debris: a refrigerator door, a child's bicycle wheel, the corner of a mattress moving in a current that has no visible source. The sky is a flat, bleached white, the kind that gives no shadow and holds the heat against the skin like a compress. Somewhere to the south, across the river in Algiers, a radio antenna is mounted to a roof peak, and its operator is watching a voltage meter needle drop one millimeter at a time toward a red line.",
+        "type": "scene"
+      },
+      {
+        "text": "You are one of three people in this sector who can change what happens next. The bridge captain is counting bodies against the weight limit of a concrete span that was never designed to be a refugee camp. The archivist is kneeling in a kayak inside a flooded house, watching a metal box disappear under settling plaster. The radio operator is calculating how many words can be spoken before the lights go out. None of them can reach the others by phone. None of them know exactly what the others are deciding. They are operating on partial information, in a city that has stopped answering, on a September afternoon that will not cool down. You are standing at the edge of what you can control, and the next two minutes are yours.",
+        "type": "entry",
+        "character_entries": {
+          "role_ham_operator": "",
+          "role_bridge_captain": "",
+          "role_family_archivist": ""
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_bridge_captain",
+    "role_family_archivist",
+    "role_ham_operator"
+  ],
+  "winConditions": [
+    "Signal_Beacon_Visibility reaches 75 or above AND valid grid coordinates are transmitted to the emergency operations post before battery cutout",
+    "Land deed records are recovered intact and delivered to the bridge camp as legal proof of property ownership for at least one displaced family",
+    "Medical antibiotic crate is secured and distributed to at least three children on the bridge before Community_Resource_Reserve reaches zero"
+  ],
+  "failConditions": [
+    "Battery voltage reaches terminal cutout before any coordinate transmission is completed",
+    "Community_Resource_Reserve reaches zero while more than twenty children remain on the bridge without medical intervention",
+    "Ambient_Toxicity_Index reaches Lethal and a survivor enters the water without protective gear, triggering a fatal medical emergency",
+    "Session time expires with Signal_Beacon_Visibility below 40 and no radio contact established"
+  ],
+  "technical_facts": {
+    "facts": [],
+    "reviewed": false,
+    "generated": false
+  },
+  "allow_free_input": true,
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": false
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": false
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": false
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": false
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Disaster Relief Operations Argot",
+        "terms": [
+          {
+            "term": "push package",
+            "meaning": "A pre-positioned emergency supply cache dispatched forward without a confirmed request — sent on projected need rather than filed requisition"
+          },
+          {
+            "term": "life safety mission",
+            "meaning": "An operation classified as immediate rescue of persons in mortal danger, which supersedes all property-protection and logistical tasking in the priority queue"
+          },
+          {
+            "term": "staging area",
+            "meaning": "A designated high-ground or dry-land assembly point where incoming relief assets are sorted, inventoried, and redistributed into the affected zone"
+          },
+          {
+            "term": "spot report",
+            "meaning": "A brief, formatted verbal or written transmission of immediate field conditions — casualties, resources, hazards — sent up the chain without waiting for a formal situation report cycle"
+          },
+          {
+            "term": "ESF",
+            "meaning": "Emergency Support Function — one of fifteen federal coordination annexes under the National Response Plan, each covering a specific category such as ESF-8 for public health or ESF-13 for law enforcement"
+          },
+          {
+            "term": "unmet need",
+            "meaning": "A documented gap between available relief resources and the confirmed requirements of a survivor population — the formal bureaucratic term for people who have nothing"
+          },
+          {
+            "term": "last known position",
+            "meaning": "The most recent confirmed coordinate or address associated with a missing person or isolated survivor group, used to prioritize search grid assignments"
+          }
+        ],
+        "context": "Used by FEMA field coordinators, National Guard logistics officers, and Red Cross staging personnel when communicating resource status and personnel movement in post-storm operations."
+      },
+      {
+        "name": "Amateur Radio Operator Protocol",
+        "terms": [
+          {
+            "term": "net control",
+            "meaning": "The designated station responsible for managing traffic flow on an emergency frequency — all other stations check in through net control before transmitting"
+          },
+          {
+            "term": "traffic",
+            "meaning": "Any message or data payload being relayed through the amateur radio network, distinct from casual conversation — 'I have traffic' means a formal message requires relay"
+          },
+          {
+            "term": "QRM",
+            "meaning": "Interference from other stations on the frequency — used as both a noun and a warning call when a transmission is being degraded by competing signals"
+          },
+          {
+            "term": "QSB",
+            "meaning": "Signal fading — a notation that transmission strength is fluctuating due to atmospheric conditions, relevant in the dense coastal humidity of post-storm New Orleans"
+          },
+          {
+            "term": "phonetic alphabet",
+            "meaning": "NATO standardized letter substitutions (Alpha, Bravo, Charlie) used to spell coordinates and names without ambiguity over degraded audio channels"
+          },
+          {
+            "term": "simplex",
+            "meaning": "Direct station-to-station transmission on a single frequency, without a repeater — used when repeater infrastructure has been destroyed or is unreachable"
+          },
+          {
+            "term": "battery reserve",
+            "meaning": "The remaining amp-hour capacity of the deep-cycle power source — operators track this in real time because it determines how many more transmissions are physically possible"
+          }
+        ],
+        "context": "Used by licensed ham radio operators on emergency frequencies, particularly those operating under ARES (Amateur Radio Emergency Service) coordination during the Katrina response when commercial networks were down."
+      },
+      {
+        "name": "Lower Ninth Ward Community Language",
+        "terms": [
+          {
+            "term": "the neutral ground",
+            "meaning": "The raised median strip running down the center of a boulevard — in New Orleans usage, any elevated strip of ground between road lanes; during the flood, any strip of dry or higher ground"
+          },
+          {
+            "term": "make groceries",
+            "meaning": "To shop for food — a New Orleans-specific idiom meaning to acquire provisions; in the flood context, to locate and secure any available food or water supply"
+          },
+          {
+            "term": "catch the bus",
+            "meaning": "To evacuate by public transit — used bitterly in the post-storm period to refer to the buses that did not come, and to the people who had no other means of leaving"
+          },
+          {
+            "term": "shotgun house",
+            "meaning": "A narrow single-story residential structure in which rooms are arranged in a direct line front to back, common throughout the Lower Ninth Ward — the architectural type most affected by the surge"
+          },
+          {
+            "term": "banquette",
+            "meaning": "The sidewalk — New Orleans French-Creole term for the raised pedestrian walkway, which in the flood became the only navigable ground-level path in some blocks"
+          },
+          {
+            "term": "the parish",
+            "meaning": "Orleans Parish — the administrative unit equivalent to a county, used interchangeably with 'the city' by residents to mean the full jurisdiction of New Orleans"
+          },
+          {
+            "term": "rode it out",
+            "meaning": "Chose to remain in place during the storm rather than evacuate — a phrase carrying both pride and, in the aftermath, the weight of what that decision cost"
+          }
+        ],
+        "context": "The vernacular of long-term Lower Ninth Ward residents — predominantly Black homeowners whose families had held property since the post-World War II era — as used in daily speech and in the immediate crisis."
+      },
+      {
+        "name": "Structural and Environmental Field Assessment",
+        "terms": [
+          {
+            "term": "freeboard",
+            "meaning": "The vertical distance between the current water surface and the top of a levee or flood wall — a freeboard of zero means the structure is overtopped"
+          },
+          {
+            "term": "scour",
+            "meaning": "The erosion of soil and foundation material caused by fast-moving water undercutting a structure's base — the mechanism by which the Industrial Canal breach widened so rapidly"
+          },
+          {
+            "term": "hydrostatic pressure",
+            "meaning": "The outward force exerted by standing water against a wall or sealed container — the reason flooded houses resist entry and why the iron document box is swollen shut"
+          },
+          {
+            "term": "load path",
+            "meaning": "The structural route by which weight travels from a roof or floor through walls to the foundation — a collapsed ceiling disrupts the load path and makes the remaining structure unpredictable"
+          },
+          {
+            "term": "black water",
+            "meaning": "Floodwater contaminated with raw sewage — distinct from grey water in its bacterial and viral load; the EPA classification applied to most standing water in New Orleans by September 2nd"
+          },
+          {
+            "term": "thermal mass",
+            "meaning": "The capacity of a material to absorb and retain heat — concrete bridge decks have high thermal mass, meaning they continue radiating absorbed solar energy for hours after sunset"
+          }
+        ],
+        "context": "Used by civil engineers, public health inspectors, and Army Corps of Engineers personnel assessing building integrity and environmental contamination in the flooded zone."
+      }
+    ]
+  },
+  "keyEvidenceClueIds": [
+    "clue_grid_coordinates_sheet",
+    "clue_land_deed_iron_box"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "Coordinates are transmitted but contain a transposition error — a rescue helicopter arrives at the wrong grid square, losing four hours",
+    "Land deed box is wrenched open under mechanical pressure — the property boundary page survives but the original signature block is destroyed, weakening legal standing",
+    "Antibiotic crate is accepted but three additional children now occupy the bridge's critical thermal zone, accelerating dehydration across the camp"
+  ],
+  "structured_endings_enabled": false,
+  "displayOrder": 99
+}

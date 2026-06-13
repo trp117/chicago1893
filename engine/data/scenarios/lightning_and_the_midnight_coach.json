@@ -32,6 +32,7 @@
     "timePerTurnDefault": 2
   },
   "version": "1.0.0",
+  "category": "underground",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T22:45:13.231Z",
   "playerGoal": "",
@@ -258,5 +259,6 @@
     "The informant is exposed but the bounty wire reaches Crane before the phantom message can misdirect him — one passenger is recaptured.",
     "Caleb destroys the brass at the junction, silencing the line but also alerting the company to sabotage and endangering the entire Ohio network."
   ],
-  "category": "underground"
+  "status": "published",
+  "displayOrder": 99
 }
