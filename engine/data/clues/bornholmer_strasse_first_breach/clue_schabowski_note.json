@@ -1,20 +1,20 @@
 {
   "id": "clue_schabowski_note",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "title": "Schabowski's Note — The Unread Regulation",
-  "description": "In the command post break room, the state broadcast is still running on the television. You find a Stasi internal telex — received at 19:34 — containing the full text of the travel regulation Schabowski read aloud. The critical line is underlined in red pen by someone who received it before the press conference: 'This regulation is to take effect on November 10, 1989, pending publication in the Gesetzblatt.' The regulation text indicates implementation was intended to follow formal publication and administrative processing beginning on November 10. But Schabowski's televised statement has already outrun the written procedure. The checkpoint now faces two incompatible realities: the state's paperwork and the crowd's understanding of what was just promised.",
+  "unlocks": [
+    "clue_jaeger_order_log"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.118Z",
+  "locationId": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "In the command post break room, the state broadcast is still running on the television. You find a Stasi internal telex — received at 19:34 — containing the full text of the travel regulation Schabowski read aloud. The critical line is underlined in red pen by someone who received it before the press conference: 'This regulation is to take effect on November 10, 1989, pending publication in the Gesetzblatt.' The regulation text indicates implementation was intended to follow formal publication and administrative processing beginning on November 10. But Schabowski's televised statement has already outrun the written procedure. The checkpoint now faces two incompatible realities: the state's paperwork and the crowd's understanding of what was just promised.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_checkpoint_command_post",
   "implicatesCharacterIds": [
     "char_jaeger",
     "char_oberst_mielke"
-  ],
-  "unlocks": [
-    "clue_jaeger_order_log"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.979Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

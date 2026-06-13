@@ -1,20 +1,20 @@
 {
   "id": "gill_print_shop_front",
-  "scenarioId": "midnight_errand_boston",
-  "name": "Gill's Print Shop — Front Room and Stairs",
-  "description": "The front room holds the shop counter, stacked broadsheets, and the foot of the stairs that lead to the family quarters above. The shutters are closed but thin — lamplight from the street shows through the cracks.",
   "mood": "domestic, precarious, watched",
-  "linkedCharacterIds": [
-    "benjamin_gill",
-    "dorothy_gill"
-  ],
+  "name": "Gill's Print Shop — Front Room and Stairs",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.915Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "midnight_errand_boston",
+  "description": "The front room holds the shop counter, stacked broadsheets, and the foot of the stairs that lead to the family quarters above. The shutters are closed but thin — lamplight from the street shows through the cracks.",
   "atmosphericDetails": [
     "A half-printed broadsheet lies on the counter — a mundane notice about a lost horse, the most ordinary thing in the world.",
     "The stairs creak on the third and seventh step; everyone in the family knows which ones to avoid.",
     "Benjamin's reading spectacles are on the counter — he came down recently and left in a hurry."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.915Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "benjamin_gill",
+    "dorothy_gill"
+  ]
 }

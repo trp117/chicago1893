@@ -1,19 +1,19 @@
 {
   "id": "lattimore_connection",
-  "scenarioId": "singing_wires",
   "title": "Jerome Lattimore's Altered Departure Times",
-  "description": "When the players examine the last three interception attempts against the network's actual departure records — held in Mercy Voss's hidden accounts beneath the dry goods store floor — a pattern emerges: each time the catchers arrived, they were between forty-five minutes and one hour late. Someone inside the network was feeding information but deliberately skewing the timing. Only a person who knew the real departure time and chose to alter it would produce this pattern. Jerome Lattimore handled the departure notifications for all three groups.",
-  "category": "observation",
-  "discoveryLocationId": "voss_dry_goods",
-  "implicatesCharacterIds": [
-    "jerome_lattimore"
-  ],
   "unlocks": [
     "lattimore_free_papers"
   ],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.486Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "singing_wires",
+  "description": "When the players examine the last three interception attempts against the network's actual departure records — held in Mercy Voss's hidden accounts beneath the dry goods store floor — a pattern emerges: each time the catchers arrived, they were between forty-five minutes and one hour late. Someone inside the network was feeding information but deliberately skewing the timing. Only a person who knew the real departure time and chose to alter it would produce this pattern. Jerome Lattimore handled the departure notifications for all three groups.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "voss_dry_goods",
+  "implicatesCharacterIds": [
+    "jerome_lattimore"
+  ]
 }

@@ -1,18 +1,18 @@
 {
   "id": "harbor_street_alley",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "Harbor Street Alley",
-  "description": "A narrow passage between a chandler's shop and a sailmaker's loft, running from King Street down to the waterfront — it is the kind of place where men go when they do not want to be seen, and tonight it smells of tobacco and recent footsteps in the mud. A single lantern at the far end casts more shadow than light.",
   "mood": "dark, furtive, liminal, dangerous",
-  "linkedCharacterIds": [
-    "reverend_ezra_willard",
-    "thomas_greenleaf"
-  ],
+  "name": "Harbor Street Alley",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.442Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "A narrow passage between a chandler's shop and a sailmaker's loft, running from King Street down to the waterfront — it is the kind of place where men go when they do not want to be seen, and tonight it smells of tobacco and recent footsteps in the mud. A single lantern at the far end casts more shadow than light.",
   "atmosphericDetails": [
     "Fresh boot prints in the mud lead toward the waterfront — two sets, one larger than the other, walking close together.",
     "A torn scrap of paper is caught on a nail in the wall — it bears a partial column of numbers in a cramped, precise hand.",
     "The sound of the crowd at Old South echoes strangely down the alley, making it impossible to tell how far away the meeting house is."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.442Z"
+  "linkedCharacterIds": [
+    "reverend_ezra_willard",
+    "thomas_greenleaf"
+  ]
 }

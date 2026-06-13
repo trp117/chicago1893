@@ -1,17 +1,17 @@
 {
   "id": "clue_raab_predated_report",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "title": "Raab's Pre-Drafted Incident Report",
-  "description": "In the command post, Oberst Raab has left his briefcase open on a chair while taking a phone call in the corridor. Inside, visible without touching anything, is a typewritten document on Ministry for State Security letterhead. The timestamp in the upper right corner reads 21:15 — forty-five minutes ago. The document's subject line reads: 'Unauthorized Unilateral Gate Opening — Responsibility of Duty Officer Lt. Col. H. Jäger.' The gate has not opened yet. The report was written before the event it describes. Raab came here tonight not to manage the situation but to document that Jäger, and Jäger alone, will bear the institutional weight of whatever happens.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.118Z",
+  "locationId": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "In the command post, Oberst Raab has left his briefcase open on a chair while taking a phone call in the corridor. Inside, visible without touching anything, is a typewritten document on Ministry for State Security letterhead. The timestamp in the upper right corner reads 21:15 — forty-five minutes ago. The document's subject line reads: 'Unauthorized Unilateral Gate Opening — Responsibility of Duty Officer Lt. Col. H. Jäger.' The gate has not opened yet. The report was written before the event it describes. Raab came here tonight not to manage the situation but to document that Jäger, and Jäger alone, will bear the institutional weight of whatever happens.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_checkpoint_command_post",
   "implicatesCharacterIds": [
     "char_oberst_mielke"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.979Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

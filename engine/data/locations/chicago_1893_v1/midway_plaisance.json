@@ -1,0 +1,18 @@
+{
+  "id": "midway_plaisance",
+  "mood": "crowded, colorful, distracting",
+  "name": "Midway Plaisance",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "Noise, spectacle, concessionaires, foreign exhibits, and loose tongues among men who assume no one is listening closely.",
+  "atmosphericDetails": [
+    "A conversation in French cut short at your approach",
+    "A receipt tied to a private carriage",
+    "A rumor of a meeting at a hotel off the grounds"
+  ],
+  "linkedCharacterIds": [
+    "emile_mercier",
+    "clara_hale"
+  ]
+}

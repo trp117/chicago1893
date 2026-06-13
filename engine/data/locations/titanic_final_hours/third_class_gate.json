@@ -1,19 +1,19 @@
 {
   "id": "third_class_gate",
-  "scenarioId": "titanic_final_hours",
-  "name": "Third Class Promenade Gate — E-Deck",
-  "description": "The iron lattice gate at the base of the E-Deck stairwell that separates the Third Class forward promenade from the main staircase leading to the upper decks — it is locked with a padlock, and on the other side, visible through the lattice, a crowd of steerage passengers has been gathering for forty minutes.",
   "mood": "tense, unjust, volatile",
-  "linkedCharacterIds": [
-    "margaret_brown"
-  ],
+  "name": "Third Class Promenade Gate — E-Deck",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.057Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "titanic_final_hours",
+  "description": "The iron lattice gate at the base of the E-Deck stairwell that separates the Third Class forward promenade from the main staircase leading to the upper decks — it is locked with a padlock, and on the other side, visible through the lattice, a crowd of steerage passengers has been gathering for forty minutes.",
   "atmosphericDetails": [
     "The sound through the gate is multilingual and rising in pitch — Polish, Italian, Finnish, Yiddish, English with a dozen accents — and the faces pressed against the iron lattice are young, most of them, and afraid",
     "The padlock is a standard White Star Line brass lock, and the key ring for this section of the ship hangs in the steward's office one deck up — a fact that is both simple and monstrous",
     "Water is visible at the far end of the Third Class corridor beyond the gate, a thin dark line advancing slowly along the floor — the passengers can see it too"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.057Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "margaret_brown"
+  ]
 }

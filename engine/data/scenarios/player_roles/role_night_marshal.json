@@ -1,33 +1,57 @@
 {
   "id": "role_night_marshal",
-  "scenarioId": "artesian_height_1892",
   "name": "The Night Marshal",
-  "description": "You are the village's lone law enforcement officer, stationed in the tower's lower office with a jail cell behind you and a construction site in front of you. The door was left unlocked overnight, and three pages of the bore log are missing.",
-  "startLocationId": "loc_lower_office",
-  "startingKnowledge": [
-    "The tower's ground floor entrance door was completely unlocked when you returned from your twenty-two minute walk.",
-    "A CBQ railroad fireman has been idling a consist two blocks south for two nights and can verify the exact movement of individuals after midnight.",
-    "The night laborer Silas Greer was hired directly through Alderman Voss's recommendation rather than the regular municipal crew agency."
-  ],
-  "accessLevel": "investigator",
-  "perspective": "first-person sensory",
+  "opening": {
+    "choices": [
+      "Open the strongbox and inventory its contents against the official filing record.",
+      "Walk the perimeter to the CBQ siding and speak to the fireman who has been watching the site.",
+      "Go directly to the Block A perimeter and find Silas Greer before the shift changes."
+    ],
+    "narrative": "The lower office is quiet except for the distant clack of the pump pistons rising through the foundation stone and the eerie, low moan of the iron tank bands settling overhead. The desk lamp is lit. The cell is empty. The strongbox hasp is bent at an angle that tells you exactly how much force was used and in what direction. You have been in this room for eleven years of accumulated instinct, and your instinct right now is that the person who opened that box was not looking for what was already in it — they were putting something in.",
+    "npcMoments": []
+  },
   "briefing": "You are standing at the white oak desk in the tower's lower office, with the heavy cell keys cold against your hip and the smell of new wood around you. The strongbox beneath the desk is closed but not locked, its iron hasp bent at an angle that proves someone forced it open during your perimeter watch. You have been policing these Cook County townships for eleven years, and you know this site was accessed by someone who did not need to search for the papers. The bore log binder sits open on the draughtsmen's cabinet with three ragged stubs where the core sample records used to be. You must find who violated this perimeter before the midnight freight consist rolls out or risk taking the blame for the theft yourself.",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.737Z",
+  "represents": "",
+  "scenarioId": "artesian_height_1892",
+  "accessLevel": "investigator",
+  "description": "You are the village's lone law enforcement officer, stationed in the tower's lower office with a jail cell behind you and a construction site in front of you. The door was left unlocked overnight, and three pages of the bore log are missing.",
+  "perspective": "first-person sensory",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "None",
+      "closing_line": "The blank complaint form remained on your desk as the board called the final, catastrophic vote.",
+      "what_happened": "The intentional diversion of the Block A trench collapse draws you away from the office for too long, allowing the intruder to return and burn the tampered torque logs. Without physical evidence or a signed complaint, your accusations are dismissed by the bond committee, and the funding freeze goes into immediate effect.",
+      "emotional_weight": "Perimeter Breach—the suffocating weight of knowing your routine rounds were calculated and manipulated by an enemy who outmaneuvered your authority.",
+      "closing_line_override": ""
+    },
+    "partial": {
+      "who_present": "The Chief Engineer",
+      "closing_line": "The train whistle screamed along the Aurora branch, carrying the architect of the conspiracy out of your reach.",
+      "what_happened": "You successfully recover the torn bore log pages and secure the forged certificate from the strongbox, providing President Wickerson with the legal cause needed to hold the bond issue open. However, during the Block A trench collapse emergency, you allow the primary saboteur to slip past the perimeter gate and board an eastbound CBQ locomotive, escaping local prosecution.",
+      "emotional_weight": "Evaded Justice—the lingering frustration of securing the municipal state records while the living asset escapes into the city's anonymous grid.",
+      "closing_line_override": ""
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The fireman on the CBQ consist has not moved in an hour.",
   "character_hooks": [
     "The warmth of the bent strongbox hasp under your palm, indicating the intruder has only recently exited the room.",
     "The parallel shadows cast across the flagstone floor by the empty cell bars as the desk lamp begins to flicker.",
     "The discovery of three torn pages from the official bore log binder stuffed behind the water closet down the hall."
   ],
-  "suggested_secret": "You have an unexecuted letter from a Chicago annexation group in your desk offering you a lucrative precinct constable commission if the village infrastructure fails.",
-  "opening": {
-    "narrative": "The lower office is quiet except for the distant clack of the pump pistons rising through the foundation stone and the eerie, low moan of the iron tank bands settling overhead. The desk lamp is lit. The cell is empty. The strongbox hasp is bent at an angle that tells you exactly how much force was used and in what direction. You have been in this room for eleven years of accumulated instinct, and your instinct right now is that the person who opened that box was not looking for what was already in it — they were putting something in.",
-    "npcMoments": [],
-    "choices": [
-      "Open the strongbox and inventory its contents against the official filing record.",
-      "Walk the perimeter to the CBQ siding and speak to the fireman who has been watching the site.",
-      "Go directly to the Block A perimeter and find Silas Greer before the shift changes."
-    ]
-  },
+  "startLocationId": "loc_lower_office",
+  "context_sentence": "You are the Night Marshal of Western Springs, Illinois, the sole law enforcement officer assigned to guard the village's new combined waterworks and tower during its construction in the summer of 1892, when Cook County municipalities were racing to build independent infrastructure against Chicago's annexation campaigns.",
   "roleInitialState": {
+    "flags": {
+      "greer_located": false,
+      "strongbox_opened": false,
+      "marsh_interviewed": false,
+      "lower_door_secured": false
+    },
     "inventory": [
       "iron cell keys",
       "sworn complaint form (blank)",
@@ -35,40 +59,16 @@
       "village marshal's badge",
       "perimeter gate key"
     ],
-    "flags": {
-      "strongbox_opened": false,
-      "marsh_interviewed": false,
-      "greer_located": false,
-      "lower_door_secured": false
-    },
     "suspicion": {
       "char_silas_greer": 1,
       "char_alderman_voss": 0,
       "char_edgar_williams": 0
     }
   },
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.861Z",
-  "context_sentence": "You are the Night Marshal of Western Springs, Illinois, the sole law enforcement officer assigned to guard the village's new combined waterworks and tower during its construction in the summer of 1892, when Cook County municipalities were racing to build independent infrastructure against Chicago's annexation campaigns.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "",
-  "fact_checked": false,
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You successfully recover the torn bore log pages and secure the forged certificate from the strongbox, providing President Wickerson with the legal cause needed to hold the bond issue open. However, during the Block A trench collapse emergency, you allow the primary saboteur to slip past the perimeter gate and board an eastbound CBQ locomotive, escaping local prosecution.",
-      "who_present": "The Chief Engineer",
-      "emotional_weight": "Evaded Justice—the lingering frustration of securing the municipal state records while the living asset escapes into the city's anonymous grid.",
-      "closing_line": "The train whistle screamed along the Aurora branch, carrying the architect of the conspiracy out of your reach.",
-      "closing_line_override": ""
-    },
-    "failure": {
-      "what_happened": "The intentional diversion of the Block A trench collapse draws you away from the office for too long, allowing the intruder to return and burn the tampered torque logs. Without physical evidence or a signed complaint, your accusations are dismissed by the bond committee, and the funding freeze goes into immediate effect.",
-      "who_present": "None",
-      "emotional_weight": "Perimeter Breach—the suffocating weight of knowing your routine rounds were calculated and manipulated by an enemy who outmaneuvered your authority.",
-      "closing_line": "The blank complaint form remained on your desk as the board called the final, catastrophic vote.",
-      "closing_line_override": ""
-    }
-  },
-  "bridge_sentence": "The fireman on the CBQ consist has not moved in an hour."
+  "suggested_secret": "You have an unexecuted letter from a Chicago annexation group in your desk offering you a lucrative precinct constable commission if the village infrastructure fails.",
+  "startingKnowledge": [
+    "The tower's ground floor entrance door was completely unlocked when you returned from your twenty-two minute walk.",
+    "A CBQ railroad fireman has been idling a consist two blocks south for two nights and can verify the exact movement of individuals after midnight.",
+    "The night laborer Silas Greer was hired directly through Alderman Voss's recommendation rather than the regular municipal crew agency."
+  ]
 }

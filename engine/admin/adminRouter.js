@@ -7,11 +7,65 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import PipelineOrchestrator from '../services/PipelineOrchestrator.js';
 import VersionController from '../services/VersionController.js';
+import multer from 'multer';
+import sharp from 'sharp';
+import { supabase } from '../../lib/supabase.js';
 
 let _anthropicClient = null;
 function getAnthropicClient(apiKey) {
   if (!_anthropicClient) _anthropicClient = new Anthropic({ apiKey });
   return _anthropicClient;
+}
+
+// ── Image processing ──────────────────────────────────────────────────────────
+
+const STORAGE_BUCKET = 'scenario-images';
+const _upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+// Combined PIL-equivalent: brightness 1.02 then contrast 1.05
+// output = 1.05 * (1.02 * input) - 128 * 0.05 = 1.071 * input - 6.4
+const ENHANCE_A = 1.071;
+const ENHANCE_B = -6.4;
+
+async function processWide(buffer) {
+  return sharp(buffer)
+    .resize(1600, 900, { fit: 'cover', position: 'centre' })
+    .linear(ENHANCE_A, ENHANCE_B)
+    .jpeg({ quality: 85 })
+    .toBuffer();
+}
+
+async function processShort(buffer, cropAnchor = 50) {
+  const meta = await sharp(buffer).metadata();
+  const targetW = 1800, targetH = 493;
+  const scale   = Math.max(targetW / meta.width, targetH / meta.height);
+  const newW    = Math.ceil(meta.width  * scale);
+  const newH    = Math.ceil(meta.height * scale);
+  const leftOff = Math.max(0, Math.floor((newW - targetW) / 2));
+  const availH  = Math.max(0, newH - targetH);
+  const topOff  = Math.max(0, Math.min(Math.round(availH * (cropAnchor / 100)), availH));
+  return sharp(buffer)
+    .resize(newW, newH, { fit: 'fill' })
+    .extract({ left: leftOff, top: topOff, width: targetW, height: targetH })
+    .linear(ENHANCE_A, ENHANCE_B)
+    .jpeg({ quality: 85 })
+    .toBuffer();
+}
+
+async function processSource(buffer) {
+  return sharp(buffer)
+    .resize(2000, null, { fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 85 })
+    .toBuffer();
+}
+
+async function storageUpload(filename, buffer) {
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(filename, buffer, { contentType: 'image/jpeg', upsert: true });
+  if (error) throw error;
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
 }
 
 const _dir = dirname(fileURLToPath(import.meta.url));
@@ -2490,6 +2544,89 @@ Return only the scene description. No preamble, no closing remarks.`,
     };
     await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ success: true });
+  });
+
+  // ── Image upload / recrop / delete ───────────────────────────────────────────
+
+  r.post('/scenarios/:id/image-upload', (req, res, next) => {
+    _upload.single('image')(req, res, err => {
+      if (err?.code === 'LIMIT_FILE_SIZE') return badRequest(res, 'File exceeds 10 MB limit.');
+      if (err) return res.status(500).json({ error: err.message });
+      next();
+    });
+  }, async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    if (!req.file)  return badRequest(res, 'No file uploaded.');
+    const { mimetype } = req.file;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(mimetype))
+      return badRequest(res, 'File must be JPEG, PNG, or WebP.');
+
+    const cropAnchor = Math.max(0, Math.min(100, Number(req.body?.cropAnchor ?? 50)));
+    const id = req.params.id;
+    try {
+      const [wideBuffer, shortBuffer, sourceBuffer] = await Promise.all([
+        processWide(req.file.buffer),
+        processShort(req.file.buffer, cropAnchor),
+        processSource(req.file.buffer),
+      ]);
+      const [wideUrl, shortUrl, sourceUrl] = await Promise.all([
+        storageUpload(`${id}_wide.jpg`,   wideBuffer),
+        storageUpload(`${id}_short.jpg`,  shortBuffer),
+        storageUpload(`${id}_source.jpg`, sourceBuffer),
+      ]);
+      const updated = {
+        ...scenario,
+        image: { ...(scenario.image || {}), url: wideUrl, shortUrl, sourceUrl, cropAnchor },
+      };
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
+      res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl });
+    } catch (err) {
+      console.error('[IMAGE-UPLOAD]', err.message);
+      res.status(500).json({ error: 'Image processing failed', detail: err.message });
+    }
+  });
+
+  r.post('/scenarios/:id/image-recrop', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    if (!scenario.image?.sourceUrl) return badRequest(res, 'No source image on file — upload first.');
+    const cropAnchor = Math.max(0, Math.min(100, Number(req.body?.cropAnchor ?? 50)));
+    const id = req.params.id;
+    try {
+      const { data: fileData, error: dlError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .download(`${id}_source.jpg`);
+      if (dlError) throw dlError;
+      const sourceBuffer  = Buffer.from(await fileData.arrayBuffer());
+      const shortBuffer   = await processShort(sourceBuffer, cropAnchor);
+      const shortUrl      = await storageUpload(`${id}_short.jpg`, shortBuffer);
+      const updated = {
+        ...scenario,
+        image: { ...(scenario.image || {}), shortUrl, cropAnchor },
+      };
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
+      res.json({ short: shortUrl });
+    } catch (err) {
+      console.error('[IMAGE-RECROP]', err.message);
+      res.status(500).json({ error: 'Recrop failed', detail: err.message });
+    }
+  });
+
+  r.delete('/scenarios/:id/image', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const id = req.params.id;
+    try {
+      await supabase.storage.from(STORAGE_BUCKET)
+        .remove([`${id}_wide.jpg`, `${id}_short.jpg`, `${id}_source.jpg`]);
+      const updated = { ...scenario, image: {} };
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image deleted' });
+      res.json({ deleted: true });
+    } catch (err) {
+      console.error('[IMAGE-DELETE]', err.message);
+      res.status(500).json({ error: 'Delete failed', detail: err.message });
+    }
   });
 
   console.log('[admin] Pipeline routes registered');

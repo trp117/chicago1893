@@ -1,63 +1,63 @@
 {
   "id": "role_arkhipov",
-  "scenarioId": "sargasso_deep_three_keys",
   "name": "The Second-in-Command",
+  "opening": {
+    "choices": [
+      "Ask Savitsky directly what new information has changed the tactical picture since the last command conference.",
+      "Request permission to consult with the Sonar Analyst before any command decision is finalized.",
+      "State formally, for the record, that you do not concur with the launch order and require documented justification before proceeding."
+    ],
+    "narrative": "It is 20:00 ship's time aboard B-59, and the submarine has been submerged for seventeen hours. The conning tower is lit by a single red lamp. The temperature gauge on the port bulkhead reads 107°F and is still climbing. Captain Savitsky is at the chart table with the standing orders document open in front of him. Political Officer Maslennikov is standing at his left shoulder. The last signaling depth charge detonated eleven minutes ago and the hull is still faintly resonating. Savitsky has called this meeting because he is ready to give the order, and the only thing standing between him and the completion of the launch sequence is the man standing across the chart table from him — you.",
+    "npcMoments": [
+      {
+        "action": "Sets his parallel rulers down carefully on the chart and looks up at Arkhipov with the flat, patient expression of a man who has already won an argument in his head.",
+        "characterId": "char_savitsky"
+      },
+      {
+        "action": "Adjusts his collar and does not look at Arkhipov — a small, deliberate act of non-commitment.",
+        "characterId": "char_maslennikov"
+      }
+    ]
+  },
+  "briefing": "You are standing in the conning tower with your back against the port bulkhead, and the steel is hot through your uniform jacket. The red emergency lamp above the chart table throws Savitsky's face into a mask of shadows and angles — you have been watching him for the last twenty minutes and you have seen the particular stillness that comes over a man who has already made his decision and is waiting for the world to catch up. The brass key in your left tunic pocket has been there for sixteen hours. You have not touched it once, not even to confirm it is still there, because the act of reaching for it would mean something you are not prepared to mean. What you know, and Savitsky does not know you know, is that the Sonar Analyst logged the last detonation at 47 meters — and that a man who knows the difference between a signal and a killing blow is sitting thirty feet aft of this compartment with Bakelite headphones pressed to his skull, reading the ocean. The Captain's voice has gone flat and careful in the last hour. Maslennikov is standing two feet to Savitsky's left and has stopped meeting your eyes. The depth charges have not stopped. The air is getting worse. You have perhaps ninety minutes before the oxygen situation makes this argument academic. The chart table is between you and Savitsky, and he has just looked up from it and found your face.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:43.874Z",
+  "scenarioId": "sargasso_deep_three_keys",
+  "accessLevel": "staff",
   "description": "You are the Flotilla Chief of Staff aboard B-59, with equal command authority to the Captain. You hold the third key. You are the last obstacle between a panicking officer and a nuclear launch.",
+  "perspective": "Write from inside Arkhipov's physical and cognitive experience — the weight of the key in his pocket, the specific quality of the heat, the way sound travels differently through oxygen-depleted air. He is not heroic; he is methodical and frightened and certain only that he must not act until he knows.",
+  "character_id": "char_arkhipov",
+  "fact_checked": false,
+  "character_type": "real",
+  "bridge_sentence": "The temperature gauge cleared ninety degrees forty minutes ago.",
+  "character_hooks": [
+    "I served with three of these men on a previous deployment, and I know which one will break first under pressure — and it is not who Savitsky thinks it is.",
+    "I have a personal letter from Admiral Fokin in my breast pocket that was given to me before departure with instructions to open it only if I believed the boat was about to take an action that could not be undone.",
+    "I told my wife, before we sailed, that I would not come home having done something I could not explain to our son — and that promise is the only thing I am certain of in this compartment right now."
+  ],
   "startLocationId": "loc_conning_tower",
+  "context_sentence": "You are Vasili Arkhipov, the flotilla chief of staff aboard Soviet submarine B-59, and on October 27, 1962, when Captain Valentin Savitsky ordered the arming of a nuclear torpedo in the depths of the Sargasso Sea, you were the sole officer whose dissent prevented its launch.",
+  "roleInitialState": {
+    "flags": {
+      "key_turned": false,
+      "savitsky_confronted": false,
+      "sonar_report_received": false
+    },
+    "inventory": [
+      "brass_launch_key",
+      "personal_service_record_annotation"
+    ],
+    "suspicion": {
+      "char_savitsky": 4,
+      "char_maslennikov": 2
+    }
+  },
+  "suggested_secret": "Arkhipov has already decided, privately and irrevocably, that he will physically destroy his own key before he turns it — a decision he has told no one because stating it aloud would force an immediate confrontation that he is not yet ready to survive.",
   "startingKnowledge": [
     "Your authority as flotilla chief of staff is legally equal to the captain's — Savitsky cannot relieve you without documentation that does not exist on this boat.",
     "The Sonar Analyst is the only person aboard who can definitively confirm whether the depth charges are signaling munitions or lethal rounds.",
     "You survived the K-19 nuclear accident in 1961 — you know what happens when nuclear systems are operated by men in physical distress, and you know what that distress looks like from the inside.",
     "The brass launch key is in your left tunic pocket. It has been there for sixteen hours. You have not touched it."
   ],
-  "accessLevel": "staff",
-  "perspective": "Write from inside Arkhipov's physical and cognitive experience — the weight of the key in his pocket, the specific quality of the heat, the way sound travels differently through oxygen-depleted air. He is not heroic; he is methodical and frightened and certain only that he must not act until he knows.",
-  "briefing": "You are standing in the conning tower with your back against the port bulkhead, and the steel is hot through your uniform jacket. The red emergency lamp above the chart table throws Savitsky's face into a mask of shadows and angles — you have been watching him for the last twenty minutes and you have seen the particular stillness that comes over a man who has already made his decision and is waiting for the world to catch up. The brass key in your left tunic pocket has been there for sixteen hours. You have not touched it once, not even to confirm it is still there, because the act of reaching for it would mean something you are not prepared to mean. What you know, and Savitsky does not know you know, is that the Sonar Analyst logged the last detonation at 47 meters — and that a man who knows the difference between a signal and a killing blow is sitting thirty feet aft of this compartment with Bakelite headphones pressed to his skull, reading the ocean. The Captain's voice has gone flat and careful in the last hour. Maslennikov is standing two feet to Savitsky's left and has stopped meeting your eyes. The depth charges have not stopped. The air is getting worse. You have perhaps ninety minutes before the oxygen situation makes this argument academic. The chart table is between you and Savitsky, and he has just looked up from it and found your face.",
-  "character_hooks": [
-    "I served with three of these men on a previous deployment, and I know which one will break first under pressure — and it is not who Savitsky thinks it is.",
-    "I have a personal letter from Admiral Fokin in my breast pocket that was given to me before departure with instructions to open it only if I believed the boat was about to take an action that could not be undone.",
-    "I told my wife, before we sailed, that I would not come home having done something I could not explain to our son — and that promise is the only thing I am certain of in this compartment right now."
-  ],
-  "suggested_secret": "Arkhipov has already decided, privately and irrevocably, that he will physically destroy his own key before he turns it — a decision he has told no one because stating it aloud would force an immediate confrontation that he is not yet ready to survive.",
-  "opening": {
-    "narrative": "It is 20:00 ship's time aboard B-59, and the submarine has been submerged for seventeen hours. The conning tower is lit by a single red lamp. The temperature gauge on the port bulkhead reads 107°F and is still climbing. Captain Savitsky is at the chart table with the standing orders document open in front of him. Political Officer Maslennikov is standing at his left shoulder. The last signaling depth charge detonated eleven minutes ago and the hull is still faintly resonating. Savitsky has called this meeting because he is ready to give the order, and the only thing standing between him and the completion of the launch sequence is the man standing across the chart table from him — you.",
-    "npcMoments": [
-      {
-        "characterId": "char_savitsky",
-        "action": "Sets his parallel rulers down carefully on the chart and looks up at Arkhipov with the flat, patient expression of a man who has already won an argument in his head."
-      },
-      {
-        "characterId": "char_maslennikov",
-        "action": "Adjusts his collar and does not look at Arkhipov — a small, deliberate act of non-commitment."
-      }
-    ],
-    "choices": [
-      "Ask Savitsky directly what new information has changed the tactical picture since the last command conference.",
-      "Request permission to consult with the Sonar Analyst before any command decision is finalized.",
-      "State formally, for the record, that you do not concur with the launch order and require documented justification before proceeding."
-    ]
-  },
-  "roleInitialState": {
-    "inventory": [
-      "brass_launch_key",
-      "personal_service_record_annotation"
-    ],
-    "flags": {
-      "key_turned": false,
-      "savitsky_confronted": false,
-      "sonar_report_received": false
-    },
-    "suspicion": {
-      "char_savitsky": 4,
-      "char_maslennikov": 2
-    }
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:43.874Z",
-  "context_sentence": "You are Vasili Arkhipov, the flotilla chief of staff aboard Soviet submarine B-59, and on October 27, 1962, when Captain Valentin Savitsky ordered the arming of a nuclear torpedo in the depths of the Sargasso Sea, you were the sole officer whose dissent prevented its launch.",
-  "character_type": "real",
-  "character_id": "char_arkhipov",
-  "historical_record_note": "Vasili Arkhipov, Flotilla Chief of Staff aboard B-59. His refusal to authorize a nuclear torpedo launch on October 27, 1962 is credited by historians including Thomas Blanton of the National Security Archive as preventing nuclear war.",
-  "fact_checked": false,
-  "bridge_sentence": "The temperature gauge cleared ninety degrees forty minutes ago."
+  "historical_record_note": "Vasili Arkhipov, Flotilla Chief of Staff aboard B-59. His refusal to authorize a nuclear torpedo launch on October 27, 1962 is credited by historians including Thomas Blanton of the National Security Archive as preventing nuclear war."
 }

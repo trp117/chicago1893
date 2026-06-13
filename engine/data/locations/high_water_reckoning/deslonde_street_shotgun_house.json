@@ -1,17 +1,17 @@
 {
   "id": "deslonde_street_shotgun_house",
-  "scenarioId": "high_water_reckoning",
-  "name": "Fontenot Family Shotgun House — Deslonde Street Interior",
-  "description": "The interior of a flooded Lower Ninth Ward shotgun house, its waterline dropped to three feet, leaving a thick grey silt coating on every surface. The ceiling plaster is in active key failure, and the smell of mold and drying clay is dense enough to taste.",
   "mood": "claustrophobic, decaying, urgent, intimate",
-  "linkedCharacterIds": [],
+  "name": "Fontenot Family Shotgun House — Deslonde Street Interior",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.281Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "high_water_reckoning",
+  "description": "The interior of a flooded Lower Ninth Ward shotgun house, its waterline dropped to three feet, leaving a thick grey silt coating on every surface. The ceiling plaster is in active key failure, and the smell of mold and drying clay is dense enough to taste.",
   "atmosphericDetails": [
     "The collapsed plaster section covers approximately six square feet of the front room floor, its edges still damp and soft where it fell",
     "The iron document box is visible beneath the largest plaster fragment — a corner of it, dark with oxidation, catching the light from the open window frame",
     "The sound of the flood plane outside is muffled by the walls, making the interior feel sealed and pressurized"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.051Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": []
 }

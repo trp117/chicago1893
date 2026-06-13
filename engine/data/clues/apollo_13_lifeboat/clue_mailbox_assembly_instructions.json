@@ -1,18 +1,18 @@
 {
   "id": "clue_mailbox_assembly_instructions",
-  "scenarioId": "apollo_13_lifeboat",
   "title": "The Mailbox — Assembly Protocol",
-  "description": "A page of handwritten instructions developed in the Mission Control back room, specifying exactly how to construct a CO2 scrubber adapter from materials confirmed to be aboard the spacecraft: the cover of the flight manual, two plastic bags from the food supply, a length of suit hose, a sock, and duct tape. Each step is numbered. Step 7 reads: 'Do not seal the final joint until airflow is confirmed — a sealed joint with no flow will make things worse faster.' The instructions were read aloud to the crew over the radio and are now being executed 200,000 miles away.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.963Z",
+  "locationId": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "description": "A page of handwritten instructions developed in the Mission Control back room, specifying exactly how to construct a CO2 scrubber adapter from materials confirmed to be aboard the spacecraft: the cover of the flight manual, two plastic bags from the food supply, a length of suit hose, a sock, and duct tape. Each step is numbered. Step 7 reads: 'Do not seal the final joint until airflow is confirmed — a sealed joint with no flow will make things worse faster.' The instructions were read aloud to the crew over the radio and are now being executed 200,000 miles away.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_mocr_back_room",
   "implicatesCharacterIds": [
     "char_john_aaron",
     "char_fred_haise"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.963Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

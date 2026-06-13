@@ -1,16 +1,16 @@
 {
   "id": "clue_rotch_sighting",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "Captain Rotch's Waterfront Sighting",
-  "description": "Captain Rotch, haggard and hollow-eyed on the deck of the Dartmouth, tells you in a defeated murmur that he saw a man matching Greenleaf's description — slight, spectacled, wearing a brown coat — speaking in low tones with a customs officer near the gangplank this afternoon. He did not think much of it at the time. He also mentions that a folded document changed hands, sealed with red wax, before the two men parted ways without looking back.",
+  "unlocks": [],
   "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.446Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Captain Rotch, haggard and hollow-eyed on the deck of the Dartmouth, tells you in a defeated murmur that he saw a man matching Greenleaf's description — slight, spectacled, wearing a brown coat — speaking in low tones with a customs officer near the gangplank this afternoon. He did not think much of it at the time. He also mentions that a folded document changed hands, sealed with red wax, before the two men parted ways without looking back.",
+  "isKeyEvidence": false,
   "discoveryLocationId": "griffins_wharf",
   "implicatesCharacterIds": [
     "thomas_greenleaf",
     "agent_silas_dawes"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.446Z"
+  ]
 }

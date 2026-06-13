@@ -1,19 +1,19 @@
 {
   "id": "algiers_point_ferry_landing",
-  "scenarioId": "high_water_reckoning",
-  "name": "Algiers Point — Canal Street Ferry Landing",
-  "description": "The Algiers side of the Canal Street ferry crossing, where the ferry has not run since August 29 but the landing dock still serves as a gathering point for people moving information on foot between the west and east banks.",
   "mood": "transitional, informational, exhausted",
-  "linkedCharacterIds": [
-    "terrence_guidry"
-  ],
+  "name": "Algiers Point — Canal Street Ferry Landing",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.279Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "high_water_reckoning",
+  "description": "The Algiers side of the Canal Street ferry crossing, where the ferry has not run since August 29 but the landing dock still serves as a gathering point for people moving information on foot between the west and east banks.",
   "atmosphericDetails": [
     "A handwritten message board nailed to the ferry terminal wall — names, locations, and requests for information, some of them already weathered past legibility",
     "The smell of the river here is different from the flood plane — moving water, less chemical, almost clean by comparison",
     "A woman sitting on the dock edge with a notebook, taking down names from people who approach her — Delphine Arceneaux, Darnell's cousin, the original source of the grid coordinates"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.049Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "terrence_guidry"
+  ]
 }

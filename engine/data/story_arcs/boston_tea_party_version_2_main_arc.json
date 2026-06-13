@@ -1,51 +1,51 @@
 {
   "id": "boston_tea_party_version_2_main_arc",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "The Informer in the Harbor",
-  "premise": "On the night of December 16, 1773, someone inside the Sons of Liberty has betrayed the tea party plan to royal customs officials. The operation — and the lives of its leaders — hang by a thread. The spy must be identified and silenced before the boarding party reaches the Dartmouth.",
-  "goal": "Gather enough evidence to correctly identify and confront the spy before the church bells signal the boarding party's departure, protecting the Sons of Liberty and ensuring the tea party succeeds.",
-  "openingSituation": "Word has just reached the Green Dragon Tavern that customs officers have been seen moving toward Griffin's Wharf — someone talked. Samuel Adams has dispatched trusted agents to find the traitor before the rally at Old South ends and the mob moves to the ships.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "Whispers in the Fog",
-      "minuteRange": [
-        0,
-        5
-      ],
       "beats": [
         "The player receives their role and enters Boston on the night of December 16 — the air is thick with tension, cold harbor wind, and the distant sound of the crowd at Old South Meeting House.",
         "Early questioning of NPCs at the Green Dragon Tavern and Griffin's Wharf reveals that someone passed information to a customs agent named Dawes — but no one knows who made contact.",
         "The first non-key clues are discovered, pointing ambiguously toward multiple suspects and establishing the misdirection: Reverend Willard's nervous behavior draws early suspicion away from the true culprit."
+      ],
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        5
       ]
     },
     {
-      "actNumber": 2,
       "name": "The Weight of Coin",
-      "minuteRange": [
-        5,
-        11
-      ],
       "beats": [
         "Deeper investigation at the Counting House and the Customs Dock uncovers financial irregularities — someone has been paid handsomely, and the paper trail begins to take shape.",
         "The first pressure event fires — a customs officer is spotted near the wharf, raising the threat level and forcing the player to move quickly between locations.",
         "The two key evidence clues become discoverable: the coded letter at the Counting House and the customs receipt hidden at the Customs Dock, both pointing unmistakably toward the true spy, Thomas Greenleaf."
+      ],
+      "actNumber": 2,
+      "minuteRange": [
+        5,
+        11
       ]
     },
     {
-      "actNumber": 3,
       "name": "Before the Bells Ring",
-      "minuteRange": [
-        11,
-        15
-      ],
       "beats": [
         "The church bells at Old South begin to toll — the boarding party is assembling, and the window for accusation is closing fast.",
         "The player must confront the spy directly, presenting evidence; if both key clues are held, the spy breaks and confesses, allowing the Sons of Liberty to proceed safely.",
         "The climax resolves: either the spy is exposed and the tea party succeeds under cover of darkness, or the player fails and the ringleaders are seized on the dock by waiting redcoats."
+      ],
+      "actNumber": 3,
+      "minuteRange": [
+        11,
+        15
       ]
     }
   ],
+  "goal": "Gather enough evidence to correctly identify and confront the spy before the church bells signal the boarding party's departure, protecting the Sons of Liberty and ensuring the tea party succeeds.",
+  "name": "The Informer in the Harbor",
+  "premise": "On the night of December 16, 1773, someone inside the Sons of Liberty has betrayed the tea party plan to royal customs officials. The operation — and the lives of its leaders — hang by a thread. The spy must be identified and silenced before the boarding party reaches the Dartmouth.",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.435Z"
+  "updatedAt": "2026-04-29T00:08:14.435Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "openingSituation": "Word has just reached the Green Dragon Tavern that customs officers have been seen moving toward Griffin's Wharf — someone talked. Samuel Adams has dispatched trusted agents to find the traitor before the rally at Old South ends and the mob moves to the ships."
 }

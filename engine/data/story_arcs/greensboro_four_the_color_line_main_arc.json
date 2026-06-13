@@ -1,18 +1,8 @@
 {
   "id": "greensboro_four_the_color_line_main_arc",
-  "scenarioId": "greensboro_four_the_color_line",
-  "name": "The Color Line",
-  "premise": "Four Black students from A&T College occupy the segregated lunch counter at Greensboro's F.W. Woolworth's and ask to be served. The store refuses to serve them and refuses to remove them by force. The next ninety minutes will test whether disciplined non-violence can hold against accumulating social, institutional, and personal pressure.",
-  "goal": "Hold the lunch counter stools through store closing at approximately 5:30 PM with Disciplined_Stillness_Pct above 70, Crowd_Agitation_Index below the critical threshold, and no physical retaliation — preserving the moral integrity of the protest and ensuring it reaches the press as an unambiguous act of peaceful defiance.",
-  "openingSituation": "Ezell Blair Jr. has just asked the waitress for a cup of coffee. She has walked away without responding. The store manager has looked up from the office stairs. The floor walker nearest the counter has slowed his pace. The four students are seated. The counter in front of them is bare. It is 4:32 PM.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Request",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "ezell_speaks_the",
@@ -31,15 +21,15 @@
           "description": "Store manager Harris Mackintosh descends two steps from the office stairs and makes eye contact with Ezell — the first direct authority confrontation of the session"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Pressure Builds",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "a_second_waitress",
@@ -58,15 +48,15 @@
           "description": "Franklin McCain's physical size draws a comment from a male patron near the aisle — the first direct verbal provocation — and Disciplined_Stillness_Pct is tested"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Witnesses Arrive",
-      "minuteRange": [
-        15,
-        23
-      ],
       "beats": [
         {
           "id": "an_offduty_greensboro",
@@ -85,15 +75,15 @@
           "description": "Harris Mackintosh makes a second telephone call; the students can now hear him through the office door, and the word 'headquarters' is audible"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The Closing Hour",
-      "minuteRange": [
-        23,
-        30
-      ],
       "beats": [
         {
           "id": "a_storewide_announcement",
@@ -112,10 +102,20 @@
           "description": "At approximately 5:30 PM the store closes; the students rise, gather their books, and walk out through the front doors — the sit-in has held, and Caldwell's notes are already moving toward the wire"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
     }
   ],
+  "goal": "Hold the lunch counter stools through store closing at approximately 5:30 PM with Disciplined_Stillness_Pct above 70, Crowd_Agitation_Index below the critical threshold, and no physical retaliation — preserving the moral integrity of the protest and ensuring it reaches the press as an unambiguous act of peaceful defiance.",
+  "name": "The Color Line",
+  "opening": "",
+  "premise": "Four Black students from A&T College occupy the segregated lunch counter at Greensboro's F.W. Woolworth's and ask to be served. The store refuses to serve them and refuses to remove them by force. The next ninety minutes will test whether disciplined non-violence can hold against accumulating social, institutional, and personal pressure.",
   "createdAt": "2025-02-01T16:30:00Z",
   "updatedAt": "2026-05-24T03:30:00.372Z",
-  "opening": ""
+  "scenarioId": "greensboro_four_the_color_line",
+  "openingSituation": "Ezell Blair Jr. has just asked the waitress for a cup of coffee. She has walked away without responding. The store manager has looked up from the office stairs. The floor walker nearest the counter has slowed his pace. The four students are seated. The counter in front of them is bare. It is 4:32 PM."
 }

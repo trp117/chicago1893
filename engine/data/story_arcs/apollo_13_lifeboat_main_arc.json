@@ -1,18 +1,8 @@
 {
   "id": "apollo_13_lifeboat_main_arc",
-  "scenarioId": "apollo_13_lifeboat",
-  "name": "The Long Way Home",
-  "premise": "Three men in a crippled spacecraft must survive four days in conditions that should be fatal, guided by a team on the ground who must invent solutions faster than the ship's systems fail.",
-  "goal": "Coordinate the three perspectives to solve the CO2 crisis, manage the power budget, execute the correct burn, and bring the crew home through atmospheric re-entry.",
-  "openingSituation": "The explosion has just occurred. Oxygen Tank Two is gone, Tank One is bleeding out, and the fuel cells are dying. The crew has minutes to decide whether to stay in Odyssey or move to Aquarius. Houston has garbage data and no procedure for this.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Shudder",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "the_explosion_registers",
@@ -35,15 +25,15 @@
           "description": "Swigert begins the emergency LM activation sequence; it was designed to take two hours and he has fifteen minutes"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Lifeboat",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "aquarius_is_live",
@@ -66,15 +56,15 @@
           "description": "Lovell and Haise perform a manual PC+2 burn using the LM descent engine to accelerate the return trajectory — the calculation must be done by hand"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Far Side",
-      "minuteRange": [
-        15,
-        23
-      ],
       "beats": [
         {
           "id": "the_mailbox",
@@ -97,15 +87,15 @@
           "description": "Navigation drifts toward Gimbal Lock; Lovell must perform a manual star-sighting through the window to realign the IMU without using the computer"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
     },
     {
-      "actNumber": 4,
       "name": "Re-entry Corridor",
-      "minuteRange": [
-        23,
-        30
-      ],
       "beats": [
         {
           "id": "swigert_initiates_the",
@@ -128,10 +118,20 @@
           "description": "The parachutes deploy; the crew splashes down in the Pacific south of Samoa; USS Iwo Jima recovers them"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
     }
   ],
+  "goal": "Coordinate the three perspectives to solve the CO2 crisis, manage the power budget, execute the correct burn, and bring the crew home through atmospheric re-entry.",
+  "name": "The Long Way Home",
+  "opening": "",
+  "premise": "Three men in a crippled spacecraft must survive four days in conditions that should be fatal, guided by a team on the ground who must invent solutions faster than the ship's systems fail.",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-25T14:53:42.947Z",
-  "opening": ""
+  "scenarioId": "apollo_13_lifeboat",
+  "openingSituation": "The explosion has just occurred. Oxygen Tank Two is gone, Tank One is bleeding out, and the fuel cells are dying. The crew has minutes to decide whether to stay in Odyssey or move to Aquarius. Houston has garbage data and no procedure for this."
 }

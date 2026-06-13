@@ -1,34 +1,56 @@
 {
   "id": "role_ranger_sergeant",
-  "scenarioId": "dog_green_sector",
   "name": "The Ranger Sergeant",
-  "description": "You are carrying the only Bangalore Torpedo on this stretch of beach, and you know exactly where the wire is and exactly what it will take to breach it. The question is whether you will survive the approach — and whether you will make it alone or wait for help that may not come.",
-  "startLocationId": "loc_surf_zone",
-  "startingKnowledge": [
-    "The Bangalore Torpedo requires two sections for a reliable breach — you have one section; Drennan has the other and is down somewhere in the surf.",
-    "The MG-42 at WN-71 has a fixed traverse limit that creates a dead zone fifteen yards to the left of the wire.",
-    "The only route off this beach for armor is through the Vierville Draw, and the wire is the lock on that door.",
-    "Lieutenant Hargrove's frontal assault plan will put men directly across the MG-42's primary arc — you have not yet decided whether to follow the order."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has reduced the world to its tactical essentials — he sees terrain, fire lanes, cover, and time. He is not cold; he is focused in a way that has been trained into him over two years and is now the only mode available to him.",
+  "opening": {
+    "choices": [
+      "Move east through the surf to find Drennan and retrieve the second Bangalore section before making the approach.",
+      "Push to the shingle and confront Hargrove about the dead zone — try to redirect the assault before men die on the frontal approach.",
+      "Begin the approach to the wire now, alone, with one section — accepting a partial breach as the price of not waiting."
+    ],
+    "narrative": "The hedgehog is the only thing between you and the MG-42's arc, and it is a steel cross three feet wide. The surf is at your waist and rising at approximately one inch per minute. Fifty yards ahead, the concertina wire catches the grey morning light in small bright points. The gun fires in four-second bursts at twelve-second intervals — you have timed it. To your left, the dead zone is a fifteen-yard strip of sand that the gun cannot reach. To your right, Hargrove is organizing men at the shingle for a push that does not use the dead zone. The second Bangalore section is somewhere in the surf to your east with a man who may or may not be alive. You have the first section, the timing, and the knowledge of the dead zone. You do not have enough explosive to guarantee the breach.",
+    "npcMoments": []
+  },
   "briefing": "You are behind a steel hedgehog in eighteen inches of surf, and the water is rising. The Bangalore section is across your knees — four feet of pipe filled with explosive, cold and heavy and wet — and the wire is fifty yards ahead of you across open sand that the MG-42 at WN-71 has been covering without pause since the first ramp dropped. You have been in this position for six minutes. You know the gun has a dead zone to the left of the wire — you identified it on the third burst pattern, counting the traverse — but you cannot use it without the second Bangalore section, and Drennan went down somewhere to your east in the surf and has not come up. Hargrove is at the shingle shouting assembly orders for a frontal push that will put men directly across the primary fire lane. You have not moved to join him. You are doing the arithmetic that Hargrove is not doing, and the arithmetic says the frontal push is a sentence. The tide is at your waist. You have perhaps two minutes before the decision makes itself.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-24T03:20:09.287Z",
+  "represents": "Sergeants of the 2nd Ranger Battalion at Dog Green Sector on June 6, 1944",
+  "scenarioId": "dog_green_sector",
+  "accessLevel": "staff",
+  "description": "You are carrying the only Bangalore Torpedo on this stretch of beach, and you know exactly where the wire is and exactly what it will take to breach it. The question is whether you will survive the approach — and whether you will make it alone or wait for help that may not come.",
+  "perspective": "Write from the perspective of a man who has reduced the world to its tactical essentials — he sees terrain, fire lanes, cover, and time. He is not cold; he is focused in a way that has been trained into him over two years and is now the only mode available to him.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "The Medic, The Coxswain (distant)",
+      "what_happened": "You were pinned at the water's edge and lost the Bangalore torpedoes in the rising tide. Without the explosives, the squad could not breach the wire, and the assault stalled under the shadow of the bluffs.",
+      "emotional_weight": "Paralysis—the crushing weight of being unable to move while the world explodes around you.",
+      "closing_line_override": "You were a Ranger with nowhere to go, pinned by history and the sea."
+    },
+    "partial": {
+      "who_present": "The Medic",
+      "what_happened": "You reached the shingle and successfully detonated the Bangalore, blowing a gap in the wire. However, you were wounded in the blast or by sniper fire immediately after. You opened the door for the 29th Division, but you won't be the one to lead them through it.",
+      "emotional_weight": "Self-Sacrifice—the grim satisfaction of a job done at the cost of your own forward progress.",
+      "closing_line_override": "The gap in the wire was your final signature on the beach."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The MG-42 has been running the same arc for six minutes.",
   "character_hooks": [
     "I trained with Drennan for eight months in Scotland and I know his voice — I heard something in the surf to the east that might have been him calling out, and I am trying to decide if I go for him or push to the wire alone.",
     "I have run Bangalore approaches twice in training and once in Sicily, and I know the push takes ninety seconds minimum — ninety seconds in the dead zone with the gun traversing above me — and I am calculating whether that is survivable with one section or two.",
     "Hargrove froze at the ramp and I saw it — eleven seconds of nothing while men piled up behind him — and I am carrying that knowledge like the torpedo, because it changes what I trust him to do when the push begins."
   ],
-  "suggested_secret": "Kowalski has already decided he will push the Bangalore alone if no one else is available, and he has made a private peace with the probability that he will not survive the approach — a decision he considers rational and has told no one.",
-  "opening": {
-    "narrative": "The hedgehog is the only thing between you and the MG-42's arc, and it is a steel cross three feet wide. The surf is at your waist and rising at approximately one inch per minute. Fifty yards ahead, the concertina wire catches the grey morning light in small bright points. The gun fires in four-second bursts at twelve-second intervals — you have timed it. To your left, the dead zone is a fifteen-yard strip of sand that the gun cannot reach. To your right, Hargrove is organizing men at the shingle for a push that does not use the dead zone. The second Bangalore section is somewhere in the surf to your east with a man who may or may not be alive. You have the first section, the timing, and the knowledge of the dead zone. You do not have enough explosive to guarantee the breach.",
-    "npcMoments": [],
-    "choices": [
-      "Move east through the surf to find Drennan and retrieve the second Bangalore section before making the approach.",
-      "Push to the shingle and confront Hargrove about the dead zone — try to redirect the assault before men die on the frontal approach.",
-      "Begin the approach to the wire now, alone, with one section — accepting a partial breach as the price of not waiting."
-    ]
-  },
+  "startLocationId": "loc_surf_zone",
+  "context_sentence": "You are the Ranger Sergeant, and the tide is at your waist with the Bangalore across your knees and fifty yards of open sand ahead.",
   "roleInitialState": {
+    "flags": {
+      "drennan_located": false,
+      "wire_approached": false,
+      "bangalore_assembled": false,
+      "hargrove_confronted": false,
+      "dead_zone_identified": true
+    },
     "inventory": [
       "Bangalore Torpedo section one",
       "M1 Garand rifle",
@@ -36,35 +58,13 @@
       "cricket clicker",
       "K-ration (unopened)"
     ],
-    "flags": {
-      "dead_zone_identified": true,
-      "drennan_located": false,
-      "hargrove_confronted": false,
-      "bangalore_assembled": false,
-      "wire_approached": false
-    },
     "suspicion": {}
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:20:09.287Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You reached the shingle and successfully detonated the Bangalore, blowing a gap in the wire. However, you were wounded in the blast or by sniper fire immediately after. You opened the door for the 29th Division, but you won't be the one to lead them through it.",
-      "who_present": "The Medic",
-      "emotional_weight": "Self-Sacrifice—the grim satisfaction of a job done at the cost of your own forward progress.",
-      "closing_line_override": "The gap in the wire was your final signature on the beach."
-    },
-    "failure": {
-      "what_happened": "You were pinned at the water's edge and lost the Bangalore torpedoes in the rising tide. Without the explosives, the squad could not breach the wire, and the assault stalled under the shadow of the bluffs.",
-      "who_present": "The Medic, The Coxswain (distant)",
-      "emotional_weight": "Paralysis—the crushing weight of being unable to move while the world explodes around you.",
-      "closing_line_override": "You were a Ranger with nowhere to go, pinned by history and the sea."
-    }
-  },
-  "context_sentence": "You are the Ranger Sergeant, and the tide is at your waist with the Bangalore across your knees and fifty yards of open sand ahead.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Sergeants of the 2nd Ranger Battalion at Dog Green Sector on June 6, 1944",
-  "fact_checked": false,
-  "bridge_sentence": "The MG-42 has been running the same arc for six minutes."
+  "suggested_secret": "Kowalski has already decided he will push the Bangalore alone if no one else is available, and he has made a private peace with the probability that he will not survive the approach — a decision he considers rational and has told no one.",
+  "startingKnowledge": [
+    "The Bangalore Torpedo requires two sections for a reliable breach — you have one section; Drennan has the other and is down somewhere in the surf.",
+    "The MG-42 at WN-71 has a fixed traverse limit that creates a dead zone fifteen yards to the left of the wire.",
+    "The only route off this beach for armor is through the Vierville Draw, and the wire is the lock on that door.",
+    "Lieutenant Hargrove's frontal assault plan will put men directly across the MG-42's primary arc — you have not yet decided whether to follow the order."
+  ]
 }

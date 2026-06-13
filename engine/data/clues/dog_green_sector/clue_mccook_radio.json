@@ -1,18 +1,18 @@
 {
   "id": "clue_mccook_radio",
-  "scenarioId": "dog_green_sector",
   "title": "LCA Radio — McCook Frequency",
-  "description": "The LCA's radio set is tuned to the naval gunfire support frequency and is functioning. Reed has been monitoring traffic from the USS McCook, which has moved to within eight hundred yards of the shore and is requesting a confirmed fire mission target. The radio is the link between Szymanski's grid reference and the destroyer's guns — without it, the fire mission cannot be called, and WN-71 remains active through the wire push.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-24T03:10:26.287Z",
+  "locationId": "",
+  "scenarioId": "dog_green_sector",
+  "description": "The LCA's radio set is tuned to the naval gunfire support frequency and is functioning. Reed has been monitoring traffic from the USS McCook, which has moved to within eight hundred yards of the shore and is requesting a confirmed fire mission target. The radio is the link between Szymanski's grid reference and the destroyer's guns — without it, the fire mission cannot be called, and WN-71 remains active through the wire push.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_lca_beached",
   "implicatesCharacterIds": [
     "char_petty_officer_reed",
     "char_feldwebel_brandt"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.287Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

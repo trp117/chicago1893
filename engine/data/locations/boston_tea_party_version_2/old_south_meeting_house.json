@@ -1,17 +1,17 @@
 {
   "id": "old_south_meeting_house",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "Old South Meeting House",
-  "description": "Five thousand colonists have packed themselves into this plain wooden church and spilled out into the street beyond, their breath fogging the cold air as Samuel Adams holds the crowd with his voice alone. The building shudders with the weight of history being made, and every minute you spend here is a minute closer to the moment the crowd moves to the ships.",
   "mood": "electric, crowded, historic, desperate",
-  "linkedCharacterIds": [
-    "reverend_ezra_willard"
-  ],
+  "name": "Old South Meeting House",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.440Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Five thousand colonists have packed themselves into this plain wooden church and spilled out into the street beyond, their breath fogging the cold air as Samuel Adams holds the crowd with his voice alone. The building shudders with the weight of history being made, and every minute you spend here is a minute closer to the moment the crowd moves to the ships.",
   "atmosphericDetails": [
     "Samuel Adams stands at the pulpit, his voice carrying over the crowd with the force of a man who knows exactly what he is doing.",
     "Reverend Willard lingers near a side door, his journal pressed against his chest beneath his coat, his eyes moving constantly.",
     "A woman near the entrance is quietly weeping — whether from fear or conviction, it is impossible to say."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.440Z"
+  "linkedCharacterIds": [
+    "reverend_ezra_willard"
+  ]
 }

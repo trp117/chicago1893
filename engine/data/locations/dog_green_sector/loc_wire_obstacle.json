@@ -1,21 +1,21 @@
 {
   "id": "loc_wire_obstacle",
-  "scenarioId": "dog_green_sector",
+  "mood": "objective, dangerous, focused, terminal",
   "name": "The Concertina Wire — Draw Approach",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-24T03:10:26.282Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "dog_green_sector",
   "short_name": "The Concertina Wire",
   "description": "Three rolls of German concertina wire staked into the sand at the base of the Vierville Draw, each roll interlaced with the next, forming a barrier twelve feet deep that no man can cross without being cut to pieces or cut through with explosives.",
-  "mood": "objective, dangerous, focused, terminal",
-  "linkedCharacterIds": [
-    "char_sgt_kowalski",
-    "char_feldwebel_brandt"
-  ],
   "atmosphericDetails": [
     "The wire catches the morning light in small bright points along its length — it looks almost decorative from a distance.",
     "The dead zone to the left of the wire is identifiable by the absence of fire — a fifteen-yard strip of sand that the MG-42 cannot reach due to the bunker's concrete embrasure.",
     "The draw rises steeply behind the wire, its grass sides channeling the wind into a low moan that sounds, at intervals, almost human."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.282Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_sgt_kowalski",
+    "char_feldwebel_brandt"
+  ]
 }

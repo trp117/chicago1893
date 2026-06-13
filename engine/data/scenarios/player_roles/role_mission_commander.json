@@ -1,82 +1,82 @@
 {
   "id": "role_mission_commander",
-  "scenarioId": "apollo_13_lifeboat",
   "name": "Mission Commander — Jim Lovell",
-  "description": "You are the most experienced astronaut alive, commanding a spacecraft that is dying around you. Your crew's survival depends on calculations you must perform by hand, in the cold, with a mind beginning to cloud from CO2.",
-  "startLocationId": "loc_lm_aquarius",
-  "startingKnowledge": [
-    "The oxygen is gone and the Command Module is dying — you have seen the venting gas with your own eyes",
-    "The Free Return Trajectory is the safer option but the slower one; every hour in space is another hour of system failure risk",
-    "Fred Haise is sick and getting sicker, and you have not told Houston the full extent of it",
-    "Your burn calculation has a figure you are not certain about, and you cannot check it without the guidance computer, which is off"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has been to space four times and knows exactly how bad this is — which is why he is not panicking. Lovell's voice is precise and economical. He states facts. He does not editorialize. The horror of the situation lives in the gap between what he says and what the reader understands.",
+  "aliases": [],
+  "opening": {
+    "choices": [
+      "Report full consumables status to Houston, including Haise's condition",
+      "Report consumables status but withhold Haise's fever until you have assessed the trajectory burn",
+      "Ask Houston for their current CO2 projection before giving your status report"
+    ],
+    "narrative": "It is 10:14 PM Central Daylight Time on April 13, 1970, and you have just floated into the Lunar Module Aquarius. The Command Module is dying behind you — its fuel cells starved of oxygen, its systems systematically going dark as Swigert executes the emergency isolation. Houston is on the loop, their voices steady in the way that trained men's voices are steady when they are fighting for a crew's life. The immediate task is completing the emergency LM power-up before Odyssey's main buses completely fail.",
+    "npcMoments": [
+      {
+        "action": "Haise is running the LM systems check, his voice even, his hands moving competently over the circuit breakers. He does not mention the fever.",
+        "characterId": "char_fred_haise"
+      },
+      {
+        "action": "Kranz's voice comes over the loop: 'Aquarius, Houston. We need your consumables status — oxygen, water, amp-hours remaining. In that order.'",
+        "characterId": "char_gene_kranz"
+      }
+    ]
+  },
   "briefing": "You are standing in the Lunar Module Aquarius — standing, because there are no seats, because this ship was never meant to hold three men for four days — with your breath visible in the instrument light and the CO2 warning cycling on and off in the corner of your vision. Through the small triangular window, the Earth is a blue disc the size of your thumbnail, and it is 200,000 miles away. You know things your crew does not: that the burn calculation you performed by hand has a figure on the second page that you erased and rewrote, and that the rewritten figure is the one you are less certain of. You know that Fred Haise is running a fever he has not reported and that his hands shake when he thinks you are not watching. You know that the CO2 canisters were rated for two men and there are three of you, and that the math on that is simple and the conclusion of that math is not something you are going to say aloud. The cabin is 38 degrees Fahrenheit. Your fingers are stiff. The radio crackles with Houston's voice — Kranz, steady and declarative, asking for a systems status — and you reach for the transmit switch with a hand that is not quite shaking yet. The next words you say will set the terms for everything that follows.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "real_name": null,
+  "updatedAt": "2026-05-25T14:53:42.966Z",
+  "cover_name": null,
+  "represents": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "accessLevel": "staff",
+  "description": "You are the most experienced astronaut alive, commanding a spacecraft that is dying around you. Your crew's survival depends on calculations you must perform by hand, in the cold, with a mind beginning to cloud from CO2.",
+  "perspective": "Write from the perspective of a man who has been to space four times and knows exactly how bad this is — which is why he is not panicking. Lovell's voice is precise and economical. He states facts. He does not editorialize. The horror of the situation lives in the gap between what he says and what the reader understands.",
+  "character_id": "char_jim_lovell",
+  "ending_notes": {
+    "failure": {
+      "who_present": "The Command Module Pilot, The Lunar Module Pilot",
+      "what_happened": "A manual burn calculation was off by a fraction of a second during the critical corridor correction. The spacecraft missed the atmospheric entry window entirely, skipping off the upper atmosphere and drifting permanently into deep space.",
+      "emotional_weight": "Eternal Isolation—the cold, weightless realization that the distance between you and Earth is now infinite.",
+      "closing_line_override": "The stars were no longer a destination; they were a final, cold resting place."
+    },
+    "partial": {
+      "who_present": "The Command Module Pilot, The Lunar Module Pilot",
+      "what_happened": "You successfully navigated the \"Free Return Trajectory\" and guided the crew through the narrow re-entry corridor. However, the extreme freezing conditions caused severe exposure for the crew, and a system delay forced a brutal, hard splashdown far from the recovery ship.",
+      "emotional_weight": "Pyrrhic Victory—the overwhelming relief of survival heavily tempered by the physical and mental toll of the dark journey.",
+      "closing_line_override": "You brought them home, but a part of you stayed behind in the silence of the Moon's far side."
+    }
+  },
+  "fact_checked": false,
+  "identity_note": null,
+  "character_type": "real",
+  "bridge_sentence": "Main Bus B is gone.",
   "character_hooks": [
     "I have already accepted, privately, that we may not make it — and my job now is to make sure my crew never reaches that same conclusion.",
     "I flew around the Moon on Apollo 8 and came home; I know what the Far Side silence sounds like and I know what it costs to hear it again.",
     "The burn calculation on page two has a number I am not certain of, and I have not told Houston, because telling them means admitting I need help I cannot give them."
   ],
-  "suggested_secret": "Lovell has already mentally composed what he would say to his crew if the re-entry fails — a short, specific speech — and he has rehearsed it twice in the silence of the Far Side passage.",
-  "opening": {
-    "narrative": "It is 10:14 PM Central Daylight Time on April 13, 1970, and you have just floated into the Lunar Module Aquarius. The Command Module is dying behind you — its fuel cells starved of oxygen, its systems systematically going dark as Swigert executes the emergency isolation. Houston is on the loop, their voices steady in the way that trained men's voices are steady when they are fighting for a crew's life. The immediate task is completing the emergency LM power-up before Odyssey's main buses completely fail.",
-    "npcMoments": [
-      {
-        "characterId": "char_fred_haise",
-        "action": "Haise is running the LM systems check, his voice even, his hands moving competently over the circuit breakers. He does not mention the fever."
-      },
-      {
-        "characterId": "char_gene_kranz",
-        "action": "Kranz's voice comes over the loop: 'Aquarius, Houston. We need your consumables status — oxygen, water, amp-hours remaining. In that order.'"
-      }
-    ],
-    "choices": [
-      "Report full consumables status to Houston, including Haise's condition",
-      "Report consumables status but withhold Haise's fever until you have assessed the trajectory burn",
-      "Ask Houston for their current CO2 projection before giving your status report"
-    ]
-  },
+  "startLocationId": "loc_lm_aquarius",
+  "context_sentence": "You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands.",
   "roleInitialState": {
+    "flags": {
+      "co2_fix_deployed": false,
+      "haise_fever_disclosed": false,
+      "burn_calculation_verified": false
+    },
     "inventory": [
       "burn calculation papers (3 pages, handwritten)",
       "slide rule",
       "celestial mechanics reference card",
       "flight plan (annotated)"
     ],
-    "flags": {
-      "haise_fever_disclosed": false,
-      "burn_calculation_verified": false,
-      "co2_fix_deployed": false
-    },
     "suspicion": {}
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.966Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You successfully navigated the \"Free Return Trajectory\" and guided the crew through the narrow re-entry corridor. However, the extreme freezing conditions caused severe exposure for the crew, and a system delay forced a brutal, hard splashdown far from the recovery ship.",
-      "who_present": "The Command Module Pilot, The Lunar Module Pilot",
-      "emotional_weight": "Pyrrhic Victory—the overwhelming relief of survival heavily tempered by the physical and mental toll of the dark journey.",
-      "closing_line_override": "You brought them home, but a part of you stayed behind in the silence of the Moon's far side."
-    },
-    "failure": {
-      "what_happened": "A manual burn calculation was off by a fraction of a second during the critical corridor correction. The spacecraft missed the atmospheric entry window entirely, skipping off the upper atmosphere and drifting permanently into deep space.",
-      "who_present": "The Command Module Pilot, The Lunar Module Pilot",
-      "emotional_weight": "Eternal Isolation—the cold, weightless realization that the distance between you and Earth is now infinite.",
-      "closing_line_override": "The stars were no longer a destination; they were a final, cold resting place."
-    }
-  },
-  "real_name": null,
-  "cover_name": null,
+  "suggested_secret": "Lovell has already mentally composed what he would say to his crew if the re-entry fails — a short, specific speech — and he has rehearsed it twice in the silence of the Far Side passage.",
+  "startingKnowledge": [
+    "The oxygen is gone and the Command Module is dying — you have seen the venting gas with your own eyes",
+    "The Free Return Trajectory is the safer option but the slower one; every hour in space is another hour of system failure risk",
+    "Fred Haise is sick and getting sicker, and you have not told Houston the full extent of it",
+    "Your burn calculation has a figure you are not certain about, and you cannot check it without the guidance computer, which is off"
+  ],
   "is_player_character": false,
-  "identity_note": null,
-  "aliases": [],
-  "context_sentence": "You are Jim Lovell, Mission Commander of Apollo 13, and you are reaching for the transmit switch with stiff, uncertain hands.",
-  "character_type": "real",
-  "character_id": "char_jim_lovell",
-  "historical_record_note": "Jim Lovell, Commander of Apollo 13. Survived the mission. Became the first person to fly to the Moon twice without landing. Later commanded the crew of Apollo 13 in the 1995 film.",
-  "fact_checked": false,
-  "bridge_sentence": "Main Bus B is gone.",
-  "represents": ""
+  "historical_record_note": "Jim Lovell, Commander of Apollo 13. Survived the mission. Became the first person to fly to the Moon twice without landing. Later commanded the crew of Apollo 13 in the 1995 film."
 }

@@ -1,0 +1,32 @@
+{
+  "id": "char_riker",
+  "fear": "That the slip structure itself will fail under the weight of continuous loading; the log reinforcements are already stressed and he has reported this to two officers who did not act on it.",
+  "name": "Jonas Riker",
+  "role": "Civilian Ferry Slip Master, Fulton's Ferry",
+  "voice": "Blunt, civilian, entirely unimpressed by military rank; addresses generals and privates in the same flat tone.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The structural load limit of the ferry slip's log reinforcements and how close the current usage is to that limit.",
+    "The precise draft depth of each bateau type in rotation and how many men each can safely carry in the current chop.",
+    "Which stretches of the Manhattan shoreline have sufficient depth for an unassisted landing versus which require the slip infrastructure."
+  ],
+  "updatedAt": "2026-06-13T20:06:16.958Z",
+  "publicFace": "A thick-armed man of fifty who has operated this crossing for twenty years; treats the military emergency as a logistics problem he has seen variants of before—floods, ice, storm surges.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "fictional",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "States the structural or logistical fact and waits.",
+    "breakingPoint": "Will not certify a load he believes will sink the bateau; his professional reputation and the lives of the men aboard are the same concern to him.",
+    "heavyPressure": "Points at the slip timbers and describes exactly what failure looks like; has seen it before."
+  },
+  "privateConstraint": "Riker's authority at the slip is informal; he has no military rank and his manifest tallies are advisory, not binding. When officers override his loading recommendations, he cannot compel compliance—only argue."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "administration_building",
+  "mood": "urgent, managerial, brittle",
+  "name": "Administration Building",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "Burnham's nerve center: papers, telegraphs, mud on boots, tempers under restraint, and the strain of a city trying to stage a modern wonder.",
+  "atmosphericDetails": [
+    "Shipping memorandum with altered crate numbers",
+    "A telegraph marked urgent but unsigned",
+    "A list of delayed electrical parts"
+  ],
+  "linkedCharacterIds": [
+    "daniel_burnham"
+  ]
+}

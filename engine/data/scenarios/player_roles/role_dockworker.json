@@ -1,42 +1,42 @@
 {
   "id": "role_dockworker",
-  "scenarioId": "boston_tea_party_version_2",
   "name": "Harbor Dockworker",
-  "description": "You are a rope-maker and dockworker recruited by the Sons of Liberty to help with tonight's operation — you know the waterfront better than anyone, and people talk freely around you because they do not think you are listening.",
-  "startLocationId": "griffins_wharf",
-  "startingKnowledge": [
-    "You heard two men arguing in hushed tones near the Customs Dock this afternoon — one of them was definitely a customs officer.",
-    "The boarding party is supposed to arrive at Griffin's Wharf dressed as Mohawks — but someone has been asking around the docks about who is involved.",
-    "Captain Rotch has been seen pacing the Dartmouth's deck all day, looking more frightened than a man caught between two factions usually does."
-  ],
-  "accessLevel": "worker",
-  "briefing": "You are a rope-maker who has worked Griffin's Wharf for eleven years — someone the Sons of Liberty trust precisely because no one pays attention to you. Find the informer who has betrayed tonight's boarding plan to the Crown before the Sons of Liberty walk into a trap. If you fail, the men who board those ships tonight will be arrested, the cause set back years, and the informer will go free.",
-  "perspective": "Write from the perspective of a working-class colonial with deep local knowledge of the waterfront but no formal authority. This player moves freely along the docks and alleys without drawing attention, and NPCs like Captain Rotch and Agent Dawes are more likely to underestimate them. However, they cannot invoke the Sons of Liberty's leadership or access the Counting House without a reason. Tone should be grounded and observational — this player notices physical details that others miss. They are trusted precisely because they are overlooked.",
   "opening": {
-    "narrative": "You have worked Griffin's Wharf for eleven years, and you know every plank, every piling, and every face that passes through here — which is why you noticed immediately that something is wrong tonight. The Dartmouth sits heavy in the water, her cargo untouched, while customs men who are usually home by dark are still here, still watching, still waiting for something you cannot name. Word came to you through the rope-walk this afternoon: the Sons of Liberty need eyes on the waterfront, someone who will not be noticed. You said yes without thinking twice, because you have three children and you know what the tea tax means for men like you. You are standing at the edge of the dock now, the cold harbor wind cutting through your coat, watching Agent Silas Dawes pace the far end of the wharf with the satisfied air of a man who knows something everyone else does not. Captain Rotch is visible on the Dartmouth's deck, his face gray and drawn, staring at the water.",
-    "npcMoments": [],
     "choices": [
       "Move closer to Agent Dawes and try to overhear his conversation with the constable.",
       "Climb aboard the Dartmouth and speak with Captain Rotch — he looks like a man who needs to unburden himself.",
       "Slip away to the Customs Dock to the south — you heard men arguing there this afternoon and want to see what they left behind."
-    ]
+    ],
+    "narrative": "You have worked Griffin's Wharf for eleven years, and you know every plank, every piling, and every face that passes through here — which is why you noticed immediately that something is wrong tonight. The Dartmouth sits heavy in the water, her cargo untouched, while customs men who are usually home by dark are still here, still watching, still waiting for something you cannot name. Word came to you through the rope-walk this afternoon: the Sons of Liberty need eyes on the waterfront, someone who will not be noticed. You said yes without thinking twice, because you have three children and you know what the tea tax means for men like you. You are standing at the edge of the dock now, the cold harbor wind cutting through your coat, watching Agent Silas Dawes pace the far end of the wharf with the satisfied air of a man who knows something everyone else does not. Captain Rotch is visible on the Dartmouth's deck, his face gray and drawn, staring at the water.",
+    "npcMoments": []
   },
+  "briefing": "You are a rope-maker who has worked Griffin's Wharf for eleven years — someone the Sons of Liberty trust precisely because no one pays attention to you. Find the informer who has betrayed tonight's boarding plan to the Crown before the Sons of Liberty walk into a trap. If you fail, the men who board those ships tonight will be arrested, the cause set back years, and the informer will go free.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:46:43.984Z",
+  "represents": "Dockworkers and laborers recruited by the Sons of Liberty who participated in the Boston Tea Party on December 16, 1773",
+  "scenarioId": "boston_tea_party_version_2",
+  "accessLevel": "worker",
+  "description": "You are a rope-maker and dockworker recruited by the Sons of Liberty to help with tonight's operation — you know the waterfront better than anyone, and people talk freely around you because they do not think you are listening.",
+  "perspective": "Write from the perspective of a working-class colonial with deep local knowledge of the waterfront but no formal authority. This player moves freely along the docks and alleys without drawing attention, and NPCs like Captain Rotch and Agent Dawes are more likely to underestimate them. However, they cannot invoke the Sons of Liberty's leadership or access the Counting House without a reason. Tone should be grounded and observational — this player notices physical details that others miss. They are trusted precisely because they are overlooked.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The crane chains are still swinging.",
+  "startLocationId": "griffins_wharf",
+  "context_sentence": "You are Caleb Morse, a rope-maker and dockworker at Griffin's Wharf who was recruited by the Sons of Liberty to help coordinate the landing parties on the night of December 16, 1773, when approximately 116 men boarded the Dartmouth, Eleanor, and Beaver and dumped 342 chests of East India Company tea into Boston Harbor.",
   "roleInitialState": {
+    "flags": {},
     "inventory": [
       "Coil of rope — standard dockworker's tool, useful as a prop or a restraint",
       "Folded note from a Sons of Liberty contact: 'Find out who talked. Tonight.'"
     ],
-    "flags": {},
     "suspicion": {
       "agent_silas_dawes": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:46:43.984Z",
-  "context_sentence": "You are Caleb Morse, a rope-maker and dockworker at Griffin's Wharf who was recruited by the Sons of Liberty to help coordinate the landing parties on the night of December 16, 1773, when approximately 116 men boarded the Dartmouth, Eleanor, and Beaver and dumped 342 chests of East India Company tea into Boston Harbor.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Dockworkers and laborers recruited by the Sons of Liberty who participated in the Boston Tea Party on December 16, 1773",
-  "fact_checked": false,
-  "bridge_sentence": "The crane chains are still swinging."
+  "startingKnowledge": [
+    "You heard two men arguing in hushed tones near the Customs Dock this afternoon — one of them was definitely a customs officer.",
+    "The boarding party is supposed to arrive at Griffin's Wharf dressed as Mohawks — but someone has been asking around the docks about who is involved.",
+    "Captain Rotch has been seen pacing the Dartmouth's deck all day, looking more frightened than a man caught between two factions usually does."
+  ]
 }

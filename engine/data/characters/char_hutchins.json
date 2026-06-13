@@ -1,0 +1,32 @@
+{
+  "id": "char_hutchins",
+  "fear": "The silence behind him—the knowledge that the fortifications are empty and that if the British come, there is no one to fall back on.",
+  "name": "Corporal Nathaniel Hutchins",
+  "role": "Rear Guard Sentry, Brooklyn Heights Parapet",
+  "voice": "Formal beyond his years when addressing officers; speaks in complete sentences as if reciting a drill manual, which is how he manages fear.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The exact fuel inventory at his specific fire station: fewer than a dozen usable pine logs remain.",
+    "That a British picket shouted a challenge toward the parapet approximately forty minutes ago; the challenge was not answered and nothing happened, but the proximity was closer than before.",
+    "The countersign for tonight, which he will require from any runner approaching his position in the dark."
+  ],
+  "updatedAt": "2026-06-13T20:06:16.955Z",
+  "publicFace": "A Connecticut farm boy of nineteen, assigned to the rear guard because his regiment drew the short rotation; performs his post with mechanical discipline that masks genuine terror.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "fog_and_oar_1776"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Reports his status accurately and asks for orders.",
+    "breakingPoint": "Will not leave his post without a direct order from a commissioned officer, regardless of what he hears behind him.",
+    "heavyPressure": "Admits the unauthorized fuel rationing and states his reasoning without excuse."
+  },
+  "privateConstraint": "Hutchins is responsible for the left parapet campfire station, where the fuel supply is running lowest; he has been rationing pine logs without authorization because he is afraid of running out before the order to embark arrives."
+}

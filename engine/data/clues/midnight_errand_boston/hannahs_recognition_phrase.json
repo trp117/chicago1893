@@ -1,18 +1,18 @@
 {
   "id": "hannahs_recognition_phrase",
-  "scenarioId": "midnight_errand_boston",
   "title": "The Recognition Phrase",
-  "description": "Before Hannah leaves — or if you ask her the right question — she leans close and says it once, very quietly: 'The tide sets east tonight.' She says Thomas Wren will not open the back room to anyone who does not say it first. She says it like she is placing something fragile in your hands.",
+  "unlocks": [],
   "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.923Z",
+  "locationId": "",
+  "scenarioId": "midnight_errand_boston",
+  "description": "Before Hannah leaves — or if you ask her the right question — she leans close and says it once, very quietly: 'The tide sets east tonight.' She says Thomas Wren will not open the back room to anyone who does not say it first. She says it like she is placing something fragile in your hands.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "gill_print_shop_back",
   "implicatesCharacterIds": [
     "hannah_cross",
     "thomas_wren"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.923Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

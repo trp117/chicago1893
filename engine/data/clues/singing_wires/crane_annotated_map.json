@@ -1,17 +1,17 @@
 {
   "id": "crane_annotated_map",
-  "scenarioId": "singing_wires",
   "title": "Deputy Crane's Annotated Route Map",
-  "description": "Visible on the side table in the sheriff's office: Crane's working map of Erie County with two pencil lines drawn north from the Huron Road junction. One line follows the main shore road — the correct route. The second line follows the old wagon track through the Voss farm property, which Crane has marked with a question mark. He does not know about the barn station, but he has drawn a line within a hundred yards of it based on the road geography alone. If Thomas Cole's phantomed misdirection fails, Crane's fallback route will take him directly past the barn.",
-  "category": "observation",
-  "discoveryLocationId": "erie_county_sheriffs_office",
-  "implicatesCharacterIds": [
-    "deputy_crane"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.484Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "singing_wires",
+  "description": "Visible on the side table in the sheriff's office: Crane's working map of Erie County with two pencil lines drawn north from the Huron Road junction. One line follows the main shore road — the correct route. The second line follows the old wagon track through the Voss farm property, which Crane has marked with a question mark. He does not know about the barn station, but he has drawn a line within a hundred yards of it based on the road geography alone. If Thomas Cole's phantomed misdirection fails, Crane's fallback route will take him directly past the barn.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "erie_county_sheriffs_office",
+  "implicatesCharacterIds": [
+    "deputy_crane"
+  ]
 }

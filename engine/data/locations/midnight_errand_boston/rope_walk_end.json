@@ -1,20 +1,20 @@
 {
   "id": "rope_walk_end",
-  "scenarioId": "midnight_errand_boston",
-  "name": "The End of the Rope-Walk",
-  "description": "The long, low rope-walk building ends in a yard open to the harbor wind; coils of rope and hemp bales make good cover, and the water is close enough to hear. It is a place people come when they do not want to be found.",
   "mood": "exposed, windswept, clandestine",
-  "linkedCharacterIds": [
-    "hannah_cross",
-    "owen_pryce"
-  ],
+  "name": "The End of the Rope-Walk",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.917Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "midnight_errand_boston",
+  "description": "The long, low rope-walk building ends in a yard open to the harbor wind; coils of rope and hemp bales make good cover, and the water is close enough to hear. It is a place people come when they do not want to be found.",
   "atmosphericDetails": [
     "The harbor smell is strong here — brine, fish, and the cold iron smell of the water at night.",
     "The rope-walk building blocks the view from the street; what happens here is invisible from Ann Street.",
     "A single lantern on a post at the water's edge swings in the wind, its light unreliable."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.917Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "hannah_cross",
+    "owen_pryce"
+  ]
 }

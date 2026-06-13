@@ -1,20 +1,20 @@
 {
   "id": "loc_trabant_queue",
-  "scenarioId": "bornholmer_strasse_first_breach",
-  "name": "The Trabant Queue",
-  "description": "The vehicle processing lane on the eastern approach — a long queue of idling Trabants whose drivers have abandoned their cars and joined the pedestrian crowd, leaving the vehicles running. The two-stroke engines produce a continuous blue haze of exhaust that mingles with the fog and the floodlight glare.",
   "mood": "abandoned, surreal, transitional",
-  "linkedCharacterIds": [
-    "char_protester",
-    "char_oberst_mielke"
-  ],
+  "name": "The Trabant Queue",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.114Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "The vehicle processing lane on the eastern approach — a long queue of idling Trabants whose drivers have abandoned their cars and joined the pedestrian crowd, leaving the vehicles running. The two-stroke engines produce a continuous blue haze of exhaust that mingles with the fog and the floodlight glare.",
   "atmosphericDetails": [
     "Dozens of Trabants idling unattended, their headlights on, engines running — the vehicles of a population that has decided the car no longer matters",
     "The distinctive smell of two-stroke exhaust — a smell so specific to East Germany that it will become, for a generation, the smell of this night",
     "Personal items visible through car windows — a child's stuffed toy on a back seat, a thermos of coffee on a dashboard, a map of West Berlin open on the passenger seat"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.975Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_protester",
+    "char_oberst_mielke"
+  ]
 }

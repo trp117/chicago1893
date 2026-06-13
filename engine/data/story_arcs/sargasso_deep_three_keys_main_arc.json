@@ -1,18 +1,8 @@
 {
   "id": "sargasso_deep_three_keys_main_arc",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "The Three Keys",
-  "premise": "Aboard the crippled Soviet submarine B-59, a suffocating crew and a panicking captain are ninety minutes from arming a nuclear torpedo. Three people — a Soviet flotilla chief, his sonar analyst, and an American destroyer captain — each hold a piece of the information needed to stop it.",
-  "goal": "Prevent the nuclear launch sequence from completing by gathering and deploying the right evidence, holding the right authority, and making the right call before oxygen, temperature, or time runs out.",
-  "openingSituation": "16:00 ship's time. The USS Cony has established a firm sonar lock on B-59. The submarine has been submerged for sixteen hours on battery power. The first signaling depth charge has just detonated forty meters off the port bow. Captain Savitsky is at the conning tower chart table, and his voice has the flat, careful quality of a man holding something back.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Trap",
-      "minuteRange": [
-        0,
-        8
-      ],
       "beats": [
         {
           "id": "the_uss_cony",
@@ -31,15 +21,15 @@
           "description": "Arkhipov locates the Political Officer Maslennikov and takes his measure: will he follow orders or follow doctrine?"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        8
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Delirium",
-      "minuteRange": [
-        8,
-        18
-      ],
       "beats": [
         {
           "id": "the_americans_begin",
@@ -62,15 +52,15 @@
           "description": "Arkhipov intercepts a whispered conversation between two torpedo room ratings confirming the special weapon has already been physically moved to the launch tube."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        8,
+        18
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Zero Horizon",
-      "minuteRange": [
-        18,
-        26
-      ],
       "beats": [
         {
           "id": "hulltemperature_hits_110f",
@@ -89,15 +79,15 @@
           "description": "The Cony captain, realizing the contact has gone completely silent and the hold-down has lasted too long, makes the unilateral decision to halt all depth charges and broadcast the international surfacing signal."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        18,
+        26
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The Key That Holds",
-      "minuteRange": [
-        26,
-        30
-      ],
       "beats": [
         {
           "id": "the_conning_tower",
@@ -116,10 +106,20 @@
           "description": "Final log entry: the world does not end tonight. Or it does."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        26,
+        30
+      ]
     }
   ],
+  "goal": "Prevent the nuclear launch sequence from completing by gathering and deploying the right evidence, holding the right authority, and making the right call before oxygen, temperature, or time runs out.",
+  "name": "The Three Keys",
+  "opening": "",
+  "premise": "Aboard the crippled Soviet submarine B-59, a suffocating crew and a panicking captain are ninety minutes from arming a nuclear torpedo. Three people — a Soviet flotilla chief, his sonar analyst, and an American destroyer captain — each hold a piece of the information needed to stop it.",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T19:37:59.793Z",
-  "opening": ""
+  "scenarioId": "sargasso_deep_three_keys",
+  "openingSituation": "16:00 ship's time. The USS Cony has established a firm sonar lock on B-59. The submarine has been submerged for sixteen hours on battery power. The first signaling depth charge has just detonated forty meters off the port bow. Captain Savitsky is at the conning tower chart table, and his voice has the flat, careful quality of a man holding something back."
 }

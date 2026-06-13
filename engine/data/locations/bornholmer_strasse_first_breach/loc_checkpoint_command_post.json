@@ -1,20 +1,20 @@
 {
   "id": "loc_checkpoint_command_post",
-  "scenarioId": "bornholmer_strasse_first_breach",
-  "name": "Checkpoint Command Post",
-  "description": "A low concrete building behind the eastern barrier, its windows fogged with condensation, containing three security phones, a wall-mounted map of the checkpoint perimeter, and a break room television still showing the state broadcast. The phones ring and go unanswered. The fluorescent light above the duty desk flickers every forty seconds.",
   "mood": "claustrophobic, isolated, bureaucratic-dread",
-  "linkedCharacterIds": [
-    "char_jaeger",
-    "char_oberst_mielke"
-  ],
+  "name": "Checkpoint Command Post",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.111Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "A low concrete building behind the eastern barrier, its windows fogged with condensation, containing three security phones, a wall-mounted map of the checkpoint perimeter, and a break room television still showing the state broadcast. The phones ring and go unanswered. The fluorescent light above the duty desk flickers every forty seconds.",
   "atmosphericDetails": [
     "The metallic click of a security phone receiver hitting the cradle — the third unanswered call in twenty minutes",
     "A half-eaten plate of Schnitzel on the duty desk, gone cold, beside an open logbook with the last entry timestamped 20:47",
     "The muffled roar of the crowd outside is present in every room, a constant low-frequency vibration that can be felt through the soles of boots on the concrete floor"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.972Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_jaeger",
+    "char_oberst_mielke"
+  ]
 }

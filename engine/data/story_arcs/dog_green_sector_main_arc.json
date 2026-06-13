@@ -1,18 +1,8 @@
 {
   "id": "dog_green_sector_main_arc",
-  "scenarioId": "dog_green_sector",
-  "name": "The Vierville Draw",
-  "premise": "Three men with different functions and different views of the same catastrophe must coordinate across the chaos of Dog Green Sector to breach the wire, neutralize WN-71, and open the Vierville Draw before the rising tide makes the beach impassable and the second wave repeats the slaughter of the first.",
-  "goal": "Breach the concertina wire obstacle at the base of the Vierville Draw using the Bangalore Torpedo, signal the USS McCook for direct fire support against WN-71, and lead survivors to the top of the bluffs by 0800 hours.",
-  "openingSituation": "It is 0630 hours. The LCA is sixty yards from the beach and taking mortar near-misses. The Ranger sergeant is pinned behind a hedgehog in the surf. The medic is already in the water with casualties. The draw is defended, the wire is intact, and the tide is coming in.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Run-In",
-      "minuteRange": [
-        0,
-        8
-      ],
       "beats": [
         {
           "id": "the_coxswain_must",
@@ -31,15 +21,15 @@
           "description": "The three roles become aware of each other's presence and the shared problem: the wire at the draw's base is the bottleneck everything depends on."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        8
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Killing Ground",
-      "minuteRange": [
-        8,
-        16
-      ],
       "beats": [
         {
           "id": "pinned_at_the",
@@ -58,15 +48,15 @@
           "description": "The medic discovers that Private Olek Szymanski, the only man who has crawled close enough to observe the WN-71 Tobruk position, is categorized as expectant — but he is still conscious and talking."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        8,
+        16
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Wire",
-      "minuteRange": [
-        16,
-        24
-      ],
       "beats": [
         {
           "id": "the_bangalore_torpedo",
@@ -85,15 +75,15 @@
           "description": "The USS McCook makes radio contact — but the fire mission requires a confirmed grid reference for WN-71 that only Szymanski's testimony can provide."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        16,
+        24
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The Bluffs",
-      "minuteRange": [
-        24,
-        30
-      ],
       "beats": [
         {
           "id": "the_bangalore_detonates",
@@ -112,10 +102,20 @@
           "description": "At the top of the Vierville bluffs, the surviving characters look back at the beach as the second wave appears on the horizon — the draw is open, or it is not, and the cost of either outcome is visible in both directions."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        24,
+        30
+      ]
     }
   ],
+  "goal": "Breach the concertina wire obstacle at the base of the Vierville Draw using the Bangalore Torpedo, signal the USS McCook for direct fire support against WN-71, and lead survivors to the top of the bluffs by 0800 hours.",
+  "name": "The Vierville Draw",
+  "opening": "",
+  "premise": "Three men with different functions and different views of the same catastrophe must coordinate across the chaos of Dog Green Sector to breach the wire, neutralize WN-71, and open the Vierville Draw before the rising tide makes the beach impassable and the second wave repeats the slaughter of the first.",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-24T03:10:26.274Z",
-  "opening": ""
+  "scenarioId": "dog_green_sector",
+  "openingSituation": "It is 0630 hours. The LCA is sixty yards from the beach and taking mortar near-misses. The Ranger sergeant is pinned behind a hedgehog in the surf. The medic is already in the water with casualties. The draw is defended, the wire is intact, and the tide is coming in."
 }

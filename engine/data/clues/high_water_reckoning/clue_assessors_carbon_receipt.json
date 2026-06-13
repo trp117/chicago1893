@@ -1,20 +1,20 @@
 {
   "id": "clue_assessors_carbon_receipt",
-  "scenarioId": "high_water_reckoning",
   "title": "Cynthia Tureaud's Abandonment Filing Receipt",
-  "description": "A carbon-copy receipt found in the outer sleeve of the iron document box, partially protected from moisture by the box's rubber gasket. The receipt bears an Orleans Parish Assessor's Office letterhead, a date stamp of August 31, 2005, and lists the Deslonde Street parcel by lot number as 'classified abandoned — no occupant contact made.' The agent signature reads C. Tureaud. The mandatory shelter-in-place order for this sector was not lifted until September 3.",
+  "unlocks": [
+    "clue_shelter_registry_cross_reference"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.284Z",
+  "locationId": "",
+  "scenarioId": "high_water_reckoning",
+  "description": "A carbon-copy receipt found in the outer sleeve of the iron document box, partially protected from moisture by the box's rubber gasket. The receipt bears an Orleans Parish Assessor's Office letterhead, a date stamp of August 31, 2005, and lists the Deslonde Street parcel by lot number as 'classified abandoned — no occupant contact made.' The agent signature reads C. Tureaud. The mandatory shelter-in-place order for this sector was not lifted until September 3.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "deslonde_street_shotgun_house",
   "implicatesCharacterIds": [
     "cynthia_tureaud",
     "father_clement_tureaud"
-  ],
-  "unlocks": [
-    "clue_shelter_registry_cross_reference"
-  ],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.054Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

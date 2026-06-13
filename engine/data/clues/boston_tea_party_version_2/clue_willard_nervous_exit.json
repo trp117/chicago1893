@@ -1,16 +1,16 @@
 {
   "id": "clue_willard_nervous_exit",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "Reverend Willard's Suspicious Departure",
-  "description": "Margaret Cole tells you, with characteristic bluntness, that Reverend Willard was seen leaving the Green Dragon Tavern in a hurry earlier this evening — clutching something beneath his coat and refusing to meet anyone's eyes. He went toward the alley, not toward Old South. It looks suspicious, but Cole also mentions, almost as an afterthought, that Greenleaf left alone two nights ago, which she found far stranger.",
+  "unlocks": [],
   "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.445Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Margaret Cole tells you, with characteristic bluntness, that Reverend Willard was seen leaving the Green Dragon Tavern in a hurry earlier this evening — clutching something beneath his coat and refusing to meet anyone's eyes. He went toward the alley, not toward Old South. It looks suspicious, but Cole also mentions, almost as an afterthought, that Greenleaf left alone two nights ago, which she found far stranger.",
+  "isKeyEvidence": false,
   "discoveryLocationId": "green_dragon_tavern",
   "implicatesCharacterIds": [
     "reverend_ezra_willard",
     "thomas_greenleaf"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.445Z"
+  ]
 }

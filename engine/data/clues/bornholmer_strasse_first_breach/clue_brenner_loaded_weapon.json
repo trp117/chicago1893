@@ -1,17 +1,17 @@
 {
   "id": "clue_brenner_loaded_weapon",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "title": "Brenner's Loaded Kalashnikov",
-  "description": "From the watchtower observation post, you can see Unteroffizier Brenner on the eastern platform below. His Kalashnikov is slung across his chest in a low-ready position — not stored, not shouldered, but held. His right hand is on the pistol grip. You watch him for ninety seconds. He does not move his hand. The safety position is not visible from this angle, but the posture is unmistakable to anyone who has seen a soldier preparing to fire. He is not pointing the weapon at anyone. He does not need to be.",
+  "unlocks": [],
   "category": "observation",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.115Z",
+  "locationId": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "From the watchtower observation post, you can see Unteroffizier Brenner on the eastern platform below. His Kalashnikov is slung across his chest in a low-ready position — not stored, not shouldered, but held. His right hand is on the pistol grip. You watch him for ninety seconds. He does not move his hand. The safety position is not visible from this angle, but the posture is unmistakable to anyone who has seen a soldier preparing to fire. He is not pointing the weapon at anyone. He does not need to be.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_watchtower",
   "implicatesCharacterIds": [
     "char_brenner"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.976Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

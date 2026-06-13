@@ -1,19 +1,19 @@
 {
   "id": "ann_street_checkpoint",
-  "scenarioId": "midnight_errand_boston",
-  "name": "Ann Street Checkpoint",
-  "description": "Two Redcoats stand at a lantern-lit barrier of sawhorses across Ann Street, with Captain Aldrich behind them making notes in a small book. The light catches their bayonets and the brass buttons of their coats.",
   "mood": "authoritative, threatening, bright against darkness",
-  "linkedCharacterIds": [
-    "captain_aldrich"
-  ],
+  "name": "Ann Street Checkpoint",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.913Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "midnight_errand_boston",
+  "description": "Two Redcoats stand at a lantern-lit barrier of sawhorses across Ann Street, with Captain Aldrich behind them making notes in a small book. The light catches their bayonets and the brass buttons of their coats.",
   "atmosphericDetails": [
     "The lantern is bright enough to see faces clearly — and to be seen.",
     "A small queue of late-night travelers stands waiting, their breath misting in the April cold.",
     "One soldier is young, barely older than Nathaniel, and keeps glancing toward the Common."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.913Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "captain_aldrich"
+  ]
 }

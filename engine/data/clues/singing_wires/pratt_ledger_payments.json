@@ -1,17 +1,17 @@
 {
   "id": "pratt_ledger_payments",
-  "scenarioId": "singing_wires",
   "title": "Station Ledger — Extra Payment Entries",
-  "description": "In the telegraph office's private operational ledger, two months of entries in Silas Pratt's hand include a recurring notation: 'equipment maintenance, private account, $4.00.' No equipment maintenance of this kind is authorized in the station's operational budget, and the amounts correspond precisely to the dates of the last three northbound groups that were watched or intercepted. Thomas Cole found this notation weeks ago and said nothing; seeing it now in the context of tonight's red fire message makes its meaning unmistakable.",
-  "category": "documentary",
-  "discoveryLocationId": "sandusky_telegraph_office",
-  "implicatesCharacterIds": [
-    "silas_pratt"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-09T21:12:00.488Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "singing_wires",
+  "description": "In the telegraph office's private operational ledger, two months of entries in Silas Pratt's hand include a recurring notation: 'equipment maintenance, private account, $4.00.' No equipment maintenance of this kind is authorized in the station's operational budget, and the amounts correspond precisely to the dates of the last three northbound groups that were watched or intercepted. Thomas Cole found this notation weeks ago and said nothing; seeing it now in the context of tonight's red fire message makes its meaning unmistakable.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "sandusky_telegraph_office",
+  "implicatesCharacterIds": [
+    "silas_pratt"
+  ]
 }

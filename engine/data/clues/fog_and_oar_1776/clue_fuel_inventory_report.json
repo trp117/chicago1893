@@ -1,18 +1,18 @@
 {
   "id": "clue_fuel_inventory_report",
-  "title": "Stacey's Unauthorized Fuel Ration",
+  "title": "Hutchins's Unauthorized Fuel Ration",
   "unlocks": [],
   "category": "testimony",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-10T22:40:42.167Z",
+  "updatedAt": "2026-06-13T20:06:16.967Z",
   "locationId": "",
   "scenarioId": "fog_and_oar_1776",
-  "description": "Corporal Stacey shows you the wood pile at the left parapet fire station: eleven usable pine logs remain, enough for perhaps seventy minutes of full-burn deception. He admits he has been rationing without orders, fearing he would exhaust the supply before the embarkation signal arrived. The right flank station has been drawing from a shared pile and may have less. The Campfire_Decoy_Luminance cannot be maintained at maximum for the full remaining crossing window without resupply from somewhere.",
+  "description": "Corporal Hutchins shows you the wood pile at the left parapet fire station: eleven usable pine logs remain, enough for perhaps seventy minutes of full-burn deception. He admits he has been rationing without orders, fearing he would exhaust the supply before the embarkation signal arrived. The right flank station has been drawing from a shared pile and may have less. The Campfire_Decoy_Luminance cannot be maintained at maximum for the full remaining crossing window without resupply from somewhere.",
   "isRedHerring": false,
   "isKeyEvidence": false,
   "discoveryLocationId": "loc_brooklyn_heights_parapet",
   "implicatesCharacterIds": [
-    "char_nathaniel_stacey",
+    "char_hutchins",
     "char_mifflin"
   ]
 }

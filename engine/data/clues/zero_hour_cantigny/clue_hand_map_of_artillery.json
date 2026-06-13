@@ -1,18 +1,18 @@
 {
   "id": "clue_hand_map_of_artillery",
-  "scenarioId": "zero_hour_cantigny",
   "title": "German Map of American Artillery Positions",
-  "description": "Pinned to a timber upright in the fortified cellar with a German bayonet is a hand-drawn map of the American artillery positions — gun emplacements, ammunition dumps, and the artillery dugout — accurate to within fifty meters and dated May 26th. The draftsmanship is precise and uses American military grid notation rather than German, suggesting it was drawn by someone familiar with AEF mapping conventions. A small notation in the lower corner reads, in English: 'Verified by personal observation 25/5.'",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.101Z",
+  "locationId": "",
+  "scenarioId": "zero_hour_cantigny",
+  "description": "Pinned to a timber upright in the fortified cellar with a German bayonet is a hand-drawn map of the American artillery positions — gun emplacements, ammunition dumps, and the artillery dugout — accurate to within fifty meters and dated May 26th. The draftsmanship is precise and uses American military grid notation rather than German, suggesting it was drawn by someone familiar with AEF mapping conventions. A small notation in the lower corner reads, in English: 'Verified by personal observation 25/5.'",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_fortified_cellar",
   "implicatesCharacterIds": [
     "char_farrow",
     "char_renard"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.101Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

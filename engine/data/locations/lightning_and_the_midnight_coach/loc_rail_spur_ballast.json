@@ -1,20 +1,20 @@
 {
   "id": "loc_rail_spur_ballast",
-  "scenarioId": "lightning_and_the_midnight_coach",
-  "name": "The Spur Line and Ballast Path",
-  "description": "A maintenance spur running north from the main, its crushed stone ballast glinting faintly in moonlight between dark wooden ties — the telegraph wire runs parallel on cedar poles, close enough to hear the wind hum through it.",
   "mood": "isolated, dark, physical, dangerous",
-  "linkedCharacterIds": [
-    "elias_cutter",
-    "prentiss_hoyle"
-  ],
+  "name": "The Spur Line and Ballast Path",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.462Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "A maintenance spur running north from the main, its crushed stone ballast glinting faintly in moonlight between dark wooden ties — the telegraph wire runs parallel on cedar poles, close enough to hear the wind hum through it.",
   "atmosphericDetails": [
     "The telegraph wire hums at a low frequency in the northwest wind — almost musical, almost a warning.",
     "The ballast is wet from yesterday's rain and the footing is uncertain in the dark.",
     "A pocket relay tap was used here recently — the cedar pole at the quarter-mile mark shows fresh scrape marks where a clip was attached."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.462Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "elias_cutter",
+    "prentiss_hoyle"
+  ]
 }

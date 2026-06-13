@@ -1,16 +1,16 @@
 {
   "id": "clue_customs_receipt",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "The Customs Receipt",
-  "description": "Inside the East India Company crate on the Customs Dock, beneath a layer of straw packing, you find a folded receipt on official customs paper. It records a payment of thirty pounds sterling to a 'confidential informant' and is countersigned by Agent Silas Dawes. The informant is not named — but a second document beneath it is a brief acknowledgment note, signed with the initials T.G. in the same precise handwriting as the coded letter you may have already found.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.444Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Inside the East India Company crate on the Customs Dock, beneath a layer of straw packing, you find a folded receipt on official customs paper. It records a payment of thirty pounds sterling to a 'confidential informant' and is countersigned by Agent Silas Dawes. The informant is not named — but a second document beneath it is a brief acknowledgment note, signed with the initials T.G. in the same precise handwriting as the coded letter you may have already found.",
+  "isKeyEvidence": true,
   "discoveryLocationId": "customs_dock",
   "implicatesCharacterIds": [
     "thomas_greenleaf",
     "agent_silas_dawes"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.444Z"
+  ]
 }

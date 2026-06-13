@@ -1,42 +1,31 @@
 {
   "id": "singing_wires",
-  "order": 2,
-  "hidden": false,
-  "version": "1.0.0",
-  "title": "Singing Wires",
-  "setting": "Sandusky, Ohio, 1853",
-  "description": "In the autumn of 1853, a red fire message races across Ezra Cornell's telegraph lines naming a veteran Underground Railroad conductor and his current charges. His son, a lightning flinger at the Sandusky junction, must use the enemy's own brass to misdirect the hunt while his father decides whether to trust the technology of slaveholders to save the lives in his care.",
+  "tone": [
+    "tense",
+    "moral",
+    "dangerous",
+    "intimate"
+  ],
   "genre": [
     "historical",
     "thriller",
     "mystery"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "storyArcIds": [
-    "singing_wires_main_arc"
-  ],
-  "playerRoleIds": [
-    "elias_cole_conductor",
-    "thomas_cole_operator",
-    "mercy_voss_stationmaster"
-  ],
-  "keyEvidenceClueIds": [
-    "red_fire_dispatch",
-    "bounty_ledger_page"
-  ],
+  "order": 2,
+  "title": "Singing Wires",
+  "hidden": false,
+  "premise": "Someone inside the Underground Railroad has sent a description of seven passengers — including two children — down the telegraph wire to a slave catcher. A conductor, a stationmaster, and a telegraph operator have thirty minutes before Deputy Crane rides north to intercept. One of the three knows who sent it.",
+  "setting": "Sandusky, Ohio, 1853",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -44,8 +33,50 @@
       "A second red fire message arrives at the Sandusky station confirming the bounty and naming the Ripley Road as the likely route — threat rises by 2.",
       "Deputy Crane is spotted riding north on the Huron Pike with two hired catchers — all players receive a 13 warning and threat rises by 2.",
       "The telegraph line between Sandusky and Norwalk goes silent for seventeen minutes; when it returns, an unknown operator has sent a null-laden message that skilled eyes can read as a trap — threat rises by 1, players must decide whether to respond."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.471Z",
+  "playerGoal": "Identify the informant, misdirect the catchers \nusing the telegraph, and move seven passengers to a Lake Erie \nvessel before half past eleven.",
+  "description": "In the autumn of 1853, a red fire message races across Ezra Cornell's telegraph lines naming a veteran Underground Railroad conductor and his current charges. His son, a lightning flinger at the Sandusky junction, must use the enemy's own brass to misdirect the hunt while his father decides whether to trust the technology of slaveholders to save the lives in his care.",
+  "storyArcIds": [
+    "singing_wires_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "It is October of 1853, and the state of Ohio sits on the knife-edge between two Americas. The Fugitive Slave Act of 1850 has transformed every free-state citizen into a potential deputy, imposing fines of one thousand dollars and six months' imprisonment on anyone who shelters or assists an escaped slave. Reverend John Rankin's house on the bluff above Ripley still burns its lantern, but the network of conductors, station masters, and sympathetic farmers who move people north toward Lake Erie and the Canadian shore now operates under a surveillance technology that did not exist five years ago. Ezra Cornell's telegraph lines, strung on white ceramic insulators between freshly cut cedar poles, now connect Cincinnati to Cleveland to Buffalo in a web of copper wire that can carry a description, a name, and a reward figure four hundred miles in under three minutes.",
+        "type": "world"
+      },
+      {
+        "text": "Tonight the wire carries a red fire message — a life-or-death priority dispatch — describing a group of seven people moving north through the Ohio corridor, including a man answering to the name Elias Cole, a conductor of twenty years' experience who has moved more than sixty souls to freedom. The bounty attached to the group totals four hundred and eighty dollars, enough to buy a working farm. What makes this moment different from every other night of danger is the source: someone inside the network, someone who knows the safe house locations and the departure schedule, has fed the description to a paid catcher who has fed it to the wire. The passengers tonight include two children under the age of ten. Failure does not mean inconvenience or even imprisonment for the adults; it means the auction block in Natchez or Memphis before the month is out.",
+        "type": "stakes"
+      },
+      {
+        "text": "The Sandusky telegraph office smells of lamp oil, brass polish, and the faint mineral bite of the battery acid in the Grove cells that power the sounder. Outside, a cold front is pushing off Lake Erie, and the cedar poles along the main line are humming a low, tuneless chord in the wind — the sound the operators call the singing of the wires. Rain has been threatening since sundown, and the mud on Water Street is the color and consistency of river silt. Three blocks south, the Lake Shore Railroad depot is lit with whale-oil lanterns, and the night freight from Cleveland is running forty minutes behind schedule, its iron horse somewhere in the darkness between Huron and the junction.",
+        "type": "scene"
+      },
+      {
+        "text": "You are here because someone in this town — someone who has eaten at the same tables, prayed in the same churches, and passed the same coded words in the same quiet voices — has decided that four hundred and eighty dollars is worth more than seven lives. The red fire message has already been sent. Deputy Crane has already read it. The catchers are already saddling horses in a livery stable two streets from where you stand. What happens in the next thirty minutes will determine whether seven people see the Canadian shore, or whether they are loaded onto a southbound consist before dawn. The clock on the depot wall reads half past nine, the wind off the lake is picking up, and somewhere in the dark woods north of the Huron River, Elias Cole is moving his passengers toward a shore he may never reach.",
+        "type": "entry",
+        "character_entries": {
+          "elias_cole_conductor": "You are standing at the edge of the elm grove with the Huron bottomland mud cold through the seams of your boots and seven people breathing quietly at your back, the two children tucked against their mother's ribs in the particular silence that is not peace but its opposite — the silence that has been taught, that has been earned through fear — and you are watching the dark shape of the Voss barn forty yards across open ground where no lantern burns in the east-facing window, which is either the all-clear or the end of everything, and you cannot yet tell which. The wire along the shore road is singing its low chord in the northeast wind and the pitch has shifted in the last hour the way a man's voice shifts when he is lying and trying not to, and what you carry that no one else carries tonight is the knowledge that three groups before this one were watched from inside, watched by someone who knew the exact hour of departure, and you have said nothing because silence felt like protection and now silence feels like the thing that has brought you to this particular darkness with these particular seven souls. Your son Thomas is three miles north at the junction sounder and you have not heard from him, which means either the wire is clean or the wire has already done its work. The gandy dancer's boy said someone is coming and could not say more. The barn is dark. The children are asleep on their feet. You have sixty seconds and one breath left before you choose the open ground or the long way through the rail yard ballast, and your hand is already moving.",
+          "thomas_cole_operator": "You are standing at the main desk with the red fire dispatch pressed flat under your left hand and the traffic log open under your right, and the sounder on the Norwalk spur has now been silent for thirteen minutes. The lamp above the desk throws a yellow circle that stops at the edge of the brass and does not reach the junction box diagram tacked to the wall, the one you have been staring at for the last four minutes without moving your eyes from the Norwalk relay schematic. What you know that no one else in this building knows — what you have known for eight weeks and have carried the way you carry a stone in a boot — is that the red fire did not come down the line from Cincinnati or Cleveland or anywhere east of this room; the secondary key traffic that seeded it originated from the Sandusky instrument itself, from Silas Pratt's chair, sometime between the nine o'clock log entry and the moment you came on shift and found the dispatch already written out in Pratt's careful, incriminating copperplate. Your hands are steady because you have trained them to be steady, but your mouth tastes like the Grove cell acid, like copper and something burning, and the cedar poles outside are singing in the lake wind at a pitch that seems, right now, personal. The null-laden cipher you sent to Mercy Voss is already in the log — column four, eleven forty-one, your initials in the operator's hand you cannot disguise — and if anyone reads that entry against the red fire timestamp they will have you, career and freedom both, before the morning freight clears the junction. Your father is somewhere on a dark road with two children aged six and eight and a scar on his left forearm that the bounty paper describes in language so precise it could only have come from someone who has stood close enough to touch him, and the phantom circuit that could misdirect Crane's men south toward Huron and buy him two hours of darkness requires you to walk thirty feet to the rail yard junction box and do a thing that will be visible in the brass work by first light to anyone who knows how to read it. You pick up the key.",
+          "mercy_voss_stationmaster": "You are standing at the back door of Voss Dry Goods with one hand flat against the doorframe and the other holding Thomas Cole's decoded message so tightly that the paper has begun to corrugate along your fingers, and the three words you translated twelve minutes ago — *Judas in the house* — have not stopped being true in all the time since. The lamp on the counter behind you is turned to its lowest wick, throwing just enough light to make the Concordance's spine readable and the chalk marks on your doorframe visible: two lines, station occupied, seven people in motion somewhere between the Huron River and your barn, moving on a schedule that Silas Pratt knows as well as you do because you trusted him with it in August when his face gave you no reason not to. What you hold in one mind that no one else in Sandusky holds tonight is the full shape of the thing: Captain Aldrich's name and his hard deadline of half past eleven; the accounts beneath your floorboards documenting sixty-three souls, enough paper to hang you in a federal court before spring; and the knowledge that Arden Gill's questions about freight routing this season have been the questions of a man drawing a map. The cold coming off the lake moves through the gap in the door and touches your wrist, and outside the cedar poles are singing their low, tuneless chord, and somewhere in the darkness between here and the water your barn holds two children under ten years old who do not know that the wire has already said their names, and you have not yet lit the lamp."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "elias_cole_conductor",
+    "thomas_cole_operator",
+    "mercy_voss_stationmaster"
+  ],
   "winConditions": [
     "The passengers for the midnight coach reach the Lake Erie shore and board a vessel bound for Canada with their identities uncompromised.",
     "The red fire dispatch is proven to have originated from a paid informant inside the network, the informant is identified and neutralized before they can send again, and the conductor escapes without arrest."
@@ -55,43 +86,12 @@
     "The passengers are identified by name in a second telegraph dispatch before they can be moved, and the catchers reach the safe house.",
     "Time expires with the group still south of the Huron River and no vessel secured at the Erie shore."
   ],
-  "partialSuccessExamples": [
-    "The passengers reach Canada but Elias Cole is arrested; the network survives but loses its most experienced conductor.",
-    "The informant is exposed but escapes before capture; the passengers are safe but the network's Sandusky route must be abandoned.",
-    "Thomas Cole successfully phantoms a false trail on the wire, but Deputy Crane has already left Sandusky on the correct road; the group reaches the shore with minutes to spare but one passenger is separated in the dark."
-  ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "It is October of 1853, and the state of Ohio sits on the knife-edge between two Americas. The Fugitive Slave Act of 1850 has transformed every free-state citizen into a potential deputy, imposing fines of one thousand dollars and six months' imprisonment on anyone who shelters or assists an escaped slave. Reverend John Rankin's house on the bluff above Ripley still burns its lantern, but the network of conductors, station masters, and sympathetic farmers who move people north toward Lake Erie and the Canadian shore now operates under a surveillance technology that did not exist five years ago. Ezra Cornell's telegraph lines, strung on white ceramic insulators between freshly cut cedar poles, now connect Cincinnati to Cleveland to Buffalo in a web of copper wire that can carry a description, a name, and a reward figure four hundred miles in under three minutes."
-      },
-      {
-        "type": "stakes",
-        "text": "Tonight the wire carries a red fire message — a life-or-death priority dispatch — describing a group of seven people moving north through the Ohio corridor, including a man answering to the name Elias Cole, a conductor of twenty years' experience who has moved more than sixty souls to freedom. The bounty attached to the group totals four hundred and eighty dollars, enough to buy a working farm. What makes this moment different from every other night of danger is the source: someone inside the network, someone who knows the safe house locations and the departure schedule, has fed the description to a paid catcher who has fed it to the wire. The passengers tonight include two children under the age of ten. Failure does not mean inconvenience or even imprisonment for the adults; it means the auction block in Natchez or Memphis before the month is out."
-      },
-      {
-        "type": "scene",
-        "text": "The Sandusky telegraph office smells of lamp oil, brass polish, and the faint mineral bite of the battery acid in the Grove cells that power the sounder. Outside, a cold front is pushing off Lake Erie, and the cedar poles along the main line are humming a low, tuneless chord in the wind — the sound the operators call the singing of the wires. Rain has been threatening since sundown, and the mud on Water Street is the color and consistency of river silt. Three blocks south, the Lake Shore Railroad depot is lit with whale-oil lanterns, and the night freight from Cleveland is running forty minutes behind schedule, its iron horse somewhere in the darkness between Huron and the junction."
-      },
-      {
-        "type": "entry",
-        "text": "You are here because someone in this town — someone who has eaten at the same tables, prayed in the same churches, and passed the same coded words in the same quiet voices — has decided that four hundred and eighty dollars is worth more than seven lives. The red fire message has already been sent. Deputy Crane has already read it. The catchers are already saddling horses in a livery stable two streets from where you stand. What happens in the next thirty minutes will determine whether seven people see the Canadian shore, or whether they are loaded onto a southbound consist before dawn. The clock on the depot wall reads half past nine, the wind off the lake is picking up, and somewhere in the dark woods north of the Huron River, Elias Cole is moving his passengers toward a shore he may never reach.",
-        "character_entries": {
-          "elias_cole_conductor": "You are standing at the edge of the elm grove with the Huron bottomland mud cold through the seams of your boots and seven people breathing quietly at your back, the two children tucked against their mother's ribs in the particular silence that is not peace but its opposite — the silence that has been taught, that has been earned through fear — and you are watching the dark shape of the Voss barn forty yards across open ground where no lantern burns in the east-facing window, which is either the all-clear or the end of everything, and you cannot yet tell which. The wire along the shore road is singing its low chord in the northeast wind and the pitch has shifted in the last hour the way a man's voice shifts when he is lying and trying not to, and what you carry that no one else carries tonight is the knowledge that three groups before this one were watched from inside, watched by someone who knew the exact hour of departure, and you have said nothing because silence felt like protection and now silence feels like the thing that has brought you to this particular darkness with these particular seven souls. Your son Thomas is three miles north at the junction sounder and you have not heard from him, which means either the wire is clean or the wire has already done its work. The gandy dancer's boy said someone is coming and could not say more. The barn is dark. The children are asleep on their feet. You have sixty seconds and one breath left before you choose the open ground or the long way through the rail yard ballast, and your hand is already moving.",
-          "thomas_cole_operator": "You are standing at the main desk with the red fire dispatch pressed flat under your left hand and the traffic log open under your right, and the sounder on the Norwalk spur has now been silent for thirteen minutes. The lamp above the desk throws a yellow circle that stops at the edge of the brass and does not reach the junction box diagram tacked to the wall, the one you have been staring at for the last four minutes without moving your eyes from the Norwalk relay schematic. What you know that no one else in this building knows — what you have known for eight weeks and have carried the way you carry a stone in a boot — is that the red fire did not come down the line from Cincinnati or Cleveland or anywhere east of this room; the secondary key traffic that seeded it originated from the Sandusky instrument itself, from Silas Pratt's chair, sometime between the nine o'clock log entry and the moment you came on shift and found the dispatch already written out in Pratt's careful, incriminating copperplate. Your hands are steady because you have trained them to be steady, but your mouth tastes like the Grove cell acid, like copper and something burning, and the cedar poles outside are singing in the lake wind at a pitch that seems, right now, personal. The null-laden cipher you sent to Mercy Voss is already in the log — column four, eleven forty-one, your initials in the operator's hand you cannot disguise — and if anyone reads that entry against the red fire timestamp they will have you, career and freedom both, before the morning freight clears the junction. Your father is somewhere on a dark road with two children aged six and eight and a scar on his left forearm that the bounty paper describes in language so precise it could only have come from someone who has stood close enough to touch him, and the phantom circuit that could misdirect Crane's men south toward Huron and buy him two hours of darkness requires you to walk thirty feet to the rail yard junction box and do a thing that will be visible in the brass work by first light to anyone who knows how to read it. You pick up the key.",
-          "mercy_voss_stationmaster": "You are standing at the back door of Voss Dry Goods with one hand flat against the doorframe and the other holding Thomas Cole's decoded message so tightly that the paper has begun to corrugate along your fingers, and the three words you translated twelve minutes ago — *Judas in the house* — have not stopped being true in all the time since. The lamp on the counter behind you is turned to its lowest wick, throwing just enough light to make the Concordance's spine readable and the chalk marks on your doorframe visible: two lines, station occupied, seven people in motion somewhere between the Huron River and your barn, moving on a schedule that Silas Pratt knows as well as you do because you trusted him with it in August when his face gave you no reason not to. What you hold in one mind that no one else in Sandusky holds tonight is the full shape of the thing: Captain Aldrich's name and his hard deadline of half past eleven; the accounts beneath your floorboards documenting sixty-three souls, enough paper to hang you in a federal court before spring; and the knowledge that Arden Gill's questions about freight routing this season have been the questions of a man drawing a map. The cold coming off the lake moves through the gap in the door and touches your wrist, and outside the cedar poles are singing their low, tuneless chord, and somewhere in the darkness between here and the water your barn holds two children under ten years old who do not know that the wire has already said their names, and you have not yet lit the lamp."
-        }
-      }
-    ]
-  },
+  "openingSituation": "A red fire dispatch has been sent. Thomas \nCole has read his father's description on the wire. Elias Cole \nis in the bottomland with seven people and a 13 warning. \nMercy Voss has decoded three words: Judas in the house.",
+  "historicalRealism": "high",
   "period_vocabulary": {
     "categories": [
       {
         "name": "Telegrapher's Lightning Dialect",
-        "context": "Used by brass pounders and lightning flingers at telegraph offices along the Lake Shore corridor when sending, receiving, or discussing wire traffic — both openly and in code.",
         "terms": [
           {
             "term": "pounding the brass",
@@ -133,11 +133,11 @@
             "term": "small dry goods",
             "meaning": "Coded term for child passengers being moved on the Underground Railroad"
           }
-        ]
+        ],
+        "context": "Used by brass pounders and lightning flingers at telegraph offices along the Lake Shore corridor when sending, receiving, or discussing wire traffic — both openly and in code."
       },
       {
         "name": "Railroad Iron Horse Lexicon",
-        "context": "Used by engineers, firemen, conductors, and gandy dancers working the Lake Shore Railroad and its feeder lines through the Ohio corridor.",
         "terms": [
           {
             "term": "iron horse",
@@ -175,11 +175,11 @@
             "term": "the main",
             "meaning": "The primary track, as opposed to a siding or spur"
           }
-        ]
+        ],
+        "context": "Used by engineers, firemen, conductors, and gandy dancers working the Lake Shore Railroad and its feeder lines through the Ohio corridor."
       },
       {
         "name": "Underground Railroad Network Codes",
-        "context": "Used by conductors, station masters, and sympathizers along the Ohio corridor when discussing the movement of passengers in the presence of strangers or in written correspondence.",
         "terms": [
           {
             "term": "passengers for the midnight coach",
@@ -213,11 +213,11 @@
             "term": "the lantern is lit",
             "meaning": "Signal that the safe house is open and it is safe to approach"
           }
-        ]
+        ],
+        "context": "Used by conductors, station masters, and sympathizers along the Ohio corridor when discussing the movement of passengers in the presence of strangers or in written correspondence."
       },
       {
         "name": "Wire Interception and Cipher Craft",
-        "context": "Used by both Underground Railroad operatives and their enemies — slave catchers, informants, and sympathetic telegraph operators — when discussing the technical manipulation of telegraph lines.",
         "terms": [
           {
             "term": "wire tapping",
@@ -243,11 +243,11 @@
             "term": "pocket relay",
             "meaning": "A small portable telegraph sounder used for field wire tapping"
           }
-        ]
+        ],
+        "context": "Used by both Underground Railroad operatives and their enemies — slave catchers, informants, and sympathetic telegraph operators — when discussing the technical manipulation of telegraph lines."
       },
       {
         "name": "1850s Ohio Free-State Social Cant",
-        "context": "General vernacular used by abolitionists, free Black residents, sympathetic Quakers, and working people in the Lake Erie corridor who operate on the margins of the law.",
         "terms": [
           {
             "term": "the law of Moses",
@@ -269,19 +269,20 @@
             "term": "a Judas in the house",
             "meaning": "An informant or betrayer within the network; the worst accusation one operator can level at another"
           }
-        ]
+        ],
+        "context": "General vernacular used by abolitionists, free Black residents, sympathetic Quakers, and working people in the Lake Erie corridor who operate on the margins of the law."
       }
     ]
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.471Z",
-  "premise": "Someone inside the Underground Railroad has sent a description of seven passengers — including two children — down the telegraph wire to a slave catcher. A conductor, a stationmaster, and a telegraph operator have thirty minutes before Deputy Crane rides north to intercept. One of the three knows who sent it.",
-  "playerGoal": "Identify the informant, misdirect the catchers \nusing the telegraph, and move seven passengers to a Lake Erie \nvessel before half past eleven.",
-  "openingSituation": "A red fire dispatch has been sent. Thomas \nCole has read his father's description on the wire. Elias Cole \nis in the bottomland with seven people and a 13 warning. \nMercy Voss has decoded three words: Judas in the house.",
-  "tone": [
-    "tense",
-    "moral",
-    "dangerous",
-    "intimate"
-  ]
+  "keyEvidenceClueIds": [
+    "red_fire_dispatch",
+    "bounty_ledger_page"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The passengers reach Canada but Elias Cole is arrested; the network survives but loses its most experienced conductor.",
+    "The informant is exposed but escapes before capture; the passengers are safe but the network's Sandusky route must be abandoned.",
+    "Thomas Cole successfully phantoms a false trail on the wire, but Deputy Crane has already left Sandusky on the correct road; the group reaches the shore with minutes to spare but one passenger is separated in the dark."
+  ],
+  "category": "underground"
 }

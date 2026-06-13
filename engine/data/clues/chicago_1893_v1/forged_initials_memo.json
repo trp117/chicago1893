@@ -1,0 +1,18 @@
+{
+  "id": "forged_initials_memo",
+  "title": "Forged Initials on Shipping Memo",
+  "unlocks": [
+    "location:freight_yards",
+    "dialogue:hanrahan_confrontation"
+  ],
+  "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "A shipping authorization bears the same initials twice — in two distinct hands. Someone falsified access.",
+  "isKeyEvidence": false,
+  "discoveryLocationId": "administration_building",
+  "implicatesCharacterIds": [
+    "patrick_hanrahan"
+  ]
+}

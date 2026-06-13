@@ -1,17 +1,17 @@
 {
   "id": "dynamo_circuit_diagram",
-  "scenarioId": "titanic_final_hours",
   "title": "Aft Dynamo Isolation Schematic",
-  "description": "Pinned to the engine room control platform bulkhead, a hand-annotated electrical schematic shows the main switchboard bus configuration for the ship's aft dynamo circuits. The diagram traces the wiring from the dynamo room through the main switchboard to the passenger-deck load circuits on one bus, and to the wireless transmission circuits and primary bilge pumps on a separate bus. An engineer has written in grease pencil across the bus junction: 'SHED LUXURY LOADS — PROTECTS MARCONI & PUMPS.' The notation is underlined twice.",
-  "category": "physical",
-  "discoveryLocationId": "engine_room_control",
-  "implicatesCharacterIds": [
-    "joseph_bell"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "physical",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-18T01:52:38.058Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "titanic_final_hours",
+  "description": "Pinned to the engine room control platform bulkhead, a hand-annotated electrical schematic shows the main switchboard bus configuration for the ship's aft dynamo circuits. The diagram traces the wiring from the dynamo room through the main switchboard to the passenger-deck load circuits on one bus, and to the wireless transmission circuits and primary bilge pumps on a separate bus. An engineer has written in grease pencil across the bus junction: 'SHED LUXURY LOADS — PROTECTS MARCONI & PUMPS.' The notation is underlined twice.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "engine_room_control",
+  "implicatesCharacterIds": [
+    "joseph_bell"
+  ]
 }

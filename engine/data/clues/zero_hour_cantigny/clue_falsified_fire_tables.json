@@ -1,20 +1,20 @@
 {
   "id": "clue_falsified_fire_tables",
-  "scenarioId": "zero_hour_cantigny",
   "title": "The Substituted Fire Tables",
-  "description": "Two sets of printed fire table pages, side by side on McCormick's map table. The authentic version — signed by McCormick in blue ink at 23:00 on May 27th — shows barrage lifts advancing on a tightly timed rolling schedule coordinated with the infantry advance on a northeast axis. The substituted version uses identical paper and typography but shifts the eastern-sector lifts 200 meters ahead of schedule, creating a gap in coverage over the approach corridor from grid reference 8-Echo. The substitution is detectable only by comparing the two documents: the authentic version has a minor ink smear on the lower-left corner where McCormick's signet ring dragged; the substitute is clean.",
+  "unlocks": [
+    "clue_beaumont_telephone_log"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.105Z",
+  "locationId": "",
+  "scenarioId": "zero_hour_cantigny",
+  "description": "Two sets of printed fire table pages, side by side on McCormick's map table. The authentic version — signed by McCormick in blue ink at 23:00 on May 27th — shows barrage lifts advancing on a tightly timed rolling schedule coordinated with the infantry advance on a northeast axis. The substituted version uses identical paper and typography but shifts the eastern-sector lifts 200 meters ahead of schedule, creating a gap in coverage over the approach corridor from grid reference 8-Echo. The substitution is detectable only by comparing the two documents: the authentic version has a minor ink smear on the lower-left corner where McCormick's signet ring dragged; the substitute is clean.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_artillery_dugout",
   "implicatesCharacterIds": [
     "char_farrow",
     "char_renard"
-  ],
-  "unlocks": [
-    "clue_beaumont_telephone_log"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.105Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

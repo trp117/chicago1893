@@ -1,54 +1,54 @@
 {
   "id": "watchman_murphy",
-  "scenarioId": "chicago_1893_v1",
   "name": "Watchman Murphy",
-  "description": "A night watchman who patrols the freight yards and service corridors. You've seen things the officials haven't noticed. You know this fair from the ground up.",
-  "startLocationId": "freight_yards",
-  "startingKnowledge": [
-    "observed after-hours delivery",
-    "knows unofficial routes through the fairgrounds"
-  ],
-  "accessLevel": "worker",
-  "briefing": {
-    "who": "You are Watchman Murphy, night patrol at the freight yards — no rank, no authority, but you know every shadow in this fair and you saw something last night that doesn't sit right.",
-    "mission": "Find out what was in those unmarked crates and who authorized the after-hours delivery before whatever was inside them is used.",
-    "stakes": "You have no badge. Go to the wrong person and you will be dismissed. Go to no one and you may be the only one who could have stopped it."
-  },
-  "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers.",
   "opening": {
-    "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",
-    "npcMoments": [],
     "choices": [
       "Examine the ground where the crates were unloaded",
       "Check the south gate log to see if the delivery was recorded",
       "Go to the Administration Building and report what you saw"
-    ]
+    ],
+    "narrative": "Chicago, May 1893. Three in the morning and you have been walking the freight yards since midnight — boots wet, lamp low, the smell of lake mud and fresh timber everywhere. You are Watchman Murphy, night patrol. You know every gate, every shadow, every man who belongs here.\n\nThat delivery was wrong. You knew it the moment the wagon came through the south gate without papers — four men unloading crates marked with an electrical supplier's stamp, working fast and saying nothing. They were gone before you could get close. But you noted the time. You noted the crate markings. And you saw the man watching from the tree line who did not work for the fair.\n\nNow it is morning. The yards are quiet. The evidence is still here if you move now.",
+    "npcMoments": []
   },
+  "briefing": {
+    "who": "You are Watchman Murphy, night patrol at the freight yards — no rank, no authority, but you know every shadow in this fair and you saw something last night that doesn't sit right.",
+    "stakes": "You have no badge. Go to the wrong person and you will be dismissed. Go to no one and you may be the only one who could have stopped it.",
+    "mission": "Find out what was in those unmarked crates and who authorized the after-hours delivery before whatever was inside them is used."
+  },
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:47:35.388Z",
+  "represents": "Night watchmen and security personnel employed at the World's Columbian Exposition, Chicago, 1893",
+  "scenarioId": "chicago_1893_v1",
+  "accessLevel": "worker",
+  "description": "A night watchman who patrols the freight yards and service corridors. You've seen things the officials haven't noticed. You know this fair from the ground up.",
+  "perspective": "The player is Watchman Murphy, a night watchman with no management authority. Burnham is a distant authority figure who should not appear in scenes unless the player explicitly travels to find him. Other workers and guards are the player's peers.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The freight yard has been quiet since the whistle at eleven.",
+  "startLocationId": "freight_yards",
+  "context_sentence": "You are Watchman Murphy, a night security guard employed by the Columbian Guard auxiliary at the 1893 World's Columbian Exposition in Chicago, where over 27 million visitors passed through the fairgrounds and a network of freight tunnels and service corridors ran beneath the White City largely unmonitored after dark.",
   "roleInitialState": {
+    "flags": {
+      "journalistInvolved": false,
+      "securityAlertIssued": false,
+      "heardFrenchConversation": false,
+      "manifestDiscrepancyFound": false
+    },
     "inventory": [
       "watch log",
       "lamp",
       "fair badge"
     ],
-    "flags": {
-      "heardFrenchConversation": false,
-      "manifestDiscrepancyFound": false,
-      "securityAlertIssued": false,
-      "journalistInvolved": false
-    },
     "suspicion": {
-      "daniel_burnham": 0,
       "emile_mercier": 0,
-      "patrick_hanrahan": 1,
-      "captain_odonnell": 0
+      "daniel_burnham": 0,
+      "captain_odonnell": 0,
+      "patrick_hanrahan": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:47:35.388Z",
-  "context_sentence": "You are Watchman Murphy, a night security guard employed by the Columbian Guard auxiliary at the 1893 World's Columbian Exposition in Chicago, where over 27 million visitors passed through the fairgrounds and a network of freight tunnels and service corridors ran beneath the White City largely unmonitored after dark.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Night watchmen and security personnel employed at the World's Columbian Exposition, Chicago, 1893",
-  "fact_checked": false,
-  "bridge_sentence": "The freight yard has been quiet since the whistle at eleven."
+  "startingKnowledge": [
+    "observed after-hours delivery",
+    "knows unofficial routes through the fairgrounds"
+  ]
 }

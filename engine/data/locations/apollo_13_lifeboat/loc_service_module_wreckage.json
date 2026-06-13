@@ -1,14 +1,14 @@
 {
   "id": "loc_service_module_wreckage",
-  "scenarioId": "apollo_13_lifeboat",
+  "mood": "revelatory, sobering, conclusive, grief-adjacent",
   "name": "Service Module — Jettison View",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.956Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "apollo_13_lifeboat",
   "short_name": "Service Module Wreckage",
   "description": "When the Service Module is finally jettisoned before re-entry, the crew sees the damage for the first time through the window — an entire panel blown away, wiring hanging in the vacuum, the oxygen tank bay a ruin.",
-  "mood": "revelatory, sobering, conclusive, grief-adjacent",
-  "linkedCharacterIds": [
-    "char_jim_lovell",
-    "char_fred_haise"
-  ],
   "atmosphericDetails": [
     "The Service Module drifts away slowly, rotating in the sunlight, and the missing panel is immediately visible — a six-foot section of the hull simply gone",
     "Internal components hang in the vacuum, frozen and crystallized, trailing wiring like the roots of a pulled tooth",
@@ -16,8 +16,8 @@
     "The sight confirms, finally and completely, that the explosion was catastrophic — not a sensor failure, not a misread — real and total",
     "Fred Haise says 'there's one whole side of the spacecraft missing' and then is quiet for a long time"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.956Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_jim_lovell",
+    "char_fred_haise"
+  ]
 }

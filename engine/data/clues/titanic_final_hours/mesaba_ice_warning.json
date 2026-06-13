@@ -1,18 +1,18 @@
 {
   "id": "mesaba_ice_warning",
-  "scenarioId": "titanic_final_hours",
   "title": "The Undelivered Mesaba Warning",
-  "description": "Tucked under the base of the Marconi transmitter, a crumpled message form in Bride's handwriting records the 9:40 PM ice warning from the SS Mesaba: 'Ice report. Lat 42N to 41.25N, Long 49W to 50.30W. Saw much heavy pack ice and great number large icebergs. Also field ice.' The form was never stamped with a bridge delivery mark. The position described is precisely where Titanic struck.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.064Z",
+  "locationId": "",
+  "scenarioId": "titanic_final_hours",
+  "description": "Tucked under the base of the Marconi transmitter, a crumpled message form in Bride's handwriting records the 9:40 PM ice warning from the SS Mesaba: 'Ice report. Lat 42N to 41.25N, Long 49W to 50.30W. Saw much heavy pack ice and great number large icebergs. Also field ice.' The form was never stamped with a bridge delivery mark. The position described is precisely where Titanic struck.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "marconi_room",
   "implicatesCharacterIds": [
     "harold_bride",
     "jack_phillips"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.064Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

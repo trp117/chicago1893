@@ -1,19 +1,19 @@
 {
   "id": "c_deck_corridor",
-  "scenarioId": "titanic_final_hours",
-  "name": "C-Deck First Class Corridor",
-  "description": "The long, carpeted corridor of C-Deck where the first class steward has been working — the overhead lights are still burning at full strength, the brass fittings still gleam, and the teak paneling shows no sign of the catastrophe five decks below, which makes the passengers who are still in their staterooms deeply reluctant to leave.",
   "mood": "surreal, opulent, in denial",
-  "linkedCharacterIds": [
-    "thomas_andrews"
-  ],
+  "name": "C-Deck First Class Corridor",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.054Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "titanic_final_hours",
+  "description": "The long, carpeted corridor of C-Deck where the first class steward has been working — the overhead lights are still burning at full strength, the brass fittings still gleam, and the teak paneling shows no sign of the catastrophe five decks below, which makes the passengers who are still in their staterooms deeply reluctant to leave.",
   "atmosphericDetails": [
     "The corridor smells of fresh linen and the faint ghost of dinner — roast lamb and claret — from the First Class Dining Saloon one deck below, which closed service only two hours ago",
     "Several stateroom doors are ajar, showing passengers in evening dress or dressing gowns standing with lifebelts in their hands, turning them over as if they are unfamiliar objects",
     "The floor has a barely perceptible tilt toward the bow — not enough to spill a glass, but enough that a marble rolled on the carpet would roll forward and not stop"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.054Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "thomas_andrews"
+  ]
 }

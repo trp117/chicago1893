@@ -1,20 +1,20 @@
 {
   "id": "loc_b59_radio_room",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "B-59 Radio Room",
-  "description": "A narrow compartment adjacent to the hydroacoustic shack, housing the submarine's communications equipment — most of it silent, the antenna arrays useless at depth. A single emergency receiver is active on the international distress frequency, its speaker emitting a low, continuous static that has not resolved into a signal for days.",
   "mood": "silent, waiting, isolated, hopeful-desperate",
-  "linkedCharacterIds": [
-    "char_sonar_analyst",
-    "char_chief_petty_officer_kozlov"
-  ],
+  "name": "B-59 Radio Room",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.800Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "A narrow compartment adjacent to the hydroacoustic shack, housing the submarine's communications equipment — most of it silent, the antenna arrays useless at depth. A single emergency receiver is active on the international distress frequency, its speaker emitting a low, continuous static that has not resolved into a signal for days.",
   "atmosphericDetails": [
     "The log of received transmissions shows the last confirmed Moscow contact as forty-one hours ago — a routine operational broadcast that contained no crisis guidance.",
     "A hand-lettered card taped above the emergency receiver lists the international surfacing signal frequencies in order of priority.",
     "The static from the emergency receiver has a rhythm to it — not a signal, but the natural modulation of atmospheric interference that a desperate man could almost convince himself was a pattern."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.800Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_sonar_analyst",
+    "char_chief_petty_officer_kozlov"
+  ]
 }

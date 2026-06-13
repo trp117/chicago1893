@@ -1,15 +1,15 @@
 {
   "id": "clue_coded_letter",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "The Coded Letter",
-  "description": "Tucked beneath the account ledger on the writing desk in the Counting House, you find a folded sheet of paper covered in cipher notation — but the opening and closing lines are written in plain English. The letter describes the exact time and method of tonight's boarding in precise operational detail. More damning still, the cipher used in the body of the letter matches the cipher notation in the open ledger on the desk — the same hand, the same system, unmistakably the work of the ledger's keeper, Thomas Greenleaf.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.443Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Tucked beneath the account ledger on the writing desk in the Counting House, you find a folded sheet of paper covered in cipher notation — but the opening and closing lines are written in plain English. The letter describes the exact time and method of tonight's boarding in precise operational detail. More damning still, the cipher used in the body of the letter matches the cipher notation in the open ledger on the desk — the same hand, the same system, unmistakably the work of the ledger's keeper, Thomas Greenleaf.",
+  "isKeyEvidence": true,
   "discoveryLocationId": "counting_house",
   "implicatesCharacterIds": [
     "thomas_greenleaf"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.443Z"
+  ]
 }

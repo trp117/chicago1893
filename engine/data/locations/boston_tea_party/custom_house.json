@@ -1,19 +1,19 @@
 {
   "id": "custom_house",
-  "scenarioId": "boston_tea_party",
-  "name": "The Custom House",
-  "description": "The most hated building in Boston stands lit against the night sky, its windows yellow with lamplight — inside, Customs Officer Hartwell and his clerks are working late, which is itself unusual enough to draw attention. A British soldier stands at the front door, his bayonet catching the light.",
   "mood": "hostile, authoritarian, dangerous, illuminated",
-  "linkedCharacterIds": [
-    "thomas_dillworth"
-  ],
+  "name": "The Custom House",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T21:41:04.774Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "boston_tea_party",
+  "description": "The most hated building in Boston stands lit against the night sky, its windows yellow with lamplight — inside, Customs Officer Hartwell and his clerks are working late, which is itself unusual enough to draw attention. A British soldier stands at the front door, his bayonet catching the light.",
   "atmosphericDetails": [
     "A dispatch rider's horse is tied at the post outside — the animal is lathered, meaning it arrived recently and hard.",
     "Through the ground-floor window, a man in a dark coat can be seen gesturing urgently over a map spread on a table.",
     "A fresh wax seal impression in the mud near the door matches the seal used on official Crown correspondence."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.774Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "thomas_dillworth"
+  ]
 }

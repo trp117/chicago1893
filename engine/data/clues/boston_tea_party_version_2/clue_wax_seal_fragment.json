@@ -1,15 +1,15 @@
 {
   "id": "clue_wax_seal_fragment",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "Crushed Red Wax Seal",
-  "description": "On the stone of the Customs Dock, you find the crushed remnant of a red wax seal — the kind used to close official or formal correspondence. The impression in the wax, though partially destroyed, shows a small device: a pair of scales, the symbol commonly used by merchant accountants and treasurers. It is consistent with a seal belonging to someone who handles financial records professionally.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.447Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "On the stone of the Customs Dock, you find the crushed remnant of a red wax seal — the kind used to close official or formal correspondence. The impression in the wax, though partially destroyed, shows a small device: a pair of scales, the symbol commonly used by merchant accountants and treasurers. It is consistent with a seal belonging to someone who handles financial records professionally.",
+  "isKeyEvidence": false,
   "discoveryLocationId": "customs_dock",
   "implicatesCharacterIds": [
     "thomas_greenleaf"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.447Z"
+  ]
 }

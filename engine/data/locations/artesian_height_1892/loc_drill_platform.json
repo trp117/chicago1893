@@ -1,20 +1,20 @@
 {
   "id": "loc_drill_platform",
-  "scenarioId": "artesian_height_1892",
-  "name": "The Drill Platform",
-  "description": "The open-air timber platform surrounding the top of the bore hole, forty feet above grade on the tower's north face, where the drilling machinery and operating equipment are mounted. The Well_Drill_Torque gauge is bolted to the main frame here, its needle sitting at 62 in the gas-lamp light.",
   "mood": "tense, industrial, exposed",
-  "linkedCharacterIds": [
-    "char_benezette_williams",
-    "char_ethan_philbrick"
-  ],
+  "name": "The Drill Platform",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.724Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "artesian_height_1892",
+  "description": "The open-air timber platform surrounding the top of the bore hole, forty feet above grade on the tower's north face, where the drilling machinery and operating equipment are mounted. The Well_Drill_Torque gauge is bolted to the main frame here, its needle sitting at 62 in the gas-lamp light.",
   "atmosphericDetails": [
     "The metallic screech of the jammed driveshaft carries down to the street every time the rotary table is jogged — a sound that has been drawing onlookers for two hours.",
     "Fine grey rock dust coats every horizontal surface, including the blueprint sheet Benezette has pinned to the frame with a steel spike.",
     "The brake collar on the rotary table has a fresh scratch mark on its adjustment bolt — visible only in direct lantern light at close range."
   ],
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.852Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_benezette_williams",
+    "char_ethan_philbrick"
+  ]
 }

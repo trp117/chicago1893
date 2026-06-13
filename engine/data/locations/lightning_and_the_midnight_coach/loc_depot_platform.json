@@ -1,20 +1,20 @@
 {
   "id": "loc_depot_platform",
-  "scenarioId": "lightning_and_the_midnight_coach",
-  "name": "The Sandusky Depot Platform",
-  "description": "A long plank platform facing the main track, its station lamp casting a yellow circle that makes the surrounding dark look absolute — the last consist cleared forty minutes ago and the platform is empty except for wind-blown leaves.",
   "mood": "exposed, watchful, liminal, cold",
-  "linkedCharacterIds": [
-    "harriet_voss",
-    "marshal_crane"
-  ],
+  "name": "The Sandusky Depot Platform",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.461Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "A long plank platform facing the main track, its station lamp casting a yellow circle that makes the surrounding dark look absolute — the last consist cleared forty minutes ago and the platform is empty except for wind-blown leaves.",
   "atmosphericDetails": [
     "The iron horse's last passage left a heat shimmer on the rails that has not yet fully faded.",
     "A posted schedule board shows no further departures until six in the morning.",
     "Boot prints in the coal dust near the platform edge — at least two sets, one of them with a distinctive worn heel."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.461Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "harriet_voss",
+    "marshal_crane"
+  ]
 }

@@ -1,69 +1,69 @@
 {
   "id": "senior_wireless_operator",
-  "scenarioId": "titanic_final_hours",
   "name": "Senior Wireless Operator",
-  "description": "You are seated at the Marconi apparatus on the Boat Deck with the transmitter key under your right hand and every ocean frequency at your command. The power running this room comes from the engineers five decks below you, and both you and they know it will not run forever. You must find a rescue ship before the power fails, balancing every transmission against the cold reality of the ticking clock. You already know there are ships out there who should have answered the ice warnings and did not.",
-  "startLocationId": "marconi_room",
-  "startingKnowledge": [
-    "The main wireless transmitter requires a steady steam supply from the engine room dynamos — if the engineers cannot maintain power, transmission range collapses to the emergency battery's limited reach of approximately 100 miles.",
-    "An ice warning from the SS Mesaba, received at 9:40 PM tonight, is sitting on the desk in front of you undelivered to the bridge — the message described pack ice directly across Titanic's course.",
-    "The nearest vessels with confirmed wireless capability are the Carpathia to the southeast and the Californian to the north-northwest, but the Californian has been transmitting dense commercial traffic all evening and her operator may have gone off-watch."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a technically expert young man who understands the physics of his situation with complete clarity and is choosing, moment by moment, how much of that clarity to act on. The Morse key is his anchor. The room is his world. Everything outside it is secondary until it isn't.",
+  "opening": {
+    "choices": [
+      "Broadcast the CQD distress call immediately on the international frequency, transmitting Titanic's position and the nature of the emergency.",
+      "Test the emergency battery circuit first to confirm its range before committing to a transmission strategy — if the main dynamos fail, you need to know what you have left.",
+      "Open the speaking tube to the engine room to coordinate directly with the engineers about how long the main wireless power supply will hold."
+    ],
+    "narrative": "It is 11:55 PM on April 14, 1912. The Captain has just left the Marconi Room after ordering you to send the call for assistance. The transmitter is warm and the power is steady. The signal log in front of you is empty of distress traffic. The Mesaba ice warning is on the desk to your left. Outside, through the Boat Deck port, you can see the first officer directing passengers toward the lifeboats in the dark. You have not yet sent the first transmission.",
+    "npcMoments": []
+  },
   "briefing": "You are seated at the Marconi apparatus in the wireless room at 11:55 PM, and Captain Smith has just left the room after delivering the distress order verbally — his exact words were 'send the call for assistance.' Phillips is beside you, but it is your log, your frequency plan, and your judgment about which ships to raise first. The signal log on the desk is empty of distress traffic — you have not yet transmitted the first CQD. On the desk to your left, under a folded chart, is the Mesaba ice warning that came in at 9:40 PM, which you noted and set aside because Phillips was clearing a commercial backlog and the bridge had not asked for it. You know that warning described pack ice at the position the ship passed approximately ninety minutes ago. You know the distress position the Captain gave you — 41°43'N, 49°56'W, derived from dead reckoning by the Fourth Officer — and you know dead reckoning accumulates error over time. You have a working transmitter, a steady power supply, and a room full of choices. The Captain's order was three words. The rest is yours to determine.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:49:01.202Z",
+  "scenarioId": "titanic_final_hours",
+  "accessLevel": "staff",
+  "description": "You are seated at the Marconi apparatus on the Boat Deck with the transmitter key under your right hand and every ocean frequency at your command. The power running this room comes from the engineers five decks below you, and both you and they know it will not run forever. You must find a rescue ship before the power fails, balancing every transmission against the cold reality of the ticking clock. You already know there are ships out there who should have answered the ice warnings and did not.",
+  "perspective": "Write from the perspective of a technically expert young man who understands the physics of his situation with complete clarity and is choosing, moment by moment, how much of that clarity to act on. The Morse key is his anchor. The room is his world. Everything outside it is secondary until it isn't.",
+  "character_id": "jack_phillips",
+  "ending_notes": {
+    "failure": {
+      "who_present": "None",
+      "what_happened": "The transmitter failed or you abandoned the room too early; the Carpathia does not have your updated position and the signals go unanswered.",
+      "emotional_weight": "Crushing Isolation—the realization that the ship will disappear into total darkness.",
+      "closing_line_override": "The air went silent, and you were left alone with the static of the stars."
+    },
+    "partial": {
+      "who_present": "The First Class Steward",
+      "what_happened": "You successfully transmitted the final SOS, and the Carpathia acknowledged your position. You stayed at your post until the power flickered out, but you were unable to reach a lifeboat in time and had to jump into the freezing water.",
+      "emotional_weight": "Bittersweet Duty—knowing the rescue is coming, but realizing you may not live to see it.",
+      "closing_line_override": "You tapped out the final signal until the Atlantic claimed the wire."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "real",
+  "bridge_sentence": "Phillips has not stopped sending.",
   "character_hooks": [
     "I have been handling private Marconigrams for First Class passengers all evening — commercial traffic that displaced the ice reports from the Mesaba and the Californian in my queue — and I have spent the last five minutes deciding whether that displacement matters now.",
     "I know the Atlantic operator code keys for three different ship lines, which means I can reach vessels that have not responded to the open distress frequency by addressing their private commercial channels directly.",
     "I have a cable in my pocket — my fiancée's arrival confirmation, sent from Southampton four days ago — and I have been carrying it through the voyage as a kind of anchor, and I am aware that I have stopped taking it out to read it."
   ],
-  "suggested_secret": "Twenty minutes into the evening watch, you shut down the auxiliary receiver to replace a faulty condenser component — a repair that took longer than expected and left a gap of approximately twenty minutes in the incoming signal log. You did not report the gap to Phillips or to the bridge because you had repaired the fault and the log looked continuous. You have thought about what might have come in during those twenty minutes. You have not told anyone.",
-  "opening": {
-    "narrative": "It is 11:55 PM on April 14, 1912. The Captain has just left the Marconi Room after ordering you to send the call for assistance. The transmitter is warm and the power is steady. The signal log in front of you is empty of distress traffic. The Mesaba ice warning is on the desk to your left. Outside, through the Boat Deck port, you can see the first officer directing passengers toward the lifeboats in the dark. You have not yet sent the first transmission.",
-    "npcMoments": [],
-    "choices": [
-      "Broadcast the CQD distress call immediately on the international frequency, transmitting Titanic's position and the nature of the emergency.",
-      "Test the emergency battery circuit first to confirm its range before committing to a transmission strategy — if the main dynamos fail, you need to know what you have left.",
-      "Open the speaking tube to the engine room to coordinate directly with the engineers about how long the main wireless power supply will hold."
-    ]
-  },
+  "startLocationId": "marconi_room",
+  "context_sentence": "You are Harold Bride, junior wireless operator aboard the RMS Titanic, and at 12:15 AM on April 15, 1912, you and Senior Operator Jack Phillips began transmitting the distress call CQD MGY — the first such signal ever sent by the largest ship afloat.",
   "roleInitialState": {
-    "inventory": [
-      "Marconi signal log ledger (current session — evening commercial traffic logged, distress log blank)",
-      "Dead-reckoning position slip from Captain Smith (41°43'N, 49°56'W)",
-      "Undelivered Mesaba ice warning slip (received 9:40 PM, set aside during commercial traffic backlog)"
-    ],
     "flags": {
       "carpathia_confirmed": false,
       "dynamo_isolation_known": false,
       "mesaba_warning_discovered": true
     },
+    "inventory": [
+      "Marconi signal log ledger (current session — evening commercial traffic logged, distress log blank)",
+      "Dead-reckoning position slip from Captain Smith (41°43'N, 49°56'W)",
+      "Undelivered Mesaba ice warning slip (received 9:40 PM, set aside during commercial traffic backlog)"
+    ],
     "suspicion": {
       "harold_bride": 0,
       "jack_phillips": 0,
       "charles_lightoller": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:49:01.202Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You successfully transmitted the final SOS, and the Carpathia acknowledged your position. You stayed at your post until the power flickered out, but you were unable to reach a lifeboat in time and had to jump into the freezing water.",
-      "who_present": "The First Class Steward",
-      "emotional_weight": "Bittersweet Duty—knowing the rescue is coming, but realizing you may not live to see it.",
-      "closing_line_override": "You tapped out the final signal until the Atlantic claimed the wire."
-    },
-    "failure": {
-      "what_happened": "The transmitter failed or you abandoned the room too early; the Carpathia does not have your updated position and the signals go unanswered.",
-      "who_present": "None",
-      "emotional_weight": "Crushing Isolation—the realization that the ship will disappear into total darkness.",
-      "closing_line_override": "The air went silent, and you were left alone with the static of the stars."
-    }
-  },
-  "context_sentence": "You are Harold Bride, junior wireless operator aboard the RMS Titanic, and at 12:15 AM on April 15, 1912, you and Senior Operator Jack Phillips began transmitting the distress call CQD MGY — the first such signal ever sent by the largest ship afloat.",
-  "character_type": "real",
-  "character_id": "jack_phillips",
-  "historical_record_note": "Jack Phillips, Senior Wireless Operator aboard RMS Titanic. Remained at his post transmitting CQD and SOS distress calls after Captain Smith released him from duty. Died in the sinking. Body never recovered.",
-  "fact_checked": false,
-  "bridge_sentence": "Phillips has not stopped sending."
+  "suggested_secret": "Twenty minutes into the evening watch, you shut down the auxiliary receiver to replace a faulty condenser component — a repair that took longer than expected and left a gap of approximately twenty minutes in the incoming signal log. You did not report the gap to Phillips or to the bridge because you had repaired the fault and the log looked continuous. You have thought about what might have come in during those twenty minutes. You have not told anyone.",
+  "startingKnowledge": [
+    "The main wireless transmitter requires a steady steam supply from the engine room dynamos — if the engineers cannot maintain power, transmission range collapses to the emergency battery's limited reach of approximately 100 miles.",
+    "An ice warning from the SS Mesaba, received at 9:40 PM tonight, is sitting on the desk in front of you undelivered to the bridge — the message described pack ice directly across Titanic's course.",
+    "The nearest vessels with confirmed wireless capability are the Carpathia to the southeast and the Californian to the north-northwest, but the Californian has been transmitting dense commercial traffic all evening and her operator may have gone off-watch."
+  ],
+  "historical_record_note": "Jack Phillips, Senior Wireless Operator aboard RMS Titanic. Remained at his post transmitting CQD and SOS distress calls after Captain Smith released him from duty. Died in the sinking. Body never recovered."
 }

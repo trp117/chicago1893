@@ -1,34 +1,41 @@
 {
   "id": "role_communications_pivot",
-  "scenarioId": "high_water_reckoning",
-  "character_id": "ida_broussard",
   "name": "The Communications Pivot",
-  "description": "You are the only functioning radio link between this pocket of the parish and the emergency operations post across the river, and your battery has minutes left. The coordinates you were given to transmit will put a helicopter in the Industrial Canal.",
-  "startLocationId": "algiers_attic_radio_post",
-  "startingKnowledge": [
-    "The marine deep-cycle battery is at 22% and dropping 3% per minute of sustained transmission",
-    "The second runner's grid coordinates contain a transposition error that would place the extraction zone in the Industrial Canal",
-    "The emergency operations post frequency window opens in eleven minutes and then again in twenty-six"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a technically precise person operating at the absolute limit of her equipment and her endurance, who has just discovered that the data she was about to transmit would have sent a helicopter to the wrong location — and who now has to solve a verification problem against a power budget that does not have room for the extra steps.",
+  "opening": {
+    "choices": [
+      "Send Terrence back to Delphine Arceneaux at the Algiers Point ferry landing immediately to verify the source coordinate — accepting the time cost against the battery budget",
+      "Calculate the coordinate correction yourself using the USGS grid reference taped to the attic rafter, transmitting the corrected burst in the eleven-minute window",
+      "Transmit the raw triage text exactly as written and flag the coordinate as unverified in the transmission header, letting the operations post's survey team make the correction"
+    ],
+    "narrative": "It is 4:45 PM on September 2, 2005, and the Algiers attic is a sealed furnace with a radio in it. The marine deep-cycle battery that has been running this station since August 29 is at 22% and the indicator light is amber. Terrence Guidry is sitting on the floor joists behind you with the second triage sheet in his hands, waiting for you to tell him whether the coordinates on it are correct. The frequency window to the emergency operations post opens in eleven minutes. The northing coordinate on the sheet in front of you reads 3007.4, and something about it has been wrong since the moment you read it.",
+    "npcMoments": []
+  },
   "briefing": "You are sitting on a wooden crate in an attic that registers 108 degrees Fahrenheit on the thermometer taped to the rafter above your head, and the sweat dripping off your forearms onto the terminal connections has been making you flinch for the past hour because you cannot tell anymore if the hiss you hear is real or something your exhausted nervous system has invented. The battery indicator shifted to amber forty minutes ago. You have been calculating the remaining transmission budget in your head the way other people count money — precisely, obsessively, in denominations of minutes and percentages — and you know that you have enough power for one full text transmission or three compressed burst transmissions, not both. Terrence Guidry brought you the second triage sheet twenty minutes ago, and you were thirty seconds from opening the frequency when you read the northing coordinate and felt the specific cold clarity of recognizing a transposition error: the number he wrote would put your extraction zone in the middle of the Industrial Canal. What you know that Terrence does not yet know is that his error is the difference between a helicopter finding eighty people and a helicopter finding brown water. What you know that no one knows is that you made a similar error two days ago — different sector, no casualties, but the memory of it is in your hands right now, in the way you are holding the pencil. The frequency window opens in eleven minutes. You have not yet decided whether to send Terrence back to verify the source coordinate or calculate the correction yourself in the dark.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.292Z",
+  "represents": "",
+  "scenarioId": "high_water_reckoning",
+  "accessLevel": "staff",
+  "description": "You are the only functioning radio link between this pocket of the parish and the emergency operations post across the river, and your battery has minutes left. The coordinates you were given to transmit will put a helicopter in the Industrial Canal.",
+  "perspective": "Write from the perspective of a technically precise person operating at the absolute limit of her equipment and her endurance, who has just discovered that the data she was about to transmit would have sent a helicopter to the wrong location — and who now has to solve a verification problem against a power budget that does not have room for the extra steps.",
+  "character_id": "ida_broussard",
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The diesel smell is stronger through the attic vent than it was an hour ago.",
   "character_hooks": [
     "I have been licensed since I was nineteen years old; I have never gone QRT during an active emergency, and I do not intend to start today.",
     "I know Sergeant Mouton at the operations post personally — we worked the same net during Hurricane Ivan — and I know he will hold the frequency open past the window if I signal a partial.",
     "I have been awake for seventy-two hours and I made one calculation error two days ago that I have not told anyone about, and it is the reason I am checking every number twice even when I do not have time to."
   ],
-  "suggested_secret": "Ida has a personal protocol she has never disclosed to any net control: if she believes a transmission will be her last before going QRT, she broadcasts a single personal identifier — her mother's address on Tchoupitoulas Street — as a final position marker, so that whoever finds her equipment will know who was operating it.",
-  "opening": {
-    "narrative": "It is 4:45 PM on September 2, 2005, and the Algiers attic is a sealed furnace with a radio in it. The marine deep-cycle battery that has been running this station since August 29 is at 22% and the indicator light is amber. Terrence Guidry is sitting on the floor joists behind you with the second triage sheet in his hands, waiting for you to tell him whether the coordinates on it are correct. The frequency window to the emergency operations post opens in eleven minutes. The northing coordinate on the sheet in front of you reads 3007.4, and something about it has been wrong since the moment you read it.",
-    "npcMoments": [],
-    "choices": [
-      "Send Terrence back to Delphine Arceneaux at the Algiers Point ferry landing immediately to verify the source coordinate — accepting the time cost against the battery budget",
-      "Calculate the coordinate correction yourself using the USGS grid reference taped to the attic rafter, transmitting the corrected burst in the eleven-minute window",
-      "Transmit the raw triage text exactly as written and flag the coordinate as unverified in the transmission header, letting the operations post's survey team make the correction"
-    ]
-  },
+  "startLocationId": "algiers_attic_radio_post",
+  "context_sentence": "You are the Communications Pivot, the only radio link to the emergency post, and the coordinate on Terrence's sheet will kill everyone waiting on that roof.",
   "roleInitialState": {
+    "flags": {
+      "battery_critical": true,
+      "frequency_window_open": false,
+      "previous_error_undisclosed": true,
+      "coordinate_error_identified": true
+    },
     "inventory": [
       "analog amateur radio rig (ICOM IC-718)",
       "marine deep-cycle battery (22%)",
@@ -36,22 +43,15 @@
       "USGS grid reference card",
       "battery voltage log"
     ],
-    "flags": {
-      "coordinate_error_identified": true,
-      "frequency_window_open": false,
-      "battery_critical": true,
-      "previous_error_undisclosed": true
-    },
     "suspicion": {
       "terrence_guidry": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.062Z",
-  "context_sentence": "You are the Communications Pivot, the only radio link to the emergency post, and the coordinate on Terrence's sheet will kill everyone waiting on that roof.",
-  "bridge_sentence": "The diesel smell is stronger through the attic vent than it was an hour ago.",
-  "character_type": "fictional",
-  "represents": "",
-  "fact_checked": false,
+  "suggested_secret": "Ida has a personal protocol she has never disclosed to any net control: if she believes a transmission will be her last before going QRT, she broadcasts a single personal identifier — her mother's address on Tchoupitoulas Street — as a final position marker, so that whoever finds her equipment will know who was operating it.",
+  "startingKnowledge": [
+    "The marine deep-cycle battery is at 22% and dropping 3% per minute of sustained transmission",
+    "The second runner's grid coordinates contain a transposition error that would place the extraction zone in the Industrial Canal",
+    "The emergency operations post frequency window opens in eleven minutes and then again in twenty-six"
+  ],
   "entry_paragraph_flags": []
 }

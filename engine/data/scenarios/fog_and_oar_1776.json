@@ -1,0 +1,770 @@
+{
+  "id": "fog_and_oar_1776",
+  "tone": [],
+  "genre": [
+    "historical",
+    "crisis_management",
+    "military"
+  ],
+  "image": {
+    "generation_prompt": "The last hour before dawn on August 30, 1776, at the Brooklyn ferry landing on the southwestern shore of Long Island. The East River churns black and cold beneath a sky that has abandoned its stars. A dense summer fog, uncommonly thick and low, presses down over everything like a held breath—it clings to the water, swallows the opposite shore entirely, and muffles the distant sounds of the British encampment perhaps a mile to the east. The fog is not merely atmosphere here; it is providence made visible, and every man on the beach knows it.\n\nThe shoreline is chaos organized into something barely resembling order. Nine thousand soldiers in varying states of exhaustion and desperation crowd the muddy embankment, their blue-and-buff Continental uniforms stained with four days of failed battle, the wool dark with river damp and August sweat. Some clutch muskets across their chests; others have already waded to the knee, steadying the flat-bottomed Durham boats and fishing sloops that knock against each other in the current. The Marblehead fishermen—Massachusetts men in tarred canvas jackets and broad-brimmed hats—work without lantern light, pulling oars with the silent efficiency of men who have done this since boyhood, their faces stone, their strokes rhythmic and certain.\n\nAt the water's edge, a figure in a dark riding cloak stands in the shallows, ankle-deep, directing men by touch and gesture rather than voice. His hat brim is pulled low. Around him, the faces of soldiers passing in single file catch what little light exists: gray-white, hollow-eyed, carrying the particular grief of men who have not yet decided whether they are saved or simply delayed.\n\nThe light source is almost nothing—a faint ambient glow absorbed and diffused by the fog, giving everything a pewter luminescence that erases shadows entirely. There is no warmth in this light. It is the color of a held secret. The ropes groan. Oars dip without sound. The fog holds. Across the water, Manhattan waits in total darkness.\n\nThe mood is one of suspended catastrophe—desperate hope moving in near-silence, eight thousand lives balanced against the fog's willingness to stay.",
+    "url": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/fog_and_oar_1776_wide.jpg",
+    "shortUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/fog_and_oar_1776_short.jpg",
+    "sourceUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/fog_and_oar_1776_source.jpg"
+  },
+  "title": "Fog and Oar: The Brooklyn Retreat",
+  "status": "published",
+  "premise": "",
+  "systems": {
+    "scales": {
+      "threat": {
+        "max": 10,
+        "min": 0,
+        "default": 2
+      },
+      "authorityTrust": {
+        "max": 5,
+        "min": -3,
+        "default": 2
+      }
+    },
+    "pressureEvents": [
+      "The northeast gale intensifies at 1:00 AM, halting flat-bottom boat deployment for one full turn and raising East_River_Tidal_Velocity by 1.",
+      "A field hospital orderly reports that forty wounded men have been bypassed by two consecutive boat waves; their groaning carries toward the British picket line.",
+      "A Marblehead oarsman collapses from exhaustion at the oarlock; his bateau drifts thirty yards downstream before the crew recovers headway.",
+      "A campfire on the left parapet burns down to coals; a British picket is heard shouting a challenge into the dark at 3:15 AM.",
+      "The fog thickens dramatically at 4:00 AM, providing unexpected cover—but also disorienting two bateaux that miss the Manhattan landing slip by fifty yards.",
+      "Dawn begins to gray the eastern horizon at 5:20 AM; the rear guard officer sends a runner to the ferry slip reporting the deception cannot hold past one more hour."
+    ],
+    "timePerTurnDefault": 2
+  },
+  "version": "1.0.0",
+  "category": "military",
+  "epilogue": {
+    "reviewed": true,
+    "generated": true,
+    "open_threads": [
+      {
+        "thread_id": "the_northeast_wind",
+        "historical_record": "The precise timing and degree of the wind shift from northeast to southwest on the night of August 29–30, 1776, is attested by Tallmadge's Memoir and several other accounts, but no meteorological record from the period provides exact measurements of wind speed or the precise hour of the shift. Historians have accepted the wind change as a documented fact while acknowledging that the exact timing relative to the first bateau launches cannot be precisely established from surviving sources."
+      },
+      {
+        "thread_id": "washington_receives_the",
+        "historical_record": "No manifest, loading tally, or written communication between a slip master and Washington from the night of the evacuation is known to survive. Washington's presence on the Brooklyn shore during the crossing is attested by multiple accounts, but the specific command decisions he made regarding loading priority and scheduling during the operation are not documented in surviving correspondence or orderly books from that night."
+      },
+      {
+        "thread_id": "the_rear_guard",
+        "historical_record": "That the rear guard maintained campfires and other deceptive measures to simulate continued occupation of the Brooklyn lines is recorded in multiple accounts. The specific management of those fires—who fed them, how fuel was allocated, and at what point they were allowed to die—is not described in detail in any surviving primary source. Mifflin's rear guard was reportedly recalled to the ferry slip earlier than intended due to a miscommunication, an incident described by Tallmadge, though the full details of that episode remain disputed among historians."
+      },
+      {
+        "thread_id": "the_player_faces",
+        "historical_record": "The historical record does not preserve a detailed account of loading priority decisions at the Brooklyn ferry slip during the evacuation. Whether artillery, wounded, or infantry were given priority at different stages of the crossing, and who made those decisions, is not documented in surviving orderly books or after-action reports from the operation."
+      },
+      {
+        "thread_id": "the_tidal_current",
+        "historical_record": "The tidal conditions on the East River on the night of August 29–30, 1776, are not recorded in surviving documents with sufficient precision to establish the exact timing of tidal reversal or its effect on individual bateaux. Accounts confirm that the crossing was difficult and that current presented challenges, but specific data on tidal velocity or the downstream displacement of particular boats is not preserved in the historical record."
+      },
+      {
+        "thread_id": "a_field_hospital",
+        "historical_record": "The fate of the Continental wounded who had been treated at field hospitals in Brooklyn following the Battle of Long Island is not fully documented. Some wounded were evacuated to Manhattan; others were left behind and fell into British captivity. The criteria used to determine which wounded were evacuated and which were left, and who made those decisions, are not recorded in surviving sources."
+      },
+      {
+        "thread_id": "on_the_parapets",
+        "historical_record": "A significant and documented episode during the rear guard phase involved a miscommunication in which Mifflin's rear guard was ordered to the ferry slip prematurely, leaving a section of the Brooklyn lines briefly unmanned. Tallmadge describes Washington as alarmed by this development. The rear guard returned to the lines and the situation was corrected before British forces detected the gap. The precise sequence of events and the identity of the officer who issued the premature order remain subjects of historical discussion, with some accounts implicating a misunderstood order from Washington's headquarters."
+      },
+      {
+        "thread_id": "a_marblehead_oarsmans",
+        "historical_record": "No account of equipment failure aboard specific bateaux during the Brooklyn evacuation is preserved in surviving primary sources. The operational details of individual crossings—including any boats temporarily removed from rotation due to equipment damage—are not recorded in the historical record."
+      },
+      {
+        "thread_id": "a_providential_fog",
+        "historical_record": "The appearance of a dense fog over the East River in the early morning hours of August 30, 1776, is one of the most consistently attested facts of the evacuation, described in multiple contemporary accounts including Tallmadge's Memoir. The fog is credited with concealing the final crossings from British observation. The precise hour at which the fog became dense enough to provide effective concealment is not established in surviving sources."
+      },
+      {
+        "thread_id": "the_fog_also",
+        "historical_record": "No account of bateaux overshooting the Manhattan landing slip due to fog disorientation during the Brooklyn evacuation is preserved in surviving primary sources. Navigation difficulties caused by the fog are plausible given conditions described in contemporary accounts, but specific incidents of boats missing the Manhattan slip are not documented in the historical record."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "the_northeast_wind",
+        "historical_record": "A northeast wind initially prevented or severely hampered the launch of bateaux on the evening of August 29, 1776. The wind shifted to the southwest during the night, enabling the crossing to proceed. Glover's Marblehead regiment operated the bateaux and other watercraft throughout the operation. The shift in wind is described by Tallmadge as a fortunate change that allowed the evacuation to proceed."
+      },
+      {
+        "beat_id": "washington_receives_the",
+        "historical_record": "Washington was present on the Brooklyn shore throughout the night and into the morning of August 30, 1776, and was among the last to cross to Manhattan. Contemporary accounts confirm his active supervision of the operation, but no written record of specific communications between Washington and ferry or slip personnel regarding loading rates survives from that night."
+      },
+      {
+        "beat_id": "the_rear_guard",
+        "historical_record": "The rear guard under Mifflin maintained the Brooklyn lines and campfire deceptions through the night. A documented incident occurred in which the rear guard was prematurely ordered to the ferry slip, briefly leaving the lines unmanned. Washington, upon learning of this, was alarmed, and the rear guard returned to its positions. The British did not detect the gap. The rear guard ultimately crossed to Manhattan in the final boats before dawn."
+      },
+      {
+        "beat_id": "the_player_faces",
+        "historical_record": "The historical record does not document the specific loading priority decisions made at the Brooklyn ferry slip during the evacuation. The operation succeeded in moving the entire force across without loss to enemy action, but the detailed command decisions governing the order of embarkation are not preserved in surviving sources."
+      },
+      {
+        "beat_id": "the_tidal_current",
+        "historical_record": "The East River is a tidal strait subject to strong and shifting currents. Contemporary accounts confirm that the crossing was conducted under difficult conditions. No surviving source records the specific effect of tidal reversal on individual bateaux during the evacuation, though the challenges posed by the current to the Marblehead oarsmen are acknowledged in historical accounts of the operation."
+      },
+      {
+        "beat_id": "a_field_hospital",
+        "historical_record": "Following the Battle of Long Island, Continental wounded were treated at field hospitals in Brooklyn. Some wounded were evacuated to Manhattan during the retreat; others remained behind and were taken prisoner by British forces. The specific decisions governing the evacuation of the wounded during the crossing operation are not documented in surviving primary sources."
+      },
+      {
+        "beat_id": "on_the_parapets",
+        "historical_record": "The rear guard maintained the Brooklyn parapet positions and campfire deceptions through the night of August 29–30, 1776. The documented premature withdrawal incident, in which the rear guard briefly left the lines before being ordered back, represents the closest the deception came to failure. The rear guard crossed to Manhattan in the final boats and the British did not assault the lines before the evacuation was complete."
+      },
+      {
+        "beat_id": "a_marblehead_oarsmans",
+        "historical_record": "Glover's 14th Continental Regiment made multiple crossings of the East River through the night. The physical demands on the oarsmen were extreme given the distance, current, load, and duration of the operation. No specific account of equipment failure during the crossing survives in the historical record."
+      },
+      {
+        "beat_id": "a_providential_fog",
+        "historical_record": "A dense fog settled over the East River in the early morning hours of August 30, 1776, and is consistently described in contemporary accounts as having concealed the final stages of the crossing from British observation. Tallmadge described it as a remarkable and fortunate development. The fog is one of the most widely attested facts of the evacuation across multiple independent sources."
+      },
+      {
+        "beat_id": "the_fog_also",
+        "historical_record": "While the fog concealed the crossing from British warships and shore observers, no surviving account records specific incidents of bateaux missing the Manhattan landing slip due to fog disorientation. The successful completion of the crossing—with all troops reaching Manhattan—is documented, but the navigational difficulties experienced by individual boats during the fog are not described in surviving primary sources."
+      }
+    ],
+    "character_fates": [
+      {
+        "character_id": "char_mifflin",
+        "name": "Brigadier General Thomas Mifflin",
+        "outcome": "survived",
+        "historical_record": "Thomas Mifflin commanded the rear guard during the Brooklyn evacuation on the night of August 29–30, 1776, and was among the last officers to cross to Manhattan. He was promoted to Major General in 1777. He later served as a delegate to the Continental Congress and as President of Congress in 1783, signing the ratification of the Treaty of Paris. He was elected the first Governor of Pennsylvania under its 1790 constitution, serving until 1799. He died on January 20, 1800, in Lancaster, Pennsylvania.",
+        "primary_source": {
+          "citation": "Pennsylvania Archives, Series 4, Vol. 3; Journals of the Continental Congress, 1783",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_tallmadge",
+        "name": "Captain Benjamin Tallmadge",
+        "outcome": "survived",
+        "historical_record": "Benjamin Tallmadge served as a staff officer during the Brooklyn retreat and recorded his recollections of the evacuation in his Memoir, published in 1858. He rose to become Major and head of Washington's intelligence network, running the Culper Spy Ring from 1778 onward. After the war he served as a U.S. Representative from Connecticut from 1801 to 1817. He died on March 7, 1835, in Litchfield, Connecticut. His Memoir remains one of the primary firsthand accounts of the Brooklyn evacuation.",
+        "primary_source": {
+          "citation": "Tallmadge, Benjamin. Memoir of Colonel Benjamin Tallmadge. New York: Thomas Holman, 1858.",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_glover",
+        "name": "Colonel John Glover",
+        "outcome": "survived",
+        "historical_record": "John Glover commanded the 14th Continental Regiment, composed largely of fishermen and sailors from Marblehead, Massachusetts, who operated the bateaux and other watercraft during the Brooklyn evacuation on the night of August 29–30, 1776. The same regiment later ferried Washington's army across the Delaware River on the night of December 25–26, 1776, before the Battle of Trenton. Glover was promoted to Brigadier General in February 1777. He resigned his commission in 1782 and returned to Marblehead, where he died on January 30, 1797.",
+        "primary_source": {
+          "citation": "Billias, George Athan. General John Glover and His Marblehead Mariners. New York: Henry Holt, 1960.",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_hutchins",
+        "name": "Corporal Nathaniel Hutchins",
+        "outcome": "unknown",
+        "historical_record": "The rear guard sentries who maintained the Brooklyn Heights parapet positions during the evacuation of August 29–30, 1776, were drawn from several Continental regiments ordered to hold the lines until the last possible moment. Their identities were almost entirely unrecorded. Mifflin's rear guard numbered approximately 2,000 men. Most crossed safely to Manhattan before dawn. The names of individual sentries at the parapet positions do not appear in surviving muster rolls, orderly books, or after-action accounts from this engagement.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_washington",
+        "name": "General George Washington",
+        "outcome": "survived",
+        "historical_record": "George Washington supervised the Brooklyn evacuation personally, remaining on the Brooklyn shore until the final boats departed on the morning of August 30, 1776. He crossed to Manhattan in one of the last bateaux. The successful retreat preserved the Continental Army, which had been in danger of total destruction or capture. Washington continued as Commander-in-Chief through the remainder of the war, leading the army to final victory at Yorktown in October 1781. He presided over the Constitutional Convention in 1787, was elected the first President of the United States in 1789, and served two terms. He died on December 14, 1799, at Mount Vernon, Virginia.",
+        "primary_source": {
+          "citation": "Washington, George. General Orders and Correspondence, August 1776. Papers of George Washington, Library of Congress; Fitzpatrick, John C., ed. The Writings of George Washington. Vol. 5. Washington: GPO, 1932.",
+          "url": null,
+          "access_note": null
+        }
+      },
+      {
+        "character_id": "char_riker",
+        "name": "Jonas Riker",
+        "outcome": "unknown",
+        "historical_record": "The ferry crossings during the Brooklyn evacuation relied on civilian ferry infrastructure at what was then known as the Brooklyn Ferry, operated from a slip near the foot of present-day Fulton Street in Brooklyn. Civilian ferrymen and their vessels were pressed into service alongside military bateaux. The names of individual civilian slip operators and ferrymen who assisted in the evacuation are not preserved in surviving records. Civilian ferry operators in the New York area during the Revolutionary War occupied a precarious position, subject to impressment by both sides and to the disruption of their livelihoods by military occupation. The British occupied New York City from September 1776 until November 1783, during which time civilian ferry operations on the East River were controlled by British military authorities.",
+        "primary_source": null
+      },
+      {
+        "character_id": "char_ezra_pulling",
+        "name": "Sergeant Ezra Pulling",
+        "outcome": "unknown",
+        "historical_record": "The oarsmen of Glover's 14th Continental Regiment (Marblehead) who rowed the bateaux during the Brooklyn evacuation were experienced mariners recruited primarily from the fishing and maritime communities of Marblehead, Massachusetts. They made multiple crossings of the East River through the night of August 29–30, 1776, under conditions of tidal current, wind shift, and later dense fog. The regiment's muster rolls survive in part, but individual assignments to specific boats or crossing rotations during the evacuation are not recorded. The regiment suffered significant attrition through the course of the war from disease, combat, and expiration of enlistments. Their role in the Brooklyn evacuation and the Delaware crossing was noted by contemporaries including Washington, but the names of individual oarsmen who performed the crossings were not preserved in the historical record.",
+        "primary_source": null
+      }
+    ],
+    "historical_frame": [
+      {
+        "text": "The Battle of Long Island on August 27, 1776, was the largest battle of the American Revolutionary War in terms of troop numbers engaged, and resulted in a significant Continental defeat with estimated American casualties of between 1,000 and 1,500 killed, wounded, or captured.",
+        "source": "Schecter, Barnet. The Battle for New York. New York: Walker & Company, 2002, pp. 150–165."
+      },
+      {
+        "text": "The British Army under General William Howe occupied New York City on September 15, 1776, following the Continental withdrawal from Manhattan, and held the city until November 25, 1783.",
+        "source": "Burrows, Edwin G., and Mike Wallace. Gotham: A History of New York City to 1898. New York: Oxford University Press, 1999, pp. 240–241."
+      },
+      {
+        "text": "Glover's 14th Continental Regiment subsequently ferried Washington's army across the Delaware River on the night of December 25–26, 1776, enabling the surprise attack on Trenton, New Jersey, on December 26, 1776.",
+        "source": "Fischer, David Hackett. Washington's Crossing. New York: Oxford University Press, 2004, pp. 215–220."
+      }
+    ],
+    "immediate_outcome": {
+      "summary": "On the night of August 29–30, 1776, the Continental Army successfully evacuated approximately 9,000 troops from Brooklyn to Manhattan across the East River without the loss of a single man to enemy action. The operation was completed before British forces discovered the withdrawal, preserving the Continental Army from capture or destruction following its defeat at the Battle of Long Island on August 27, 1776.",
+      "key_facts": [
+        {
+          "text": "The evacuation began on the evening of August 29, 1776, and was completed by approximately 7:00 AM on August 30, 1776.",
+          "source": "McCullough, David. 1776. New York: Simon & Schuster, 2005, pp. 191–196."
+        },
+        {
+          "text": "Approximately 9,000 Continental troops were transported across the East River during the operation.",
+          "source": "Schecter, Barnet. The Battle for New York. New York: Walker & Company, 2002, pp. 178–183."
+        },
+        {
+          "text": "A northeast wind that had initially prevented bateau launches shifted to the southwest during the night, enabling the crossing.",
+          "source": "Tallmadge, Benjamin. Memoir of Colonel Benjamin Tallmadge. New York: Thomas Holman, 1858, p. 11."
+        },
+        {
+          "text": "A dense fog settled over the East River in the early morning hours of August 30, concealing the final stages of the crossing from British observation.",
+          "source": "Tallmadge, Benjamin. Memoir of Colonel Benjamin Tallmadge. New York: Thomas Holman, 1858, p. 11."
+        },
+        {
+          "text": "No Continental soldiers were lost to enemy action during the evacuation itself.",
+          "source": "Schecter, Barnet. The Battle for New York. New York: Walker & Company, 2002, p. 183."
+        },
+        {
+          "text": "Some artillery pieces and heavy stores could not be transported and were left behind in Brooklyn.",
+          "source": "McCullough, David. 1776. New York: Simon & Schuster, 2005, p. 196."
+        }
+      ]
+    }
+  },
+  "glossary": [
+    {
+      "term": "command-in-chief",
+      "definition": "The supreme military commander with authority over all forces in a theater—Washington's decision to remain on the Brooklyn shore until the last regiment embarks defines the moral and practical limits of the retreat.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "stroke and trail",
+      "definition": "The two rowers positioned in the stern of a boat—the stroke sets the pace while the trail provides power and helps steer.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "northeast gale",
+      "definition": "A strong, sustained wind from the northeast—paradoxically dangerous for launching boats, but the same wind will bring the fog needed to hide the retreat from British observers.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "pickets",
+      "definition": "Soldiers posted in advance of the main army to watch for enemy movement and warn of attacks—the British pickets less than two hundred yards away mean any noise could trigger a massacre.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "abatis",
+      "definition": "A defensive barrier made of sharpened branches or felled trees with points facing outward—the British have positioned sentries just beyond these obstacles on the American line.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "bateaux",
+      "definition": "Flat-bottomed boats with shallow draft, ideal for moving troops across rivers and through coastal waters—the primary vessels available for moving men across the East River.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Marblehead Regiment",
+      "definition": "Colonel John Glover's regiment of fishermen and sailors from Marblehead, Massachusetts—their knowledge of boats and water makes them the only force capable of executing a water-based retreat.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "encirclement",
+      "definition": "A tactical situation where an enemy force is surrounded on multiple sides with no escape route—Howe's objective in positioning his army and fleet around Brooklyn Heights.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "northern theater",
+      "definition": "The strategic region covering New York and surrounding states where the main Revolutionary campaign was being fought in 1776.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Continental force",
+      "definition": "The organized army fighting for American independence, authorized by the Continental Congress—distinct from state militias or local volunteer companies.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "men-of-war",
+      "definition": "Large, heavily armed warships capable of dominating a harbor or coastline—the British had positioned the Phoenix and Rose to prevent any escape by water.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "earthwork parapets",
+      "definition": "Defensive walls built from packed earth and reinforced with logs or sod—the hastily constructed fortifications that now form Washington's only protection on Brooklyn Heights.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "Jamaica Pass",
+      "definition": "A narrow route through the Heights of Guan that the British used to outflank the American defenses—the Americans had left it lightly guarded, a critical error.",
+      "source": "",
+      "approved": true
+    },
+    {
+      "term": "flanking maneuver",
+      "definition": "A military movement that attacks the side or rear of an enemy position rather than meeting them head-on—in this case, Howe's forces moved through Jamaica Pass to strike Washington's left wing from an unexpected direction.",
+      "source": "",
+      "approved": true
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "playerGoal": "",
+  "description": "August 29–30, 1776. Nine thousand Continental soldiers are trapped on Brooklyn Heights with the British army at their backs and the East River at their feet. Before dawn breaks and the fog lifts, every man must cross—or be taken. You have seven hours.",
+  "storyArcIds": [
+    "fog_and_oar_1776_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "On the afternoon of August 27, 1776, the British army under General William Howe executed a flanking maneuver through the Jamaica Pass that shattered the Continental left wing and drove Washington's forces back against the fortified ridge of Brooklyn Heights. In two days of fighting, the Americans lost nearly 1,500 men killed, wounded, or captured—among them Generals Sullivan and Stirling, both taken prisoner. The remaining force of roughly nine thousand men now huddles behind earthwork parapets, their backs to the East River, while Howe's army of twenty thousand prepares to complete the encirclement. The British fleet, including the men-of-war Phoenix and Rose, rides at anchor in the harbor below, positioned to interdict any waterborne escape.",
+        "type": "world"
+      },
+      {
+        "text": "This is not merely an army at risk—it is the army, the only organized Continental force capable of continuing resistance in the northern theater. If Washington's men are captured or destroyed on Brooklyn Heights, the rebellion effectively ends before the year is out; there is no reserve, no second formation waiting in Philadelphia. The general himself has resolved to remain on the Brooklyn shore until the last regiment embarks, a decision that places the commander-in-chief within a quarter mile of British pickets. For the fishermen of Colonel John Glover's Marblehead Regiment, tonight is the difference between a war that continues and one that simply stops.",
+        "type": "stakes"
+      },
+      {
+        "text": "It is eleven o'clock on the night of August 29th, and the Brooklyn ferry slip smells of river mud, horse dung, and the wet wool of nine thousand frightened men standing in the dark. A northeast gale has been blowing since dusk, churning the East River into a black, pitching chop that has already driven back two attempts to launch the flat-bottomed bateaux. The rain has stopped but the wind has not; pine torches gutter and snap along the parapet line, throwing orange light across faces that have not slept in thirty-six hours. Somewhere to the south, less than two hundred yards beyond the abatis, British sentries are walking their posts.",
+        "type": "scene"
+      },
+      {
+        "text": "You have been handed a specific task inside a situation that cannot be altered—the British have won the field, the dawn will come, and the river does not care about the cause. What remains is execution: the number of men who reach Manhattan alive, the silence held long enough to prevent a massacre at the water's edge, the oars pulled through the dark long enough for the fog to do its work. The history books will record that the retreat succeeded. What they will not record is the ten thousand decisions made between now and six o'clock in the morning that made it so. You are standing at the threshold of one of them.",
+        "type": "entry",
+        "character_entries": {
+          "role_sentry_decoy": "The parapet timber is cold against your spine and the fire grate is hot against your face and between those two sensations is the entire width of what you know: that the earthworks behind you are empty, that the nearest American soldier is a quarter mile away at the slip, that you are standing in front of a theater with no audience and no backstage and no one left to pull you off the stage. Your men move between the grates in the dark—you can hear the scrape of spades, the wet crack of green pine taking flame—and they sound, you have decided, like thousands, or close enough to thousands that a British picket two hundred yards south in the black would not know the difference. You hope. The left station has gone quiet in the last ten minutes in a way that has nothing to do with discipline and everything to do with Hutchins and the fuel, and you have not yet walked down to confirm what you already know because walking down would mean turning your back on the abatis line, and you are not ready to do that. The embarkation signal has not come. Your men ran a half-mile on a misdirected order two hours ago and came back running and have not stopped moving since, because to stop moving is to become two hundred men instead of thousands, and two hundred men on a parapet with a British army twenty yards beyond the wire is a different kind of night entirely. You press one hand flat against the timber and count the fires still burning and begin to turn toward the left station.",
+          "role_maritime_teamster": "Mid-channel, and the ash oar is no longer something you hold so much as something your hands have grown around, the grain of it worn into the split flesh of your palms the way a keel groove wears into a dock plank. The fog has come in heavy off the harbor in the last quarter hour—thick enough now that the Manhattan shore lantern is gone entirely, swallowed, and you are reading the river the only way left to read it: by the pull of the current against the starboard quarter, by the sound of the water parting under the bow, by forty years of Marblehead mornings that live somewhere below conscious thought and tell you, with the authority of a man who has never once been wrong about this, that the tidal reversal is coming before the schedule your colonel was handed. Forty-five minutes early. Maybe less. Two seats forward, Josiah Pratt has stopped driving his stroke and is simply moving the oar, the blade barely biting, and you have said nothing, reported nothing, because you cannot afford to lose the rhythm of this crew with eight more trips still to make. The salt-pork tin sits in your coat pocket, heavy and specific, enough grease for three bateaux's oarlocks and two hours of silence between you and whatever the Phoenix's watch is hearing in the dark. The current shifts, fractionally, a quarter-degree of pressure you feel in your wrists before your mind names it, and your hand is already moving toward your pocket.",
+          "role_tactical_commander": "The mud at the ferry slip has worked through your boot leather and you feel it now against your left heel, cold and specific, the kind of detail a man notices when he has stopped feeling the larger things. Tallmadge is at your right elbow with the tally board and you do not look at it because you already know what it says and knowing it again will not change it. What you know that no one else at this slip knows is that the tide turns in forty minutes, not ninety, and that the rear guard standing on those parapets numbers fewer than two hundred men performing the work of two thousand, and that somewhere behind you in the hospital hollow sixty-three men are waiting in the dark with no legs to carry them to the water. The slip master has been talking about the timber joint for an hour. The field guns are staged on the road above you, their horses blowing white breath into the black air, and you cannot leave them because without them Manhattan is an open throat. The quill is still in your hand. The runner from Mifflin arrived ninety seconds ago and has not yet been acknowledged. Tallmadge shifts his weight. The river smell rises off the chop below — cold iron, river rot, the particular darkness of water that does not care what crosses it or what does not. You raise the quill."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_tactical_commander",
+    "role_maritime_teamster",
+    "role_sentry_decoy"
+  ],
+  "winConditions": [
+    "Manning_Boat_Throughput reaches 9,000 troops safely landed on Manhattan before 6:00 AM.",
+    "Campfire_Decoy_Luminance remains above 40 until the last rear guard unit embarks.",
+    "East_River_Tidal_Velocity is managed such that no bateau is lost to British warship detection or downstream drift."
+  ],
+  "failConditions": [
+    "Campfire_Decoy_Luminance drops below 20, triggering a British bayonet charge into the empty fortifications before the rear guard can embark.",
+    "Manning_Boat_Throughput stalls below 7,500 troops when dawn fog dissipates, leaving the rear guard and remaining troops exposed and captured.",
+    "East_River_Tidal_Velocity reaches 5 knots and two or more bateaux are lost, collapsing the ferry schedule entirely."
+  ],
+  "technical_facts": {
+    "facts": [
+      {
+        "fact_id": "evacuation_date_and_night",
+        "content": "The Brooklyn evacuation took place on the night of August 29–30, 1776, beginning after dark on the 29th and completing before dawn on the 30th.",
+        "domain": "timing",
+        "source": {
+          "citation": "David McCullough, 1776 (2005), Chapter 7; Journals of the Continental Congress; multiple officer memoirs",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "total_troops_evacuated",
+        "content": "Approximately 9,000 Continental soldiers were evacuated from Brooklyn to Manhattan during the night of August 29–30, 1776.",
+        "domain": "capacity",
+        "source": {
+          "citation": "Henry P. Johnston, The Campaign of 1776 Around New York and Brooklyn (1878), Part II; Benjamin Tallmadge memoir",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "east_river_crossing_width",
+        "content": "The East River crossing from the Brooklyn ferry slip to the Manhattan (Cortlandt Street) slip measured approximately one mile in width at the point used during the evacuation.",
+        "domain": "navigation",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); period survey maps of New York Harbor",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "glover_regiment_identity",
+        "content": "Colonel John Glover commanded the 14th Continental Regiment, recruited primarily from Marblehead, Massachusetts, whose men were experienced fishermen and sailors who managed the boat operations during the evacuation.",
+        "domain": "personnel",
+        "source": {
+          "citation": "George Athan Billias, General John Glover and His Marblehead Mariners (1960); Journals of the Continental Congress",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "northeast_wind_shift_timing",
+        "content": "A northeast wind initially prevented boat launches at the start of the evacuation; the wind shifted to the southwest during the night, enabling the crossing, and was later supplemented by a dense fog that obscured the operation from British observation.",
+        "domain": "timing",
+        "source": {
+          "citation": "Benjamin Tallmadge, Memoir of Colonel Benjamin Tallmadge (1858); McCullough, 1776 (2005)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "tallmadge_rear_guard_role",
+        "content": "Captain Benjamin Tallmadge served with the rear guard on Brooklyn Heights during the evacuation and recorded in his memoir that he was among the last officers to embark, crossing with General Washington in one of the final boats.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Benjamin Tallmadge, Memoir of Colonel Benjamin Tallmadge (1858)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "washington_last_to_leave",
+        "content": "General George Washington remained on the Brooklyn side until the final boats departed and was among the last men to cross to Manhattan, embarking only after confirming the rear guard had cleared the shore.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Tallmadge, Memoir (1858); Johnston, The Campaign of 1776 (1878); McCullough, 1776 (2005)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "mifflin_rear_guard_command",
+        "content": "Brigadier General Thomas Mifflin commanded the rear guard holding the Brooklyn Heights fortifications during the evacuation, maintaining the deception that the lines were fully occupied.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); Washington's General Orders, August 1776",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "mifflin_premature_recall_documented",
+        "content": "During the evacuation, Mifflin's rear guard was mistakenly ordered to march to the ferry slip before the embarkation was ready; Washington personally countermanded the order and sent the rear guard back to the parapets, an incident Tallmadge recorded in his memoir.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Tallmadge, Memoir of Colonel Benjamin Tallmadge (1858); Johnston, The Campaign of 1776 (1878)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "vessel_types_used",
+        "content": "The evacuation employed a variety of watercraft including flat-bottomed bateaux, periaugers, and rowboats collected from the surrounding waterways; no single vessel type was used exclusively.",
+        "domain": "capacity",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); Billias, General John Glover (1960)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "fog_arrival_timing",
+        "content": "A dense fog descended over the East River during the early morning hours of August 30, 1776, providing concealment for the final stages of the crossing after the wind had already shifted to permit rowing.",
+        "domain": "timing",
+        "source": {
+          "citation": "Tallmadge, Memoir (1858); McCullough, 1776 (2005); Johnston, The Campaign of 1776 (1878)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "british_discovery_timing",
+        "content": "British forces did not discover the evacuation until after daylight on August 30, 1776, by which time the entire Continental force had crossed to Manhattan.",
+        "domain": "timing",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); Howe's dispatches, British Headquarters Papers",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "brooklyn_fortification_extent",
+        "content": "The Brooklyn Heights defensive perimeter extended approximately one mile in length, anchored on the left by Wallabout Bay and on the right by Gowanus Creek, with earthwork redoubts and connecting trenches.",
+        "domain": "navigation",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); period British and American military maps of Long Island",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "ferry_slip_location_brooklyn",
+        "content": "The primary Brooklyn embarkation point was at the foot of the Old Ferry Road at the Brooklyn ferry slip, the same landing used by the regular New York–Brooklyn ferry service before the war.",
+        "domain": "navigation",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); period New York City maps",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "manhattan_landing_point",
+        "content": "The primary Manhattan landing point during the evacuation was at or near the Cortlandt Street slip, the established ferry terminus on the Manhattan side of the East River.",
+        "domain": "navigation",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); period New York City survey maps",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "tallmadge_account_of_silence",
+        "content": "Tallmadge recorded in his memoir that the evacuation was conducted with strict silence orders, with troops forbidden to speak above a whisper and equipment muffled to prevent acoustic detection by British forces.",
+        "domain": "other",
+        "source": {
+          "citation": "Tallmadge, Memoir of Colonel Benjamin Tallmadge (1858)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "british_warship_presence_harbor",
+        "content": "British naval vessels including warships of Admiral Howe's fleet were anchored in New York Harbor and the lower East River during the period of the evacuation, making acoustic and visual concealment operationally critical.",
+        "domain": "navigation",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); Admiral Richard Howe's dispatches, British Admiralty Records",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "no_continental_casualties_during_crossing",
+        "content": "No Continental soldiers were killed or captured during the actual water crossing on the night of August 29–30, 1776; the evacuation was completed without engagement by British forces.",
+        "domain": "other",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); McCullough, 1776 (2005)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "artillery_not_fully_evacuated",
+        "content": "Not all Continental artillery and heavy equipment was successfully evacuated; some cannon and stores were left behind on the Brooklyn side when the crossing concluded at dawn.",
+        "domain": "capacity",
+        "source": {
+          "citation": "Johnston, The Campaign of 1776 Around New York and Brooklyn (1878); Washington's correspondence, Papers of George Washington",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "operation_secrecy_maintained_from_troops",
+        "content": "The evacuation order was kept secret from most Continental troops until the operation began; soldiers were told only to assemble with their equipment, and the destination was not announced in advance to prevent panic or desertion that might alert British forces.",
+        "domain": "other",
+        "source": {
+          "citation": "Tallmadge, Memoir (1858); McCullough, 1776 (2005); Johnston, The Campaign of 1776 (1878)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      }
+    ],
+    "reviewed": true,
+    "generated": true
+  },
+  "allow_free_input": true,
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "checked": false,
+      "notes": ""
+    },
+    "sequence_check": {
+      "checked": false,
+      "notes": ""
+    },
+    "path_independence": {
+      "checked": false,
+      "notes": ""
+    },
+    "final_beat_spec": {
+      "checked": false,
+      "notes": ""
+    },
+    "tense_attribution": {
+      "checked": false,
+      "notes": ""
+    },
+    "reviewer_summary": {
+      "checked": false,
+      "notes": ""
+    },
+    "manual_playthrough": {
+      "checked": false,
+      "notes": ""
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Marblehead Watermen's Argot",
+        "terms": [
+          {
+            "term": "fetch",
+            "meaning": "The distance a boat must travel across open water against wind or current; a long fetch means hard rowing and slow transit."
+          },
+          {
+            "term": "feather the blade",
+            "meaning": "To rotate the oar flat against the water on the recovery stroke, reducing splash and noise near enemy positions."
+          },
+          {
+            "term": "back water",
+            "meaning": "To row in reverse, slowing or stopping a bateau without turning it—used to hold position at a crowded slip."
+          },
+          {
+            "term": "make fast",
+            "meaning": "To secure a line or tie off a boat to a post or cleat; also used loosely to mean 'hold your position.'"
+          },
+          {
+            "term": "running before it",
+            "meaning": "Allowing the current or wind to carry the boat rather than fighting it; acceptable on the return crossing to Brooklyn, dangerous near the harbor mouth."
+          },
+          {
+            "term": "stroke and trail",
+            "meaning": "A muffled rowing cadence where one oarsman sets the pace and the rest match without calling count—used for silent passage near enemy vessels."
+          },
+          {
+            "term": "grease the locks",
+            "meaning": "To apply salt-pork fat to iron oarlocks to eliminate squeaking; a critical precaution within earshot of British sentinels."
+          }
+        ],
+        "context": "Used by Colonel Glover's 14th Continental Regiment—fishermen, sailors, and coastal tradesmen from Essex County, Massachusetts—when coordinating boat operations on the East River."
+      },
+      {
+        "name": "Continental Army Field Command Language",
+        "terms": [
+          {
+            "term": "the returns",
+            "meaning": "Written muster tallies showing how many men of a given regiment are present, fit for duty, and ready to embark; Washington demanded returns every half hour."
+          },
+          {
+            "term": "file off",
+            "meaning": "To move troops out of line in an orderly column; the command given to each regiment when its turn to march to the ferry slip arrived."
+          },
+          {
+            "term": "close order",
+            "meaning": "A tight infantry formation used to move large numbers of men quickly and quietly through narrow paths to the embarkation point."
+          },
+          {
+            "term": "the park",
+            "meaning": "The artillery park—the designated area where field cannon, limbers, and ammunition wagons were staged awaiting loading decisions."
+          },
+          {
+            "term": "detachment of observation",
+            "meaning": "The official designation for the rear guard units left on the parapets to maintain the deception; a deliberate euphemism to prevent panic among the men selected."
+          },
+          {
+            "term": "forlorn hope",
+            "meaning": "An informal but widely understood term for a small unit assigned a near-suicidal holding action to protect a larger force's withdrawal."
+          },
+          {
+            "term": "countersign",
+            "meaning": "The secret password for the night, changed at dusk; required to pass between positions and prevent British infiltrators from moving freely in the dark."
+          }
+        ],
+        "context": "Used by officers and staff at the brigade and regimental level to communicate logistical and tactical orders during the retreat, often under extreme time pressure and in near-darkness."
+      },
+      {
+        "name": "Ferry Slip and Logistics Trade Language",
+        "terms": [
+          {
+            "term": "deadweight",
+            "meaning": "Non-human cargo—cannon, shot, powder casks, baggage—counted against a bateau's payload capacity; loading deadweight displaced men."
+          },
+          {
+            "term": "trim the boat",
+            "meaning": "To distribute passengers and cargo evenly across a bateau's beam to prevent dangerous listing in choppy water."
+          },
+          {
+            "term": "the slip",
+            "meaning": "The log-reinforced ramp and dock structure at the water's edge where bateaux were loaded; the primary bottleneck of the entire operation."
+          },
+          {
+            "term": "round trip",
+            "meaning": "One complete crossing from Brooklyn to Manhattan and back; each round trip cost between forty minutes and two hours depending on current and wind."
+          },
+          {
+            "term": "horse passage",
+            "meaning": "The separate, slower crossing lane reserved for officers' horses and artillery draft animals, which required larger, more stable craft than infantry bateaux."
+          },
+          {
+            "term": "manifest tally",
+            "meaning": "The running count of men loaded per boat per crossing, scratched on a wooden board by the slip master to track progress against the total force."
+          }
+        ],
+        "context": "Used by ferrymen, teamsters, and the civilian boatmen pressed into service alongside Glover's regiment to manage the physical loading and unloading of men, animals, and equipment at the Brooklyn and Manhattan slips."
+      }
+    ]
+  },
+  "keyEvidenceClueIds": [
+    "clue_tide_table_shift",
+    "clue_empty_trench_line"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "8,200 troops cross safely but the field artillery is abandoned on the Brooklyn shore; Manhattan's defensive line is weakened but the army survives.",
+    "The rear guard crosses under first light but loses two men captured by a British advance patrol; the deception held long enough for the main body.",
+    "The wounded from the field hospital are evacuated but three field cannon are spiked and left behind; a strategic loss accepted to preserve manpower."
+  ],
+  "structured_endings_enabled": false
+}

@@ -1,81 +1,81 @@
 {
   "id": "role_doughboy",
-  "scenarioId": "zero_hour_cantigny",
   "name": "The Doughboy",
-  "description": "You are in the assault wave, moving through smoke and rubble toward Cantigny. You will clear the fortified cellars and discover what the Germans left behind — including evidence that someone on your side was talking to the other side.",
-  "startLocationId": "loc_jump_off_trench",
-  "startingKnowledge": [
-    "The creeping barrage is running ahead of schedule on the eastern side, creating an unworked gap in shell coverage.",
-    "Sergeant Voss was present near the forward wire staging area before dawn and observed unauthorized movements.",
-    "A French army liaison officer was seen inspecting the forward communication trench line during the late watch."
-  ],
-  "accessLevel": "investigator",
-  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from ground level — physical, sensory, immediate. What the body registers before the mind names it.",
+  "opening": {
+    "choices": [
+      "Confront Voss directly about what he saw before dawn and why he has not reported it",
+      "Move to Kowalski and ask him about the state of the forward wire before you go over the top",
+      "Go over the top immediately and move toward the eastern gap in the barrage to assess the exposure yourself"
+    ],
+    "narrative": "It is 05:58 on the morning of May 28th, 1918. The barrage is in its second minute, and the eastern sector is wrong — the lifts are advancing too fast, leaving a gap in coverage that your men will walk into in approximately eight minutes. Sergeant Voss is at the traverse junction, watch in hand, not speaking. The whistle will blow in ninety seconds. You have the time between now and the moment you go over the top to ask one question or do one thing.",
+    "npcMoments": [
+      {
+        "action": "stands at the traverse junction, watching the eastern horizon, his jaw set, not meeting anyone's eyes",
+        "characterId": "char_voss"
+      },
+      {
+        "action": "is coiling wire onto his spool thirty feet down the trench, muttering in Polish, moving with the focused speed of a man who is already late",
+        "characterId": "char_kowalski"
+      }
+    ]
+  },
   "briefing": "You are standing on the fire-step of the jump-off trench with your left hand on the cold, gritty sandbag at the top of the parapet and your right hand on the receiver of your Springfield, and the barrage sounds like the sky is being torn in half. The men on either side of you have stopped checking their equipment; they are just waiting. You have been a runner and a squad leader long enough to know when something is wrong with a barrage, and something is wrong with this one—on the eastern side, the shell impacts are lifting too fast, leaving a corridor of unworked ground between the smoke curtain and the village edge that should not be there. You mentioned it to Sergeant Voss four minutes ago and he went quiet in a way that meant he had already noticed. The whistle is in your breast pocket, and in approximately ninety seconds, someone will blow it.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:49:06.707Z",
+  "represents": "Enlisted men of the 28th Infantry Regiment, 1st Division, United States Army, who assaulted Cantigny on May 28, 1918",
+  "scenarioId": "zero_hour_cantigny",
+  "accessLevel": "investigator",
+  "description": "You are in the assault wave, moving through smoke and rubble toward Cantigny. You will clear the fortified cellars and discover what the Germans left behind — including evidence that someone on your side was talking to the other side.",
+  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from ground level — physical, sensory, immediate. What the body registers before the mind names it.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "Sergeant Emil Voss",
+      "closing_line": "The smoke cleared too soon, exposing your position to the heights before the line could move.",
+      "what_happened": "You walk directly into the unprotected corridor on the eastern flank where the barrage lifted early. Pinned down by pre-registered machine-gun fire from the heights and cut off from the wire network, your assault squad is completely isolated and overrun during the first German counter-attack probe.",
+      "emotional_weight": "Tactical Exposure—the weightless terror of finding yourself in an empty corridor where the friendly iron was supposed to be.",
+      "closing_line_override": ""
+    },
+    "partial": {
+      "who_present": "The Signaler, Sergeant Emil Voss",
+      "closing_line": "You held the stone ruins of Cantigny, but the price of the ground was tallied in the faces of the men on your right.",
+      "what_happened": "You go over the top and successfully secure the fortified cellar along the Rue du Moulin, recovering a German field radio and a list of target coordinates that match the ambush pattern. You capture the saboteur at the village edge, but your right flank takes severe casualties due to the premature lift in the eastern sector barrage data.",
+      "emotional_weight": "Haunted Victory—the raw, tactical achievement of taking the village ridge while surrounded by the bodies of the platoon that walked into the open gap.",
+      "closing_line_override": ""
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The wool is soaked through to your skin.",
   "character_hooks": [
     "The visual gap in the rolling smoke curtain as the shell line lifts prematurely from the eastern approach.",
     "The sharp hiss of a mustard gas shell detonating in a neighboring traverse, forcing an immediate transition to masks.",
     "A heavy German machine gun emplacement inside a fortified stone cellar on Rue du Moulin that has bypassed the artillery fire."
   ],
-  "suggested_secret": "You speak fluent German—your family's primary language at home—allowing you to instantly translate captured operational notes found inside the village cellars without an interpreter.",
-  "opening": {
-    "narrative": "It is 05:58 on the morning of May 28th, 1918. The barrage is in its second minute, and the eastern sector is wrong — the lifts are advancing too fast, leaving a gap in coverage that your men will walk into in approximately eight minutes. Sergeant Voss is at the traverse junction, watch in hand, not speaking. The whistle will blow in ninety seconds. You have the time between now and the moment you go over the top to ask one question or do one thing.",
-    "npcMoments": [
-      {
-        "characterId": "char_voss",
-        "action": "stands at the traverse junction, watching the eastern horizon, his jaw set, not meeting anyone's eyes"
-      },
-      {
-        "characterId": "char_kowalski",
-        "action": "is coiling wire onto his spool thirty feet down the trench, muttering in Polish, moving with the focused speed of a man who is already late"
-      }
-    ],
-    "choices": [
-      "Confront Voss directly about what he saw before dawn and why he has not reported it",
-      "Move to Kowalski and ask him about the state of the forward wire before you go over the top",
-      "Go over the top immediately and move toward the eastern gap in the barrage to assess the exposure yourself"
-    ]
-  },
+  "startLocationId": "loc_jump_off_trench",
+  "context_sentence": "You are Corporal Daniel Marsh, a squad leader in the 28th Infantry Regiment, 1st Division, United States Army, one of approximately 3,500 American soldiers who stepped off at 6:45 a.m. on May 28, 1918, in the first independent American offensive operation of the First World War.",
   "roleInitialState": {
+    "flags": {
+      "cellar_cleared": false,
+      "voss_questioned": false,
+      "german_radio_found": false
+    },
     "inventory": [
       "Springfield M1903 rifle",
       "two Mk I grenades",
       "bayonet",
       "runner's message pouch"
     ],
-    "flags": {
-      "voss_questioned": false,
-      "cellar_cleared": false,
-      "german_radio_found": false
-    },
     "suspicion": {
+      "char_voss": 0,
       "char_farrow": 0,
-      "char_renard": 0,
-      "char_voss": 0
+      "char_renard": 0
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:49:06.707Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You go over the top and successfully secure the fortified cellar along the Rue du Moulin, recovering a German field radio and a list of target coordinates that match the ambush pattern. You capture the saboteur at the village edge, but your right flank takes severe casualties due to the premature lift in the eastern sector barrage data.",
-      "who_present": "The Signaler, Sergeant Emil Voss",
-      "emotional_weight": "Haunted Victory—the raw, tactical achievement of taking the village ridge while surrounded by the bodies of the platoon that walked into the open gap.",
-      "closing_line": "You held the stone ruins of Cantigny, but the price of the ground was tallied in the faces of the men on your right.",
-      "closing_line_override": ""
-    },
-    "failure": {
-      "what_happened": "You walk directly into the unprotected corridor on the eastern flank where the barrage lifted early. Pinned down by pre-registered machine-gun fire from the heights and cut off from the wire network, your assault squad is completely isolated and overrun during the first German counter-attack probe.",
-      "who_present": "Sergeant Emil Voss",
-      "emotional_weight": "Tactical Exposure—the weightless terror of finding yourself in an empty corridor where the friendly iron was supposed to be.",
-      "closing_line": "The smoke cleared too soon, exposing your position to the heights before the line could move.",
-      "closing_line_override": ""
-    }
-  },
-  "context_sentence": "You are Corporal Daniel Marsh, a squad leader in the 28th Infantry Regiment, 1st Division, United States Army, one of approximately 3,500 American soldiers who stepped off at 6:45 a.m. on May 28, 1918, in the first independent American offensive operation of the First World War.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Enlisted men of the 28th Infantry Regiment, 1st Division, United States Army, who assaulted Cantigny on May 28, 1918",
-  "fact_checked": false,
-  "bridge_sentence": "The wool is soaked through to your skin."
+  "suggested_secret": "You speak fluent German—your family's primary language at home—allowing you to instantly translate captured operational notes found inside the village cellars without an interpreter.",
+  "startingKnowledge": [
+    "The creeping barrage is running ahead of schedule on the eastern side, creating an unworked gap in shell coverage.",
+    "Sergeant Voss was present near the forward wire staging area before dawn and observed unauthorized movements.",
+    "A French army liaison officer was seen inspecting the forward communication trench line during the late watch."
+  ]
 }

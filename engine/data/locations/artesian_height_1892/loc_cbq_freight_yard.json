@@ -1,19 +1,19 @@
 {
   "id": "loc_cbq_freight_yard",
-  "scenarioId": "artesian_height_1892",
-  "name": "The CBQ Freight Yard Siding",
-  "description": "The idling freight consist on the Chicago, Burlington and Quincy siding two blocks south of the tower — a locomotive, tender, and four boxcars sitting under a single track lamp, the fireman visible in the cab.",
   "mood": "peripheral, observational, transient",
-  "linkedCharacterIds": [
-    "char_dolan_marsh"
-  ],
+  "name": "The CBQ Freight Yard Siding",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.722Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "artesian_height_1892",
+  "description": "The idling freight consist on the Chicago, Burlington and Quincy siding two blocks south of the tower — a locomotive, tender, and four boxcars sitting under a single track lamp, the fireman visible in the cab.",
   "atmosphericDetails": [
     "The locomotive is breathing slowly — a low, rhythmic exhaust that is more felt than heard at this distance from the tower.",
     "The track lamp throws a circle of yellow light that barely reaches the cab step — beyond it, the yard is dark and the perimeter fence of the construction site is just visible.",
     "The smell of coal smoke and hot iron is different here from the boiler house — older, more diffuse, mixed with the green smell of the summer rail corridor."
   ],
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.850Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_dolan_marsh"
+  ]
 }

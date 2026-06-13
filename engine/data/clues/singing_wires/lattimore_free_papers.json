@@ -1,18 +1,18 @@
 {
   "id": "lattimore_free_papers",
-  "scenarioId": "singing_wires",
   "title": "Lattimore's Hidden Cache at the Fish Shed",
-  "description": "Beneath the floor planks of Jerome Lattimore's dock station at the fish shed, wrapped in oilcloth: a set of free papers, forty dollars in coin, and a folded letter in Arden Gill's handwriting that reads, in part, 'your continued cooperation ensures the arrangement remains private. The children are not your concern. Deliver the time and the route as agreed.' The letter is dated three days ago. It is not a confession — Lattimore has not signed it — but it establishes the relationship and Gill's knowledge that Lattimore had moral reservations about the children.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.486Z",
+  "locationId": "",
+  "scenarioId": "singing_wires",
+  "description": "Beneath the floor planks of Jerome Lattimore's dock station at the fish shed, wrapped in oilcloth: a set of free papers, forty dollars in coin, and a folded letter in Arden Gill's handwriting that reads, in part, 'your continued cooperation ensures the arrangement remains private. The children are not your concern. Deliver the time and the route as agreed.' The letter is dated three days ago. It is not a confession — Lattimore has not signed it — but it establishes the relationship and Gill's knowledge that Lattimore had moral reservations about the children.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "sandusky_waterfront",
   "implicatesCharacterIds": [
     "jerome_lattimore",
     "arden_gill"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.486Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

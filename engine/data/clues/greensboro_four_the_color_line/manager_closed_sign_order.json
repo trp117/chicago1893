@@ -1,19 +1,19 @@
 {
   "id": "manager_closed_sign_order",
-  "scenarioId": "greensboro_four_the_color_line",
   "title": "Mackintosh's Closed-Sign Directive",
-  "description": "You observe Mackintosh lean down to the nearest floor walker and speak directly into his ear, then watch the floor walker move immediately to the counter with a 'Counter Closed' card. The directive did not come from store policy — it came from a personal, in-the-moment decision by the manager, and it was issued after the students were already seated and after no disturbance had occurred. This is not a routine closing. This is a targeted response to the presence of the students specifically.",
-  "category": "observation",
-  "discoveryLocationId": "store_main_aisle",
-  "implicatesCharacterIds": [
-    "harris_mackintosh"
-  ],
   "unlocks": [
     "patsy_napkin_gesture"
   ],
-  "isKeyEvidence": true,
+  "category": "observation",
   "createdAt": "2025-02-01T16:30:00Z",
   "updatedAt": "2026-05-24T03:30:00.384Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "greensboro_four_the_color_line",
+  "description": "You observe Mackintosh lean down to the nearest floor walker and speak directly into his ear, then watch the floor walker move immediately to the counter with a 'Counter Closed' card. The directive did not come from store policy — it came from a personal, in-the-moment decision by the manager, and it was issued after the students were already seated and after no disturbance had occurred. This is not a routine closing. This is a targeted response to the presence of the students specifically.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
+  "discoveryLocationId": "store_main_aisle",
+  "implicatesCharacterIds": [
+    "harris_mackintosh"
+  ]
 }

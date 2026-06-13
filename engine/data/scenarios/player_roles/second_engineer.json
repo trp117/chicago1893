@@ -1,69 +1,69 @@
 {
   "id": "second_engineer",
-  "scenarioId": "titanic_final_hours",
   "name": "Second Engineer",
-  "description": "You are inside the massive power plant of the Titanic — five decks below the lifeboats, standing at the main throttle platform with the switchboard at your back and the dynamos humming behind the bulkhead. Every kilowatt on the boat deck runs through the circuits you are managing right now. The davit winches, the wireless room, the emergency lighting — all of it depends on your hands and your judgment. Every kilowatt must be fiercely defended.",
-  "startLocationId": "engine_room_control",
-  "startingKnowledge": [
-    "The aft dynamos can outlast the flooding if the main switchboard buses are split early — shedding the luxury loads from the passenger decks protects the wireless transmission circuits and the primary bilge pumps from overload collapse.",
-    "Chief Engineer Bell's standing order is to keep engine room staff at their stations until he personally authorizes withdrawal — but Bell has never managed a flooding scenario, and the order was written for fire, not water.",
-    "Boiler Room No. 4 is the critical buffer zone between the engine room and the flooding forward compartments: as long as its firemen can maintain steam pressure, the dynamos run."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has spent his professional life translating abstract engineering principles into physical action in loud, hot, dangerous spaces. He thinks in systems and tolerances. He measures time in pressure gauges and water levels. He does not dramatize — he calculates. The drama comes from the gap between what the calculation says and what he chooses to do with it.",
+  "opening": {
+    "choices": [
+      "Split the main switchboard buses now, shedding luxury loads to protect the wireless room and bilge pump circuits before any flooding reaches the engine spaces.",
+      "Send a stoker runner up through the escape trunk to the Marconi Room to coordinate power management with the wireless operators directly.",
+      "Inspect the forward watertight door seals on Boiler Room No. 5 yourself before committing to any electrical action — you need to know the actual water state in the forward compartments."
+    ],
+    "narrative": "It is 11:55 PM on April 14, 1912. The reciprocating engines have ground to a halt, and the enormous engine room is settling into an unfamiliar quiet broken only by the hiss of steam venting from the cooling drive shafts and the steady throb of the dynamos behind the aft bulkhead. Boiler Room No. 4 is currently clear — no water on the plates, stokers at their stations, fires banked and steam pressure nominal. The switchboard beside you is drawing full load from every luxury circuit on the ship. You have the schematic. You have the authority to split the buses. You have the time — for now.",
+    "npcMoments": []
+  },
   "briefing": "You are standing at the main throttle platform in the reciprocating engine room at 11:55 PM, and the main telegraph has just slammed to STOP after nineteen knots. The engines are coasting down — you can feel the change in the floor vibration — and your immediate task is to secure the machinery so that nothing tears itself apart as the drive shafts decelerate. The engine room is dry. The dynamos are running at nominal. The switchboard on the starboard bulkhead is showing full load across all circuits: passenger-deck lighting, heating elements, the galley, the first-class elevators, the gymnasium — everything drawing current simultaneously. You know, from your knowledge of the electrical schematic pinned to this bulkhead, that if you split the main switchboard buses now — before the flooding begins, before anyone panics — you can shed the luxury loads and concentrate the remaining power on the wireless room, the bilge pumps, and the davit winches. The water has not reached you yet. The stokers in No. 4 are at their stations. Bell has not ordered anything. You have perhaps thirty minutes before the flooding mathematics begin to constrain your choices, and right now every choice is still available.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:58.514Z",
+  "represents": "Engineering officers of RMS Titanic who maintained power at their stations during the sinking on April 14-15, 1912",
+  "scenarioId": "titanic_final_hours",
+  "accessLevel": "staff",
+  "description": "You are inside the massive power plant of the Titanic — five decks below the lifeboats, standing at the main throttle platform with the switchboard at your back and the dynamos humming behind the bulkhead. Every kilowatt on the boat deck runs through the circuits you are managing right now. The davit winches, the wireless room, the emergency lighting — all of it depends on your hands and your judgment. Every kilowatt must be fiercely defended.",
+  "perspective": "Write from the perspective of a man who has spent his professional life translating abstract engineering principles into physical action in loud, hot, dangerous spaces. He thinks in systems and tolerances. He measures time in pressure gauges and water levels. He does not dramatize — he calculates. The drama comes from the gap between what the calculation says and what he chooses to do with it.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "None",
+      "what_happened": "A bulkhead failed or the pumps were overwhelmed too early; the ship lost power before the lifeboats were launched, leading to a disorganized and panicked evacuation in the dark.",
+      "emotional_weight": "Utter Despair—the feeling of a massive mechanical and moral failure.",
+      "closing_line_override": "The dark came too soon, and the engines stopped forever."
+    },
+    "partial": {
+      "who_present": "The First Class Steward",
+      "what_happened": "You kept the dynamos running until the very last boats were lowered, preventing a total blackout and riot. You managed to lead your stokers to the upper decks, but you reached the rail after the last collapsible had departed.",
+      "emotional_weight": "Stoic Sacrifice—the pride of a job well done in the face of inevitable disaster.",
+      "closing_line_override": "You kept the light alive until the sea finally turned it out."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The saltwater smell reached the engine flat seven minutes ago.",
   "character_hooks": [
     "I have a brother in the forward stokehold — a fireman in Boiler Room No. 6, the compartment nearest the bow — and no one on this platform has heard anything from the forward bulkhead telephone since the engines stopped.",
     "I know the precise pump capacity figures for each bilge circuit, and I have already done the arithmetic: the pumps can handle the current inflow rate, but only if the dynamos stay above 70% load — which means I cannot let the passenger deck circuits drag the voltage down.",
     "I turned down a shore posting last spring specifically to take the flagship commission on Titanic — a decision I made on the grounds that this was the finest engineering plant afloat, and I wanted to see what she could do at sea."
   ],
-  "suggested_secret": "During the afternoon watch, you noticed a pressure variation in the starboard low-pressure turbine that you flagged mentally as worth monitoring — but you did not log it, because logging it would have required a formal report to Bell and a possible speed reduction. The variation resolved on its own within the hour. You have not thought about it since. You are thinking about it now.",
-  "opening": {
-    "narrative": "It is 11:55 PM on April 14, 1912. The reciprocating engines have ground to a halt, and the enormous engine room is settling into an unfamiliar quiet broken only by the hiss of steam venting from the cooling drive shafts and the steady throb of the dynamos behind the aft bulkhead. Boiler Room No. 4 is currently clear — no water on the plates, stokers at their stations, fires banked and steam pressure nominal. The switchboard beside you is drawing full load from every luxury circuit on the ship. You have the schematic. You have the authority to split the buses. You have the time — for now.",
-    "npcMoments": [],
-    "choices": [
-      "Split the main switchboard buses now, shedding luxury loads to protect the wireless room and bilge pump circuits before any flooding reaches the engine spaces.",
-      "Send a stoker runner up through the escape trunk to the Marconi Room to coordinate power management with the wireless operators directly.",
-      "Inspect the forward watertight door seals on Boiler Room No. 5 yourself before committing to any electrical action — you need to know the actual water state in the forward compartments."
-    ]
-  },
+  "startLocationId": "engine_room_control",
+  "context_sentence": "You are Jonathan Shepherd, Second Engineer aboard RMS Titanic, one of the licensed engineering officers responsible for the reciprocating engine room on the night of April 14, 1912, who died at his post before the ship foundered at 2:20 AM and whose body was never recovered.",
   "roleInitialState": {
-    "inventory": [
-      "Water level log sheet (blank — flooding has not yet reached engine spaces)",
-      "Main switchboard schematic (pinned to engine room bulkhead)",
-      "Engineer's pocket watch"
-    ],
     "flags": {
       "buses_split": false,
       "runner_sent": false,
       "seals_inspected": false
     },
+    "inventory": [
+      "Water level log sheet (blank — flooding has not yet reached engine spaces)",
+      "Main switchboard schematic (pinned to engine room bulkhead)",
+      "Engineer's pocket watch"
+    ],
     "suspicion": {
       "joseph_bell": 0,
-      "charles_lightoller": 2,
-      "thomas_andrews": 0
+      "thomas_andrews": 0,
+      "charles_lightoller": 2
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:58.514Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You kept the dynamos running until the very last boats were lowered, preventing a total blackout and riot. You managed to lead your stokers to the upper decks, but you reached the rail after the last collapsible had departed.",
-      "who_present": "The First Class Steward",
-      "emotional_weight": "Stoic Sacrifice—the pride of a job well done in the face of inevitable disaster.",
-      "closing_line_override": "You kept the light alive until the sea finally turned it out."
-    },
-    "failure": {
-      "what_happened": "A bulkhead failed or the pumps were overwhelmed too early; the ship lost power before the lifeboats were launched, leading to a disorganized and panicked evacuation in the dark.",
-      "who_present": "None",
-      "emotional_weight": "Utter Despair—the feeling of a massive mechanical and moral failure.",
-      "closing_line_override": "The dark came too soon, and the engines stopped forever."
-    }
-  },
-  "context_sentence": "You are Jonathan Shepherd, Second Engineer aboard RMS Titanic, one of the licensed engineering officers responsible for the reciprocating engine room on the night of April 14, 1912, who died at his post before the ship foundered at 2:20 AM and whose body was never recovered.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Engineering officers of RMS Titanic who maintained power at their stations during the sinking on April 14-15, 1912",
-  "fact_checked": false,
-  "bridge_sentence": "The saltwater smell reached the engine flat seven minutes ago."
+  "suggested_secret": "During the afternoon watch, you noticed a pressure variation in the starboard low-pressure turbine that you flagged mentally as worth monitoring — but you did not log it, because logging it would have required a formal report to Bell and a possible speed reduction. The variation resolved on its own within the hour. You have not thought about it since. You are thinking about it now.",
+  "startingKnowledge": [
+    "The aft dynamos can outlast the flooding if the main switchboard buses are split early — shedding the luxury loads from the passenger decks protects the wireless transmission circuits and the primary bilge pumps from overload collapse.",
+    "Chief Engineer Bell's standing order is to keep engine room staff at their stations until he personally authorizes withdrawal — but Bell has never managed a flooding scenario, and the order was written for fire, not water.",
+    "Boiler Room No. 4 is the critical buffer zone between the engine room and the flooding forward compartments: as long as its firemen can maintain steam pressure, the dynamos run."
+  ]
 }

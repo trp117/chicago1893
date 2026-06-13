@@ -1,20 +1,20 @@
 {
   "id": "green_dragon_tavern",
-  "scenarioId": "boston_tea_party",
-  "name": "Green Dragon Tavern",
-  "description": "The Sons of Liberty's unofficial headquarters reeks of pipe smoke, spilled ale, and low conspiracy — the low-beamed taproom is half-empty tonight, the regulars having moved to the meeting house, leaving only the inner circle and the shadows they cast. A fire pops in the hearth, throwing orange light across faces that are watching each other as much as the door.",
   "mood": "secretive, smoky, intimate, watchful",
-  "linkedCharacterIds": [
-    "paul_revere",
-    "elias_croft"
-  ],
+  "name": "Green Dragon Tavern",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-03T21:41:04.772Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "boston_tea_party",
+  "description": "The Sons of Liberty's unofficial headquarters reeks of pipe smoke, spilled ale, and low conspiracy — the low-beamed taproom is half-empty tonight, the regulars having moved to the meeting house, leaving only the inner circle and the shadows they cast. A fire pops in the hearth, throwing orange light across faces that are watching each other as much as the door.",
   "atmosphericDetails": [
     "A half-finished mug of ale sits abandoned on the corner table where the inner circle usually meets — whoever was sitting there left in a hurry.",
     "The tavern keeper has hung a green paper dragon above the bar that sways gently despite the absence of any draft.",
     "Scratched into the wooden table near the hearth are initials and dates going back thirty years — history carved by nervous hands."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-03T21:41:04.772Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "paul_revere",
+    "elias_croft"
+  ]
 }

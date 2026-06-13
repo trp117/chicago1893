@@ -1,20 +1,20 @@
 {
   "id": "flooding_rate_calculation",
-  "scenarioId": "titanic_final_hours",
   "title": "Andrews's Flooding Rate Notebook",
-  "description": "Thomas Andrews's open notebook on the chart table contains a column of figures in pencil: compartment-by-compartment flooding rates measured at ten-minute intervals since 11:50 PM. A final calculation at the bottom, circled twice in heavy pencil: 'Foundering inevitable. Estimated 1.5 to 2 hours max. Hull stress compounds: actual time may be less.' The notebook also contains a separate column of lifeboat capacity figures in Andrews's hand — an unofficial tally that exposes the dangerous inflation of the official officer manifests, showing total certified capacity as 1,178 against the master roll of 2,224.",
+  "unlocks": [
+    "lifeboat_capacity_manifest"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.059Z",
+  "locationId": "",
+  "scenarioId": "titanic_final_hours",
+  "description": "Thomas Andrews's open notebook on the chart table contains a column of figures in pencil: compartment-by-compartment flooding rates measured at ten-minute intervals since 11:50 PM. A final calculation at the bottom, circled twice in heavy pencil: 'Foundering inevitable. Estimated 1.5 to 2 hours max. Hull stress compounds: actual time may be less.' The notebook also contains a separate column of lifeboat capacity figures in Andrews's hand — an unofficial tally that exposes the dangerous inflation of the official officer manifests, showing total certified capacity as 1,178 against the master roll of 2,224.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "captains_bridge",
   "implicatesCharacterIds": [
     "thomas_andrews",
     "charles_lightoller"
-  ],
-  "unlocks": [
-    "lifeboat_capacity_manifest"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.059Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

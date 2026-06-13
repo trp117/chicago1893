@@ -1,18 +1,18 @@
 {
   "id": "clue_bridge_camp_misread",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "Bridge Camp Mirror-Read Log — Possible Error",
-  "description": "The bridge camp's handwritten signal log, maintained on a cardboard panel near the northern railing, records three mirror transmissions received from the Algiers direction between 3:15 PM and 4:30 PM. The third entry is annotated with a question mark and the note 'bearing wrong? — checked twice.' If the array was 22 degrees off during this window, the third transmission may have been misread, misattributed, or missed entirely.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:22:30.337Z",
+  "locationId": "",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "The bridge camp's handwritten signal log, maintained on a cardboard panel near the northern railing, records three mirror transmissions received from the Algiers direction between 3:15 PM and 4:30 PM. The third entry is annotated with a question mark and the note 'bearing wrong? — checked twice.' If the array was 22 degrees off during this window, the third transmission may have been misread, misattributed, or missed entirely.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_st_claude_bridge",
   "implicatesCharacterIds": [
     "char_radio_operator",
     "char_bridge_captain"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.337Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

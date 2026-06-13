@@ -1,18 +1,18 @@
 {
   "id": "green_dragon_tavern",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "The Green Dragon Tavern",
-  "description": "Low-beamed and smoke-darkened, the Green Dragon hums with barely suppressed urgency tonight — men huddle over pewter mugs, speaking in tight clusters, and every head turns when the door opens. The smell of tallow candles and wet wool fills the air, and somewhere beneath the floorboards, the city's most dangerous secrets are stored.",
   "mood": "tense, conspiratorial, smoky, urgent",
-  "linkedCharacterIds": [
-    "margaret_cole",
-    "thomas_greenleaf"
-  ],
+  "name": "The Green Dragon Tavern",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.439Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Low-beamed and smoke-darkened, the Green Dragon hums with barely suppressed urgency tonight — men huddle over pewter mugs, speaking in tight clusters, and every head turns when the door opens. The smell of tallow candles and wet wool fills the air, and somewhere beneath the floorboards, the city's most dangerous secrets are stored.",
   "atmosphericDetails": [
     "A Sons of Liberty broadsheet is pinned crookedly above the bar, its ink still smelling faintly of the press.",
     "Two men near the fire stop talking the moment you approach, their eyes tracking you over the rims of their mugs.",
     "Margaret Cole moves behind the bar with the efficiency of a woman who has memorized every face in the room and noted every absence."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.439Z"
+  "linkedCharacterIds": [
+    "margaret_cole",
+    "thomas_greenleaf"
+  ]
 }

@@ -1,20 +1,20 @@
 {
   "id": "loc_cony_bridge",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "USS Cony Open Bridge",
-  "description": "The exposed command position atop the Cony's superstructure — an open platform of painted steel surrounded by a waist-high windbreak, facing forward over the main gun mount. The Atlantic fog is thin tonight but persistent; the searchlight cuts a white cone into it that illuminates nothing but the fog itself. Salt spray comes over the bow in irregular pulses.",
   "mood": "exposed, cold, vigilant, commanding",
-  "linkedCharacterIds": [
-    "char_captain_estocin",
-    "char_lt_commander_hayes"
-  ],
+  "name": "USS Cony Open Bridge",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.802Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "The exposed command position atop the Cony's superstructure — an open platform of painted steel surrounded by a waist-high windbreak, facing forward over the main gun mount. The Atlantic fog is thin tonight but persistent; the searchlight cuts a white cone into it that illuminates nothing but the fog itself. Salt spray comes over the bow in irregular pulses.",
   "atmosphericDetails": [
     "The depth-charge rack is visible aft — a steel cradle holding the remaining Mk-84 signaling canisters, each one the size of a large thermos, painted international orange.",
     "The sonar repeater screen is mounted inside the bridge windbreak — a green circular display showing the contact as a bright, stationary smear at bearing 210, range 800 yards.",
     "A sound-powered telephone handset hangs on the port windbreak post, connecting the bridge to the sonar shack, the engine room, and the radio room below."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.802Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_captain_estocin",
+    "char_lt_commander_hayes"
+  ]
 }

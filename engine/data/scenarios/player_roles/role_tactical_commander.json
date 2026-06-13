@@ -4,7 +4,7 @@
   "opening": {
     "choices": [
       "Review Tallmadge's manifest tally and issue a revised loading priority order for the next three boat waves.",
-      "Walk to the slip and speak directly with Cortelyou about the structural warning he has been raising.",
+      "Walk to the slip and speak directly with Riker about the structural warning he has been raising.",
       "Send a runner to Mifflin on the parapet requesting a precise fuel inventory and current British picket activity report."
     ],
     "narrative": "It is eleven o'clock on the night of August 29th, and the Brooklyn ferry slip is the most important piece of ground in North America. The gale that halted the first launches has dropped just enough to permit the bateaux to push off; Glover's men are at the oars. The column of infantry stretching back from the slip is silent in the way that frightened men are silent—not calm, but controlled. You have been at this post since dusk, and the arithmetic of the crossing has not improved: the boats are slower than the schedule requires, the tide will turn before you expected, and the rear guard on the parapets is burning through its fuel. The first major decision of the night is already in front of you.",
@@ -12,7 +12,7 @@
   },
   "briefing": "You are standing in the mud of the Brooklyn ferry road with a shuttered lantern at your feet and a quill that has been scratching tally marks on damp paper for the last two hours. The rain stopped an hour ago but the cold has not; your wool coat is soaked through to the lining and the weight of it has settled into your shoulders like ballast. Around you, nine thousand men are moving in near-silence toward the water, regiment by regiment, and every thirty minutes a runner arrives with a count that is never as high as you need it to be. You know things the men in the column do not: that the tide turns earlier than the schedule you were given, that the rear guard on the parapets numbers fewer than two hundred, that the slip master has been warning about the timber joint for the last hour and no one has acted on it. The field cannon are staged on the road above the slip, their draft horses stamping in the dark, and the hospital hollow behind the parapets still holds sixty-three men who cannot walk to the water on their own. Tallmadge is at your elbow with a tally board, waiting. The slip master is waiting. A runner from Mifflin is waiting. The decisions you make in the next two minutes will determine which of these problems you solve and which you accept as losses. The quill is in your hand.",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-10T22:40:42.169Z",
+  "updatedAt": "2026-06-13T20:06:16.976Z",
   "represents": "",
   "scenarioId": "fog_and_oar_1776",
   "accessLevel": "staff",

@@ -1,17 +1,17 @@
 {
   "id": "clue_delphine_source_verification",
-  "scenarioId": "high_water_reckoning",
   "title": "Delphine Arceneaux's Original Coordinate Note",
-  "description": "The original handwritten note at Delphine Arceneaux's position at the Algiers Point ferry landing, from which Terrence Guidry copied his transcription. Delphine's note reads the northing coordinate clearly as '3001.4' — the correct value. The transposition error is confirmed as Terrence's alone, introduced during the low-light transcription. Delphine's source was a National Guard sergeant who verbally relayed the coordinates from the emergency operations post's own survey map.",
+  "unlocks": [],
   "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.285Z",
+  "locationId": "",
+  "scenarioId": "high_water_reckoning",
+  "description": "The original handwritten note at Delphine Arceneaux's position at the Algiers Point ferry landing, from which Terrence Guidry copied his transcription. Delphine's note reads the northing coordinate clearly as '3001.4' — the correct value. The transposition error is confirmed as Terrence's alone, introduced during the low-light transcription. Delphine's source was a National Guard sergeant who verbally relayed the coordinates from the emergency operations post's own survey map.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "algiers_point_ferry_landing",
   "implicatesCharacterIds": [
     "terrence_guidry"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.055Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

@@ -1,19 +1,19 @@
 {
   "id": "loc_hydroacoustic_shack",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "B-59 Hydroacoustic Shack",
-  "description": "A closet-sized compartment aft of the conning tower, separated from the main passageway by a sound-dampening curtain of rubberized canvas. The Sonar Analyst works here alone, bracketed by a cathode-ray oscilloscope and a manual tracing table, wearing Bakelite headphones that press the ocean's noise directly into his skull.",
   "mood": "isolated, technical, tense, sensory-overloaded",
-  "linkedCharacterIds": [
-    "char_sonar_analyst"
-  ],
+  "name": "B-59 Hydroacoustic Shack",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.799Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "A closet-sized compartment aft of the conning tower, separated from the main passageway by a sound-dampening curtain of rubberized canvas. The Sonar Analyst works here alone, bracketed by a cathode-ray oscilloscope and a manual tracing table, wearing Bakelite headphones that press the ocean's noise directly into his skull.",
   "atmosphericDetails": [
     "The green cathode-ray trace pulses with every external detonation — a bright, spiking line that fades back to baseline in the seconds between events.",
     "The manual tracing chart is covered in pencil marks — bearing lines, range estimates, time stamps — the accumulated record of six hours of tracking.",
     "The headphone cable is long enough to reach the curtain but no further; to communicate with the conning tower, Volkov must remove the headphones and shout through the canvas."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.799Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_sonar_analyst"
+  ]
 }

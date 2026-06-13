@@ -1,20 +1,20 @@
 {
   "id": "loc_jump_off_trench",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "Jump-Off Trench, Company C Sector",
-  "description": "A forward assault trench cut into the chalky Picardy subsoil, four feet deep and barely wide enough for two men to pass. The parapet sandbags are dark with dew, and the wooden fire-step is slick with mud and the boot-marks of two hundred men who have been standing on it since 04:00.",
   "mood": "cold, cramped, fearful, electric",
-  "linkedCharacterIds": [
-    "char_voss",
-    "char_kowalski"
-  ],
+  "name": "Jump-Off Trench, Company C Sector",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.096Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "A forward assault trench cut into the chalky Picardy subsoil, four feet deep and barely wide enough for two men to pass. The parapet sandbags are dark with dew, and the wooden fire-step is slick with mud and the boot-marks of two hundred men who have been standing on it since 04:00.",
   "atmosphericDetails": [
     "The smell of wet wool, rifle oil, and the faint chemical smell of lingering smoke and old shellfire hangs in the still air below the parapet hangs in the still air below the parapet",
     "A row of Springfield rifles leans against the trench wall, bayonets fixed, their blades beaded with condensation",
     "Sergeant Voss stands at the traverse junction, his watch in his hand, not looking at it"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.096Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_voss",
+    "char_kowalski"
+  ]
 }

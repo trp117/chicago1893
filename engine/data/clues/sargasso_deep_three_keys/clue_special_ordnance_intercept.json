@@ -1,18 +1,18 @@
 {
   "id": "clue_special_ordnance_intercept",
-  "scenarioId": "sargasso_deep_three_keys",
   "title": "Task Force Intelligence Broadcast: Special Ordnance Warning",
-  "description": "A message received in the Cony's radio room at 19:55 and not yet shown to the captain: a task force broadcast from USS Randolph classifying the four Foxtrot submarines as potentially carrying 'special ordnance' — naval code for nuclear weapons. The message instructs all surface units to 'exercise extreme caution in escalation of contact prosecution.' Hayes has read it. Estocin has not.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.808Z",
+  "locationId": "",
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "A message received in the Cony's radio room at 19:55 and not yet shown to the captain: a task force broadcast from USS Randolph classifying the four Foxtrot submarines as potentially carrying 'special ordnance' — naval code for nuclear weapons. The message instructs all surface units to 'exercise extreme caution in escalation of contact prosecution.' Hayes has read it. Estocin has not.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_cony_sonar_shack",
   "implicatesCharacterIds": [
     "char_lt_commander_hayes",
     "char_captain_estocin"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.808Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

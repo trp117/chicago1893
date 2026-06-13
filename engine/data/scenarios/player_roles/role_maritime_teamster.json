@@ -1,0 +1,52 @@
+{
+  "id": "role_maritime_teamster",
+  "name": "The Maritime Teamster",
+  "opening": {
+    "choices": [
+      "Order the crew to maximum stroke rate to gain headway before the tidal reversal, accepting the noise and the physical cost.",
+      "Break out the salt-pork tin and grease the oarlocks now, shifting to the silent feathering stroke near the British anchorage.",
+      "Hold current pace and angle the heading further north to compensate for the southward drift, accepting slower progress for better positioning."
+    ],
+    "narrative": "The East River at midnight is not a river—it is a tidal strait with opinions about where you are going, and tonight its opinion is south, toward the harbor and the British fleet. You have been on the water since before eleven, and the bateau under you is a flat-bottomed, un-decked hull that communicates every wave and current shift directly through the oar into your palms. The fog is coming. The tide is thinking about turning. The soldiers sitting amidships are trying not to make noise and mostly succeeding. You have a decision to make before the next stroke.",
+    "npcMoments": []
+  },
+  "briefing": "You are in the mid-channel of the East River with an ash oar in your split hands and a bateau full of soldiers who have never been on water in their lives. The blisters opened two hours ago and the salt of the river water has been working into them since; you have stopped noticing the pain the way you stop noticing a sound that does not change. The fog is beginning to come in off the harbor, which is both salvation and problem—it hides you from the British warships riding at anchor to the south, but it also swallows the Manhattan landing lantern and leaves you navigating by the feel of the current under the hull. You know this river the way you know the back of your hand from Marblehead harbor to the Gloucester headlands: you know where the tidal current runs fastest, you know the sound of the Phoenix's hull creaking at anchor, and you know that the reversal is coming forty-five minutes earlier than the schedule your colonel was given. What you do not know is whether to spend the salt-pork tin on silence or push the stroke rate and get more men across before the current turns. The oar is in your hands. The choice is yours.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T20:06:16.974Z",
+  "represents": "",
+  "scenarioId": "fog_and_oar_1776",
+  "accessLevel": "staff",
+  "description": "You are a senior oarsman in Glover's Marblehead Regiment, responsible for a bateau crew on the East River crossing. The river, the current, and the proximity of British warships are your domain.",
+  "perspective": "Write from the perspective of a skilled physical laborer performing expert work under extreme physical duress, in near-total darkness, with the constant awareness of enemy ships nearby. Emphasize the bodily reality of five hours of continuous rowing and the professional pride of a man who knows this water.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The pine torches on the parapet are gone.",
+  "character_hooks": [
+    "My hands are worse than I have let on to Glover; if I pull maximum stroke rate for another hour, I will not be able to grip the oar for the final crossings, and there is no one in my crew who can take the stroke seat.",
+    "I can hear the Phoenix's hull creaking from here, which means we are closer to her anchor position than we should be; someone has let the heading drift south and I need to correct it before the next wave of bateaux follows our lane.",
+    "I have enough salt-pork fat for three sets of oarlocks, but there are seven bateaux in rotation tonight; I need to decide which three get the grease and which three row fast and loud."
+  ],
+  "startLocationId": "loc_east_river_crossing",
+  "context_sentence": "You are the Maritime Teamster, senior oarsman on this bateau, and the current is already shifting beneath your hull.",
+  "roleInitialState": {
+    "flags": {
+      "oarlocks_greased": false,
+      "crew_exhaustion_reported": false,
+      "tidal_reversal_communicated_to_glover": false
+    },
+    "inventory": [
+      "twenty-foot ash bateau oar",
+      "small tin of salt-pork fat",
+      "hand-copied tide table with pencil correction",
+      "length of spare tow rope"
+    ]
+  },
+  "suggested_secret": "",
+  "startingKnowledge": [
+    "The tidal reversal is coming earlier than Washington's schedule accounts for.",
+    "The salt-pork tin in your coat pocket can silence three bateaux's oarlocks for the next two hours.",
+    "One of your crew members is approaching physical failure and you have not reported it."
+  ],
+  "entry_paragraph_flags": []
+}

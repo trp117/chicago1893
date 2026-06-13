@@ -1,19 +1,19 @@
 {
   "id": "algiers_attic_radio_post",
-  "scenarioId": "high_water_reckoning",
-  "name": "Algiers Attic — Amateur Radio Station",
-  "description": "An unventilated attic space in Algiers registering 108 degrees Fahrenheit, its floor joists lined with the analog amateur radio equipment and the marine deep-cycle battery that is the only communications link between this pocket of the parish and the emergency operations post across the river.",
   "mood": "isolated, technical, deteriorating, focused",
-  "linkedCharacterIds": [
-    "terrence_guidry"
-  ],
+  "name": "Algiers Attic — Amateur Radio Station",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.278Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "high_water_reckoning",
+  "description": "An unventilated attic space in Algiers registering 108 degrees Fahrenheit, its floor joists lined with the analog amateur radio equipment and the marine deep-cycle battery that is the only communications link between this pocket of the parish and the emergency operations post across the river.",
   "atmosphericDetails": [
     "The battery indicator light has shifted from green to amber — it has been amber for forty minutes",
     "Salt-sweat drips onto the uninsulated terminal connections with a faint hiss that may or may not be real",
     "A stack of handwritten triage sheets weighted down by a spare antenna connector, their ink beginning to run in the humidity"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.049Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "terrence_guidry"
+  ]
 }

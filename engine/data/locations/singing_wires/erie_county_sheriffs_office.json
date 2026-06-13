@@ -1,21 +1,21 @@
 {
   "id": "erie_county_sheriffs_office",
-  "scenarioId": "singing_wires",
+  "mood": "authoritative, procedural, threatening, methodical",
   "name": "Erie County Sheriff's Office, Columbus Avenue",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.478Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "singing_wires",
   "short_name": "Sheriff's Office",
   "description": "A two-room brick building two blocks from the waterfront, its front room lit by a single hanging lantern and smelling of horse leather and pipe tobacco. Deputy Crane's desk is covered with papers including the red fire dispatch, which he has read twice and annotated in the margins.",
-  "mood": "authoritative, procedural, threatening, methodical",
-  "linkedCharacterIds": [
-    "deputy_crane"
-  ],
   "atmosphericDetails": [
     "The red fire dispatch is pinned to the board behind the desk with a horseshoe nail, its text visible to anyone standing at the counter.",
     "A map of Erie County is spread on the side table with two pencil lines drawn north from the Huron Road junction — Crane's estimate of the likely routes.",
     "Two sets of saddlebags are packed and leaning against the wall near the door; Crane is planning to ride within the hour.",
     "The wanted notices on the front board include three other fugitive descriptions, all from 1852 and 1853, none resolved."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.478Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "deputy_crane"
+  ]
 }

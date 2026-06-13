@@ -3,7 +3,7 @@
   "mood": "threshold, exposed, the edge of controlled space",
   "name": "Abatis Line, Forward Edge of Brooklyn Fortifications",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-10T22:40:42.166Z",
+  "updatedAt": "2026-06-13T20:06:16.960Z",
   "atmosphere": "",
   "linkedNPCs": [],
   "scenarioId": "fog_and_oar_1776",
@@ -16,6 +16,6 @@
   ],
   "linkedCharacterIds": [
     "char_mifflin",
-    "char_nathaniel_stacey"
+    "char_hutchins"
   ]
 }

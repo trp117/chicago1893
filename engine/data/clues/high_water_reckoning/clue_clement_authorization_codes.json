@@ -1,17 +1,17 @@
 {
   "id": "clue_clement_authorization_codes",
-  "scenarioId": "high_water_reckoning",
   "title": "Supply Ledger Authorization Signatures",
-  "description": "Eleven entries in the bridge camp's waterproof supply ledger notebook, each signed with the same authorization code in Father Clement Tureaud's block handwriting. Cross-referencing the code against the diocesan emergency relief fund number printed on a pamphlet in the camp's first-aid kit reveals a four-digit discrepancy — the code Father Clement has been using does not match the official fund number. He has been signing receipts with a self-generated authorization that carries no institutional backing.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.289Z",
+  "locationId": "",
+  "scenarioId": "high_water_reckoning",
+  "description": "Eleven entries in the bridge camp's waterproof supply ledger notebook, each signed with the same authorization code in Father Clement Tureaud's block handwriting. Cross-referencing the code against the diocesan emergency relief fund number printed on a pamphlet in the camp's first-aid kit reveals a four-digit discrepancy — the code Father Clement has been using does not match the official fund number. He has been signing receipts with a self-generated authorization that carries no institutional backing.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "bridge_camp_supply_ledger_post",
   "implicatesCharacterIds": [
     "father_clement_tureaud"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.059Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

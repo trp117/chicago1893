@@ -1,33 +1,56 @@
 {
   "id": "role_pump_operator",
-  "scenarioId": "artesian_height_1892",
   "name": "The Plant Engineer",
-  "description": "You are the veteran steam engineer in the subterranean pump room — the one person on this site who understands what the steam-powered duplex pumps will do under pressure and what they will not survive. Something has been done to your equipment.",
-  "startLocationId": "loc_pump_room",
-  "startingKnowledge": [
-    "The Boiler_Steam_Pressure must be strictly stabilized between 60 and 85 PSI to prevent a catastrophic casing rupture in the intake manifold.",
-    "The carved wooden shim recovered from the coal-feed valve matches the specific ray-fleck grain of the white oak furniture in the lower office.",
-    "The number-two pump's main bearing is worn significantly beyond its rated tolerance, meaning a sudden pressure spike will permanently seize the mechanism."
-  ],
-  "accessLevel": "staff",
-  "perspective": "first-person sensory",
+  "opening": {
+    "choices": [
+      "Remove the wooden shim from the coal-feed valve and throttle back the steam admission to stabilize the pressure curve.",
+      "Leave the shim in place and climb to the boiler house to examine the steam admission valve for additional tampering.",
+      "Send word up to the drill platform that the pump room has been interfered with and that the pressure test timeline needs to be reviewed."
+    ],
+    "narrative": "The pump room is forty degrees cooler than the surface and completely isolated from the sounds of the construction site above. The lantern hangs from a ceiling beam and throws moving shadows every time the pistons cycle. The Boiler_Steam_Pressure gauge reads 45, and you have been watching it climb for the last forty minutes at a rate that does not match the coal input you authorized. The wooden shim is still in the coal-feed valve seat where you found it. You have not removed it yet because you want to think carefully about what removing it will do to the pressure curve before you act.",
+    "npcMoments": []
+  },
   "briefing": "You are crouched beside the number-two Deane duplex pump, eight feet below street grade, feeling the cold water spit against your palm in hard, rhythmic pulses. The limestone walls hold the summer heat like a kiln, and the clack-hiss of the heavy pistons fills the space so completely that you feel it in your back teeth. You have been running industrial steam plants for nineteen years, and you have never seen a coal-feed valve wedge itself open without human help. The carved white oak shim in your pocket is proof that someone has sabotaged your boiler settings to force an immediate pressure emergency. You have less than forty minutes to locate what else they tampered with before the safety relief valves pop off and flood your entire manifold layout.",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.738Z",
+  "represents": "",
+  "scenarioId": "artesian_height_1892",
+  "accessLevel": "staff",
+  "description": "You are the veteran steam engineer in the subterranean pump room — the one person on this site who understands what the steam-powered duplex pumps will do under pressure and what they will not survive. Something has been done to your equipment.",
+  "perspective": "first-person sensory",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "None",
+      "closing_line": "Superheated steam obliterated the lantern light, burying the pumps under a wall of boiling water.",
+      "what_happened": "The Boiler_Steam_Pressure spikes past the critical 110 PSI threshold before you can clear the coal-feed valve seat. The safety relief valves lift violently, but the unvented pressure surge fractures the cast-iron intake pipe manifold, completely flooding the subterranean pump room with freezing rock dust slurry before the well can be certified.",
+      "emotional_weight": "Systemic Rupture—the absolute despair of watching a high-pressure steam array destroy its own iron casings in the dark.",
+      "closing_line_override": ""
+    },
+    "partial": {
+      "who_present": "The Chief Engineer",
+      "closing_line": "The pistons slowed to a steady, exhausted rhythm, leaking a fine trail of oil into the drainage sump.",
+      "what_happened": "You manage to pull the oak shim and throttle back the steam admission valve, stabilizing the pressure curve just as the artesian water reaches the pump intake. The hydrostatic load test passes, but the intense thermal shock permanently warps the internal valves of the number-two pump, leaving the station operating at half-capacity and requiring a costly emergency repair warrant.",
+      "emotional_weight": "Mechanical Scarcity—the grueling relief of averting a total boiler explosion, shadowed by the permanent crippling of the machine under your hands.",
+      "closing_line_override": ""
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The smoke from the foundation grate has slowed.",
   "character_hooks": [
     "The cold water from the packing gland hitting your hand as the leakage shifts from a minor weep to a steady spray.",
     "The vertical gauge glass showing the boiler water level dropping rapidly against an accelerated combustion curve.",
     "The automated safety weights on the steam line beginning to chatter as the pressure needle ticks past 95 PSI."
   ],
-  "suggested_secret": "You have kept the worn state of the main pump bearing hidden from Chief Engineer Williams to prevent a mandatory two-day shutdown that would void your employment contract.",
-  "opening": {
-    "narrative": "The pump room is forty degrees cooler than the surface and completely isolated from the sounds of the construction site above. The lantern hangs from a ceiling beam and throws moving shadows every time the pistons cycle. The Boiler_Steam_Pressure gauge reads 45, and you have been watching it climb for the last forty minutes at a rate that does not match the coal input you authorized. The wooden shim is still in the coal-feed valve seat where you found it. You have not removed it yet because you want to think carefully about what removing it will do to the pressure curve before you act.",
-    "npcMoments": [],
-    "choices": [
-      "Remove the wooden shim from the coal-feed valve and throttle back the steam admission to stabilize the pressure curve.",
-      "Leave the shim in place and climb to the boiler house to examine the steam admission valve for additional tampering.",
-      "Send word up to the drill platform that the pump room has been interfered with and that the pressure test timeline needs to be reviewed."
-    ]
-  },
+  "startLocationId": "loc_pump_room",
+  "context_sentence": "You are the plant engineer responsible for the steam-driven pump system at Western Springs' new combined waterworks, one of the men who will bring the village's first artesian water to the surface on the night of its inaugural pressure test in the summer of 1892.",
   "roleInitialState": {
+    "flags": {
+      "shim_removed": false,
+      "pressure_stabilized": false,
+      "boiler_house_inspected": false
+    },
     "inventory": [
       "coal shovel",
       "valve wrench set",
@@ -35,39 +58,16 @@
       "pressure test certification form (blank)",
       "the carved wooden shim (found in valve seat)"
     ],
-    "flags": {
-      "shim_removed": false,
-      "pressure_stabilized": false,
-      "boiler_house_inspected": false
-    },
     "suspicion": {
       "char_silas_greer": 0,
       "char_alderman_voss": 0,
       "char_edgar_williams": 0
     }
   },
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.862Z",
-  "context_sentence": "You are the plant engineer responsible for the steam-driven pump system at Western Springs' new combined waterworks, one of the men who will bring the village's first artesian water to the surface on the night of its inaugural pressure test in the summer of 1892.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "",
-  "fact_checked": false,
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You manage to pull the oak shim and throttle back the steam admission valve, stabilizing the pressure curve just as the artesian water reaches the pump intake. The hydrostatic load test passes, but the intense thermal shock permanently warps the internal valves of the number-two pump, leaving the station operating at half-capacity and requiring a costly emergency repair warrant.",
-      "who_present": "The Chief Engineer",
-      "emotional_weight": "Mechanical Scarcity—the grueling relief of averting a total boiler explosion, shadowed by the permanent crippling of the machine under your hands.",
-      "closing_line": "The pistons slowed to a steady, exhausted rhythm, leaking a fine trail of oil into the drainage sump.",
-      "closing_line_override": ""
-    },
-    "failure": {
-      "what_happened": "The Boiler_Steam_Pressure spikes past the critical 110 PSI threshold before you can clear the coal-feed valve seat. The safety relief valves lift violently, but the unvented pressure surge fractures the cast-iron intake pipe manifold, completely flooding the subterranean pump room with freezing rock dust slurry before the well can be certified.",
-      "who_present": "None",
-      "emotional_weight": "Systemic Rupture—the absolute despair of watching a high-pressure steam array destroy its own iron casings in the dark.",
-      "closing_line": "Superheated steam obliterated the lantern light, burying the pumps under a wall of boiling water.",
-      "closing_line_override": ""
-    }
-  },
-  "bridge_sentence": "The smoke from the foundation grate has slowed."
+  "suggested_secret": "You have kept the worn state of the main pump bearing hidden from Chief Engineer Williams to prevent a mandatory two-day shutdown that would void your employment contract.",
+  "startingKnowledge": [
+    "The Boiler_Steam_Pressure must be strictly stabilized between 60 and 85 PSI to prevent a catastrophic casing rupture in the intake manifold.",
+    "The carved wooden shim recovered from the coal-feed valve matches the specific ray-fleck grain of the white oak furniture in the lower office.",
+    "The number-two pump's main bearing is worn significantly beyond its rated tolerance, meaning a sudden pressure spike will permanently seize the mechanism."
+  ]
 }

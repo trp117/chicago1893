@@ -1,70 +1,70 @@
 {
   "id": "nathaniel_gill_role",
-  "scenarioId": "midnight_errand_boston",
   "name": "Nathaniel Gill — The Apprentice",
-  "description": "You are the printer's son, nineteen years old, standing at the exact moment when circling something finally becomes choosing it. The dispatch is in your hands. Your father is upstairs.",
-  "startLocationId": "gill_print_shop_back",
-  "startingKnowledge": [
-    "The back door of the shop has a broken latch that makes no sound when opened.",
-    "Owen Pryce stayed late tonight — unusual, and he did not say why.",
-    "Your father knows Captain Aldrich by name and has spoken well of him."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write in close second person, emphasizing the physical sensation of divided loyalty — the weight of the packet, the sound of footsteps above, the cold air from the alley. Nathaniel is young and feels everything acutely.",
+  "opening": {
+    "choices": [
+      "Send Hannah away and go upstairs to your father — tell him nothing, or tell him everything.",
+      "Take the dispatch and slip out the back door into the alley before your father comes down.",
+      "Search the back room first — something about Owen staying late tonight is wrong and you want to know what before you move."
+    ],
+    "narrative": "The bell of Christ Church struck nine not ten minutes ago, and the echo of it is still somewhere in your chest. Hannah Cross is standing just inside the back door of the shop, her shawl pulled tight, holding an oilskin packet that she has placed in your hands without ceremony or explanation beyond the name Thomas Wren and the time before ten. Above you, your father's footstep crosses the bedroom floor — once, twice — and then stops. The candle on the compositing table is the only light, and it makes everything outside its small circle invisible. You are holding something that will change what tonight means, and the broken latch of the back door is swinging gently in the April air, and you have not yet decided anything, which is itself a kind of decision.",
+    "npcMoments": [
+      {
+        "moment": "Hannah watches your face and not the door. She has already decided what she thinks of you; she is waiting to find out if she is right.",
+        "characterId": "hannah_cross"
+      },
+      {
+        "moment": "A floorboard above creaks — the seventh step, which means he is at the top of the stairs and not yet coming down, but he is considering it.",
+        "characterId": "benjamin_gill"
+      }
+    ]
+  },
   "briefing": "You are standing at the back door of your father's print shop with a dispatch in your coat that you were not supposed to read but have read, and the reading of it has made every choice that follows yours in a way it was not before. You are nineteen years old. You have been setting type in this shop since you were eleven, breathing the smell of ink and linseed oil, listening to your father choose his words with the care of a man who knows that words, once printed, cannot be taken back. Your father is upstairs. The woman who gave you the dispatch is somewhere in the dark behind you. The clock at Old South has not yet struck ten. What is in your coat describes where seven hundred men will march at dawn, and you are the only person standing between that information and the riders who are waiting for it.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:38.732Z",
+  "represents": "Young men who carried dispatches through occupied Boston on the night of April 18-19, 1775",
+  "scenarioId": "midnight_errand_boston",
+  "accessLevel": "staff",
+  "description": "You are the printer's son, nineteen years old, standing at the exact moment when circling something finally becomes choosing it. The dispatch is in your hands. Your father is upstairs.",
+  "perspective": "Write in close second person, emphasizing the physical sensation of divided loyalty — the weight of the packet, the sound of footsteps above, the cold air from the alley. Nathaniel is young and feels everything acutely.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": " A stranger — a patriot sympathizer whose name Nathaniel does not know. No one else. The street is otherwise empty.",
+      "what_happened": "Nathaniel is shot by a soldier on the street before reaching the Green Dragon. A patriot sympathizer nearby finds him. Nathaniel passes the dispatch as he is dying and asks the person to deliver it to Thomas Wren.",
+      "emotional_weight": "He asks the stranger to tell his father he loves him. He is not afraid. He is sorry he will not see Benjamin's face when he finds out what his son did tonight.",
+      "closing_line_override": "The dispatch arrived. Nathaniel Gill did not."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The dispatch is on the composing table.",
   "character_hooks": [
     "I owe Owen Pryce a debt — he covered for me when I broke the press last winter — and I have been wondering all evening whether he will use it tonight.",
     "I found a pamphlet in my father's old trunk six months ago that proved he was not always so cautious, and I have never known what to do with that knowledge.",
     "I told a girl on Fish Street that I was going to do something worth remembering before the year was out, and I have thought about that promise every day since."
   ],
-  "suggested_secret": "Nathaniel has already read the dispatch — he broke the seal and resealed it with a candle stub, and he knows exactly what the Regulars are planning tonight.",
-  "opening": {
-    "narrative": "The bell of Christ Church struck nine not ten minutes ago, and the echo of it is still somewhere in your chest. Hannah Cross is standing just inside the back door of the shop, her shawl pulled tight, holding an oilskin packet that she has placed in your hands without ceremony or explanation beyond the name Thomas Wren and the time before ten. Above you, your father's footstep crosses the bedroom floor — once, twice — and then stops. The candle on the compositing table is the only light, and it makes everything outside its small circle invisible. You are holding something that will change what tonight means, and the broken latch of the back door is swinging gently in the April air, and you have not yet decided anything, which is itself a kind of decision.",
-    "npcMoments": [
-      {
-        "characterId": "hannah_cross",
-        "moment": "Hannah watches your face and not the door. She has already decided what she thinks of you; she is waiting to find out if she is right."
-      },
-      {
-        "characterId": "benjamin_gill",
-        "moment": "A floorboard above creaks — the seventh step, which means he is at the top of the stairs and not yet coming down, but he is considering it."
-      }
-    ],
-    "choices": [
-      "Send Hannah away and go upstairs to your father — tell him nothing, or tell him everything.",
-      "Take the dispatch and slip out the back door into the alley before your father comes down.",
-      "Search the back room first — something about Owen staying late tonight is wrong and you want to know what before you move."
-    ]
-  },
+  "startLocationId": "gill_print_shop_back",
+  "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War.",
   "roleInitialState": {
-    "inventory": [
-      "dispatch_letter"
-    ],
     "flags": {
       "father_knows": false,
       "owen_suspected": false,
       "recognition_phrase_known": false
     },
+    "inventory": [
+      "dispatch_letter"
+    ],
     "suspicion": {
-      "captain_aldrich": 0,
       "owen_pryce": 1,
-      "silas_murch": 0
+      "silas_murch": 0,
+      "captain_aldrich": 0
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:38.732Z",
-  "ending_notes": {
-    "failure": {
-      "what_happened": "Nathaniel is shot by a soldier on the street before reaching the Green Dragon. A patriot sympathizer nearby finds him. Nathaniel passes the dispatch as he is dying and asks the person to deliver it to Thomas Wren.",
-      "who_present": " A stranger — a patriot sympathizer whose name Nathaniel does not know. No one else. The street is otherwise empty.",
-      "emotional_weight": "He asks the stranger to tell his father he loves him. He is not afraid. He is sorry he will not see Benjamin's face when he finds out what his son did tonight.",
-      "closing_line_override": "The dispatch arrived. Nathaniel Gill did not."
-    }
-  },
-  "context_sentence": "You are Nathaniel Gill, a printer's apprentice in occupied Boston in the spring of 1775, carrying intelligence about British troop movements on the eve of the expedition to Concord that will open the American Revolutionary War.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Young men who carried dispatches through occupied Boston on the night of April 18-19, 1775",
-  "fact_checked": false,
-  "bridge_sentence": "The dispatch is on the composing table."
+  "suggested_secret": "Nathaniel has already read the dispatch — he broke the seal and resealed it with a candle stub, and he knows exactly what the Regulars are planning tonight.",
+  "startingKnowledge": [
+    "The back door of the shop has a broken latch that makes no sound when opened.",
+    "Owen Pryce stayed late tonight — unusual, and he did not say why.",
+    "Your father knows Captain Aldrich by name and has spoken well of him."
+  ]
 }

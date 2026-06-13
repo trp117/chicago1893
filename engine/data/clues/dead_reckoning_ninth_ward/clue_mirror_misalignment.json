@@ -1,19 +1,19 @@
 {
   "id": "clue_mirror_misalignment",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "Mirror Array — 22 Degrees Off Alignment",
-  "description": "The rooftop mirror array's wooden frame has rotated clockwise from its optimal east-northeast heading; the wing-nut bracket on the base plate is loose, and the shadow cast by the frame's center post falls 22 degrees south of where it should. Any signal transmitted from this array in the last hour and forty-five minutes has been directed at the wrong sector of the flood plane — and anything the bridge camp thought it read from this position may be based on a degraded or misdirected signal.",
-  "category": "physical",
-  "discoveryLocationId": "loc_algiers_rooftop",
-  "implicatesCharacterIds": [
-    "char_radio_operator"
-  ],
   "unlocks": [
     "clue_bridge_camp_misread"
   ],
-  "isKeyEvidence": true,
+  "category": "physical",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-06-04T03:22:30.339Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "The rooftop mirror array's wooden frame has rotated clockwise from its optimal east-northeast heading; the wing-nut bracket on the base plate is loose, and the shadow cast by the frame's center post falls 22 degrees south of where it should. Any signal transmitted from this array in the last hour and forty-five minutes has been directed at the wrong sector of the flood plane — and anything the bridge camp thought it read from this position may be based on a degraded or misdirected signal.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
+  "discoveryLocationId": "loc_algiers_rooftop",
+  "implicatesCharacterIds": [
+    "char_radio_operator"
+  ]
 }

@@ -1,19 +1,19 @@
 {
   "id": "clue_deed_box_lock_condition",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "Silt-Packed Lock Mechanism",
-  "description": "The deed box's lock cylinder is packed with consolidated silt along the lower seam; the keyway is fully occluded. The lock was already stiff in a dry year — it required two hands and a specific torque sequence to open. Forcing it with the crowbar risks shearing the hinge plate, which would collapse the box's left panel onto the documents inside. The alternative is a controlled pick with a narrow instrument, which requires approximately fifteen minutes the decay envelope may not allow.",
-  "category": "physical",
-  "discoveryLocationId": "loc_flood_street_house",
-  "implicatesCharacterIds": [
-    "char_family_archivist"
-  ],
   "unlocks": [
     "clue_1962_ledger_contents"
   ],
-  "isKeyEvidence": false,
+  "category": "physical",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-06-04T03:22:30.339Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "The deed box's lock cylinder is packed with consolidated silt along the lower seam; the keyway is fully occluded. The lock was already stiff in a dry year — it required two hands and a specific torque sequence to open. Forcing it with the crowbar risks shearing the hinge plate, which would collapse the box's left panel onto the documents inside. The alternative is a controlled pick with a narrow instrument, which requires approximately fifteen minutes the decay envelope may not allow.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_flood_street_house",
+  "implicatesCharacterIds": [
+    "char_family_archivist"
+  ]
 }

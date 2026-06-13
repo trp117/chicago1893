@@ -1,69 +1,69 @@
 {
   "id": "role_flight_director",
-  "scenarioId": "apollo_13_lifeboat",
   "name": "Flight Director — Gene Kranz",
-  "description": "You are 200,000 miles from the problem and responsible for solving it. Your tools are thirty engineers, a wall of failing data, and the authority to make decisions that cannot be undone.",
-  "startLocationId": "loc_mocr_main_floor",
-  "startingKnowledge": [
-    "The power budget has a margin of approximately 12 amp-hours — enough for one major error, not two",
-    "The CO2 scrubber problem is solvable with materials aboard the spacecraft, but the solution must be communicated verbally, in sequence, without ambiguity",
-    "Sy Liebergot waited nearly two minutes before escalating the initial anomaly — you have not yet decided whether this matters",
-    "John Aaron has a revised power-up sequence that reduces the amp-hour requirement, but you have not seen the full trade-off analysis"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has decided that failure is not an option — not as a motivational phrase, but as a literal operational constraint that shapes every decision. Kranz's voice is declarative. He does not wonder aloud. He does not ask rhetorical questions. Every sentence he speaks is a direction or a data request.",
+  "aliases": [],
+  "opening": {
+    "choices": [
+      "Convene the power budget meeting immediately — the CO2 problem can run in parallel",
+      "Address the CO2 crisis first and delay the power budget meeting by 10 minutes",
+      "Poll all controllers for their current status before making any resource allocation decision"
+    ],
+    "narrative": "It is 10:14 PM Central Daylight Time, and the Mission Operations Control Room has been in emergency configuration for seven minutes. The main screen shows the Free Return Trajectory — the curved line that represents the crew's best chance of survival — and the small blinking dot that is Apollo 13, moving along it at 25,000 feet per second. Main Bus B pressure has collapsed, and Tank 1 oxygen is visibly venting into space. The emergency power-down and LM transfer operations are underway.",
+    "npcMoments": [
+      {
+        "action": "Liebergot looks up from his console: 'Flight, EECOM. CO2 trend is steeper than the model predicted. We have less time than the initial estimate.'",
+        "characterId": "char_sy_liebergot"
+      },
+      {
+        "action": "Aaron appears at the back of the room, yellow legal pad in hand, waiting for eye contact before approaching the Flight Director's console.",
+        "characterId": "char_john_aaron"
+      }
+    ]
+  },
   "briefing": "You are standing at the Flight Director's console in the Mission Operations Control Room, and the wall of screens in front of you is showing data that does not make sense in any configuration that ends with three men alive. The room smells of cigarette smoke and the burnt-coffee smell of the urn that has been running since the morning shift, and every controller at every console is looking at you in the way that people look at the one person they have decided is responsible for the outcome. You know that the power budget John Aaron brought you twenty minutes ago has a margin of twelve amp-hours, and you know that twelve is not enough if anything else goes wrong, and you know that something else will go wrong. You know that Sy Liebergot waited one minute and fifty-three seconds before escalating the initial anomaly, and you have not yet decided whether those two minutes changed anything, because right now that question does not help you and the CO2 graph does. The White Team has been on shift for fourteen hours. You can see the cognitive fatigue in the way controllers are phrasing their reports — slightly longer sentences, slightly more hedging. You have not slept. The loop crackles: Aquarius is asking for the CO2 projection. You have thirty seconds before the silence becomes its own kind of answer.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "real_name": null,
+  "updatedAt": "2026-05-25T14:53:42.965Z",
+  "cover_name": null,
+  "represents": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "accessLevel": "staff",
+  "description": "You are 200,000 miles from the problem and responsible for solving it. Your tools are thirty engineers, a wall of failing data, and the authority to make decisions that cannot be undone.",
+  "perspective": "Write from the perspective of a man who has decided that failure is not an option — not as a motivational phrase, but as a literal operational constraint that shapes every decision. Kranz's voice is declarative. He does not wonder aloud. He does not ask rhetorical questions. Every sentence he speaks is a direction or a data request.",
+  "character_id": "char_gene_kranz",
+  "fact_checked": false,
+  "identity_note": null,
+  "character_type": "real",
+  "bridge_sentence": "The telemetry wall is showing numbers that should not be possible.",
   "character_hooks": [
     "I have already decided that if I have to choose between the scrubber fix and the power budget in the same turn, I choose the scrubber — but I have not told anyone, because the moment I say it, it becomes the plan.",
     "I caught an arithmetic error in the power budget before anyone saw it, corrected it, and have been wondering for two hours whether the correction introduced a second error I have not found yet.",
     "I trust John Aaron completely, which is why the fact that he has not shown me the full trade-off analysis on the power-up sequence is the thing I keep returning to."
   ],
-  "suggested_secret": "Kranz has already written, in his head, the statement he would give to the press if the crew does not come home — and the act of composing it made him more certain they will, not less.",
-  "opening": {
-    "narrative": "It is 10:14 PM Central Daylight Time, and the Mission Operations Control Room has been in emergency configuration for seven minutes. The main screen shows the Free Return Trajectory — the curved line that represents the crew's best chance of survival — and the small blinking dot that is Apollo 13, moving along it at 25,000 feet per second. Main Bus B pressure has collapsed, and Tank 1 oxygen is visibly venting into space. The emergency power-down and LM transfer operations are underway.",
-    "npcMoments": [
-      {
-        "characterId": "char_sy_liebergot",
-        "action": "Liebergot looks up from his console: 'Flight, EECOM. CO2 trend is steeper than the model predicted. We have less time than the initial estimate.'"
-      },
-      {
-        "characterId": "char_john_aaron",
-        "action": "Aaron appears at the back of the room, yellow legal pad in hand, waiting for eye contact before approaching the Flight Director's console."
-      }
-    ],
-    "choices": [
-      "Convene the power budget meeting immediately — the CO2 problem can run in parallel",
-      "Address the CO2 crisis first and delay the power budget meeting by 10 minutes",
-      "Poll all controllers for their current status before making any resource allocation decision"
-    ]
-  },
+  "startLocationId": "loc_mocr_main_floor",
+  "context_sentence": "You are Gene Kranz, Flight Director, and the loop is waiting for an answer you don't have yet.",
   "roleInitialState": {
+    "flags": {
+      "co2_fix_authorized": false,
+      "power_budget_finalized": false,
+      "aaron_tradeoff_reviewed": false,
+      "liebergot_delay_investigated": false
+    },
     "inventory": [
       "power budget draft (Aaron's yellow legal pad)",
       "CO2 trend report (Liebergot's printout)",
       "crew manifest and consumables inventory",
       "White Team shift log"
     ],
-    "flags": {
-      "co2_fix_authorized": false,
-      "power_budget_finalized": false,
-      "liebergot_delay_investigated": false,
-      "aaron_tradeoff_reviewed": false
-    },
     "suspicion": {}
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.965Z",
-  "real_name": null,
-  "cover_name": null,
+  "suggested_secret": "Kranz has already written, in his head, the statement he would give to the press if the crew does not come home — and the act of composing it made him more certain they will, not less.",
+  "startingKnowledge": [
+    "The power budget has a margin of approximately 12 amp-hours — enough for one major error, not two",
+    "The CO2 scrubber problem is solvable with materials aboard the spacecraft, but the solution must be communicated verbally, in sequence, without ambiguity",
+    "Sy Liebergot waited nearly two minutes before escalating the initial anomaly — you have not yet decided whether this matters",
+    "John Aaron has a revised power-up sequence that reduces the amp-hour requirement, but you have not seen the full trade-off analysis"
+  ],
   "is_player_character": false,
-  "identity_note": null,
-  "aliases": [],
-  "context_sentence": "You are Gene Kranz, Flight Director, and the loop is waiting for an answer you don't have yet.",
-  "character_type": "real",
-  "character_id": "char_gene_kranz",
-  "historical_record_note": "Gene Kranz, Flight Director during the Apollo 13 crisis. His white vest became iconic. His account is the basis for the film's famous \"failure is not an option\" framing (a phrase actually coined by the screenwriters, not Kranz).",
-  "fact_checked": false,
-  "bridge_sentence": "The telemetry wall is showing numbers that should not be possible.",
-  "represents": ""
+  "historical_record_note": "Gene Kranz, Flight Director during the Apollo 13 crisis. His white vest became iconic. His account is the basis for the film's famous \"failure is not an option\" framing (a phrase actually coined by the screenwriters, not Kranz)."
 }

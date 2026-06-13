@@ -1,51 +1,51 @@
 {
   "id": "role_merchant_observer",
-  "scenarioId": "boston_tea_party",
   "name": "Merchant Observer  John",
-  "description": "You are a Boston merchant sympathetic to the patriot cause but not formally a Son of Liberty — your position gives you access to both sides of the commercial world, and tonight you have been asked by Samuel Adams to watch and listen from the outside.",
-  "startLocationId": "green_dragon_tavern",
-  "startingKnowledge": [
-    "You know Thomas Dillworth professionally — you have done business with him — and you have noticed his accounts have been unusually flush for a man who claims to be suffering under the tea tax.",
-    "You know that Dr. Warren has been meeting privately with at least one Loyalist merchant, which has made some patriots uneasy.",
-    "You were present when Dillworth volunteered detailed information about the ships' manifests at a meeting last week — information he should not have had."
-  ],
-  "accessLevel": "staff",
-  "briefing": "You stand at the corner of Milk Street and Hutchinson, collar turned against the December cold, close enough to Griffin's Wharf to smell the salt and tar but far enough that no constable can place you among the crowd. The Dartmouth sits low in the water and you know something tonight's shouting patriots do not: her manifest is wrong. You reviewed the East India Company's shipping ledgers last Tuesday at Dillworth's counting house — a professional courtesy, he called it, two merchants examining the numbers together — and the declared weight of the tea does not match the warehouse receipts you glimpsed folded beneath his blotter. Someone has been skimming duties before the Crown ever sees them, and the question burning in your chest is not whether that someone is Dillworth, but who above Dillworth made it possible. Samuel Adams asked you to watch and listen tonight, but watching and listening is not what your mind is doing. Your mind is following the money. The crowd noise swells from the direction of the wharf, torchlight flickering orange across the rooftops, and somewhere in the darkness between you and that counting house door is the answer. You take one breath. You choose your direction.",
-  "perspective": "Write from the perspective of an educated merchant who moves between the patriot and commercial worlds with equal ease. This player has natural credibility with Dillworth and can approach him without triggering immediate suspicion. They also have enough social standing to gain access to Warren and Adams, though they are not part of the inner circle. The narrative should emphasize the player's commercial instincts — following the money, reading contracts, noticing financial irregularities. This player is the most natural candidate to investigate Dillworth's counting house without arousing suspicion.",
   "opening": {
-    "narrative": "The Green Dragon Tavern is quieter than you have ever seen it — the regulars are all at the meeting house, and the fire in the hearth is burning low, casting the room in amber and shadow. Paul Revere is standing near the hearth with a mug he has not touched, his eyes moving between the door and the window with the rhythm of a man expecting bad news. He spots you and waves you over: 'Adams asked me to keep you close tonight. He thinks the spy is someone with money and connections — your kind of person.' The words sting a little, but he is not wrong.",
-    "npcMoments": [],
     "choices": [
       "Press Revere on which of the inner circle merchants he has been watching — and whether his suspicions match yours.",
       "Leave the tavern and walk to Dillworth's counting house on King Street — a merchant calling on another merchant after hours is not unusual.",
       "Head to Dr. Warren's surgery on Hanover Street — if anyone has been quietly investigating the leak, it is Warren."
-    ]
-  },
-  "roleInitialState": {
-    "inventory": [
-      "letter of introduction from Samuel Adams",
-      "personal ledger with notes on Dillworth's recent transactions"
     ],
-    "flags": {
-      "dillworth_acquaintance": true,
-      "warren_access": false
-    },
-    "suspicion": {
-      "thomas_dillworth": 2
-    }
+    "narrative": "The Green Dragon Tavern is quieter than you have ever seen it — the regulars are all at the meeting house, and the fire in the hearth is burning low, casting the room in amber and shadow. Paul Revere is standing near the hearth with a mug he has not touched, his eyes moving between the door and the window with the rhythm of a man expecting bad news. He spots you and waves you over: 'Adams asked me to keep you close tonight. He thinks the spy is someone with money and connections — your kind of person.' The words sting a little, but he is not wrong.",
+    "npcMoments": []
   },
+  "briefing": "You stand at the corner of Milk Street and Hutchinson, collar turned against the December cold, close enough to Griffin's Wharf to smell the salt and tar but far enough that no constable can place you among the crowd. The Dartmouth sits low in the water and you know something tonight's shouting patriots do not: her manifest is wrong. You reviewed the East India Company's shipping ledgers last Tuesday at Dillworth's counting house — a professional courtesy, he called it, two merchants examining the numbers together — and the declared weight of the tea does not match the warehouse receipts you glimpsed folded beneath his blotter. Someone has been skimming duties before the Crown ever sees them, and the question burning in your chest is not whether that someone is Dillworth, but who above Dillworth made it possible. Samuel Adams asked you to watch and listen tonight, but watching and listening is not what your mind is doing. Your mind is following the money. The crowd noise swells from the direction of the wharf, torchlight flickering orange across the rooftops, and somewhere in the darkness between you and that counting house door is the answer. You take one breath. You choose your direction.",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-22T01:45:56.733Z",
+  "represents": "Boston merchants sympathetic to the patriot cause who were present at or near the waterfront on the night of December 16, 1773",
+  "scenarioId": "boston_tea_party",
+  "accessLevel": "staff",
+  "description": "You are a Boston merchant sympathetic to the patriot cause but not formally a Son of Liberty — your position gives you access to both sides of the commercial world, and tonight you have been asked by Samuel Adams to watch and listen from the outside.",
+  "perspective": "Write from the perspective of an educated merchant who moves between the patriot and commercial worlds with equal ease. This player has natural credibility with Dillworth and can approach him without triggering immediate suspicion. They also have enough social standing to gain access to Warren and Adams, though they are not part of the inner circle. The narrative should emphasize the player's commercial instincts — following the money, reading contracts, noticing financial irregularities. This player is the most natural candidate to investigate Dillworth's counting house without arousing suspicion.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The crowd on Griffin's Wharf is three hundred deep.",
   "character_hooks": [
     "",
     "",
     ""
   ],
-  "suggested_secret": "",
+  "startLocationId": "green_dragon_tavern",
   "context_sentence": "You are John Andrews, a Boston merchant and prolific letter-writer whose correspondence in the winter of 1773 would become one of the most detailed firsthand accounts of the Tea Party's events, placing you among the few educated observers who watched that night from the edges rather than the waterfront.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Boston merchants sympathetic to the patriot cause who were present at or near the waterfront on the night of December 16, 1773",
-  "fact_checked": false,
-  "bridge_sentence": "The crowd on Griffin's Wharf is three hundred deep."
+  "roleInitialState": {
+    "flags": {
+      "warren_access": false,
+      "dillworth_acquaintance": true
+    },
+    "inventory": [
+      "letter of introduction from Samuel Adams",
+      "personal ledger with notes on Dillworth's recent transactions"
+    ],
+    "suspicion": {
+      "thomas_dillworth": 2
+    }
+  },
+  "suggested_secret": "",
+  "startingKnowledge": [
+    "You know Thomas Dillworth professionally — you have done business with him — and you have noticed his accounts have been unusually flush for a man who claims to be suffering under the tea tax.",
+    "You know that Dr. Warren has been meeting privately with at least one Loyalist merchant, which has made some patriots uneasy.",
+    "You were present when Dillworth volunteered detailed information about the ships' manifests at a meeting last week — information he should not have had."
+  ]
 }

@@ -1,17 +1,17 @@
 {
   "id": "regional_office_memo",
-  "scenarioId": "greensboro_four_the_color_line",
   "title": "The Regional Office Memo",
-  "description": "On the edge of the desk visible through the half-open office door at the top of the stairs, a single-page memorandum on Woolworth's corporate stationery is visible — the letterhead and the words 'student action' and 'Southern stores' legible from the landing. The document appears to concern growing concern within Woolworth's management about student protest activity and lunch-counter policy across Southern stores. The fact that no protocol was prepared — no specific instruction, no clear authority to remove or serve — is itself a document of institutional paralysis.",
-  "category": "documentary",
-  "discoveryLocationId": "store_office_stairs",
-  "implicatesCharacterIds": [
-    "harris_mackintosh"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-02-01T16:30:00Z",
   "updatedAt": "2026-05-24T03:30:00.388Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "greensboro_four_the_color_line",
+  "description": "On the edge of the desk visible through the half-open office door at the top of the stairs, a single-page memorandum on Woolworth's corporate stationery is visible — the letterhead and the words 'student action' and 'Southern stores' legible from the landing. The document appears to concern growing concern within Woolworth's management about student protest activity and lunch-counter policy across Southern stores. The fact that no protocol was prepared — no specific instruction, no clear authority to remove or serve — is itself a document of institutional paralysis.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "store_office_stairs",
+  "implicatesCharacterIds": [
+    "harris_mackintosh"
+  ]
 }

@@ -1,17 +1,17 @@
 {
   "id": "saddled_horses_sound",
-  "scenarioId": "midnight_errand_boston",
   "title": "The Sound of Saddled Horses",
-  "description": "Through the shuttered window of the Green Dragon's back room, or in the stable yard if you find your way there, you hear it: horses already saddled and bridled, shifting their weight, breathing steam into the cold air. Two of them. Three. They are not here for a late-night ride. They are waiting for word to move.",
-  "category": "observation",
-  "discoveryLocationId": "green_dragon_back_room",
-  "implicatesCharacterIds": [
-    "thomas_wren"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-10T03:09:06.924Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "midnight_errand_boston",
+  "description": "Through the shuttered window of the Green Dragon's back room, or in the stable yard if you find your way there, you hear it: horses already saddled and bridled, shifting their weight, breathing steam into the cold air. Two of them. Three. They are not here for a late-night ride. They are waiting for word to move.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "green_dragon_back_room",
+  "implicatesCharacterIds": [
+    "thomas_wren"
+  ]
 }

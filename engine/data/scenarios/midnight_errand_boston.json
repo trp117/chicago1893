@@ -1,50 +1,26 @@
 {
   "id": "midnight_errand_boston",
-  "order": 4,
-  "hidden": false,
-  "structured_endings_enabled": true,
-  "version": "1.0.0",
-  "title": "Midnight Errand: Boston, 1775",
-  "setting": "Boston, Massachusetts, 1775",
-  "description": "On the eve of the Regulars' march, a printer's apprentice must decide whether to carry a secret dispatch through a city on the edge of war. Every choice tonight will echo for years — but the clock strikes ten in less than an hour.",
+  "tone": [],
   "genre": [
     "historical",
     "thriller",
     "moral_drama"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "overused_anchors": [
-    "dispatch or packet pressing against the ribs or body",
-    "candle guttering, burning low, or nearly gone",
-    "smell of ink, linseed oil, tallow, or type metal",
-    "spectacles picked up and not put on",
-    "cold finding a gap at collar, wrist, or neck"
-  ],
-  "storyArcIds": [
-    "midnight_errand_boston_main_arc"
-  ],
-  "playerRoleIds": [
-    "nathaniel_gill_role",
-    "margaret_vane_role",
-    "ezra_cole_role"
-  ],
-  "keyEvidenceClueIds": [
-    "dispatch_letter",
-    "troop_route_map"
-  ],
+  "order": 4,
+  "title": "Midnight Errand: Boston, 1775",
+  "hidden": false,
+  "premise": "A sealed dispatch describing where 700 British soldiers will march at dawn is sitting on a composing table in a print shop on the night of April 18, 1775. It has to reach the Green Dragon Tavern before ten o'clock. The streets between here and there are full of soldiers who would very much like to find it first.",
+  "setting": "Boston, Massachusetts, 1775",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -52,8 +28,49 @@
       "A Redcoat patrol is heard passing the end of Milk Street — boots on cobblestone, lantern light under the door.",
       "Benjamin Gill's candle appears in the upstairs window; he is awake and moving toward the stairs.",
       "A church bell tolls the half-hour — nine-thirty — and the woman at the back door whispers that the window is closing."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.908Z",
+  "playerGoal": "",
+  "description": "On the eve of the Regulars' march, a printer's apprentice must decide whether to carry a secret dispatch through a city on the edge of war. Every choice tonight will echo for years — but the clock strikes ten in less than an hour.",
+  "storyArcIds": [
+    "midnight_errand_boston_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "The year is 1775 and Boston is a city of sixteen thousand souls living under military occupation. Since General Thomas Gage landed with his Regulars the previous spring, the town has been two cities at once: the one that goes about its business — the chandlers and cobblers, the printers and porters, the women carrying market baskets down Queen Street — and the one that meets in back rooms and speaks in careful half-sentences about what is being planned. Two years have passed since the night men with painted faces dumped three hundred and forty-two chests of East India tea into the harbor. Parliament's answer was the Coercive Acts, which closed the port, dissolved the provincial assembly, and quartered troops in private homes. What had been colonial grievance became something else. The word for it is not yet settled. Some say rebellion. Some say liberty. Most say nothing in public.",
+        "type": "world"
+      },
+      {
+        "text": "Tonight a dispatch is moving through the city — or trying to. It describes in careful hand the route Colonel Francis Smith's column will take when Gage orders the march to Concord: the roads, the bridges, the timing. If this information reaches the warning riders before the clock at Old South strikes ten, Paul Revere and William Dawes will be in the saddle within the hour, riding north and west through the sleeping countryside, and the militia at Lexington will have time to decide whether to stand. If the dispatch is seized, or simply does not move, seven hundred Regulars will arrive at Concord in silence. What is buried in the field there — cannon, muskets, powder, the stores of a provincial army — will be taken or destroyed. What the men who put them there believed about their own cause will face its first and harshest test unanswered.",
+        "type": "stakes"
+      },
+      {
+        "text": "Spring has come cold to Boston. The air off the harbor carries salt and the first green of the marshes beyond the Back Bay, and the cobblestones of Milk Street are still wet from an afternoon rain that has since cleared to a sky pricked through with stars. It is half past nine. The garrison curfew falls at ten, and already the streets are nearly empty — a Redcoat patrol, two men with a lantern, moves in the middle distance toward King Street without urgency. Benjamin Gill's print shop sits dark at the corner, the smell of ink and linseed oil pressing through its door frame, the hand press inside silent for the first time since morning. The broadsheets that rolled off that press today are in the taverns and coffeehouses now, their careful language walking the line Benjamin Gill has always walked — close enough to the Patriot cause to keep his customers, far enough from it to keep his neck.",
+        "type": "scene"
+      },
+      {
+        "type": "entry",
+        "character_entries": {
+          "dorothy_gill_role": "You are standing in the front room of your brother's print shop with a candle burned to its last inch and a year's worth of careful watching arriving all at once. You have seen Owen Pryce's hours. You have counted the nights the back door opened after Benjamin went upstairs. You packed the bag behind the ink barrels eleven months ago and have not unpacked it because some part of you always knew tonight was coming. Through the wall you can hear a woman's voice — low, controlled, the voice of someone who has done this before — and your nephew has not answered in two minutes, which means he is still deciding. The boots on the cobblestones outside are a patrol or something worse. You are the only person in this building who knows enough to stop everything from going wrong, and the candle has perhaps four minutes left.",
+          "margaret_vane_role": "You are standing in the shadow of the door frame at the back of Gill's print shop under a name that is not yours, in a city that has been trying to find you for two years. The dispatch is out of your hands now — which is the moment you have always trusted least. The boy is nineteen and his hands were steady when he took it, which is something, but steady hands are not the same as a decided mind. You have three minutes before you must move regardless of what he chooses, because the woman who does not move becomes the woman who is found, and you have not survived this long by waiting on other people's courage. The patrol on Milk Street is two blocks north. You have counted their cadence. You know exactly how long you have.",
+          "nathaniel_gill_role": "You are standing at the back door of your father's print shop with a dispatch in your coat that you were not supposed to read but have read, and the reading of it has made every choice that follows yours in a way it was not before. You are nineteen years old. You have been setting type in this shop since you were eleven, breathing the smell of ink and linseed oil, listening to your father choose his words with the care of a man who knows that words, once printed, cannot be taken back. Your father is upstairs. The woman who gave you the dispatch is somewhere in the dark behind you. The clock at Old South has not yet struck ten. What is in your coat describes where seven hundred men will march at dawn, and you are the only person standing between that information and the riders who are waiting for it."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "nathaniel_gill_role",
+    "margaret_vane_role",
+    "ezra_cole_role"
+  ],
   "winConditions": [
     "The dispatch is delivered to the Green Dragon Tavern before ten o'clock without Benjamin Gill alerting the authorities.",
     "The troop route is confirmed and passed to the Sons of Liberty network, enabling the warning riders to depart.",
@@ -65,43 +82,19 @@
     "The player is arrested or detained at the checkpoint on Ann Street.",
     "Benjamin Gill discovers the conspiracy and sends word to the garrison before the player can act."
   ],
-  "partialSuccessExamples": [
-    "The dispatch is delivered but Benjamin Gill suspects his son — the family business is ruined though the Cause is served.",
-    "The troop route reaches the riders but one NPC is arrested; history is made at a personal cost.",
-    "The player delivers the letter but cannot confirm the route map, leaving the warning incomplete."
+  "openingSituation": "",
+  "overused_anchors": [
+    "dispatch or packet pressing against the ribs or body",
+    "candle guttering, burning low, or nearly gone",
+    "smell of ink, linseed oil, tallow, or type metal",
+    "spectacles picked up and not put on",
+    "cold finding a gap at collar, wrist, or neck"
   ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "The year is 1775 and Boston is a city of sixteen thousand souls living under military occupation. Since General Thomas Gage landed with his Regulars the previous spring, the town has been two cities at once: the one that goes about its business — the chandlers and cobblers, the printers and porters, the women carrying market baskets down Queen Street — and the one that meets in back rooms and speaks in careful half-sentences about what is being planned. Two years have passed since the night men with painted faces dumped three hundred and forty-two chests of East India tea into the harbor. Parliament's answer was the Coercive Acts, which closed the port, dissolved the provincial assembly, and quartered troops in private homes. What had been colonial grievance became something else. The word for it is not yet settled. Some say rebellion. Some say liberty. Most say nothing in public."
-      },
-      {
-        "type": "stakes",
-        "text": "Tonight a dispatch is moving through the city — or trying to. It describes in careful hand the route Colonel Francis Smith's column will take when Gage orders the march to Concord: the roads, the bridges, the timing. If this information reaches the warning riders before the clock at Old South strikes ten, Paul Revere and William Dawes will be in the saddle within the hour, riding north and west through the sleeping countryside, and the militia at Lexington will have time to decide whether to stand. If the dispatch is seized, or simply does not move, seven hundred Regulars will arrive at Concord in silence. What is buried in the field there — cannon, muskets, powder, the stores of a provincial army — will be taken or destroyed. What the men who put them there believed about their own cause will face its first and harshest test unanswered."
-      },
-      {
-        "type": "scene",
-        "text": "Spring has come cold to Boston. The air off the harbor carries salt and the first green of the marshes beyond the Back Bay, and the cobblestones of Milk Street are still wet from an afternoon rain that has since cleared to a sky pricked through with stars. It is half past nine. The garrison curfew falls at ten, and already the streets are nearly empty — a Redcoat patrol, two men with a lantern, moves in the middle distance toward King Street without urgency. Benjamin Gill's print shop sits dark at the corner, the smell of ink and linseed oil pressing through its door frame, the hand press inside silent for the first time since morning. The broadsheets that rolled off that press today are in the taverns and coffeehouses now, their careful language walking the line Benjamin Gill has always walked — close enough to the Patriot cause to keep his customers, far enough from it to keep his neck."
-      },
-      {
-        "type": "entry",
-        "character_entries": {
-          "dorothy_gill_role": "You are standing in the front room of your brother's print shop with a candle burned to its last inch and a year's worth of careful watching arriving all at once. You have seen Owen Pryce's hours. You have counted the nights the back door opened after Benjamin went upstairs. You packed the bag behind the ink barrels eleven months ago and have not unpacked it because some part of you always knew tonight was coming. Through the wall you can hear a woman's voice — low, controlled, the voice of someone who has done this before — and your nephew has not answered in two minutes, which means he is still deciding. The boots on the cobblestones outside are a patrol or something worse. You are the only person in this building who knows enough to stop everything from going wrong, and the candle has perhaps four minutes left.",
-          "margaret_vane_role": "You are standing in the shadow of the door frame at the back of Gill's print shop under a name that is not yours, in a city that has been trying to find you for two years. The dispatch is out of your hands now — which is the moment you have always trusted least. The boy is nineteen and his hands were steady when he took it, which is something, but steady hands are not the same as a decided mind. You have three minutes before you must move regardless of what he chooses, because the woman who does not move becomes the woman who is found, and you have not survived this long by waiting on other people's courage. The patrol on Milk Street is two blocks north. You have counted their cadence. You know exactly how long you have.",
-          "nathaniel_gill_role": "You are standing at the back door of your father's print shop with a dispatch in your coat that you were not supposed to read but have read, and the reading of it has made every choice that follows yours in a way it was not before. You are nineteen years old. You have been setting type in this shop since you were eleven, breathing the smell of ink and linseed oil, listening to your father choose his words with the care of a man who knows that words, once printed, cannot be taken back. Your father is upstairs. The woman who gave you the dispatch is somewhere in the dark behind you. The clock at Old South has not yet struck ten. What is in your coat describes where seven hundred men will march at dawn, and you are the only person standing between that information and the riders who are waiting for it."
-        }
-      }
-    ]
-  },
-  "historical_aftermath": "Paul Revere rode at midnight. William Dawes rode west. A third rider took a road that was never written down. The militia at Lexington stood at dawn on April 19th, 1775 — and what made that possible moved through Boston in the hours before, carried by people whose names the history books did not keep.",
+  "historicalRealism": "high",
   "period_vocabulary": {
     "categories": [
       {
         "name": "Print Shop Language",
-        "context": "Used by Benjamin and workers in the shop. Natural in description and action.",
         "terms": [
           {
             "term": "compositing stone",
@@ -131,11 +124,11 @@
             "term": "hand press",
             "meaning": "the manually operated printing press"
           }
-        ]
+        ],
+        "context": "Used by Benjamin and workers in the shop. Natural in description and action."
       },
       {
         "name": "Patriot Network Language",
-        "context": "Used carefully and sparingly — only between people who know each other's allegiances.",
         "terms": [
           {
             "term": "Sons of Liberty",
@@ -157,11 +150,11 @@
             "term": "the dispatch",
             "meaning": "the message being carried tonight"
           }
-        ]
+        ],
+        "context": "Used carefully and sparingly — only between people who know each other's allegiances."
       },
       {
         "name": "Period Boston",
-        "context": "Physical and navigational language for moving through the city at night.",
         "terms": [
           {
             "term": "curfew",
@@ -183,14 +176,22 @@
             "term": "broadside",
             "meaning": "a printed sheet with news or political content"
           }
-        ]
+        ],
+        "context": "Physical and navigational language for moving through the city at night."
       }
     ]
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.908Z",
-  "premise": "A sealed dispatch describing where 700 British soldiers will march at dawn is sitting on a composing table in a print shop on the night of April 18, 1775. It has to reach the Green Dragon Tavern before ten o'clock. The streets between here and there are full of soldiers who would very much like to find it first.",
-  "playerGoal": "",
-  "openingSituation": "",
-  "tone": []
+  "keyEvidenceClueIds": [
+    "dispatch_letter",
+    "troop_route_map"
+  ],
+  "historical_aftermath": "Paul Revere rode at midnight. William Dawes rode west. A third rider took a road that was never written down. The militia at Lexington stood at dawn on April 19th, 1775 — and what made that possible moved through Boston in the hours before, carried by people whose names the history books did not keep.",
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The dispatch is delivered but Benjamin Gill suspects his son — the family business is ruined though the Cause is served.",
+    "The troop route reaches the riders but one NPC is arrested; history is made at a personal cost.",
+    "The player delivers the letter but cannot confirm the route map, leaving the warning incomplete."
+  ],
+  "structured_endings_enabled": true,
+  "category": "underground"
 }

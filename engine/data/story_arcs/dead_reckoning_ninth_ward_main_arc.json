@@ -1,18 +1,8 @@
 {
   "id": "dead_reckoning_ninth_ward_main_arc",
-  "scenarioId": "dead_reckoning_ninth_ward",
-  "name": "The Five-Day Window",
-  "premise": "Three survivors at three pressure points must coordinate across failing infrastructure — a bridge camp, a flooded house, and an attic radio station — to keep their sector alive and signal their location before resources, power, and time run out.",
-  "goal": "Transmit accurate triage coordinates to the emergency operations post, maintain the bridge camp population above critical resource threshold, and recover the family land deed before federal relief makes contact with the St. Claude Bridge camp.",
-  "openingSituation": "It is 4:45 PM on September 2, 2005. The battery voltage reads 11.8. The Community_Resource_Reserve stands at 380 fluid ounces. The mirror array has been 22 degrees off optimal alignment for nearly two hours. A skiff with a red-cross crate is knocking against the bridge piling. A plaster block is shifting above a waterlogged iron box. The arithmetic does not change no matter how many times it is done.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "Separate Reckonings",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "the_communications_pivot",
@@ -27,15 +17,15 @@
           "description": "The Asset Custodian takes the slow breath, calculates the plaster block's saturated weight at approximately fifty-five pounds, and makes the first move toward the deed box — or waits one more minute for the kayak to fully stabilize"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Information Problem",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "runner_theo_delacroix",
@@ -54,15 +44,15 @@
           "description": "Celestine Arceneaux, the retired nurse at the bridge camp, confirms the cellulitis progression timeline: without the antibiotics in the skiff crate, the two wound cases will reach systemic infection within 24 to 48 hours — but accepting the crate means Renard Tureaud learns the actual water reserve figure"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Convergence",
-      "minuteRange": [
-        15,
-        23
-      ],
       "beats": [
         {
           "id": "the_communications_pivot",
@@ -81,15 +71,15 @@
           "description": "The reconnaissance airframe makes its first pass at 16,000 feet — Signal_Beacon_Visibility is checked against the 75-point threshold; if the mirror array has not been corrected, this pass registers the sector only as a probable coordinate"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
     },
     {
-      "actNumber": 4,
       "name": "First Contact",
-      "minuteRange": [
-        23,
-        30
-      ],
       "beats": [
         {
           "id": "the_coordinate_transmission",
@@ -108,10 +98,20 @@
           "description": "The sector's outcome is fixed: the specific combination of what was transmitted, what was preserved, what was conserved, and what was spent determines which version of this afternoon enters the record that nobody will officially keep"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
     }
   ],
+  "goal": "Transmit accurate triage coordinates to the emergency operations post, maintain the bridge camp population above critical resource threshold, and recover the family land deed before federal relief makes contact with the St. Claude Bridge camp.",
+  "name": "The Five-Day Window",
+  "opening": "",
+  "premise": "Three survivors at three pressure points must coordinate across failing infrastructure — a bridge camp, a flooded house, and an attic radio station — to keep their sector alive and signal their location before resources, power, and time run out.",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.327Z",
-  "opening": ""
+  "updatedAt": "2026-06-13T02:31:56.026Z",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "openingSituation": "It is 4:45 PM on September 2, 2005. The battery voltage reads 11.8. The Community_Resource_Reserve stands at 380 fluid ounces. The mirror array has been 22 degrees off optimal alignment for nearly two hours. A skiff with a red-cross crate is knocking against the bridge piling. A plaster block is shifting above a waterlogged iron box. The arithmetic does not change no matter how many times it is done."
 }

@@ -1,17 +1,17 @@
 {
   "id": "clue_runner_wet_sheet",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "The Ink Run on the Address Line",
-  "description": "The original triage sheet for the Flood Street address shows a slight ink run on the address line — the specific blurring of ballpoint on saturated paper that means the document made contact with water at some point after it was written. Theo Delacroix's waterproof bag has a small tear at the bottom seam.",
-  "category": "physical",
-  "discoveryLocationId": "loc_st_claude_bridge",
-  "implicatesCharacterIds": [
-    "char_runner"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "physical",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-06-04T03:22:30.343Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "The original triage sheet for the Flood Street address shows a slight ink run on the address line — the specific blurring of ballpoint on saturated paper that means the document made contact with water at some point after it was written. Theo Delacroix's waterproof bag has a small tear at the bottom seam.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_st_claude_bridge",
+  "implicatesCharacterIds": [
+    "char_runner"
+  ]
 }

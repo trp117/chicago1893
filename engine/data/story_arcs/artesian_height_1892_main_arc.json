@@ -1,18 +1,8 @@
 {
   "id": "artesian_height_1892_main_arc",
-  "scenarioId": "artesian_height_1892",
-  "name": "Strike or Snap",
-  "premise": "With the village's first artesian well bound at 1,800 feet and a falsified cost ledger circulating toward the bond committee, someone inside the project is engineering its failure — and the three people best positioned to stop it are each holding one piece of the truth the others don't have.",
-  "goal": "Identify and expose the saboteur manipulating the project's financial records and engineering tolerances, certify the pressure test before the bond vote, and bring the well to the St. Peter Sandstone aquifer without destroying the drill string.",
-  "openingSituation": "The drill bit is bound in difficult subsurface formation conditions at approximately 1,800 feet. The Well_Drill_Torque gauge reads 62 — dangerously close to the 78 threshold above which the wrought-iron string will begin to fatigue. A forged cost certificate has already been delivered to one member of the bond committee. The pump room is cold and the boiler has not yet been fired to operating pressure. The Night Marshal has just discovered that the tower's lower-level door was left unlocked overnight — and the spoil-sample logbook is missing three pages.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Bound String",
-      "minuteRange": [
-        0,
-        8
-      ],
       "beats": [
         {
           "id": "the_chief_engineer",
@@ -31,15 +21,15 @@
           "description": "All three perspectives receive their first shared data point: the Well_Drill_Torque gauge was manually reset sometime between midnight and 4 AM — a fact only visible if you know what the original baseline reading was."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        8
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Ledger and the Liar",
-      "minuteRange": [
-        8,
-        16
-      ],
       "beats": [
         {
           "id": "the_chief_engineer",
@@ -58,15 +48,15 @@
           "description": "The pressure event at minute 8 fires: the Block A trench collapse pulls the Night Marshal toward the perimeter, creating a window during which the saboteur may move freely inside the tower."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        8,
+        16
+      ]
     },
     {
-      "actNumber": 3,
       "name": "Pressure and Proof",
-      "minuteRange": [
-        16,
-        24
-      ],
       "beats": [
         {
           "id": "the_well_breaks",
@@ -85,15 +75,15 @@
           "description": "Village President Wickerson arrives at the tower base at minute 24 and demands a public accounting; the players must decide collectively how much to reveal before the evidence is fully assembled."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        16,
+        24
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The First Water",
-      "minuteRange": [
-        24,
-        30
-      ],
       "beats": [
         {
           "id": "the_forged_bond",
@@ -112,10 +102,20 @@
           "description": "Final resolution: the board vote is called in the presence of Wickerson and the bond committee; the players' accumulated evidence either holds the bond issue open or fails to prevent the freeze — the well's water rises regardless, but the village's future hangs on what the players have proven."
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        24,
+        30
+      ]
     }
   ],
+  "goal": "Identify and expose the saboteur manipulating the project's financial records and engineering tolerances, certify the pressure test before the bond vote, and bring the well to the St. Peter Sandstone aquifer without destroying the drill string.",
+  "name": "Strike or Snap",
+  "opening": "",
+  "premise": "With the village's first artesian well bound at 1,800 feet and a falsified cost ledger circulating toward the bond committee, someone inside the project is engineering its failure — and the three people best positioned to stop it are each holding one piece of the truth the others don't have.",
   "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.842Z",
-  "opening": ""
+  "updatedAt": "2026-06-13T17:40:35.713Z",
+  "scenarioId": "artesian_height_1892",
+  "openingSituation": "The drill bit is bound in difficult subsurface formation conditions at approximately 1,800 feet. The Well_Drill_Torque gauge reads 62 — dangerously close to the 78 threshold above which the wrought-iron string will begin to fatigue. A forged cost certificate has already been delivered to one member of the bond committee. The pump room is cold and the boiler has not yet been fired to operating pressure. The Night Marshal has just discovered that the tower's lower-level door was left unlocked overnight — and the spoil-sample logbook is missing three pages."
 }

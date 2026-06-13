@@ -1,20 +1,20 @@
 {
   "id": "loc_draughtsmen_cabinet",
-  "scenarioId": "artesian_height_1892",
-  "name": "The Draughtsmen's Field Cabinet",
-  "description": "A heavy oak field cabinet bolted to the interior wall of the tower's first-floor office, containing rolled blueprints, cost ledgers, and the official bore log — the paper spine of the entire project.",
   "mood": "quiet, administrative, revealing",
-  "linkedCharacterIds": [
-    "char_benezette_williams",
-    "char_edgar_williams"
-  ],
+  "name": "The Draughtsmen's Field Cabinet",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.723Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "artesian_height_1892",
+  "description": "A heavy oak field cabinet bolted to the interior wall of the tower's first-floor office, containing rolled blueprints, cost ledgers, and the official bore log — the paper spine of the entire project.",
   "atmosphericDetails": [
     "The smell of damp blueprint linen and graphite is strong here — the cabinet has been open recently, the brass latch still warm.",
     "A gas lamp on the adjacent table has been burning low, suggesting someone was working here within the last hour.",
     "The bore log binder shows a gap where three pages have been removed — the torn edges are still visible at the spine."
   ],
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.851Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_benezette_williams",
+    "char_edgar_williams"
+  ]
 }

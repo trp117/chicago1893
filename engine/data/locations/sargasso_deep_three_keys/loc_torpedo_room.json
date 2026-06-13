@@ -1,19 +1,19 @@
 {
   "id": "loc_torpedo_room",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "B-59 Torpedo Room",
-  "description": "The forward compartment of the submarine, dominated by four torpedo tubes and the heavy cylindrical forms of the weapons themselves. The T-5 nuclear torpedo — distinguished from the conventional rounds by the yellow band painted around its midsection — has been moved from its storage rack to tube one. The room smells of grease, metal, and the particular chemical sharpness of a weapons system that has been brought to readiness.",
   "mood": "dangerous, mechanical, loaded, final",
-  "linkedCharacterIds": [
-    "char_chief_petty_officer_kozlov"
-  ],
+  "name": "B-59 Torpedo Room",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.801Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "The forward compartment of the submarine, dominated by four torpedo tubes and the heavy cylindrical forms of the weapons themselves. The T-5 nuclear torpedo — distinguished from the conventional rounds by the yellow band painted around its midsection — has been moved from its storage rack to tube one. The room smells of grease, metal, and the particular chemical sharpness of a weapons system that has been brought to readiness.",
   "atmosphericDetails": [
     "The second key receptacle is mounted on the port bulkhead between tubes one and two — its brass housing polished from years of inspection.",
     "A yellow band of paint on tube one's outer door indicates the T-5 is loaded and the outer door is closed but not yet flooded.",
     "Three ratings are present, sitting on the deck with their backs against the tube housing — they have been told to wait, and they are waiting with the stillness of men who have been told something they cannot unknow."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.801Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_chief_petty_officer_kozlov"
+  ]
 }

@@ -1,18 +1,18 @@
 {
   "id": "clue_ard_broadcast_angle",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "title": "The Camera Angle — The Only Clear Shot",
-  "description": "From the ARD broadcast position, you assess the sight lines. Every other network's camera is positioned to the south of the bridge, angled toward the crowd on the eastern side. ARD's position — directly on the bridge railing — is the only angle that captures both the gate and the death strip simultaneously. When the gate opens, if it opens, this is the only camera that will show the full moment: the gate swinging, the death strip crossed, the two crowds meeting on the bridge. The Liveschaltung authorization from Hamburg is still pending. If it comes through in the next five minutes, this position will broadcast the defining image of the twentieth century's end. If it comes through in ten minutes, someone else will.",
+  "unlocks": [],
   "category": "observation",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.120Z",
+  "locationId": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "From the ARD broadcast position, you assess the sight lines. Every other network's camera is positioned to the south of the bridge, angled toward the crowd on the eastern side. ARD's position — directly on the bridge railing — is the only angle that captures both the gate and the death strip simultaneously. When the gate opens, if it opens, this is the only camera that will show the full moment: the gate swinging, the death strip crossed, the two crowds meeting on the bridge. The Liveschaltung authorization from Hamburg is still pending. If it comes through in the next five minutes, this position will broadcast the defining image of the twentieth century's end. If it comes through in ten minutes, someone else will.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_ard_broadcast_position",
   "implicatesCharacterIds": [
     "char_journalist",
     "char_westberlin_producer"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.981Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

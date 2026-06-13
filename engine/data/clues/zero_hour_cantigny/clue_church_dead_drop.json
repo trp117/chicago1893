@@ -1,18 +1,18 @@
 {
   "id": "clue_church_dead_drop",
-  "scenarioId": "zero_hour_cantigny",
   "title": "The Sacristy Dead-Drop",
-  "description": "Behind the loose stone in the sacristy's north wall — third course from the floor, second from the left — is a small oilskin packet. Inside: a folded copy of the falsified fire tables with German margin annotations in red pencil, and a handwritten note in French reading 'Confirmed. Eastern corridor clear 0700–0900. Proceed as planned. — R.' The oilskin is dry; it was placed here recently, before the morning rain reached the interior.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.104Z",
+  "locationId": "",
+  "scenarioId": "zero_hour_cantigny",
+  "description": "Behind the loose stone in the sacristy's north wall — third course from the floor, second from the left — is a small oilskin packet. Inside: a folded copy of the falsified fire tables with German margin annotations in red pencil, and a handwritten note in French reading 'Confirmed. Eastern corridor clear 0700–0900. Proceed as planned. — R.' The oilskin is dry; it was placed here recently, before the morning rain reached the interior.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_church_ruins",
   "implicatesCharacterIds": [
     "char_renard",
     "char_farrow"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.104Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

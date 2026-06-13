@@ -1,20 +1,20 @@
 {
   "id": "boat_deck_port",
-  "scenarioId": "titanic_final_hours",
-  "name": "Boat Deck — Port Side",
-  "description": "The open upper deck where Lightoller commands the port-side evacuation — the davit arms are swung out, the boats hang in their falls, and a crowd of passengers in lifebelts stands in the twenty-eight-degree air, many of them refusing to believe the ship is sinking because the deck still feels solid beneath their feet.",
   "mood": "cold, controlled, brittle",
-  "linkedCharacterIds": [
-    "charles_lightoller",
-    "margaret_brown"
-  ],
+  "name": "Boat Deck — Port Side",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.053Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "titanic_final_hours",
+  "description": "The open upper deck where Lightoller commands the port-side evacuation — the davit arms are swung out, the boats hang in their falls, and a crowd of passengers in lifebelts stands in the twenty-eight-degree air, many of them refusing to believe the ship is sinking because the deck still feels solid beneath their feet.",
   "atmosphericDetails": [
     "The stars are extraordinary — no moon, no clouds, a sky so dense with light that the horizon is almost visible, which makes the black water below the rail look like a void",
     "The band's music carries from the First Class entrance forty feet aft, and several passengers are standing near it as if proximity to normalcy is a form of protection",
     "Each time a boat is lowered, the davit falls squeal against their sheaves and the crowd surges slightly forward, then pulls back — a tide controlled by Lightoller's voice and the presence of two armed officers"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.053Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "charles_lightoller",
+    "margaret_brown"
+  ]
 }

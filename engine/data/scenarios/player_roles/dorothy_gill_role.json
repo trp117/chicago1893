@@ -1,77 +1,77 @@
 {
   "id": "dorothy_gill_role",
-  "scenarioId": "midnight_errand_boston",
   "name": "Dorothy Gill — The Watcher",
-  "description": "You are the printer's sister, the one who keeps the accounts and sees everything and says nothing — until tonight, when everything you have been waiting for is finally happening at once. You have a bag packed behind the ink barrels. You have been ready for this for a year.",
-  "startLocationId": "gill_print_shop_front",
-  "startingKnowledge": [
-    "The recognition phrase — overheard through a wall eighteen months ago: 'The tide sets east tonight.'",
-    "The type drawer in the back room has been used as a dead-drop at least twice; you have seen it and said nothing to Benjamin.",
-    "Owen Pryce is not what he appears — you have watched him for weeks and you are certain."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write in close second person, emphasizing the quality of attention that comes from years of watching without being watched in return. Dorothy sees the room before she enters it. She is not passive — she has been making decisions for a long time; she has simply been making them quietly.",
+  "opening": {
+    "choices": [
+      "Go upstairs and distract Benjamin — give Nathaniel whatever time he needs to get out the back.",
+      "Go into the back room and make yourself known — take control of whatever is happening before it happens without you.",
+      "Blow out your candle and stay exactly where you are, listening, until you know enough to act with certainty."
+    ],
+    "narrative": "You came downstairs for a glass of water and stopped at the bottom step when you heard the back door. You have been standing in the front room for four minutes now, candle in hand, listening. The woman's voice is low and quick — you cannot make out words, only the shape of urgency. Nathaniel has not spoken yet, or not loudly enough to hear, which means he is listening, which means he has not panicked, which is something. Benjamin is at the top of the stairs — you can tell by the creak — and he has not come down yet, which means he heard something but is not certain what. You have perhaps two minutes before one of the men in this building does something that cannot be undone, and the question is whether you are going to stand here holding a candle or whether you are going to act.",
+    "npcMoments": [
+      {
+        "moment": "Your brother's shadow moves at the top of the stairs. He is cautious — he will listen before he acts — but he is not patient, and four minutes is already longer than he usually waits.",
+        "characterId": "benjamin_gill"
+      },
+      {
+        "moment": "Through the wall you hear Nathaniel shift his weight — the particular sound of someone who has made a decision and is about to move on it.",
+        "characterId": "nathaniel_gill"
+      }
+    ]
+  },
   "briefing": "You are standing in the front room of your brother's print shop with a candle burned to its last inch and a year's worth of careful watching arriving all at once. You have seen Owen Pryce's hours. You have counted the nights the back door opened after Benjamin went upstairs. You packed the bag behind the ink barrels eleven months ago and have not unpacked it because some part of you always knew tonight was coming. Through the wall you can hear a woman's voice — low, controlled, the voice of someone who has done this before — and your nephew has not answered in two minutes, which means he is still deciding. The boots on the cobblestones outside are a patrol or something worse. You are the only person in this building who knows enough to stop everything from going wrong, and the candle has perhaps four minutes left.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:33.050Z",
+  "represents": "Women who maintained patriot networks in colonial Boston, 1774-1776",
+  "scenarioId": "midnight_errand_boston",
+  "accessLevel": "staff",
+  "description": "You are the printer's sister, the one who keeps the accounts and sees everything and says nothing — until tonight, when everything you have been waiting for is finally happening at once. You have a bag packed behind the ink barrels. You have been ready for this for a year.",
+  "perspective": "Write in close second person, emphasizing the quality of attention that comes from years of watching without being watched in return. Dorothy sees the room before she enters it. She is not passive — she has been making decisions for a long time; she has simply been making them quietly.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "Nathaniel, Benjamin, Captain Aldrich",
+      "what_happened": "The patrol caught Nathaniel at the back door — Dorothy's silence in the front room, her careful waiting for certainty, was the last thing that might have saved him and was not enough.",
+      "emotional_weight": "The particular weight of knowing she held the one piece of information that could have changed everything and chose to hold it one minute too long",
+      "closing_line_override": "She had kept every secret. She had given away nothing. And still it had not been enough."
+    },
+    "partial": {
+      "who_present": "Benjamin, the woman courier, the patrol captain",
+      "what_happened": "Dorothy helped Nathaniel and the courier escape but was seen by the patrol — her position at the print shop is broken and Benjamin now knows everything she has kept from him.",
+      "emotional_weight": "The cost of one night's honesty landing on people she spent a year protecting with silence",
+      "closing_line_override": "She had always known the shop would go. She had not known she would be the one to lose it for them."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The knock came from the back door.",
   "character_hooks": [
     "I passed a message for the Sons of Liberty myself, two years ago, and told no one — not Benjamin, not Nathaniel — and tonight I am wondering whether that silence was cowardice or wisdom.",
     "I know that Benjamin has been approached by a Loyalist merchant about buying the shop, and I know that he has not said no, and I have not told Nathaniel because I did not know what it would do to him.",
     "I have a letter in my pocket from a man in Concord who asked me, six months ago, to watch this shop and report anything unusual — I have never sent a reply, but I have never thrown the letter away either."
   ],
-  "suggested_secret": "Dorothy knows the identity of the second courier in the Sons of Liberty network — a name that Thomas Wren himself does not know she possesses — because she is the one who recruited them.",
-  "opening": {
-    "narrative": "You came downstairs for a glass of water and stopped at the bottom step when you heard the back door. You have been standing in the front room for four minutes now, candle in hand, listening. The woman's voice is low and quick — you cannot make out words, only the shape of urgency. Nathaniel has not spoken yet, or not loudly enough to hear, which means he is listening, which means he has not panicked, which is something. Benjamin is at the top of the stairs — you can tell by the creak — and he has not come down yet, which means he heard something but is not certain what. You have perhaps two minutes before one of the men in this building does something that cannot be undone, and the question is whether you are going to stand here holding a candle or whether you are going to act.",
-    "npcMoments": [
-      {
-        "characterId": "benjamin_gill",
-        "moment": "Your brother's shadow moves at the top of the stairs. He is cautious — he will listen before he acts — but he is not patient, and four minutes is already longer than he usually waits."
-      },
-      {
-        "characterId": "nathaniel_gill",
-        "moment": "Through the wall you hear Nathaniel shift his weight — the particular sound of someone who has made a decision and is about to move on it."
-      }
-    ],
-    "choices": [
-      "Go upstairs and distract Benjamin — give Nathaniel whatever time he needs to get out the back.",
-      "Go into the back room and make yourself known — take control of whatever is happening before it happens without you.",
-      "Blow out your candle and stay exactly where you are, listening, until you know enough to act with certainty."
-    ]
-  },
+  "startLocationId": "gill_print_shop_front",
+  "context_sentence": "You are Dorothy Gill, keeper of accounts at a Patriot print shop in occupied Boston during the weeks before the Battles of Lexington and Concord, in a city where General Gage's soldiers have been billeted among civilians since the Port Act closed the harbor in June 1774.",
   "roleInitialState": {
+    "flags": {
+      "bag_packed": true,
+      "owen_suspected": true,
+      "benjamin_unaware": true,
+      "recognition_phrase_known": true
+    },
     "inventory": [
       "dorothys_packed_bag"
     ],
-    "flags": {
-      "owen_suspected": true,
-      "recognition_phrase_known": true,
-      "bag_packed": true,
-      "benjamin_unaware": true
-    },
     "suspicion": {
       "owen_pryce": 4,
-      "captain_aldrich": 1,
-      "silas_murch": 0
+      "silas_murch": 0,
+      "captain_aldrich": 1
     }
   },
-  "ending_notes": {
-    "partial": {
-      "what_happened": "Dorothy helped Nathaniel and the courier escape but was seen by the patrol — her position at the print shop is broken and Benjamin now knows everything she has kept from him.",
-      "who_present": "Benjamin, the woman courier, the patrol captain",
-      "emotional_weight": "The cost of one night's honesty landing on people she spent a year protecting with silence",
-      "closing_line_override": "She had always known the shop would go. She had not known she would be the one to lose it for them."
-    },
-    "failure": {
-      "what_happened": "The patrol caught Nathaniel at the back door — Dorothy's silence in the front room, her careful waiting for certainty, was the last thing that might have saved him and was not enough.",
-      "who_present": "Nathaniel, Benjamin, Captain Aldrich",
-      "emotional_weight": "The particular weight of knowing she held the one piece of information that could have changed everything and chose to hold it one minute too long",
-      "closing_line_override": "She had kept every secret. She had given away nothing. And still it had not been enough."
-    }
-  },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:33.050Z",
-  "context_sentence": "You are Dorothy Gill, keeper of accounts at a Patriot print shop in occupied Boston during the weeks before the Battles of Lexington and Concord, in a city where General Gage's soldiers have been billeted among civilians since the Port Act closed the harbor in June 1774.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Women who maintained patriot networks in colonial Boston, 1774-1776",
-  "fact_checked": false,
-  "bridge_sentence": "The knock came from the back door."
+  "suggested_secret": "Dorothy knows the identity of the second courier in the Sons of Liberty network — a name that Thomas Wren himself does not know she possesses — because she is the one who recruited them.",
+  "startingKnowledge": [
+    "The recognition phrase — overheard through a wall eighteen months ago: 'The tide sets east tonight.'",
+    "The type drawer in the back room has been used as a dead-drop at least twice; you have seen it and said nothing to Benjamin.",
+    "Owen Pryce is not what he appears — you have watched him for weeks and you are certain."
+  ]
 }

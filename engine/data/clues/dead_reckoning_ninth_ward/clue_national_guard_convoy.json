@@ -1,17 +1,17 @@
 {
   "id": "clue_national_guard_convoy",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "Staged National Guard Convoy — North Bridge Approach",
-  "description": "A National Guard logistics convoy — two five-ton trucks and a command vehicle — has been staged at the north end of the St. Claude Bridge approach for approximately ninety minutes. Devereux Molina saw it from the canal side. The convoy has not moved. The reason it has not moved is not visible from the bridge deck, but its presence means organized relief assets are closer than the bridge camp population currently believes.",
-  "category": "observation",
-  "discoveryLocationId": "loc_bridge_piling_access",
-  "implicatesCharacterIds": [
-    "char_skiff_operator"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-06-04T03:22:30.340Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "A National Guard logistics convoy — two five-ton trucks and a command vehicle — has been staged at the north end of the St. Claude Bridge approach for approximately ninety minutes. Devereux Molina saw it from the canal side. The convoy has not moved. The reason it has not moved is not visible from the bridge deck, but its presence means organized relief assets are closer than the bridge camp population currently believes.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_bridge_piling_access",
+  "implicatesCharacterIds": [
+    "char_skiff_operator"
+  ]
 }

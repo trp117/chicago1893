@@ -1,17 +1,17 @@
 {
   "id": "clue_philbrick_bore_log_copy",
-  "scenarioId": "artesian_height_1892",
   "title": "Philbrick's Field Notebook",
-  "description": "Ethan Philbrick's personal field notebook contains a complete copy of the daily bore log in his own hand, including the original Well_Drill_Torque baseline reading of 41 recorded six days ago. The notebook also shows his notation from this morning: 'brake collar — adjusted? — check with B.W.' — evidence that Philbrick noticed the discrepancy and flagged it, at least to himself, before anyone else thought to look.",
-  "category": "documentary",
-  "discoveryLocationId": "loc_block_a_perimeter",
-  "implicatesCharacterIds": [],
   "unlocks": [
     "clue_tampered_torque_log"
   ],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.855Z",
+  "updatedAt": "2026-06-13T17:40:35.729Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "artesian_height_1892",
+  "description": "Ethan Philbrick's personal field notebook contains a complete copy of the daily bore log in his own hand, including the original Well_Drill_Torque baseline reading of 41 recorded six days ago. The notebook also shows his notation from this morning: 'brake collar — adjusted? — check with B.W.' — evidence that Philbrick noticed the discrepancy and flagged it, at least to himself, before anyone else thought to look.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_block_a_perimeter",
+  "implicatesCharacterIds": []
 }

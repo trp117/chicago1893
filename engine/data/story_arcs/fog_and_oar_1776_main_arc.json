@@ -1,0 +1,129 @@
+{
+  "id": "fog_and_oar_1776_main_arc",
+  "acts": [
+    {
+      "name": "The Gale Breaks",
+      "beats": [
+        {
+          "id": "the_northeast_wind",
+          "description": "The northeast wind drops just enough to permit the first bateau launches; Glover's men scramble to the oars in near-darkness."
+        },
+        {
+          "id": "washington_receives_the",
+          "description": "Washington receives the first manifest tally from the slip master—the loading rate is slower than required to clear all troops before dawn."
+        },
+        {
+          "id": "the_rear_guard",
+          "description": "The rear guard officer on the parapet reports that a British picket has moved closer than usual; the campfires must be fed immediately."
+        },
+        {
+          "id": "the_player_faces",
+          "description": "The player faces their first major decision: loading priority at the slip, rowing technique on the river, or fire management on the parapets."
+        }
+      ],
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
+    },
+    {
+      "name": "The Tide Turns",
+      "beats": [
+        {
+          "id": "the_tidal_current",
+          "description": "The tidal current reverses early, pushing bateaux downstream toward the harbor and the silhouettes of British warships; East_River_Tidal_Velocity rises."
+        },
+        {
+          "id": "a_field_hospital",
+          "description": "A field hospital orderly reaches the ferry slip demanding priority loading for the severely wounded; the decision conflicts directly with artillery loading orders."
+        },
+        {
+          "id": "on_the_parapets",
+          "description": "On the parapets, the decoy fuel supply is running low; the rear guard must choose between maintaining maximum luminance and conserving strength for a possible fighting withdrawal."
+        },
+        {
+          "id": "a_marblehead_oarsmans",
+          "description": "A Marblehead oarsman's blade snaps under maximum stroke pressure; one bateau is temporarily out of rotation, compressing the transit schedule."
+        }
+      ],
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
+    },
+    {
+      "name": "The Fog Arrives",
+      "beats": [
+        {
+          "id": "a_providential_fog",
+          "description": "A providential fog rolls in off the harbor, thickening visibility to less than twenty yards; British warships cannot see the crossing lanes."
+        },
+        {
+          "id": "the_fog_also",
+          "description": "The fog also disorients two bateaux, which overshoot the Manhattan slip and must be redirected by shouted whispers from the shore—risking acoustic detection."
+        },
+        {
+          "id": "washington_receives_word",
+          "description": "Washington receives word that the rear guard's fuel supply is nearly exhausted; the deception cannot hold more than ninety more minutes."
+        },
+        {
+          "id": "the_final_artillery",
+          "description": "The final artillery loading decision must be made: the last two field cannon either cross now, displacing one full infantry wave, or are spiked and abandoned."
+        },
+        {
+          "id": "manningboatthroughput_approaches_but",
+          "description": "Manning_Boat_Throughput approaches but has not yet reached the threshold; the pace of crossing determines whether the rear guard can safely embark before light."
+        }
+      ],
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
+    },
+    {
+      "name": "The Last Boats",
+      "beats": [
+        {
+          "id": "dawn_begins_to",
+          "description": "Dawn begins to gray the eastern horizon; the fog is thinning faster than expected."
+        },
+        {
+          "id": "the_rear_guard",
+          "description": "The rear guard officer sends a final runner: the parapets are empty of everyone except his small unit; they must embark within the next two crossings or be left behind."
+        },
+        {
+          "id": "glovers_exhausted_oarsmen",
+          "description": "Glover's exhausted oarsmen make their final round trips; the physical stamina of the crews is at its lowest point of the night."
+        },
+        {
+          "id": "the_last_bateau",
+          "description": "The last bateau pushes off from the Brooklyn slip; Washington is reported to be among the final passengers."
+        },
+        {
+          "id": "resolution_the_outcome",
+          "description": "Resolution: the outcome of Manning_Boat_Throughput, Campfire_Decoy_Luminance, and East_River_Tidal_Velocity are reconciled against the dawn timeline to determine the scenario's end state."
+        }
+      ],
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
+    }
+  ],
+  "goal": "Move the entire Continental force from Brooklyn to Manhattan before 6:00 AM while maintaining the campfire deception long enough for the rear guard to embark safely.",
+  "name": "The Night Crossing",
+  "opening": "",
+  "premise": "Nine thousand Continental soldiers must be silently evacuated across a mile of hostile tidal water before dawn exposes the empty Brooklyn fortifications to British assault. Every decision—who boards next, how hard the oars are pulled, how long the fires burn—determines whether the army survives.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T20:06:16.951Z",
+  "scenarioId": "fog_and_oar_1776",
+  "openingSituation": "It is 11:00 PM. The northeast gale has just abated enough to launch the first bateaux. The ferry slip is jammed with troops, wounded men, and field artillery all competing for limited boat space. The tide is turning. The rear guard is alone on the parapets. The crossing has not yet begun in earnest."
+}

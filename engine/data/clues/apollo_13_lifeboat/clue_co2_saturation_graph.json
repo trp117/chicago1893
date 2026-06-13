@@ -1,20 +1,20 @@
 {
   "id": "clue_co2_saturation_graph",
-  "scenarioId": "apollo_13_lifeboat",
   "title": "CO2 Partial Pressure Trend Graph",
-  "description": "A strip of telemetry paper from the EECOM console showing the partial pressure of carbon dioxide in the Lunar Module cabin plotted against time. The line is climbing steadily. At the current rate, the crew will reach cognitive impairment in 87 minutes and unconsciousness within four hours. Someone has drawn a horizontal line in red pen at the danger threshold and written '2 men / 36 hrs' next to the canister capacity figure — the designed limit the crew has already exceeded. The graph makes the abstract crisis physical and countable.",
+  "unlocks": [
+    "clue_mailbox_assembly_instructions"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.958Z",
+  "locationId": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "description": "A strip of telemetry paper from the EECOM console showing the partial pressure of carbon dioxide in the Lunar Module cabin plotted against time. The line is climbing steadily. At the current rate, the crew will reach cognitive impairment in 87 minutes and unconsciousness within four hours. Someone has drawn a horizontal line in red pen at the danger threshold and written '2 men / 36 hrs' next to the canister capacity figure — the designed limit the crew has already exceeded. The graph makes the abstract crisis physical and countable.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_mocr_back_room",
   "implicatesCharacterIds": [
     "char_sy_liebergot",
     "char_fred_haise"
-  ],
-  "unlocks": [
-    "clue_mailbox_assembly_instructions"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.958Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

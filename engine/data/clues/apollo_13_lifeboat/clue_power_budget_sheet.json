@@ -1,20 +1,20 @@
 {
   "id": "clue_power_budget_sheet",
-  "scenarioId": "apollo_13_lifeboat",
   "title": "John Aaron's Revised Power Budget",
-  "description": "A single sheet of yellow legal paper covered in John Aaron's handwriting — columns of amp-hour figures, system names, and the words 'NEVER ON' circled three times next to four specific systems. At the bottom, a final figure: 43 amp-hours available for re-entry, against a minimum requirement of 43.5. The margin is negative. Someone — Aaron himself, from the handwriting — has crossed out one line and rewritten it, shaving the requirement to 42.8. The crossed-out figure and the replacement are both visible. The sheet is the entire survival calculus of the mission on one page.",
+  "unlocks": [
+    "clue_cold_soak_cue_card"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.960Z",
+  "locationId": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "description": "A single sheet of yellow legal paper covered in John Aaron's handwriting — columns of amp-hour figures, system names, and the words 'NEVER ON' circled three times next to four specific systems. At the bottom, a final figure: 43 amp-hours available for re-entry, against a minimum requirement of 43.5. The margin is negative. Someone — Aaron himself, from the handwriting — has crossed out one line and rewritten it, shaving the requirement to 42.8. The crossed-out figure and the replacement are both visible. The sheet is the entire survival calculus of the mission on one page.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_mocr_back_room",
   "implicatesCharacterIds": [
     "char_john_aaron",
     "char_gene_kranz"
-  ],
-  "unlocks": [
-    "clue_cold_soak_cue_card"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.960Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

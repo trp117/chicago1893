@@ -1,57 +1,57 @@
 {
   "id": "role_lightning_flinger",
-  "scenarioId": "lightning_and_the_midnight_coach",
   "name": "The Lightning Flinger",
-  "description": "You are Caleb Morse, night operator at the Sandusky junction, and you have just received a red fire dispatch that describes your father's passengers in enough detail to hang the whole network. You have twelve minutes before protocol requires you to acknowledge and forward it.",
-  "startLocationId": "loc_instrument_room",
-  "startingKnowledge": [
-    "The red fire dispatch is in the receiving tray and you have not yet acknowledged it.",
-    "The Huron station operator Wickes is a plug who will ask for a repeat if anything looks irregular.",
-    "You know how to phantom a circuit — you have done it twice before for practice, never for stakes this high.",
-    "You know who the informant is and you have not told your father."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a young man who thinks in signals and systems — he sees the world as a network of connections, some of which can be rerouted. He is faster than almost everyone around him and he knows it, which is both his strength and his blind spot.",
+  "opening": {
+    "choices": [
+      "Send the phantom location report now, before the protocol window closes.",
+      "Acknowledge the red fire with a standard receipt and buy time while you think.",
+      "Ground the line — kill the signal for the whole corridor and deal with the consequences."
+    ],
+    "narrative": "The sounder delivered the red fire at 11:31 PM and you have been sitting with it for nine minutes, which means you have three minutes of protocol time remaining before Huron expects an acknowledgment. The paper tape is on the baize in front of you and you have read it four times. The description is accurate — the scar, the woman, the height — and the filing party is Greer, which means Greer is working. The codebook is open to the commercial cipher section and you have already identified the entry you need to construct the phantom location report. What you have not done is touch the key.",
+    "npcMoments": []
+  },
   "briefing": "You are Caleb Morse, the fastest brass pounder on the Erie corridor night shift, and the red fire on your table right now describes three people your father is moving through the woods fourteen miles north of you. The plug at Huron is already asking for a repeat on a routine wire and if he gets suspicious he will flag the line supervisor, which means you have less time than you thought. You know something about the informant that your father does not know, and every minute you wait to tell him is a minute that information could save someone's life. You have not yet sent a single character in response to the red fire dispatch, and the protocol clock is running. The brass is warm under your hand and the sounder is clicking and the lamp is burning low.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:28.099Z",
+  "represents": "Telegraph operators who used their wire access to support Underground Railroad networks in Ohio during the 1850s",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "accessLevel": "staff",
+  "description": "You are Caleb Morse, night operator at the Sandusky junction, and you have just received a red fire dispatch that describes your father's passengers in enough detail to hang the whole network. You have twelve minutes before protocol requires you to acknowledge and forward it.",
+  "perspective": "Write from the perspective of a young man who thinks in signals and systems — he sees the world as a network of connections, some of which can be rerouted. He is faster than almost everyone around him and he knows it, which is both his strength and his blind spot.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The last message on the tape has not been answered.",
   "character_hooks": [
     "I have already started the phantom circuit once tonight and aborted it — my hands were shaking and I made an error, and I need to decide if I can do it clean this time.",
     "I intercepted a wire two days ago that told me Greer was already north of Columbus, and I said nothing because I was afraid of what my father would do if he knew how close the catcher was.",
     "I know the company supervisor has been watching my transmissions, and if I phantom this wire he will see the discrepancy in the log — I am choosing between my father and my livelihood."
   ],
-  "suggested_secret": "Caleb has already made one phantom transmission tonight as a test run, and it contained enough real information about the network that if anyone reconstructed it, three safe houses would be exposed — he does not know the test ran longer than he intended.",
-  "opening": {
-    "narrative": "The sounder delivered the red fire at 11:31 PM and you have been sitting with it for nine minutes, which means you have three minutes of protocol time remaining before Huron expects an acknowledgment. The paper tape is on the baize in front of you and you have read it four times. The description is accurate — the scar, the woman, the height — and the filing party is Greer, which means Greer is working. The codebook is open to the commercial cipher section and you have already identified the entry you need to construct the phantom location report. What you have not done is touch the key.",
-    "npcMoments": [],
-    "choices": [
-      "Send the phantom location report now, before the protocol window closes.",
-      "Acknowledge the red fire with a standard receipt and buy time while you think.",
-      "Ground the line — kill the signal for the whole corridor and deal with the consequences."
-    ]
-  },
+  "startLocationId": "loc_instrument_room",
+  "context_sentence": "You are Caleb Morse, night telegraph operator at the Sandusky junction on the New York and Erie line in October 1856, one of an estimated three hundred sympathetic railroad and telegraph employees who used their positions along the northern corridor to obstruct enforcement of the Fugitive Slave Act of 1850.",
   "roleInitialState": {
+    "flags": {
+      "father_contacted": false,
+      "phantom_attempted": false,
+      "red_fire_received": true,
+      "informant_identity_known": true
+    },
     "inventory": [
       "The red fire dispatch paper tape.",
       "The company commercial codebook, open to the cipher section.",
       "A personal notebook with phantom circuit diagrams sketched in pencil.",
       "A brass key tool for adjusting the sounder tension."
     ],
-    "flags": {
-      "red_fire_received": true,
-      "phantom_attempted": false,
-      "informant_identity_known": true,
-      "father_contacted": false
-    },
     "suspicion": {
-      "marshal_crane": 0,
-      "wickes_huron": 0
+      "wickes_huron": 0,
+      "marshal_crane": 0
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:28.099Z",
-  "context_sentence": "You are Caleb Morse, night telegraph operator at the Sandusky junction on the New York and Erie line in October 1856, one of an estimated three hundred sympathetic railroad and telegraph employees who used their positions along the northern corridor to obstruct enforcement of the Fugitive Slave Act of 1850.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Telegraph operators who used their wire access to support Underground Railroad networks in Ohio during the 1850s",
-  "fact_checked": false,
-  "bridge_sentence": "The last message on the tape has not been answered."
+  "suggested_secret": "Caleb has already made one phantom transmission tonight as a test run, and it contained enough real information about the network that if anyone reconstructed it, three safe houses would be exposed — he does not know the test ran longer than he intended.",
+  "startingKnowledge": [
+    "The red fire dispatch is in the receiving tray and you have not yet acknowledged it.",
+    "The Huron station operator Wickes is a plug who will ask for a repeat if anything looks irregular.",
+    "You know how to phantom a circuit — you have done it twice before for practice, never for stakes this high.",
+    "You know who the informant is and you have not told your father."
+  ]
 }

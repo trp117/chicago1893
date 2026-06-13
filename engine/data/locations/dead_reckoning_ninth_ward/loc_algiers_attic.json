@@ -1,10 +1,13 @@
 {
   "id": "loc_algiers_attic",
-  "scenarioId": "dead_reckoning_ninth_ward",
-  "name": "Algiers Attic Radio Station",
-  "description": "A residential attic on the Algiers west bank, 108 degrees at noon and not measurably cooler now; the amateur radio rig sits on a card table surrounded by yellow legal pads covered in voltage readings, triage figures, and transmission logs, its carrier wave audible as a faint hum against the heat.",
   "mood": "isolated, focused, deteriorating",
-  "linkedCharacterIds": [],
+  "name": "Algiers Attic Radio Station",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:22:30.333Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "A residential attic on the Algiers west bank, 108 degrees at noon and not measurably cooler now; the amateur radio rig sits on a card table surrounded by yellow legal pads covered in voltage readings, triage figures, and transmission logs, its carrier wave audible as a faint hum against the heat.",
   "atmosphericDetails": [
     "The voltmeter reads 11.8 on the yellow legal pad — the number has been written eleven times in the same column, each entry with a timestamp",
     "The carrier wave has a barely perceptible flattening — the crystal losing its temperature compensation, the drift that means the twenty minutes that are not available are already running",
@@ -12,8 +15,5 @@
     "The attic window is propped open with a piece of broken conduit; the air that comes through it is the same temperature as the air inside",
     "The rooftop mirror array is accessible through the window but requires leaning out over a twelve-foot drop to the porch roof below"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.333Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": []
 }

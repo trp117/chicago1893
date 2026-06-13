@@ -1,17 +1,17 @@
 {
   "id": "clue_voss_sighting",
-  "scenarioId": "zero_hour_cantigny",
   "title": "Voss's Pre-Dawn Sighting",
-  "description": "Sergeant Voss, when pressed in private, states that he saw Lieutenant Farrow moving along the communication trench toward the forward wire staging area at approximately 04:00 — a full hour before Farrow's claimed position in the artillery dugout. Voss is specific: Farrow was carrying his map case and moving quickly, without a lantern, which Voss noted as unusual because the trench boards were icy and treacherous in the dark.",
-  "category": "testimony",
-  "discoveryLocationId": "loc_jump_off_trench",
-  "implicatesCharacterIds": [
-    "char_farrow"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "testimony",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.105Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "zero_hour_cantigny",
+  "description": "Sergeant Voss, when pressed in private, states that he saw Lieutenant Farrow moving along the communication trench toward the forward wire staging area at approximately 04:00 — a full hour before Farrow's claimed position in the artillery dugout. Voss is specific: Farrow was carrying his map case and moving quickly, without a lantern, which Voss noted as unusual because the trench boards were icy and treacherous in the dark.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_jump_off_trench",
+  "implicatesCharacterIds": [
+    "char_farrow"
+  ]
 }

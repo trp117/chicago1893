@@ -1,21 +1,21 @@
 {
   "id": "loc_artillery_dugout",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "McCormick's Fire Direction Dugout",
-  "description": "A reinforced earth-and-timber command post twelve feet below grade, smelling of cordite, damp wool, and kerosene lamp smoke. The map table dominates the center — a door laid across two ammunition crates, covered in oilskin and overlaid with the 1:10,000 grid map of the Cantigny salient.",
   "mood": "tense, claustrophobic, authoritative, dim",
-  "linkedCharacterIds": [
-    "char_mccormick",
-    "char_farrow",
-    "char_beaumont"
-  ],
+  "name": "McCormick's Fire Direction Dugout",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.097Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "A reinforced earth-and-timber command post twelve feet below grade, smelling of cordite, damp wool, and kerosene lamp smoke. The map table dominates the center — a door laid across two ammunition crates, covered in oilskin and overlaid with the 1:10,000 grid map of the Cantigny salient.",
   "atmosphericDetails": [
     "The kerosene lamp swings on its hook with each artillery concussion, throwing the shadow of the map table across the log walls in lurching arcs",
     "A field telephone sits on a wooden shelf, its handset worn smooth by a hundred hands; the cord disappears into a rubber grommet in the earthen wall",
     "The map-table case — a steel-banded oak box with a combination lock — sits open beside McCormick's chair, the fire tables inside visibly disturbed from their original order"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.097Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_mccormick",
+    "char_farrow",
+    "char_beaumont"
+  ]
 }

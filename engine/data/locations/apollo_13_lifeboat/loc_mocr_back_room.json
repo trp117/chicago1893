@@ -1,14 +1,14 @@
 {
   "id": "loc_mocr_back_room",
-  "scenarioId": "apollo_13_lifeboat",
+  "mood": "focused, improvisational, desperate, inventive",
   "name": "Mission Control — Back Room Support Bays",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.954Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "apollo_13_lifeboat",
   "short_name": "Mission Control Back Room",
   "description": "The rooms behind the main floor where the specialists work — engineers with slide rules and reference manuals, building solutions out of physics and whatever materials the crew has on board.",
-  "mood": "focused, improvisational, desperate, inventive",
-  "linkedCharacterIds": [
-    "char_john_aaron",
-    "char_sy_liebergot"
-  ],
   "atmosphericDetails": [
     "Every horizontal surface is covered in paper — trajectory printouts, systems schematics, the inventory of everything aboard the spacecraft written out by hand",
     "A physical mockup of the CO2 scrubber adapter is being assembled on a table using a flight manual cover, plastic bags, a sock, and duct tape",
@@ -16,8 +16,8 @@
     "A chalkboard on the far wall shows the power budget — a column of numbers being revised in real time as systems are powered down",
     "John Aaron is standing at the chalkboard with chalk in his hand, and the sequence he is writing is the one that will either save or kill the crew"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.954Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_john_aaron",
+    "char_sy_liebergot"
+  ]
 }

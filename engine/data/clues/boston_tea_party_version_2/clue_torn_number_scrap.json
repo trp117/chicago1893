@@ -1,15 +1,15 @@
 {
   "id": "clue_torn_number_scrap",
-  "scenarioId": "boston_tea_party_version_2",
   "title": "Torn Numerical Scrap",
-  "description": "Caught on a nail in the Harbor Street Alley, you find a torn scrap of paper bearing a partial column of numbers in a cramped, precise hand. The figures appear to be financial — amounts, possibly in pounds sterling — and the handwriting matches the account ledger entries you have seen attributed to the Sons of Liberty treasurer. Someone passed through this alley recently and lost part of a document.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.445Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "Caught on a nail in the Harbor Street Alley, you find a torn scrap of paper bearing a partial column of numbers in a cramped, precise hand. The figures appear to be financial — amounts, possibly in pounds sterling — and the handwriting matches the account ledger entries you have seen attributed to the Sons of Liberty treasurer. Someone passed through this alley recently and lost part of a document.",
+  "isKeyEvidence": false,
   "discoveryLocationId": "harbor_street_alley",
   "implicatesCharacterIds": [
     "thomas_greenleaf"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.445Z"
+  ]
 }

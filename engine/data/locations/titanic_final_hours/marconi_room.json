@@ -1,20 +1,20 @@
 {
   "id": "marconi_room",
-  "scenarioId": "titanic_final_hours",
-  "name": "The Marconi Room",
-  "description": "A cramped steel compartment on the Boat Deck just aft of the officers' quarters, barely large enough for two operators and their equipment — the air smells of ozone and hot insulation, and the spark-gap transmitter fills the room with a rhythmic metallic clatter that can be heard in the corridor outside.",
   "mood": "urgent, claustrophobic, purposeful",
-  "linkedCharacterIds": [
-    "harold_bride",
-    "jack_phillips"
-  ],
+  "name": "The Marconi Room",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.057Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "titanic_final_hours",
+  "description": "A cramped steel compartment on the Boat Deck just aft of the officers' quarters, barely large enough for two operators and their equipment — the air smells of ozone and hot insulation, and the spark-gap transmitter fills the room with a rhythmic metallic clatter that can be heard in the corridor outside.",
   "atmosphericDetails": [
     "The transmitter key clicks in a steady rhythm even as the floor tilts almost imperceptibly to starboard — Morse code filling the air like a second heartbeat",
     "A single bare electric bulb swings slightly with the ship's movement, casting shifting shadows across the log book open on the shelf",
     "Through the thin steel wall, the sound of the band playing ragtime on the Boat Deck drifts in, absurdly cheerful against the crackling static of the receiver"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.057Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "harold_bride",
+    "jack_phillips"
+  ]
 }

@@ -1,0 +1,52 @@
+{
+  "id": "chicago1893_main_arc",
+  "acts": [
+    {
+      "name": "Setup",
+      "beats": [
+        "Burnham introduces stakes",
+        "First irregularity appears",
+        "Player gets first lead",
+        "At least one suspect becomes visible"
+      ],
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        4
+      ]
+    },
+    {
+      "name": "Pressure",
+      "beats": [
+        "Evidence of deliberate interference confirmed",
+        "A second suspect or complication emerges",
+        "Sabotage method or target becomes clearer"
+      ],
+      "actNumber": 2,
+      "minuteRange": [
+        5,
+        10
+      ]
+    },
+    {
+      "name": "Climax",
+      "beats": [
+        "Sabotage plan is clear",
+        "Player chooses how to intervene",
+        "Resolution before opening"
+      ],
+      "actNumber": 3,
+      "minuteRange": [
+        11,
+        20
+      ]
+    }
+  ],
+  "goal": "Identify the conspirators, confirm the method of sabotage, and stop it before public disaster or humiliation strikes the fair.",
+  "name": "The Sabotage of the White City",
+  "premise": "The player must uncover and stop a conspiracy to sabotage the World's Columbian Exposition before opening day.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "openingSituation": "A discrepancy in shipping manifests and an unnerving conversation overheard near the Administration Building suggest that someone is tampering with critical fair infrastructure."
+}

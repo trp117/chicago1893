@@ -1,20 +1,20 @@
 {
   "id": "loc_no_mans_land",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "No Man's Land — The Crater Field",
-  "description": "Four hundred meters of churned topsoil, collapsed wire obstacles, and water-filled shell craters stretching between the American jump-off trench and the ruins of Cantigny's western edge. The ground is not flat — it heaves and dips in a continuous series of overlapping craters, each one a potential shelter or a potential grave.",
   "mood": "exposed, chaotic, deafening, surreal",
-  "linkedCharacterIds": [
-    "char_kowalski",
-    "char_voss"
-  ],
+  "name": "No Man's Land — The Crater Field",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.097Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "Four hundred meters of churned topsoil, collapsed wire obstacles, and water-filled shell craters stretching between the American jump-off trench and the ruins of Cantigny's western edge. The ground is not flat — it heaves and dips in a continuous series of overlapping craters, each one a potential shelter or a potential grave.",
   "atmosphericDetails": [
     "The creeping barrage is visible as a continuous wall of smoke and dirt moving slowly northeast, lit from within by muzzle flashes and secondary detonations",
     "Red and green pyrotechnic flares burst overhead at irregular intervals, their light washing the smoke in garish color before fading",
     "The wire spool Kowalski is carrying catches on a collapsed picket stake; the copper line goes taut and hums audibly in the morning air"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.097Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_kowalski",
+    "char_voss"
+  ]
 }

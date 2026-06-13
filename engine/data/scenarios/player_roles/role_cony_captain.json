@@ -1,59 +1,59 @@
 {
   "id": "role_cony_captain",
-  "scenarioId": "sargasso_deep_three_keys",
   "name": "The Surface Hunter",
-  "description": "You command the USS Cony, the destroyer that has been holding the Soviet submarine down for hours. You don't know what's aboard it. You don't know how close it is to the edge. You have the power to stop the pressure — if you can find a reason that satisfies your orders.",
-  "startLocationId": "loc_cony_bridge",
-  "startingKnowledge": [
-    "Your explicit CINCLANT orders authorize only Mk-84 signaling charges — escalation to lethal munitions requires direct task force commander authorization.",
-    "The contact has been stationary for over two hours, which is tactically abnormal for a submarine attempting to evade.",
-    "You do not know the B-59 is nuclear-armed — your intelligence brief described Foxtrot-class submarines as conventionally armed.",
-    "The third signaling charge was dropped closer than protocol specified — a deviation your XO has logged but not yet shown you."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the surface — the physical experience of the open bridge, the cold and the salt and the fog, the mechanical sounds of the ship. Estocin has complete tactical information about the surface picture and zero information about what is happening below. He is the most powerful actor in this scenario and the most blind.",
+  "opening": {
+    "choices": [
+      "Ask Hayes directly what he has on the clipboard and why he has been below decks for forty minutes.",
+      "Order a fourth signaling charge dropped immediately — the contact needs to understand that the signals will not stop.",
+      "Contact the task force commander on the secure circuit and request updated intelligence on the contact's probable status and armament."
+    ],
+    "narrative": "It is 20:00 on the open bridge of the USS Cony, and the Atlantic is flat and black and the fog is in. The sonar repeater shows the contact stationary at 800 yards. Three signaling charges have been dropped in the last forty minutes. The contact has not surfaced, has not responded, has not moved. The task force commander's last communication was ninety minutes ago: 'Continue hold-down. Compel surface. Report contact behavior.' The contact's behavior is: nothing. Your XO has been below decks for forty minutes. The depth-charge rack aft is loaded. You are standing at the windbreak rail and you are beginning to ask yourself a question that your orders do not answer.",
+    "npcMoments": [
+      {
+        "action": "Appears at the top of the bridge ladder with a message clipboard and a careful expression — the expression of a man who has something to say and is choosing his moment.",
+        "characterId": "char_lt_commander_hayes"
+      }
+    ]
+  },
   "briefing": "You are standing on the open bridge of the USS Cony with both hands on the windbreak rail, and the Atlantic fog is doing what Atlantic fog does — making the searchlight useless and the darkness complete beyond forty yards. The sonar repeater to your left shows the contact as a bright, stationary smear at bearing 210, and it has not moved in two hours and eleven minutes. A submarine that stops moving is a submarine that has lost propulsion, or is waiting, or is dying — and you do not yet know which of those three things is true. You have dropped three signaling charges. The contact has not surfaced. Your standing orders say to continue the hold-down and continue the signals until the contact surfaces or until you receive new orders from the task force commander. What your orders do not account for is a contact that simply refuses to respond — that sits at depth in total silence while your sonar pings it every four seconds like a man knocking on a door that is never going to open. Your XO is below decks and has not come to the bridge in forty minutes, which is its own kind of signal. The depth-charge rack aft holds four more Mk-84 canisters and, in the locker below it, the live charges that your informal orders authorize you to use if the contact attempts to break the perimeter. You have not opened that locker. You are standing at the rail and the fog is coming in and the contact is not moving and you are beginning to understand that something is wrong down there in a way that your briefing did not prepare you for.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:46.325Z",
+  "represents": "US Navy destroyer captains participating in the naval quarantine of Cuba, October 1962",
+  "scenarioId": "sargasso_deep_three_keys",
+  "accessLevel": "staff",
+  "description": "You command the USS Cony, the destroyer that has been holding the Soviet submarine down for hours. You don't know what's aboard it. You don't know how close it is to the edge. You have the power to stop the pressure — if you can find a reason that satisfies your orders.",
+  "perspective": "Write from the surface — the physical experience of the open bridge, the cold and the salt and the fog, the mechanical sounds of the ship. Estocin has complete tactical information about the surface picture and zero information about what is happening below. He is the most powerful actor in this scenario and the most blind.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The contact has been stationary for six minutes.",
   "character_hooks": [
     "I have a brother who is a naval attaché in Moscow, and I have spent the last fourteen days thinking about what it means to be on opposite sides of a line that neither of us drew.",
     "I commanded an ASW exercise against a Foxtrot-class submarine two years ago and I know exactly how much endurance the crew has at depth — and by my calculation, they passed their limit three hours ago.",
     "I received an informal message from a classmate at CINCLANT staff before departure suggesting that the intelligence picture on these submarines was incomplete — a message I did not report because I had no way to verify it."
   ],
-  "suggested_secret": "Estocin has already decided that if the contact attempts to break the perimeter, he will not open the live-charge locker — he will let it go rather than risk a lethal engagement with a crew that may be in distress. He has not told his XO, and the decision directly contradicts his informal orders from the task force admiral.",
-  "opening": {
-    "narrative": "It is 20:00 on the open bridge of the USS Cony, and the Atlantic is flat and black and the fog is in. The sonar repeater shows the contact stationary at 800 yards. Three signaling charges have been dropped in the last forty minutes. The contact has not surfaced, has not responded, has not moved. The task force commander's last communication was ninety minutes ago: 'Continue hold-down. Compel surface. Report contact behavior.' The contact's behavior is: nothing. Your XO has been below decks for forty minutes. The depth-charge rack aft is loaded. You are standing at the windbreak rail and you are beginning to ask yourself a question that your orders do not answer.",
-    "npcMoments": [
-      {
-        "characterId": "char_lt_commander_hayes",
-        "action": "Appears at the top of the bridge ladder with a message clipboard and a careful expression — the expression of a man who has something to say and is choosing his moment."
-      }
-    ],
-    "choices": [
-      "Ask Hayes directly what he has on the clipboard and why he has been below decks for forty minutes.",
-      "Order a fourth signaling charge dropped immediately — the contact needs to understand that the signals will not stop.",
-      "Contact the task force commander on the secure circuit and request updated intelligence on the contact's probable status and armament."
-    ]
-  },
+  "startLocationId": "loc_cony_bridge",
+  "context_sentence": "You are Commander Charles R. Espe, commanding officer of the USS Cony (DD-508), the lead destroyer in the hunter-killer group that located and held down Soviet submarine B-59 on October 27, 1962 — the day a nuclear-armed vessel came closer to firing on American forces than any submarine in history.",
   "roleInitialState": {
+    "flags": {
+      "hayes_log_reviewed": false,
+      "live_charges_authorized": false,
+      "surfacing_signal_broadcast": false,
+      "special_ordnance_warning_received": false
+    },
     "inventory": [
       "cinclant_orders_document",
       "task_force_radio_handset"
     ],
-    "flags": {
-      "special_ordnance_warning_received": false,
-      "live_charges_authorized": false,
-      "surfacing_signal_broadcast": false,
-      "hayes_log_reviewed": false
-    },
     "suspicion": {
       "char_lt_commander_hayes": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:46.325Z",
-  "context_sentence": "You are Commander Charles R. Espe, commanding officer of the USS Cony (DD-508), the lead destroyer in the hunter-killer group that located and held down Soviet submarine B-59 on October 27, 1962 — the day a nuclear-armed vessel came closer to firing on American forces than any submarine in history.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "US Navy destroyer captains participating in the naval quarantine of Cuba, October 1962",
-  "fact_checked": false,
-  "bridge_sentence": "The contact has been stationary for six minutes."
+  "suggested_secret": "Estocin has already decided that if the contact attempts to break the perimeter, he will not open the live-charge locker — he will let it go rather than risk a lethal engagement with a crew that may be in distress. He has not told his XO, and the decision directly contradicts his informal orders from the task force admiral.",
+  "startingKnowledge": [
+    "Your explicit CINCLANT orders authorize only Mk-84 signaling charges — escalation to lethal munitions requires direct task force commander authorization.",
+    "The contact has been stationary for over two hours, which is tactically abnormal for a submarine attempting to evade.",
+    "You do not know the B-59 is nuclear-armed — your intelligence brief described Foxtrot-class submarines as conventionally armed.",
+    "The third signaling charge was dropped closer than protocol specified — a deviation your XO has logged but not yet shown you."
+  ]
 }

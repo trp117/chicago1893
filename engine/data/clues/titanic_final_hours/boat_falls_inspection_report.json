@@ -1,17 +1,17 @@
 {
   "id": "boat_falls_inspection_report",
-  "scenarioId": "titanic_final_hours",
   "title": "Davit Falls Load Test Report — Southampton",
-  "description": "A White Star Line inspection document found in the officer's chart locker records the Southampton pre-departure load test of the Welin davit falls: all sixteen sets tested to 70-person capacity with no failures noted. The document directly contradicts the claim made to Lightoller by a junior officer that the falls might not hold a full load — the falls were tested and certified for full capacity four days ago.",
-  "category": "documentary",
-  "discoveryLocationId": "captains_bridge",
-  "implicatesCharacterIds": [
-    "charles_lightoller"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-18T01:52:38.060Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "titanic_final_hours",
+  "description": "A White Star Line inspection document found in the officer's chart locker records the Southampton pre-departure load test of the Welin davit falls: all sixteen sets tested to 70-person capacity with no failures noted. The document directly contradicts the claim made to Lightoller by a junior officer that the falls might not hold a full load — the falls were tested and certified for full capacity four days ago.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "captains_bridge",
+  "implicatesCharacterIds": [
+    "charles_lightoller"
+  ]
 }

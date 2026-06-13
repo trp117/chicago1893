@@ -1,17 +1,17 @@
 {
   "id": "boiler_room_water_level_log",
-  "scenarioId": "titanic_final_hours",
   "title": "Engineer's Water Level Log — Boiler Rooms 5 and 4",
-  "description": "A grease-stained notebook passed up from Boiler Room No. 5 records water level measurements taken every ten minutes since midnight: at 12:00 AM, two inches on the plates; at 12:20 AM, eight inches; at 12:40 AM, nineteen inches; at 1:00 AM, thirty-one inches. The rate of increase is accelerating. At the bottom, in a different hand: 'BR4 plates clear as of 0105. May not hold.' The log tells anyone who reads it that the Black Gang has perhaps thirty minutes before the boiler rooms must be abandoned.",
-  "category": "documentary",
-  "discoveryLocationId": "boiler_room_four",
-  "implicatesCharacterIds": [
-    "joseph_bell"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-18T01:52:38.061Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "titanic_final_hours",
+  "description": "A grease-stained notebook passed up from Boiler Room No. 5 records water level measurements taken every ten minutes since midnight: at 12:00 AM, two inches on the plates; at 12:20 AM, eight inches; at 12:40 AM, nineteen inches; at 1:00 AM, thirty-one inches. The rate of increase is accelerating. At the bottom, in a different hand: 'BR4 plates clear as of 0105. May not hold.' The log tells anyone who reads it that the Black Gang has perhaps thirty minutes before the boiler rooms must be abandoned.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "boiler_room_four",
+  "implicatesCharacterIds": [
+    "joseph_bell"
+  ]
 }

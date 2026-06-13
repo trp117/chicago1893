@@ -1,19 +1,19 @@
 {
   "id": "engine_room_control",
-  "scenarioId": "titanic_final_hours",
-  "name": "Engine Room — Throttle Platform",
-  "description": "The central control platform of the engine room, one level above the triple-expansion reciprocating engines themselves — a steel catwalk with gauges, speaking tubes, and telegraph dials, currently showing both engines at STOP and the throttle valves closed, while the turbine exhaust feeds the aft dynamos that are still generating power.",
   "mood": "technical, pressurized, terminal",
-  "linkedCharacterIds": [
-    "joseph_bell"
-  ],
+  "name": "Engine Room — Throttle Platform",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-18T01:52:38.055Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "titanic_final_hours",
+  "description": "The central control platform of the engine room, one level above the triple-expansion reciprocating engines themselves — a steel catwalk with gauges, speaking tubes, and telegraph dials, currently showing both engines at STOP and the throttle valves closed, while the turbine exhaust feeds the aft dynamos that are still generating power.",
   "atmosphericDetails": [
     "The telegraph dials are set to STOP but the dynamo gauges are still reading nominal — the engineers have isolated the electrical generation from the propulsion system, buying time",
     "A speaking tube to the Marconi Room runs along the port bulkhead — the cap is off, and occasionally a faint crackling sound comes through it, the ghost of Morse code from five decks up",
     "The water is visible through the grating below the platform, black and rising, and two engineers are still working at the bilge pumps with the focused efficiency of men who know the math and have chosen to ignore it"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-18T01:52:38.055Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "joseph_bell"
+  ]
 }

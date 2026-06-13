@@ -1,14 +1,14 @@
 {
   "id": "loc_mocr_main_floor",
-  "scenarioId": "apollo_13_lifeboat",
+  "mood": "urgent, pressurized, institutional, exhausted",
   "name": "Mission Operations Control Room — Main Floor",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.955Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "apollo_13_lifeboat",
   "short_name": "Mission Control, Houston",
   "description": "The nerve center of the American space program, now running on adrenaline and cigarette smoke. Rows of consoles face a wall of screens showing data that makes no sense and trajectories that lead to death unless someone changes them.",
-  "mood": "urgent, pressurized, institutional, exhausted",
-  "linkedCharacterIds": [
-    "char_gene_kranz",
-    "char_glynn_lunney"
-  ],
   "atmosphericDetails": [
     "The overhead fluorescent lights are too bright; every controller looks slightly ill in the light, or perhaps they are slightly ill",
     "The room smells of cigarette smoke, burnt coffee from the urn that has been running for 14 hours, and the particular human smell of men who have not left their seats",
@@ -16,8 +16,8 @@
     "Every console has a phone handset lying off the hook; the background noise is a continuous low murmur of technical language from a dozen simultaneous conversations",
     "Gene Kranz's white vest is the brightest thing in the room; controllers orient to it the way sailors orient to a lighthouse"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.955Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_gene_kranz",
+    "char_glynn_lunney"
+  ]
 }

@@ -1,20 +1,20 @@
 {
   "id": "loc_wire_splice_point",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "Wire Splice Point Delta-7, No Man's Land",
-  "description": "A specific point in the crater field, marked on Kowalski's hand-drawn wire chart as D-7, where the forward copper telephone line was cut. The cut is clean, diagonal, and sits in a shallow depression between two overlapping shell craters, sheltered from casual observation.",
   "mood": "isolated, forensic, urgent, cold",
-  "linkedCharacterIds": [
-    "char_kowalski",
-    "char_farrow"
-  ],
+  "name": "Wire Splice Point Delta-7, No Man's Land",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.099Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "A specific point in the crater field, marked on Kowalski's hand-drawn wire chart as D-7, where the forward copper telephone line was cut. The cut is clean, diagonal, and sits in a shallow depression between two overlapping shell craters, sheltered from casual observation.",
   "atmosphericDetails": [
     "The two ends of the copper wire lie in the mud three feet apart; the cut surfaces are bright and unoxidized, indicating they were made within the last two hours",
     "A bootprint in the clay beside the cut is deeper on the left heel — the print of someone who paused here, shifted their weight, worked with both hands",
     "A single strand of khaki wool thread is caught on the wire's cut end — the color matches American officer's uniform fabric, not enlisted"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.099Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_kowalski",
+    "char_farrow"
+  ]
 }

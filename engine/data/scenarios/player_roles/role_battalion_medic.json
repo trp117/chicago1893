@@ -1,34 +1,55 @@
 {
   "id": "role_battalion_medic",
-  "scenarioId": "dog_green_sector",
   "name": "The Battalion Medic",
-  "description": "You are unarmed, marked by red crosses, and surrounded by men who need more than you have. Your triage decisions will determine who survives long enough to reach the wire — and one of the men you have already assessed as expectant is still conscious and carrying intelligence that could change the entire assault.",
-  "startLocationId": "loc_surf_zone",
-  "startingKnowledge": [
-    "Your medical supplies are critically limited: four morphine syrettes, one plasma unit, sulfa powder for approximately six wounds.",
-    "Private Szymanski, currently assessed as expectant, has a scalp laceration rather than the abdominal wound you initially identified — he can move.",
-    "Salt water contamination means every open wound on this beach is an infection waiting to become sepsis in forty-eight hours.",
-    "You are a conscientious objector serving as a non-combatant — a fact that no one in your unit knows."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man whose training has given him a clinical language for things that are not clinical — he uses precise medical terminology as a way of maintaining the distance necessary to keep working. When the distance collapses, it collapses completely.",
+  "opening": {
+    "choices": [
+      "Complete treatment of the man under your hands — use the plasma, do what you can, then move to the shingle.",
+      "Make the hard call now — categorize the current patient as expectant and move immediately to Szymanski to reassess.",
+      "Call out to Szymanski from where you are — try to assess his mobility and mental clarity before committing to either patient."
+    ],
+    "narrative": "The surf is cold enough to numb the hands in four minutes and you have been in it for eleven. Your bag is waterproof but the zipper has sand in it and every opening costs three seconds you do not have. The man under your hands has a femoral wound that is not survivable without a surgical team and a blood supply that does not exist within five miles of this beach. The men at the shingle are calling for you in voices that are trying to stay controlled and not entirely succeeding. Thirty feet to your left, Szymanski is propped against a hedgehog with his helmet pushed back and blood on his face, talking to himself or to someone you cannot see, in a voice too low to hear over the surf. You made a triage call on him twenty minutes ago that you are no longer certain was correct.",
+    "npcMoments": []
+  },
   "briefing": "You are on your hands and knees in the surf with your bag open and a man's leg in your hands, and the water is at your elbows and rising. You have treated eleven men since the ramp dropped — you know this because you counted, the way you count everything, because counting is the only way to know what you have left. You have four morphine syrettes, one plasma unit, and sulfa for six more wounds. The man under your hands is beyond the plasma — you know this with the flat certainty of training — and the men calling from the shingle need what you are about to use on him. Thirty feet to your left, a soldier you marked as expectant twenty minutes ago is propped against a hedgehog and talking — quietly, deliberately, in the careful English of a man for whom it is a second language. You marked him as an abdominal wound. Looking at him now, in better light, the blood is from his scalp, not his belly. You made an error. He is alive and mobile and saying something you cannot yet hear over the surf and the gun. You have to decide what to do with the man under your hands before you can go find out what the other one is saying.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-24T03:20:06.239Z",
+  "represents": "Battalion aid men of the 116th Infantry Regiment at Omaha Beach on June 6, 1944",
+  "scenarioId": "dog_green_sector",
+  "accessLevel": "staff",
+  "description": "You are unarmed, marked by red crosses, and surrounded by men who need more than you have. Your triage decisions will determine who survives long enough to reach the wire — and one of the men you have already assessed as expectant is still conscious and carrying intelligence that could change the entire assault.",
+  "perspective": "Write from the perspective of a man whose training has given him a clinical language for things that are not clinical — he uses precise medical terminology as a way of maintaining the distance necessary to keep working. When the distance collapses, it collapses completely.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "The Sergeant, The Coxswain",
+      "what_happened": "Your medical kit was lost in the surf or destroyed by shrapnel early in the landing. You spent the morning huddled against a steel obstacle, unable to provide anything but words to the dying as the tide forced you back.",
+      "emotional_weight": "Helplessness—the agony of a healer with empty hands.",
+      "closing_line_override": "You were a witness to the carnage, but the red cross on your helmet was just a hollow promise."
+    },
+    "partial": {
+      "who_present": "The Sergeant",
+      "what_happened": "You reached the shingle and saved the Sergeant, but your medical supplies are exhausted. You had to leave men in the \"wash\" to focus on those who could still fight. The breach is open, but you are haunted by the faces of those you couldn't reach.",
+      "emotional_weight": "Moral Injury—the burden of choosing who lives when you wanted to save them all.",
+      "closing_line_override": "You saved the mission, but you couldn't save the men."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The tide is at your elbows now.",
   "character_hooks": [
     "I know Szymanski from the transport crossing — he taught me three words of Polish and I taught him three of Georgian, and when I marked him expectant I did not look at his face, and now I cannot stop thinking about that.",
     "I have four syrettes left and I know exactly who on this beach needs them most, and one of those people is the sergeant who is going to push the Bangalore, and I have not told him I am saving one for him.",
     "I filed for conscientious objector status in 1942 and was denied and assigned to the medical corps instead, and every man I save on this beach is an argument I am making to no one in particular about what that distinction means."
   ],
-  "suggested_secret": "Calloway made a triage error on the run-in — a man he categorized as expectant and left in the LCA was still alive when the craft pulled away from the previous beach rehearsal, and he has never reported it or been certain the man survived.",
-  "opening": {
-    "narrative": "The surf is cold enough to numb the hands in four minutes and you have been in it for eleven. Your bag is waterproof but the zipper has sand in it and every opening costs three seconds you do not have. The man under your hands has a femoral wound that is not survivable without a surgical team and a blood supply that does not exist within five miles of this beach. The men at the shingle are calling for you in voices that are trying to stay controlled and not entirely succeeding. Thirty feet to your left, Szymanski is propped against a hedgehog with his helmet pushed back and blood on his face, talking to himself or to someone you cannot see, in a voice too low to hear over the surf. You made a triage call on him twenty minutes ago that you are no longer certain was correct.",
-    "npcMoments": [],
-    "choices": [
-      "Complete treatment of the man under your hands — use the plasma, do what you can, then move to the shingle.",
-      "Make the hard call now — categorize the current patient as expectant and move immediately to Szymanski to reassess.",
-      "Call out to Szymanski from where you are — try to assess his mobility and mental clarity before committing to either patient."
-    ]
-  },
+  "startLocationId": "loc_surf_zone",
+  "context_sentence": "You are the Battalion Medic, and the man dying in your hands is not the man you need to reach.",
   "roleInitialState": {
+    "flags": {
+      "drennan_treated": false,
+      "szymanski_reassessed": false,
+      "supply_inventory_shared": false,
+      "triage_error_acknowledged": false
+    },
     "inventory": [
       "medical bag with four morphine syrettes",
       "one plasma unit and reconstitution kit",
@@ -36,34 +57,13 @@
       "field dressings (three remaining)",
       "Geneva Convention non-combatant brassard"
     ],
-    "flags": {
-      "szymanski_reassessed": false,
-      "drennan_treated": false,
-      "supply_inventory_shared": false,
-      "triage_error_acknowledged": false
-    },
     "suspicion": {}
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:20:06.239Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You reached the shingle and saved the Sergeant, but your medical supplies are exhausted. You had to leave men in the \"wash\" to focus on those who could still fight. The breach is open, but you are haunted by the faces of those you couldn't reach.",
-      "who_present": "The Sergeant",
-      "emotional_weight": "Moral Injury—the burden of choosing who lives when you wanted to save them all.",
-      "closing_line_override": "You saved the mission, but you couldn't save the men."
-    },
-    "failure": {
-      "what_happened": "Your medical kit was lost in the surf or destroyed by shrapnel early in the landing. You spent the morning huddled against a steel obstacle, unable to provide anything but words to the dying as the tide forced you back.",
-      "who_present": "The Sergeant, The Coxswain",
-      "emotional_weight": "Helplessness—the agony of a healer with empty hands.",
-      "closing_line_override": "You were a witness to the carnage, but the red cross on your helmet was just a hollow promise."
-    }
-  },
-  "context_sentence": "You are the Battalion Medic, and the man dying in your hands is not the man you need to reach.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Battalion aid men of the 116th Infantry Regiment at Omaha Beach on June 6, 1944",
-  "fact_checked": false,
-  "bridge_sentence": "The tide is at your elbows now."
+  "suggested_secret": "Calloway made a triage error on the run-in — a man he categorized as expectant and left in the LCA was still alive when the craft pulled away from the previous beach rehearsal, and he has never reported it or been certain the man survived.",
+  "startingKnowledge": [
+    "Your medical supplies are critically limited: four morphine syrettes, one plasma unit, sulfa powder for approximately six wounds.",
+    "Private Szymanski, currently assessed as expectant, has a scalp laceration rather than the abdominal wound you initially identified — he can move.",
+    "Salt water contamination means every open wound on this beach is an infection waiting to become sepsis in forty-eight hours.",
+    "You are a conscientious objector serving as a non-combatant — a fact that no one in your unit knows."
+  ]
 }

@@ -1,57 +1,57 @@
 {
   "id": "elias_cole_conductor",
-  "scenarioId": "singing_wires",
   "name": "Elias Cole — The Conductor",
-  "description": "You are the veteran conductor with seven passengers in your care, moving north through the bottomland toward a barn that may no longer be safe. You know the land and the routes, but you are cut off from the wire and from the truth of what has already been sent.",
-  "startLocationId": "huron_road_bottomland",
-  "startingKnowledge": [
-    "You know the location of the Voss barn safe house and the shore road to the Patience.",
-    "You know the book cipher keyed to the 1844 Cruden's Concordance.",
-    "You know that the last three groups you moved were watched, and that the watching came from somewhere inside the network.",
-    "You know that your son Thomas works the night wire at the Sandusky junction and that he would warn you if he could."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write for this role from the ground level — physical, sensory, dependent on direct observation and trusted relationships. Elias does not have access to the telegraph office or the sheriff's records; he learns through people and through the land itself. His decisions are about pace, route, and trust.",
+  "opening": {
+    "choices": [
+      "Move the passengers directly to the barn across the open field and check the lantern signal yourself.",
+      "Send the fastest adult passenger ahead alone to check the barn while you hold the group in the tree line.",
+      "Take the long route through the rail yard ballast toward the waterfront path, bypassing the barn entirely and heading directly for the shore."
+    ],
+    "narrative": "It is half past nine on an October night in 1853, and you are in the bottomland north of the Huron River with seven passengers and a 13 warning burning in your chest. The telegraph wire sings above the road to your left. The Voss barn is a dark shape two hundred yards north across an open field. The lantern is not lit.",
+    "npcMoments": []
+  },
   "briefing": "You are standing in the Huron River bottomland with your back against an elm tree and seven people within arm's reach in the dark, the two children pressed against their mother's side and quiet in the way that children learn to be quiet when quiet means survival. The telegraph wire runs along the road thirty yards to your left, and it is singing tonight — a low, tuneless chord in the northeast wind that you have come to read the way other men read weather. Something in the wire's pitch has changed in the last hour, or you have told yourself it has, which amounts to the same thing when you are responsible for seven lives and the shore is still a mile and a half north. You received a 13 warning twenty minutes ago from a gandy dancer's boy on a fast horse — the sheriff is coming, or someone is coming, and the boy did not know more than that. What you know that no one else in this story knows is that the last three groups you moved were watched from inside the network, and that the watching came from someone who knew the departure times exactly. You have said nothing because you had no proof. Tonight you have seven people including two children who are asleep on their feet, a shore road that may be watched, and a barn that may or may not be safe to enter. The lantern in the Voss barn window is not lit, which means either the station is secure and waiting for your signal, or it means something has already gone wrong. You are standing at the edge of the tree line looking at the dark shape of the barn, and you must decide in the next sixty seconds whether to move your passengers forward or take the long way around through the rail yard ballast toward the waterfront path.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:48.765Z",
+  "represents": "Underground Railroad conductors operating in the Ohio corridor, 1850-1860",
+  "scenarioId": "singing_wires",
+  "accessLevel": "staff",
+  "description": "You are the veteran conductor with seven passengers in your care, moving north through the bottomland toward a barn that may no longer be safe. You know the land and the routes, but you are cut off from the wire and from the truth of what has already been sent.",
+  "perspective": "Write for this role from the ground level — physical, sensory, dependent on direct observation and trusted relationships. Elias does not have access to the telegraph office or the sheriff's records; he learns through people and through the land itself. His decisions are about pace, route, and trust.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The barn window is dark.",
   "character_hooks": [
     "I have moved sixty-three people north in twenty years, and I have never lost a passenger to the law — but three years ago I left a man behind when the catchers came too fast, and I have never told anyone, and tonight I can feel that decision riding with me.",
     "I received a letter last month from a stationmaster in Windsor offering me passage and a new life on the other shore — I have not told my son, and I do not know yet if I am going to take it after tonight.",
     "I do not trust the telegraph and I do not trust my son's faith in it, but Thomas sent me a warning through a gandy dancer's boy tonight using the old code, and that means he is already in it with me whether I asked him to be or not."
   ],
-  "suggested_secret": "Elias Cole has memorized the names and last-known locations of every person he has moved north in twenty years — sixty-three names — and he recites them silently every night before he sleeps, because he believes that if he stops remembering them, the work will have been only about the movement and not about the people.",
-  "opening": {
-    "narrative": "It is half past nine on an October night in 1853, and you are in the bottomland north of the Huron River with seven passengers and a 13 warning burning in your chest. The telegraph wire sings above the road to your left. The Voss barn is a dark shape two hundred yards north across an open field. The lantern is not lit.",
-    "npcMoments": [],
-    "choices": [
-      "Move the passengers directly to the barn across the open field and check the lantern signal yourself.",
-      "Send the fastest adult passenger ahead alone to check the barn while you hold the group in the tree line.",
-      "Take the long route through the rail yard ballast toward the waterfront path, bypassing the barn entirely and heading directly for the shore."
-    ]
-  },
+  "startLocationId": "huron_road_bottomland",
+  "context_sentence": "You are Elias Cole, a conductor on the Underground Railroad operating along the Lake Erie corridor in northern Ohio in the autumn of 1853, responsible tonight for moving seven escaped slaves — among them two children — across the final mile of bottomland toward the Canadian-bound vessel waiting at Sandusky Bay.",
   "roleInitialState": {
+    "flags": {
+      "barn_checked": false,
+      "passengers_moving": true,
+      "13_warning_received": true
+    },
     "inventory": [
       "Cruden's Concordance cipher key (memorized)",
       "Folded recognition phrase card",
       "Small lantern, unlit",
       "Pocket knife"
     ],
-    "flags": {
-      "barn_checked": false,
-      "passengers_moving": true,
-      "13_warning_received": true
-    },
     "suspicion": {
-      "deputy_crane": 2,
+      "arden_gill": 0,
       "silas_pratt": 0,
-      "arden_gill": 0
+      "deputy_crane": 2
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:48.765Z",
-  "context_sentence": "You are Elias Cole, a conductor on the Underground Railroad operating along the Lake Erie corridor in northern Ohio in the autumn of 1853, responsible tonight for moving seven escaped slaves — among them two children — across the final mile of bottomland toward the Canadian-bound vessel waiting at Sandusky Bay.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Underground Railroad conductors operating in the Ohio corridor, 1850-1860",
-  "fact_checked": false,
-  "bridge_sentence": "The barn window is dark."
+  "suggested_secret": "Elias Cole has memorized the names and last-known locations of every person he has moved north in twenty years — sixty-three names — and he recites them silently every night before he sleeps, because he believes that if he stops remembering them, the work will have been only about the movement and not about the people.",
+  "startingKnowledge": [
+    "You know the location of the Voss barn safe house and the shore road to the Patience.",
+    "You know the book cipher keyed to the 1844 Cruden's Concordance.",
+    "You know that the last three groups you moved were watched, and that the watching came from somewhere inside the network.",
+    "You know that your son Thomas works the night wire at the Sandusky junction and that he would warn you if he could."
+  ]
 }

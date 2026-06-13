@@ -1,17 +1,17 @@
 {
   "id": "clue_shelter_registry_cross_reference",
-  "scenarioId": "high_water_reckoning",
   "title": "Shelter Registry Entry — Fontenot Family",
-  "description": "A page from the bridge camp's informal shelter registry, maintained by Loretta Sainte-Claire in a spiral notebook since August 30. The Fontenot family — Marcus, his mother Estelle, and two cousins — appear on the August 30 intake list, confirming their presence in the bridge camp at the time Cynthia Tureaud filed the Deslonde Street property as abandoned. The registry entry predates the abandonment filing by approximately eighteen hours.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.288Z",
+  "locationId": "",
+  "scenarioId": "high_water_reckoning",
+  "description": "A page from the bridge camp's informal shelter registry, maintained by Loretta Sainte-Claire in a spiral notebook since August 30. The Fontenot family — Marcus, his mother Estelle, and two cousins — appear on the August 30 intake list, confirming their presence in the bridge camp at the time Cynthia Tureaud filed the Deslonde Street property as abandoned. The registry entry predates the abandonment filing by approximately eighteen hours.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "bridge_camp_supply_ledger_post",
   "implicatesCharacterIds": [
     "cynthia_tureaud"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.058Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

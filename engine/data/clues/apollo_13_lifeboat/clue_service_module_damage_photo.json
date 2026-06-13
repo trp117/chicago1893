@@ -1,18 +1,18 @@
 {
   "id": "clue_service_module_damage_photo",
-  "scenarioId": "apollo_13_lifeboat",
   "title": "Lovell's Photograph of the Service Module",
-  "description": "A Hasselblad photograph taken through Odyssey's window as the Service Module drifts away — the image shows an entire panel of the hull missing, the oxygen tank bay open to space, and internal components frozen and trailing in the vacuum. The photograph confirms what the telemetry could only suggest: the explosion was not a sensor failure or a partial rupture. An entire section of the spacecraft is simply gone. The image will be studied for decades. Right now, it is evidence.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-25T14:53:42.961Z",
+  "locationId": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "description": "A Hasselblad photograph taken through Odyssey's window as the Service Module drifts away — the image shows an entire panel of the hull missing, the oxygen tank bay open to space, and internal components frozen and trailing in the vacuum. The photograph confirms what the telemetry could only suggest: the explosion was not a sensor failure or a partial rupture. An entire section of the spacecraft is simply gone. The image will be studied for decades. Right now, it is evidence.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_service_module_wreckage",
   "implicatesCharacterIds": [
     "char_jim_lovell",
     "char_jack_swigert"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.961Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

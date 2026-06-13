@@ -1,20 +1,20 @@
 {
   "id": "clue_nulled_codebook",
-  "scenarioId": "lightning_and_the_midnight_coach",
   "title": "The Nulled Codebook Entry",
-  "description": "The commercial codebook on the telegraph table has been used as a cipher key. When you read every third entry on the dog-eared pages — a classic null cipher — a message assembles itself: HOYLE CONFIRMS DRY GOODS IN CELLAR. SMALL DRY GOODS NOT COUNTED. HURON ROAD MARK. The entries were bent down in sequence over multiple visits, not all at once. The handwriting on the bent-page margins is not Caleb Morse's — it is a rougher, less practiced hand. The word HOYLE is an unambiguous name.",
+  "unlocks": [
+    "clue_dead_drop_impression"
+  ],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.466Z",
+  "locationId": "",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "The commercial codebook on the telegraph table has been used as a cipher key. When you read every third entry on the dog-eared pages — a classic null cipher — a message assembles itself: HOYLE CONFIRMS DRY GOODS IN CELLAR. SMALL DRY GOODS NOT COUNTED. HURON ROAD MARK. The entries were bent down in sequence over multiple visits, not all at once. The handwriting on the bent-page margins is not Caleb Morse's — it is a rougher, less practiced hand. The word HOYLE is an unambiguous name.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_instrument_room",
   "implicatesCharacterIds": [
     "prentiss_hoyle",
     "aldous_greer"
-  ],
-  "unlocks": [
-    "clue_dead_drop_impression"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.466Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

@@ -1,18 +1,8 @@
 {
   "id": "high_water_reckoning_main_arc",
-  "scenarioId": "high_water_reckoning",
-  "name": "The Margin Between Outcome and Catastrophe",
-  "premise": "Five days after the Industrial Canal floodwall failures, three survivors in three separate locations must coordinate across a communications blackout to secure extraction for eighty bridge camp refugees, recover irreplaceable legal documents from a flooded house, and transmit accurate coordinates before a dying battery goes QRT — while a diverted supply chain and a falsified grid reference threaten to collapse all three efforts simultaneously.",
-  "goal": "Secure confirmed extraction for the bridge camp's most vulnerable survivors, recover the Fontenot land deeds before mold liquefaction, and transmit accurate coordinates to the emergency operations post before the Algiers radio station loses power — exposing and neutralizing the two systemic failures that are actively working against all three objectives.",
-  "openingSituation": "4:45 PM, September 2, 2005. A flat-bottom skiff carrying a pharmaceutical crate is knocking against the St. Claude Bridge piling. A waterlogged iron document box is pinned under collapsed plaster on Deslonde Street. A marine battery in an Algiers attic is dropping toward terminal voltage. All three crises are connected by a single diverted supply manifest and a single falsified coordinate — neither of which any one character can see in full.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Weight of What Remains",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "loretta_sainteclaire_confronts",
@@ -27,15 +17,15 @@
           "description": "Ida Broussard receives the first runner with handwritten triage sheets and checks her battery voltage — the frequency is already drifting 200 Hz off the designated emergency net"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "What the Water Carries",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "loretta_discovers_that",
@@ -54,15 +44,15 @@
           "description": "The Ambient_Toxicity_Index advances to Hazardous after a fuel drum ruptures two blocks from the bridge — a survivor with open wounds must be treated immediately"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Falsified Record",
-      "minuteRange": [
-        15,
-        23
-      ],
       "beats": [
         {
           "id": "crossreferencing_testimony_from",
@@ -81,15 +71,15 @@
           "description": "Father Clement, confronted with the diversion manifest, attempts to reframe the supply redirection as pastoral necessity — his breaking point is the revelation that the three children on the skiff were from the same family whose property Cynthia filed as abandoned"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
     },
     {
-      "actNumber": 4,
       "name": "Extraction Window",
-      "minuteRange": [
-        23,
-        30
-      ],
       "beats": [
         {
           "id": "ida_transmits_the",
@@ -108,10 +98,20 @@
           "description": "The extraction window closes: the game resolves based on the cumulative state of all three metric systems, the accuracy of the transmitted coordinates, the integrity of the recovered documents, and whether Father Clement's supply diversion has been formally documented for post-storm accountability"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
     }
   ],
+  "goal": "Secure confirmed extraction for the bridge camp's most vulnerable survivors, recover the Fontenot land deeds before mold liquefaction, and transmit accurate coordinates to the emergency operations post before the Algiers radio station loses power — exposing and neutralizing the two systemic failures that are actively working against all three objectives.",
+  "name": "The Margin Between Outcome and Catastrophe",
+  "opening": "",
+  "premise": "Five days after the Industrial Canal floodwall failures, three survivors in three separate locations must coordinate across a communications blackout to secure extraction for eighty bridge camp refugees, recover irreplaceable legal documents from a flooded house, and transmit accurate coordinates before a dying battery goes QRT — while a diverted supply chain and a falsified grid reference threaten to collapse all three efforts simultaneously.",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.043Z",
-  "opening": ""
+  "updatedAt": "2026-06-13T02:58:31.271Z",
+  "scenarioId": "high_water_reckoning",
+  "openingSituation": "4:45 PM, September 2, 2005. A flat-bottom skiff carrying a pharmaceutical crate is knocking against the St. Claude Bridge piling. A waterlogged iron document box is pinned under collapsed plaster on Deslonde Street. A marine battery in an Algiers attic is dropping toward terminal voltage. All three crises are connected by a single diverted supply manifest and a single falsified coordinate — neither of which any one character can see in full."
 }

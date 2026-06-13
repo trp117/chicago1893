@@ -1,21 +1,21 @@
 {
   "id": "gill_print_shop_back",
-  "scenarioId": "midnight_errand_boston",
-  "name": "Gill's Print Shop — Back Room and Door",
-  "description": "The rear of the shop smells of linseed oil and cold metal type; a single tallow candle on the compositing table throws more shadow than light. The back door opens onto a narrow alley that smells of low tide and horse.",
   "mood": "tense, intimate, conspiratorial",
-  "linkedCharacterIds": [
-    "hannah_cross",
-    "owen_pryce",
-    "dorothy_gill"
-  ],
+  "name": "Gill's Print Shop — Back Room and Door",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.914Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "midnight_errand_boston",
+  "description": "The rear of the shop smells of linseed oil and cold metal type; a single tallow candle on the compositing table throws more shadow than light. The back door opens onto a narrow alley that smells of low tide and horse.",
   "atmosphericDetails": [
     "The press stands idle, its ink-black platen catching the candlelight like a dark mirror.",
     "Somewhere above, a floorboard creaks — Benjamin moving in his room.",
     "The back door has a broken latch that has never been repaired; it swings open at a touch."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.914Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "hannah_cross",
+    "owen_pryce",
+    "dorothy_gill"
+  ]
 }

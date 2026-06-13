@@ -1,56 +1,56 @@
 {
   "id": "role_conductor",
-  "scenarioId": "lightning_and_the_midnight_coach",
   "name": "The Conductor",
-  "description": "You are Elias Cutter, a veteran Underground Railroad conductor moving three passengers through the Ohio corridor toward Lake Erie. You know the roads, the woods, and the people — but the singing wires know things now that the roads cannot hide.",
-  "startLocationId": "loc_freight_house",
-  "startingKnowledge": [
-    "Three passengers — a man, a woman, and a child — are currently in or near the root cellar beneath the freight house.",
-    "The Marblehead ferry captain will not wait past four in the morning.",
-    "The telegraph line has been active tonight in ways that make you uneasy.",
-    "Your son Caleb is the night operator at the junction and he knows what you carry."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who thinks in physical terms — distances, weights, the sound of gravel underfoot. He distrusts abstraction and technology. He notices what is out of place in a landscape he has crossed dozens of times.",
+  "opening": {
+    "choices": [
+      "Go directly to the instrument room and find out what Caleb is sending.",
+      "Check on the passengers in the root cellar before doing anything else.",
+      "Walk the rail spur toward the water tower to see if anyone is watching the freight house."
+    ],
+    "narrative": "The freight house is dark except for the red lantern on its nail, and you have been watching it for ten minutes from the tree line. The root cellar holds three people who have been underground for six hours and who are trusting you with their lives. The sounder in the instrument room is audible even here — it has been clicking steadily for the last several minutes, which means someone is sending or receiving something that cannot wait until morning. Your wagon is hitched behind the cooperage on the Huron Road, two hundred yards north, and the lake is fourteen miles beyond that. You have done this run in three hours on a good night. Tonight does not feel like a good night.",
+    "npcMoments": []
+  },
   "briefing": "You are Elias Cutter, a freight hauler by cover and a conductor for eleven years by conviction, and tonight you are moving three passengers toward a lake ferry that will not wait. Your son Caleb is inside that instrument room, and the last time you looked in his eyes you saw something he had not told you yet. You know that someone has been feeding your routes to the catchers — three compromised houses in six weeks is not bad luck. You have not yet told your passengers that the route may be blown, because telling them would mean stopping, and stopping means dying. You are standing behind the freight house right now, smelling coal smoke and wet ballast, and the sounder inside the depot has been clicking for the last four minutes without stopping.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:24.735Z",
+  "represents": "Underground Railroad conductors operating in the Ohio corridor in the 1850s",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "accessLevel": "staff",
+  "description": "You are Elias Cutter, a veteran Underground Railroad conductor moving three passengers through the Ohio corridor toward Lake Erie. You know the roads, the woods, and the people — but the singing wires know things now that the roads cannot hide.",
+  "perspective": "Write from the perspective of a man who thinks in physical terms — distances, weights, the sound of gravel underfoot. He distrusts abstraction and technology. He notices what is out of place in a landscape he has crossed dozens of times.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The sounder went quiet eleven minutes ago.",
   "character_hooks": [
     "I have been doing this since 1845, and I have never once used the telegraph — tonight I may have no choice.",
     "I know who the informant is, and it is someone I brought into this work myself, which means this is my fault.",
     "I have three passengers instead of the two I was told to expect, and the extra one is a child, and that changes everything about the route."
   ],
-  "suggested_secret": "Elias has a second set of letters hidden in his wagon — correspondence with a free Black organizer in Toronto that, if found, would implicate a dozen people in two countries.",
-  "opening": {
-    "narrative": "The freight house is dark except for the red lantern on its nail, and you have been watching it for ten minutes from the tree line. The root cellar holds three people who have been underground for six hours and who are trusting you with their lives. The sounder in the instrument room is audible even here — it has been clicking steadily for the last several minutes, which means someone is sending or receiving something that cannot wait until morning. Your wagon is hitched behind the cooperage on the Huron Road, two hundred yards north, and the lake is fourteen miles beyond that. You have done this run in three hours on a good night. Tonight does not feel like a good night.",
-    "npcMoments": [],
-    "choices": [
-      "Go directly to the instrument room and find out what Caleb is sending.",
-      "Check on the passengers in the root cellar before doing anything else.",
-      "Walk the rail spur toward the water tower to see if anyone is watching the freight house."
-    ]
-  },
+  "startLocationId": "loc_freight_house",
+  "context_sentence": "You are Elias Cutter, a freight hauler and eleven-year conductor on the Ohio corridor of the Underground Railroad, moving three freedom seekers north toward Lake Erie in October 1856, operating in direct violation of the Fugitive Slave Act of 1850, which mandated federal prosecution of anyone who aided an escaped slave.",
   "roleInitialState": {
+    "flags": {
+      "caleb_contacted": false,
+      "passengers_located": true,
+      "route_compromised_suspected": true
+    },
     "inventory": [
       "A folded paper with the ferry captain's signal pattern written in book cipher.",
       "A clasp knife.",
       "Two Webster's Dictionary book cipher keys, one for Caleb and one for the Oberlin safe house.",
       "A lantern with a shutter, unlit."
     ],
-    "flags": {
-      "passengers_located": true,
-      "route_compromised_suspected": true,
-      "caleb_contacted": false
-    },
     "suspicion": {
-      "marshal_crane": 0,
-      "aldous_greer": 0
+      "aldous_greer": 0,
+      "marshal_crane": 0
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:24.735Z",
-  "context_sentence": "You are Elias Cutter, a freight hauler and eleven-year conductor on the Ohio corridor of the Underground Railroad, moving three freedom seekers north toward Lake Erie in October 1856, operating in direct violation of the Fugitive Slave Act of 1850, which mandated federal prosecution of anyone who aided an escaped slave.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Underground Railroad conductors operating in the Ohio corridor in the 1850s",
-  "fact_checked": false,
-  "bridge_sentence": "The sounder went quiet eleven minutes ago."
+  "suggested_secret": "Elias has a second set of letters hidden in his wagon — correspondence with a free Black organizer in Toronto that, if found, would implicate a dozen people in two countries.",
+  "startingKnowledge": [
+    "Three passengers — a man, a woman, and a child — are currently in or near the root cellar beneath the freight house.",
+    "The Marblehead ferry captain will not wait past four in the morning.",
+    "The telegraph line has been active tonight in ways that make you uneasy.",
+    "Your son Caleb is the night operator at the junction and he knows what you carry."
+  ]
 }

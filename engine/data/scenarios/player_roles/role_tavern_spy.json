@@ -1,42 +1,42 @@
 {
   "id": "role_tavern_spy",
-  "scenarioId": "boston_tea_party_version_2",
   "name": "Tavern Informant",
-  "description": "You are a printer's apprentice who runs messages and gathers information for the Sons of Liberty — you have no official standing, but you move between worlds, and people tell you things they would never say to a Patriot organizer.",
-  "startLocationId": "old_south_meeting_house",
-  "startingKnowledge": [
-    "You delivered a message to the Counting House on King Street two nights ago and saw a light burning inside long after it should have been empty.",
-    "A well-dressed stranger asked you last week if you knew who kept the Sons of Liberty's accounts — you did not answer, but the question has stayed with you.",
-    "Reverend Willard has been at Old South all evening, but he keeps drifting toward the side door as though he is waiting for someone who has not arrived."
-  ],
-  "accessLevel": "staff",
-  "briefing": "You are a printer's apprentice who runs messages for the Sons of Liberty — no official standing, but you move between worlds and people tell you things. Track down who betrayed the boarding plan before the Sons of Liberty step into a Crown ambush. The men at Old South are about to move. You may be the only person in a position to stop what is coming.",
-  "perspective": "Write from the perspective of a young, quick-witted colonial who occupies a liminal social position — trusted enough to carry messages for the Sons of Liberty but not senior enough to be kept fully informed. This player has the advantage of being underestimated and can move between social classes without raising suspicion. They are particularly effective at drawing out NPCs like Reverend Willard who respond to youth and earnestness. Tone should be sharp and observational, with a slight edge of urgency — this player is aware they are in over their head but determined to see it through.",
   "opening": {
-    "narrative": "December 16, 1773, and Old South Meeting House is so full of people that the walls seem to breathe — five thousand colonists packed into a building meant for five hundred, their voices rising and falling with Samuel Adams's words like a tide. You have been coming to these meetings since you were twelve years old, running messages between the men in the back rows and the men at the pulpit, and you have learned that the most important conversations happen in the margins, in the doorways, in the pauses between speeches. Tonight something feels different. The man who usually meets you here with instructions has not come, and the message you were supposed to deliver to the Counting House two nights ago has been preying on your mind ever since you saw the light burning inside. Reverend Willard is near the side door, his eyes moving across the crowd with a restlessness that does not match the solemn gravity on his face — he is looking for someone, or trying not to be found by them.",
-    "npcMoments": [],
     "choices": [
       "Approach Reverend Willard and ask him directly what he is watching for near the side door.",
       "Slip out of the meeting house and make your way to the Counting House on King Street — the memory of that burning light has not left you.",
       "Find a position near the back of the crowd where you can observe who comes and goes from Old South without being noticed."
-    ]
+    ],
+    "narrative": "December 16, 1773, and Old South Meeting House is so full of people that the walls seem to breathe — five thousand colonists packed into a building meant for five hundred, their voices rising and falling with Samuel Adams's words like a tide. You have been coming to these meetings since you were twelve years old, running messages between the men in the back rows and the men at the pulpit, and you have learned that the most important conversations happen in the margins, in the doorways, in the pauses between speeches. Tonight something feels different. The man who usually meets you here with instructions has not come, and the message you were supposed to deliver to the Counting House two nights ago has been preying on your mind ever since you saw the light burning inside. Reverend Willard is near the side door, his eyes moving across the crowd with a restlessness that does not match the solemn gravity on his face — he is looking for someone, or trying not to be found by them.",
+    "npcMoments": []
   },
+  "briefing": "You are a printer's apprentice who runs messages for the Sons of Liberty — no official standing, but you move between worlds and people tell you things. Track down who betrayed the boarding plan before the Sons of Liberty step into a Crown ambush. The men at Old South are about to move. You may be the only person in a position to stop what is coming.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:46:48.484Z",
+  "represents": "Informants and message carriers working for the Sons of Liberty in Boston in 1773",
+  "scenarioId": "boston_tea_party_version_2",
+  "accessLevel": "staff",
+  "description": "You are a printer's apprentice who runs messages and gathers information for the Sons of Liberty — you have no official standing, but you move between worlds, and people tell you things they would never say to a Patriot organizer.",
+  "perspective": "Write from the perspective of a young, quick-witted colonial who occupies a liminal social position — trusted enough to carry messages for the Sons of Liberty but not senior enough to be kept fully informed. This player has the advantage of being underestimated and can move between social classes without raising suspicion. They are particularly effective at drawing out NPCs like Reverend Willard who respond to youth and earnestness. Tone should be sharp and observational, with a slight edge of urgency — this player is aware they are in over their head but determined to see it through.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The candle in the back booth has burned to the saucer.",
+  "startLocationId": "old_south_meeting_house",
+  "context_sentence": "\"You are a printer's apprentice in Boston, one of the anonymous young men who carried intelligence between the Sons of Liberty's inner circle and the city's taverns and wharves in the weeks surrounding the destruction of the tea aboard the Dartmouth, Eleanor, and Beaver on the night of December 16, 1773.\"",
   "roleInitialState": {
+    "flags": {},
     "inventory": [
       "Printer's leather satchel — useful for carrying documents without attracting attention",
       "Half-finished broadsheet from the press — it lists the names of key Sons of Liberty organizers, including Thomas Greenleaf as treasurer"
     ],
-    "flags": {},
     "suspicion": {
       "reverend_ezra_willard": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:46:48.484Z",
-  "context_sentence": "\"You are a printer's apprentice in Boston, one of the anonymous young men who carried intelligence between the Sons of Liberty's inner circle and the city's taverns and wharves in the weeks surrounding the destruction of the tea aboard the Dartmouth, Eleanor, and Beaver on the night of December 16, 1773.\"",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Informants and message carriers working for the Sons of Liberty in Boston in 1773",
-  "fact_checked": false,
-  "bridge_sentence": "The candle in the back booth has burned to the saucer."
+  "startingKnowledge": [
+    "You delivered a message to the Counting House on King Street two nights ago and saw a light burning inside long after it should have been empty.",
+    "A well-dressed stranger asked you last week if you knew who kept the Sons of Liberty's accounts — you did not answer, but the question has stayed with you.",
+    "Reverend Willard has been at Old South all evening, but he keeps drifting toward the side door as though he is waiting for someone who has not arrived."
+  ]
 }

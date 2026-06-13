@@ -1,17 +1,17 @@
 {
   "id": "clue_farrow_alibi_gap",
-  "scenarioId": "zero_hour_cantigny",
   "title": "The Forty-Five Minute Gap in Farrow's Account",
-  "description": "When Lieutenant Farrow's stated timeline is compared against Beaumont's telephone log, Voss's sighting, and the wire-cut timeline, a gap of 45 minutes emerges — from 04:00 to 04:45 — during which Farrow is unaccounted for by any witness. The distance from the artillery dugout to splice point Delta-7 and back is exactly 38 minutes at a fast walk through the communication trenches. The gap fits.",
-  "category": "observation",
-  "discoveryLocationId": "loc_artillery_dugout",
-  "implicatesCharacterIds": [
-    "char_farrow"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.103Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "zero_hour_cantigny",
+  "description": "When Lieutenant Farrow's stated timeline is compared against Beaumont's telephone log, Voss's sighting, and the wire-cut timeline, a gap of 45 minutes emerges — from 04:00 to 04:45 — during which Farrow is unaccounted for by any witness. The distance from the artillery dugout to splice point Delta-7 and back is exactly 38 minutes at a fast walk through the communication trenches. The gap fits.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_artillery_dugout",
+  "implicatesCharacterIds": [
+    "char_farrow"
+  ]
 }

@@ -1,0 +1,17 @@
+{
+  "id": "bribed_watchman",
+  "title": "Bribed Night Watchman",
+  "unlocks": [
+    "dialogue:hanrahan_pressure"
+  ],
+  "category": "testimony",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "A freight yard watchman admits to accepting payment for looking away during after-hours deliveries, paid in cash by a well-dressed intermediary.",
+  "isKeyEvidence": false,
+  "discoveryLocationId": "freight_yards",
+  "implicatesCharacterIds": [
+    "patrick_hanrahan"
+  ]
+}

@@ -1,19 +1,19 @@
 {
   "id": "loc_stationmaster_office",
-  "scenarioId": "lightning_and_the_midnight_coach",
-  "name": "Harriet Voss's Office",
-  "description": "A small room behind the ticket window, orderly to the point of severity — the desk holds a logbook, a brass lamp, and a locked drawer that Harriet's hand moves toward when she is nervous.",
   "mood": "controlled, secretive, professional, guarded",
-  "linkedCharacterIds": [
-    "harriet_voss"
-  ],
+  "name": "Harriet Voss's Office",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.463Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "A small room behind the ticket window, orderly to the point of severity — the desk holds a logbook, a brass lamp, and a locked drawer that Harriet's hand moves toward when she is nervous.",
   "atmosphericDetails": [
     "The logbook is open to tonight's entry — the last notation is at 11:22 PM and records nothing unusual.",
     "A faint smell of machine oil that does not belong to any visible equipment in the room.",
     "The locked drawer has a small scratch on its face near the keyhole, as if something was recently forced or hurriedly inserted."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.463Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "harriet_voss"
+  ]
 }

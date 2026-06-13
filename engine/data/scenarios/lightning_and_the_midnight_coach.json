@@ -1,42 +1,26 @@
 {
   "id": "lightning_and_the_midnight_coach",
-  "order": 3,
-  "hidden": false,
-  "version": "1.0.0",
-  "title": "Lightning and the Midnight Coach",
-  "setting": "Erie County, Ohio, 1856",
-  "description": "In the autumn of 1856, a red fire message crackles across Ezra Cornell's expanding telegraph lines, carrying a bounty description of freedom-seekers moving through the Ohio corridor. A veteran Underground Railroad conductor and his son — a telegraph operator at the Sandusky junction — must outmaneuver the brass and the law before the iron horse delivers its human cargo into the hands of slave catchers.",
+  "tone": [],
   "genre": [
     "historical_thriller",
     "mystery",
     "moral_drama"
   ],
-  "historicalRealism": "high",
-  "freedomLevel": "guided",
-  "sessionTargetMinutes": 30,
-  "storyArcIds": [
-    "lightning_and_the_midnight_coach_main_arc"
-  ],
-  "playerRoleIds": [
-    "role_conductor",
-    "role_lightning_flinger",
-    "role_stationmaster"
-  ],
-  "keyEvidenceClueIds": [
-    "clue_red_fire_dispatch",
-    "clue_nulled_codebook"
-  ],
+  "order": 3,
+  "title": "Lightning and the Midnight Coach",
+  "hidden": false,
+  "premise": "Three passengers are moving north through Erie County toward a Lake Erie ferry that will not wait past four in the morning. The bounty description is already on the wire. The network has been compromised before. Tonight it may be compromised again.",
+  "setting": "Erie County, Ohio, 1856",
   "systems": {
-    "timePerTurnDefault": 2,
     "scales": {
       "threat": {
-        "min": 0,
         "max": 10,
+        "min": 0,
         "default": 1
       },
       "authorityTrust": {
-        "min": -3,
         "max": 5,
+        "min": -3,
         "default": 1
       }
     },
@@ -44,8 +28,50 @@
       "A relay station east of Sandusky re-transmits the bounty description with updated physical particulars — threat rises by 2.",
       "Deputy Marshal Crane is spotted on horseback near the Huron River crossing, closing the northern route — threat rises by 1.",
       "The telegraph line goes silent for twelve minutes; operators assume sabotage and begin manual inspection patrols — authorityTrust drops by 1."
-    ]
+    ],
+    "timePerTurnDefault": 2
   },
+  "version": "1.0.0",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T22:45:13.231Z",
+  "playerGoal": "",
+  "description": "In the autumn of 1856, a red fire message crackles across Ezra Cornell's expanding telegraph lines, carrying a bounty description of freedom-seekers moving through the Ohio corridor. A veteran Underground Railroad conductor and his son — a telegraph operator at the Sandusky junction — must outmaneuver the brass and the law before the iron horse delivers its human cargo into the hands of slave catchers.",
+  "storyArcIds": [
+    "lightning_and_the_midnight_coach_main_arc"
+  ],
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "It is October 1856, and the telegraph wire has changed everything. Ezra Cornell's New York and Erie Telegraph Company now strings its copper and gutta-percha across nearly every major rail corridor in the northern states, and where the wire goes, the law follows within minutes rather than days. Samuel Morse, who drew his first patent in 1837, has made no secret of his sympathies — his 1863 pamphlet defending slavery is still a decade away, but his politics are already well known in the operator rooms and the parlors of men who use his invention to enforce the Fugitive Slave Act of 1850. In the Ohio corridor between Cincinnati and the Lake Erie shore, the Underground Railroad moves an estimated 1,500 freedom-seekers per year through a web of safe houses, root cellars, church lofts, and false-bottomed wagons — but every year the web grows more dangerous, because the men hunting them can now speak faster than a horse can run.",
+        "type": "world"
+      },
+      {
+        "text": "Tonight, three passengers — a man, a woman, and a child of perhaps seven — are moving north through Erie County toward a Lake Erie ferry captain who will not wait past four in the morning. If they do not reach Marblehead by three-fifteen, the captain sails without them, and they will be stranded in open country with a fresh bounty description already on the wire. The description was filed this evening by a slave catcher named Aldous Greer out of Columbus, who paid a relay operator twenty dollars to mark it red fire — the highest priority designation, reserved for life and death. For the people in that wagon, it is precisely that.",
+        "type": "stakes"
+      },
+      {
+        "text": "The Sandusky rail junction smells of coal smoke, horse dung, and the faint mineral bite of lake air pushing inland on a northwest wind. The station lamp throws a yellow oval across the platform planking, and somewhere in the instrument room the sounder is clicking in its tin cup — a sound like a man tapping his finger on a table, patient and relentless. The maples along the Huron Road have dropped most of their leaves, and what remains rattles in the dark like dry paper. It is eleven forty in the evening, the temperature is falling toward freezing, and the last regular passenger consist cleared the main forty minutes ago.",
+        "type": "scene"
+      },
+      {
+        "text": "You have been watching this junction for three hours from different angles — from the woodpile behind the freight house, from the shadow of the water tower, from the road itself. You know the schedule, you know the faces, and you know that somewhere between here and the lake a message is already moving that could end everything you have built over the last eleven years. The sounder inside the instrument room has gone quiet for the last four minutes, which is either nothing or the most important silence of your life. You are standing at the edge of the lamplight, close enough to smell the coal oil in the lantern, and the door to the instrument room is ten feet away.",
+        "type": "entry",
+        "character_entries": {
+          "role_conductor": "You are standing in the shadow gap between the freight house's east wall and the woodpile, close enough to the building that you can feel its stored warmth against your left shoulder, and you are counting the clicks coming through the plank siding the way another man might count his pulse. Four minutes has become six. You have hauled split oak and barrel stave and dressed hog from Chillicothe to the lake shore and back again more times than you have fingers to count, and you know the weight of a load that wants to shift before it shifts, the sound a wheel makes on frozen mud before it breaks through, the particular silence of a tree line that has a man standing in it — and what you know right now, what neither the stationmaster in his wool coat nor whoever is working that key knows you know, is that the clicking has changed rhythm in the last ninety seconds, shorter groups, a different hand, which means Caleb is no longer the one sending. Caleb taps with two fingers and leans into the long marks. Whoever is on that key now uses one finger and hurries the shorts. There are three people beneath the floor you are leaning against — a man with a split lip he has not complained about, a woman who has not let go of the child's wrist since Cincinnati, a child who has learned not to make a sound in the dark — and they have perhaps three hours and twenty minutes before a ferry captain on Marblehead Point makes a decision that cannot be unmade, and you have not told them that the last safe house before this one was taken on a Tuesday, the one before that on a Wednesday, and that the man who knew both routes also knows this one, because you told him yourself. The coal smoke is coming from the north now, which means the wind has shifted, which means the temperature will drop another four degrees before one o'clock and the mud on the Huron Road will harden and your wagon wheels will stop throwing sound into the dark and that is the only piece of luck you have been handed tonight. You pull your coat collar up with one hand and you look at the instrument room window, its yellow rectangle of light, the shadow that is not Caleb's shadow moving behind the glass, and you understand that you are standing at the exact point where eleven years of knowing when to move and when to hold has brought",
+          "role_stationmaster": "You are sitting at your desk in the stationmaster's office with the lamp turned low and the logbook open to a page that has not received a single entry in forty minutes, and the sounder in the instrument room is clicking through something routine — a consist report from Norwalk, nothing — but you are listening to it the way you listen to everything in this building, which is to say completely, the way a woman listens when she has learned that the cost of missing a thing is always paid later and always in full. The federal notification is in your left coat pocket, folded to the size of a calling card. The pocket relay is in the locked drawer beneath your right hand, wrapped in the wool cloth you found it in three nights ago when you pulled it off the line south of the mile marker, and you have told no one, not Caleb, not anyone, because the moment you report a tap on the wire you must also explain why you waited seventy-two hours to do it, and that explanation does not exist in any form that protects you. Prentiss Hoyle was at the water tower two nights ago with a man whose coat was wrong for this weather and whose hat brim was pulled to a deliberate angle, and you noted it the way you note everything — precisely, without reaction, filing it in the part of your mind where you keep the things that have not yet become problems but will. Marshal Crane is coming. The freight house is forty yards behind you across the platform planking, and whatever is in that root cellar you have never asked about is either there or it is not, and the three people who may or may not be moving through Erie County tonight are either going to reach Marblehead or they are not, and none of that is your jurisdiction, and all of it is, and the logbook is open, and the pen is in your hand, and you have perhaps six minutes before you must decide what tonight's official record says you knew and when you knew it.",
+          "role_lightning_flinger": "You are standing at the instrument table in the Sandusky junction relay room, one hand flat on the warm brass of the key and the other holding Aldous Greer's red fire dispatch at an angle that catches the lamp, as though the light might change what the words say. It will not. The sounder clicks in its tin cup — Wickes at Huron, asking again for his routine repeat, patient as a man who does not yet know he is dangerous — and you count the intervals the way you count everything, automatically, the way other men breathe. You are nineteen years old and you can read wire faster than most operators can read print, and what you read in this dispatch is your father's wagon, your father's passengers, described down to the child's red wool coat, and you know the name behind it because you recognized the hand the moment the signal came through: the informant is not a stranger to the network, which is the thing your father does not know, the thing that makes this worse than a simple betrayal. The phantom circuit is in your head already, clean and complete, a reroute that would buy the wagon forty minutes and bury the red fire in a loop Wickes will never untangle before morning. You have run it twice in practice. The protocol clock does not care about practice. Your finger rests on the key, the lamp throws its yellow oval across the dispatch, and the room smells of coal oil and copper and the particular cold that comes off Lake Erie when the wind is moving south, and you have not yet sent a single character, and Wickes is about to ask a third time."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_conductor",
+    "role_lightning_flinger",
+    "role_stationmaster"
+  ],
   "winConditions": [
     "The midnight coach passengers reach the Lake Erie ferry before the bounty wire is re-transmitted and the sheriff acts on it.",
     "The informant inside the network is identified and neutralized before they can confirm the passengers' location to Marshal Crane.",
@@ -56,43 +82,12 @@
     "The informant successfully transmits the passengers' exact location before being exposed.",
     "Time expires with the passengers still south of the lake and the threat scale at 8 or above."
   ],
-  "partialSuccessExamples": [
-    "The passengers escape but Elias Cutter is arrested — the network survives at great personal cost.",
-    "The informant is exposed but the bounty wire reaches Crane before the phantom message can misdirect him — one passenger is recaptured.",
-    "Caleb destroys the brass at the junction, silencing the line but also alerting the company to sabotage and endangering the entire Ohio network."
-  ],
-  "introduction": {
-    "enabled": true,
-    "skippable": true,
-    "sections": [
-      {
-        "type": "world",
-        "text": "It is October 1856, and the telegraph wire has changed everything. Ezra Cornell's New York and Erie Telegraph Company now strings its copper and gutta-percha across nearly every major rail corridor in the northern states, and where the wire goes, the law follows within minutes rather than days. Samuel Morse, who drew his first patent in 1837, has made no secret of his sympathies — his 1863 pamphlet defending slavery is still a decade away, but his politics are already well known in the operator rooms and the parlors of men who use his invention to enforce the Fugitive Slave Act of 1850. In the Ohio corridor between Cincinnati and the Lake Erie shore, the Underground Railroad moves an estimated 1,500 freedom-seekers per year through a web of safe houses, root cellars, church lofts, and false-bottomed wagons — but every year the web grows more dangerous, because the men hunting them can now speak faster than a horse can run."
-      },
-      {
-        "type": "stakes",
-        "text": "Tonight, three passengers — a man, a woman, and a child of perhaps seven — are moving north through Erie County toward a Lake Erie ferry captain who will not wait past four in the morning. If they do not reach Marblehead by three-fifteen, the captain sails without them, and they will be stranded in open country with a fresh bounty description already on the wire. The description was filed this evening by a slave catcher named Aldous Greer out of Columbus, who paid a relay operator twenty dollars to mark it red fire — the highest priority designation, reserved for life and death. For the people in that wagon, it is precisely that."
-      },
-      {
-        "type": "scene",
-        "text": "The Sandusky rail junction smells of coal smoke, horse dung, and the faint mineral bite of lake air pushing inland on a northwest wind. The station lamp throws a yellow oval across the platform planking, and somewhere in the instrument room the sounder is clicking in its tin cup — a sound like a man tapping his finger on a table, patient and relentless. The maples along the Huron Road have dropped most of their leaves, and what remains rattles in the dark like dry paper. It is eleven forty in the evening, the temperature is falling toward freezing, and the last regular passenger consist cleared the main forty minutes ago."
-      },
-      {
-        "type": "entry",
-        "text": "You have been watching this junction for three hours from different angles — from the woodpile behind the freight house, from the shadow of the water tower, from the road itself. You know the schedule, you know the faces, and you know that somewhere between here and the lake a message is already moving that could end everything you have built over the last eleven years. The sounder inside the instrument room has gone quiet for the last four minutes, which is either nothing or the most important silence of your life. You are standing at the edge of the lamplight, close enough to smell the coal oil in the lantern, and the door to the instrument room is ten feet away.",
-        "character_entries": {
-          "role_conductor": "You are standing in the shadow gap between the freight house's east wall and the woodpile, close enough to the building that you can feel its stored warmth against your left shoulder, and you are counting the clicks coming through the plank siding the way another man might count his pulse. Four minutes has become six. You have hauled split oak and barrel stave and dressed hog from Chillicothe to the lake shore and back again more times than you have fingers to count, and you know the weight of a load that wants to shift before it shifts, the sound a wheel makes on frozen mud before it breaks through, the particular silence of a tree line that has a man standing in it — and what you know right now, what neither the stationmaster in his wool coat nor whoever is working that key knows you know, is that the clicking has changed rhythm in the last ninety seconds, shorter groups, a different hand, which means Caleb is no longer the one sending. Caleb taps with two fingers and leans into the long marks. Whoever is on that key now uses one finger and hurries the shorts. There are three people beneath the floor you are leaning against — a man with a split lip he has not complained about, a woman who has not let go of the child's wrist since Cincinnati, a child who has learned not to make a sound in the dark — and they have perhaps three hours and twenty minutes before a ferry captain on Marblehead Point makes a decision that cannot be unmade, and you have not told them that the last safe house before this one was taken on a Tuesday, the one before that on a Wednesday, and that the man who knew both routes also knows this one, because you told him yourself. The coal smoke is coming from the north now, which means the wind has shifted, which means the temperature will drop another four degrees before one o'clock and the mud on the Huron Road will harden and your wagon wheels will stop throwing sound into the dark and that is the only piece of luck you have been handed tonight. You pull your coat collar up with one hand and you look at the instrument room window, its yellow rectangle of light, the shadow that is not Caleb's shadow moving behind the glass, and you understand that you are standing at the exact point where eleven years of knowing when to move and when to hold has brought",
-          "role_lightning_flinger": "You are standing at the instrument table in the Sandusky junction relay room, one hand flat on the warm brass of the key and the other holding Aldous Greer's red fire dispatch at an angle that catches the lamp, as though the light might change what the words say. It will not. The sounder clicks in its tin cup — Wickes at Huron, asking again for his routine repeat, patient as a man who does not yet know he is dangerous — and you count the intervals the way you count everything, automatically, the way other men breathe. You are nineteen years old and you can read wire faster than most operators can read print, and what you read in this dispatch is your father's wagon, your father's passengers, described down to the child's red wool coat, and you know the name behind it because you recognized the hand the moment the signal came through: the informant is not a stranger to the network, which is the thing your father does not know, the thing that makes this worse than a simple betrayal. The phantom circuit is in your head already, clean and complete, a reroute that would buy the wagon forty minutes and bury the red fire in a loop Wickes will never untangle before morning. You have run it twice in practice. The protocol clock does not care about practice. Your finger rests on the key, the lamp throws its yellow oval across the dispatch, and the room smells of coal oil and copper and the particular cold that comes off Lake Erie when the wind is moving south, and you have not yet sent a single character, and Wickes is about to ask a third time.",
-          "role_stationmaster": "You are sitting at your desk in the stationmaster's office with the lamp turned low and the logbook open to a page that has not received a single entry in forty minutes, and the sounder in the instrument room is clicking through something routine — a consist report from Norwalk, nothing — but you are listening to it the way you listen to everything in this building, which is to say completely, the way a woman listens when she has learned that the cost of missing a thing is always paid later and always in full. The federal notification is in your left coat pocket, folded to the size of a calling card. The pocket relay is in the locked drawer beneath your right hand, wrapped in the wool cloth you found it in three nights ago when you pulled it off the line south of the mile marker, and you have told no one, not Caleb, not anyone, because the moment you report a tap on the wire you must also explain why you waited seventy-two hours to do it, and that explanation does not exist in any form that protects you. Prentiss Hoyle was at the water tower two nights ago with a man whose coat was wrong for this weather and whose hat brim was pulled to a deliberate angle, and you noted it the way you note everything — precisely, without reaction, filing it in the part of your mind where you keep the things that have not yet become problems but will. Marshal Crane is coming. The freight house is forty yards behind you across the platform planking, and whatever is in that root cellar you have never asked about is either there or it is not, and the three people who may or may not be moving through Erie County tonight are either going to reach Marblehead or they are not, and none of that is your jurisdiction, and all of it is, and the logbook is open, and the pen is in your hand, and you have perhaps six minutes before you must decide what tonight's official record says you knew and when you knew it."
-        }
-      }
-    ]
-  },
+  "openingSituation": "",
+  "historicalRealism": "high",
   "period_vocabulary": {
     "categories": [
       {
         "name": "Telegraphers' Slang",
-        "context": "Used by Caleb and other operators. Natural in dialogue and interior thought. Never explained directly.",
         "terms": [
           {
             "term": "the brass",
@@ -146,11 +141,11 @@
             "term": "pounding the brass",
             "meaning": "sending a telegraph message"
           }
-        ]
+        ],
+        "context": "Used by Caleb and other operators. Natural in dialogue and interior thought. Never explained directly."
       },
       {
         "name": "Railroad Language",
-        "context": "Used by Cutter and railroad workers. Physical and gritty. Natural in action and description.",
         "terms": [
           {
             "term": "highball",
@@ -188,11 +183,11 @@
             "term": "consist",
             "meaning": "the specific make-up of a train's cars"
           }
-        ]
+        ],
+        "context": "Used by Cutter and railroad workers. Physical and gritty. Natural in action and description."
       },
       {
         "name": "Network Codes",
-        "context": "Used by conductors and network members to discuss passengers without detection. Never explained in scene — context only.",
         "terms": [
           {
             "term": "dry goods",
@@ -218,11 +213,11 @@
             "term": "parcels",
             "meaning": "same as passengers — freight language for people"
           }
-        ]
+        ],
+        "context": "Used by conductors and network members to discuss passengers without detection. Never explained in scene — context only."
       },
       {
         "name": "Telegraph Hacking Methods",
-        "context": "Technical methods available to Caleb and other skilled operators. Use when dramatically appropriate — these are actions, not just words.",
         "terms": [
           {
             "term": "wire tapping",
@@ -248,14 +243,20 @@
             "term": "vulnerable bridge",
             "meaning": "intentionally loosening key tension to make a message legible to a skilled friend but gibberish to an enemy"
           }
-        ]
+        ],
+        "context": "Technical methods available to Caleb and other skilled operators. Use when dramatically appropriate — these are actions, not just words."
       }
     ]
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T22:45:13.231Z",
-  "premise": "Three passengers are moving north through Erie County toward a Lake Erie ferry that will not wait past four in the morning. The bounty description is already on the wire. The network has been compromised before. Tonight it may be compromised again.",
-  "playerGoal": "",
-  "openingSituation": "",
-  "tone": []
+  "keyEvidenceClueIds": [
+    "clue_red_fire_dispatch",
+    "clue_nulled_codebook"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "The passengers escape but Elias Cutter is arrested — the network survives at great personal cost.",
+    "The informant is exposed but the bounty wire reaches Crane before the phantom message can misdirect him — one passenger is recaptured.",
+    "Caleb destroys the brass at the junction, silencing the line but also alerting the company to sabotage and endangering the entire Ohio network."
+  ],
+  "category": "underground"
 }

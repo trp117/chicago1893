@@ -1,20 +1,20 @@
 {
   "id": "loc_water_tower_yard",
-  "scenarioId": "lightning_and_the_midnight_coach",
-  "name": "The Water Tower and Rail Yard",
-  "description": "The iron water tower stands at the north end of the yard, its shadow falling across the consist of parked cars on the siding — the space between the cars creates a maze of dark corridors that anyone who knows the yard can use as cover.",
   "mood": "industrial, shadowed, useful, dangerous",
-  "linkedCharacterIds": [
-    "caleb_morse",
-    "marshal_crane"
-  ],
+  "name": "The Water Tower and Rail Yard",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.465Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "The iron water tower stands at the north end of the yard, its shadow falling across the consist of parked cars on the siding — the space between the cars creates a maze of dark corridors that anyone who knows the yard can use as cover.",
   "atmosphericDetails": [
     "The water tower drips steadily — the sound masks footsteps at close range.",
     "The consist on the siding includes a tender still warm from the evening run, its coal smell strong.",
     "A lantern is mounted on the waycar at the end of the consist — its light barely reaches the water tower but makes the middle ground visible."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.465Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "caleb_morse",
+    "marshal_crane"
+  ]
 }

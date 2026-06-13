@@ -1,22 +1,22 @@
 {
   "id": "lake_shore_rail_yard",
-  "scenarioId": "singing_wires",
+  "mood": "industrial, shadowed, transitional, mechanical",
   "name": "Lake Shore Railroad Yard, South End of Sandusky",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-09T21:12:00.480Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "singing_wires",
   "short_name": "Lake Shore Rail Yard",
   "description": "Three sidings of iron rail converging on the main depot, crowded with freight cars waiting for the morning consist and lit by a pair of yard lanterns that cast more shadow than light. The night freight from Cleveland is expected in forty minutes, and the yard foreman is somewhere among the cars with a lantern.",
-  "mood": "industrial, shadowed, transitional, mechanical",
-  "linkedCharacterIds": [
-    "thomas_cole",
-    "silas_pratt"
-  ],
   "atmosphericDetails": [
     "The smell of the yard is coal smoke, machine oil, and the particular iron smell of the rails themselves — a smell that Thomas Cole has known since childhood when his father brought him here.",
     "A deadheading railroad man is asleep in the waycar of the nearest consist, his lantern turned low; he has seen nothing or everything, it is impossible to tell which.",
     "The telegraph line enters the depot building through a conduit in the east wall, and the junction box where the Norwalk spur connects to the main line is accessible from the yard — this is where a phantomed circuit could be introduced.",
     "The tender of a stationary engine on the middle siding is half-full of coal, and the firebox is cold — this engine is not going anywhere tonight, which means the siding is clear."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-09T21:12:00.480Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "thomas_cole",
+    "silas_pratt"
+  ]
 }

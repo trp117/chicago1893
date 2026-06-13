@@ -1,20 +1,20 @@
 {
   "id": "dispatch_letter",
-  "scenarioId": "midnight_errand_boston",
   "title": "The Sealed Dispatch",
-  "description": "An oilskin packet, sealed with plain wax and no mark. When you hold it, you can feel a folded paper inside — thick, like a letter of several pages. Hannah pressed it into your hands and said only: 'Thomas Wren. Green Dragon. Before ten.' The wax is still warm from being carried close to her body.",
+  "unlocks": [
+    "troop_route_map"
+  ],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.923Z",
+  "locationId": "",
+  "scenarioId": "midnight_errand_boston",
+  "description": "An oilskin packet, sealed with plain wax and no mark. When you hold it, you can feel a folded paper inside — thick, like a letter of several pages. Hannah pressed it into your hands and said only: 'Thomas Wren. Green Dragon. Before ten.' The wax is still warm from being carried close to her body.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "gill_print_shop_back",
   "implicatesCharacterIds": [
     "hannah_cross",
     "thomas_wren"
-  ],
-  "unlocks": [
-    "troop_route_map"
-  ],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.923Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

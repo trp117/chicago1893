@@ -1,0 +1,17 @@
+{
+  "id": "overheard_french",
+  "title": "Overheard French Exchange",
+  "unlocks": [
+    "dialogue:mercier_pressure"
+  ],
+  "category": "observation",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "Near the Midway, a brief exchange in French cuts off at your approach. The words 'la démonstration' and 'demain soir' were unmistakable.",
+  "isKeyEvidence": false,
+  "discoveryLocationId": "midway_plaisance",
+  "implicatesCharacterIds": [
+    "emile_mercier"
+  ]
+}

@@ -1,20 +1,20 @@
 {
   "id": "loc_fortified_cellar",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "Fortified Cellar, Rue du Moulin",
-  "description": "A German-improved farmhouse cellar reinforced with railway ties and sandbags, accessed through a trapdoor in the kitchen floor. It served as a company command post and still smells of ersatz coffee, tobacco, and the copper-iron smell of blood from the recent clearing action.",
   "mood": "close, dangerous, revelatory, grim",
-  "linkedCharacterIds": [
-    "char_renard",
-    "char_farrow"
-  ],
+  "name": "Fortified Cellar, Rue du Moulin",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.095Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "A German-improved farmhouse cellar reinforced with railway ties and sandbags, accessed through a trapdoor in the kitchen floor. It served as a company command post and still smells of ersatz coffee, tobacco, and the copper-iron smell of blood from the recent clearing action.",
   "atmosphericDetails": [
     "A German field telephone sits on a wooden shelf, its handset off the hook; the wire running from it disappears into the eastern wall through a hole packed with rags",
     "A hand-drawn map of the American artillery positions is pinned to a timber upright with a German bayonet — it is dated May 26th and is accurate to within fifty meters",
     "Spent brass casings crunch underfoot; a German steel helmet sits upright on the floor beside scattered equipment and broken ration tins as if its owner simply set it down and stepped out"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.095Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_renard",
+    "char_farrow"
+  ]
 }

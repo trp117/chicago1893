@@ -1,20 +1,20 @@
 {
   "id": "loc_b59_main_passageway",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "B-59 Main Passageway",
-  "description": "The central corridor running the length of the pressure hull — a tunnel of painted steel barely wide enough for two men to pass sideways, its overhead festooned with pipes, cable bundles, and the occasional red lamp casting pools of dark crimson light. This is where the crew moves between compartments, and where information — rumor, order, and panic — travels fastest.",
   "mood": "transient, anxious, red-lit, overheard",
-  "linkedCharacterIds": [
-    "char_chief_petty_officer_kozlov",
-    "char_maslennikov"
-  ],
+  "name": "B-59 Main Passageway",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.800Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "The central corridor running the length of the pressure hull — a tunnel of painted steel barely wide enough for two men to pass sideways, its overhead festooned with pipes, cable bundles, and the occasional red lamp casting pools of dark crimson light. This is where the crew moves between compartments, and where information — rumor, order, and panic — travels fastest.",
   "atmosphericDetails": [
     "Three crewmen are sitting on the deck with their backs against the port bulkhead, eyes open, not speaking — their faces have the blank, inward look of men conserving oxygen by conserving thought.",
     "A handwritten duty roster is pinned to a cork board near the forward watertight door — several names have been crossed out and replaced, the ink smeared by condensation.",
     "The sound of the sonar pings is clearest here, transmitted through the hull structure — each WHANG arrives as a physical sensation in the chest before it registers as sound."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.800Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_chief_petty_officer_kozlov",
+    "char_maslennikov"
+  ]
 }

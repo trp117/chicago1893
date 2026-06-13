@@ -1,20 +1,20 @@
 {
   "id": "loc_watchtower",
-  "scenarioId": "bornholmer_strasse_first_breach",
-  "name": "Watchtower Observation Post",
-  "description": "The elevated guard post above the death strip — a steel and concrete structure with a 360-degree observation window, a telephone that connects directly to the command post, and a mounted searchlight that has been left on its fixed position all evening. From here, the entire checkpoint is visible: the crowd on the eastern side, the press on the western side, the death strip below.",
   "mood": "omniscient, isolated, vertiginous",
-  "linkedCharacterIds": [
-    "char_jaeger",
-    "char_brenner"
-  ],
+  "name": "Watchtower Observation Post",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.115Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "The elevated guard post above the death strip — a steel and concrete structure with a 360-degree observation window, a telephone that connects directly to the command post, and a mounted searchlight that has been left on its fixed position all evening. From here, the entire checkpoint is visible: the crowd on the eastern side, the press on the western side, the death strip below.",
   "atmosphericDetails": [
     "The searchlight's beam cutting through the fog at a fixed angle, illuminating a cross-section of the crowd that shifts and breathes like a single organism",
     "The telephone handset on the observation desk — its cord slightly frayed at the connection point, its line to command post still technically operational",
     "The view from above: the death strip's raked gravel, the two crowds on either side, the bridge, and in the distance the lights of West Berlin glowing amber through the fog"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.976Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_jaeger",
+    "char_brenner"
+  ]
 }

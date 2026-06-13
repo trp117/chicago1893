@@ -1,19 +1,19 @@
 {
   "id": "clue_cut_wire_splice",
-  "scenarioId": "zero_hour_cantigny",
   "title": "The Diagonal Wire Cut at Delta-7",
-  "description": "At splice point Delta-7 in the crater field, the forward copper telephone line has been cut with a single clean stroke at a 45-degree angle. The cut surfaces are bright copper — unoxidized, made within the last two hours. A strand of khaki officer's uniform wool is caught on the wire's severed end. Most conclusively: lying in the mud eighteen inches from the cut, half-concealed under a clod of clay, is a pair of wire cutters with German manufacturer's markings — Feldzange, stamped with the Prussian eagle — that have no business being in an American signals kit.",
-  "category": "physical",
-  "discoveryLocationId": "loc_wire_splice_point",
-  "implicatesCharacterIds": [
-    "char_farrow"
-  ],
   "unlocks": [
     "clue_farrow_alibi_gap"
   ],
-  "isKeyEvidence": true,
+  "category": "physical",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-20T23:57:44.103Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "zero_hour_cantigny",
+  "description": "At splice point Delta-7 in the crater field, the forward copper telephone line has been cut with a single clean stroke at a 45-degree angle. The cut surfaces are bright copper — unoxidized, made within the last two hours. A strand of khaki officer's uniform wool is caught on the wire's severed end. Most conclusively: lying in the mud eighteen inches from the cut, half-concealed under a clod of clay, is a pair of wire cutters with German manufacturer's markings — Feldzange, stamped with the Prussian eagle — that have no business being in an American signals kit.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
+  "discoveryLocationId": "loc_wire_splice_point",
+  "implicatesCharacterIds": [
+    "char_farrow"
+  ]
 }

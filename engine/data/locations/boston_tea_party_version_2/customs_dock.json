@@ -1,17 +1,17 @@
 {
   "id": "customs_dock",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "The Customs Dock",
-  "description": "A stone jetty south of Griffin's Wharf, officially used for inspecting incoming cargo — tonight it is conspicuously quiet, the customs men having been pulled toward the main wharf, leaving behind only the evidence of a hasty departure and a crate that should not be here. The water slaps against the pilings with a cold, hollow sound.",
   "mood": "isolated, cold, suspicious, abandoned",
-  "linkedCharacterIds": [
-    "agent_silas_dawes"
-  ],
+  "name": "The Customs Dock",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.442Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "A stone jetty south of Griffin's Wharf, officially used for inspecting incoming cargo — tonight it is conspicuously quiet, the customs men having been pulled toward the main wharf, leaving behind only the evidence of a hasty departure and a crate that should not be here. The water slaps against the pilings with a cold, hollow sound.",
   "atmosphericDetails": [
     "A wooden crate stamped with the East India Company mark sits beside the jetty — it is not the kind of crate that belongs on a customs dock.",
     "The stub of a red wax seal lies crushed on the stone — someone opened a letter here and did not bother to hide it.",
     "Boot prints in the frost lead from the jetty to the street and back again, as though someone paced here for some time before leaving in a hurry."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.442Z"
+  "linkedCharacterIds": [
+    "agent_silas_dawes"
+  ]
 }

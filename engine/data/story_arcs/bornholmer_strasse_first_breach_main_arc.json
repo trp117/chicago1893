@@ -1,18 +1,8 @@
 {
   "id": "bornholmer_strasse_first_breach_main_arc",
-  "scenarioId": "bornholmer_strasse_first_breach",
-  "name": "The Gate That History Required",
-  "premise": "On the night of November 9, 1989, a bureaucratic error has set twenty thousand East Berliners in motion toward the Bornholmer Straße checkpoint. Three people — a border commander, a student protester, and a Western journalist — must navigate the next several hours as thousands of East Berliners — perhaps as many as twenty thousand — press against a gate that history will open, but that could just as easily become a massacre.",
-  "goal": "Reach the moment of the gate's opening without a lethal incident — and ensure that each perspective witnesses, enables, or survives the breach intact.",
-  "openingSituation": "It is 20:00. Schabowski's press conference ended forty minutes ago. The first arrivals are already at the gate. Jäger has placed his first call to his superiors and received no clear instruction. The Journalist's camera is rolling on the western approach. The Protester has just pushed through the outer edge of the gathering crowd and can see the floodlights ahead.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Echo Chamber",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "crowddensity_20",
@@ -39,15 +29,15 @@
           "description": "Jäger reviews the checkpoint's standing orders and realizes they contain no provision for a crowd of this size or composition"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Crush",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "crowddensity_75",
@@ -78,15 +68,15 @@
           "description": "A Grenztruppen guard on the upper platform unslings his weapon; Jäger must intervene before the situation escalates to a firing incident"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Breach",
-      "minuteRange": [
-        15,
-        22
-      ],
       "beats": [
         {
           "id": "crowddensity_100",
@@ -117,15 +107,15 @@
           "description": "The Journalist's camera captures the exact moment the gate opens and the Liveschaltung goes live to networks across the world"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        22
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The Reckoning",
-      "minuteRange": [
-        22,
-        30
-      ],
       "beats": [
         {
           "id": "the_immediate_aftermath",
@@ -152,10 +142,20 @@
           "description": "The players' final actions determine whether the breach is clean — a moment of pure human possibility — or shadowed by the costs each of them has paid to reach it"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        22,
+        30
+      ]
     }
   ],
+  "goal": "Reach the moment of the gate's opening without a lethal incident — and ensure that each perspective witnesses, enables, or survives the breach intact.",
+  "name": "The Gate That History Required",
+  "opening": "",
+  "premise": "On the night of November 9, 1989, a bureaucratic error has set twenty thousand East Berliners in motion toward the Bornholmer Straße checkpoint. Three people — a border commander, a student protester, and a Western journalist — must navigate the next several hours as thousands of East Berliners — perhaps as many as twenty thousand — press against a gate that history will open, but that could just as easily become a massacre.",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.965Z",
-  "opening": ""
+  "updatedAt": "2026-06-13T02:59:31.103Z",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "openingSituation": "It is 20:00. Schabowski's press conference ended forty minutes ago. The first arrivals are already at the gate. Jäger has placed his first call to his superiors and received no clear instruction. The Journalist's camera is rolling on the western approach. The Protester has just pushed through the outer edge of the gathering crowd and can see the floodlights ahead."
 }

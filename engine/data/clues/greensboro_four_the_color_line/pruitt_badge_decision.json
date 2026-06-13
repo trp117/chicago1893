@@ -1,18 +1,18 @@
 {
   "id": "pruitt_badge_decision",
-  "scenarioId": "greensboro_four_the_color_line",
   "title": "Pruitt Keeps His Badge in His Pocket",
-  "description": "Mackintosh approaches Sergeant Pruitt near the front of the store and speaks to him in a low voice. Pruitt listens, nods once, and then does not move toward the counter. He does not produce his badge. He completes his purchase and moves toward the exit at a deliberate, unhurried pace — and moves toward the exit at a deliberate, unhurried pace. The conversation lasted less than thirty seconds. Whatever Mackintosh asked, the answer was no.",
+  "unlocks": [],
   "category": "observation",
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-24T03:30:00.385Z",
+  "locationId": "",
+  "scenarioId": "greensboro_four_the_color_line",
+  "description": "Mackintosh approaches Sergeant Pruitt near the front of the store and speaks to him in a low voice. Pruitt listens, nods once, and then does not move toward the counter. He does not produce his badge. He completes his purchase and moves toward the exit at a deliberate, unhurried pace — and moves toward the exit at a deliberate, unhurried pace. The conversation lasted less than thirty seconds. Whatever Mackintosh asked, the answer was no.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "store_main_aisle",
   "implicatesCharacterIds": [
     "sergeant_dale_pruitt",
     "harris_mackintosh"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.385Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

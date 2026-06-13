@@ -1,0 +1,19 @@
+{
+  "id": "redirected_crates",
+  "title": "Rerouted Electrical Crates",
+  "unlocks": [
+    "dialogue:mercier_access",
+    "location:machinery_hall"
+  ],
+  "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "Three crates of electrical switching equipment were diverted from Machinery Hall to an unlisted service depot under irregular paperwork.",
+  "isKeyEvidence": false,
+  "discoveryLocationId": "freight_yards",
+  "implicatesCharacterIds": [
+    "emile_mercier",
+    "patrick_hanrahan"
+  ]
+}

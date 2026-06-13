@@ -1,59 +1,59 @@
 {
   "id": "mercy_voss_stationmaster",
-  "scenarioId": "singing_wires",
   "name": "Mercy Voss — The Stationmaster",
-  "description": "You run the Sandusky station and you know the network's full shape — the safe houses, the vessel captain, the accounts. You have suspected a Judas in the house for six weeks. Tonight you will find out if you were right, and what it costs to be right this late.",
-  "startLocationId": "voss_dry_goods",
-  "startingKnowledge": [
-    "You know the vessel captain's name and his departure deadline of half past eleven.",
-    "You know the hidden accounts beneath your floor document sixty-three passengers — evidence that would convict you under the 1850 Act.",
-    "You have suspected Silas Pratt for six weeks based on behavioral observation, but you have no proof.",
-    "You know that Arden Gill is not the commercial traveler he presents himself as."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write for this role from the position of the network's operational center — Mercy Voss has the most information and the most to lose. She has access to the dry goods store, the hidden accounts, and the network's organizational knowledge, but she cannot move freely without drawing attention. Her decisions are about who to trust, what evidence to use, and whether to expose the Judas before the passengers are clear or after.",
+  "opening": {
+    "choices": [
+      "Go directly to the barn and move the passengers to the waterfront now, before waiting for confirmation that the road is clear.",
+      "Go to the telegraph office to find Thomas Cole and get the full picture of what is on the wire before moving anyone.",
+      "Find Jerome Lattimore on the waterfront and confront him with what you suspect — if he breaks, you will know the shape of the betrayal before you move the passengers into it."
+    ],
+    "narrative": "It is half past nine. The cipher message is decoded. The chalk mark is on the door. The barn is occupied. The vessel captain is waiting. You have perhaps ninety minutes before the Patience must sail with or without her passengers, and you are standing in the dark of your own store deciding which fire to put out first.",
+    "npcMoments": []
+  },
   "briefing": "You are standing at the back of the dry goods store with the lamp turned low and Thomas Cole's cipher message open in your hand, the Concordance on the counter beside it, and you have just decoded three words that confirm what you have been afraid to say aloud for six weeks: Judas in the house. The chalk mark on your door frame is still showing two lines — the station is occupied — and seven people are somewhere between the Huron River and your barn right now, moving toward a shore road that may be watched. You know things that no one else in this story holds together in one mind: you know the vessel captain's name and that he cannot wait past half past eleven; you know the hidden accounts beneath your floor that document sixty-three people and would send you to prison under the Fugitive Slave Act; you know that Arden Gill has been in Sandusky three times this season and that his questions about freight routing have nothing to do with dry goods; and you have known for six weeks, without proof, that Silas Pratt's name belongs on the short list of people who could have given the network's timing to the law. The proof you lacked is apparently somewhere in the telegraph office tonight, and Thomas Cole has told you to move the small dry goods first, which means the children, which means your barn is the next decision. You are holding a lamp that is not yet lit, standing at the threshold of your own back door, and the question is not whether to act — the question is which of the three things you know needs to happen first.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:50.964Z",
+  "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network",
+  "scenarioId": "singing_wires",
+  "accessLevel": "staff",
+  "description": "You run the Sandusky station and you know the network's full shape — the safe houses, the vessel captain, the accounts. You have suspected a Judas in the house for six weeks. Tonight you will find out if you were right, and what it costs to be right this late.",
+  "perspective": "Write for this role from the position of the network's operational center — Mercy Voss has the most information and the most to lose. She has access to the dry goods store, the hidden accounts, and the network's organizational knowledge, but she cannot move freely without drawing attention. Her decisions are about who to trust, what evidence to use, and whether to expose the Judas before the passengers are clear or after.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The decoded message is in your hand.",
   "character_hooks": [
     "I have sixty-three names in those accounts beneath my floor, and I have not destroyed them because I believe history will want the record — but tonight I am standing in my own store wondering if my faith in history is about to cost seven living people their freedom.",
     "I have suspected Silas Pratt for six weeks and said nothing to Thomas Cole or Elias Cole because I had no proof and because an accusation without proof inside a network like this is how you destroy trust faster than any informant can — tonight I find out what that silence cost.",
     "I know the vessel captain on the Patience personally — he is a man who has made this crossing eleven times for the network and who has never been late and never been caught — and I know that if I send word to him now to hold past half past eleven, I am asking him to risk everything he has built, and I do not know yet if I have the right to ask that."
   ],
-  "suggested_secret": "Mercy Voss has already written a full account of the network's Sandusky operation — names, dates, routes, sixty-three passengers — in a document she has sent to a Quaker contact in Philadelphia with instructions to publish it in the event of her death or arrest, because she believes the only protection the network has in the long run is that the world eventually knows what was done here.",
-  "opening": {
-    "narrative": "It is half past nine. The cipher message is decoded. The chalk mark is on the door. The barn is occupied. The vessel captain is waiting. You have perhaps ninety minutes before the Patience must sail with or without her passengers, and you are standing in the dark of your own store deciding which fire to put out first.",
-    "npcMoments": [],
-    "choices": [
-      "Go directly to the barn and move the passengers to the waterfront now, before waiting for confirmation that the road is clear.",
-      "Go to the telegraph office to find Thomas Cole and get the full picture of what is on the wire before moving anyone.",
-      "Find Jerome Lattimore on the waterfront and confront him with what you suspect — if he breaks, you will know the shape of the betrayal before you move the passengers into it."
-    ]
-  },
+  "startLocationId": "voss_dry_goods",
+  "context_sentence": "You are Mercy Voss, stationmaster of the Sandusky terminus of the Underground Railroad in October 1853, operating under the Fugitive Slave Act's threat of a thousand-dollar fine and six months' imprisonment, responsible tonight for seven people moving toward Lake Erie and a vessel captain who cannot wait past half past eleven.",
   "roleInitialState": {
+    "flags": {
+      "barn_occupied": true,
+      "pratt_suspected": true,
+      "cipher_message_decoded": true,
+      "gill_identified_as_threat": true
+    },
     "inventory": [
       "Cruden's Concordance cipher key (memorized)",
       "Hidden accounts ledger (location known)",
       "Vessel captain's name and dock location",
       "Chalk mark key for safe house signals"
     ],
-    "flags": {
-      "cipher_message_decoded": true,
-      "barn_occupied": true,
-      "pratt_suspected": true,
-      "gill_identified_as_threat": true
-    },
     "suspicion": {
-      "silas_pratt": 4,
       "arden_gill": 3,
-      "jerome_lattimore": 1,
-      "deputy_crane": 2
+      "silas_pratt": 4,
+      "deputy_crane": 2,
+      "jerome_lattimore": 1
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:50.964Z",
-  "context_sentence": "You are Mercy Voss, stationmaster of the Sandusky terminus of the Underground Railroad in October 1853, operating under the Fugitive Slave Act's threat of a thousand-dollar fine and six months' imprisonment, responsible tonight for seven people moving toward Lake Erie and a vessel captain who cannot wait past half past eleven.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "Station masters who ran safe houses along the Underground Railroad's northern Ohio network",
-  "fact_checked": false,
-  "bridge_sentence": "The decoded message is in your hand."
+  "suggested_secret": "Mercy Voss has already written a full account of the network's Sandusky operation — names, dates, routes, sixty-three passengers — in a document she has sent to a Quaker contact in Philadelphia with instructions to publish it in the event of her death or arrest, because she believes the only protection the network has in the long run is that the world eventually knows what was done here.",
+  "startingKnowledge": [
+    "You know the vessel captain's name and his departure deadline of half past eleven.",
+    "You know the hidden accounts beneath your floor document sixty-three passengers — evidence that would convict you under the 1850 Act.",
+    "You have suspected Silas Pratt for six weeks based on behavioral observation, but you have no proof.",
+    "You know that Arden Gill is not the commercial traveler he presents himself as."
+  ]
 }

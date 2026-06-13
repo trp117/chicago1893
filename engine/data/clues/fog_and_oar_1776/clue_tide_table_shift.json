@@ -6,7 +6,7 @@
   ],
   "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-10T22:40:42.167Z",
+  "updatedAt": "2026-06-13T20:06:16.970Z",
   "locationId": "",
   "scenarioId": "fog_and_oar_1776",
   "description": "Tucked inside Glover's coat is a hand-copied tide table for the East River, annotated in pencil by one of his senior oarsmen. The reversal time has been corrected from 2:30 AM to 1:45 AM—forty-five minutes earlier than the schedule Washington was given at the start of the operation. If the crossing rate is not accelerated before 1:45, the returning bateaux will be fighting a full ebb current directly toward the British harbor anchorage, adding forty minutes or more to every round trip and collapsing the transit schedule.",
@@ -15,6 +15,6 @@
   "discoveryLocationId": "loc_east_river_crossing",
   "implicatesCharacterIds": [
     "char_glover",
-    "char_ezra_pedrick"
+    "char_ezra_pulling"
   ]
 }

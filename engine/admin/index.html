@@ -223,6 +223,27 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .btn-img-prompt-copy { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); transition: background .15s; }
 .btn-img-prompt-copy:hover { background: var(--bg); }
 .img-prompt-status { font-size: 12px; min-height: 18px; line-height: 1.5; }
+
+/* ── Image Artwork Section ────────────────────────────────────── */
+.img-artwork-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0 14px; }
+.img-upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+.img-upload-zone:hover, .img-upload-zone.drag-over { border-color: var(--accent); background: #f0f6ff; }
+.img-upload-icon { font-size: 28px; margin-bottom: 8px; }
+.img-upload-label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.img-upload-hint  { font-size: 12px; color: var(--text-soft); margin-bottom: 14px; }
+.btn-img-pick { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--accent); background: #fff; color: var(--accent); transition: background .15s; }
+.btn-img-pick:hover { background: #eef4ff; }
+.img-artwork-processing { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 28px 20px; font-size: 14px; color: var(--text-soft); }
+.img-previews-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.img-preview-thumb { width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); display: block; transition: opacity .2s; }
+.img-crop-slider { width: 100%; margin: 6px 0 3px; accent-color: var(--accent); cursor: pointer; }
+.img-crop-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-soft); margin-bottom: 12px; }
+.img-artwork-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-img-delete  { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--danger, #dc2626); background: #fff; color: var(--danger, #dc2626); transition: background .15s; }
+.btn-img-delete:hover  { background: #fff1f1; }
+.btn-img-replace { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); transition: background .15s; }
+.btn-img-replace:hover { background: var(--bg); }
+.img-artwork-status { font-size: 12px; min-height: 18px; line-height: 1.5; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -3019,6 +3040,47 @@ function renderImgPromptStudio(data) {
       <button onclick="copyImgPrompt()" class="btn-img-prompt-copy" id="btn-copy-prompt">Copy prompt</button>
     </div>
     <div id="img-prompt-status" class="img-prompt-status"></div>
+
+    <hr class="img-artwork-divider">
+    <div class="img-prompt-label" style="margin-bottom:10px">Scenario artwork</div>
+
+    <div id="img-artwork-upload-zone" class="img-upload-zone" style="display:none">
+      <div class="img-upload-icon">📸</div>
+      <div class="img-upload-label">Upload scenario artwork</div>
+      <div class="img-upload-hint">JPEG · PNG · WebP &nbsp;·&nbsp; max 10 MB</div>
+      <button class="btn-img-pick" type="button">Choose file</button>
+      <input type="file" id="img-artwork-file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+    </div>
+
+    <div id="img-artwork-processing" class="img-artwork-processing" style="display:none">
+      <span>⏳</span><span>Processing artwork…</span>
+    </div>
+
+    <div id="img-artwork-has-images" style="display:none">
+      <div class="img-previews-row">
+        <div>
+          <div class="img-prompt-label" style="margin-bottom:4px">Wide (1600×900)</div>
+          <img id="img-preview-wide" class="img-preview-thumb" src="" alt="Wide preview">
+        </div>
+        <div>
+          <div class="img-prompt-label" style="margin-bottom:4px">Short (1800×493)</div>
+          <img id="img-preview-short" class="img-preview-thumb" src="" alt="Short preview">
+        </div>
+      </div>
+      <div>
+        <div class="img-prompt-label" style="margin-bottom:2px">Crop position — short banner</div>
+        <input type="range" id="img-crop-anchor" min="0" max="100" value="50" class="img-crop-slider">
+        <div class="img-crop-labels"><span>Top</span><span>Bottom</span></div>
+      </div>
+      <div class="img-artwork-actions">
+        <button class="btn-img-delete" type="button" id="btn-img-delete">Delete images</button>
+        <label class="btn-img-replace">Replace
+          <input type="file" id="img-artwork-replace-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+        </label>
+      </div>
+    </div>
+
+    <div id="img-artwork-status" class="img-artwork-status"></div>
   </div>
 </div>`;
 }
@@ -3235,6 +3297,130 @@ function renderPreview(data, autoSaved = false) {
   }
 
   const formEl = document.getElementById('preview-form');
+
+  // ── Image Artwork section ─────────────────────────────────────────────────
+  {
+    const artScenarioId = scenarioId;
+    const uploadZone   = document.getElementById('img-artwork-upload-zone');
+    const processingEl = document.getElementById('img-artwork-processing');
+    const hasImagesEl  = document.getElementById('img-artwork-has-images');
+    const artStatusEl  = document.getElementById('img-artwork-status');
+    const wideImg      = document.getElementById('img-preview-wide');
+    const shortImg     = document.getElementById('img-preview-short');
+    const cropSlider   = document.getElementById('img-crop-anchor');
+    const fileInput    = document.getElementById('img-artwork-file-input');
+    const replaceInput = document.getElementById('img-artwork-replace-input');
+
+    function showArtState(state) {
+      uploadZone.style.display   = state === 'upload'     ? 'block' : 'none';
+      processingEl.style.display = state === 'processing' ? 'flex'  : 'none';
+      hasImagesEl.style.display  = state === 'images'     ? 'block' : 'none';
+    }
+    function setArtStatus(msg, type = '') {
+      if (!artStatusEl) return;
+      artStatusEl.textContent = msg;
+      artStatusEl.style.color = type === 'error' ? 'var(--danger,#dc2626)' : type === 'success' ? 'var(--success,#16a34a)' : 'var(--text-soft)';
+    }
+    function setArtPreviews(wide, short) {
+      const ts = '?t=' + Date.now();
+      if (wideImg)  wideImg.src  = wide  + ts;
+      if (shortImg) shortImg.src = short + ts;
+    }
+
+    // Set initial UI state
+    if (data.scenario?.image?.url) {
+      setArtPreviews(data.scenario.image.url, data.scenario.image.shortUrl || data.scenario.image.url);
+      if (cropSlider && data.scenario.image.cropAnchor != null) cropSlider.value = data.scenario.image.cropAnchor;
+      showArtState('images');
+    } else {
+      showArtState('upload');
+    }
+
+    async function handleArtUpload(file) {
+      if (!file) return;
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        setArtStatus('File must be JPEG, PNG, or WebP.', 'error'); return;
+      }
+      showArtState('processing');
+      setArtStatus('');
+      const fd = new FormData();
+      fd.append('image', file);
+      fd.append('cropAnchor', cropSlider?.value ?? '50');
+      try {
+        const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image-upload`, { method: 'POST', body: fd });
+        const result = await resp.json();
+        if (result.error) throw new Error(result.detail || result.error);
+        data.scenario = data.scenario || {};
+        data.scenario.image = { ...(data.scenario.image || {}), url: result.wide, shortUrl: result.short, sourceUrl: result.source };
+        setArtPreviews(result.wide, result.short);
+        showArtState('images');
+        setArtStatus('Images saved.', 'success');
+      } catch (err) {
+        showArtState(data.scenario?.image?.url ? 'images' : 'upload');
+        setArtStatus('Upload failed: ' + err.message, 'error');
+      }
+    }
+
+    fileInput?.addEventListener('change',  e => { handleArtUpload(e.target.files[0]); e.target.value = ''; });
+    replaceInput?.addEventListener('change', e => { handleArtUpload(e.target.files[0]); e.target.value = ''; });
+
+    uploadZone?.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone?.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone?.addEventListener('drop', e => {
+      e.preventDefault(); uploadZone.classList.remove('drag-over');
+      handleArtUpload(e.dataTransfer.files[0]);
+    });
+
+    formEl.addEventListener('click', e => {
+      if (e.target.closest('.btn-img-pick')) { fileInput?.click(); }
+    });
+
+    formEl.addEventListener('click', async e => {
+      if (!e.target.closest('#btn-img-delete')) return;
+      if (!confirm('Delete all images for this scenario? This cannot be undone.')) return;
+      setArtStatus('Deleting…');
+      try {
+        const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image`, { method: 'DELETE' });
+        const result = await resp.json();
+        if (result.error) throw new Error(result.error);
+        data.scenario = data.scenario || {};
+        data.scenario.image = {};
+        if (wideImg)  wideImg.src  = '';
+        if (shortImg) shortImg.src = '';
+        showArtState('upload');
+        setArtStatus('Images deleted.', 'success');
+      } catch (err) {
+        setArtStatus('Delete failed: ' + err.message, 'error');
+      }
+    });
+
+    let _recropTimer;
+    cropSlider?.addEventListener('input', () => {
+      clearTimeout(_recropTimer);
+      _recropTimer = setTimeout(async () => {
+        if (!data.scenario?.image?.sourceUrl) return;
+        const anchor = parseInt(cropSlider.value, 10);
+        if (shortImg) shortImg.style.opacity = '0.5';
+        setArtStatus('Re-cropping…');
+        try {
+          const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image-recrop`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cropAnchor: anchor }),
+          });
+          const result = await resp.json();
+          if (result.error) throw new Error(result.detail || result.error);
+          data.scenario.image.shortUrl = result.short;
+          if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
+          setArtStatus('Crop updated.', 'success');
+        } catch (err) {
+          if (shortImg) shortImg.style.opacity = '1';
+          setArtStatus('Recrop failed: ' + err.message, 'error');
+        }
+      }, 500);
+    });
+  }
+
   document.getElementById('preview-play').addEventListener('click', () => {
     const id = formEl.querySelector('[data-path="scenario.id"]')?.value || scenarioId;
     window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank');

@@ -1,18 +1,18 @@
 {
   "id": "clue_dead_drop_impression",
-  "scenarioId": "lightning_and_the_midnight_coach",
   "title": "The Dead Drop Paper Impression",
-  "description": "At the Huron Road mile marker, the gap between the two stones at the base is empty — but the damp earth inside holds the impression of a folded paper that was recently removed. Pressing a fresh piece of paper against the impression and holding it to a lantern reveals ghost-text transferred by pressure: the word CELLAR and what appears to be a partial route description ending in MARBLEHEAD. The paper was removed within the last two hours — the impression edges are still crisp.",
+  "unlocks": [],
   "category": "physical",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.468Z",
+  "locationId": "",
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "At the Huron Road mile marker, the gap between the two stones at the base is empty — but the damp earth inside holds the impression of a folded paper that was recently removed. Pressing a fresh piece of paper against the impression and holding it to a lantern reveals ghost-text transferred by pressure: the word CELLAR and what appears to be a partial route description ending in MARBLEHEAD. The paper was removed within the last two hours — the impression edges are still crisp.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_huron_road_tavern",
   "implicatesCharacterIds": [
     "prentiss_hoyle",
     "aldous_greer"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.468Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

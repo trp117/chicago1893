@@ -1,19 +1,19 @@
 {
   "id": "bridge_camp_supply_ledger_post",
-  "scenarioId": "high_water_reckoning",
-  "name": "St. Claude Bridge — Supply Ledger Station",
-  "description": "A folding table at the center of the bridge deck where the camp's resource inventory is tracked in a waterproof notebook — the physical record of every item received, distributed, and signed for over the past five days.",
   "mood": "administrative, revealing, contested",
-  "linkedCharacterIds": [
-    "father_clement_tureaud"
-  ],
+  "name": "St. Claude Bridge — Supply Ledger Station",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:58:31.283Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "high_water_reckoning",
+  "description": "A folding table at the center of the bridge deck where the camp's resource inventory is tracked in a waterproof notebook — the physical record of every item received, distributed, and signed for over the past five days.",
   "atmosphericDetails": [
     "The notebook's pages are wavy from humidity, the ink slightly smeared on the earliest entries",
     "Father Clement's authorization signatures appear on eleven of the last fourteen supply receipt lines",
     "A separate column headed 'lot number' where the pharmaceutical lot numbers have been logged — the column stops three entries before today's date"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T19:27:16.054Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "father_clement_tureaud"
+  ]
 }

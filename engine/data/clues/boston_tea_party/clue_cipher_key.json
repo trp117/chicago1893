@@ -1,17 +1,17 @@
 {
   "id": "clue_cipher_key",
-  "scenarioId": "boston_tea_party",
   "title": "Dr. Warren's Cipher Key",
-  "description": "In the jar of rolled papers on Dr. Warren's surgery windowsill — the one between the valerian and the camphor — you find a partial cipher key recovered from a Crown messenger. Warren reluctantly confirms it matches the encoding style used in the letter you found: a system taught only to a handful of trusted Crown informants, none of whom should have any connection to the Sons of Liberty.",
-  "category": "documentary",
-  "discoveryLocationId": "warren_surgery",
-  "implicatesCharacterIds": [
-    "thomas_dillworth"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-03T21:41:04.775Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "boston_tea_party",
+  "description": "In the jar of rolled papers on Dr. Warren's surgery windowsill — the one between the valerian and the camphor — you find a partial cipher key recovered from a Crown messenger. Warren reluctantly confirms it matches the encoding style used in the letter you found: a system taught only to a handful of trusted Crown informants, none of whom should have any connection to the Sons of Liberty.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "warren_surgery",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ]
 }

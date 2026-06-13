@@ -1,82 +1,82 @@
 {
   "id": "role_gatekeeper",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "name": "The Gatekeeper",
-  "real_name": "Harald Jäger",
-  "description": "You are the Stasi border control commander at Bornholmer Straße. You have a weapon, standing orders you cannot execute, and a chain of command that has gone silent. The decision that history requires is yours alone.",
-  "startLocationId": "loc_checkpoint_command_post",
-  "startingKnowledge": [
-    "The Schießbefehl is technically still in force — you have the legal authority to order your guards to fire",
-    "Your last three calls to superior officers have ended with the phone being hung up without orders being issued",
-    "The Durchschleusung strategy — releasing individuals and revoking their citizenship — has backfired and accelerated the crowd's growth",
-    "Unteroffizier Brenner has loaded his weapon without being ordered to"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a career military officer in the last hour of his institutional world — a man trained to receive orders who has received none, and who understands with increasing clarity that the decision is his and that history will judge it. The prose should carry the weight of command without authority: formal, controlled, increasingly strained. The sensory world is the command post — the phones, the logbook, the fluorescent light, the sound of the crowd through concrete walls.",
+  "opening": {
+    "choices": [
+      "Call your direct superior again and log the attempt — build the paper trail that shows you requested orders",
+      "Go to the eastern barrier yourself and assess Brenner's state directly",
+      "Confront Oberst Raab about his presence and his authority here tonight"
+    ],
+    "narrative": "It is 20:00 on November 9, 1989. The Bornholmer Straße checkpoint is your command, and tonight it has become something else entirely. The break room television is still running the state broadcast — Schabowski's press conference, replayed on a loop, the words 'immediately, without delay' arriving every twelve minutes like a scheduled detonation. Outside, the first arrivals have reached the gate: a few dozen, then a few hundred, the number climbing with each check through the observation window. Your security phone has rung twice. Both calls were from officers who asked for a situation report and then, when you gave it, went quiet and disconnected. The logbook is open. The floodlights are on. The crowd is, for now, passive — but you have been a border officer long enough to know the difference between a crowd that is waiting and a crowd that is building.",
+    "npcMoments": [
+      {
+        "moment": "Brenner appears in the command post doorway and asks, very quietly, whether he should prepare the upper platform. He is already in full kit. You have not ordered this.",
+        "characterId": "char_brenner"
+      },
+      {
+        "moment": "A car pulls up to the rear entrance of the command post. A man in civilian clothes gets out, shows identification to your duty guard, and enters without being stopped. He introduces himself as Oberst Raab, Ministry for State Security, and says he is here to observe.",
+        "characterId": "char_oberst_mielke"
+      }
+    ]
+  },
   "briefing": "You are standing at the duty desk in the command post, the logbook open in front of you, the security phone in your hand. The line to Generalmajor Neiber's office rang fourteen times before someone picked up and immediately disconnected. That was four minutes ago. You have been commander of this checkpoint for eleven years and in eleven years you have never made a decision that was not covered by a regulation, a standing order, or a direct instruction from above — and tonight, for the first time, there is nothing above you. The phones are working. The lines are open. Your superiors are simply choosing not to answer them, and you understand, with the particular clarity that comes from having spent a career reading institutional signals, that this is not a communications failure. They are leaving you here. Outside, through the concrete walls and the bulletproof glass, twenty thousand people are pressing against your gate, and one of your guards has a loaded weapon and a hand that will not leave the grip. You have the Schießbefehl. You have the authority to invoke it. You also have eyes, and you can count, and you know that the mathematics of what is outside that gate do not resolve in your favor regardless of what order you give. The logbook is open to tonight's entries. The last line reads: 'Kein Befehl.' No order. You wrote it yourself, twenty minutes ago, and you have been looking at it since. The phone is still in your hand.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "real_name": "Harald Jäger",
+  "updatedAt": "2026-06-13T02:59:31.124Z",
+  "represents": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "accessLevel": "staff",
+  "description": "You are the Stasi border control commander at Bornholmer Straße. You have a weapon, standing orders you cannot execute, and a chain of command that has gone silent. The decision that history requires is yours alone.",
+  "perspective": "Write from the perspective of a career military officer in the last hour of his institutional world — a man trained to receive orders who has received none, and who understands with increasing clarity that the decision is his and that history will judge it. The prose should carry the weight of command without authority: formal, controlled, increasingly strained. The sensory world is the command post — the phones, the logbook, the fluorescent light, the sound of the crowd through concrete walls.",
+  "character_id": "char_jaeger",
+  "ending_notes": {
+    "failure": {
+      "who_present": "The Student Protester",
+      "what_happened": "As the crowd surged forward against a buckling security gate, you delayed your decision too long, trying to reach a superior officer. A panicked guard fired a warning shot into the air, triggering a stampede that crushed several civilians and turned the checkpoint into an unrecoverable zone of violence. ",
+      "emotional_weight": " Total Ruin—the devastating psychological weight of allowing bureaucratic paralysis to cause a human catastrophe. ",
+      "closing_line_override": "The telephone receiver dangled from its cord, buzzing with a dial tone over the screams outside. "
+    },
+    "partial": {
+      "who_present": "The Student Protester, The Western Journalist ",
+      "what_happened": " You ordered the vehicle gates raised without authorization, averting a bloodbath and allowing unrestricted passage. However, in the frantic rush, your passport control staff completely panicked, leaving sensitive state intelligence documents unsecured on the desks, which were pilfered by crossing citizens. ",
+      "emotional_weight": "Bitter Relief—the heavy realization that while you saved thousands of lives, your decades of disciplined military service ended in an unauthorized, chaotic retreat. ",
+      "closing_line_override": "You watched the drop-bar rise into the night sky, knowing your uniform no longer held any power. "
+    }
+  },
+  "fact_checked": false,
+  "character_type": "real",
+  "bridge_sentence": "The Trabant queue is no longer moving.",
   "character_hooks": [
     "I have a brother-in-law in West Berlin I have never been permitted to visit, and tonight I find I am thinking about him more than about the regulations.",
     "I watched Schabowski's press conference on the break room television and I knew immediately it was an error — I had thirty minutes to call upward and I chose to wait, and that choice is now the weight I am carrying.",
     "I have filed three Meldungen tonight with no response, and I have begun to understand that the silence is not an accident but a decision made by people who will not be standing here when the gate breaks."
   ],
-  "suggested_secret": "Jäger has already drafted his own version of the open order in the logbook margin — in pencil, unsigned — and has been staring at it for twenty minutes, unable to make himself ink it.",
-  "opening": {
-    "narrative": "It is 20:00 on November 9, 1989. The Bornholmer Straße checkpoint is your command, and tonight it has become something else entirely. The break room television is still running the state broadcast — Schabowski's press conference, replayed on a loop, the words 'immediately, without delay' arriving every twelve minutes like a scheduled detonation. Outside, the first arrivals have reached the gate: a few dozen, then a few hundred, the number climbing with each check through the observation window. Your security phone has rung twice. Both calls were from officers who asked for a situation report and then, when you gave it, went quiet and disconnected. The logbook is open. The floodlights are on. The crowd is, for now, passive — but you have been a border officer long enough to know the difference between a crowd that is waiting and a crowd that is building.",
-    "npcMoments": [
-      {
-        "characterId": "char_brenner",
-        "moment": "Brenner appears in the command post doorway and asks, very quietly, whether he should prepare the upper platform. He is already in full kit. You have not ordered this."
-      },
-      {
-        "characterId": "char_oberst_mielke",
-        "moment": "A car pulls up to the rear entrance of the command post. A man in civilian clothes gets out, shows identification to your duty guard, and enters without being stopped. He introduces himself as Oberst Raab, Ministry for State Security, and says he is here to observe."
-      }
-    ],
-    "choices": [
-      "Call your direct superior again and log the attempt — build the paper trail that shows you requested orders",
-      "Go to the eastern barrier yourself and assess Brenner's state directly",
-      "Confront Oberst Raab about his presence and his authority here tonight"
-    ]
-  },
+  "startLocationId": "loc_checkpoint_command_post",
+  "context_sentence": "You are Harald Jäger, the Stasi passport control commander at Bornholmer Straße who, on the night of November 9, 1989, made the unilateral decision to open the checkpoint gates at 11:30 PM — the first breach in the Berlin Wall, and the one that made all the others inevitable.",
   "roleInitialState": {
+    "flags": {
+      "open_order_issued": false,
+      "has_called_superior": true,
+      "brenner_intervention": false,
+      "durchschleusung_attempted": false
+    },
     "inventory": [
       "service pistol",
       "checkpoint command logbook",
       "standing orders document — dated 1984",
       "security phone directory"
     ],
-    "flags": {
-      "has_called_superior": true,
-      "durchschleusung_attempted": false,
-      "open_order_issued": false,
-      "brenner_intervention": false
-    },
     "suspicion": {
-      "char_oberst_mielke": 2,
-      "char_brenner": 1
+      "char_brenner": 1,
+      "char_oberst_mielke": 2
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.984Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": " You ordered the vehicle gates raised without authorization, averting a bloodbath and allowing unrestricted passage. However, in the frantic rush, your passport control staff completely panicked, leaving sensitive state intelligence documents unsecured on the desks, which were pilfered by crossing citizens. ",
-      "who_present": "The Student Protester, The Western Journalist ",
-      "emotional_weight": "Bitter Relief—the heavy realization that while you saved thousands of lives, your decades of disciplined military service ended in an unauthorized, chaotic retreat. ",
-      "closing_line_override": "You watched the drop-bar rise into the night sky, knowing your uniform no longer held any power. "
-    },
-    "failure": {
-      "what_happened": "As the crowd surged forward against a buckling security gate, you delayed your decision too long, trying to reach a superior officer. A panicked guard fired a warning shot into the air, triggering a stampede that crushed several civilians and turned the checkpoint into an unrecoverable zone of violence. ",
-      "who_present": "The Student Protester",
-      "emotional_weight": " Total Ruin—the devastating psychological weight of allowing bureaucratic paralysis to cause a human catastrophe. ",
-      "closing_line_override": "The telephone receiver dangled from its cord, buzzing with a dial tone over the screams outside. "
-    }
-  },
-  "context_sentence": "You are Harald Jäger, the Stasi passport control commander at Bornholmer Straße who, on the night of November 9, 1989, made the unilateral decision to open the checkpoint gates at 11:30 PM — the first breach in the Berlin Wall, and the one that made all the others inevitable.",
-  "character_type": "real",
-  "character_id": "char_jaeger",
-  "historical_record_note": "Harald Jäger, Stasi Oberstleutnant commanding the Bornholmer Straße passport control unit. Made the unilateral decision to open the checkpoint at approximately 23:30 on November 9, 1989. Primary source on the opening night.",
-  "fact_checked": false,
-  "represents": "",
-  "bridge_sentence": "The Trabant queue is no longer moving."
+  "suggested_secret": "Jäger has already drafted his own version of the open order in the logbook margin — in pencil, unsigned — and has been staring at it for twenty minutes, unable to make himself ink it.",
+  "startingKnowledge": [
+    "The Schießbefehl is technically still in force — you have the legal authority to order your guards to fire",
+    "Your last three calls to superior officers have ended with the phone being hung up without orders being issued",
+    "The Durchschleusung strategy — releasing individuals and revoking their citizenship — has backfired and accelerated the crowd's growth",
+    "Unteroffizier Brenner has loaded his weapon without being ordered to"
+  ],
+  "historical_record_note": "Harald Jäger, Stasi Oberstleutnant commanding the Bornholmer Straße passport control unit. Made the unilateral decision to open the checkpoint at approximately 23:30 on November 9, 1989. Primary source on the opening night."
 }

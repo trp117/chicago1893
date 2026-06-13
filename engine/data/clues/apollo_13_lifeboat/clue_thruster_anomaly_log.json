@@ -1,17 +1,17 @@
 {
   "id": "clue_thruster_anomaly_log",
-  "scenarioId": "apollo_13_lifeboat",
   "title": "Haise's Private Thruster Anomaly Note",
-  "description": "A handwritten note found tucked into the LM systems manual — Haise's handwriting, dated two hours after the explosion. It reads: 'RCS Thruster B-4 reading 3% low on oxidizer pressure. Within spec. Monitoring. Not reported.' Below that, in fresher ink: 'Now 6% low. Still within spec. Will report if it crosses threshold.' The threshold is noted as 10%. The current reading, visible on the instrument panel, is 8.2%.",
-  "category": "documentary",
-  "discoveryLocationId": "loc_lm_aquarius",
-  "implicatesCharacterIds": [
-    "char_fred_haise"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "documentary",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-25T14:53:42.959Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "apollo_13_lifeboat",
+  "description": "A handwritten note found tucked into the LM systems manual — Haise's handwriting, dated two hours after the explosion. It reads: 'RCS Thruster B-4 reading 3% low on oxidizer pressure. Within spec. Monitoring. Not reported.' Below that, in fresher ink: 'Now 6% low. Still within spec. Will report if it crosses threshold.' The threshold is noted as 10%. The current reading, visible on the instrument panel, is 8.2%.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "loc_lm_aquarius",
+  "implicatesCharacterIds": [
+    "char_fred_haise"
+  ]
 }

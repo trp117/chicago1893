@@ -1,19 +1,19 @@
 {
   "id": "loc_boiler_house",
-  "scenarioId": "artesian_height_1892",
-  "name": "The Boiler House",
-  "description": "A low brick outbuilding attached to the tower's south face, containing the coal-fired boiler that feeds steam to the pump room below. The Boiler_Steam_Pressure gauge is mounted on the firebox door frame, currently reading 45 PSI.",
   "mood": "hot, smoky, volatile",
-  "linkedCharacterIds": [
-    "char_silas_greer"
-  ],
+  "name": "The Boiler House",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.721Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "artesian_height_1892",
+  "description": "A low brick outbuilding attached to the tower's south face, containing the coal-fired boiler that feeds steam to the pump room below. The Boiler_Steam_Pressure gauge is mounted on the firebox door frame, currently reading 45 PSI.",
   "atmosphericDetails": [
     "The smell of wet coal dust and heated lubricating grease is overwhelming within two steps of the door — it coats the back of the throat.",
     "The gauge glass shows the water level at three-quarters — adequate, but the level is dropping faster than the coal input rate should allow.",
     "A pipe wrench has been left on the floor beside the main steam admission valve, its jaws set to a diameter that matches the valve's packing nut."
   ],
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.850Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_silas_greer"
+  ]
 }

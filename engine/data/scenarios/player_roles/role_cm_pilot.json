@@ -1,83 +1,83 @@
 {
   "id": "role_cm_pilot",
-  "scenarioId": "apollo_13_lifeboat",
   "name": "Command Module Pilot — Jack Swigert",
-  "description": "You are the last-minute replacement who is now the only person who can bring Odyssey back to life. The power-up sequence lives in your head and on a handwritten card taped to a wet instrument panel.",
-  "startLocationId": "loc_cm_odyssey",
-  "startingKnowledge": [
-    "The Command Module power-up sequence — you have drilled it so many times you can recite it in sequence from any step",
-    "The condensation on the left side of the instrument panel is heavier than the right, and you do not know what it means for the power-up",
-    "The tank-stirring procedure you performed before launch is under informal investigation as a possible cause of the explosion",
-    "John Aaron's revised sequence reduces the amp-hour requirement but eliminates a check you know exists for a specific reason — a reason Aaron may not have considered"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who prepared obsessively for exactly this scenario and is now discovering that obsessive preparation and the real thing are not the same thing. Swigert's voice is precise under pressure, slightly over-formal, and drops in register when he is frightened. He reaches for procedure numbers when he does not know what else to reach for.",
+  "aliases": [],
+  "opening": {
+    "choices": [
+      "Execute the immediate, aggressive power-down sequence to preserve the re-entry battery bank at all costs.",
+      "Hold the main telemetry and guidance links active for an extra 60 seconds to ensure the LM perfectly copies the IMU alignment data.",
+      "Challenge the EECOM desk’s emergency battery configuration before cutting the main bus ties"
+    ],
+    "narrative": "It is 10:14 PM Central Daylight Time, exactly seven minutes since the shudder rattled the hull. Odyssey is bleeding out its electrical life. Lovell is in the tunnel, calling out for the emergency LM activation checklists. Houston is on the loop, their voices carrying the tight, controlled cadence of men staring at a dying spacecraft. You are standing at the main circuit breaker panel, your fingers poised over the switches that will intentionally turn Odyssey into a cold, dark tomb.",
+    "npcMoments": [
+      {
+        "action": "Lovell's voice comes through the tunnel from Aquarius: 'Jack. How does she look?' Three words. The weight of the question is not in the words.",
+        "characterId": "char_jim_lovell"
+      },
+      {
+        "action": "Aaron's voice on the loop, from Houston: 'Swigert, Aaron. When you have a moment — I need to walk you through a modification to the power-up sequence. Step 9 specifically.'",
+        "characterId": "char_john_aaron"
+      }
+    ]
+  },
   "briefing": " You are in the Command Module Odyssey, and the master alarm is a physical pressure in your ears. The instrument panel in front of you—the one you spent three intense days memorizing after Ken Mattingly was pulled from the mission—is lit up like a Christmas tree with warning lights. Main Bus B has dropped offline, and Bus A is dying. You know that the tank-stirring procedure you performed minutes ago preceded this disaster. You don't know why, and you can't dwell on it. John Aaron and the EECOM desk are frantically working to figure out how to save your entry batteries, and your immediate job is to systematically execute an emergency power-down of your own ship while Lovell and Haise scramble to bring the Lunar Module Aquarius to life. If you pull the plugs too slowly, the entry batteries drain and you are dead before you even clear the Moon. If you pull them too fast, you drop navigation before the LM can mirror the guidance data. Your hands cannot shake. You have minutes to kill the power to a ship you were trained only to keep alive.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "real_name": null,
+  "updatedAt": "2026-05-25T14:53:42.964Z",
+  "cover_name": null,
+  "represents": "",
+  "scenarioId": "apollo_13_lifeboat",
+  "accessLevel": "staff",
+  "description": "You are the last-minute replacement who is now the only person who can bring Odyssey back to life. The power-up sequence lives in your head and on a handwritten card taped to a wet instrument panel.",
+  "perspective": "Write from the perspective of a man who prepared obsessively for exactly this scenario and is now discovering that obsessive preparation and the real thing are not the same thing. Swigert's voice is precise under pressure, slightly over-formal, and drops in register when he is frightened. He reaches for procedure numbers when he does not know what else to reach for.",
+  "character_id": "char_jack_swigert",
+  "ending_notes": {
+    "failure": {
+      "who_present": "The Mission Commander, The Lunar Module Pilot",
+      "what_happened": "The \"Cold Soak\" startup was initiated too late, or a major short circuit caused by condensation on the main control panels completely disabled the re-entry thrusters. The Command Module was unable to maintain its precise entry orientation and broke apart.",
+      "emotional_weight": "Fatal Regret—the horrifying, split-second realization of a mechanical failure in the final seconds of the mission.",
+      "closing_line_override": "The condensation on the window glass was the last thing you saw before the heat of re-entry took everything else."
+    },
+    "partial": {
+      "who_present": "The Mission Commander, The Lunar Module Pilot",
+      "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
+      "emotional_weight": "Fragile Relief—the shaking hands and shallow breath of a man who knows he narrowly avoided a fatal technical error.",
+      "closing_line_override": "You flipped the final switch and held your breath until you felt the weight of Earth's gravity again."
+    }
+  },
+  "fact_checked": false,
+  "identity_note": null,
+  "character_type": "real",
+  "bridge_sentence": "The master alarm stopped screaming forty seconds ago.",
   "character_hooks": [
     "I know the power-up sequence better than anyone alive, which means I also know exactly which step Aaron's revised procedure has eliminated — and I know why that step exists.",
     "The condensation on the left side of the panel has been bothering me for two hours and I have said nothing because I do not know what it means and I am afraid of what it might mean.",
     "I filed my taxes wrong this year and somewhere in the back of my mind, behind the burn calculations and the CO2 numbers, that fact keeps surfacing — which tells me something about the human mind under pressure that I did not know before tonight."
   ],
-  "suggested_secret": "Swigert knows, from a pre-launch conversation he was not supposed to hear, that the tank-stirring procedure he performed had been flagged as potentially problematic by a technician six months earlier — a flag that was reviewed, accepted, and filed. He has told no one.",
-  "opening": {
-    "narrative": "It is 10:14 PM Central Daylight Time, exactly seven minutes since the shudder rattled the hull. Odyssey is bleeding out its electrical life. Lovell is in the tunnel, calling out for the emergency LM activation checklists. Houston is on the loop, their voices carrying the tight, controlled cadence of men staring at a dying spacecraft. You are standing at the main circuit breaker panel, your fingers poised over the switches that will intentionally turn Odyssey into a cold, dark tomb.",
-    "npcMoments": [
-      {
-        "characterId": "char_jim_lovell",
-        "action": "Lovell's voice comes through the tunnel from Aquarius: 'Jack. How does she look?' Three words. The weight of the question is not in the words."
-      },
-      {
-        "characterId": "char_john_aaron",
-        "action": "Aaron's voice on the loop, from Houston: 'Swigert, Aaron. When you have a moment — I need to walk you through a modification to the power-up sequence. Step 9 specifically.'"
-      }
-    ],
-    "choices": [
-      "Execute the immediate, aggressive power-down sequence to preserve the re-entry battery bank at all costs.",
-      "Hold the main telemetry and guidance links active for an extra 60 seconds to ensure the LM perfectly copies the IMU alignment data.",
-      "Challenge the EECOM desk’s emergency battery configuration before cutting the main bus ties"
-    ]
-  },
+  "startLocationId": "loc_cm_odyssey",
+  "context_sentence": "You are Jack Swigert, the Command Module Pilot, and you are systematically killing your own ship before it kills you.",
   "roleInitialState": {
+    "flags": {
+      "powerup_initiated": false,
+      "condensation_reported": false,
+      "aaron_sequence_received": false,
+      "tank_stirring_disclosed": false
+    },
     "inventory": [
       "handwritten power-up cue card (taped to center console)",
       "flight manual (annotated, cover removed for Mailbox)",
       "medical tape (partial roll)",
       "pen (black marker)"
     ],
-    "flags": {
-      "condensation_reported": false,
-      "aaron_sequence_received": false,
-      "tank_stirring_disclosed": false,
-      "powerup_initiated": false
-    },
     "suspicion": {}
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-25T14:53:42.964Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You successfully completed the \"Cold Soak\" startup sequence despite the freezing fog. The ship made it through the atmosphere, but a minor short circuit caused by moisture on the main breaker panel triggered a premature parachute deployment, resulting in a dangerous drift.",
-      "who_present": "The Mission Commander, The Lunar Module Pilot",
-      "emotional_weight": "Fragile Relief—the shaking hands and shallow breath of a man who knows he narrowly avoided a fatal technical error.",
-      "closing_line_override": "You flipped the final switch and held your breath until you felt the weight of Earth's gravity again."
-    },
-    "failure": {
-      "what_happened": "The \"Cold Soak\" startup was initiated too late, or a major short circuit caused by condensation on the main control panels completely disabled the re-entry thrusters. The Command Module was unable to maintain its precise entry orientation and broke apart.",
-      "who_present": "The Mission Commander, The Lunar Module Pilot",
-      "emotional_weight": "Fatal Regret—the horrifying, split-second realization of a mechanical failure in the final seconds of the mission.",
-      "closing_line_override": "The condensation on the window glass was the last thing you saw before the heat of re-entry took everything else."
-    }
-  },
-  "real_name": null,
-  "cover_name": null,
+  "suggested_secret": "Swigert knows, from a pre-launch conversation he was not supposed to hear, that the tank-stirring procedure he performed had been flagged as potentially problematic by a technician six months earlier — a flag that was reviewed, accepted, and filed. He has told no one.",
+  "startingKnowledge": [
+    "The Command Module power-up sequence — you have drilled it so many times you can recite it in sequence from any step",
+    "The condensation on the left side of the instrument panel is heavier than the right, and you do not know what it means for the power-up",
+    "The tank-stirring procedure you performed before launch is under informal investigation as a possible cause of the explosion",
+    "John Aaron's revised sequence reduces the amp-hour requirement but eliminates a check you know exists for a specific reason — a reason Aaron may not have considered"
+  ],
   "is_player_character": false,
-  "identity_note": null,
-  "aliases": [],
-  "context_sentence": "You are Jack Swigert, the Command Module Pilot, and you are systematically killing your own ship before it kills you.",
-  "character_type": "real",
-  "character_id": "char_jack_swigert",
-  "historical_record_note": "Jack Swigert left NASA in 1977. In November 1982 he was elected to the United States House of Representatives from Colorado's 6th congressional district. He had been diagnosed with bone cancer during the campaign. He died on December 27, 1982, six days before he was to be sworn in. He was 51 years old. Sources: NASA Astronaut Biography; Congressional Record, 97th Congress.",
-  "fact_checked": false,
-  "bridge_sentence": "The master alarm stopped screaming forty seconds ago.",
-  "represents": ""
+  "historical_record_note": "Jack Swigert left NASA in 1977. In November 1982 he was elected to the United States House of Representatives from Colorado's 6th congressional district. He had been diagnosed with bone cancer during the campaign. He died on December 27, 1982, six days before he was to be sworn in. He was 51 years old. Sources: NASA Astronaut Biography; Congressional Record, 97th Congress."
 }

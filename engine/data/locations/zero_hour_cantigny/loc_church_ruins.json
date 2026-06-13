@@ -1,20 +1,20 @@
 {
   "id": "loc_church_ruins",
-  "scenarioId": "zero_hour_cantigny",
-  "name": "Church of Saint-Martin, Cantigny — Ruins",
-  "description": "The village church has taken three direct hits from 150mm shells; the nave roof is gone, the bell tower is a jagged stump, and the interior is open to the sky. The sacristy at the eastern end is partially intact, its stone walls two feet thick, which is why it is still standing.",
   "mood": "eerie, exposed, significant, silent",
-  "linkedCharacterIds": [
-    "char_renard",
-    "char_farrow"
-  ],
+  "name": "Church of Saint-Martin, Cantigny — Ruins",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T23:57:44.094Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "zero_hour_cantigny",
+  "description": "The village church has taken three direct hits from 150mm shells; the nave roof is gone, the bell tower is a jagged stump, and the interior is open to the sky. The sacristy at the eastern end is partially intact, its stone walls two feet thick, which is why it is still standing.",
   "atmosphericDetails": [
     "Morning light falls through the missing roof in pale columns, illuminating drifting cordite smoke and the scattered pages of a hymnbook",
     "The sacristy's stone water basin is still intact, filled with rainwater that has turned gray with plaster dust",
     "A loose stone in the sacristy's north wall — third course from the floor, second from the left — sits slightly proud of its neighbors, as if recently disturbed"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T23:57:44.094Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_renard",
+    "char_farrow"
+  ]
 }

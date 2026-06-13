@@ -1,20 +1,20 @@
 {
   "id": "loc_huron_road_tavern",
-  "scenarioId": "lightning_and_the_midnight_coach",
-  "name": "The Huron Road Tavern and Mile Marker",
-  "description": "A low-ceilinged roadhouse at the junction of the Huron Road and the lake road, its sign unlit at this hour — the mile marker post outside has a gap between two stones in its base that serves as a dead-drop.",
   "mood": "rough, transient, conspiratorial, dark",
-  "linkedCharacterIds": [
-    "prentiss_hoyle",
-    "aldous_greer"
-  ],
+  "name": "The Huron Road Tavern and Mile Marker",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-08T17:48:26.463Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "lightning_and_the_midnight_coach",
+  "description": "A low-ceilinged roadhouse at the junction of the Huron Road and the lake road, its sign unlit at this hour — the mile marker post outside has a gap between two stones in its base that serves as a dead-drop.",
   "atmosphericDetails": [
     "The dead-drop gap between the mile marker stones holds a folded paper — or held one recently, the gap is empty but the paper's impression is visible in the damp earth.",
     "Fresh horse dung near the hitching post, still steaming slightly in the cold air — a rider was here within the last hour.",
     "The tavern keeper is asleep; a single candle burns in the window by arrangement, signaling that the road north is clear."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-08T17:48:26.463Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "prentiss_hoyle",
+    "aldous_greer"
+  ]
 }

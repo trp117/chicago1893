@@ -1,18 +1,18 @@
 {
   "id": "clue_jaeger_order_log",
-  "scenarioId": "bornholmer_strasse_first_breach",
   "title": "Jäger's Call Log — The Deliberate Silence",
-  "description": "The duty desk logbook in the command post contains Jäger's handwritten record of every phone call made and received since 20:00. There are eleven outgoing calls logged to four different superior officers. Beside each entry, Jäger has written the outcome in a single word: 'Abgebrochen' — disconnected. 'Keine Antwort' — no answer. 'Beschimpft' — abused. The final entry, timestamped 22:47, reads: 'Generalmajor Neiber. Abgebrochen. Kein Befehl. Kein Befehl. Kein Befehl.' No order. No order. No order. Written three times, the pen pressing harder with each repetition until the third line tears the paper slightly. This is not a failure of communication. This is a deliberate institutional abandonment — Jäger's superiors have chosen to leave him without orders so that whatever happens tonight is his decision and his alone.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-13T02:59:31.116Z",
+  "locationId": "",
+  "scenarioId": "bornholmer_strasse_first_breach",
+  "description": "The duty desk logbook in the command post contains Jäger's handwritten record of every phone call made and received since 20:00. There are eleven outgoing calls logged to four different superior officers. Beside each entry, Jäger has written the outcome in a single word: 'Abgebrochen' — disconnected. 'Keine Antwort' — no answer. 'Beschimpft' — abused. The final entry, timestamped 22:47, reads: 'Generalmajor Neiber. Abgebrochen. Kein Befehl. Kein Befehl. Kein Befehl.' No order. No order. No order. Written three times, the pen pressing harder with each repetition until the third line tears the paper slightly. This is not a failure of communication. This is a deliberate institutional abandonment — Jäger's superiors have chosen to leave him without orders so that whatever happens tonight is his decision and his alone.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
   "discoveryLocationId": "loc_checkpoint_command_post",
   "implicatesCharacterIds": [
     "char_jaeger",
     "char_oberst_mielke"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": true,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T18:14:55.977Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

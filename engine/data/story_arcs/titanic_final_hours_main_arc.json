@@ -1,18 +1,8 @@
 {
   "id": "titanic_final_hours_main_arc",
-  "scenarioId": "titanic_final_hours",
-  "name": "The Final Hours of the RMS Titanic",
-  "premise": "Three crew members — a wireless operator, a second engineer, and a first class steward — must coordinate their separate crises across a sinking ship to maximize survival before 02:20 AM. Each controls a system the others depend on; each faces a human authority that may prevent them from doing what the situation demands.",
-  "goal": "Maintain wireless contact with Carpathia, keep the dynamos running until the last lifeboat is clear, and ensure the boats are filled to meaningful capacity — then survive.",
-  "openingSituation": "It is 11:55 PM. The ship has been struck for fifteen minutes. Thomas Andrews has told the Captain she will sink. The lifeboats are not yet being loaded. The three player characters are each at their posts, each in possession of information the others do not have, and the clock is already moving.",
   "acts": [
     {
-      "actNumber": 1,
       "name": "The Arithmetic of Survival",
-      "minuteRange": [
-        0,
-        7
-      ],
       "beats": [
         {
           "id": "each_player_character",
@@ -27,15 +17,15 @@
           "description": "The first lifeboat is lowered half-empty — Boat No. 7 with 28 passengers — establishing the central tension of the evacuation"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 1,
+      "minuteRange": [
+        0,
+        7
+      ]
     },
     {
-      "actNumber": 2,
       "name": "The Machinery of Panic",
-      "minuteRange": [
-        7,
-        15
-      ],
       "beats": [
         {
           "id": "officer_lightoller_enforces",
@@ -54,15 +44,15 @@
           "description": "First evidence of the lifeboat capacity manifest surfaces, revealing that officers have been recording departure numbers — the documented proof of half-empty boats"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 2,
+      "minuteRange": [
+        7,
+        15
+      ]
     },
     {
-      "actNumber": 3,
       "name": "The Price of Each Minute",
-      "minuteRange": [
-        15,
-        23
-      ],
       "beats": [
         {
           "id": "power_fluctuates_in",
@@ -81,15 +71,15 @@
           "description": "First Officer Murdoch is confronted with the evidence of half-empty boats; his response determines whether the final six boats are filled properly"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 3,
+      "minuteRange": [
+        15,
+        23
+      ]
     },
     {
-      "actNumber": 4,
       "name": "The Final Plunge",
-      "minuteRange": [
-        23,
-        30
-      ],
       "beats": [
         {
           "id": "0205_am",
@@ -108,10 +98,20 @@
           "description": "02:17 AM — Titanic's stern rises to 45 degrees; the ship breaks between the third and fourth funnels; the final outcome is narrated based on the three possible endings"
         }
       ],
-      "title": ""
+      "title": "",
+      "actNumber": 4,
+      "minuteRange": [
+        23,
+        30
+      ]
     }
   ],
+  "goal": "Maintain wireless contact with Carpathia, keep the dynamos running until the last lifeboat is clear, and ensure the boats are filled to meaningful capacity — then survive.",
+  "name": "The Final Hours of the RMS Titanic",
+  "opening": "",
+  "premise": "Three crew members — a wireless operator, a second engineer, and a first class steward — must coordinate their separate crises across a sinking ship to maximize survival before 02:20 AM. Each controls a system the others depend on; each faces a human authority that may prevent them from doing what the situation demands.",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-18T01:52:38.048Z",
-  "opening": ""
+  "scenarioId": "titanic_final_hours",
+  "openingSituation": "It is 11:55 PM. The ship has been struck for fifteen minutes. Thomas Andrews has told the Captain she will sink. The lifeboats are not yet being loaded. The three player characters are each at their posts, each in possession of information the others do not have, and the clock is already moving."
 }

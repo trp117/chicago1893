@@ -1,18 +1,18 @@
 {
   "id": "clue_arkhipov_k19_service_record",
-  "scenarioId": "sargasso_deep_three_keys",
   "title": "Arkhipov's Service Record Annotation",
-  "description": "Pinned inside the cover of the conning tower's standing orders binder — placed there by someone, at some point, for reasons that are not recorded — is a single page from a personnel file. It is Arkhipov's service record annotation from July 1961: 'Officer demonstrated exceptional command stability during K-19 nuclear reactor emergency. Crew confidence maintained under conditions of extreme physical and psychological stress. Recommended for senior flotilla assignment.' Savitsky has read this. He knows exactly who he is dealing with.",
+  "unlocks": [],
   "category": "documentary",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.804Z",
+  "locationId": "",
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "Pinned inside the cover of the conning tower's standing orders binder — placed there by someone, at some point, for reasons that are not recorded — is a single page from a personnel file. It is Arkhipov's service record annotation from July 1961: 'Officer demonstrated exceptional command stability during K-19 nuclear reactor emergency. Crew confidence maintained under conditions of extreme physical and psychological stress. Recommended for senior flotilla assignment.' Savitsky has read this. He knows exactly who he is dealing with.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_conning_tower",
   "implicatesCharacterIds": [
     "char_arkhipov",
     "char_savitsky"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.804Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

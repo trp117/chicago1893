@@ -1,0 +1,18 @@
+{
+  "id": "machinery_hall",
+  "mood": "mechanical, dangerous, impressive",
+  "name": "Machinery Hall",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "scenarioId": "chicago_1893_v1",
+  "description": "Steel, heat, engines, belts, and the nervous confidence of modern industry on display.",
+  "atmosphericDetails": [
+    "Tampered wiring diagrams",
+    "A missing toolbox",
+    "A maintenance log entry in the wrong hand"
+  ],
+  "linkedCharacterIds": [
+    "captain_odonnell",
+    "emile_mercier"
+  ]
+}

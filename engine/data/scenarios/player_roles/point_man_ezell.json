@@ -1,57 +1,57 @@
 {
   "id": "point_man_ezell",
-  "scenarioId": "greensboro_four_the_color_line",
   "name": "The Point Man — Ezell Blair Jr.",
-  "real_name": "Ezell Blair Jr.",
-  "description": "You spoke the words. You asked for the coffee. Now the silence that followed has become a physical environment, and every person in this store is waiting to see what you do next.",
-  "startLocationId": "lunch_counter_main",
-  "startingKnowledge": [
-    "You know that the other three have agreed: no one leaves until closing time, regardless of what is said or done",
-    "You know the manager's name — Mackintosh — because you looked it up before you came",
-    "You know that the waitress who walked away is named on the employee board near the kitchen as M. Simmons, and that she has not gone far"
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from the perspective of the man who spoke first, who asked for the coffee, who created the silence that followed. Every person in this store is now waiting to see what he does next. The weight of having initiated this is physical and present.",
+  "opening": {
+    "choices": [
+      "Hold direct eye contact with Mackintosh — assert your right to be here through sustained, unblinking acknowledgment of his authority",
+      "Fix your gaze on the mirrored backbar — watch the room in reflection without giving Mackintosh the confrontation he may be looking for",
+      "Place your textbook flat on the counter in front of you — anchor your space and establish your identity as a student before any further move is made"
+    ],
+    "narrative": "It is 4:32 PM on Monday, February 1, 1960, and you are seated at the lunch counter of F.W. Woolworth's at 132 South Elm Street, Greensboro, North Carolina. You asked for a cup of coffee three minutes ago. The waitress walked away. The counter in front of you is bare. The store has not stopped — the cash registers are still clicking, the floor walker is still pacing — but something in the room has changed, a shift in the quality of attention, and you are at the center of it. Mackintosh is on the office stairs. The floor walker is behind you. The mirror shows you the whole room.",
+    "npcMoments": []
+  },
   "briefing": "You are seated at the lunch counter of F.W. Woolworth's on South Elm Street, Greensboro, and the words have already been spoken — you asked for a cup of coffee three minutes ago, and the waitress walked away without answering, and the silence she left behind has been filling with other things ever since. You can feel the chrome edge of the stool casing pressing through the back of your thighs, and the laminate surface in front of you is bare and cold and perfectly clean in the way that things are clean when someone has decided they will not be used. You know something the others cannot fully know from their positions: the manager, Mackintosh, looked directly at you when the waitress walked away — not at the group, at you specifically — and the look was not anger but calculation, the look of a man deciding how much this is going to cost him. The smell of coffee from the urns behind the backbar is present and specific and deliberate, and you have the money in your pocket to pay for it, and that fact is its own kind of pressure. The floor walker is behind you now, close enough that you can hear the creak of his leather soles on the tile, and Mackintosh has not moved from the office stairs, and the question of where to put your eyes — on the manager, on the mirror, straight ahead — is the first decision that is entirely yours to make.",
+  "createdAt": "2025-02-01T16:30:00Z",
+  "real_name": "Ezell Blair Jr.",
+  "updatedAt": "2026-05-24T03:30:00.390Z",
+  "represents": "",
+  "scenarioId": "greensboro_four_the_color_line",
+  "accessLevel": "staff",
+  "description": "You spoke the words. You asked for the coffee. Now the silence that followed has become a physical environment, and every person in this store is waiting to see what you do next.",
+  "perspective": "Write in close second person throughout — \"you,\" \"your.\" Write from the perspective of the man who spoke first, who asked for the coffee, who created the silence that followed. Every person in this store is now waiting to see what he does next. The weight of having initiated this is physical and present.",
+  "character_id": null,
+  "fact_checked": false,
+  "character_type": "real",
+  "bridge_sentence": "The silence after the words is still in the air.",
   "character_hooks": [
     "I almost changed my mind at the door — I stood on the sidewalk for a full minute before I walked in, and I have not told the others.",
     "I know one of the white women watching from the aisle — she is the mother of a boy I went to school with before the color line separated our schools — and I do not know if she recognizes me.",
     "I have a test tomorrow morning at A&T that I have not studied for, and I brought the textbook with me, and I am considering putting it on the counter in front of me right now."
   ],
-  "suggested_secret": "Ezell memorized the exact wording of the Fourteenth Amendment's equal protection clause before he came today and has been reciting it silently to himself since he sat down.",
-  "opening": {
-    "narrative": "It is 4:32 PM on Monday, February 1, 1960, and you are seated at the lunch counter of F.W. Woolworth's at 132 South Elm Street, Greensboro, North Carolina. You asked for a cup of coffee three minutes ago. The waitress walked away. The counter in front of you is bare. The store has not stopped — the cash registers are still clicking, the floor walker is still pacing — but something in the room has changed, a shift in the quality of attention, and you are at the center of it. Mackintosh is on the office stairs. The floor walker is behind you. The mirror shows you the whole room.",
-    "npcMoments": [],
-    "choices": [
-      "Hold direct eye contact with Mackintosh — assert your right to be here through sustained, unblinking acknowledgment of his authority",
-      "Fix your gaze on the mirrored backbar — watch the room in reflection without giving Mackintosh the confrontation he may be looking for",
-      "Place your textbook flat on the counter in front of you — anchor your space and establish your identity as a student before any further move is made"
-    ]
-  },
+  "startLocationId": "lunch_counter_main",
+  "context_sentence": "You are Ezell Blair Jr., the one who asked for the coffee, and no one has answered you.",
   "roleInitialState": {
+    "flags": {
+      "words_spoken": true,
+      "textbook_placed": false,
+      "eye_contact_with_mackintosh": false
+    },
     "inventory": [
       "textbook — Introduction to Economics, A&T College edition",
       "wallet containing $1.35 in coins and bills",
       "bus transfer ticket, dated today"
     ],
-    "flags": {
-      "words_spoken": true,
-      "eye_contact_with_mackintosh": false,
-      "textbook_placed": false
-    },
     "suspicion": {
-      "harris_mackintosh": 20,
       "ruth_carver": 10,
+      "harris_mackintosh": 20,
       "sergeant_dale_pruitt": 5
     }
   },
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.390Z",
-  "context_sentence": "You are Ezell Blair Jr., the one who asked for the coffee, and no one has answered you.",
-  "character_type": "real",
-  "character_id": null,
-  "historical_record_note": "Ezell Blair Jr. (later Jibreel Khazan). Spoke the words that initiated the sit-in. Co-founded the student chapter of NAACP at NC A&T. The movement spread to 54 cities within two months.",
-  "fact_checked": false,
-  "bridge_sentence": "The silence after the words is still in the air.",
-  "represents": ""
+  "suggested_secret": "Ezell memorized the exact wording of the Fourteenth Amendment's equal protection clause before he came today and has been reciting it silently to himself since he sat down.",
+  "startingKnowledge": [
+    "You know that the other three have agreed: no one leaves until closing time, regardless of what is said or done",
+    "You know the manager's name — Mackintosh — because you looked it up before you came",
+    "You know that the waitress who walked away is named on the employee board near the kitchen as M. Simmons, and that she has not gone far"
+  ],
+  "historical_record_note": "Ezell Blair Jr. (later Jibreel Khazan). Spoke the words that initiated the sit-in. Co-founded the student chapter of NAACP at NC A&T. The movement spread to 54 cities within two months."
 }

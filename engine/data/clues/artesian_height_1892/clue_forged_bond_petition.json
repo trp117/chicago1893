@@ -1,19 +1,19 @@
 {
   "id": "clue_forged_bond_petition",
-  "scenarioId": "artesian_height_1892",
   "title": "The Forged Cost Certificate",
-  "description": "In the lower office strongbox — its hasp bent from a hasty opening — you find a document on village letterhead bearing the project cost figure of $84,900.00 and the signature of Benezette Williams. But the signature is wrong: The signature differs noticeably from authenticated engineering documents associated with Williams and Williams, and whoever produced this document used a printed B and a long crossbar. The document is dated three days ago. Benezette Williams was in the field on that date and did not enter the office.",
-  "category": "documentary",
-  "discoveryLocationId": "loc_lower_office",
-  "implicatesCharacterIds": [
-    "char_alderman_voss"
-  ],
   "unlocks": [
     "clue_edgar_satchel_receipt"
   ],
-  "isKeyEvidence": true,
+  "category": "documentary",
   "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.858Z",
+  "updatedAt": "2026-06-13T17:40:35.732Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "artesian_height_1892",
+  "description": "In the lower office strongbox — its hasp bent from a hasty opening — you find a document on village letterhead bearing the project cost figure of $84,900.00 and the signature of Benezette Williams. But the signature is wrong: The signature differs noticeably from authenticated engineering documents associated with Williams and Williams, and whoever produced this document used a printed B and a long crossbar. The document is dated three days ago. Benezette Williams was in the field on that date and did not enter the office.",
+  "isRedHerring": false,
+  "isKeyEvidence": true,
+  "discoveryLocationId": "loc_lower_office",
+  "implicatesCharacterIds": [
+    "char_alderman_voss"
+  ]
 }

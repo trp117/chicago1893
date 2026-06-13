@@ -1,20 +1,20 @@
 {
   "id": "counter_kitchen_passthrough",
-  "scenarioId": "greensboro_four_the_color_line",
+  "mood": "enclosed, humid, refuge",
   "name": "Counter Kitchen and Pass-Through Window",
+  "createdAt": "2025-02-01T16:30:00Z",
+  "updatedAt": "2026-05-24T03:30:00.379Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "greensboro_four_the_color_line",
   "short_name": "Counter Kitchen",
   "description": "The narrow kitchen area behind the lunch counter, accessible only through the pass-through window and a staff door at the counter's far end — where Patsy Howell retreats when the pressure on the floor becomes unmanageable.",
-  "mood": "enclosed, humid, refuge",
-  "linkedCharacterIds": [
-    "patsy_howell"
-  ],
   "atmosphericDetails": [
     "The hot-fat smell of the grill dominant here — close, almost nauseating after the cold outside air",
     "The sound of the coffee urns cycling — a mechanical, indifferent sound that continues regardless of what is happening at the counter",
     "Patsy's hands on the dish rack — she is cleaning cups that are already clean"
   ],
-  "createdAt": "2025-02-01T16:30:00Z",
-  "updatedAt": "2026-05-24T03:30:00.379Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "patsy_howell"
+  ]
 }

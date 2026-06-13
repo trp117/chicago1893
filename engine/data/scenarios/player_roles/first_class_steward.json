@@ -1,69 +1,69 @@
 {
   "id": "first_class_steward",
-  "scenarioId": "titanic_final_hours",
   "name": "First Class Steward",
-  "description": "You serve the wealthiest passengers on C-Deck and know every corridor, gate, and key ring on this ship. You are among the first to notice the subtle changes on the passenger decks, and you know where the Third Class passengers are restricted below. The question is what you are willing to do about it.",
-  "startLocationId": "c_deck_corridor",
-  "startingKnowledge": [
-    "The emergency gate keys are located in the E-Deck steward's station, governing the structural barriers between steerage and the upper decks.",
-    "The davit falls were load-tested to 70-person capacity in Southampton four days ago — any subsequent claim that they cannot hold a full boat under load is false.",
-    "The total passenger and crew manifest stands at 2,224 souls, while the total lifeboat capacity provides seats for only 1,178."
-  ],
-  "accessLevel": "staff",
-  "perspective": "Write from the perspective of a man who has spent his professional life making the machinery of class hierarchy run smoothly and invisibly, and who is now watching that machinery begin to complicate an emergency evacuation. He knows every physical detail of this ship. He knows the social architecture of it just as well. His crisis is not fear — it is the collision between his training and his conscience, and the question of which one has more force.",
+  "opening": {
+    "choices": [
+      "Descend immediately to the E-Deck station to secure the Third Class separation keys before the stairwells clear.",
+      "Begin methodically knocking on your assigned First Class stateroom doors to quietly warn high-value passengers before an official order.",
+      "Locate Managing Director Thomas Andrews near the Grand Staircase to visually confirm the structural damage report yourself."
+    ],
+    "narrative": "It is 11:55 PM on April 14, 1912. The C-Deck corridor is eerie in its stillness. The order to uncover the lifeboats has not yet been broadcast to the passengers. You have the keys. The ship has less than two and a half hours, though no one around you believes it yet.",
+    "npcMoments": []
+  },
   "briefing": "You are standing in the C-Deck corridor with a ring of passenger keys in your left hand and a lifebelt you have been carrying since the engines stopped. The corridor still smells of dinner and carpet, but there is a faint, cold draft advancing up from the forward stairwells. You have just come from the Purser's office on E-Deck, where you saw the master embarkation rolls: 2,224 souls aboard. You know—from your knowledge of the ship's layout—that the emergency gate keys are secured in the chief steward's station on E-Deck, and that if the forward bulkheads are compromised, the steerage spaces near the bow will face water long before the boat deck even uncovers a canvas cover. The corridor is quiet for the moment as passengers slowly wake to the silence of the stopped engines. You have the access. You have the structural knowledge. You are deciding which direction to walk.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-22T01:48:56.169Z",
+  "represents": "First class stewards aboard RMS Titanic on the night of April 14-15, 1912",
+  "scenarioId": "titanic_final_hours",
+  "accessLevel": "staff",
+  "description": "You serve the wealthiest passengers on C-Deck and know every corridor, gate, and key ring on this ship. You are among the first to notice the subtle changes on the passenger decks, and you know where the Third Class passengers are restricted below. The question is what you are willing to do about it.",
+  "perspective": "Write from the perspective of a man who has spent his professional life making the machinery of class hierarchy run smoothly and invisibly, and who is now watching that machinery begin to complicate an emergency evacuation. He knows every physical detail of this ship. He knows the social architecture of it just as well. His crisis is not fear — it is the collision between his training and his conscience, and the question of which one has more force.",
+  "character_id": null,
+  "ending_notes": {
+    "failure": {
+      "who_present": "None",
+      "what_happened": "You were unable to convince the passengers to leave in time, or the lifeboats under your care were lowered nearly empty due to fear and confusion. You were trapped on the lower decks as the water flooded the Grand Staircase.",
+      "emotional_weight": "Profound Regret—the failure of duty at the most critical moment.",
+      "closing_line_override": "The palace became a tomb, and your service finally ended."
+    },
+    "partial": {
+      "who_present": "The Senior Wireless Operator, The Second Engineer",
+      "what_happened": "You managed to fill your assigned lifeboats to their full 65-person capacity, bypassing \"Class\" restrictions to save steerage passengers. You stayed on deck to help with the last collapsible, eventually finding yourself in the water as the ship went down.",
+      "emotional_weight": "Haunted Survival—the relief of being alive shadowed by the faces of those you couldn't fit in the boats.",
+      "closing_line_override": "You filled the boats as best you could, but the ocean's ledger was never going to balance."
+    }
+  },
+  "fact_checked": false,
+  "character_type": "fictional",
+  "bridge_sentence": "The band has started its fourth number since the collision.",
   "character_hooks": [
     "I have been on White Star ships for eleven years and I have never once questioned a structural regulation—until tonight, when the complete lack of a general alarm makes me question what the bridge is hiding.",
     "I know a family in Third Class — a woman and three children from County Cork whom I helped find their cabin on embarkation day — and I know exactly how many corridors stand between them and the sky.",
     "I saw the ship's actual capacity log on the Purser's desk less than an hour ago; the mathematical deficit is burned into my mind."
   ],
-  "suggested_secret": "You accidentally left an unauthorized pass key inside a First Class stateroom door locker earlier this evening—a minor infraction that could reveal a private compromise of ship rules if discovered during the evacuation.",
-  "opening": {
-    "narrative": "It is 11:55 PM on April 14, 1912. The C-Deck corridor is eerie in its stillness. The order to uncover the lifeboats has not yet been broadcast to the passengers. You have the keys. The ship has less than two and a half hours, though no one around you believes it yet.",
-    "npcMoments": [],
-    "choices": [
-      "Descend immediately to the E-Deck station to secure the Third Class separation keys before the stairwells clear.",
-      "Begin methodically knocking on your assigned First Class stateroom doors to quietly warn high-value passengers before an official order.",
-      "Locate Managing Director Thomas Andrews near the Grand Staircase to visually confirm the structural damage report yourself."
-    ]
-  },
+  "startLocationId": "c_deck_corridor",
+  "context_sentence": "You are a First Class steward assigned to C-Deck aboard RMS Titanic on the night of April 14–15, 1912, one of the 908 crew members who knew the ship's locked gate system separated Third Class passengers from the boat deck on a vessel carrying lifeboats sufficient for fewer than half the souls aboard.",
   "roleInitialState": {
+    "flags": {
+      "andrews_consulted": false,
+      "first_class_warned": false,
+      "gate_key_retrieved": false
+    },
     "inventory": [
       "C-Deck passenger key ring",
       "Lifebelt (not yet worn)",
       "Master passenger count ledger notes"
     ],
-    "flags": {
-      "gate_key_retrieved": false,
-      "first_class_warned": false,
-      "andrews_consulted": false
-    },
     "suspicion": {
-      "charles_lightoller": 3,
+      "margaret_brown": 0,
       "thomas_andrews": 0,
-      "margaret_brown": 0
+      "charles_lightoller": 3
     }
   },
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-22T01:48:56.169Z",
-  "ending_notes": {
-    "partial": {
-      "what_happened": "You managed to fill your assigned lifeboats to their full 65-person capacity, bypassing \"Class\" restrictions to save steerage passengers. You stayed on deck to help with the last collapsible, eventually finding yourself in the water as the ship went down.",
-      "who_present": "The Senior Wireless Operator, The Second Engineer",
-      "emotional_weight": "Haunted Survival—the relief of being alive shadowed by the faces of those you couldn't fit in the boats.",
-      "closing_line_override": "You filled the boats as best you could, but the ocean's ledger was never going to balance."
-    },
-    "failure": {
-      "what_happened": "You were unable to convince the passengers to leave in time, or the lifeboats under your care were lowered nearly empty due to fear and confusion. You were trapped on the lower decks as the water flooded the Grand Staircase.",
-      "who_present": "None",
-      "emotional_weight": "Profound Regret—the failure of duty at the most critical moment.",
-      "closing_line_override": "The palace became a tomb, and your service finally ended."
-    }
-  },
-  "context_sentence": "You are a First Class steward assigned to C-Deck aboard RMS Titanic on the night of April 14–15, 1912, one of the 908 crew members who knew the ship's locked gate system separated Third Class passengers from the boat deck on a vessel carrying lifeboats sufficient for fewer than half the souls aboard.",
-  "character_type": "fictional",
-  "character_id": null,
-  "represents": "First class stewards aboard RMS Titanic on the night of April 14-15, 1912",
-  "fact_checked": false,
-  "bridge_sentence": "The band has started its fourth number since the collision."
+  "suggested_secret": "You accidentally left an unauthorized pass key inside a First Class stateroom door locker earlier this evening—a minor infraction that could reveal a private compromise of ship rules if discovered during the evacuation.",
+  "startingKnowledge": [
+    "The emergency gate keys are located in the E-Deck steward's station, governing the structural barriers between steerage and the upper decks.",
+    "The davit falls were load-tested to 70-person capacity in Southampton four days ago — any subsequent claim that they cannot hold a full boat under load is false.",
+    "The total passenger and crew manifest stands at 2,224 souls, while the total lifeboat capacity provides seats for only 1,178."
+  ]
 }

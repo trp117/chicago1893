@@ -1,18 +1,18 @@
 {
   "id": "clue_water_reserve_gap",
-  "scenarioId": "dead_reckoning_ninth_ward",
   "title": "The Announced vs. Actual Water Figure",
-  "description": "The triage coordinator's morning announcement placed the water reserve at 440 fluid ounces. A physical count of the remaining pouches yields 380. The gap of 60 fluid ounces represents approximately five person-days of minimum hydration at the current consumption rate — and Renard Tureaud has already done this count.",
+  "unlocks": [],
   "category": "observation",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:22:30.341Z",
+  "locationId": "",
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "The triage coordinator's morning announcement placed the water reserve at 440 fluid ounces. A physical count of the remaining pouches yields 380. The gap of 60 fluid ounces represents approximately five person-days of minimum hydration at the current consumption rate — and Renard Tureaud has already done this count.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
   "discoveryLocationId": "loc_st_claude_bridge",
   "implicatesCharacterIds": [
     "char_bridge_captain",
     "char_dissenter"
-  ],
-  "unlocks": [],
-  "isKeyEvidence": false,
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.341Z",
-  "locationId": "",
-  "isRedHerring": false
+  ]
 }

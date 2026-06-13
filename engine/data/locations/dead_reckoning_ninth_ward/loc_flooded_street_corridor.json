@@ -1,20 +1,20 @@
 {
   "id": "loc_flooded_street_corridor",
-  "scenarioId": "dead_reckoning_ninth_ward",
-  "name": "Flooded Street Corridor — Flood Street to Bridge Approach",
-  "description": "Two blocks of residential street between the Flood Street house and the St. Claude Bridge approach, currently under approximately three feet of water; navigable by kayak in a straight line but the submerged street furniture — stop signs, parked cars, porch steps — requires active reading of the water surface.",
   "mood": "liminal, hazardous, silent",
-  "linkedCharacterIds": [
-    "char_skiff_operator"
-  ],
+  "name": "Flooded Street Corridor — Flood Street to Bridge Approach",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-06-04T03:22:30.335Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "dead_reckoning_ninth_ward",
+  "description": "Two blocks of residential street between the Flood Street house and the St. Claude Bridge approach, currently under approximately three feet of water; navigable by kayak in a straight line but the submerged street furniture — stop signs, parked cars, porch steps — requires active reading of the water surface.",
   "atmosphericDetails": [
     "The water surface is nearly flat here — the current from the original breach has long since dissipated, leaving a still, opaque grey plane that conceals everything below knee depth",
     "The tops of stop signs and utility poles provide navigation reference points; the street grid is recoverable if you grew up here",
     "The EPA classified this water as hazardous — fecal coliform, E. coli, heavy metals, petroleum hydrocarbons; any open wound in contact with this water for more than a few minutes is a clinical event",
     "The smell at water level is the full compound — organic, chemical, petroleum, biological — without the slight relief of elevation that the bridge deck provides"
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-06-04T03:22:30.335Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_skiff_operator"
+  ]
 }

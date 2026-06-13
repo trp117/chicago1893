@@ -1,19 +1,19 @@
 {
   "id": "loc_pump_room",
-  "scenarioId": "artesian_height_1892",
-  "name": "The Subterranean Pump Room",
-  "description": "The limestone-lined pit beneath the tower's foundation, housing the two Deane duplex steam pumps and their connecting pipe manifold — damp, low-ceilinged, and lit by a single iron lantern hanging from a beam.",
   "mood": "claustrophobic, mechanical, urgent",
-  "linkedCharacterIds": [
-    "char_ethan_philbrick"
-  ],
+  "name": "The Subterranean Pump Room",
+  "createdAt": "2025-07-14T00:00:00Z",
+  "updatedAt": "2026-06-13T17:40:35.725Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "artesian_height_1892",
+  "description": "The limestone-lined pit beneath the tower's foundation, housing the two Deane duplex steam pumps and their connecting pipe manifold — damp, low-ceilinged, and lit by a single iron lantern hanging from a beam.",
   "atmosphericDetails": [
     "The rhythmic clack-hiss of the steam pistons is felt as much as heard — a chest-deep percussion that makes conversation difficult.",
     "A packing gland on the number-two pump is weeping steadily, the cold water spraying in a fine mist that has soaked the nearest wall.",
     "The coal-feed valve handle has a carved wooden shim jammed into its seat — crude, deliberate, and still in place."
   ],
-  "createdAt": "2025-07-14T00:00:00Z",
-  "updatedAt": "2026-05-22T22:09:01.852Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_ethan_philbrick"
+  ]
 }

@@ -1,17 +1,17 @@
 {
   "id": "counting_house",
-  "scenarioId": "boston_tea_party_version_2",
-  "name": "The Counting House",
-  "description": "A narrow brick building on King Street, its shutters drawn tight and its single lamp burning low — this is where Thomas Greenleaf keeps the Sons of Liberty's accounts, and where, two nights ago, a meeting took place that no one was supposed to know about. The smell of ink and candle wax hangs in the cold air, and papers are stacked in careful order on every surface.",
   "mood": "cold, secretive, dim, incriminating",
-  "linkedCharacterIds": [
-    "thomas_greenleaf"
-  ],
+  "name": "The Counting House",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-04-29T00:08:14.441Z",
+  "scenarioId": "boston_tea_party_version_2",
+  "description": "A narrow brick building on King Street, its shutters drawn tight and its single lamp burning low — this is where Thomas Greenleaf keeps the Sons of Liberty's accounts, and where, two nights ago, a meeting took place that no one was supposed to know about. The smell of ink and candle wax hangs in the cold air, and papers are stacked in careful order on every surface.",
   "atmosphericDetails": [
     "A half-burned candle sits on the writing desk, its wax pooled and hardened as though it was left to burn out untended.",
     "The account ledger on the desk is open to a page of cipher notation — the same hand appears throughout, precise and unmistakable.",
     "A faint impression in the dust on the windowsill suggests someone climbed through the window recently rather than using the door."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-04-29T00:08:14.441Z"
+  "linkedCharacterIds": [
+    "thomas_greenleaf"
+  ]
 }

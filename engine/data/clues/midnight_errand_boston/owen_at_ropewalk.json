@@ -1,17 +1,17 @@
 {
   "id": "owen_at_ropewalk",
-  "scenarioId": "midnight_errand_boston",
   "title": "Owen Watching from the Rope-Walk",
-  "description": "At the end of the rope-walk yard, you see Owen Pryce standing in shadow near the water, watching the alley that leads back toward the shop. He does not see you yet. He is not here by accident — there is no reason for a journeyman printer to be at the rope-walk at this hour. He is waiting for something, or reporting on someone.",
-  "category": "observation",
-  "discoveryLocationId": "rope_walk_end",
-  "implicatesCharacterIds": [
-    "owen_pryce"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "observation",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-10T03:09:06.921Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "midnight_errand_boston",
+  "description": "At the end of the rope-walk yard, you see Owen Pryce standing in shadow near the water, watching the alley that leads back toward the shop. He does not see you yet. He is not here by accident — there is no reason for a journeyman printer to be at the rope-walk at this hour. He is waiting for something, or reporting on someone.",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "rope_walk_end",
+  "implicatesCharacterIds": [
+    "owen_pryce"
+  ]
 }

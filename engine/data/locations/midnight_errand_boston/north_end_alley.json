@@ -1,20 +1,20 @@
 {
   "id": "north_end_alley",
-  "scenarioId": "midnight_errand_boston",
-  "name": "The Alley Behind Sheafe Street",
-  "description": "A crooked passage between timber-framed houses, barely wide enough for two people abreast, running north toward the rope-walk. The ground is wet cobblestone and the darkness is nearly total except where a window above shows a faint glow.",
   "mood": "dark, urgent, exposed",
-  "linkedCharacterIds": [
-    "hannah_cross",
-    "silas_murch"
-  ],
+  "name": "The Alley Behind Sheafe Street",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-10T03:09:06.916Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "midnight_errand_boston",
+  "description": "A crooked passage between timber-framed houses, barely wide enough for two people abreast, running north toward the rope-walk. The ground is wet cobblestone and the darkness is nearly total except where a window above shows a faint glow.",
   "atmosphericDetails": [
     "The smell of tar and salt rope from the walk ahead mixes with something burned — someone's hearth, or something else.",
     "A cat on a windowsill watches without moving as you pass.",
     "Voices — soldiers? — echo from the direction of Ann Street, impossible to judge how close."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-10T03:09:06.916Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "hannah_cross",
+    "silas_murch"
+  ]
 }

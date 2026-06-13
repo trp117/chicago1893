@@ -1,21 +1,21 @@
 {
   "id": "loc_lca_beached",
-  "scenarioId": "dog_green_sector",
+  "mood": "threshold, mechanical, abandoned, functional",
   "name": "Beached LCA — The Waterline",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-24T03:10:26.280Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "dog_green_sector",
   "short_name": "Beached LCA",
   "description": "The grounded landing craft, ramp down, engine still running at idle, its hull scarred by shrapnel and one small-arms hit that punched through the armored side without penetrating — a steel island at the edge of the killing ground.",
-  "mood": "threshold, mechanical, abandoned, functional",
-  "linkedCharacterIds": [
-    "char_petty_officer_reed",
-    "char_medic_calloway"
-  ],
   "atmosphericDetails": [
     "The radio handset inside the cockpit crackles with traffic from the fleet — voices calling grid references, casualty reports, requests for fire support that are piling up unanswered.",
     "The ramp has driven itself into the sand at an angle and will require the kedging anchor to free — Reed has already rigged it but not yet deployed it.",
     "Three men who could not make it to the shingle have taken cover behind the LCA's hull — they are using it as a fighting position, which Reed finds both understandable and catastrophic for his kedging timeline."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-24T03:10:26.280Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_petty_officer_reed",
+    "char_medic_calloway"
+  ]
 }

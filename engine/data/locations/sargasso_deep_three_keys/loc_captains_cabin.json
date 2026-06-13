@@ -1,20 +1,20 @@
 {
   "id": "loc_captains_cabin",
-  "scenarioId": "sargasso_deep_three_keys",
-  "name": "Captain's Cabin, B-59",
-  "description": "A compartment barely large enough for a bunk, a fold-down desk, and a wall-mounted safe — the only lockable private space on the boat. The safe door is ajar. Papers are spread across the desk in a disorder that is itself a form of evidence: Savitsky has been working in here, alone, for a long time.",
   "mood": "private, disordered, revealing",
-  "linkedCharacterIds": [
-    "char_savitsky",
-    "char_maslennikov"
-  ],
+  "name": "Captain's Cabin, B-59",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2026-05-20T19:37:59.802Z",
+  "atmosphere": "",
+  "linkedNPCs": [],
+  "scenarioId": "sargasso_deep_three_keys",
+  "description": "A compartment barely large enough for a bunk, a fold-down desk, and a wall-mounted safe — the only lockable private space on the boat. The safe door is ajar. Papers are spread across the desk in a disorder that is itself a form of evidence: Savitsky has been working in here, alone, for a long time.",
   "atmosphericDetails": [
     "The fold-down desk holds a handwritten log that is not the official ship's log — personal notes in a cramped, deteriorating script that grows less legible toward the bottom of the page.",
     "A half-eaten tin of preserved fish sits beside the log, the lid bent back — a man who ate alone and did not notice the taste.",
     "The safe contains the standing orders document, a sealed envelope with a Moscow frank, and a photograph of a young man in an air force uniform."
   ],
-  "createdAt": "2025-01-01T00:00:00Z",
-  "updatedAt": "2026-05-20T19:37:59.802Z",
-  "atmosphere": "",
-  "linkedNPCs": []
+  "linkedCharacterIds": [
+    "char_savitsky",
+    "char_maslennikov"
+  ]
 }

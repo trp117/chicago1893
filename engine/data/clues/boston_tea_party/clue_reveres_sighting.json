@@ -1,17 +1,17 @@
 {
   "id": "clue_reveres_sighting",
-  "scenarioId": "boston_tea_party",
   "title": "Revere's Eyewitness Account",
-  "description": "Paul Revere, pressed with a direct question about Dillworth's recent movements, admits he saw Dillworth speaking privately with a well-dressed stranger near the Custom House three days ago. The stranger passed Dillworth something small — Revere thought it was a business card at the time, but now, hearing your questions, he is not so sure. 'The man had the look of a clerk,' Revere says, 'but dressed too well for honest clerking.'",
-  "category": "testimony",
-  "discoveryLocationId": "green_dragon_tavern",
-  "implicatesCharacterIds": [
-    "thomas_dillworth"
-  ],
   "unlocks": [],
-  "isKeyEvidence": false,
+  "category": "testimony",
   "createdAt": "2025-01-01T00:00:00Z",
   "updatedAt": "2026-05-03T21:41:04.776Z",
   "locationId": "",
-  "isRedHerring": false
+  "scenarioId": "boston_tea_party",
+  "description": "Paul Revere, pressed with a direct question about Dillworth's recent movements, admits he saw Dillworth speaking privately with a well-dressed stranger near the Custom House three days ago. The stranger passed Dillworth something small — Revere thought it was a business card at the time, but now, hearing your questions, he is not so sure. 'The man had the look of a clerk,' Revere says, 'but dressed too well for honest clerking.'",
+  "isRedHerring": false,
+  "isKeyEvidence": false,
+  "discoveryLocationId": "green_dragon_tavern",
+  "implicatesCharacterIds": [
+    "thomas_dillworth"
+  ]
 }
