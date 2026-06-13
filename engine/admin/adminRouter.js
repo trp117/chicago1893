@@ -1735,6 +1735,7 @@ Return ONLY valid JSON in this exact structure:
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
+      scenario.status = 'draft';
       await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));

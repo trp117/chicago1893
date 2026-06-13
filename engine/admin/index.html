@@ -78,6 +78,9 @@ body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg);
 .stat-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px #4f8ef720; }
 .stat-card-num  { font-size: 32px; font-weight: 700; color: var(--accent); }
 .stat-card-label { font-size: 13px; color: var(--text-soft); margin-top: 4px; }
+.scenario-filter-btn { font-family: inherit; font-size: 12px; font-weight: 500; padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px; background: transparent; color: var(--text-soft); cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.scenario-filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.scenario-filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .scenario-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
 .scenario-play-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .scenario-play-card-info { flex: 1; min-width: 0; }
@@ -883,10 +886,17 @@ async function renderDashboard() {
       <div class="stat-card-label">Transcripts</div>
     </div>`;
 
+  const _statusCounts = { all: scenarios.length };
+  scenarios.forEach(s => { const st = s.status || 'draft'; _statusCounts[st] = (_statusCounts[st] || 0) + 1; });
+  const _filterRow = `<div id="scenario-filter-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+    ${[['all','All'],['draft','Draft'],['published','Published'],['hidden','Hidden'],['archived','Archived']].map(([st,lbl]) => `<button class="scenario-filter-btn${st==='all'?' active':''}" data-filter="${st}">${lbl} (${_statusCounts[st]||0})</button>`).join('')}
+  </div>`;
+
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
+    ${_filterRow}
     <div class="scenario-cards">${scenarios.map(s => `
-      <div class="scenario-play-card" data-scenario="${s.id}" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
+      <div class="scenario-play-card" data-scenario="${s.id}" data-status="${s.status || 'draft'}" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
           <div class="scenario-play-card-info" style="display:flex;align-items:center;gap:8px;min-width:0;">
             <span class="health-dot checking" title="Checking health…"></span>
@@ -967,6 +977,18 @@ async function renderDashboard() {
   });
   document.querySelector('.stat-card[data-view="transcripts"]')
     ?.addEventListener('click', () => renderTranscripts());
+
+  // Wire status filter buttons
+  document.querySelectorAll('.scenario-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scenario-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.scenario-play-card').forEach(card => {
+        card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
+      });
+    });
+  });
 
   // Wire scene-opening panels
   document.querySelectorAll('.sop-toggle-btn').forEach(btn => {
@@ -1423,8 +1445,14 @@ function edDetails(summary, sub, bodyHtml, open = false) {
   return `<details class="entity-details"${open ? ' open' : ''}><summary class="entity-details-summary">${esc(summary)}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</summary><div class="entity-details-body">${bodyHtml}</div></details>`;
 }
 function statusBadge(status) {
-  const cfg = { published: ['#22c55e','Published'], hidden: ['#94a3b8','Hidden'], archived: ['#f59e0b','Archived'] };
-  const [color, label] = cfg[status] || cfg.published;
+  const effectiveStatus = status || 'draft';
+  const cfg = {
+    draft:     ['#94a3b8', 'Draft'],
+    published: ['#22c55e', 'Published'],
+    hidden:    ['#f59e0b', 'Hidden'],
+    archived:  ['#64748b', 'Archived'],
+  };
+  const [color, label] = cfg[effectiveStatus] || ['#94a3b8', effectiveStatus];
   return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:${color}"><span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>${label}</span>`;
 }
 
@@ -1639,7 +1667,7 @@ function renderScenarioSection(data) {
   return edSection('Scenario', `
     ${edField('Title',             edInput('scenario.title',             s.title))}
     ${edField('Scenario ID',       edInput('scenario.id',               s.id),              'snake_case slug — used in URLs')}
-    ${edField('Status', `<select data-path="scenario.status"><option value="published"${(s.status || 'published') === 'published' ? ' selected' : ''}>Published</option><option value="hidden"${s.status === 'hidden' ? ' selected' : ''}>Hidden</option><option value="archived"${s.status === 'archived' ? ' selected' : ''}>Archived</option></select>`, 'Published = visible publicly. Hidden = admin-only. Archived = not shown publicly.')}
+    ${edField('Status', `<select data-path="scenario.status"><option value="draft"${(s.status || 'draft') === 'draft' ? ' selected' : ''}>Draft (in development)</option><option value="published"${s.status === 'published' ? ' selected' : ''}>Published (live on site)</option><option value="hidden"${s.status === 'hidden' ? ' selected' : ''}>Hidden (not visible to public)</option><option value="archived"${s.status === 'archived' ? ' selected' : ''}>Archived</option></select>`, 'Draft = in development, not visible publicly. Published = live on site. Hidden = admin-only. Archived = not shown publicly.')}
     ${edField('Category', `<select data-path="scenario.category"><option value=""${!s.category ? ' selected' : ''}>(unassigned)</option><option value="space"${s.category === 'space' ? ' selected' : ''}>Space &amp; Cold War</option><option value="military"${s.category === 'military' ? ' selected' : ''}>Military</option><option value="civil-rights"${s.category === 'civil-rights' ? ' selected' : ''}>Civil Rights</option><option value="underground"${s.category === 'underground' ? ' selected' : ''}>Underground</option><option value="maritime"${s.category === 'maritime' ? ' selected' : ''}>Maritime</option><option value="industrial"${s.category === 'industrial' ? ' selected' : ''}>Industrial</option></select>`, 'Controls which category page this scenario appears on.')}
     ${edField('Display Order', `<input type="number" data-path="scenario.displayOrder" data-type="number" value="${s.displayOrder ?? 99}" min="1" max="999" style="width:100px">`, 'Lower numbers appear first on the homepage Open Now grid. Default is 99.')}
     ${edField('Description',        edTextarea('scenario.description',    s.description,      3), 'Shown on the role selection screen — one paragraph summarising the situation and stakes')}
