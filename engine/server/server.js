@@ -143,9 +143,10 @@ app.get('/api/stories', async (req, res) => {
         era:         CATEGORY_LABELS[s.category || CATEGORY_MAP[s.id]] || deriveEra(s),
         duration:    s.sessionTargetMinutes ? `~${s.sessionTargetMinutes} min` : null,
         category:    s.category || CATEGORY_MAP[s.id] || null,
-        image_url:   s.image?.url || null,
-        roles:       roleNamesBy[s.id] || [],
+        image_url:    s.image?.url || null,
+        roles:        roleNamesBy[s.id] || [],
         cost_tracked: s.costTracked || null,
+        displayOrder: s.displayOrder ?? 99,
       }));
     res.json(stories);
   } catch (err) {

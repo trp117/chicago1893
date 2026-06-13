@@ -264,87 +264,10 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </section>
 <section class="section section--dark" id="scenarios" style="padding-top:16px">
   <div class="section-header reveal">
-    <div><p class="section-label">Open Now</p><h2 class="section-title">Seven scenarios open now</h2></div>
+    <div><p class="section-label">Open Now</p><h2 class="section-title" id="open-now-heading"></h2></div>
     <a href="#all-scenarios" class="section-link">View all 25 &rarr;</a>
   </div>
-  <div class="featured-grid">
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=dog_green_sector';return false" class="featured-card fc-live fc-has-img" id="fc-card-dgs">
-      <div class="fc-bg bg-omaha bg-img-omaha" id="fc-omaha"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">World War II &middot; June 6, 1944</p>
-        <h3 class="fc-title">Dog Green Sector</h3>
-        <p class="fc-desc">The ramp drops. The gap in the wire is yours to find &mdash; if it exists at all. 300 yards of open water between you and the seawall.</p>
-        <p class="fc-cost">Cost tracked: physical survival margin, unit cohesion</p>
-        <div class="fc-meta"><span class="meta-pill">LCA Coxswain</span><span class="meta-pill">Army rifleman</span><span class="meta-pill">Combat medic</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="featured-card fc-live fc-has-img" id="fc-card-apollo">
-      <div class="fc-bg bg-apollo bg-img-apollo" id="fc-apollo"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">Space &middot; April 1970</p>
-        <h3 class="fc-title">Apollo 13: Lifeboat</h3>
-        <p class="fc-desc">Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.</p>
-        <p class="fc-cost">Cost tracked: battery reserve, crew physical margin</p>
-        <div class="fc-meta"><span class="meta-pill">Jack Swigert</span><span class="meta-pill">Jim Lovell</span><span class="meta-pill">Gene Kranz</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=greensboro_four_the_color_line';return false" class="featured-card fc-live fc-has-img" id="fc-card-greensboro">
-      <div class="fc-bg bg-civil bg-img-greensboro" id="fc-greensboro"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">Civil Rights &middot; February 1, 1960</p>
-        <h3 class="fc-title">Greensboro Four: The Color Line</h3>
-        <p class="fc-desc">Four students have occupied the lunch counter at Woolworth&rsquo;s on South Elm Street. Service has been refused. They are not leaving.</p>
-        <p class="fc-cost">Cost tracked: psychological discipline under provocation</p>
-        <div class="fc-meta"><span class="meta-pill">Ezell Blair Jr.</span><span class="meta-pill">Franklin McCain</span><span class="meta-pill">Joseph McNeil</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=sargasso_deep_three_keys';return false" class="featured-card fc-live fc-has-img" id="fc-card-sargasso">
-      <div class="fc-bg bg-sub bg-img-sargasso" id="fc-sargasso"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">Cuban Missile Crisis &middot; October 27, 1962</p>
-        <h3 class="fc-title">Sargasso Deep: The Three Keys</h3>
-        <p class="fc-desc">B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.</p>
-        <p class="fc-cost">Cost tracked: command authority, oxygen, heat exhaustion</p>
-        <div class="fc-meta"><span class="meta-pill">Hydroacoustic Officer</span><span class="meta-pill">Second-in-Command</span><span class="meta-pill">USS Cony captain</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=zero_hour_cantigny';return false" class="featured-card fc-live fc-has-img" id="fc-card-cantigny">
-      <div class="fc-bg bg-military bg-img-cantigny" id="fc-cantigny"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">World War I &middot; May 28, 1918</p>
-        <h3 class="fc-title">The Zero Hour at Cantigny</h3>
-        <p class="fc-desc">The barrage has started but something is wrong. A cut wire, falsified tables, and a chain of command that has gone silent.</p>
-        <p class="fc-cost">Cost tracked: command authority, unit cohesion, tactical margin</p>
-        <div class="fc-meta"><span class="meta-pill">The Artillery Commander</span><span class="meta-pill">The Doughboy</span><span class="meta-pill">The Signaler</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=titanic_final_hours';return false" class="featured-card fc-live fc-has-img" id="fc-card-titanic">
-      <div class="fc-bg bg-sub bg-img-titanic" id="fc-titanic"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">Maritime &middot; April 14, 1912</p>
-        <h3 class="fc-title">Titanic: The Final Hours</h3>
-        <p class="fc-desc">11:40 PM. The iceberg has opened five compartments. The wireless room is the last place on the ship where someone can still change what happens next.</p>
-        <p class="fc-cost">Cost tracked: lifeboat capacity, time to flooding</p>
-        <div class="fc-meta"><span class="meta-pill">Senior Wireless Operator</span><span class="meta-pill">Second Engineer</span><span class="meta-pill">First Class Steward</span></div>
-      </div>
-    </a>
-    <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=high_water_reckoning';return false" class="featured-card fc-live fc-has-img" id="fc-card-ninth-ward">
-      <div class="fc-bg bg-fire bg-img-ninth-ward" id="fc-ninth-ward"></div>
-      <span class="fc-ai-attr">AI-generated illustration</span>
-      <div class="fc-inner">
-        <p class="fc-tag">Hurricane Katrina &middot; September 2005</p>
-        <h3 class="fc-title">High Water Reckoning: Ninth Ward</h3>
-        <p class="fc-desc">Five days after the levee failures drowned the Lower Ninth Ward, three survivors must coordinate across failing infrastructure to keep their sector alive long enough for federal relief to reach them.</p>
-        <div class="fc-meta"><span class="meta-pill">The Asset Custodian</span><span class="meta-pill">The Communications Pivot</span><span class="meta-pill">The Triage Coordinator</span></div>
-      </div>
-    </a>
-  </div>
+  <div class="featured-grid" id="open-now-grid"></div>
 </section>
 <!-- ledger-featured: commented out — reintroduce when Apollo 13 featured panel is ready
 <section class="ledger-featured" id="featured" style="position:relative">
@@ -468,36 +391,38 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
 // Change this ID to feature a different scenario in the hero.
 const HERO_FEATURED_SCENARIO_ID='apollo_13_lifeboat';
-const STORIES=[
-  {id:'apollo_13_lifeboat',cat:'space',era:'Space Race',year:'Apr 13, 1970',title:'Apollo 13: Lifeboat',hook:'Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.',cost:'Battery reserve, crew physical margin',perspectives:['Jack Swigert','Jim Lovell','Gene Kranz'],scene:'ci-space'},
-  {id:'gemini8',cat:'space',era:'Space Race',year:'Mar 16, 1966',title:'Gemini 8: The Tumble',hook:'One revolution per second. Vision tunneling. Armstrong must fire the thrusters before the craft disintegrates.',cost:'G-force tolerance, abort window',perspectives:['Neil Armstrong','David Scott','Capcom'],scene:'ci-space'},
-  {id:'apollo11',cat:'space',era:'Space Race',year:'Jul 16, 1969',title:'Apollo 11: Launch Day',hook:'Hand on the abort handle. T-minus 10. The most powerful machine ever built groans beneath you.',cost:'Structural margin, abort decision threshold',perspectives:['Neil Armstrong','GUIDO Jack Garman','Pad safety engineer'],scene:'ci-space'},
-  {id:'greensboro_four_the_color_line',cat:'civil',era:'Civil Rights',year:'Feb 1, 1960',title:'Greensboro Four: The Color Line',hook:'Four students have occupied the lunch counter at Woolworth\'s on South Elm Street. Service has been refused. They are not leaving.',cost:'Psychological discipline under provocation',perspectives:['Ezell Blair Jr.','Franklin McCain','Joseph McNeil'],scene:'ci-civil'},
-  {id:'woolworth',cat:'civil',era:'Civil Rights',year:'Feb 1, 1960',title:'The Woolworth Counter',hook:'Sit still. Do not respond. Do not leave. Every second of stillness is a political act.',cost:'Psychological discipline under provocation',perspectives:['Student activist','White waitress','Local officer'],scene:'ci-civil'},
-  {id:'anniston',cat:'civil',era:'Civil Rights',year:'May 14, 1961',title:'Anniston: The Firebombing',hook:'The bus is on fire. The doors are held shut from outside.',cost:'Smoke saturation, escape window',perspectives:['Freedom Rider','Undercover FBI agent','Highway Patrolman'],scene:'ci-civil'},
-  {id:'underground',cat:'civil',era:'Civil Rights',year:'1855',title:'The Underground Railroad',hook:'The conductor has not appeared. You have a folded scrap of paper with two words: Follow stars.',cost:'Detection risk, route margin',perspectives:['Freedom seeker','Harriet Tubman','US Marshal'],scene:'ci-civil'},
-  {id:'lorraine',cat:'civil',era:'Civil Rights',year:'Apr 4, 1968',title:'The Lorraine Motel',hook:'The shot was fired four seconds ago. You are kneeling on the concrete balcony.',cost:'Medical window, scene control',perspectives:['Andrew Young','First responding officer','Police dispatcher'],scene:'ci-civil'},
-  {id:'stonewall',cat:'civil',era:'Civil Rights',year:'Jun 28, 1969',title:'Stonewall: The Night Before the Moon',hook:'Something is different tonight. The crowd outside is not dispersing.',cost:'Crowd cohesion, personal threshold',perspectives:['Patron Ray','Beat cop','Village Voice reporter'],scene:'ci-civil'},
-  {id:'selma',cat:'civil',era:'Civil Rights',year:'Mar 7, 1965',title:'Edmund Pettus Bridge',hook:'He can see the troopers. He does not stop walking. 600 people are walking behind him.',cost:'Physical injury margin, march cohesion',perspectives:['John Lewis','Major John Cloud','NBC cameraman'],scene:'ci-civil'},
-  {id:'dog_green_sector',cat:'military',era:'World War II',year:'Jun 6, 1944',title:'Dog Green Sector',hook:'The ramp drops. The gap in the wire is yours to find — if it exists at all.',cost:'Physical survival margin, unit cohesion',perspectives:['LCA Coxswain','Army rifleman','Combat medic'],scene:'ci-military'},
-  {id:'hue',cat:'military',era:'Vietnam',year:'Feb 1968',title:'The Battle of Huế: The Citadel',hook:'House to house. Ancient stone walls. A sniper in every shadow.',cost:'Urban cover integrity, sniper exposure',perspectives:['Marine rifleman','NVA squad leader','Civilian in the cellar'],scene:'ci-military'},
-  {id:'gettysburg',cat:'military',era:'Civil War',year:'Jul 3, 1863',title:'Gettysburg: The Angle',hook:'12,500 men in parade-ground order. One mile away. The wall is all that stands between them and the Union rear.',cost:'Ammunition reserve, wall integrity',perspectives:['Union corporal','Confederate officer','Field surgeon'],scene:'ci-military'},
-  {id:'ammo_hill',cat:'military',era:'Six-Day War',year:'Jun 6, 1967',title:'Ammunition Hill: Jerusalem',hook:'The briefing said lightly fortified. The briefing was wrong.',cost:'Ammunition, trench visibility',perspectives:['Israeli paratrooper','Jordanian legionnaire','Combat medic'],scene:'ci-military'},
-  {id:'valley_forge',cat:'military',era:'Revolutionary War',year:'Dec 19, 1777',title:'Valley Forge: The Winter',hook:'No shoes. 14 degrees Fahrenheit. No barracks yet. The cold is not dramatic. It is relentless.',cost:'Body temperature, desertion threshold',perspectives:['Continental soldier','George Washington','Surgeon Waldo'],scene:'ci-military'},
-  {id:'sargasso_deep_three_keys',cat:'political',era:'Cuban Missile Crisis',year:'Oct 27, 1962',title:'Sargasso Deep: The Three Keys',hook:'B-59 lies crippled beneath the Sargasso Sea. Three officers have ninety minutes to prevent a nuclear launch that would end the world.',cost:'Command authority, oxygen, heat exhaustion',perspectives:['Hydroacoustic Officer','Second-in-Command','USS Cony captain'],scene:'ci-political'},
-  {id:'b59',cat:'political',era:'Cold War',year:'Oct 27, 1962',title:'B-59: The Submarine',hook:'One officer can stop a nuclear launch. That officer is you. The temperature in the submarine is 120°F.',cost:'Command authority, oxygen, heat exhaustion',perspectives:['Vasili Arkhipov','Soviet sonar operator','USS Cony captain'],scene:'ci-political'},
-  {id:'blackout',cat:'political',era:'Cold War',year:'Nov 9, 1965',title:'The Northeast Blackout',hook:'30 million people. Total darkness. The grid is collapsing section by section on the board in front of you.',cost:'Grid stability, cascade window',perspectives:['Con Edison dispatcher','Subway conductor','Elevator operator'],scene:'ci-political'},
-  {id:'alcatraz',cat:'political',era:'Cold War',year:'Jun 11, 1962',title:'Alcatraz: The Escape',hook:'The dummy head is in his bunk. The guard’s footsteps are on the Broadway corridor floor.',cost:'Guard alert level, raft integrity',perspectives:['Frank Morris','Night guard','Coast Guard coxswain'],scene:'ci-political'},
-  {id:'tea_party',cat:'political',era:'Revolutionary War',year:'Dec 16, 1773',title:'The Boston Tea Party',hook:'342 chests. One hatchet. No going back.',cost:'Mob coordination, detection risk',perspectives:['Patriot on the wharf','Customs officer','Boston merchant'],scene:'ci-political'},
-  {id:'constitution',cat:'political',era:'Founding Era',year:'Jul 16, 1787',title:'The Constitutional Convention',hook:'The man carrying the tea cannot vote on the republic being designed in this room.',cost:'Compromise margin, moral cost tracking',perspectives:['Roger Sherman','James Madison','Caesar (enslaved)'],scene:'ci-political'},
-  {id:'triangle',cat:'labor',era:'Progressive Era',year:'Mar 25, 1911',title:'Triangle Shirtwaist Fire',hook:'The door is locked from the outside. The smoke is rising. You have 60 seconds.',cost:'Seconds to decision, escape window',perspectives:['Worker Rosie Freedman','Owner Isaac Harris','Firefighter'],scene:'ci-labor'},
-  {id:'pullman',cat:'labor',era:'Gilded Age',year:'Jul 4, 1894',title:'The Pullman Strike',hook:'Federal bayonets 50 yards away. Your family is in a company house that can be evicted tonight.',cost:'Picket cohesion, eviction threat',perspectives:['Pullman porter','Eugene Debs','Federal marshal'],scene:'ci-labor'},
-  {id:'flu1918',cat:'labor',era:'WWI Era',year:'Oct 1918',title:'1918 Influenza: Philadelphia',hook:'635 new cases this morning. 40 beds. The ward was designed for peacetime.',cost:'Ward capacity, triage load',perspectives:['Staff nurse','Health director Krusen','Morgue worker'],scene:'ci-labor'},
-  {id:'dustbowl',cat:'labor',era:'Great Depression',year:'Apr 14, 1935',title:'Dust Bowl: Black Sunday',hook:'8,000 feet tall. Moving at 60 miles per hour. You can see it on the northern horizon.',cost:'Static charge, visibility, topsoil loss',perspectives:['Farmer Earl','Dorothea Lange','Route 66 diner owner'],scene:'ci-labor'},
-  {id:'lewisclark',cat:'labor',era:'Frontier Era',year:'Aug 12, 1805',title:'Lewis & Clark: The Continental Divide',hook:'Her brother is likely in that camp. She is the negotiation. The expedition depends on what she says next.',cost:'Negotiation margin, trust threshold',perspectives:['Sacagawea','Meriwether Lewis','Chief Cameahwait'],scene:'ci-labor'},
-  {id:'mission_control',cat:'labor',era:'Space Race',year:'Jul 20, 1969',title:'Moon Landing: Mission Control',hook:'You are 24 years old. Your index card decides the first Moon landing. You wrote it yourself six months ago.',cost:'Abort window, decision confidence',perspectives:['Jack Garman','Gene Kranz','Walter Cronkite'],scene:'ci-labor'},
-];
+const LOCAL_WIDE_IMAGES={
+  apollo_13_lifeboat:'/images/scenarios/apollo_13_wide.jpg',
+  dog_green_sector:'/images/scenarios/dog_green_wide.jpg',
+  greensboro_four_the_color_line:'/images/scenarios/greensboro_four_wide.jpg',
+  sargasso_deep_three_keys:'/images/scenarios/sargasso_deep_wide.jpg',
+  zero_hour_cantigny:'/images/scenarios/zero_hour_cantigny_wide.jpg',
+  titanic_final_hours:'/images/scenarios/titanic_final_hours_wide.jpg',
+  high_water_reckoning:'/images/scenarios/high_water_reckoning_wide.jpg',
+};
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderFeaturedCard(s){
+  const imgUrl=s.image_url||LOCAL_WIDE_IMAGES[s.id]||null;
+  const bgStyle=imgUrl?`background-image:url('${imgUrl}');background-size:cover;background-position:center`:'background:linear-gradient(160deg,#2a2420 0%,#0f0d08 100%)';
+  const hasImg=imgUrl?' fc-has-img':'';
+  const aiAttr=imgUrl?'<span class="fc-ai-attr">AI-generated illustration</span>':'';
+  const costLine=s.cost_tracked?`<p class="fc-cost">Cost tracked: ${esc(s.cost_tracked)}</p>`:'';
+  const pills=(s.roles||[]).map(r=>`<span class="meta-pill">${esc(r)}</span>`).join('');
+  return `<a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=${s.id}';return false" class="featured-card fc-live${hasImg}"><div class="fc-bg" style="${bgStyle}"></div>${aiAttr}<div class="fc-inner"><p class="fc-tag">${esc(s.era||'')}</p><h3 class="fc-title">${esc(s.title)}</h3><p class="fc-desc">${esc(s.description||'')}</p>${costLine}<div class="fc-meta">${pills}</div></div></a>`;
+}
+function renderOpenNow(stories){
+  const sorted=[...stories].sort((a,b)=>{
+    const da=a.displayOrder??99,db=b.displayOrder??99;
+    if(da!==db)return da-db;
+    return(a.title||'').localeCompare(b.title||'');
+  });
+  const grid=document.getElementById('open-now-grid');
+  const heading=document.getElementById('open-now-heading');
+  if(!grid)return;
+  grid.innerHTML=sorted.map(renderFeaturedCard).join('');
+  const n=sorted.length;
+  if(heading)heading.textContent=`${n} scenario${n===1?'':'s'} open now`;
+}
 function makeCanvas(w,h,painter){const c=document.createElement('canvas');c.width=w;c.height=h;painter(c.getContext('2d'),w,h);return c.toDataURL('image/jpeg',.85)}
 const SCENES={
   'ci-space':(ctx,w,h)=>{const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#06061a');g.addColorStop(1,'#0a0a28');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);ctx.fillStyle='#f5f0e8';for(let i=0;i<80;i++){ctx.globalAlpha=Math.random()*.8+.1;ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*1.2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;const eg=ctx.createRadialGradient(w*.1,h*1.1,0,w*.1,h*1.1,h*.9);eg.addColorStop(0,'rgba(30,60,140,.55)');eg.addColorStop(1,'rgba(30,60,140,0)');ctx.fillStyle=eg;ctx.fillRect(0,0,w,h);const pg=ctx.createRadialGradient(w*.5,h*.7,0,w*.5,h*.7,w*.4);pg.addColorStop(0,'rgba(196,154,60,.18)');pg.addColorStop(1,'rgba(196,154,60,0)');ctx.fillStyle=pg;ctx.fillRect(0,0,w,h);},
@@ -546,6 +471,7 @@ async function renderGrid(cat){
   const firstLoad=!_storiesCache;
   if(!_storiesCache){const r=await fetch('/api/stories');_storiesCache=await r.json();}
   if(firstLoad)updateHeroFeatured(_storiesCache);
+  if(firstLoad)renderOpenNow(_storiesCache);
   const grid=document.getElementById('stories-grid');
   const items=cat==='all'?_storiesCache:_storiesCache.filter(s=>s.category===cat);
   grid.innerHTML=items.map(s=>_renderCard(s,{baseUrl:BASE_URL})).join('');
