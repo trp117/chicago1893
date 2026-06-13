@@ -3043,6 +3043,22 @@ Save the source PNG as [scenario_id]_source.png. Downstream processing produces 
 SCENARIO-SPECIFIC SCENE DESCRIPTION
 `;
 
+function renderSourceNarrativeSection(data) {
+  const prompt = data.scenario?.generationPrompt || '';
+  return `<div style="margin-bottom:20px">
+    <details id="source-narrative-details">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span>Source Narrative</span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <p class="help-text" style="margin-bottom:12px">The original narrative document used to generate this scenario. Saved for reference and future regeneration.</p>
+        <textarea data-path="scenario.generationPrompt" rows="8" style="width:100%;box-sizing:border-box">${esc(prompt)}</textarea>
+      </div>
+    </details>
+  </div>`;
+}
+
 function renderImgPromptStudio(data) {
   const existingDraft = data.scenario?.image?.generation_prompt || '';
   const escaped = existingDraft.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -3261,6 +3277,7 @@ function renderPreview(data, autoSaved = false) {
       ${renderTechnicalFactsSection(data)}
       ${renderEpilogueSection(data)}
       ${renderImgPromptStudio(data)}
+      ${renderSourceNarrativeSection(data)}
       <div class="form-actions" style="padding-bottom:32px">
         <button class="btn btn-success"   id="preview-play">▶ Play Now</button>
         <button class="btn btn-primary"   id="preview-save">💾 Save</button>
