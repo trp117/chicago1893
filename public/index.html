@@ -236,30 +236,10 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
       <h1 class="hero-title"><span style="white-space:nowrap">You cannot change</span><br>what happened.<br><em>You can only discover<br>what it cost.</em></h1>
       <div class="hero-sub"><p class="hero-sub-inner">History&rsquo;s outcomes are fixed. The human cost of reaching them is not. Step inside 25 defining American moments across 250 years.</p><p class="hero-sub-inner" style="margin-top:10px">Choose a historical moment. Step inside it as the person whose decisions shaped what happened next.</p></div>
       <div class="hero-cta">
-        <a href="#" onclick="location.href=BASE_URL+'/game?scenarioId=apollo_13_lifeboat';return false" class="btn-primary">Begin with Apollo 13 &rarr;</a>
         <a href="#scenarios" class="btn-ghost">Browse all scenarios</a>
       </div>
     </div>
-    <div class="hero-right">
-      <div class="hero-feat-card" style="cursor:pointer" onclick="location.href=BASE_URL+'/game?scenarioId='+HERO_FEATURED_SCENARIO_ID">
-        <div class="hero-feat-img" id="hero-feat-img-el">
-          <div class="hero-feat-overlay"></div>
-        </div>
-        <div class="story-card-body">
-          <p class="story-era" id="hero-feat-era">Space &middot; April 1970</p>
-          <h3 class="story-title">Apollo 13: Lifeboat</h3>
-          <p class="hero-feat-quote">&ldquo;Main Bus B is gone. You have minutes to kill the power to a ship you were trained only to keep alive.&rdquo;</p>
-          <div style="margin-top:clamp(14px,2vw,20px)"><span class="btn-primary">Enter this scenario &rarr;</span></div>
-          <div class="story-footer" style="margin-top:clamp(14px,2vw,20px)">
-            <div class="story-pills" id="hero-feat-pills">
-              <span class="meta-pill">Jack Swigert</span>
-              <span class="meta-pill">Jim Lovell</span>
-              <span class="meta-pill">Gene Kranz</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="hero-right" id="hero-feat-slot"></div>
   </div>
 </section>
 <section class="section section--dark" id="scenarios" style="padding-top:16px">
@@ -389,8 +369,6 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </footer>
 <script>
 const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
-// Change this ID to feature a different scenario in the hero.
-const HERO_FEATURED_SCENARIO_ID='apollo_13_lifeboat';
 const LOCAL_WIDE_IMAGES={
   apollo_13_lifeboat:'/images/scenarios/apollo_13_wide.jpg',
   dog_green_sector:'/images/scenarios/dog_green_wide.jpg',
@@ -470,23 +448,22 @@ async function renderGrid(cat){
   if(!_renderCard){const m=await import('/js/scenario-card.js');_renderCard=m.renderScenarioCard;}
   const firstLoad=!_storiesCache;
   if(!_storiesCache){const r=await fetch('/api/stories');_storiesCache=await r.json();}
-  if(firstLoad)updateHeroFeatured(_storiesCache);
+  if(firstLoad)renderFeaturedSection(_storiesCache);
   if(firstLoad)renderOpenNow(_storiesCache);
   const grid=document.getElementById('stories-grid');
   const items=cat==='all'?_storiesCache:_storiesCache.filter(s=>s.category===cat);
   grid.innerHTML=items.map(s=>_renderCard(s,{baseUrl:BASE_URL})).join('');
 }
-function updateHeroFeatured(stories){
-  const s=stories.find(x=>x.id===HERO_FEATURED_SCENARIO_ID);
-  if(!s)return;
-  const imgEl=document.getElementById('hero-feat-img-el');
-  const _heroLocalImg={apollo_13_lifeboat:'/images/scenarios/apollo_13_wide.jpg',dog_green_sector:'/images/scenarios/dog_green_wide.jpg',greensboro_four_the_color_line:'/images/scenarios/greensboro_four_wide.jpg',sargasso_deep_three_keys:'/images/scenarios/sargasso_deep_wide.jpg'}[s.id];
-  const _heroImgSrc=s.image_url||_heroLocalImg;
-  if(imgEl&&_heroImgSrc)imgEl.style.backgroundImage=`url('${_heroImgSrc}')`;
-  const pillsEl=document.getElementById('hero-feat-pills');
-  if(pillsEl&&s.roles&&s.roles.length){pillsEl.innerHTML=s.roles.map(r=>`<span class="meta-pill">${r}</span>`).join('');}
-  const eraEl=document.getElementById('hero-feat-era');
-  if(eraEl&&s.era)eraEl.textContent=s.era;
+function renderFeaturedSection(stories){
+  const s=stories.find(x=>x.featured);
+  const slot=document.getElementById('hero-feat-slot');
+  if(!slot)return;
+  if(!s){slot.style.display='none';return;}
+  slot.innerHTML=
+    `<p class="section-label" style="margin-bottom:12px">Featured Scenario</p>`+
+    `<div style="display:grid;grid-template-columns:1fr;grid-auto-rows:clamp(300px,36vw,480px)">`+
+    renderFeaturedCard(s)+
+    `</div>`;
 }
 function filterStories(cat,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGrid(cat);}
 function filterTo(slug){

@@ -147,6 +147,7 @@ app.get('/api/stories', async (req, res) => {
         roles:        roleNamesBy[s.id] || [],
         cost_tracked: s.costTracked || null,
         displayOrder: s.displayOrder ?? 99,
+        featured:     s.featured ?? false,
       }));
     res.json(stories);
   } catch (err) {
