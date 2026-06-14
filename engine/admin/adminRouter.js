@@ -1735,7 +1735,16 @@ Return ONLY valid JSON in this exact structure:
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
-      scenario.status = 'draft';
+      const existing = await repos.scenarios.findById(scenario.id);
+      if (!existing) scenario.status = 'draft';
+      if (scenario.featured === true) {
+        const allScenarios = await repos.scenarios.findAll();
+        for (const other of allScenarios) {
+          if (other.id !== scenario.id && other.featured) {
+            await repos.scenarios.save({ ...other, featured: false }, { savedBy: req.adminUser?.email || 'admin' });
+          }
+        }
+      }
       await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
