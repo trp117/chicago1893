@@ -1479,6 +1479,30 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  r.post('/generate/premise', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const { title = '', description = '', world = '', stakes = '' } = req.body;
+    const context = [
+      title       ? `TITLE: ${title}`             : '',
+      description ? `DESCRIPTION: ${description}` : '',
+      world       ? `WORLD CONTEXT: ${world}`      : '',
+      stakes      ? `STAKES: ${stakes}`            : '',
+    ].filter(Boolean).join('\n');
+    const prompt = `${context}\n\nWrite a 2-3 sentence premise for a historical scenario. It should capture the situation, the stakes, and the time pressure in vivid, present-tense language. No more than 50 words. Do not use game language. Return only the premise text, no labels or quotes.`;
+    try {
+      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+        { model: 'claude-haiku-4-5-20251001', max_tokens: 200, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+        { timeout: 30_000, maxRetries: 0 }
+      );
+      const premise = msg.content[0]?.text?.trim();
+      if (!premise) return res.status(500).json({ error: 'No response from Claude.' });
+      res.json({ premise });
+    } catch (err) {
+      console.error('[GENERATE-PREMISE]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.post('/generate/essential-beats', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const { title = '', premise = '', world = '', stakes = '', briefings = [] } = req.body;

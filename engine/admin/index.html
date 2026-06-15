@@ -1671,8 +1671,8 @@ function renderScenarioSection(data) {
     ${edField('Category', `<select data-path="scenario.category"><option value=""${!s.category ? ' selected' : ''}>(unassigned)</option><option value="space"${s.category === 'space' ? ' selected' : ''}>Space &amp; Cold War</option><option value="military"${s.category === 'military' ? ' selected' : ''}>Military</option><option value="civil-rights"${s.category === 'civil-rights' ? ' selected' : ''}>Civil Rights</option><option value="underground"${s.category === 'underground' ? ' selected' : ''}>Underground</option><option value="maritime"${s.category === 'maritime' ? ' selected' : ''}>Maritime</option><option value="industrial"${s.category === 'industrial' ? ' selected' : ''}>Industrial</option></select>`, 'Controls which category page this scenario appears on.')}
     ${edField('Display Order', `<input type="number" data-path="scenario.displayOrder" data-type="number" value="${s.displayOrder ?? 99}" min="1" max="999" style="width:100px">`, 'Lower numbers appear first on the homepage Open Now grid. Default is 99.')}
     ${edField('Featured on homepage', `<select data-path="scenario.featured"><option value="false"${!s.featured ? ' selected' : ''}>Not featured</option><option value="true"${s.featured ? ' selected' : ''}>Featured — shown prominently on the homepage</option></select>`, 'Only one scenario can be featured at a time. Saving will automatically un-feature any currently featured scenario.')}
-    ${edField('Description',        edTextarea('scenario.description',    s.description,      3), 'Shown on the role selection screen — one paragraph summarising the situation and stakes')}
-    ${edField('Premise',           edTextarea('scenario.premise',        s.premise,          2))}
+    ${edField('Description',        edTextarea('scenario.description',    s.description,      3), 'Used in homepage cards and API responses. Not displayed on the game\'s role selection screen.')}
+    ${edField('Premise',           `${edTextarea('scenario.premise', s.premise, 2)}<button type="button" id="gen-premise-btn" class="btn btn-secondary btn-sm" style="margin-top:6px">✦ Generate premise</button>`, 'Shown on the role selection screen between the title and \'Read the full historical introduction\'. 2–3 sentences summarizing the situation and stakes.')}
     ${edField('Player Goal',       edTextarea('scenario.playerGoal',     s.playerGoal,       2))}
     ${edField('Opening Situation', edTextarea('scenario.openingSituation', s.openingSituation, 2))}
     ${edField('Tone',              edInput('scenario.tone',             toneVal, 'data-type="csv"'), 'Comma-separated')}
@@ -3499,6 +3499,33 @@ function renderPreview(data, autoSaved = false) {
       toast('Bridge sentence draft generated — review before saving', 'warn');
     } catch (err) {
       toast(`Error: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+
+  // ── Generate Premise ───────────────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#gen-premise-btn')) return;
+    const btn = e.target.closest('#gen-premise-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+    try {
+      const title       = formEl.querySelector('[data-path="scenario.title"]')?.value.trim()       || '';
+      const description = formEl.querySelector('[data-path="scenario.description"]')?.value.trim() || '';
+      const world       = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim()     || '';
+      const stakes      = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim()        || '';
+      const result = await apiPost('/generate/premise', { title, description, world, stakes });
+      const textarea = formEl.querySelector('[data-path="scenario.premise"]');
+      if (textarea) {
+        textarea.value = result.premise;
+        textarea.dispatchEvent(new Event('input'));
+      }
+      toast('Premise generated — review and edit before saving.', 'warn');
+    } catch (err) {
+      toast(`Premise generation failed: ${err.message}`, 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = originalText;
