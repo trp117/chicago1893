@@ -7,6 +7,7 @@
     "crisis-simulation"
   ],
   "title": "Apollo 13: Lifeboat",
+  "status": "draft",
   "premise": "April 13, 1970: an oxygen tank has exploded 200,000 miles from Earth, and three men must survive four days in a spacecraft never designed for survival.",
   "setting": "200,000 miles from Earth, April 1970",
   "systems": {
@@ -124,270 +125,293 @@
     ],
     "character_fates": [
       {
+        "character_id": "char_jim_lovell",
         "name": "James A. Lovell Jr.",
         "outcome": "survived",
-        "character_id": "char_jim_lovell",
-        "classification": "documented",
+        "historical_record": "Lovell splashed down safely in the South Pacific on April 17, 1970, recovered by USS Iwo Jima. He never flew in space again. Apollo 13 was his fourth and final spaceflight. He retired from NASA and the U.S. Navy in 1973 and went on to a career in business. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "NASA Mission Report: Apollo 13 Review Board Report (1970); Lovell, James A. and Jeffrey Kluger, 'Lost Moon' (1994)",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Lovell splashed down safely in the South Pacific on April 17, 1970, recovered by USS Iwo Jima. He never flew in space again. Apollo 13 was his fourth and final spaceflight. He retired from NASA and the U.S. Navy in 1973 and went on to a career in business. As of the time of this scenario's composition he is alive."
+        }
       },
       {
+        "character_id": "char_jack_swigert",
         "name": "John L. Swigert Jr.",
         "outcome": "died",
-        "character_id": "char_jack_swigert",
-        "classification": "documented",
+        "historical_record": "Swigert splashed down safely on April 17, 1970. He left NASA in 1977 and entered politics. He was elected to the U.S. House of Representatives from Colorado's 6th congressional district in November 1982 but died of bone cancer on December 27, 1982, before he could be sworn in. He was 51 years old.",
         "primary_source": {
-          "url": null,
           "citation": "Congressional Record; NASA Astronaut Biography, JSC",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Swigert splashed down safely on April 17, 1970. He left NASA in 1977 and entered politics. He was elected to the U.S. House of Representatives from Colorado's 6th congressional district in November 1982 but died of bone cancer on December 27, 1982, before he could be sworn in. He was 51 years old."
+        }
       },
       {
+        "character_id": "char_fred_haise",
         "name": "Fred W. Haise Jr.",
         "outcome": "survived",
-        "character_id": "char_fred_haise",
-        "classification": "documented",
+        "historical_record": "Haise splashed down safely on April 17, 1970. He was assigned to Apollo 19 but that mission was cancelled in September 1970. He later flew the Space Shuttle Enterprise in the Approach and Landing Tests in 1977. He retired from NASA in 1979. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Astronaut Biography, JSC",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Haise splashed down safely on April 17, 1970. He was assigned to Apollo 19 but that mission was cancelled in September 1970. He later flew the Space Shuttle Enterprise in the Approach and Landing Tests in 1977. He retired from NASA in 1979. As of the time of this scenario's composition he is alive."
+        }
       },
       {
+        "character_id": "char_gene_kranz",
         "name": "Gene Kranz",
         "outcome": "survived",
-        "character_id": "char_gene_kranz",
-        "classification": "documented",
+        "historical_record": "Kranz served as Flight Director through the Apollo 13 crisis and subsequent Apollo missions. He became Chief of the Flight Director Office and later Director of Mission Operations at NASA Johnson Space Center. He retired from NASA in 1994. His White Team was awarded the Presidential Medal of Freedom collectively with the Apollo 13 crew and Mission Control in April 1970. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "Presidential Medal of Freedom citation, April 18, 1970; Kranz, Gene, 'Failure Is Not an Option' (2000)",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Kranz served as Flight Director through the Apollo 13 crisis and subsequent Apollo missions. He became Chief of the Flight Director Office and later Director of Mission Operations at NASA Johnson Space Center. He retired from NASA in 1994. His White Team was awarded the Presidential Medal of Freedom collectively with the Apollo 13 crew and Mission Control in April 1970. As of the time of this scenario's composition he is alive."
+        }
       },
       {
+        "character_id": "char_glynn_lunney",
         "name": "Glynn Lunney",
         "outcome": "survived",
-        "character_id": "char_glynn_lunney",
-        "classification": "documented",
+        "historical_record": "Lunney's Black Team took over from Kranz's White Team during the crisis rotation and managed the critical hours of LM activation and initial power-down procedures. He continued as a Flight Director through the Apollo program and later managed the Apollo-Soyuz Test Project. He retired from NASA in 1985. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Johnson Space Center oral history, Lunney interview",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Lunney's Black Team took over from Kranz's White Team during the crisis rotation and managed the critical hours of LM activation and initial power-down procedures. He continued as a Flight Director through the Apollo program and later managed the Apollo-Soyuz Test Project. He retired from NASA in 1985. As of the time of this scenario's composition he is alive."
+        }
       },
       {
+        "character_id": "char_john_aaron",
         "name": "John Aaron",
         "outcome": "survived",
-        "character_id": "char_john_aaron",
-        "classification": "documented",
+        "historical_record": "Aaron was off-shift when the accident occurred and was called back to Mission Control. He led the power budget analysis that determined the minimum electrical load required to safely power up the Command Module for re-entry. His power-up sequence was executed successfully on April 17, 1970. He later became Chief of the Spacecraft Energy Systems Section and worked on early Space Shuttle development. He later served as manager of the Space Station Freedom project and acting director of the Johnson Space Center before retiring from NASA in 1993. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "NASA Mission Report: Apollo 13 Review Board Report (1970); NASA Johnson Space Center oral history, Aaron interview (1999)",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Aaron was off-shift when the accident occurred and was called back to Mission Control. He led the power budget analysis that determined the minimum electrical load required to safely power up the Command Module for re-entry. His power-up sequence was executed successfully on April 17, 1970. He later became Chief of the Spacecraft Energy Systems Section and worked on early Space Shuttle development. He later served as manager of the Space Station Freedom project and acting director of the Johnson Space Center before retiring from NASA in 1993. As of the time of this scenario's composition he is alive."
+        }
       },
       {
+        "character_id": "char_sy_liebergot",
         "name": "Seymour 'Sy' Liebergot",
         "outcome": "survived",
-        "character_id": "char_sy_liebergot",
-        "classification": "documented",
+        "historical_record": "Liebergot was the EECOM on duty when the oxygen tank rupture occurred and was the first controller to identify the anomalous readings. He continued working at NASA Mission Control and later wrote a memoir about his experiences. He retired from NASA. As of the time of this scenario's composition he is alive.",
         "primary_source": {
-          "url": null,
           "citation": "Liebergot, Sy and David Harland, 'Apollo EECOM: Journey of a Lifetime' (2003); NASA Mission Report: Apollo 13 Review Board Report (1970)",
+          "url": null,
           "access_note": null
-        },
-        "historical_record": "Liebergot was the EECOM on duty when the oxygen tank rupture occurred and was the first controller to identify the anomalous readings. He continued working at NASA Mission Control and later wrote a memoir about his experiences. He retired from NASA. As of the time of this scenario's composition he is alive."
+        }
       }
     ],
     "historical_frame": [
-      "Apollo 13 was the seventh crewed Apollo mission and was intended to land in the Fra Mauro highlands; that landing was accomplished instead by Apollo 14 in February 1971.",
-      "The Presidential Medal of Freedom was awarded on April 18, 1970, to the Apollo 13 crew and the Mission Operations team at NASA Manned Spacecraft Center, Houston.",
-      "The Apollo 13 Review Board report, released June 15, 1970, identified the root cause as damaged Teflon insulation on wires inside Oxygen Tank Two, damage that occurred during ground operations, and led to redesign of the oxygen tank and service module bay configuration for subsequent Apollo missions."
+      {
+        "text": "Apollo 13 was the seventh crewed Apollo mission and was intended to land in the Fra Mauro highlands; that landing was accomplished instead by Apollo 14 in February 1971.",
+        "source": null
+      },
+      {
+        "text": "The Presidential Medal of Freedom was awarded on April 18, 1970, to the Apollo 13 crew and the Mission Operations team at NASA Manned Spacecraft Center, Houston.",
+        "source": null
+      },
+      {
+        "text": "The Apollo 13 Review Board report, released June 15, 1970, identified the root cause as damaged Teflon insulation on wires inside Oxygen Tank Two, damage that occurred during ground operations, and led to redesign of the oxygen tank and service module bay configuration for subsequent Apollo missions.",
+        "source": null
+      }
     ],
     "immediate_outcome": {
       "summary": "Apollo 13 splashed down safely in the South Pacific Ocean at 18:07:41 UTC on April 17, 1970, and all three crew members were recovered alive by USS Iwo Jima. The mission, intended as the third crewed lunar landing, did not land on the Moon. The crew spent approximately 87 hours in the Lunar Module Aquarius, which served as a lifeboat, before re-entering and splashing down in the Command Module Odyssey.",
       "key_facts": [
-        "Oxygen Tank Two in Service Module Bay 4 ruptured at 03:07:53 UTC on April 14, 1970, approximately 55 hours 54 minutes 53 seconds into the mission",
-        "The spacecraft was approximately 321,860 kilometers (199,990 miles) from Earth at the time of the explosion",
-        "Splashdown occurred at 18:07:41 UTC on April 17, 1970, in the South Pacific Ocean at approximately 21°38'S, 165°22'W",
-        "Recovery was performed by USS Iwo Jima (LPH-2)",
-        "Total mission elapsed time at splashdown was 142 hours 54 minutes 41 seconds",
-        "The crew spent approximately 87 hours living in the Lunar Module Aquarius",
-        "The Apollo 13 Review Board, chaired by Edgar Cortright, concluded the accident was caused by damaged wire insulation in Oxygen Tank Two that had been compromised during a pre-launch detanking procedure on March 27–28, 1970"
+        {
+          "text": "Oxygen Tank Two in Service Module Bay 4 ruptured at 03:07:53 UTC on April 14, 1970, approximately 55 hours 54 minutes 53 seconds into the mission",
+          "source": null
+        },
+        {
+          "text": "The spacecraft was approximately 321,860 kilometers (199,990 miles) from Earth at the time of the explosion",
+          "source": null
+        },
+        {
+          "text": "Splashdown occurred at 18:07:41 UTC on April 17, 1970, in the South Pacific Ocean at approximately 21°38'S, 165°22'W",
+          "source": null
+        },
+        {
+          "text": "Recovery was performed by USS Iwo Jima (LPH-2)",
+          "source": null
+        },
+        {
+          "text": "Total mission elapsed time at splashdown was 142 hours 54 minutes 41 seconds",
+          "source": null
+        },
+        {
+          "text": "The crew spent approximately 87 hours living in the Lunar Module Aquarius",
+          "source": null
+        },
+        {
+          "text": "The Apollo 13 Review Board, chaired by Edgar Cortright, concluded the accident was caused by damaged wire insulation in Oxygen Tank Two that had been compromised during a pre-launch detanking procedure on March 27–28, 1970",
+          "source": null
+        }
       ]
     }
   },
   "glossary": [
     {
       "term": "splashdown",
+      "definition": "The moment a spacecraft returns to Earth and impacts the ocean, bringing the crew safely home — Apollo 13 splashed down in the South Pacific on April 17, 1970.",
       "source": "",
-      "approved": true,
-      "definition": "The moment a spacecraft returns to Earth and impacts the ocean, bringing the crew safely home — Apollo 13 splashed down in the South Pacific on April 17, 1970."
+      "approved": true
     },
     {
       "term": "psia",
+      "definition": "Pounds per square inch absolute — the unit used to measure oxygen tank pressure; Tank Two dropped from a safe pressure to zero within 130 minutes of the explosion.",
       "source": "",
-      "approved": true,
-      "definition": "Pounds per square inch absolute — the unit used to measure oxygen tank pressure; Tank Two dropped from a safe pressure to zero within 130 minutes of the explosion."
+      "approved": true
     },
     {
       "term": "power-up budget",
+      "definition": "A detailed calculation of exactly how much electricity can be used for each system during re-entry — systems engineer John Aaron was called back to Mission Control to create the budget that kept the Command Module powered just long enough.",
       "source": "",
-      "approved": true,
-      "definition": "A detailed calculation of exactly how much electricity can be used for each system during re-entry — systems engineer John Aaron was called back to Mission Control to create the budget that kept the Command Module powered just long enough."
+      "approved": true
     },
     {
       "term": "Tiger Team",
+      "definition": "A dedicated team of controllers isolated to work on a single critical problem — Gene Kranz's White Team became the Tiger Team, focused exclusively on re-entry procedures after the explosion.",
       "source": "",
-      "approved": true,
-      "definition": "A dedicated team of controllers isolated to work on a single critical problem — Gene Kranz's White Team became the Tiger Team, focused exclusively on re-entry procedures after the explosion."
+      "approved": true
     },
     {
       "term": "Flight Director",
+      "definition": "The highest-ranking controller in the Mission Control room, responsible for all decisions during a mission phase — Gene Kranz led the crisis response through the explosion, then handed off to Glynn Lunney.",
       "source": "",
-      "approved": true,
-      "definition": "The highest-ranking controller in the Mission Control room, responsible for all decisions during a mission phase — Gene Kranz led the crisis response through the explosion, then handed off to Glynn Lunney."
+      "approved": true
     },
     {
       "term": "EECOM",
+      "definition": "Electrical, Environmental, and Communications Officer — the Mission Control specialist responsible for monitoring all spacecraft systems; Sy Liebergot initially assessed the oxygen tank readings as a sensor failure.",
       "source": "",
-      "approved": true,
-      "definition": "Electrical, Environmental, and Communications Officer — the Mission Control specialist responsible for monitoring all spacecraft systems; Sy Liebergot initially assessed the oxygen tank readings as a sensor failure."
+      "approved": true
     },
     {
       "term": "Service Module",
+      "definition": "The unpressurized compartment behind the Command Module that housed fuel cells, oxygen tanks, and the main engine — the oxygen tank explosion rendered it useless and it was jettisoned before re-entry.",
       "source": "",
-      "approved": true,
-      "definition": "The unpressurized compartment behind the Command Module that housed fuel cells, oxygen tanks, and the main engine — the oxygen tank explosion rendered it useless and it was jettisoned before re-entry."
+      "approved": true
     },
     {
       "term": "descent batteries",
+      "definition": "Two batteries in the Lunar Module with a combined 1,600 amp-hours, originally designed to run the moon lander for 45 hours — they were stretched to run life support for 87 hours.",
       "source": "",
-      "approved": true,
-      "definition": "Two batteries in the Lunar Module with a combined 1,600 amp-hours, originally designed to run the moon lander for 45 hours — they were stretched to run life support for 87 hours."
+      "approved": true
     },
     {
       "term": "entry batteries",
+      "definition": "Three batteries in the Command Module with a combined 135 amp-hours of power — they needed to supply at least 43 amp-hours to complete re-entry, leaving almost no margin for error.",
       "source": "",
-      "approved": true,
-      "definition": "Three batteries in the Command Module with a combined 135 amp-hours of power — they needed to supply at least 43 amp-hours to complete re-entry, leaving almost no margin for error."
+      "approved": true
     },
     {
       "term": "delta-V",
+      "definition": "A measure of the change in velocity achieved by a rocket burn — the PC+2 maneuver produced approximately 860.5 feet per second of delta-V.",
       "source": "",
-      "approved": true,
-      "definition": "A measure of the change in velocity achieved by a rocket burn — the PC+2 maneuver produced approximately 860.5 feet per second of delta-V."
+      "approved": true
     },
     {
       "term": "Lunar Module Descent Propulsion System",
+      "definition": "The engine designed to lower the lunar lander to the moon's surface — it became the only available engine to execute course corrections and return the crew to Earth.",
       "source": "",
-      "approved": true,
-      "definition": "The engine designed to lower the lunar lander to the moon's surface — it became the only available engine to execute course corrections and return the crew to Earth."
+      "approved": true
     },
     {
       "term": "PC+2 burn",
+      "definition": "A course-correction burn executed two hours after passing closest to the moon using the Lunar Module's descent engine — it shortened the return journey to Earth by approximately 10 hours.",
       "source": "",
-      "approved": true,
-      "definition": "A course-correction burn executed two hours after passing closest to the moon using the Lunar Module's descent engine — it shortened the return journey to Earth by approximately 10 hours."
+      "approved": true
     },
     {
       "term": "mailbox",
+      "definition": "The improvised CO2 scrubber adapter built from a Command Module canister, plastic bags, a flight plan cover, a sock, and duct tape — a makeshift solution that saved the crew's lives.",
       "source": "",
-      "approved": true,
-      "definition": "The improvised CO2 scrubber adapter built from a Command Module canister, plastic bags, a flight plan cover, a sock, and duct tape — a makeshift solution that saved the crew's lives."
+      "approved": true
     },
     {
       "term": "carbon dioxide partial pressure",
+      "definition": "A measurement of CO2 concentration in the cabin air; at 7.6 mmHg the crew risked losing consciousness, and cognitive problems begin around 15 mmHg.",
       "source": "",
-      "approved": true,
-      "definition": "A measurement of CO2 concentration in the cabin air; at 7.6 mmHg the crew risked losing consciousness, and cognitive problems begin around 15 mmHg."
+      "approved": true
     },
     {
       "term": "lithium hydroxide canisters",
+      "definition": "Chemical scrubbers that absorb carbon dioxide from the cabin air — the Lunar Module's canisters were insufficient for three men over 87 hours, requiring an improvised adapter.",
       "source": "",
-      "approved": true,
-      "definition": "Chemical scrubbers that absorb carbon dioxide from the cabin air — the Lunar Module's canisters were insufficient for three men over 87 hours, requiring an improvised adapter."
+      "approved": true
     },
     {
       "term": "Command Module Odyssey",
+      "definition": "The capsule that carried the crew and housed life support systems during Earth orbit and coast — it became unpowered and dangerously cold once the Service Module was crippled.",
       "source": "",
-      "approved": true,
-      "definition": "The capsule that carried the crew and housed life support systems during Earth orbit and coast — it became unpowered and dangerously cold once the Service Module was crippled."
+      "approved": true
     },
     {
       "term": "Lunar Module Aquarius",
+      "definition": "The moon lander that became an unplanned lifeboat for all three astronauts after the Service Module failed — designed for two men for 36 hours, it had to support three for 87 hours.",
       "source": "",
-      "approved": true,
-      "definition": "The moon lander that became an unplanned lifeboat for all three astronauts after the Service Module failed — designed for two men for 36 hours, it had to support three for 87 hours."
+      "approved": true
     },
     {
       "term": "Mission Elapsed Time",
+      "definition": "The official mission clock that starts at launch and measures every moment of the flight — at the moment of the explosion, it read 55 hours, 54 minutes, and 53 seconds.",
       "source": "",
-      "approved": true,
-      "definition": "The official mission clock that starts at launch and measures every moment of the flight — at the moment of the explosion, it read 55 hours, 54 minutes, and 53 seconds."
+      "approved": true
     },
     {
       "term": "Oxygen Tank Two",
+      "definition": "One of two cryogenic oxygen storage tanks in the Service Module; the rupture of this tank triggered the cascade of failures that crippled Apollo 13.",
       "source": "",
-      "approved": true,
-      "definition": "One of two cryogenic oxygen storage tanks in the Service Module; the rupture of this tank triggered the cascade of failures that crippled Apollo 13."
+      "approved": true
     },
     {
       "term": "Bus B",
+      "definition": "The electrical power distribution system for the Command Module Odyssey, separate from the Service Module's fuel cells; Bus B remained partially powered after the explosion, allowing critical systems to remain operational until the final power-down for re-entry.",
       "source": "Apollo 13 Flight Data File, NASA Mission Operations Reports, April 1970; Apollo 13 Technical Debriefing, MSC-02680, NASA Manned Spacecraft Center, June 1970",
-      "approved": true,
-      "definition": "The electrical power distribution system for the Command Module Odyssey, separate from the Service Module's fuel cells; Bus B remained partially powered after the explosion, allowing critical systems to remain operational until the final power-down for re-entry."
+      "approved": true
     },
     {
       "term": "IMU",
+      "definition": "Inertial Measurement Unit—the platform of gyroscopes and accelerometers that maintained Odyssey's navigational reference in space. When the explosion damaged the Command Module's systems, Mission Control had to realign the IMU using star sightings through the telescope, a procedure normally performed only during cislunar coast phases.",
       "source": "Apollo 13 Flight Journal, NASA Johnson Space Center, https://history.nasa.gov/afj/ap13fj/index.html; Apollo 13 Technical Crew Debriefing, NASA, April 1970.",
-      "approved": true,
-      "definition": "Inertial Measurement Unit—the platform of gyroscopes and accelerometers that maintained Odyssey's navigational reference in space. When the explosion damaged the Command Module's systems, Mission Control had to realign the IMU using star sightings through the telescope, a procedure normally performed only during cislunar coast phases."
+      "approved": true
     },
     {
       "term": "PC+2",
+      "definition": "The midcourse correction burn executed 2 hours past closest approach to the Moon, using the Lunar Module's descent engine to accelerate the return trajectory and shorten the journey home by approximately 10 hours — a critical maneuver that allowed the crippled spacecraft to reach Earth before life support systems failed.",
       "source": "NASA Apollo 13 Mission Report, NASA SP-4029, May 1970. Available at: https://www.nasa.gov/history/alsj/a13/a13.html",
-      "approved": true,
-      "definition": "The midcourse correction burn executed 2 hours past closest approach to the Moon, using the Lunar Module's descent engine to accelerate the return trajectory and shorten the journey home by approximately 10 hours — a critical maneuver that allowed the crippled spacecraft to reach Earth before life support systems failed."
+      "approved": true
     },
     {
       "term": "LM",
+      "definition": "The Lunar Module Aquarius — a two-man spacecraft designed for 45 hours on the lunar surface — became a lifeboat for three men for 87 hours, its lithium hydroxide canisters and descent batteries the only systems keeping the crew alive on the journey home.",
       "source": "NASA Apollo 13 Technical Crew Debriefing, April 1970; NASA Report on the Apollo 13 Accident, June 1970. https://www.nasa.gov/history/apollo-13-accident-and-recovery/",
-      "approved": true,
-      "definition": "The Lunar Module Aquarius — a two-man spacecraft designed for 45 hours on the lunar surface — became a lifeboat for three men for 87 hours, its lithium hydroxide canisters and descent batteries the only systems keeping the crew alive on the journey home."
+      "approved": true
     },
     {
       "term": "GUIDO",
+      "definition": "Flight controller at Mission Control responsible for guidance, navigation, and control of the spacecraft — the person in the MOCR (Mission Operations Control Room) who communicates directly with the crew and manages trajectory decisions. During Apollo 13's crisis, GUIDO John Aaron was called back from home to calculate the power-down procedures that would keep Odyssey alive for re-entry.",
       "source": "NASA Mission Control transcript archives and Gene Kranz, 'Failure Is Not an Option' (Simon & Schuster, 2000), pp. 311-330; NASA Historical Reference Collection, https://history.nasa.gov/sp4029.pdf",
-      "approved": true,
-      "definition": "Flight controller at Mission Control responsible for guidance, navigation, and control of the spacecraft — the person in the MOCR (Mission Operations Control Room) who communicates directly with the crew and manages trajectory decisions. During Apollo 13's crisis, GUIDO John Aaron was called back from home to calculate the power-down procedures that would keep Odyssey alive for re-entry."
+      "approved": true
     },
     {
       "term": "CM",
+      "definition": "Command Module Odyssey — the conical spacecraft where the three astronauts lived during Earth orbit and trans-lunar coast, and where they would return for re-entry; after the oxygen tank explosion, it became a dead spacecraft with only 43 amp-hours of battery power needed for re-entry, forcing the crew to shelter in the Lunar Module.",
       "source": "NASA Apollo 13 Mission Report, MSC-02680, April 1970, https://www.nasa.gov/history/alsj/a13/Apollo13MissionReport.pdf",
-      "approved": true,
-      "definition": "Command Module Odyssey — the conical spacecraft where the three astronauts lived during Earth orbit and trans-lunar coast, and where they would return for re-entry; after the oxygen tank explosion, it became a dead spacecraft with only 43 amp-hours of battery power needed for re-entry, forcing the crew to shelter in the Lunar Module."
+      "approved": true
     },
     {
       "term": "G-7",
+      "definition": "The seventh guidance platform alignment check during the Lunar Module emergency activation sequence — a critical realignment of the Inertial Measurement Unit that had to be completed in the compressed 83-minute powered-up window before the platform's gyroscopes drifted beyond usable tolerance.",
       "source": "NASA Apollo 13 Mission Report (MSC-02680), Section 6.2.2 'Lunar Module Activation and Navigation,' April 1970. Available at NASA Technical Reports Server (NTRS): https://ntrs.nasa.gov/",
-      "approved": true,
-      "definition": "The seventh guidance platform alignment check during the Lunar Module emergency activation sequence — a critical realignment of the Inertial Measurement Unit that had to be completed in the compressed 83-minute powered-up window before the platform's gyroscopes drifted beyond usable tolerance."
+      "approved": true
     },
     {
       "term": "Loop",
+      "definition": "A term meaning a flight controller or astronaut is actively connected to, monitoring, or speaking on a specific, closed-circuit NASA voice communication channel.  During Apollo 13, being \"on the loop\" meant a specialist was plugged directly into the real-time audio network—such as the Flight Director's channel or the Air-to-Ground frequency—instantly hearing the crisis unfold and coordinating the rescue alongside the rest of the team.",
       "source": "",
-      "approved": true,
-      "definition": "A term meaning a flight controller or astronaut is actively connected to, monitoring, or speaking on a specific, closed-circuit NASA voice communication channel.  During Apollo 13, being \"on the loop\" meant a specialist was plugged directly into the real-time audio network—such as the Flight Director's channel or the Air-to-Ground frequency—instantly hearing the crisis unfold and coordinating the rescue alongside the rest of the team."
+      "approved": true
     }
   ],
   "createdAt": "2025-01-01T00:00:00Z",
@@ -398,6 +422,7 @@
     "apollo_13_lifeboat_main_arc"
   ],
   "beats_status": "not_generated",
+  "displayOrder": 2,
   "freedomLevel": "guided",
   "introduction": {
     "enabled": true,
@@ -448,242 +473,242 @@
   "technical_facts": {
     "facts": [
       {
+        "fact_id": "explosion_timestamp_cdt",
+        "content": "The oxygen tank explosion aboard Apollo 13 occurred at 21:07:53 CDT on April 13, 1970 (03:07:53 UTC on April 14, 1970), at 55 hours, 54 minutes, and 53 seconds Mission Elapsed Time.",
         "domain": "timing",
         "source": {
-          "url": null,
           "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 4; Edgar Cortright Review Board Report, 1970",
+          "url": null,
           "access_note": null
         },
-        "content": "The oxygen tank explosion aboard Apollo 13 occurred at 21:07:53 CDT on April 13, 1970 (03:07:53 UTC on April 14, 1970), at 55 hours, 54 minutes, and 53 seconds Mission Elapsed Time.",
-        "fact_id": "explosion_timestamp_cdt",
         "valid_from": null,
         "valid_until": null
       },
       {
+        "fact_id": "lovell_actual_words",
+        "content": "James Lovell's actual transmission to Mission Control was 'Houston, we've had a problem,' spoken in past tense; the present-tense version 'we have a problem' is a film inaccuracy.",
         "domain": "personnel",
         "source": {
-          "url": null,
           "citation": "Apollo 13 Air-to-Ground Voice Transcription, NASA Manned Spacecraft Center, April 1970, page 175",
+          "url": null,
           "access_note": null
         },
-        "content": "James Lovell's actual transmission to Mission Control was 'Houston, we've had a problem,' spoken in past tense; the present-tense version 'we have a problem' is a film inaccuracy.",
-        "fact_id": "lovell_actual_words",
         "valid_from": null,
         "valid_until": null
       },
       {
+        "fact_id": "spacecraft_distance_at_explosion",
+        "content": "At the time of the explosion, Apollo 13 was approximately 200,000 statute miles (321,860 kilometers) from Earth.",
         "domain": "navigation",
         "source": {
-          "url": null,
           "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I; Cortright Review Board Report, 1970",
+          "url": null,
           "access_note": null
         },
-        "content": "At the time of the explosion, Apollo 13 was approximately 200,000 statute miles (321,860 kilometers) from Earth.",
-        "fact_id": "spacecraft_distance_at_explosion",
         "valid_from": null,
         "valid_until": null
       },
       {
+        "fact_id": "oxygen_tank_two_pressure_zero",
+        "content": "Oxygen Tank Two pressure dropped to zero within approximately 130 minutes of the explosion; Oxygen Tank One pressure fell from 865 psia to zero over approximately 130 minutes as oxygen vented through the damaged bay.",
         "domain": "flooding",
         "source": {
-          "url": null,
           "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 4.2; Cortright Review Board Report, Appendix D",
+          "url": null,
           "access_note": null
         },
-        "content": "Oxygen Tank Two pressure dropped to zero within approximately 130 minutes of the explosion; Oxygen Tank One pressure fell from 865 psia to zero over approximately 130 minutes as oxygen vented through the damaged bay.",
-        "fact_id": "oxygen_tank_two_pressure_zero",
         "valid_from": null,
         "valid_until": null
       },
       {
+        "fact_id": "lm_co2_canister_rated_capacity",
+        "content": "The Lunar Module Aquarius lithium hydroxide canisters were rated to support two men for 36 hours; the actual requirement was to support three men for approximately 87 hours.",
         "domain": "capacity",
         "source": {
-          "url": null,
           "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; testimony of mission controllers in Cortright Review Board proceedings",
+          "url": null,
           "access_note": null
         },
-        "content": "The Lunar Module Aquarius lithium hydroxide canisters were rated to support two men for 36 hours; the actual requirement was to support three men for approximately 87 hours.",
-        "fact_id": "lm_co2_canister_rated_capacity",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "domain": "other",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; NASA Environmental Control System specifications",
-          "access_note": null
-        },
-        "content": "The danger threshold for carbon dioxide partial pressure in the spacecraft cabin was 7.6 mmHg (1% partial pressure); cognitive impairment begins at approximately 15 mmHg.",
         "fact_id": "co2_danger_threshold",
+        "content": "The danger threshold for carbon dioxide partial pressure in the spacecraft cabin was 7.6 mmHg (1% partial pressure); cognitive impairment begins at approximately 15 mmHg.",
+        "domain": "other",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; NASA Environmental Control System specifications",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       },
       {
-        "domain": "other",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
-          "access_note": null
-        },
-        "content": "The improvised CO2 scrubber adapter — called the 'mailbox' — was constructed using materials confirmed aboard the spacecraft: a Command Module lithium hydroxide canister, plastic bags, a flight plan cover, a sock, and duct tape, connected with suit hose.",
         "fact_id": "mailbox_adapter_materials",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "timing",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II; Apollo 13 Flight Journal, NASA",
-          "access_note": null
-        },
-        "content": "The PC+2 (pericynthion plus 2 hours) burn using the Lunar Module Descent Propulsion System was executed at approximately 79 hours, 27 minutes, 38.9 seconds Mission Elapsed Time, lasting 263.1 seconds (4 minutes, 23.1 seconds).",
-        "fact_id": "pc_plus_2_burn_met",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "navigation",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II",
-          "access_note": null
-        },
-        "content": "The PC+2 burn produced a delta-V of approximately 860.5 feet per second (262.3 m/s), shortening the return time to Earth by approximately 10 hours.",
-        "fact_id": "pc_plus_2_burn_delta_v",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "power",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; testimony of John Aaron, Cortright Review Board",
-          "access_note": null
-        },
-        "content": "The Command Module Odyssey required a minimum of approximately 43 amp-hours of battery power to support re-entry; the three entry batteries had a combined capacity of approximately 135 amp-hours but had been partially depleted.",
-        "fact_id": "command_module_reentry_power_requirement",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "power",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; Grumman LM Systems Handbook",
-          "access_note": null
-        },
-        "content": "The Lunar Module Aquarius carried two descent batteries with a combined capacity of approximately 1,600 amp-hours at 28–32 volts DC, designed for a 45-hour lunar surface mission; they were used over approximately 87 hours as a lifeboat.",
-        "fact_id": "lm_battery_capacity",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "timing",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.1; Apollo 13 Flight Journal, NASA",
-          "access_note": null
-        },
-        "content": "The emergency activation of the Lunar Module Aquarius was completed in approximately 1 hour and 23 minutes; the standard activation procedure was designed to take approximately 2 hours.",
-        "fact_id": "lm_activation_time_actual",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "timing",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
-          "access_note": null
-        },
-        "content": "Apollo 13 splashed down in the South Pacific Ocean at 12:07:44 CDT on April 17, 1970 (18:07:44 UTC), at 142 hours, 54 minutes, 41 seconds Mission Elapsed Time.",
-        "fact_id": "splashdown_timestamp",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "navigation",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
-          "access_note": null
-        },
-        "content": "Apollo 13 splashed down at approximately 21°38' South latitude, 165°22' West longitude, approximately 3.5 nautical miles from the primary recovery ship USS Iwo Jima.",
-        "fact_id": "splashdown_coordinates",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "personnel",
-        "source": {
-          "url": null,
-          "citation": "Sy Liebergot with David Harland, Apollo EECOM: Journey of a Lifetime (2003); Cortright Review Board testimony",
-          "access_note": null
-        },
-        "content": "EECOM Sy Liebergot's initial assessment of the anomaly was that it was likely a sensor failure, based in part on a similar telemetry signature from an Apollo 12 instrumentation anomaly; he recommended standing by before initiating emergency procedures.",
-        "fact_id": "liebergot_sensor_failure_assessment",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "personnel",
-        "source": {
-          "url": null,
-          "citation": "Gene Kranz, Failure Is Not an Option (2000); NASA Mission Control shift logs, April 1970",
-          "access_note": null
-        },
-        "content": "Flight Director Gene Kranz isolated his White Team as a dedicated 'Tiger Team' to work re-entry procedures exclusively, handing ongoing mission management to Flight Director Glynn Lunney's Black Team immediately after the explosion.",
-        "fact_id": "kranz_tiger_team_isolation",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
-        "domain": "personnel",
-        "source": {
-          "url": null,
-          "citation": "Gene Kranz, Failure Is Not an Option (2000); NASA oral history, John Aaron interview, 2000",
-          "access_note": null
-        },
-        "content": "Systems engineer John Aaron was off-shift and at home when the Apollo 13 emergency began; he was called back to Mission Control specifically to lead the Command Module power-up budget calculations for re-entry.",
-        "fact_id": "john_aaron_off_duty_recalled",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
+        "content": "The improvised CO2 scrubber adapter — called the 'mailbox' — was constructed using materials confirmed aboard the spacecraft: a Command Module lithium hydroxide canister, plastic bags, a flight plan cover, a sock, and duct tape, connected with suit hose.",
         "domain": "other",
         "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.4; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
           "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.5; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
           "access_note": null
         },
-        "content": "Cabin temperature inside the Lunar Module Aquarius dropped to approximately 38°F (3°C) during the coast phase as all non-essential heaters were powered off to conserve electricity.",
-        "fact_id": "cabin_temperature_lm",
         "valid_from": null,
         "valid_until": null
       },
       {
-        "domain": "personnel",
-        "source": {
-          "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.6 (Medical); NASA post-mission crew debriefing",
-          "access_note": null
-        },
-        "content": "Fred Haise developed a urinary tract infection during the mission, caused in part by reduced water intake — the crew was rationed to approximately 6 ounces of water per man per day, well below the normal 32 ounces.",
-        "fact_id": "haise_illness_during_mission",
-        "valid_from": null,
-        "valid_until": null
-      },
-      {
+        "fact_id": "pc_plus_2_burn_met",
+        "content": "The PC+2 (pericynthion plus 2 hours) burn using the Lunar Module Descent Propulsion System was executed at approximately 79 hours, 27 minutes, 38.9 seconds Mission Elapsed Time, lasting 263.1 seconds (4 minutes, 23.1 seconds).",
         "domain": "timing",
         "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II; Apollo 13 Flight Journal, NASA",
           "url": null,
-          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I; Apollo 13 Flight Journal, NASA",
           "access_note": null
         },
-        "content": "The Service Module was jettisoned at 138 hours, 2 minutes Mission Elapsed Time, approximately 4 hours and 15 minutes before re-entry; the crew photographed the damage through the Command Module windows immediately after separation.",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "pc_plus_2_burn_delta_v",
+        "content": "The PC+2 burn produced a delta-V of approximately 860.5 feet per second (262.3 m/s), shortening the return time to Earth by approximately 10 hours.",
+        "domain": "navigation",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-II",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "command_module_reentry_power_requirement",
+        "content": "The Command Module Odyssey required a minimum of approximately 43 amp-hours of battery power to support re-entry; the three entry batteries had a combined capacity of approximately 135 amp-hours but had been partially depleted.",
+        "domain": "power",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; testimony of John Aaron, Cortright Review Board",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lm_battery_capacity",
+        "content": "The Lunar Module Aquarius carried two descent batteries with a combined capacity of approximately 1,600 amp-hours at 28–32 volts DC, designed for a 45-hour lunar surface mission; they were used over approximately 87 hours as a lifeboat.",
+        "domain": "power",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.3; Grumman LM Systems Handbook",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "lm_activation_time_actual",
+        "content": "The emergency activation of the Lunar Module Aquarius was completed in approximately 1 hour and 23 minutes; the standard activation procedure was designed to take approximately 2 hours.",
+        "domain": "timing",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.1; Apollo 13 Flight Journal, NASA",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "splashdown_timestamp",
+        "content": "Apollo 13 splashed down in the South Pacific Ocean at 12:07:44 CDT on April 17, 1970 (18:07:44 UTC), at 142 hours, 54 minutes, 41 seconds Mission Elapsed Time.",
+        "domain": "timing",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "splashdown_coordinates",
+        "content": "Apollo 13 splashed down at approximately 21°38' South latitude, 165°22' West longitude, approximately 3.5 nautical miles from the primary recovery ship USS Iwo Jima.",
+        "domain": "navigation",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "liebergot_sensor_failure_assessment",
+        "content": "EECOM Sy Liebergot's initial assessment of the anomaly was that it was likely a sensor failure, based in part on a similar telemetry signature from an Apollo 12 instrumentation anomaly; he recommended standing by before initiating emergency procedures.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Sy Liebergot with David Harland, Apollo EECOM: Journey of a Lifetime (2003); Cortright Review Board testimony",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "kranz_tiger_team_isolation",
+        "content": "Flight Director Gene Kranz isolated his White Team as a dedicated 'Tiger Team' to work re-entry procedures exclusively, handing ongoing mission management to Flight Director Glynn Lunney's Black Team immediately after the explosion.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Gene Kranz, Failure Is Not an Option (2000); NASA Mission Control shift logs, April 1970",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "john_aaron_off_duty_recalled",
+        "content": "Systems engineer John Aaron was off-shift and at home when the Apollo 13 emergency began; he was called back to Mission Control specifically to lead the Command Module power-up budget calculations for re-entry.",
+        "domain": "personnel",
+        "source": {
+          "citation": "Gene Kranz, Failure Is Not an Option (2000); NASA oral history, John Aaron interview, 2000",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "cabin_temperature_lm",
+        "content": "Cabin temperature inside the Lunar Module Aquarius dropped to approximately 38°F (3°C) during the coast phase as all non-essential heaters were powered off to conserve electricity.",
+        "domain": "other",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.5; Jim Lovell and Jeffrey Kluger, Lost Moon (1994)",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "fact_id": "haise_illness_during_mission",
+        "content": "Fred Haise developed a urinary tract infection during the mission, caused in part by reduced water intake — the crew was rationed to approximately 6 ounces of water per man per day, well below the normal 32 ounces.",
+        "domain": "personnel",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Section 5.6 (Medical); NASA post-mission crew debriefing",
+          "url": null,
+          "access_note": null
+        },
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
         "fact_id": "service_module_jettison_timing",
+        "content": "The Service Module was jettisoned at 138 hours, 2 minutes Mission Elapsed Time, approximately 4 hours and 15 minutes before re-entry; the crew photographed the damage through the Command Module windows immediately after separation.",
+        "domain": "timing",
+        "source": {
+          "citation": "NASA Apollo 13 Mission Report (MSC-02680), Table 4-I; Apollo 13 Flight Journal, NASA",
+          "url": null,
+          "access_note": null
+        },
         "valid_from": null,
         "valid_until": null
       }
@@ -695,32 +720,32 @@
   "openingSituation": "",
   "review_checklist": {
     "beat_count": {
-      "notes": "",
-      "checked": false
+      "checked": false,
+      "notes": ""
     },
     "sequence_check": {
-      "notes": "",
-      "checked": false
-    },
-    "final_beat_spec": {
-      "notes": "",
-      "checked": false
-    },
-    "reviewer_summary": {
-      "notes": "",
-      "checked": false
+      "checked": false,
+      "notes": ""
     },
     "path_independence": {
-      "notes": "",
-      "checked": false
+      "checked": false,
+      "notes": ""
+    },
+    "final_beat_spec": {
+      "checked": false,
+      "notes": ""
     },
     "tense_attribution": {
-      "notes": "",
-      "checked": false
+      "checked": false,
+      "notes": ""
+    },
+    "reviewer_summary": {
+      "checked": false,
+      "notes": ""
     },
     "manual_playthrough": {
-      "notes": "",
-      "checked": false
+      "checked": false,
+      "notes": ""
     }
   },
   "historicalRealism": "high",
@@ -867,6 +892,9 @@
     "The burn is slightly off — the ship enters the re-entry corridor at the shallow edge, skipping once before catching the atmosphere; recovery is possible but the heat shield is stressed"
   ],
   "structured_endings_enabled": false,
-  "status": "published",
-  "displayOrder": 2
+  "featured": false,
+  "generationPrompt": "",
+  "image": {
+    "generation_prompt": ""
+  }
 }
