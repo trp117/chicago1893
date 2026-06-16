@@ -489,6 +489,161 @@ li { margin-bottom: 8px; }
     50%  { opacity: 1; }
     100% { opacity: 0.3; }
   }
+
+/* ══ SCENARIO REDESIGN (USE_SCENARIO_REDESIGN) ════════════════════════════════
+   ALL rules scoped to .redesign — set USE_SCENARIO_REDESIGN = false to revert.
+   No existing CSS is modified here. ========================================= */
+
+/* ── Role overlay: full-screen layout ── */
+.redesign .role-overlay { align-items: flex-start; padding: 0; }
+.redesign .role-overlay-inner {
+  max-width: 100%; width: 100%; gap: 0; align-items: center; padding-bottom: 32px;
+}
+
+/* ── Role overlay: hero image header ── */
+.redesign-role-hero { display: none; }
+.redesign .redesign-role-hero {
+  display: flex; flex-direction: column; justify-content: flex-end;
+  width: 100%; min-height: 280px; position: relative;
+  background-color: #0a0a09; background-size: cover; background-position: center 20%;
+  overflow: hidden; flex-shrink: 0; align-self: stretch;
+}
+.redesign .redesign-role-hero-gradient {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10,10,9,0) 0%, rgba(10,10,9,0.85) 70%, #0a0a09 100%);
+}
+.redesign .redesign-hero-back {
+  position: absolute; top: 16px; left: 20px; z-index: 2; margin: 0;
+}
+.redesign .redesign-role-hero-content {
+  position: relative; z-index: 1; padding: 0 24px 24px; text-align: center;
+}
+.redesign-category-label,
+.redesign-hero-title,
+.redesign-hero-premise { display: none; }
+.redesign .redesign-category-label {
+  display: block; font-family: system-ui, sans-serif; font-style: normal;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #ba7517; margin: 0 0 6px;
+}
+.redesign .redesign-hero-title {
+  display: block; font-size: 1.8rem; color: #f0eadc;
+  margin: 0 0 10px; letter-spacing: 0.01em;
+}
+.redesign .redesign-hero-premise {
+  display: block; font-family: Georgia, serif; font-style: italic;
+  font-size: 0.92rem; color: #b4b2a9; line-height: 1.65; margin: 0;
+}
+/* hide original title / tagline / desc — content lives in the hero */
+.redesign .role-overlay-inner > .back-link.overlay-back-link { display: none; }
+.redesign #overlay-title  { display: none; }
+.redesign #overlay-tagline { display: none; }
+.redesign #overlay-desc   { display: none; }
+
+/* ── Role overlay: section padding below hero — constrained + centered ── */
+/* Shared constraint: matches briefing page (680px) and in-game prose */
+.redesign .role-overlay-inner > .intro-zone,
+.redesign .role-overlay-inner > .style-zone,
+.redesign .role-overlay-inner > .role-section-label,
+.redesign .role-cards {
+  max-width: 680px; width: 100%; box-sizing: border-box;
+  padding-left: 1.5rem; padding-right: 1.5rem;
+}
+.redesign .role-overlay-inner > .intro-zone { margin-top: 12px; }
+
+/* ── Role cards: gold border accent ── */
+.redesign .role-card { border: 0.5px solid #2c2c2a; border-radius: 8px; }
+.redesign .role-card:hover { border-color: #ba7517; }
+.redesign .role-card.selected { border-color: #ba7517; background: rgba(186,117,23,0.06); }
+.redesign .role-card-name { color: #ba7517; }
+.redesign .role-card-desc { color: #888780; }
+
+/* ── In-game: typography ── */
+.redesign .scene-card {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px; line-height: 1.8; color: #d3d1c7; font-style: normal;
+}
+.redesign .scene-card p { margin-bottom: 0.9em; font-style: normal; }
+/* markupNarrative wraps every prose line in <em> — neutralise it so only inline
+   *asterisk* emphasis and the sensory-opening remain italic */
+.redesign .scene-card .line > em:only-child { font-style: normal; }
+.redesign .sensory-opening { color: #ba7517; }
+
+/* ── In-game: dialogue blocks ── */
+.redesign .line.dialogue {
+  display: block; border-left: 2px solid #2c2c2a;
+  padding-left: 1rem; margin: 0.75em 0; color: #e8e4da;
+}
+.redesign .redesign-dialogue-speaker {
+  display: block; font-family: system-ui, sans-serif;
+  font-size: 11px; font-style: normal; text-transform: uppercase;
+  letter-spacing: 0.06em; color: #888780; margin-bottom: 3px;
+}
+.redesign .redesign-dialogue-text { color: #e8e4da; font-style: normal; }
+
+/* ── In-game: location header subtitle ── */
+/* Act·time element kept in DOM but hidden — location name shows via #header-subtitle as live */
+.redesign-location-sub { display: none; }
+.redesign .redesign-location-sub { display: none; }
+/* ── In-game: header background image ── */
+.redesign .hero {
+  position: relative; background-size: cover; background-position: center; border-bottom: none;
+}
+/* heavy dark overlay — image is atmospheric texture, text must stay readable */
+.redesign .hero::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: linear-gradient(to bottom, rgba(10,10,9,0.85) 0%, rgba(10,10,9,0.95) 80%, #0a0a09 100%);
+}
+.redesign .hero > * { position: relative; z-index: 1; }
+@media (min-width: 981px) {
+  /* expand the header to show more of the image on desktop */
+  .redesign .hero { min-height: 110px; padding-bottom: 24px; }
+}
+
+/* ── In-game: chips above input (prose → chips → input) ── */
+.redesign #stream-options-dots { order: 1; }
+.redesign #choices-area-wrap   { order: 2; }
+.redesign .tools-row           { order: 3; }
+.redesign #input-form          { order: 4; }
+
+/* ── In-game: suggestion chips ── */
+.redesign .choice-btn {
+  border: 0.5px solid #2c2c2a; border-radius: 20px;
+  padding: 8px 16px; font-size: 13px;
+  background: transparent; color: #b4b2a9;
+  font-family: system-ui, sans-serif;
+  transition: border-color 0.15s, color 0.15s;
+}
+.redesign .choice-btn:hover { border-color: #ba7517; color: #ba7517; }
+
+/* ── In-game: input area ── */
+.redesign textarea {
+  background: #1a1917; border: 0.5px solid rgba(44,44,42,0.9);
+  border-radius: 6px; font-family: Georgia, 'Times New Roman', serif; color: #e8e4da;
+}
+.redesign #player-input:focus {
+  border-color: #ba7517; box-shadow: 0 0 0 2px rgba(186,117,23,0.1);
+}
+.redesign .input-actions button[type="submit"] {
+  background: #ba7517; color: #0a0a09; border: none;
+  border-radius: 6px; font-weight: 500;
+}
+.redesign .input-actions button[type="submit"]:hover { background: #d08520; }
+
+/* ── Briefing page: pull Enter button closer to text ── */
+.redesign .intro-begin-actions { margin-top: 0.5rem; }
+.redesign .streamlined-screen2-content { padding-bottom: 4px; }
+
+/* ── Narrow screens ── */
+@media (max-width: 600px) {
+  .redesign .choice-btn { border-radius: 8px; padding: 6px 12px; }
+  .redesign .redesign-role-hero { min-height: 220px; }
+}
+/* ══ END SCENARIO REDESIGN ═══════════════════════════════════════════════════ */
+
+/* TTS UI hidden — remove this block to restore narration buttons when TTS is re-enabled */
+#tts-toggle, #slim-audio-btn, #tts-bar, #tts-stop,
+#sheet-tts-btn, #intro-tts-btn { display: none !important; }
   </style>
 </head>
 <body>
@@ -501,6 +656,7 @@ li { margin-bottom: 8px; }
         <div class="header-title-stack">
           <h1 id="header-title">Investigation</h1>
           <p id="header-subtitle" class="header-subtitle"></p>
+          <p class="redesign-location-sub" id="redesign-location-sub"></p>
         </div>
         <div class="hero-controls">
           <button type="button" id="new-game-btn" class="new-game-btn">Begin Again</button>
@@ -587,6 +743,16 @@ li { margin-bottom: 8px; }
 
 <div id="role-overlay" class="role-overlay" role="dialog" aria-modal="true" aria-label="Begin investigation">
   <div class="role-overlay-inner">
+    <!-- redesign-only hero — invisible / zero-height without .redesign on body -->
+    <div id="redesign-role-hero" class="redesign-role-hero">
+      <div class="redesign-role-hero-gradient"></div>
+      <a href="/" class="back-link redesign-hero-back">&#8592; Stories</a>
+      <div class="redesign-role-hero-content">
+        <p class="redesign-category-label" id="redesign-category-label"></p>
+        <h2 class="redesign-hero-title" id="redesign-hero-title"></h2>
+        <p class="redesign-hero-premise" id="redesign-hero-premise"></p>
+      </div>
+    </div>
     <a href="/" class="back-link overlay-back-link">&#8592; Stories</a>
     <h2 id="overlay-title">Investigation</h2>
     <p class="role-intro" id="overlay-tagline"></p>
@@ -680,6 +846,11 @@ function markWorldIntroSeen() { sessionStorage.setItem(worldIntroKey, 'true'); }
 // Set to true for two-screen flow, false for original flow
 // Rollback: change this one line back to false
 const USE_STREAMLINED_ONBOARDING = true;
+
+// SCENARIO REDESIGN — cinematic role-selection + in-game styling
+// Rollback: set to false — instantly removes all redesign CSS via the .redesign class
+const USE_SCENARIO_REDESIGN = true;
+if (USE_SCENARIO_REDESIGN) document.body.classList.add('redesign');
 
 if (!SCENARIO_ID) {
   document.body.innerHTML = `<div class="error-page"><h1>No scenario selected</h1><p>Open this page with <code>?scenarioId=your_id</code> in the URL, or go back to the <a href="/" style="color:var(--accent)">admin panel</a> and use the Play button.</p></div>`;
@@ -921,6 +1092,7 @@ function updateCandleIndicator(minutesRemaining, totalMinutes) {
 function renderSidebar() {
   updateHeaderSubtitle();
   updateSlimLabel();
+  if (USE_SCENARIO_REDESIGN) updateRedesignLocationSub();
 }
 
 function prettifyId(id) {
@@ -1014,6 +1186,7 @@ function renderOutput(output, meta = {}) {
   });
 
   renderChoices(output.choices || []);
+  if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(sceneEl);
 
   const messageId = ++currentMessageId;
   lastRenderedSpeakText      = output.narrative;
@@ -1472,6 +1645,59 @@ inputEl.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); formEl.requestSubmit(); }
 });
 
+// ── Redesign helpers (USE_SCENARIO_REDESIGN) ─────────────────────────────────
+
+function applyRedesignRoleHero() {
+  const heroEl = document.getElementById('redesign-role-hero');
+  if (!heroEl || !scenario) return;
+
+  const imgUrl = scenario.image?.url || scenario.wide_image_url || scenario.image_url || null;
+  if (imgUrl) {
+    const safeUrl = `url('${imgUrl.replace(/'/g, "\\'")}')`;
+    heroEl.style.backgroundImage = safeUrl;
+    // Apply the same image to the in-game location header
+    const gameHeaderEl = document.querySelector('header.hero');
+    if (gameHeaderEl) gameHeaderEl.style.backgroundImage = safeUrl;
+  }
+
+  const catEl = document.getElementById('redesign-category-label');
+  if (catEl) {
+    const parts = [];
+    if (scenario.category) parts.push(scenario.category.toUpperCase());
+    const era = scenario.era || scenario.date || scenario.period || '';
+    if (era) parts.push(era.toUpperCase());
+    catEl.textContent = parts.join(' · ');
+  }
+
+  const heroTitleEl = document.getElementById('redesign-hero-title');
+  if (heroTitleEl) heroTitleEl.textContent = scenario.title || '';
+
+  const premiseEl = document.getElementById('redesign-hero-premise');
+  if (premiseEl) premiseEl.textContent = scenario.premise || scenario.tagline || '';
+}
+
+function updateRedesignLocationSub() {
+  const el = document.getElementById('redesign-location-sub');
+  if (!el) return;
+  if (!gameState) { el.textContent = ''; return; }
+  const act  = gameState.act || 1;
+  const mins = gameState.remainingMinutes ?? '';
+  el.textContent = `Act ${act} · ${mins} min remaining`;
+}
+
+function applyRedesignDialogueFormatting(containerEl) {
+  if (!containerEl) return;
+  containerEl.querySelectorAll('.line.dialogue').forEach(line => {
+    if (line.querySelector('.redesign-dialogue-speaker')) return;
+    const text = line.textContent || '';
+    const m = text.match(/^([^:]{1,40}):\s*([\s\S]+)$/);
+    if (!m) return;
+    const safeS = m[1].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeD = m[2].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    line.innerHTML = `<span class="redesign-dialogue-speaker">${safeS}</span><span class="redesign-dialogue-text">${safeD}</span>`;
+  });
+}
+
 // ── Load game ─────────────────────────────────────────────────────────────────
 
 async function loadGame() {
@@ -1486,6 +1712,7 @@ async function loadGame() {
     scenario           = bootstrapData.scenario;
     ttsNarrationSpeed  = scenario.tts_narration_speed ?? 1.0;
     locationsList      = bootstrapData.locations    || [];
+    if (USE_SCENARIO_REDESIGN) applyRedesignRoleHero();
 
 
     document.title = scenario.title || 'Investigation';
@@ -2496,6 +2723,8 @@ function restartGame() {
 
   const bottomBar = document.querySelector('.bottom-bar');
   if (bottomBar) { bottomBar.style.transition = ''; bottomBar.style.opacity = ''; }
+
+  if (USE_SCENARIO_REDESIGN) updateRedesignLocationSub();
 
   if (USE_STREAMLINED_ONBOARDING) {
     renderStreamlinedScreen1();
