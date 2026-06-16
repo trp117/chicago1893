@@ -11,6 +11,8 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
 
+const MODEL = 'claude-sonnet-4-6';
+
 let _anthropicClient = null;
 function getAnthropicClient(apiKey) {
   if (!_anthropicClient) _anthropicClient = new Anthropic({ apiKey });
@@ -329,7 +331,7 @@ async function generateBriefingText(scenario, role, anthropicApiKey) {
   ].filter(Boolean).join('\n');
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: 'claude-sonnet-4-6', max_tokens: 600, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+    { model: MODEL, max_tokens: 600, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
     { timeout: 60_000 }
   );
   const text = msg.content[0]?.text?.trim();
@@ -389,7 +391,7 @@ async function generateCharacterEntry(scenario, role, allRoles, anthropicApiKey)
   ].filter(Boolean).join('\n');
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: 'claude-sonnet-4-6', max_tokens: 500, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+    { model: MODEL, max_tokens: 500, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
     { timeout: 60_000 }
   );
   const text = msg.content[0]?.text?.trim();
@@ -442,7 +444,7 @@ PATTERN: "You are [name], [their role in this moment], and [what is happening to
 Maximum 20 words. One clause describing identity. One clause describing immediate situation. Nothing else. No preamble. No explanation. Just the sentence.`;
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: 'claude-sonnet-4-6', max_tokens: 120, temperature: 0.7, messages: [{ role: 'user', content }] },
+    { model: MODEL, max_tokens: 120, temperature: 0.7, messages: [{ role: 'user', content }] },
     { timeout: 30_000 }
   );
   const text = msg.content[0]?.text?.trim();
@@ -523,7 +525,7 @@ WRONG examples:
 Write only the sentence. No preamble, no explanation, no quotation marks.`;
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: 'claude-sonnet-4-6', max_tokens: 60, temperature: 0.7, messages: [{ role: 'user', content }] },
+    { model: MODEL, max_tokens: 60, temperature: 0.7, messages: [{ role: 'user', content }] },
     { timeout: 30_000 }
   );
   const text = msg.content[0]?.text?.trim();
@@ -564,7 +566,7 @@ async function generatePeriodVocabulary(scenario, characters, anthropicApiKey) {
   ].filter(Boolean).join('\n');
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+    { model: MODEL, max_tokens: 4000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
     { timeout: 90_000 }
   );
   if (msg.stop_reason === 'max_tokens') {
@@ -1236,7 +1238,7 @@ export function createAdminRouter(repos, config = {}) {
     console.log(`[GENERATE] playTime=${playTimeMinutes}min tokenBudget=${toks}`);
 
     const genTrace = langfuse?.trace({ name: 'story-generate', input: { playTimeMinutes, tokenBudget: toks } });
-    const genSpan  = genTrace?.generation({ name: 'generate', model: 'claude-sonnet-4-6', modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
+    const genSpan  = genTrace?.generation({ name: 'generate', model: MODEL, modelParameters: { max_tokens: toks, temperature: 0.7 }, input: [{ role: 'user', content: prompt.slice(0, 2000) + '…' }] });
 
     // streaming is required by the SDK for long requests; timeout covers time-to-first-chunk
     const timeoutMs = 120_000;
@@ -1245,7 +1247,7 @@ export function createAdminRouter(repos, config = {}) {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const stream = getAnthropicClient(anthropicApiKey).messages.stream(
-          { model: 'claude-sonnet-4-6', max_tokens: toks, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+          { model: MODEL, max_tokens: toks, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
           { timeout: timeoutMs, maxRetries: 0 }
         );
 
@@ -1393,7 +1395,7 @@ Return ONLY valid JSON in this exact structure:
     let text;
     try {
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-        { model: 'claude-sonnet-4-6', max_tokens: 4000, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
+        { model: MODEL, max_tokens: 4000, temperature: 0.8, messages: [{ role: 'user', content: prompt }] },
         { timeout: 120_000, maxRetries: 0 }
       );
       text = msg.content[0]?.text;
@@ -1526,7 +1528,7 @@ Return ONLY valid JSON in this exact structure:
 
     try {
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-        { model: 'claude-sonnet-4-6', max_tokens: 1000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
+        { model: MODEL, max_tokens: 1000, temperature: 0.7, messages: [{ role: 'user', content: prompt }] },
         { timeout: 60_000, maxRetries: 0 }
       );
       const text = msg.content[0]?.text?.trim();
@@ -1603,7 +1605,7 @@ Return ONLY valid JSON in this exact structure:
     try {
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
         {
-          model: 'claude-sonnet-4-6',
+          model: MODEL,
           max_tokens: 4000,
           temperature: 0.2,
           system: systemPrompt,
@@ -1710,7 +1712,7 @@ Return ONLY valid JSON in this exact structure:
     try {
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
         {
-          model: 'claude-sonnet-4-6',
+          model: MODEL,
           max_tokens: 8000,
           temperature: 0.3,
           system: systemPrompt,
@@ -2538,7 +2540,7 @@ Return JSON only:
     try {
       const msg = await getAnthropicClient(anthropicApiKey).messages.create(
         {
-          model: 'claude-sonnet-4-6',
+          model: MODEL,
           max_tokens: 1000,
           system: `You are a professional art director writing image generation prompts for a historical immersive fiction platform. You write scene descriptions that will be appended to a master technical specification and sent to an AI image generator.
 
