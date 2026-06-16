@@ -3113,6 +3113,12 @@ function renderImgPromptStudio(data) {
           <div class="img-prompt-label" style="margin-bottom:4px">Short (1800×493)</div>
           <img id="img-preview-short" class="img-preview-thumb" src="" alt="Short preview">
         </div>
+        <div>
+          <div class="img-prompt-label" style="margin-bottom:4px">Source</div>
+          <a id="img-preview-source-link" href="#" target="_blank" rel="noopener">
+            <img id="img-preview-source" src="" alt="Source image" style="width:200px;height:auto;display:block;border-radius:4px">
+          </a>
+        </div>
       </div>
       <div>
         <div class="img-prompt-label" style="margin-bottom:2px">Crop position — short banner</div>
@@ -3355,6 +3361,8 @@ function renderPreview(data, autoSaved = false) {
     const artStatusEl  = document.getElementById('img-artwork-status');
     const wideImg      = document.getElementById('img-preview-wide');
     const shortImg     = document.getElementById('img-preview-short');
+    const sourceImg    = document.getElementById('img-preview-source');
+    const sourceLink   = document.getElementById('img-preview-source-link');
     const cropSlider   = document.getElementById('img-crop-anchor');
     const fileInput    = document.getElementById('img-artwork-file-input');
     const replaceInput = document.getElementById('img-artwork-replace-input');
@@ -3369,15 +3377,19 @@ function renderPreview(data, autoSaved = false) {
       artStatusEl.textContent = msg;
       artStatusEl.style.color = type === 'error' ? 'var(--danger,#dc2626)' : type === 'success' ? 'var(--success,#16a34a)' : 'var(--text-soft)';
     }
-    function setArtPreviews(wide, short) {
+    function setArtPreviews(wide, short, source) {
       const ts = '?t=' + Date.now();
       if (wideImg)  wideImg.src  = wide  + ts;
       if (shortImg) shortImg.src = short + ts;
+      if (sourceImg && sourceLink && source) {
+        sourceImg.src  = source + ts;
+        sourceLink.href = source;
+      }
     }
 
     // Set initial UI state
     if (data.scenario?.image?.url) {
-      setArtPreviews(data.scenario.image.url, data.scenario.image.shortUrl || data.scenario.image.url);
+      setArtPreviews(data.scenario.image.url, data.scenario.image.shortUrl || data.scenario.image.url, data.scenario.image.sourceUrl);
       if (cropSlider && data.scenario.image.cropAnchor != null) cropSlider.value = data.scenario.image.cropAnchor;
       showArtState('images');
     } else {
@@ -3400,7 +3412,7 @@ function renderPreview(data, autoSaved = false) {
         if (result.error) throw new Error(result.detail || result.error);
         data.scenario = data.scenario || {};
         data.scenario.image = { ...(data.scenario.image || {}), url: result.wide, shortUrl: result.short, sourceUrl: result.source };
-        setArtPreviews(result.wide, result.short);
+        setArtPreviews(result.wide, result.short, result.source);
         showArtState('images');
         setArtStatus('Images saved.', 'success');
       } catch (err) {
