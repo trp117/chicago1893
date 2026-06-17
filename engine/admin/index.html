@@ -402,10 +402,9 @@ const ENTITIES = {
       ]},
       { title: 'Historical Record', fields: [
         { key: 'character_type', label: 'Character Type', type: 'select', options: [
-          { value: '',           label: '— not declared —' },
-          { value: 'real',       label: 'real — documented historical person' },
-          { value: 'fictional',  label: 'fictional — invented character' },
-          { value: 'composite',  label: 'composite — based on real people, not a specific individual' },
+          { value: '',           label: '— not declared (legacy only) —' },
+          { value: 'real',       label: 'real — documented historical individual' },
+          { value: 'fictional',  label: 'fictional — not a documented individual (composite, representative, or invented)' },
         ], help: 'Required for Historical Record generation.' },
         { key: 'represents', label: 'Represents', type: 'textarea', help: 'Required for fictional/composite. What category of real person this character represents — used in the Historical Record.' },
         { key: 'fact_checked', label: 'Fact Checked', type: 'select', bool: true, options: [
