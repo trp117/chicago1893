@@ -29,15 +29,19 @@ const _upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10
 const ENHANCE_A = 1.071;
 const ENHANCE_B = -6.4;
 
-async function processWide(buffer) {
+async function processWide(buffer, brightness = 100) {
+  const a = (brightness / 100) * ENHANCE_A;
+  const b = (brightness / 100) * ENHANCE_B;
   return sharp(buffer)
     .resize(1600, 900, { fit: 'cover', position: 'centre' })
-    .linear(ENHANCE_A, ENHANCE_B)
+    .linear(a, b)
     .jpeg({ quality: 85 })
     .toBuffer();
 }
 
-async function processShort(buffer, cropAnchor = 50) {
+async function processShort(buffer, cropAnchor = 50, brightness = 100) {
+  const a = (brightness / 100) * ENHANCE_A;
+  const b = (brightness / 100) * ENHANCE_B;
   const meta = await sharp(buffer).metadata();
   const targetW = 1800, targetH = 493;
   const scale   = Math.max(targetW / meta.width, targetH / meta.height);
@@ -49,7 +53,7 @@ async function processShort(buffer, cropAnchor = 50) {
   return sharp(buffer)
     .resize(newW, newH, { fit: 'fill' })
     .extract({ left: leftOff, top: topOff, width: targetW, height: targetH })
-    .linear(ENHANCE_A, ENHANCE_B)
+    .linear(a, b)
     .jpeg({ quality: 85 })
     .toBuffer();
 }
@@ -2613,7 +2617,7 @@ Return only the scene description. No preamble, no closing remarks.`,
       ]);
       const updated = {
         ...scenario,
-        image: { ...(scenario.image || {}), url: wideUrl, shortUrl, sourceUrl, cropAnchor },
+        image: { ...(scenario.image || {}), url: wideUrl, shortUrl, sourceUrl, cropAnchor, brightness: 100 },
       };
       await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
       res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl });
@@ -2628,6 +2632,7 @@ Return only the scene description. No preamble, no closing remarks.`,
     if (!scenario) return notFound(res);
     if (!scenario.image?.sourceUrl) return badRequest(res, 'No source image on file — upload first.');
     const cropAnchor = Math.max(0, Math.min(100, Number(req.body?.cropAnchor ?? 50)));
+    const brightness = Math.max(50, Math.min(150, Number(req.body?.brightness ?? scenario.image?.brightness ?? 100)));
     const id = req.params.id;
     try {
       const { data: fileData, error: dlError } = await supabase.storage
@@ -2635,17 +2640,50 @@ Return only the scene description. No preamble, no closing remarks.`,
         .download(`${id}_source.jpg`);
       if (dlError) throw dlError;
       const sourceBuffer  = Buffer.from(await fileData.arrayBuffer());
-      const shortBuffer   = await processShort(sourceBuffer, cropAnchor);
+      const shortBuffer   = await processShort(sourceBuffer, cropAnchor, brightness);
       const shortUrl      = await storageUpload(`${id}_short.jpg`, shortBuffer);
       const updated = {
         ...scenario,
-        image: { ...(scenario.image || {}), shortUrl, cropAnchor },
+        image: { ...(scenario.image || {}), shortUrl, cropAnchor, brightness },
       };
       await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
       res.json({ short: shortUrl });
     } catch (err) {
       console.error('[IMAGE-RECROP]', err.message);
       res.status(500).json({ error: 'Recrop failed', detail: err.message });
+    }
+  });
+
+  r.post('/scenarios/:id/image-reprocess', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    if (!scenario.image?.sourceUrl) return badRequest(res, 'No source image on file — upload first.');
+    const brightness = Math.max(50, Math.min(150, Number(req.body?.brightness ?? scenario.image?.brightness ?? 100)));
+    const cropAnchor = Math.max(0, Math.min(100, Number(req.body?.cropAnchor ?? scenario.image?.cropAnchor ?? 50)));
+    const id = req.params.id;
+    try {
+      const { data: fileData, error: dlError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .download(`${id}_source.jpg`);
+      if (dlError) throw dlError;
+      const sourceBuffer = Buffer.from(await fileData.arrayBuffer());
+      const [wideBuffer, shortBuffer] = await Promise.all([
+        processWide(sourceBuffer, brightness),
+        processShort(sourceBuffer, cropAnchor, brightness),
+      ]);
+      const [wideUrl, shortUrl] = await Promise.all([
+        storageUpload(`${id}_wide.jpg`, wideBuffer),
+        storageUpload(`${id}_short.jpg`, shortBuffer),
+      ]);
+      const updated = {
+        ...scenario,
+        image: { ...(scenario.image || {}), url: wideUrl, shortUrl, cropAnchor, brightness },
+      };
+      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image reprocess' });
+      res.json({ wide: wideUrl, short: shortUrl });
+    } catch (err) {
+      console.error('[IMAGE-REPROCESS]', err.message);
+      res.status(500).json({ error: 'Reprocess failed', detail: err.message });
     }
   });
 

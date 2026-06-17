@@ -3149,6 +3149,11 @@ function renderImgPromptStudio(data) {
         <input type="range" id="img-crop-anchor" min="0" max="100" value="50" class="img-crop-slider">
         <div class="img-crop-labels"><span>Top</span><span>Bottom</span></div>
       </div>
+      <div>
+        <div class="img-prompt-label" style="margin-bottom:2px">Brightness &nbsp;<span id="img-brightness-value" style="font-weight:normal;color:var(--text-soft)">100%</span></div>
+        <input type="range" id="img-brightness" min="50" max="150" value="100" step="5" class="img-crop-slider">
+        <div class="img-crop-labels"><span>Darker</span><span>Brighter</span></div>
+      </div>
       <div class="img-artwork-actions">
         <button class="btn-img-delete" type="button" id="btn-img-delete">Delete images</button>
         <label class="btn-img-replace">Replace
@@ -3387,7 +3392,9 @@ function renderPreview(data, autoSaved = false) {
     const shortImg     = document.getElementById('img-preview-short');
     const sourceImg    = document.getElementById('img-preview-source');
     const sourceLink   = document.getElementById('img-preview-source-link');
-    const cropSlider   = document.getElementById('img-crop-anchor');
+    const cropSlider      = document.getElementById('img-crop-anchor');
+    const brightnessSlider = document.getElementById('img-brightness');
+    const brightnessValueEl = document.getElementById('img-brightness-value');
     const fileInput    = document.getElementById('img-artwork-file-input');
     const replaceInput = document.getElementById('img-artwork-replace-input');
 
@@ -3415,6 +3422,9 @@ function renderPreview(data, autoSaved = false) {
     if (data.scenario?.image?.url) {
       setArtPreviews(data.scenario.image.url, data.scenario.image.shortUrl || data.scenario.image.url, data.scenario.image.sourceUrl);
       if (cropSlider && data.scenario.image.cropAnchor != null) cropSlider.value = data.scenario.image.cropAnchor;
+      const savedBrightness = data.scenario.image.brightness ?? 100;
+      if (brightnessSlider) brightnessSlider.value = savedBrightness;
+      if (brightnessValueEl) brightnessValueEl.textContent = savedBrightness + '%';
       showArtState('images');
     } else {
       showArtState('upload');
@@ -3495,11 +3505,48 @@ function renderPreview(data, autoSaved = false) {
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
           data.scenario.image.shortUrl = result.short;
+          data.scenario.image.cropAnchor = anchor;
           if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
           setArtStatus('Crop updated.', 'success');
         } catch (err) {
           if (shortImg) shortImg.style.opacity = '1';
           setArtStatus('Recrop failed: ' + err.message, 'error');
+        }
+      }, 500);
+    });
+
+    brightnessSlider?.addEventListener('input', () => {
+      if (brightnessValueEl) brightnessValueEl.textContent = brightnessSlider.value + '%';
+    });
+
+    let _brightnessTimer;
+    brightnessSlider?.addEventListener('input', () => {
+      clearTimeout(_brightnessTimer);
+      _brightnessTimer = setTimeout(async () => {
+        if (!data.scenario?.image?.sourceUrl) return;
+        const brightnessVal = parseInt(brightnessSlider.value, 10);
+        const cropAnchor    = parseInt(cropSlider?.value ?? '50', 10);
+        if (wideImg)  wideImg.style.opacity  = '0.5';
+        if (shortImg) shortImg.style.opacity = '0.5';
+        setArtStatus('Adjusting brightness…');
+        try {
+          const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image-reprocess`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ brightness: brightnessVal, cropAnchor }),
+          });
+          const result = await resp.json();
+          if (result.error) throw new Error(result.detail || result.error);
+          data.scenario.image.url        = result.wide;
+          data.scenario.image.shortUrl   = result.short;
+          data.scenario.image.brightness = brightnessVal;
+          if (wideImg)  { wideImg.src  = result.wide  + '?t=' + Date.now(); wideImg.style.opacity  = '1'; }
+          if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
+          setArtStatus('Brightness updated.', 'success');
+        } catch (err) {
+          if (wideImg)  wideImg.style.opacity  = '1';
+          if (shortImg) shortImg.style.opacity = '1';
+          setArtStatus('Brightness update failed: ' + err.message, 'error');
         }
       }, 500);
     });
