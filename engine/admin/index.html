@@ -1420,6 +1420,9 @@ async function handleGenerate() {
     return;
   }
 
+  // Preserve the source narrative on the scenario record
+  generated.scenario.generationPrompt = description;
+
   // Auto-save immediately so Play works without any extra step
   let autoSaved = false;
   try {
