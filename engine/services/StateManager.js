@@ -54,6 +54,8 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
     : (scenario.sessionTargetMinutes || 15);
   next.elapsedMinutes  += advance;
   next.remainingMinutes = Math.max(0, sessionTarget - next.elapsedMinutes);
+  next.turnCount   = (currentState.turnCount   || 0) + 1;
+  next.turnsAtZero = next.remainingMinutes <= 0 ? (currentState.turnsAtZero || 0) + 1 : 0;
 
   if (typeof modelOutput.location === 'string' && modelOutput.location) {
     next.location = modelOutput.location;

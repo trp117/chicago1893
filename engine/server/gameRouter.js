@@ -824,7 +824,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const prompt = composeTurnPrompt(state, playerInput, gameData);
 
-      const isEndingTurn  = !!(state.finalAccusation || state.remainingMinutes <= 0);
+      const isEndingTurn  = state.remainingMinutes <= 0;
       const endingSignals = checkEndingReadiness(state, scenario);
       const mightEnd      = endingSignals.readyForClimax;
       const isLateGame    = (state.remainingMinutes <= 7 && state.remainingMinutes > 0) || state.elapsedMinutes >= (scenario.sessionTargetMinutes * 0.75);
@@ -908,15 +908,9 @@ Do not open with the historical context. Open inside the character's body. Let t
             stateChanges: {},
             location:     state.location,
             endState: {
-              isEnding:                true,
-              result:                  'failure',
-              scene:                   text,
-              situationSummary:        (scenario?.partialSuccessExamples || [])[0] || 'The session ended as time expired.',
-              whatPlayerDiscovered:    'No formal conclusion was reached.',
-              outcome:                 (scenario?.failConditions || [])[0] || 'Time expired.',
-              playerContribution:      'The investigation could not be completed in the time available.',
-              authorityResponse:       scenario?.coreSystems?.failureAuthorityQuote || 'Time has run out.',
-              correctSuspectIdentified: false,
+              isEnding: true,
+              outcome:  'session_complete',
+              scene:    text,
             },
           };
         }
@@ -1023,7 +1017,6 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const prevAct = state.act || 1;
       let nextState = mergeState(state, output, scenario, clues, playerInput);
-      if (state.finalAccusation) nextState.remainingMinutes = 0;
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
@@ -1033,31 +1026,24 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       // Prevent LLM-generated endings before the FINAL arc threshold (80% elapsed)
-      if (arcPosition !== 'final' && !state.finalAccusation) {
+      if (arcPosition !== 'final' && nextState.remainingMinutes > 0) {
         if (output.endState?.isEnding) {
           console.log(`[ARC GUARD] arcPosition=${arcPosition} — suppressed premature isEnding`);
           output.endState.isEnding = false;
         }
       }
 
-      if (state.finalAccusation && !output.endState?.isEnding) {
-        const failCond = (scenario.failConditions || [])[0] || 'The investigation ends inconclusively.';
-        output.endState = {
-          isEnding: true, result: 'failure',
-          scene: `Time has run out. ${failCond}`,
-          situationSummary: (scenario.partialSuccessExamples || [])[0] || 'The session ended before the situation was fully resolved.',
-          whatPlayerDiscovered: 'No conclusion was reached in time.',
-          outcome: (scenario.failConditions || [])[0] || 'The case remains unresolved.',
-          playerContribution: 'The investigation could not be completed in the time available.',
-          authorityResponse: scenario.coreSystems?.failureAuthorityQuote || 'We ran out of time.',
-          correctSuspectIdentified: false
-        };
+      // Hard enforcement: if time has been at zero for 3+ turns and the model hasn't
+      // closed, force it — this should not normally fire
+      if (nextState.turnsAtZero >= 3 && !output.endState?.isEnding) {
+        console.log(`[CLOSING ENFORCE] turnsAtZero=${nextState.turnsAtZero} — forcing session close`);
+        output.endState = { isEnding: true, outcome: 'session_complete' };
       }
 
       if (output.endState?.isEnding) {
         output.endState.performance = {
           timeRemaining: nextState.remainingMinutes,
-          result:        output.endState.result || 'failure'
+          turnsPlayed:   nextState.turnCount || 0,
         };
       }
 
@@ -1080,10 +1066,10 @@ Do not open with the historical context. Open inside the character's body. Let t
         ];
         if (output.endState?.isEnding) {
           const p = output.endState.performance || {};
-          chunk.push(`## Ending — ${(output.endState.result || 'unknown').toUpperCase()}`);
+          chunk.push(`## Session Close`);
           chunk.push(``);
-          chunk.push(`**Result:** ${output.endState.result || '—'}`);
           chunk.push(`**Time remaining:** ${p.timeRemaining ?? '?'} min`);
+          chunk.push(`**Turns played:** ${p.turnsPlayed ?? '?'}`);
           chunk.push(``);
         }
         chunk.push(`---`);
@@ -1272,7 +1258,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       closingPrompt = [
         'You are writing the closing interior prose for a historical interactive fiction session.',
         `Character: ${role.name || roleId}`,
-        `Ending type: ${endResult}`,
+        `Ending type: session close`,
         '',
         'ENDING NOTES — ground your prose specifically in these details:',
         `What happened: ${notes.what_happened}`,

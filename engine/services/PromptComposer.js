@@ -679,12 +679,26 @@ function buildVerifiedFactsBlock(state) {
   ].join('\n');
 }
 
-export function checkEndingReadiness(state, scenario) {
-  const essentialBeatsComplete = state.essentialBeatsComplete === true;
-  const isLateTurn             = (state.remainingMinutes ?? 0) <= 5 || state.finalAccusation;
+export function checkEndingReadiness(state) {
   return {
-    readyForClimax: essentialBeatsComplete || isLateTurn,
+    readyForClimax: (state.remainingMinutes ?? 0) <= 5,
+    turnsAtZero:    state.turnsAtZero || 0,
   };
+}
+
+function buildClosingInstruction(state) {
+  const remaining   = state.remainingMinutes ?? 0;
+  const turnsAtZero = state.turnsAtZero || 0;
+  if (remaining <= 0) {
+    if (turnsAtZero >= 1) {
+      return '⚠️ FINAL TURN (REQUIRED): The session must end now. Write one last physical moment — a sensation, a sound, the weight of what is still unresolved. Do not resolve the historical situation. Do not evaluate success or failure. Do not introduce anything new. End in the middle of the moment. You MUST set isEnding to true in your response. The session cannot continue past this turn.';
+    }
+    return '⚠️ FINAL TURN: Write one last moment — a physical sensation, a sound, an unresolved weight. Do not resolve the historical situation. Do not evaluate success or failure. End in the middle of the moment. You MUST set isEnding to true in your response.';
+  }
+  if (remaining <= 5) {
+    return 'The session is approaching its final moments. Begin drawing the current scene toward a natural resting point. Do not introduce new characters, new locations, or new dramatic threads. The existing tension carries the scene.';
+  }
+  return '';
 }
 
 export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues }) {
@@ -695,10 +709,6 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
 
   const refContext    = buildReferenceContext(playerInput, state, locations);
   const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
-
-  const finalAccusationNote = state.finalAccusation
-    ? '\n\n⚠️ FINAL ACCUSATION: The player has chosen to end the investigation and make their final accusation. This is their last move. You MUST return endState with isEnding: true. Evaluate as strong/partial/weak based on the player\'s reasoning and what they have observed.'
-    : '';
 
   // Replace raw minute count with period-appropriate time language
   const { remainingMinutes, ...stateRest } = state;
@@ -724,5 +734,6 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
-    .replace('{{PLAYER_INPUT}}',           resolvedInput + finalAccusationNote);
+    .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state))
+    .replace('{{PLAYER_INPUT}}',           resolvedInput);
 }
