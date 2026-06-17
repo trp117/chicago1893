@@ -888,15 +888,36 @@ async function renderDashboard() {
 
   const _statusCounts = { all: scenarios.length };
   scenarios.forEach(s => { const st = s.status || 'draft'; _statusCounts[st] = (_statusCounts[st] || 0) + 1; });
+
+  const _activeFilter = sessionStorage.getItem('admin-scenario-filter') || 'all';
+
+  const _STATUS_ORDER = { draft: 0, published: 1, hidden: 2, archived: 3 };
+  const _getUpdatedAt = s => s.updatedAt || s.updated_at || s.version || null;
+  const sortedScenarios = [...scenarios].sort((a, b) => {
+    const sa = a.status || 'draft', sb = b.status || 'draft';
+    const oa = _STATUS_ORDER[sa] ?? 99, ob = _STATUS_ORDER[sb] ?? 99;
+    if (oa !== ob) return oa - ob;
+    if (sa === 'published') {
+      if (b.featured && !a.featured) return 1;
+      if (a.featured && !b.featured) return -1;
+      return (a.displayOrder ?? 9999) - (b.displayOrder ?? 9999);
+    }
+    const ta = _getUpdatedAt(a), tb = _getUpdatedAt(b);
+    if (ta && tb) return tb > ta ? 1 : tb < ta ? -1 : 0;
+    if (ta) return -1;
+    if (tb) return 1;
+    return (a.title || a.id).localeCompare(b.title || b.id);
+  });
+
   const _filterRow = `<div id="scenario-filter-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-    ${[['all','All'],['draft','Draft'],['published','Published'],['hidden','Hidden'],['archived','Archived']].map(([st,lbl]) => `<button class="scenario-filter-btn${st==='all'?' active':''}" data-filter="${st}">${lbl} (${_statusCounts[st]||0})</button>`).join('')}
+    ${[['all','All'],['draft','Draft'],['published','Published'],['hidden','Hidden'],['archived','Archived']].map(([st,lbl]) => `<button class="scenario-filter-btn${st===_activeFilter?' active':''}" data-filter="${st}">${lbl} (${_statusCounts[st]||0})</button>`).join('')}
   </div>`;
 
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
     ${_filterRow}
-    <div class="scenario-cards">${scenarios.map(s => `
-      <div class="scenario-play-card" data-scenario="${s.id}" data-status="${s.status || 'draft'}" style="flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
+    <div class="scenario-cards">${sortedScenarios.map(s => `
+      <div class="scenario-play-card" data-scenario="${s.id}" data-status="${s.status || 'draft'}" style="${_activeFilter !== 'all' && (s.status || 'draft') !== _activeFilter ? 'display:none;' : ''}flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
           <div class="scenario-play-card-info" style="display:flex;align-items:center;gap:8px;min-width:0;">
             <span class="health-dot checking" title="Checking health…"></span>
@@ -984,6 +1005,7 @@ async function renderDashboard() {
       document.querySelectorAll('.scenario-filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
+      sessionStorage.setItem('admin-scenario-filter', filter);
       document.querySelectorAll('.scenario-play-card').forEach(card => {
         card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
       });
