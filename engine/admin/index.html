@@ -4437,6 +4437,450 @@ document.querySelector('.nav-link[data-view="review"]')
 renderDashboard();
 
 // ═══════════════════════════════════════════════════════════════
+// REVIEW PROMPTS — canonical, scenario-agnostic, section-keyed.
+// Static text served for copy only (never executed / sent to an API here).
+// FIELD conventions are load-bearing (beat slugs not ordinals; no "behavior"
+// field; <id>.<field>, fact_id) — must match the committed resolver. Verbatim.
+// ═══════════════════════════════════════════════════════════════
+const REVIEW_PROMPTS = {
+  generic: `Review this for historical accuracy and consistency. For every correction needed, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [section name]
+FIELD: [exact locator — see conventions below]
+CURRENT: [the stored text, copied verbatim — exact bytes, not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [citation if applicable]
+---END---
+
+If nothing needs correcting in a section: ---CONFIRMED: [section name]---
+
+FIELD locator conventions:
+- Characters: <character_id>.<field> (publicFace, voice, fear, description, knowledge, privateGoal, trustLogic, secrets — no "behavior" field)
+- Player Roles: <role_id>.<field> (character_hooks, startingKnowledge, briefing, inventory, openingChoices, perspective)
+- Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
+- Technical Facts: <fact_id>
+- Locations / Clues: <id>.<field>
+- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- Period Vocabulary: category name + the exact term
+- Epilogue: <character_id> for fates; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+
+Rules:
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- A character outcome means in-event fate, not lifespan.
+- Prefer cutting an unsourced specific to inventing a citation for it.`,
+
+  opening: `Review the OPENING SCENE of this interactive historical fiction scenario for historical accuracy and internal consistency. This includes the WORLD / STAKES / SCENE / ENTRY framing and each player role's opening narrative.
+
+Check:
+- Every factual claim in the world-setting framing (dates, units, geography, the strategic situation) against primary sources.
+- Each role's opening narrative for anachronism, invented specifics presented as fact, and physical/technical detail accuracy.
+- Consistency between the opening's stated facts (times, distances, conditions) and the rest of the scenario.
+- That the historical situation is set up as it actually was, not as a dramatized version asserting undocumented detail as fact.
+
+FIELD locator for this section: <role_id>.opening for a role's opening narrative; openingSituation or the named framing block otherwise.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Opening Scene
+FIELD: [the locator per above]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Opening Scene---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE OPENING SCENE DATA HERE]`,
+
+  roles: `Review the PLAYER ROLES for historical accuracy and internal consistency — briefings, perspectives, character hooks, starting knowledge, opening choices, and inventory. These fields carry factual and technical claims that are easy to overlook.
+
+Check:
+- Every factual claim in character_hooks and startingKnowledge (technical figures, unit attachments, equipment, thresholds, dates) against primary sources — these assert specifics that must be verifiable.
+- Anachronism in perspective and briefing text.
+- Inventory items for period and unit accuracy (weapons, equipment, documents).
+- Opening choices for plausibility against the historical situation.
+- For roles based on real figures: consistency with the documented person (rank, role, what they could have known).
+
+FIELD locator for this section: <role_id>.<field> — where field is one of: character_hooks, startingKnowledge, briefing, inventory, openingChoices, perspective, opening, description, suggested_secret.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Player Roles
+FIELD: [the locator per above]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Player Roles---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE PLAYER ROLES DATA HERE]`,
+
+  gameplay: `Review the WIN CONDITIONS, FAIL CONDITIONS, PARTIAL SUCCESS EXAMPLES, and PRESSURE EVENTS for historical accuracy and internal consistency.
+
+Check:
+- That win/fail thresholds and deadlines are consistent with the documented historical outcome and with the scenario's own Technical Facts (e.g. a stated departure or H-Hour time must match across gameplay and technical facts — flag any contradiction).
+- Every factual claim embedded in a pressure event (timings, unit actions, casualty figures, equipment behavior) against sources.
+- Internal consistency: a partial-success example must not contradict the fixed macro-outcome.
+- Any number that appears in more than one section (casualties, times) must reconcile.
+
+FIELD locator for this section: the exact condition or pressure-event text, quoted verbatim.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Win Conditions / Gameplay
+FIELD: [the exact condition or pressure-event text]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Win Conditions / Gameplay---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE WIN/FAIL CONDITIONS AND PRESSURE EVENTS DATA HERE]`,
+
+  storyarc: `Review the STORY ARC — acts and beats — for historical accuracy and internal consistency.
+
+Check:
+- Each beat's factual and timing claims against primary sources.
+- The sequence: beats must be in plausible chronological/causal order and consistent with the documented event.
+- Any specific time, figure, or unit action asserted in a beat description.
+- That dramatized beats don't assert undocumented specifics as established fact.
+
+FIELD locator for this section: <beat_slug>.description — use the beat's descriptive slug id (e.g. the_artillery_commander). NEVER use an ordinal like beat_3 — beats have no ordinal ids and an ordinal will not resolve.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Story Arc
+FIELD: <beat_slug>.description
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Story Arc---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE STORY ARC DATA HERE]`,
+
+  characters: `Review the CHARACTERS (non-player) for historical accuracy and internal consistency — public face, voice, fear, description, knowledge, goals.
+
+Check:
+- For real historical figures: rank, role, affiliation, and what they plausibly knew must match the record.
+- For composite/fictional characters: that they're plausible for the time, place, unit, and role, with no anachronism.
+- Knowledge entries for factual accuracy (what this person could actually have known).
+- Internal consistency with the roles, clues, and epilogue that reference each character.
+
+FIELD locator for this section: <character_id>.<field> — where field is one of: publicFace, voice, fear, description, knowledge, privateGoal, trustLogic, secrets. There is NO "behavior" field.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Characters
+FIELD: <character_id>.<field>
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Characters---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE CHARACTERS DATA HERE]`,
+
+  locations: `Review the LOCATIONS for historical and physical accuracy.
+
+Check:
+- Geographic, architectural, and physical detail against the documented setting.
+- Period accuracy of described features and atmospheric detail.
+- Consistency with distances/positions stated elsewhere in the scenario.
+
+FIELD locator for this section: <location_id>.<field>.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Locations
+FIELD: <location_id>.<field>
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Locations---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented detail is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or distance appearing in more than one place must reconcile.
+
+DATA TO REVIEW:
+[PASTE LOCATIONS DATA HERE]`,
+
+  clues: `Review the CLUES for historical accuracy and internal consistency.
+
+Check:
+- Every factual claim embedded in each clue (documents, testimony, physical/technical detail) against sources.
+- That a clue describing a real document or fact is accurate to the record.
+- Consistency between each clue and the characters/roles it implicates.
+
+FIELD locator for this section: <clue_id>.<field>.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Clues
+FIELD: <clue_id>.<field>
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Clues---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Documented vs dramatized: flag any place where invented detail is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any claim appearing in more than one place must reconcile.
+
+DATA TO REVIEW:
+[PASTE CLUES DATA HERE]`,
+
+  vocabulary: `Review the PERIOD VOCABULARY for historical authenticity. Check EACH TERM individually — do not pass the section as a block.
+
+Check:
+- Each term must be verifiable as period-and-place-appropriate. Flag any term that cannot be sourced as actually in use.
+- Flag invented or speculative terms, especially in culturally specific registers (e.g. claimed indigenous or unit-specific dialect) — an unsourced "authentic-sounding" term is a liability, not a feature.
+- Each definition for accuracy.
+- Prefer cutting an unverifiable term to keeping it.
+
+FIELD locator for this section: the category name + the exact term, quoted verbatim.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Period Vocabulary
+FIELD: [category name + the exact term]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Period Vocabulary---
+If you cannot verify a claim: ---UNVERIFIED: [term]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Prefer cutting an unverifiable term to inventing a source for it.
+- An unsourced "authentic-sounding" term is a liability, not a feature — flag it.
+
+DATA TO REVIEW:
+[PASTE PERIOD VOCABULARY DATA HERE]`,
+
+  techfacts: `Review the TECHNICAL FACTS for accuracy and source quality. Each fact carries a primary-source citation.
+
+Check:
+- Each fact's content against its cited source and against the broader record (figures, timings, specifications).
+- Source quality: flag any fact whose citation is weak, missing, or doesn't support the claim — prefer an empty citation to an uncertain one.
+- Consistency: a technical fact (e.g. a departure time) must not contradict the gameplay or story-arc use of the same fact.
+
+FIELD locator for this section: <fact_id> (e.g. h_hour_cantigny_28_may_1918).
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Technical Facts
+FIELD: <fact_id>
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Technical Facts---
+If you cannot verify a claim: ---UNVERIFIED: [fact_id]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Prefer an empty citation to an uncertain one — flag any fact whose source doesn't support it.
+- Internal consistency: a fact must not contradict the same figure used elsewhere in the scenario.
+
+DATA TO REVIEW:
+[PASTE TECHNICAL FACTS DATA HERE]`,
+
+  epilogue: `Review the HISTORICAL EPILOGUE DATA. Check each of the five sub-sections SEPARATELY — Character Fates, Immediate Outcome, Historical Frame, Open Threads, Choice Echoes — for historical accuracy and internal consistency. Do not pass the epilogue as a single block.
+
+CHARACTER FATES — check each fate:
+- The outcome reflects the IN-EVENT fate (survived/died DURING the depicted event), NOT lifespan. A documented survivor of the event is "survived" even if they died years later; later death belongs in the historical-record text, not the outcome field.
+- For documented figures: the fate matches the record (do not let a documented survivor be described as dying in-event).
+- For record-silent figures: "unknown" is honest and correct — do not invent a fate.
+
+IMMEDIATE OUTCOME — the summary and key facts match the documented result; figures (casualties, timings) reconcile with the Technical Facts.
+
+HISTORICAL FRAME — each framing claim is accurate and sourced.
+
+OPEN THREADS — each "not documented in surviving records" claim is genuinely true; flag any that overstate or understate what the record contains.
+
+CHOICE ECHOES — each echo is historically accurate and does not narrate invented player action as documented fact.
+
+FIELD locator for this section: <character_id> for fates; immediate_outcome.summary or the exact fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads and echoes.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [Character Fates / Immediate Outcome / Historical Frame / Open Threads / Choice Echoes]
+FIELD: [the locator per above]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If a sub-section is fully accurate: ---CONFIRMED: [sub-section name]---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- In-event, not lifespan: an outcome is what happened during the depicted event, not whether the person is alive today.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — role and fate must match history.
+
+DATA TO REVIEW:
+[PASTE EPILOGUE DATA HERE]`,
+
+  allstory: `Review this COMPLETE interactive historical fiction scenario for historical accuracy and internal consistency. Check every section against primary sources: Opening Scene, Player Roles, Win/Fail Conditions and Pressure Events, Story Arc, Characters, Locations, Clues, Period Vocabulary, Technical Facts, and the Epilogue (Character Fates, Immediate Outcome, Historical Frame, Open Threads, Choice Echoes — each checked separately).
+
+Apply, for each section, the checks appropriate to it:
+- factual claims (dates, units, figures, equipment, geography) verified against primary sources;
+- anachronism and invented-specifics-as-fact flagged;
+- period vocabulary checked term-by-term, with unsourced/invented terms flagged (especially culturally specific registers);
+- character fates checked as IN-EVENT outcome, not lifespan; documented survivors never described as dying in-event; record-silent figures left "unknown";
+- real figures bound to the documented record (rank, role, fate).
+
+THEN perform the cross-section consistency pass — the checks no single-section review can do:
+- Every number that appears in more than one section must reconcile: casualty figures (immediate outcome vs technical facts vs character-fate notes), times and deadlines (gameplay win/fail vs technical facts vs story arc), distances and positions.
+- A deadline or time stated in the gameplay must match the same time in the Technical Facts and Story Arc.
+- Characters referenced across roles, clues, and epilogue must be consistent — and present. Flag any character referenced in clues or roles but missing from the Characters list, or vice versa.
+- The fixed macro-outcome must be consistent everywhere it's stated.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: [the section the correction belongs to]
+FIELD: [the locator — see conventions below]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+FIELD locator conventions by section:
+- Characters: <character_id>.<field> (fields: publicFace, voice, fear, description, knowledge, privateGoal, trustLogic, secrets — there is no "behavior" field)
+- Player Roles: <role_id>.<field> (character_hooks, startingKnowledge, briefing, inventory, openingChoices, perspective, opening, description)
+- Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
+- Technical Facts: <fact_id>
+- Locations / Clues: <id>.<field>
+- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- Period Vocabulary: category name + the exact term
+- Epilogue: <character_id> for fates; immediate_outcome.summary or fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+
+If a section is fully accurate: ---CONFIRMED: [section name]---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- In-event, not lifespan: a character outcome is what happened during the depicted event, not lifespan.
+- Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
+- Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
+- Internal consistency: any number, date, or time appearing in more than one place must reconcile.
+- Real figures are bound by the record — rank, role, and fate must match history.
+
+DATA TO REVIEW:
+[PASTE THE COMPLETE SCENARIO DATA HERE]`,
+};
+
+// Picker swaps the displayed prompt via textContent (never innerHTML — the FIELD
+// tokens contain <angle brackets> that HTML parsing would mangle).
+function selectReviewPrompt(sel) {
+  const el = document.getElementById('correction-prompt-text');
+  if (el) el.textContent = REVIEW_PROMPTS[sel.value] || REVIEW_PROMPTS.generic;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // AI RESPONSE INJECTOR PANEL
 // ═══════════════════════════════════════════════════════════════
 function buildAIPanel(scenarioId) {
@@ -4450,21 +4894,23 @@ function buildAIPanel(scenarioId) {
   </div>
 
   <div id='ai-tab-corrections'>
-    <p style='font-size:12px;color:var(--text-muted);margin:0 0 8px'>Paste the full Gemini or ChatGPT correction response below. Use this prompt when asking for corrections:</p>
+    <p style='font-size:12px;color:var(--text-muted);margin:0 0 8px'>Paste the full Gemini or ChatGPT correction response below. Pick a section to load its tailored review prompt:</p>
+    <select id='review-prompt-section' onchange='selectReviewPrompt(this)' style='width:100%;padding:6px 8px;border:1px solid var(--border-color);border-radius:6px;font-size:12px;margin-bottom:8px'>
+      <option value='generic' selected>Generic (any section)</option>
+      <option value='opening'>Opening Scene</option>
+      <option value='roles'>Player Roles</option>
+      <option value='gameplay'>Win/Fail &amp; Gameplay</option>
+      <option value='storyarc'>Story Arc</option>
+      <option value='characters'>Characters</option>
+      <option value='locations'>Locations</option>
+      <option value='clues'>Clues</option>
+      <option value='vocabulary'>Period Vocabulary</option>
+      <option value='techfacts'>Technical Facts</option>
+      <option value='epilogue'>Epilogue</option>
+      <option value='allstory'>All-Story (first-pass sweep)</option>
+    </select>
     <div style='background:var(--bg-secondary,#f5f5f5);border:1px solid var(--border-color);border-radius:6px;padding:10px;margin-bottom:12px;position:relative'>
-      <pre id='correction-prompt-text' style='font-size:11px;color:var(--text-muted);white-space:pre-wrap;margin:0;line-height:1.5'>Review this for historical accuracy and consistency. For every correction needed, use EXACTLY this format — no prose between corrections:
-
----CORRECTION---
-SECTION: [section name]
-FIELD: [field name or ID]
-CURRENT: [exact current text]
-REPLACE WITH: [complete replacement text]
-REASON: [one sentence]
-SOURCE: [citation if applicable]
----END---
-
-If nothing needs correcting in a section, write:
----CONFIRMED: [section name]---</pre>
+      <pre id='correction-prompt-text' style='font-size:11px;color:var(--text-muted);white-space:pre-wrap;margin:0;line-height:1.5'></pre>
       <button onclick='copyPrompt("correction-prompt-text")' style='position:absolute;top:8px;right:8px;padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Copy</button>
     </div>
     <textarea id='corrections-paste' placeholder='Paste Gemini or ChatGPT response here...' style='width:100%;height:160px;padding:10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px'></textarea>
@@ -4532,6 +4978,9 @@ async function initAIPanel(scenarioId) {
   window._aiPanelScenarioId = scenarioId;
   window._aiDiffs = [];
   window._aiEndingNotes = null;
+  // Default the section picker's prompt box to Generic (textContent, not innerHTML).
+  const ps = document.getElementById('correction-prompt-text');
+  if (ps) ps.textContent = REVIEW_PROMPTS.generic;
   loadVersionHistory(scenarioId);
 }
 
