@@ -2961,12 +2961,20 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push(indent(ep.immediate_outcome.summary));
       if (ep.immediate_outcome.key_facts?.length) {
         out.push(''); out.push('  KEY FACTS');
-        ep.immediate_outcome.key_facts.forEach(f => out.push(`    • ${f}`));
+        ep.immediate_outcome.key_facts.forEach(f => {
+          const t = typeof f === 'string' ? f : (f?.text || '');
+          const s = (f && typeof f === 'object' && f.source) ? `  [${f.source}]` : '';
+          if (t) out.push(`    • ${t}${s}`);
+        });
       }
     }
     if (ep.historical_frame?.length) {
       out.push(''); out.push('HISTORICAL FRAME');
-      ep.historical_frame.forEach(f => out.push(indent(`• ${f}`)));
+      ep.historical_frame.forEach(f => {
+        const t = typeof f === 'string' ? f : (f?.text || '');
+        const s = (f && typeof f === 'object' && f.source) ? `  [${f.source}]` : '';
+        if (t) out.push(indent(`• ${t}${s}`));
+      });
     }
     if (ep.open_threads?.length) {
       out.push(''); out.push('OPEN THREADS');
@@ -4557,7 +4565,9 @@ function parseCorrections(scenarioId) {
   while ((match = regex.exec(raw)) !== null) {
     const block = match[1].trim();
     const get = (label) => {
-      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z ]*:|$)');
+      // Terminate a field only at a KNOWN label line, so a body containing an
+      // internal label-like line (e.g. "NOTE:") isn't silently truncated.
+      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n(?:SECTION|FIELD|CURRENT|REPLACE WITH|REASON|SOURCE):|$)');
       const m = block.match(re);
       return m ? m[1].trim() : '';
     };
@@ -4693,75 +4703,180 @@ async function applyCorrections(scenarioId) {
   if (accepted.length === 0) return toast('No accepted corrections to apply', 'error');
   try {
     const data = await apiFetch('GET', '/scenarios/' + scenarioId + '/full');
-    let applied = 0, missed = 0;
+    const results = [];
+    let appliedCount = 0;
     for (const d of accepted) {
-      if (!d.current) {
-        console.warn('[IMPORT] skipped — no CURRENT text for field: ' + d.field);
-        missed++;
-        continue;
-      }
-      const count = applyFieldCorrection(data, d.current, d.replacewith);
-      if (count === 0) {
-        console.warn('[IMPORT] not applied — CURRENT text not found: ' + d.current.slice(0, 60));
-        missed++;
-      } else {
-        if (count > 1) console.warn('[IMPORT] applied to ' + count + ' locations for: ' + d.current.slice(0, 60));
-        applied++;
-      }
+      const res = resolveAndApply(data, d);
+      results.push({ section: d.section, field: d.field, current: d.current, ...res });
+      if (res.outcome === 'applied') appliedCount++;
     }
-    await apiPost('/generate/save', data);
-    await apiPost('/pipeline/snapshot/' + scenarioId, {
-      label: 'corrections_applied',
-      pipeline_step: 'manual_correction',
-      changes_applied: applied
-    });
-    const msg = missed > 0
-      ? applied + ' correction(s) applied, ' + missed + ' not found (check console)'
-      : applied + ' correction(s) applied and saved';
-    toast(msg, missed > 0 ? 'warning' : 'success');
-    window._aiDiffs = [];
-    renderScenarioEditor(scenarioId);
+    if (appliedCount > 0) {
+      // Preserve read-ground-truth → edit → dual-write: /generate/save writes local + Supabase.
+      await apiPost('/generate/save', data);
+      await apiPost('/pipeline/snapshot/' + scenarioId, {
+        label: 'corrections_applied',
+        pipeline_step: 'manual_correction',
+        changes_applied: appliedCount
+      });
+    }
+    renderInjectionResults(results, appliedCount);
   } catch (err) {
     toast(err.message, 'error');
   }
 }
 
-function applyFieldCorrection(obj, current, replacewith) {
-  if (!current) return 0;
-  const normalizeWs = s => s.replace(/\s+/g, ' ').trim();
-  const normCurrent = normalizeWs(current);
-  let count = 0;
+// ── FIELD-scoped, CURRENT-verified correction resolver ──────────────────────────
+// Locate by FIELD (id[.subfield]) → fall back to SECTION scope → verify with CURRENT
+// → replace ONLY the single resolved field. No tree-wide replacement (kills over-apply);
+// every correction returns an explicit outcome (applied / field-not-found /
+// current-mismatch / ambiguous), surfaced in the UI rather than a toast count.
 
-  function visit(node) {
-    if (Array.isArray(node)) {
-      node.forEach((item, i) => {
-        if (typeof item === 'string') {
-          if (normalizeWs(item).includes(normCurrent)) {
-            const escaped = normCurrent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
-            node[i] = node[i].replace(new RegExp(escaped), replacewith);
-            count++;
-          }
-        } else if (item && typeof item === 'object') {
-          visit(item);
-        }
-      });
-    } else if (node && typeof node === 'object') {
-      for (const k of Object.keys(node)) {
-        if (typeof node[k] === 'string') {
-          if (normalizeWs(node[k]).includes(normCurrent)) {
-            const escaped = normCurrent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
-            node[k] = node[k].replace(new RegExp(escaped), replacewith);
-            count++;
-          }
-        } else if (node[k] && typeof node[k] === 'object') {
-          visit(node[k]);
-        }
+function _normWs(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
+
+// Whitespace-tolerant literal pattern. Quotes/dashes must match literally — a
+// smart-quote / em-dash / paraphrase variant deliberately yields current-mismatch
+// (surfaced) rather than being silently coerced.
+function _flexPattern(s) {
+  return String(s).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+}
+function _replaceOnce(raw, current, replacewith) {
+  let re;
+  try { re = new RegExp(_flexPattern(current)); } catch { return { ok: false, value: raw }; }
+  if (!re.test(raw)) return { ok: false, value: raw };
+  return { ok: true, value: raw.replace(re, () => replacewith) };  // fn-replacer: no $ interpretation
+}
+
+// Editable string leaves within a scope, as {container, key} so we can mutate in place.
+function _collectSlots(node, out) {
+  if (Array.isArray(node)) {
+    node.forEach((v, i) => {
+      if (typeof v === 'string') out.push({ container: node, key: i });
+      else if (v && typeof v === 'object') _collectSlots(v, out);
+    });
+  } else if (node && typeof node === 'object') {
+    for (const k of Object.keys(node)) {
+      const v = node[k];
+      if (typeof v === 'string') out.push({ container: node, key: k });
+      else if (v && typeof v === 'object') _collectSlots(v, out);
+    }
+  }
+}
+
+// Resolve a FIELD id across all six composite branches. Beats match by SLUG id.
+function _findRecordById(data, id) {
+  if (!id) return null;
+  const inArr = (arr, idKey) => (arr || []).find(x => x && x[idKey] === id);
+  let r = inArr(data.characters, 'id'); if (r) return r;
+  r = inArr(data.playerRoles, 'id'); if (r) return r;
+  r = inArr(data.locations, 'id'); if (r) return r;
+  r = inArr(data.clues, 'id'); if (r) return r;
+  for (const act of (data.storyArc?.acts || [])) { r = inArr(act.beats, 'id'); if (r) return r; } // beat slug
+  r = inArr(data.scenario?.technical_facts?.facts, 'fact_id'); if (r) return r;
+  r = inArr(data.scenario?.epilogue?.character_fates, 'character_id'); if (r) return r;
+  return null;
+}
+
+// Walk a dotted subpath within a record to a single string slot.
+function _navigateSub(rec, sub) {
+  const parts = sub.split('.');
+  let cur = rec, container = null, key = null;
+  for (const p of parts) {
+    if (cur == null || typeof cur !== 'object') return null;
+    container = cur; key = Array.isArray(cur) ? Number(p) : p;
+    cur = cur[key];
+  }
+  return (container && typeof container[key] === 'string') ? { container, key } : null;
+}
+
+// SECTION label → subtree of the composite.
+function _resolveSectionNode(data, section) {
+  const s = _normWs(section).toLowerCase();
+  const sc = data.scenario || {};
+  if (!s) return undefined;
+  switch (s) {
+    case 'characters':        return data.characters;
+    case 'player roles':      return data.playerRoles;
+    case 'locations':         return data.locations;
+    case 'clues':             return data.clues;
+    case 'story arc':         return (data.storyArc?.acts || []).flatMap(a => a.beats || []);
+    case 'win conditions':    return { winConditions: sc.winConditions, failConditions: sc.failConditions, partialSuccessExamples: sc.partialSuccessExamples };
+    case 'opening scene':     return { openingSituation: sc.openingSituation, introduction: sc.introduction };
+    case 'period vocabulary': return sc.period_vocabulary;
+    case 'technical facts':   return sc.technical_facts;
+    case 'epilogue':          return sc.epilogue;
+    case 'character fates':   return sc.epilogue?.character_fates;
+    case 'immediate outcome': return sc.epilogue?.immediate_outcome;
+    case 'historical frame':  return sc.epilogue?.historical_frame;
+    case 'open threads':      return sc.epilogue?.open_threads;
+    case 'choice echoes':     return sc.epilogue?.choice_echoes;
+    default:                  return undefined;
+  }
+}
+
+function resolveAndApply(data, corr) {
+  const field = (corr.field || '').trim();
+  const cur = _normWs(corr.current);
+  if (!cur) return { outcome: 'current-mismatch', detail: 'empty CURRENT text' };
+
+  let explicitSlots = null, scopeNode = null, label = null;
+
+  // Layer 1 — FIELD: id[.subfield] across all branches (beat ids are slugs).
+  if (field) {
+    const dot = field.indexOf('.');
+    const id = dot >= 0 ? field.slice(0, dot) : field;
+    const sub = dot >= 0 ? field.slice(dot + 1) : null;
+    const rec = _findRecordById(data, id);
+    if (rec) {
+      label = field;
+      if (sub) {
+        const slot = _navigateSub(rec, sub);
+        if (slot) explicitSlots = [slot];
+        else scopeNode = rec;  // subfield not a string — search the whole record
+      } else {
+        scopeNode = rec;
       }
     }
   }
 
-  visit(obj);
-  return count;
+  // Layer 2 — SECTION fallback (only if FIELD did not resolve a scope).
+  if (!explicitSlots && !scopeNode) {
+    scopeNode = _resolveSectionNode(data, corr.section);
+    label = corr.section || field || '(unscoped)';
+    if (scopeNode == null) {
+      return { outcome: 'field-not-found', detail: `FIELD "${field || '∅'}" / SECTION "${corr.section || '∅'}" did not resolve` };
+    }
+  }
+
+  // Locate + verify CURRENT within the resolved scope.
+  let slots = explicitSlots;
+  if (!slots) { slots = []; _collectSlots(scopeNode, slots); }
+  const matches = slots.filter(s => _normWs(s.container[s.key]).includes(cur));
+
+  if (matches.length === 0) return { outcome: 'current-mismatch', detail: `CURRENT not found in ${label}` };
+  if (matches.length > 1)  return { outcome: 'ambiguous', count: matches.length, detail: `CURRENT matches ${matches.length} fields in ${label} — none applied` };
+
+  const slot = matches[0];
+  const rep = _replaceOnce(slot.container[slot.key], corr.current, corr.replacewith);
+  if (!rep.ok) return { outcome: 'current-mismatch', detail: `CURRENT located but exact replace failed in ${label}` };
+  slot.container[slot.key] = rep.value;  // bounded: single field only
+  return { outcome: 'applied', detail: label };
+}
+
+function renderInjectionResults(results, appliedCount) {
+  const el = document.getElementById('corrections-diff');
+  const C = o => o === 'applied' ? '#2a7a2a' : o === 'ambiguous' ? '#b8860b' : '#c0392b';
+  const BG = o => o === 'applied' ? '#f0faf0' : o === 'ambiguous' ? '#fff8e6' : '#fff5f5';
+  const L = o => ({ 'applied': '✓ applied', 'field-not-found': '✕ field not found', 'current-mismatch': '✕ current mismatch', 'ambiguous': '⚠ ambiguous — not applied' }[o] || o);
+  const failed = results.length - appliedCount;
+  let html = `<div style="margin-bottom:10px;font-weight:600;font-size:13px">Injection results — ${appliedCount}/${results.length} applied${appliedCount > 0 ? ' &amp; saved' : ''}</div>`;
+  html += results.map(r => `
+    <div style="border:1px solid var(--border-color);border-left:4px solid ${C(r.outcome)};border-radius:4px;background:${BG(r.outcome)};padding:8px 10px;margin-bottom:6px;font-size:12px">
+      <div style="font-family:monospace;color:var(--accent)">${escapeHtml(r.section || '')}${r.field ? ' → ' + escapeHtml(r.field) : ''}</div>
+      <div style="color:${C(r.outcome)};font-weight:600">${L(r.outcome)}${r.detail ? ': ' + escapeHtml(r.detail) : ''}</div>
+      ${r.outcome !== 'applied' ? `<div style="color:var(--text-muted);margin-top:3px;white-space:pre-wrap">CURRENT: ${escapeHtml((r.current || '').slice(0, 140))}</div>` : ''}
+    </div>`).join('');
+  if (el) el.innerHTML = html;
+  toast(`${appliedCount} applied${failed ? ', ' + failed + ' need attention (see results panel)' : ' &amp; saved'}`, failed ? 'warning' : 'success');
 }
 
 function parseEndingNotes(scenarioId) {
@@ -4800,10 +4915,14 @@ function renderEndingNotesPreview(notes) {
 async function applyEndingNotes(scenarioId) {
   if (!window._aiEndingNotes) return toast('No ending notes parsed yet', 'error');
   try {
-    await apiFetch('POST', '/pipeline/inject-ending-notes/' + scenarioId, {
+    const r = await apiFetch('POST', '/pipeline/inject-ending-notes/' + scenarioId, {
       ending_notes: window._aiEndingNotes
     });
-    toast('Ending notes applied to all player roles', 'success');
+    if (r && r.unmatched && r.unmatched.length) {
+      toast(`${r.rolesUpdated} role(s) updated — ${r.unmatched.length} role_name(s) did NOT match and were skipped: ${r.unmatched.join(', ')}`, 'warning');
+    } else {
+      toast(`Ending notes applied to all ${r?.rolesUpdated ?? ''} player role(s)`, 'success');
+    }
     window._aiEndingNotes = null;
     renderScenarioEditor(scenarioId);
   } catch (err) {

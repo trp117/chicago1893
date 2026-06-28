@@ -2283,9 +2283,11 @@ Return ONLY valid JSON in this exact structure:
       if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
       const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
       let updated = 0;
+      const unmatched = [];
       for (const note of ending_notes) {
         const role = playerRoles.find(r => r.name === note.role_name);
-        if (role) {
+        if (!role) { unmatched.push(note.role_name); continue; }
+        {
           if (note.briefing)           role.briefing          = note.briefing;
           if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
           if (note.hook_1 || note.hook_2 || note.hook_3) {
@@ -2309,7 +2311,7 @@ Return ONLY valid JSON in this exact structure:
         pipeline_step: 'ending_notes',
         changes_applied: updated
       });
-      res.json({ success: true, rolesUpdated: updated });
+      res.json({ success: true, rolesUpdated: updated, unmatched });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
