@@ -2688,30 +2688,10 @@ async function handleManualSave(data, containerEl) {
 // ═══════════════════════════════════════════════════════════════
 // SCENARIO COPY
 // ═══════════════════════════════════════════════════════════════
-const SCENARIO_REVIEW_PROMPT = `You are reviewing a complete interactive historical fiction scenario for accuracy and internal consistency. Check every section — opening scene, win/fail conditions, story arc beats, player roles, characters, locations, clues, period vocabulary, and epilogue data — against primary historical sources.
-
-For every correction needed, use EXACTLY this format — no prose between corrections:
-
----CORRECTION---
-SECTION: [Opening Scene / Win Conditions / Story Arc / Player Roles / Characters / Locations / Clues / Period Vocabulary / Epilogue / Technical Facts]
-FIELD: [id or field name, e.g. char_brenner.publicFace or beat_3.description]
-CURRENT: [exact current text]
-REPLACE WITH: [complete replacement text]
-REASON: [one sentence explanation]
-SOURCE: [primary source citation]
----END---
-
-If a section is fully accurate, write:
----CONFIRMED: [section name]---
-
-Do not invent corrections. If you cannot verify something, write:
----UNVERIFIED: [section or field name]---
-
-SCENARIO TO REVIEW:
-`;
-
 function copyScenarioDocWithPrompt(data, btn) {
-  const text = buildScenarioDocText(data, SCENARIO_REVIEW_PROMPT);
+  // Prompt text from the canonical REVIEW_PROMPTS map; scenario doc body slots into the marker.
+  // Function-replacer avoids $-pattern interpretation in the doc body.
+  const text = REVIEW_PROMPTS.allstory.replace('[PASTE THE COMPLETE SCENARIO DATA HERE]', () => buildScenarioDocText(data));
   navigator.clipboard.writeText(text).then(() => {
     const orig = btn.textContent;
     btn.textContent = '✓ Copied';
@@ -3873,27 +3853,6 @@ function renderPreview(data, autoSaved = false) {
     if (e.target.closest('#download-epilogue-facts-with-prompt-btn')) {
       const epDetails = formEl.querySelector('#epilogue-data-details');
       if (!epDetails) return;
-      const EP_REVIEW_PROMPT = `Review the following historical epilogue data for this interactive historical fiction scenario. Check all character fates, key facts, historical frame entries, open threads, and choice echoes for historical accuracy and internal consistency.
-
-For every correction needed, use EXACTLY this format — no prose between corrections:
-
----CORRECTION---
-SECTION: [Character Fates / Immediate Outcome / Historical Frame / Open Threads / Choice Echoes]
-FIELD: [character name or beat id or fact description]
-CURRENT: [exact current text]
-REPLACE WITH: [complete replacement text]
-REASON: [one sentence explanation]
-SOURCE: [primary source citation]
----END---
-
-If a section is accurate, write:
----CONFIRMED: [section name]---
-
-Do not invent corrections. If you cannot verify something, write:
----UNVERIFIED: [section or field name]---
-
-EPILOGUE DATA TO REVIEW:
-`;
       const lines = [];
       const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
       lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
@@ -3938,7 +3897,7 @@ EPILOGUE DATA TO REVIEW:
         if (id || record) { if (id) lines.push(`Beat: ${id}`); if (record) lines.push(record); lines.push(''); }
       });
       const btnWp = e.target.closest('#download-epilogue-facts-with-prompt-btn');
-      navigator.clipboard.writeText(EP_REVIEW_PROMPT + lines.join('\n')).then(() => {
+      navigator.clipboard.writeText(REVIEW_PROMPTS.epilogue.replace('[PASTE EPILOGUE DATA HERE]', () => lines.join('\n'))).then(() => {
         const orig = btnWp.textContent;
         btnWp.textContent = '✓ Copied to clipboard';
         setTimeout(() => { btnWp.textContent = orig; }, 2000);
@@ -3984,27 +3943,6 @@ EPILOGUE DATA TO REVIEW:
     if (e.target.closest('#download-tf-facts-with-prompt-btn')) {
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (!tfDetails) return;
-      const TF_REVIEW_PROMPT = `Review the following technical facts for this interactive historical fiction scenario. Check each fact for historical accuracy against primary sources.
-
-For every correction needed, use EXACTLY this format — no prose between corrections:
-
----CORRECTION---
-SECTION: Technical Facts
-FIELD: [fact_id]
-CURRENT: [exact current text]
-REPLACE WITH: [complete replacement text]
-REASON: [one sentence explanation]
-SOURCE: [primary source citation]
----END---
-
-If a fact is accurate, write:
----CONFIRMED: [fact_id]---
-
-Do not invent corrections. If you cannot verify a fact, write:
----UNVERIFIED: [fact_id]---
-
-TECHNICAL FACTS TO REVIEW:
-`;
       const lines = [];
       const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
       lines.push(`TECHNICAL FACTS — ${scenarioTitle}`);
@@ -4024,7 +3962,7 @@ TECHNICAL FACTS TO REVIEW:
         lines.push('');
       });
       const btnTfWp = e.target.closest('#download-tf-facts-with-prompt-btn');
-      navigator.clipboard.writeText(TF_REVIEW_PROMPT + lines.join('\n')).then(() => {
+      navigator.clipboard.writeText(REVIEW_PROMPTS.techfacts.replace('[PASTE TECHNICAL FACTS DATA HERE]', () => lines.join('\n'))).then(() => {
         const orig = btnTfWp.textContent;
         btnTfWp.textContent = '✓ Copied to clipboard';
         setTimeout(() => { btnTfWp.textContent = orig; }, 2000);
