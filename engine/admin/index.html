@@ -5306,9 +5306,40 @@ function _resolveSectionNode(data, section) {
   }
 }
 
+// Period-Vocabulary display seam: buildVocabSection renders each term as
+// "term: meaning", so the reviewer quotes "term: meaning" as CURRENT/REPLACE WITH
+// while the stored leaf is the bare `meaning`. Strip ONLY an exact "<term>: "
+// prefix where <term> is a REAL vocab term in this scenario — never a greedy
+// first-colon split, so definitions containing internal colons stay intact.
+// Scoped to the Period Vocabulary path only (see resolveAndApply).
+function _vocabTerms(data) {
+  const cats = data.scenario?.period_vocabulary?.categories || [];
+  return cats.flatMap(c => (c.terms || []).map(t => t && t.term).filter(Boolean));
+}
+function _stripVocabTermPrefix(s, terms) {
+  const str = String(s == null ? '' : s);
+  for (const term of terms) {
+    const prefix = term + ': ';
+    if (str.startsWith(prefix)) return str.slice(prefix.length);
+  }
+  return str;
+}
+
 function resolveAndApply(data, corr) {
   const field = (corr.field || '').trim();
-  const cur = _normWs(corr.current);
+
+  // Period Vocabulary ONLY: reconcile the "term: meaning" display form against the
+  // bare `meaning` leaf. Strip an exact "<term>: " prefix from CURRENT and
+  // REPLACE WITH symmetrically — so locate + replace act on the bare meaning, and we
+  // never write the term prefix back into stored data. No effect on other sections.
+  let curRaw = corr.current, repRaw = corr.replacewith;
+  if (_normWs(corr.section).toLowerCase() === 'period vocabulary') {
+    const terms = _vocabTerms(data);
+    curRaw = _stripVocabTermPrefix(corr.current, terms);
+    repRaw = _stripVocabTermPrefix(corr.replacewith, terms);
+  }
+
+  const cur = _normWs(curRaw);
   if (!cur) return { outcome: 'current-mismatch', detail: 'empty CURRENT text' };
 
   let explicitSlots = null, scopeNode = null, label = null;
@@ -5349,7 +5380,7 @@ function resolveAndApply(data, corr) {
   if (matches.length > 1)  return { outcome: 'ambiguous', count: matches.length, detail: `CURRENT matches ${matches.length} fields in ${label} — none applied` };
 
   const slot = matches[0];
-  const rep = _replaceOnce(slot.container[slot.key], corr.current, corr.replacewith);
+  const rep = _replaceOnce(slot.container[slot.key], curRaw, repRaw);
   if (!rep.ok) return { outcome: 'current-mismatch', detail: `CURRENT located but exact replace failed in ${label}` };
   slot.container[slot.key] = rep.value;  // bounded: single field only
   return { outcome: 'applied', detail: label };
