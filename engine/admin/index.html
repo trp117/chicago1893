@@ -2722,29 +2722,21 @@ async function copyTranscript(btn, id) {
   }
 }
 
-function buildScenarioDocText(data, promptPrefix = '') {
-  const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
-  const L  = lines => lines.join('\n');
-  const HR = '═'.repeat(60);
-  const hr = '─'.repeat(60);
-  const sec  = title => ['', HR, title.toUpperCase(), HR, ''].join('\n');
-  const sub  = label => ['', `── ${label} ──`, ''].join('\n');
-  const list = (arr, fn) => (arr || []).map(fn).join('\n');
-  const indent = (text, n = 2) => String(text || '').split('\n').map(l => ' '.repeat(n) + l).join('\n');
+// ── Shared scenario-doc formatting helpers + per-section builders ─────────────
+// Single source of truth for the scenario-doc body. Both buildScenarioDocText
+// (the all-story export behind the legacy "Copy + AI Prompt" button) and the
+// AI-panel section picker build from these helpers — no parallel copies of the
+// formatting logic. Each buildXxxSection(data) returns an array of lines (or []
+// when the section is absent); the monolith spreads them in order.
+const HR = '═'.repeat(60);
+const hr = '─'.repeat(60);
+const sec  = title => ['', HR, title.toUpperCase(), HR, ''].join('\n');
+const sub  = label => ['', `── ${label} ──`, ''].join('\n');
+const indent = (text, n = 2) => String(text || '').split('\n').map(l => ' '.repeat(n) + l).join('\n');
 
+function buildOpeningSection(data) {
+  const { scenario = {}, playerRoles = [] } = data;
   const out = [];
-
-  // ── Header ─────────────────────────────────────────────────
-  out.push(HR);
-  out.push(`${(scenario.title || 'Untitled').toUpperCase()}`);
-  const genreLine = [scenario.id, ...(scenario.genre || [])].filter(Boolean).join(' | ');
-  if (genreLine) out.push(genreLine);
-  if (scenario.sessionTargetMinutes) out.push(`Session target: ${scenario.sessionTargetMinutes} min`);
-  if (scenario.historicalRealism)    out.push(`Historical realism: ${scenario.historicalRealism}`);
-  out.push(HR);
-  if (scenario.description) { out.push(''); out.push(scenario.description); }
-
-  // ── Opening Scene ───────────────────────────────────────────
   const intro = scenario.introduction;
   if (intro?.sections?.length) {
     out.push(sec('Opening Scene'));
@@ -2756,14 +2748,19 @@ function buildScenarioDocText(data, promptPrefix = '') {
         for (const [roleId, entryText] of Object.entries(s.character_entries)) {
           const role = playerRoles.find(r => r.id === roleId);
           out.push('');
-          out.push(`  [${role?.name || roleId}]`);
+          // role_id first so the model can form the <role_id>.opening locator.
+          out.push(`  [${roleId}]${role?.name ? ` (${role.name})` : ''}`);
           out.push(indent(entryText));
         }
       }
     }
   }
+  return out;
+}
 
-  // ── Win / Fail / Pressure ───────────────────────────────────
+function buildGameplaySection(data) {
+  const { scenario = {} } = data;
+  const out = [];
   out.push(sec('Win / Fail Conditions'));
   if (scenario.winConditions?.length) {
     out.push('WIN CONDITIONS');
@@ -2781,8 +2778,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
     out.push(''); out.push('PRESSURE EVENTS');
     scenario.systems.pressureEvents.forEach(e => out.push(`  • ${e}`));
   }
+  return out;
+}
 
-  // ── Story Arc ───────────────────────────────────────────────
+function buildStoryArcSection(data) {
+  const { storyArc } = data;
+  const out = [];
   if (storyArc) {
     out.push(sec(`Story Arc — ${storyArc.name || storyArc.id || ''}`));
     if (storyArc.premise)          { out.push('PREMISE'); out.push(indent(storyArc.premise)); out.push(''); }
@@ -2798,34 +2799,38 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push('');
     });
   }
+  return out;
+}
 
-  // ── Player Roles ────────────────────────────────────────────
+function buildRolesSection(data) {
+  const { playerRoles = [] } = data;
+  const out = [];
   if (playerRoles.length) {
     out.push(sec(`Player Roles (${playerRoles.length})`));
     for (const r of playerRoles) {
       out.push(sub(`${r.name || r.id} (${r.id})`));
       if (r.description)  { out.push(r.description); out.push(''); }
-      if (r.perspective)  { out.push('PERSPECTIVE'); out.push(indent(r.perspective)); out.push(''); }
-      if (r.briefing)     { out.push('BRIEFING'); out.push(indent(r.briefing)); out.push(''); }
-      if (r.opening?.narrative) { out.push('OPENING NARRATIVE'); out.push(indent(r.opening.narrative)); out.push(''); }
+      if (r.perspective)  { out.push('PERSPECTIVE (perspective):'); out.push(indent(r.perspective)); out.push(''); }
+      if (r.briefing)     { out.push('BRIEFING (briefing):'); out.push(indent(r.briefing)); out.push(''); }
+      if (r.opening?.narrative) { out.push('OPENING NARRATIVE (opening):'); out.push(indent(r.opening.narrative)); out.push(''); }
       if (r.opening?.choices?.length) {
-        out.push('OPENING CHOICES');
+        out.push('OPENING CHOICES (openingChoices):');
         r.opening.choices.forEach(c => out.push(`  • ${c}`));
         out.push('');
       }
       if (r.startingKnowledge?.length) {
-        out.push('STARTING KNOWLEDGE');
+        out.push('STARTING KNOWLEDGE (startingKnowledge):');
         r.startingKnowledge.forEach(k => out.push(`  • ${k}`));
         out.push('');
       }
       if (r.character_hooks?.length) {
-        out.push('CHARACTER HOOKS');
+        out.push('CHARACTER HOOKS (character_hooks):');
         r.character_hooks.forEach(h => out.push(`  • ${h}`));
         out.push('');
       }
-      if (r.suggested_secret) { out.push('SUGGESTED SECRET'); out.push(indent(r.suggested_secret)); out.push(''); }
+      if (r.suggested_secret) { out.push('SUGGESTED SECRET (suggested_secret):'); out.push(indent(r.suggested_secret)); out.push(''); }
       if (r.roleInitialState?.inventory?.length) {
-        out.push('STARTING INVENTORY');
+        out.push('STARTING INVENTORY (inventory):');
         r.roleInitialState.inventory.forEach(i => out.push(`  • ${i}`));
         out.push('');
       }
@@ -2841,30 +2846,38 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push(hr);
     }
   }
+  return out;
+}
 
-  // ── Characters ──────────────────────────────────────────────
+function buildCharactersSection(data) {
+  const { characters = [] } = data;
+  const out = [];
   if (characters.length) {
     out.push(sec(`Characters (${characters.length})`));
     for (const c of characters) {
       out.push(sub(`${c.name || c.id} (${c.id})`));
       if (c.role)        out.push(`Role: ${c.role}`);
-      if (c.publicFace)  { out.push(''); out.push('PUBLIC FACE'); out.push(indent(c.publicFace)); }
-      if (c.privateGoal) { out.push(''); out.push('PRIVATE GOAL'); out.push(indent(c.privateGoal)); }
-      if (c.fear)        { out.push(''); out.push(`Fear: ${c.fear}`); }
-      if (c.voice)       out.push(`Voice: ${c.voice}`);
-      if (c.trustLogic)  { out.push(''); out.push('TRUST LOGIC'); out.push(indent(c.trustLogic)); }
+      if (c.description) { out.push(''); out.push('DESCRIPTION (description):'); out.push(indent(c.description)); }
+      if (c.publicFace)  { out.push(''); out.push('PUBLIC FACE (publicFace):'); out.push(indent(c.publicFace)); }
+      if (c.privateGoal) { out.push(''); out.push('PRIVATE GOAL (privateGoal):'); out.push(indent(c.privateGoal)); }
+      if (c.fear)        { out.push(''); out.push(`Fear (fear): ${c.fear}`); }
+      if (c.voice)       out.push(`Voice (voice): ${c.voice}`);
+      if (c.trustLogic)  { out.push(''); out.push('TRUST LOGIC (trustLogic):'); out.push(indent(c.trustLogic)); }
       if (c.knowledge?.length) {
-        out.push(''); out.push('KNOWLEDGE');
+        out.push(''); out.push('KNOWLEDGE (knowledge):');
         c.knowledge.forEach(k => out.push(`  • ${k}`));
       }
       if (c.secrets?.length) {
-        out.push(''); out.push('SECRETS');
+        out.push(''); out.push('SECRETS (secrets):');
         const s = Array.isArray(c.secrets) ? c.secrets : c.secrets.split('\n').filter(Boolean);
         s.forEach(k => out.push(`  • ${k}`));
       }
+      // aggressionProfile is NOT a FIELD-convention field — the review prompt
+      // says there is no "behavior" field. Emit it clearly marked as context
+      // only so the model never produces an unresolvable char_x.behavior locator.
       const ap = c.aggressionProfile;
       if (ap && Object.values(ap).some(Boolean)) {
-        out.push(''); out.push('BEHAVIOR UNDER PRESSURE');
+        out.push(''); out.push('BEHAVIOR UNDER PRESSURE (context only — not a correctable field):');
         if (ap.mildPressure)     { out.push('  Mild pressure:');  out.push(indent(ap.mildPressure, 4)); }
         if (ap.heavyPressure)    { out.push('  Heavy pressure:'); out.push(indent(ap.heavyPressure, 4)); }
         if (ap.breakingPoint)    { out.push('  Breaking point:'); out.push(indent(ap.breakingPoint, 4)); }
@@ -2876,8 +2889,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push(''); out.push(hr);
     }
   }
+  return out;
+}
 
-  // ── Locations ───────────────────────────────────────────────
+function buildLocationsSection(data) {
+  const { locations = [] } = data;
+  const out = [];
   if (locations.length) {
     out.push(sec(`Locations (${locations.length})`));
     for (const l of locations) {
@@ -2891,8 +2908,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push('');
     }
   }
+  return out;
+}
 
-  // ── Clues ───────────────────────────────────────────────────
+function buildCluesSection(data) {
+  const { clues = [] } = data;
+  const out = [];
   if (clues.length) {
     out.push(sec(`Clues (${clues.length})`));
     for (const cl of clues) {
@@ -2906,8 +2927,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push('');
     }
   }
+  return out;
+}
 
-  // ── Period Vocabulary ───────────────────────────────────────
+function buildVocabSection(data) {
+  const { scenario = {} } = data;
+  const out = [];
   const vocab = scenario.period_vocabulary?.categories || [];
   if (vocab.length) {
     out.push(sec('Period Vocabulary'));
@@ -2919,8 +2944,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push('');
     }
   }
+  return out;
+}
 
-  // ── Epilogue Data ───────────────────────────────────────────
+function buildEpilogueSection(data) {
+  const { scenario = {} } = data;
+  const out = [];
   const ep = scenario.epilogue;
   if (ep?.generated) {
     out.push(sec('Historical Epilogue Data'));
@@ -2973,8 +3002,12 @@ function buildScenarioDocText(data, promptPrefix = '') {
       }
     }
   }
+  return out;
+}
 
-  // ── Technical Facts ─────────────────────────────────────────
+function buildTechFactsSection(data) {
+  const { scenario = {} } = data;
+  const out = [];
   const tf = scenario.technical_facts;
   if (tf?.facts?.length) {
     out.push(sec('Technical Facts'));
@@ -2989,6 +3022,35 @@ function buildScenarioDocText(data, promptPrefix = '') {
       out.push('');
     }
   }
+  return out;
+}
+
+function buildScenarioDocText(data, promptPrefix = '') {
+  const { scenario = {} } = data;
+
+  const out = [];
+
+  // ── Header ─────────────────────────────────────────────────
+  out.push(HR);
+  out.push(`${(scenario.title || 'Untitled').toUpperCase()}`);
+  const genreLine = [scenario.id, ...(scenario.genre || [])].filter(Boolean).join(' | ');
+  if (genreLine) out.push(genreLine);
+  if (scenario.sessionTargetMinutes) out.push(`Session target: ${scenario.sessionTargetMinutes} min`);
+  if (scenario.historicalRealism)    out.push(`Historical realism: ${scenario.historicalRealism}`);
+  out.push(HR);
+  if (scenario.description) { out.push(''); out.push(scenario.description); }
+
+  // ── Body sections (single source of truth: the buildXxxSection helpers) ─────
+  out.push(...buildOpeningSection(data));
+  out.push(...buildGameplaySection(data));
+  out.push(...buildStoryArcSection(data));
+  out.push(...buildRolesSection(data));
+  out.push(...buildCharactersSection(data));
+  out.push(...buildLocationsSection(data));
+  out.push(...buildCluesSection(data));
+  out.push(...buildVocabSection(data));
+  out.push(...buildEpilogueSection(data));
+  out.push(...buildTechFactsSection(data));
 
   // ── Review Checklist ────────────────────────────────────────
   const cl = scenario.review_checklist;
@@ -3310,6 +3372,7 @@ function renderPreview(data, autoSaved = false) {
     </div>`;
 
   if (scenarioId) {
+    window._aiPanelData = data;   // section picker splices per-section data from this
     document.getElementById('content').insertAdjacentHTML('beforeend', buildAIPanel(scenarioId));
     initAIPanel(scenarioId);
     initGlossarySection(scenarioId);
@@ -4818,6 +4881,49 @@ function selectReviewPrompt(sel) {
   if (el) el.textContent = REVIEW_PROMPTS[sel.value] || REVIEW_PROMPTS.generic;
 }
 
+// Each selectable section → its prompt's [PASTE … DATA HERE] marker + the builder
+// that produces that section's data body. The builders return line arrays (joined
+// here); allstory reuses the full scenario-doc builder. generic has no entry — it's
+// a markerless instruction block, copied as-is. Source of truth = the same helpers
+// behind the legacy "Copy + AI Prompt" button.
+const PICKER_SECTION_DATA = {
+  opening:    { marker: '[PASTE OPENING SCENE DATA HERE]',                          build: d => buildOpeningSection(d) },
+  roles:      { marker: '[PASTE PLAYER ROLES DATA HERE]',                           build: d => buildRolesSection(d) },
+  gameplay:   { marker: '[PASTE WIN/FAIL CONDITIONS AND PRESSURE EVENTS DATA HERE]', build: d => buildGameplaySection(d) },
+  storyarc:   { marker: '[PASTE STORY ARC DATA HERE]',                              build: d => buildStoryArcSection(d) },
+  characters: { marker: '[PASTE CHARACTERS DATA HERE]',                            build: d => buildCharactersSection(d) },
+  locations:  { marker: '[PASTE LOCATIONS DATA HERE]',                             build: d => buildLocationsSection(d) },
+  clues:      { marker: '[PASTE CLUES DATA HERE]',                                 build: d => buildCluesSection(d) },
+  vocabulary: { marker: '[PASTE PERIOD VOCABULARY DATA HERE]',                     build: d => buildVocabSection(d) },
+  techfacts:  { marker: '[PASTE TECHNICAL FACTS DATA HERE]',                       build: d => buildTechFactsSection(d) },
+  epilogue:   { marker: '[PASTE EPILOGUE DATA HERE]',                              build: d => buildEpilogueSection(d) },
+  allstory:   { marker: '[PASTE THE COMPLETE SCENARIO DATA HERE]',                 build: d => [buildScenarioDocText(d)] },
+};
+
+// Copy = prompt + that section's data, spliced into the marker. One click →
+// paste-ready, like the legacy Copy + AI Prompt button. Function-replacer keeps
+// $-bearing historical text and <angle-bracket> FIELD tokens literal.
+function copyCorrectionPrompt(btn) {
+  const sel    = document.getElementById('review-prompt-section');
+  const key    = sel ? sel.value : 'generic';
+  const prompt = REVIEW_PROMPTS[key] || REVIEW_PROMPTS.generic;
+  const data   = window._aiPanelData;
+  const spec   = PICKER_SECTION_DATA[key];
+  let text;
+  if (spec && data) {
+    const body = spec.build(data).join('\n');
+    text = prompt.replace(spec.marker, () => body);
+  } else {
+    // generic (no marker), or data not yet loaded → copy the prompt as-is.
+    text = prompt;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => toast('Clipboard write failed', 'error'));
+}
+
 // ═══════════════════════════════════════════════════════════════
 // AI RESPONSE INJECTOR PANEL
 // ═══════════════════════════════════════════════════════════════
@@ -4849,7 +4955,7 @@ function buildAIPanel(scenarioId) {
     </select>
     <div style='background:var(--bg-secondary,#f5f5f5);border:1px solid var(--border-color);border-radius:6px;padding:10px;margin-bottom:12px;position:relative'>
       <pre id='correction-prompt-text' style='font-size:11px;color:var(--text-muted);white-space:pre-wrap;margin:0;line-height:1.5'></pre>
-      <button onclick='copyPrompt("correction-prompt-text")' style='position:absolute;top:8px;right:8px;padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Copy</button>
+      <button onclick='copyCorrectionPrompt(this)' style='position:absolute;top:8px;right:8px;padding:3px 8px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>Copy</button>
     </div>
     <textarea id='corrections-paste' placeholder='Paste Gemini or ChatGPT response here...' style='width:100%;height:160px;padding:10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;margin-bottom:8px'></textarea>
     <button onclick='parseCorrections("${scenarioId}")' class='btn btn-primary' style='margin-bottom:16px'>Parse Corrections</button>
