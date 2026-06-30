@@ -132,6 +132,48 @@ function resolveAnchorBinding(scenario, role) {
   return { kind: 'welded_unbound' };
 }
 
+// In-event outcomes that are consistent with a documented survivor surviving the event.
+const SURVIVOR_SAFE_OUTCOMES = new Set(['survived', 'incapacitated', 'captured']);
+
+// Deterministic survivor-safety guard. Reads the STRUCTURED in_event_outcome on each
+// generated branch — never infers from prose — against the role's anchored documented
+// outcome. A documented survivor (character_fates outcome === 'survived', resolved via
+// resolveAnchorBinding) must not be killed in-event in ANY branch. Returns structured
+// lists for the gate: a 'died' branch is a hard block; an 'unresolved' or missing field
+// is a soft warning; survived/incapacitated/captured pass. Non-survivors are silent
+// (their in-event death is authorially permitted).
+function assertSurvivorSafety(scenario, endingNotes) {
+  const blocked = [];
+  const warnings = [];
+  const notes = (endingNotes && endingNotes.ending_notes) || [];
+  const roles = scenario?.player_roles || scenario?.playerRoles || [];
+  const roleByName = new Map(roles.map(r => [r.name, r]));
+
+  for (const note of notes) {
+    const role = roleByName.get(note.role_name);
+    if (!role) continue; // fate has no matching role → cannot bind an anchor; stay silent
+    const binding = resolveAnchorBinding(scenario, role);
+    // Only a documented figure recorded as having survived the event is guarded.
+    if (binding.kind !== 'documented' || binding.fate.outcome !== 'survived') continue;
+
+    for (const branch of ['success', 'partial', 'failure']) {
+      const b = note[branch];
+      if (!b) continue;
+      const outcome = b.in_event_outcome || 'unresolved'; // missing field reads as unresolved
+      if (outcome === 'died') {
+        blocked.push({ role: note.role_name, branch, type: 'survivor_died' });
+      } else if (!SURVIVOR_SAFE_OUTCOMES.has(outcome)) {
+        // 'unresolved', missing, or any unrecognized value → soft flag, never a hard block
+        warnings.push({ role: note.role_name, branch, type: 'survivor_unresolved' });
+      }
+    }
+  }
+  // A blocked role is dropped entirely — the block subsumes any warning on it, so
+  // exclude blocked roles from warnings to avoid double-listing the same role.
+  const blockedRoles = new Set(blocked.map(v => v.role));
+  return { blocked, warnings: warnings.filter(w => !blockedRoles.has(w.role)) };
+}
+
 const FATE_OUTPUT_SHAPE = `Return valid JSON only — no prose, no markdown, no backticks. Exactly this shape:
 {
   "role_name": "<exact role name>",
@@ -242,4 +284,5 @@ Write the success/partial/failure fates for ${role.name} now, as JSON only.`;
   return { ending_notes, skipped };
 }
 
-export default { fillMissingFields, generateEndingNotes };
+export { assertSurvivorSafety };
+export default { fillMissingFields, generateEndingNotes, assertSurvivorSafety };

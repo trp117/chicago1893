@@ -129,6 +129,25 @@ class PipelineOrchestrator {
         gptApproved,
         playerRoles
       );
+
+      // Survivor-safety guard — deterministic, structured-field-only. A documented
+      // survivor must not be killed in-event in any branch. Blocks are halt-and-tell:
+      // the offending role's fate is dropped (never injected/persisted) and surfaced at
+      // the review gate; warnings are flagged but persist. No auto-retry.
+      const guard = ClaudeScenarioClient.assertSurvivorSafety(gptApproved, endingNotes);
+      const blockedRoles = new Set(guard.blocked.map(v => v.role));
+      for (const v of guard.blocked) {
+        console.error(`[FATE-GUARD] BLOCKED survivor death: ${scenarioId}/${v.role}/${v.branch}`);
+      }
+      for (const v of guard.warnings) {
+        console.warn(`[FATE-GUARD] WARN survivor unresolved: ${scenarioId}/${v.role}/${v.branch}`);
+      }
+      if (blockedRoles.size) {
+        // Drop blocked roles' fates so _injectEndingNotes never writes them.
+        endingNotes.ending_notes = endingNotes.ending_notes.filter(n => !blockedRoles.has(n.role_name));
+      }
+      endingNotes.violations = [...guard.blocked, ...guard.warnings];
+
       const withEndingNotes = this._injectEndingNotes(gptApproved, endingNotes);
       await VersionController.saveVersion(scenarioId, withEndingNotes, {
         label: 'ending_notes',

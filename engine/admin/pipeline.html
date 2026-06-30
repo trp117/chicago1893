@@ -437,9 +437,11 @@ function loadCorrections(stepName, stepData) {
   if (stepName === 'ending_notes') {
     scenario = stepData.scenario;
     state.currentScenario = scenario;
-    renderEndingNotes(stepData.endingNotes, scenario);
-    document.getElementById('diff-meta').textContent = 'Review ending notes for all player roles';
-    document.getElementById('btn-approve-step').disabled = false;
+    const fateBlocked = renderEndingNotes(stepData.endingNotes, scenario);
+    document.getElementById('diff-meta').textContent = fateBlocked
+      ? 'BLOCKED — a documented survivor was marked died in-event; regenerate before approving'
+      : 'Review ending notes for all player roles';
+    document.getElementById('btn-approve-step').disabled = fateBlocked;
     document.getElementById('btn-accept-all').disabled = true;
     document.getElementById('btn-reject-all').disabled = true;
     return;
@@ -509,30 +511,65 @@ function renderCorrectionCard(c) {
 function renderEndingNotes(endingNotes, scenario) {
   const body = document.getElementById('diff-body');
   const notes = endingNotes.ending_notes || [];
-  if (notes.length === 0) {
-    body.innerHTML = '<div class=empty-state><div class=icon>!</div><p>No ending notes generated</p></div>';
-    return;
+  const violations = endingNotes.violations || [];
+  const blocks = violations.filter(v => v.type === 'survivor_died');
+  const warns = violations.filter(v => v.type === 'survivor_unresolved');
+
+  // Index warnings by role → warned branch (for per-card soft-flag annotation).
+  const warnByRole = {};
+  warns.forEach(v => { (warnByRole[v.role] = warnByRole[v.role] || {})[v.branch] = true; });
+
+  let banner = '';
+  if (blocks.length) {
+    banner += '<div style=\"background:#3a1a1a;border:2px solid var(--danger);border-radius:6px;padding:12px;margin-bottom:14px\">' +
+      '<div style=\"color:var(--danger);font-weight:700;font-size:14px;margin-bottom:6px\">⛔ BLOCKED — documented survivor marked died in-event</div>' +
+      '<div style=\"color:#e0a0a0;font-size:12px;margin-bottom:6px\">These branches kill a documented survivor and were NOT persisted. This step cannot be approved until the fate is regenerated.</div>' +
+      blocks.map(v => '<div style=\"font-family:monospace;font-size:12px;color:var(--danger)\">• ' + escHtml(v.role) + ' — died in <strong>' + escHtml(v.branch) + '</strong></div>').join('') +
+      '</div>';
   }
-  body.innerHTML = notes.map((note, i) => renderEndingNoteCard(note, i)).join('');
+  if (warns.length) {
+    banner += '<div style=\"background:#3a2f1a;border:1px solid var(--warning);border-radius:6px;padding:10px;margin-bottom:14px\">' +
+      '<div style=\"color:var(--warning);font-weight:700;font-size:13px;margin-bottom:4px\">⚠ WARN — survivor in-event fate unresolved</div>' +
+      '<div style=\"color:#d8c08a;font-size:12px;margin-bottom:6px\">Soft flag — persisted and still approvable. Confirm these branches are intentionally open.</div>' +
+      warns.map(v => '<div style=\"font-family:monospace;font-size:12px;color:var(--warning)\">• ' + escHtml(v.role) + ' — unresolved in <strong>' + escHtml(v.branch) + '</strong></div>').join('') +
+      '</div>';
+  }
+
+  if (notes.length === 0) {
+    body.innerHTML = banner + '<div class=empty-state><div class=icon>!</div><p>No ending notes to review' + (blocks.length ? ' (all blocked)' : '') + '</p></div>';
+    return blocks.length > 0;
+  }
+  body.innerHTML = banner + notes.map((note, i) => renderEndingNoteCard(note, i, warnByRole[note.role_name] || {})).join('');
+  return blocks.length > 0;
 }
 
-function renderEndingNoteCard(note, index) {
+function renderFateBranch(label, b, cls, warned) {
+  if (!b) return '';
+  const outcome = b.in_event_outcome || 'unresolved';
+  const outColor = outcome === 'died' ? 'var(--danger)'
+    : outcome === 'survived' ? 'var(--success)'
+    : outcome === 'unresolved' ? 'var(--warning)'
+    : 'var(--accent)';
+  const warnTag = warned ? ' <span style=\"color:var(--warning);font-weight:700\">⚠ unresolved</span>' : '';
+  return '<div class=correction-label>' + label + '</div>' +
+    '<div class=\"correction-text ' + cls + '\" style=margin-bottom:4px><strong>In-event outcome:</strong> <span style=\"color:' + outColor + ';font-weight:700\">' + escHtml(outcome) + '</span>' + warnTag + '</div>' +
+    '<div class=\"correction-text ' + cls + '\" style=margin-bottom:4px><strong>What happened:</strong> ' + escHtml(b.what_happened || '') + '</div>' +
+    '<div class=\"correction-text ' + cls + '\" style=margin-bottom:4px><strong>Who present:</strong> ' + escHtml(b.who_present || '') + '</div>' +
+    '<div class=\"correction-text ' + cls + '\" style=margin-bottom:4px><strong>Emotional weight:</strong> ' + escHtml(b.emotional_weight || '') + '</div>' +
+    '<div class=\"correction-text ' + cls + '\" style=margin-bottom:10px><strong>Closing line:</strong> ' + escHtml(b.closing_line || '') + '</div>';
+}
+
+function renderEndingNoteCard(note, index, warnedBranches) {
+  warnedBranches = warnedBranches || {};
   return '<div class=correction-card id=note-card-' + index + ' style=border-color:var(--accent)>' +
     '<div class=correction-header>' +
       '<span class=correction-path>' + escHtml(note.role_name) + '</span>' +
       '<span class=\"badge badge-type\">ending notes</span>' +
     '</div>' +
     '<div class=correction-body>' +
-      '<div class=correction-label>Partial Success</div>' +
-      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>What happened:</strong> ' + escHtml(note.partial.what_happened || '') + '</div>' +
-      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>Who present:</strong> ' + escHtml(note.partial.who_present || '') + '</div>' +
-      '<div class=\"correction-text suggested\" style=margin-bottom:4px><strong>Emotional weight:</strong> ' + escHtml(note.partial.emotional_weight || '') + '</div>' +
-      '<div class=\"correction-text suggested\" style=margin-bottom:10px><strong>Closing line:</strong> ' + escHtml(note.partial.closing_line || '') + '</div>' +
-      '<div class=correction-label>Failure</div>' +
-      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>What happened:</strong> ' + escHtml(note.failure.what_happened || '') + '</div>' +
-      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>Who present:</strong> ' + escHtml(note.failure.who_present || '') + '</div>' +
-      '<div class=\"correction-text current\" style=margin-bottom:4px><strong>Emotional weight:</strong> ' + escHtml(note.failure.emotional_weight || '') + '</div>' +
-      '<div class=\"correction-text current\" style=margin-bottom:10px><strong>Closing line:</strong> ' + escHtml(note.failure.closing_line || '') + '</div>' +
+      renderFateBranch('Success', note.success, 'suggested', warnedBranches.success) +
+      renderFateBranch('Partial Success', note.partial, 'suggested', warnedBranches.partial) +
+      renderFateBranch('Failure', note.failure, 'current', warnedBranches.failure) +
     '</div>' +
   '</div>';
 }
