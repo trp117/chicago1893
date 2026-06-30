@@ -130,23 +130,9 @@ class PipelineOrchestrator {
         playerRoles
       );
 
-      // Survivor-safety guard — deterministic, structured-field-only. A documented
-      // survivor must not be killed in-event in any branch. Blocks are halt-and-tell:
-      // the offending role's fate is dropped (never injected/persisted) and surfaced at
-      // the review gate; warnings are flagged but persist. No auto-retry.
-      const guard = ClaudeScenarioClient.assertSurvivorSafety(gptApproved, endingNotes);
-      const blockedRoles = new Set(guard.blocked.map(v => v.role));
-      for (const v of guard.blocked) {
-        console.error(`[FATE-GUARD] BLOCKED survivor death: ${scenarioId}/${v.role}/${v.branch}`);
-      }
-      for (const v of guard.warnings) {
-        console.warn(`[FATE-GUARD] WARN survivor unresolved: ${scenarioId}/${v.role}/${v.branch}`);
-      }
-      if (blockedRoles.size) {
-        // Drop blocked roles' fates so _injectEndingNotes never writes them.
-        endingNotes.ending_notes = endingNotes.ending_notes.filter(n => !blockedRoles.has(n.role_name));
-      }
-      endingNotes.violations = [...guard.blocked, ...guard.warnings];
+      // Survivor-safety guard — gptApproved carries embedded player_roles, so anchor
+      // matching works here directly. Shared with the regenerate-endings path.
+      this._applySurvivorGuard(scenarioId, gptApproved, endingNotes);
 
       const withEndingNotes = this._injectEndingNotes(gptApproved, endingNotes);
       await VersionController.saveVersion(scenarioId, withEndingNotes, {
@@ -206,6 +192,88 @@ class PipelineOrchestrator {
 
   getStatus(scenarioId) {
     return this.activePipelines.get(scenarioId) || null;
+  }
+
+  // Deterministic, structured-field-only survivor-safety guard. Shared by the full
+  // pipeline (Step 6) and the per-role regenerate path so the logic cannot drift.
+  // A documented survivor must not be killed in-event in any branch: a 'died' branch
+  // is a hard block (the role's fate is dropped here so it is never injected/persisted
+  // and surfaced loudly at the gate); 'unresolved'/missing is a soft warning. The
+  // scenarioForAnchor MUST carry player_roles (with character_id) for anchor matching.
+  _applySurvivorGuard(scenarioId, scenarioForAnchor, endingNotes) {
+    const guard = ClaudeScenarioClient.assertSurvivorSafety(scenarioForAnchor, endingNotes);
+    const blockedRoles = new Set(guard.blocked.map(v => v.role));
+    for (const v of guard.blocked) {
+      console.error(`[FATE-GUARD] BLOCKED survivor death: ${scenarioId}/${v.role}/${v.branch}`);
+    }
+    for (const v of guard.warnings) {
+      console.warn(`[FATE-GUARD] WARN survivor unresolved: ${scenarioId}/${v.role}/${v.branch}`);
+    }
+    if (blockedRoles.size) {
+      endingNotes.ending_notes = endingNotes.ending_notes.filter(n => !blockedRoles.has(n.role_name));
+    }
+    endingNotes.violations = [...guard.blocked, ...guard.warnings];
+    return guard;
+  }
+
+  // Regenerate ONE role's fate endings on an existing, already-built scenario.
+  // Non-destructive: generates only the target role, runs the shared guard, and lands
+  // at the existing ending_notes review gate. Persistence (on approval) is a MERGE that
+  // writes only this role's file — other roles are never touched. repos is passed in by
+  // the route (the orchestrator has no repository handle of its own).
+  async regenerateEndingNotes(scenarioId, roleId, repos) {
+    const scenario = await repos.scenarios.findById(scenarioId);
+    if (!scenario) return { ok: false, error: `Scenario not found: ${scenarioId}` };
+
+    const roles = repos.scenarios.findPlayerRoles(scenarioId);
+    const targetRole = roles.find(r => r.id === roleId);
+    if (!targetRole) return { ok: false, error: `Role not found: ${roleId} (scenario ${scenarioId})` };
+
+    // Hard-refuse: the Opus generator requires a declared fate_mode. Do NOT default it
+    // (that is a separate authorial decision) and do NOT generate-and-skip silently.
+    const VALID_FATE_MODES = new Set(['committed', 'suspended', 'anchored']);
+    if (!VALID_FATE_MODES.has(targetRole.fate_mode)) {
+      return { ok: false, refused: true,
+        error: `role ${roleId} has no fate_mode — set it before regenerating` };
+    }
+
+    // MANDATORY: persisted scenarios use playerRoleIds with no embedded player_roles, so
+    // the guard's anchor lookup (scenario.player_roles) would otherwise be empty and
+    // SILENTLY pass a survivor death. Attach the loaded roles (they carry character_id).
+    scenario.player_roles = roles;
+
+    const endingNotes = await ClaudeScenarioClient.generateEndingNotes(scenario, [targetRole]);
+
+    // Empty/skip check — never silently succeed. Detect before the guard so a generation
+    // skip (no fate output) is distinct from a guard block (generated but killed survivor).
+    const generated = (endingNotes.ending_notes || []).find(n => n.role_name === targetRole.name);
+    if (!generated) {
+      const skip = (endingNotes.skipped || []).find(s => s.role_name === targetRole.name);
+      return { ok: false, skipped: true,
+        error: `nothing generated for ${roleId}${skip ? ` — ${skip.reason}` : ''}` };
+    }
+
+    // Shared guard. scenario now carries player_roles, so anchor matching works.
+    this._applySurvivorGuard(scenarioId, scenario, endingNotes);
+
+    // Stand up a fresh single-step pipeline state at the existing review gate. The
+    // regenerateEndings flag routes approval through the merge-persist path.
+    const state = {
+      scenarioId,
+      status: 'running',
+      currentStep: 'ending_notes',
+      steps: {},
+      startedAt: new Date().toISOString(),
+      regenerateEndings: true,
+      regenerateRoleId: roleId
+    };
+    this.activePipelines.set(scenarioId, state);
+    this._setStep(state, 'ending_notes', 'awaiting_approval', { endingNotes, scenario });
+
+    const blocked = (endingNotes.violations || []).filter(
+      v => v.type === 'survivor_died' && v.role === targetRole.name
+    );
+    return { ok: true, blocked, violations: endingNotes.violations || [], state };
   }
 
   _setStep(state, stepName, status, data = {}) {

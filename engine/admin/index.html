@@ -1924,6 +1924,12 @@ function renderPlayerRolesSection(data) {
       ${edField('Character Type', `<select data-path="playerRoles.${i}.character_type"><option value=""${!r.character_type ? ' selected' : ''}>— not declared (legacy only) —</option><option value="real"${r.character_type === 'real' ? ' selected' : ''}>real — documented historical individual</option><option value="fictional"${r.character_type === 'fictional' || r.character_type === 'composite' ? ' selected' : ''}>fictional — not a documented individual (composite, representative, or invented)</option></select>`, 'Required for Historical Record generation.')}
       ${edField('Represents',         edTextarea(`playerRoles.${i}.represents`, r.represents, 2), 'Required for fictional/composite — what category of real person this role represents')}
       ${edField('Fact Checked', `<select data-path="playerRoles.${i}.fact_checked"><option value="false"${r.fact_checked !== true ? ' selected' : ''}>No — needs review</option><option value="true"${r.fact_checked === true ? ' selected' : ''}>Yes — verified</option></select>`, 'Has the real vs fictional declaration been verified?')}
+      <div style="background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary btn-sm regen-endings-btn" data-role-id="${r.id}" data-role-name="${(r.name||'').replace(/"/g,'&quot;')}" style="white-space:nowrap;flex-shrink:0">↻ Regenerate Endings (Opus)</button>
+          <span class="help-text" style="margin:0">Regenerates this role's success / partial / failure fates only — reviewed at the pipeline gate before saving. Does <strong>not</strong> rebuild the scenario or touch other roles. Requires a <code>fate_mode</code> on this role.</span>
+        </div>
+      </div>
       ${edDetails('Ending Notes', 'partial + failure', `
         <p class="help-text" style="margin-bottom:12px">Used when <em>Structured Endings</em> is enabled on the scenario. Notes guide the closing prose for partial and failure outcomes — success always uses the transcript.</p>
         <div style="margin-bottom:18px">
@@ -3633,6 +3639,40 @@ function renderPreview(data, autoSaved = false) {
       toast('Bridge sentence draft generated — review before saving', 'warn');
     } catch (err) {
       toast(`Error: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+
+  // ── Regenerate Endings (per role, Opus) ────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.regen-endings-btn');
+    if (!btn) return;
+    const roleId   = btn.dataset.roleId;
+    const roleName = btn.dataset.roleName || roleId;
+    if (!roleId || !scenarioId) return;
+    if (!confirm(
+      `Regenerate endings for "${roleName}" in scenario "${scenarioId}"?\n\n` +
+      `Regenerates this role's endings only — does not touch other roles or scenario content. ` +
+      `You will review the result at the pipeline gate before anything is saved.`
+    )) return;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Regenerating…';
+    try {
+      const result = await apiPost(`/pipeline/regenerate-endings/${encodeURIComponent(scenarioId)}`, { roleId });
+      if (result.blocked && result.blocked.length) {
+        toast('Blocked — documented survivor marked died. Review at the pipeline gate (Approve is disabled).', 'error');
+      } else if (result.violations && result.violations.length) {
+        toast('Regenerated with warnings — review unresolved branches at the pipeline gate.', 'warn');
+      } else {
+        toast('Endings regenerated — review and approve at the pipeline gate.', 'warn');
+      }
+      window.open(`/admin/pipeline.html?scenario=${encodeURIComponent(scenarioId)}`, '_blank');
+    } catch (err) {
+      // Hard-refuse (no fate_mode) and skip surface here with the server's message.
+      toast(`Regenerate failed: ${err.message}`, 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = originalText;

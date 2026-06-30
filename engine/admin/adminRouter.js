@@ -131,6 +131,46 @@ function stripEmptyEndingNotes(role) {
   return role;
 }
 
+// Persist a set of ending-notes (and the other role fields they may carry) onto the
+// scenario's player-role files. This is a MERGE: only roles named in `notes` are written
+// (one file each via savePlayerRole); roles absent from `notes` are never loaded or
+// touched. Shared by the inject-ending-notes route and the regenerate-endings approval
+// so a single-role write can never disturb the other roles' endings.
+async function applyEndingNotesToRoles(repos, scenarioId, notes) {
+  const scenario = await repos.scenarios.findById(scenarioId);
+  if (!scenario) throw new Error(`Scenario not found: ${scenarioId}`);
+  const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
+  let updated = 0;
+  const unmatched = [];
+  for (const note of (notes || [])) {
+    const role = playerRoles.find(r => r.name === note.role_name);
+    if (!role) { unmatched.push(note.role_name); continue; }
+    if (note.briefing)           role.briefing          = note.briefing;
+    if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
+    if (note.hook_1 || note.hook_2 || note.hook_3) {
+      role.character_hooks = [note.hook_1, note.hook_2, note.hook_3].filter(h => h);
+    }
+    if (note.suggested_secret)  role.suggested_secret  = note.suggested_secret;
+    if (note.access_level)      role.accessLevel       = note.access_level;
+    if (note.perspective)       role.perspective       = note.perspective;
+    if (note.description)       role.description       = note.description;
+    if (note.success || note.partial || note.failure) {
+      role.ending_notes = role.ending_notes || {};
+      if (note.success) role.ending_notes.success = note.success;
+      if (note.partial) role.ending_notes.partial = note.partial;
+      if (note.failure) role.ending_notes.failure = note.failure;
+    }
+    repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(role)));
+    updated++;
+  }
+  await VersionController.saveVersion(scenarioId, scenario, {
+    label: 'ending_notes_injected',
+    pipeline_step: 'ending_notes',
+    changes_applied: updated
+  });
+  return { updated, unmatched, scenario };
+}
+
 // ── Generation helpers ────────────────────────────────────────────────────────
 
 function extractJson(raw) {
@@ -2201,6 +2241,17 @@ Return ONLY valid JSON in this exact structure:
             pipeline_step: 'synopsis'
           });
         }
+      } else if (stepName === 'ending_notes' && state.regenerateEndings) {
+        // Regenerate-endings flow: persist ONLY the regenerated role(s) via the merge
+        // helper (writes role files; others untouched). Blocked roles were already
+        // dropped from ending_notes by the guard, so they are not written here.
+        const en = state.steps['ending_notes'] && state.steps['ending_notes'].endingNotes;
+        const notes = (en && en.ending_notes) || [];
+        const { updated, unmatched } = await applyEndingNotesToRoles(repos, scenarioId, notes);
+        state.steps['ending_notes'].status = 'approved';
+        state.steps['ending_notes'].approvedAt = new Date().toISOString();
+        state.status = 'complete';
+        return res.json({ success: true, rolesUpdated: updated, unmatched });
       } else {
         await PipelineOrchestrator.approveStep(scenarioId, stepName, approvedScenario);
       }
@@ -2237,6 +2288,37 @@ Return ONLY valid JSON in this exact structure:
       const { scenarioId, versionA, versionB } = req.params;
       const diff = await VersionController.diff(scenarioId, parseInt(versionA), parseInt(versionB));
       res.json({ diff });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Regenerate ONE role's fate endings on an existing scenario, on demand. Runs the full
+  // safety path (generate -> guard -> review gate) and lands at the ending_notes gate for
+  // approval; on approval the merge-persist writes only this role's file. Non-destructive
+  // to other roles and to all other scenario content. NOT the destructive full build.
+  r.post('/pipeline/regenerate-endings/:scenarioId', async (req, res) => {
+    try {
+      const { scenarioId } = req.params;
+      const { roleId } = req.body;
+      if (!roleId) return res.status(400).json({ error: 'roleId is required' });
+      const result = await PipelineOrchestrator.regenerateEndingNotes(scenarioId, roleId, repos);
+      if (!result.ok) {
+        // 422 for refusal (no fate_mode) / skip (nothing generated); 404 for not-found.
+        const code = (result.refused || result.skipped) ? 422 : 404;
+        return res.status(code).json({
+          error: result.error,
+          refused: !!result.refused,
+          skipped: !!result.skipped
+        });
+      }
+      res.json({
+        success: true,
+        scenarioId,
+        roleId,
+        blocked: result.blocked,
+        violations: result.violations
+      });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -2281,37 +2363,7 @@ Return ONLY valid JSON in this exact structure:
       }
       const scenario = await repos.scenarios.findById(scenarioId);
       if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
-      const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
-      let updated = 0;
-      const unmatched = [];
-      for (const note of ending_notes) {
-        const role = playerRoles.find(r => r.name === note.role_name);
-        if (!role) { unmatched.push(note.role_name); continue; }
-        {
-          if (note.briefing)           role.briefing          = note.briefing;
-          if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
-          if (note.hook_1 || note.hook_2 || note.hook_3) {
-            role.character_hooks = [note.hook_1, note.hook_2, note.hook_3].filter(h => h);
-          }
-          if (note.suggested_secret)  role.suggested_secret  = note.suggested_secret;
-          if (note.access_level)      role.accessLevel       = note.access_level;
-          if (note.perspective)       role.perspective       = note.perspective;
-          if (note.description)       role.description       = note.description;
-          if (note.success || note.partial || note.failure) {
-            role.ending_notes = role.ending_notes || {};
-            if (note.success) role.ending_notes.success = note.success;
-            if (note.partial) role.ending_notes.partial = note.partial;
-            if (note.failure) role.ending_notes.failure = note.failure;
-          }
-          repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(role)));
-          updated++;
-        }
-      }
-      await VersionController.saveVersion(scenarioId, scenario, {
-        label: 'ending_notes_injected',
-        pipeline_step: 'ending_notes',
-        changes_applied: updated
-      });
+      const { updated, unmatched } = await applyEndingNotesToRoles(repos, scenarioId, ending_notes);
       res.json({ success: true, rolesUpdated: updated, unmatched });
     } catch (err) {
       res.status(500).json({ error: err.message });

@@ -795,6 +795,18 @@ function showToast(msg, type) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
+
+// Deep-link: /admin/pipeline.html?scenario=<id> auto-attaches to an in-progress pipeline
+// (e.g. a regenerate-endings run kicked off from the scenario editor) and starts polling
+// so the review gate renders without re-entering the scenario id.
+(function autoLoadFromQuery() {
+  const id = new URLSearchParams(window.location.search).get('scenario');
+  if (!id) return;
+  state.scenarioId = id;
+  const badge = document.getElementById('scenario-badge');
+  if (badge) badge.textContent = id;
+  startPolling();
+})();
 </script>
 </body>
 </html>
