@@ -119,13 +119,13 @@ function normalizeBriefing(role) {
 // a preview form never writes empty ending_notes structures into role files.
 function stripEmptyEndingNotes(role) {
   if (!role.ending_notes) return role;
-  for (const type of ['partial', 'failure']) {
+  for (const type of ['success', 'partial', 'failure']) {
     const notes = role.ending_notes[type];
     if (!notes) continue;
     const hasContent = Object.values(notes).some(v => typeof v === 'string' && v.trim());
     if (!hasContent) delete role.ending_notes[type];
   }
-  if (!role.ending_notes.partial && !role.ending_notes.failure) {
+  if (!role.ending_notes.success && !role.ending_notes.partial && !role.ending_notes.failure) {
     delete role.ending_notes;
   }
   return role;
@@ -2297,8 +2297,9 @@ Return ONLY valid JSON in this exact structure:
           if (note.access_level)      role.accessLevel       = note.access_level;
           if (note.perspective)       role.perspective       = note.perspective;
           if (note.description)       role.description       = note.description;
-          if (note.partial || note.failure) {
+          if (note.success || note.partial || note.failure) {
             role.ending_notes = role.ending_notes || {};
+            if (note.success) role.ending_notes.success = note.success;
             if (note.partial) role.ending_notes.partial = note.partial;
             if (note.failure) role.ending_notes.failure = note.failure;
           }

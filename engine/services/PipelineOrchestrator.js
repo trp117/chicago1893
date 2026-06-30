@@ -122,12 +122,11 @@ class PipelineOrchestrator {
       await this._waitForApproval(scenarioId, 'gpt_reviewed');
       const gptApproved = state.steps['gpt_reviewed'].approvedScenario;
 
-      // Step 6 — Gemini generates ending notes
+      // Step 6 — Claude/Opus generates ending notes (Gemini generator left in place, unwired)
       this._setStep(state, 'ending_notes', 'running');
       const playerRoles = gptApproved.player_roles || [];
-      const endingNotes = await GeminiClient.generateEndingNotes(
-        JSON.stringify(gptApproved, null, 2),
-        gptApproved.title || scenarioId,
+      const endingNotes = await ClaudeScenarioClient.generateEndingNotes(
+        gptApproved,
         playerRoles
       );
       const withEndingNotes = this._injectEndingNotes(gptApproved, endingNotes);
@@ -301,8 +300,13 @@ class PipelineOrchestrator {
     for (const note of notes) {
       const role = playerRoles.find(r => r.name === note.role_name);
       if (role) {
-        if (note.partial) role.partial = note.partial;
-        if (note.failure) role.failure = note.failure;
+        // Write the nested ending_notes path the renderer reads (gameRouter.js:1248-1266).
+        if (note.success || note.partial || note.failure) {
+          role.ending_notes = role.ending_notes || {};
+          if (note.success) role.ending_notes.success = note.success;
+          if (note.partial) role.ending_notes.partial = note.partial;
+          if (note.failure) role.ending_notes.failure = note.failure;
+        }
         if (note.briefing) role.briefing = note.briefing;
         if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
         if (note.hook_1) role.hook1 = note.hook_1;

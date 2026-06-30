@@ -77,10 +77,19 @@ ${scenarioText}`;
   return JSON.parse(result);
 }
 
-export async function reviewEndingNotes(endingNotesText, scenarioTitle, scenarioContext) {
+export async function reviewEndingNotes(endingNotesText, scenarioTitle, scenarioContext, anchoredBindings = []) {
   const systemPrompt = `You are a narrative quality editor for interactive historical fiction.
 You review character ending notes for consistency with the scenario, emotional authenticity,
 and historical accuracy. You always respond with valid JSON only — no prose before or after.`;
+
+  // Record-binding constraints: for anchored roles, the note must not contradict the
+  // documented/macro outcome. This is the check that must catch an invented death of a
+  // documented survivor (the gap that let an Apollo commander "drift into deep space").
+  const bindingBlock = (anchoredBindings && anchoredBindings.length)
+    ? `\nRECORD-BINDING CONSTRAINTS (anchored roles — a contradiction here is a HIGH-priority violation):\n` +
+      anchoredBindings.map(b => `- ${b.role_name}: ${b.requirement}`).join('\n') +
+      `\nFor each anchored role, check EVERY end-state (success, partial, failure). Flag — with field "RECORD_CONTRADICTION" — any note that kills, strands-to-death, or otherwise removes from life a documented survivor in any branch, or that contradicts the role's fixed macro-outcome. A documented survivor must survive in all three branches; failure is survival at cost, never death.`
+    : '';
 
   const userPrompt = `Review the following ending notes for ${scenarioTitle}.
 
@@ -90,6 +99,8 @@ Check for:
 3. Emotional authenticity — are the emotional weights believable and earned
 4. Historical grounding — do endings respect the fixed historical outcome
 5. Closing line quality — is each closing line strong and specific
+6. Record contradiction — for anchored roles, does any branch contradict the documented outcome / macro-outcome (see constraints below)
+${bindingBlock}
 
 Respond in the following JSON format exactly:
 
@@ -97,8 +108,8 @@ Respond in the following JSON format exactly:
   "corrections": [
     {
       "role_name": "the character role this correction applies to",
-      "ending_type": "partial|failure",
-      "field": "what_happened|who_present|emotional_weight|closing_line",
+      "ending_type": "success|partial|failure",
+      "field": "what_happened|who_present|emotional_weight|closing_line|RECORD_CONTRADICTION",
       "current_text": "exact current text",
       "corrected_text": "the full corrected replacement text",
       "reason": "brief explanation",
