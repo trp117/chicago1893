@@ -135,11 +135,12 @@ function resolveAnchorBinding(scenario, role) {
 const FATE_OUTPUT_SHAPE = `Return valid JSON only — no prose, no markdown, no backticks. Exactly this shape:
 {
   "role_name": "<exact role name>",
-  "success": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "..." },
-  "partial": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "..." },
-  "failure": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "..." }
+  "success": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" },
+  "partial": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" },
+  "failure": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" }
 }
-Each end-state commits to its outcome: success = the objective achieved cleanly; partial = achieved at a real toll; failure = not achieved. "who_present" is a comma-separated list of co-located player role names at that resolution. "closing_line" is one punchy standalone thematic sentence — not a generic wrap-up. "emotional_weight" is the precise psychological takeaway.`;
+Each end-state commits to its outcome: success = the objective achieved cleanly; partial = achieved at a real toll; failure = not achieved. "who_present" is a comma-separated list of co-located player role names at that resolution. "closing_line" is one punchy standalone thematic sentence — not a generic wrap-up. "emotional_weight" is the precise psychological takeaway.
+"in_event_outcome" is a STRUCTURED restatement of what "what_happened" depicts for THIS character — not an independent claim. It is one of exactly: "survived" (alive and not seriously incapacitated at the end of the depicted event), "died" (killed DURING the depicted event — in-event, not later in life), "incapacitated" (alive but seriously wounded / out of action by the event's end), "captured" (taken prisoner during the event — alive, in enemy hands), or "unresolved" (the branch does not commit to a definite in-event fate). Reflect the IN-EVENT outcome only, never the character's later-life fate. Set it to match what the prose actually depicts; you MUST use "unresolved" rather than invent a definite fate the prose does not support.`;
 
 function buildFateBranch(scenario, role) {
   const mode = role.fate_mode;

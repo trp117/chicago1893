@@ -122,7 +122,7 @@ function stripEmptyEndingNotes(role) {
   for (const type of ['success', 'partial', 'failure']) {
     const notes = role.ending_notes[type];
     if (!notes) continue;
-    const hasContent = Object.values(notes).some(v => typeof v === 'string' && v.trim());
+    const hasContent = Object.entries(notes).some(([k, v]) => k !== 'in_event_outcome' && typeof v === 'string' && v.trim());
     if (!hasContent) delete role.ending_notes[type];
   }
   if (!role.ending_notes.success && !role.ending_notes.partial && !role.ending_notes.failure) {
