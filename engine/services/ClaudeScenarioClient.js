@@ -132,6 +132,34 @@ function resolveAnchorBinding(scenario, role) {
   return { kind: 'welded_unbound' };
 }
 
+// Compact, immutable roster of every real person's documented fate, injected into the
+// fate prompt so the generator can honor the universal law across ALL roles — not just
+// the target role's own anchor. A role's ending may not kill another documented survivor
+// (or resurrect a documented casualty); this block is what makes that enforceable at
+// generation. One line per fate: outcome + a short manner clause (the first sentence of
+// the record), never the full paragraph.
+function buildDocumentedFatesRoster(scenario) {
+  const fates = scenario?.epilogue?.character_fates || [];
+  if (!fates.length) return '';
+  const lines = fates.map(f => {
+    const name = f.name || f.character_id || 'Unknown';
+    const outcome = f.outcome || 'unknown';
+    const rec = (f.historical_record || '').trim();
+    const clause = rec ? rec.split(/(?<=[.!?])\s/)[0].trim() : '';
+    return clause ? `- ${name}: ${outcome} — ${clause}` : `- ${name}: ${outcome}`;
+  });
+  return `DOCUMENTED FATES OF REAL PEOPLE (immutable — no branch of any role may contradict these: survivors survive, casualties die, in every branch):\n${lines.join('\n')}`;
+}
+
+// The immutability law + failure redefinition, prepended to every mode's instruction so
+// each generated ending is bound by it regardless of the role's fate_mode.
+const UNIVERSAL_LAW = `UNIVERSAL LAW — THE RECORD IS IMMUTABLE IN EVERY DIRECTION. The documented historical record is fixed for every real person, across all roles and all three branches. No ending may narrate: a documented survivor dying, a documented casualty surviving, or any change to the macro-historical outcome or to the documented manner of and relationships between real people. This holds EVEN WHEN the ending belongs to a different character than the one whose fate would be altered — a commander's failure branch may NOT kill the crew; a witness's failure may not change what they witnessed. Consult the DOCUMENTED FATES OF REAL PEOPLE block above: every name there is fixed in the direction stated.
+
+FAILURE, REDEFINED FOR FIXED HISTORY. Failure is NOT a different outcome — it is the costliest human path to the SAME fixed outcome. The fixed events land where they landed; what the success/partial/failure gradient changes is cost, method, and self — at what price the fixed outcome was reached, through whose error, and what the character carries out of it.
+- SUCCESS = the fixed outcome reached cleanly; the character was equal to the moment.
+- PARTIAL = the fixed outcome reached, but at cost — haunted, a near-miss, a price paid.
+- FAILURE = the fixed outcome STILL reached (history holds), but through the character's errors, by luck rather than skill, at the maximal personal / professional / moral cost. The character fails HIMSELF and those around him — never history. The fixed result arrives DESPITE the character, who is left with the corrosive knowledge that he was lucky, not good. Failure never undoes the fixed result.`;
+
 // In-event outcomes that are consistent with a documented survivor surviving the event.
 const SURVIVOR_SAFE_OUTCOMES = new Set(['survived', 'incapacitated', 'captured']);
 
@@ -189,26 +217,36 @@ function buildFateBranch(scenario, role) {
   if (mode === 'committed') {
     return {
       ok: true,
-      instruction: `MODE: COMMITTED (composite figure in jeopardy). Invent a plausible, dramatically-earned outcome across the full fate range. The failure branch MAY commit to this character's death if the scene earns it — death is on the table here.`
+      instruction: `${UNIVERSAL_LAW}
+
+MODE: COMMITTED (fictional / composite figure — full range on the table). This character MAY die in a failure branch, OR may live bearing the burden of failure — the whole range is available for THIS character. BUT their death or failure is SELF-CONTAINED: it may affect only this fictional character and OTHER FICTIONAL characters. It may NOT kill or alter the documented fate of any real person, and may NOT change the macro-outcome. (A fictional Ranger may die pushing the Bangalore; his death may NOT make the fixed draw "never taken" or kill a real documented officer.) Within those bounds, invent a plausible, dramatically-earned outcome.`
     };
   }
   if (mode === 'suspended') {
     return {
       ok: true,
-      instruction: `MODE: SUSPENDED (openness-preserving). Do NOT commit to a death in any branch. Keep the character's ultimate fate open; failure is a degraded, unresolved cost, never a death-committed ending.`
+      instruction: `${UNIVERSAL_LAW}
+
+MODE: SUSPENDED (fictional; no death by authorial choice). Do NOT commit to this character's death in any branch — their ultimate fate is kept open by authorial choice, not by the record. Failure is cost and burden only: a degraded, unresolved personal price, never a death-committed ending. The same no-altering-history constraint applies — nothing in any branch may change a real person's documented fate or the macro-outcome.`
     };
   }
   if (mode === 'anchored') {
     const binding = resolveAnchorBinding(scenario, role);
     if (binding.kind === 'documented') {
       const f = binding.fate;
-      const survived = f.outcome === 'survived';
-      const deathRule = survived
-        ? `This figure is a DOCUMENTED SURVIVOR of the depicted event (outcome: survived). NO branch — including failure — may kill, disappear, or strand this person to their death. Failure means a degraded outcome or heavy personal cost at which the documented figure still survives.`
-        : `This figure's documented in-event outcome is "${f.outcome}". Stay within that record; do not invent specifics beyond it.`;
+      let ownFateRule;
+      if (f.outcome === 'survived') {
+        ownFateRule = `THIS CHARACTER'S OWN FATE — DOCUMENTED SURVIVOR (outcome: survived). This person does NOT die in any branch; the record says they lived. NO branch — including failure — may kill, disappear, or strand this person to their death. Failure means the maximal personal / professional / moral cost WITHIN their survival — they live, but they live having failed themselves.`;
+      } else if (f.outcome === 'died') {
+        ownFateRule = `THIS CHARACTER'S OWN FATE — DOCUMENTED CASUALTY (outcome: died). This person DIES in EVERY branch — success, partial, AND failure — because the record says they died; the player cannot prevent it. Success/partial/failure is NOT whether they die but the MEANING, DIGNITY, and COST of how they meet the fixed death, honoring the documented manner and relationships. Success = the documented, meaningful death met with intentions intact; partial = the fixed death, but shadowed by a price or a near-betrayal; failure = a death that squanders its meaning — panic, or a betrayal of the character's own principles. Do not invent a manner of death that contradicts the record.`;
+      } else {
+        ownFateRule = `THIS CHARACTER'S OWN FATE — INDETERMINATE (documented outcome: "${f.outcome}"). The record does not fix a definite in-event fate. Stay within the record; do not invent a definite in-event death or survival the record does not support. Failure is cost and burden within that documented ambiguity.`;
+      }
       return {
         ok: true,
-        instruction: `MODE: ANCHORED — DOCUMENTED FIGURE (${f.name}). Stay within the documented record. ${deathRule} Ground facts ONLY in this record; do not assert undocumented specifics as fact.
+        instruction: `${UNIVERSAL_LAW}
+
+MODE: ANCHORED — DOCUMENTED FIGURE (${f.name}). Stay within the documented record; ground facts ONLY in it and do not assert undocumented specifics as fact. ${ownFateRule}
 DOCUMENTED RECORD:\n${f.historical_record || '(no narrative record provided)'}`
       };
     }
@@ -216,7 +254,9 @@ DOCUMENTED RECORD:\n${f.historical_record || '(no narrative record provided)'}`
       const m = binding.macro;
       return {
         ok: true,
-        instruction: `MODE: ANCHORED — WELDED COMPOSITE (no documented person record). This invented figure is welded to the scenario's FIXED MACRO-OUTCOME, which is immutable and bounds all three branches. If the macro-outcome is one in which the people involved survive (no violence, no deaths), then NO branch — including failure — may kill this role; failure is a degraded personal cost within that fixed surviving reality, never a contradiction of it.
+        instruction: `${UNIVERSAL_LAW}
+
+MODE: ANCHORED — WELDED COMPOSITE (no documented person record). This invented figure is welded to the scenario's FIXED MACRO-OUTCOME, which is immutable and bounds all three branches. The macro-outcome and every real person's documented fate hold in every branch. If the macro-outcome is one in which the people involved survive (no violence, no deaths), then NO branch — including failure — may kill this role; failure is the maximal personal cost WITHIN that fixed surviving reality, never a contradiction of it.
 FIXED MACRO-OUTCOME:\n${m.summary || ''}${(m.key_facts && m.key_facts.length) ? '\nKey facts: ' + m.key_facts.map(k => (typeof k === 'string' ? k : k.text)).filter(Boolean).join(' | ') : ''}`
       };
     }
@@ -249,10 +289,11 @@ export async function generateEndingNotes(scenario, roles) {
     const systemPrompt = `You are the structured-endings author for an interactive historical simulation. For ONE player role, write three committed end-states — success, partial, failure — each as ground-level narrative consequence, not melodrama. Outcomes are driven by the tactical environment and the character's choices. Write in tight, sensory, professional prose. ${FATE_OUTPUT_SHAPE}`;
 
     const otherRoles = (roles || []).filter(r => r.name !== role.name).map(r => r.name);
+    const fatesRoster = buildDocumentedFatesRoster(scenario);
     const userPrompt = `SCENARIO: ${scenarioTitle}
 PREMISE: ${scenario?.premise || scenario?.opening_premise || ''}
 DOCUMENTED EVENT OUTCOME: ${scenario?.epilogue?.immediate_outcome?.summary || '(see record below)'}
-
+${fatesRoster ? '\n' + fatesRoster + '\n' : ''}
 PLAYER ROLE: ${role.name}
 ROLE CONTEXT: ${role.description || role.briefing || ''}
 OTHER PLAYER ROLES (for "who_present" cross-reference): ${otherRoles.join(', ') || '(none)'}
