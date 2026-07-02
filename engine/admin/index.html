@@ -2652,6 +2652,99 @@ function renderPublicationReview(data) {
   </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// UNSAVED-CHANGES TRACKING (role editor / preview)
+// ═══════════════════════════════════════════════════════════════
+// Whole-form dirty flag. Set true on any change to a PERSISTED field, cleared
+// on successful save. Drives the "● Unsaved changes" badge, the Save-button
+// emphasis, the header pill, the Save-before-Regenerate guard, and the
+// beforeunload warning. Module-level so handleManualSave (defined outside the
+// renderPreview closure) can clear it at the single save choke point.
+let formDirty = false;
+
+// Mirrors exactly the fields collectEdits() persists, so dirty ⟺ a saved field
+// changed (no false positives from the name-search box, sliders, or AI panel).
+// fate_mode is a <select data-path="…"> → covered by [data-path]; the change
+// listener (not just input) is what actually catches it.
+const PERSISTED_FIELD_SELECTOR = [
+  '[data-path]',
+  '.beat-desc', '.beat-id',
+  '.checklist-cb', '.checklist-notes',
+  '[class*="tf-fact-"]',
+  '[class*="ep-char"]', '[class*="ep-fact"]', '[class*="ep-frame"]',
+  '[class*="ep-thread"]', '[class*="ep-echo"]',
+  '.edit-term', '.edit-definition', '.edit-source',
+].join(',');
+
+function markFormDirty() {
+  formDirty = true;
+  const badge = document.getElementById('dirty-badge');
+  if (badge) badge.style.display = 'inline-flex';
+  const saveBtn = document.getElementById('preview-save');
+  if (saveBtn) saveBtn.style.boxShadow = '0 0 0 2px #f59e0b';
+  const pill = document.getElementById('save-status-pill');
+  if (pill) { pill.className = 'saved-pill warn'; pill.textContent = '⚠ Not saved'; }
+}
+
+function clearFormDirty() {
+  formDirty = false;
+  const badge = document.getElementById('dirty-badge');
+  if (badge) badge.style.display = 'none';
+  const saveBtn = document.getElementById('preview-save');
+  if (saveBtn) saveBtn.style.boxShadow = '';
+  // Header pill is set to "✓ Saved" by handleManualSave's success path.
+}
+
+// Promise-based confirm reusing the shared #modal-overlay. Captures and restores
+// the modal's title/body/button text+class so the shared delete-confirm modal
+// (which relies on its default "Cancel"/"Delete" labels) is untouched afterward.
+function confirmModal({ title, body, confirmLabel = 'OK', confirmClass = 'btn-primary', cancelLabel = 'Cancel' }) {
+  return new Promise(resolve => {
+    const overlay   = document.getElementById('modal-overlay');
+    const titleEl   = document.getElementById('modal-title');
+    const bodyEl    = document.getElementById('modal-body');
+    const okBtn     = document.getElementById('modal-confirm');
+    const cancelBtn = document.getElementById('modal-cancel');
+    const orig = {
+      title: titleEl.textContent, body: bodyEl.textContent,
+      okText: okBtn.textContent, okClass: okBtn.className,
+      cancelText: cancelBtn.textContent,
+    };
+    titleEl.textContent   = title;
+    bodyEl.textContent    = body;
+    okBtn.textContent     = confirmLabel;
+    okBtn.className        = `btn ${confirmClass}`;
+    cancelBtn.textContent = cancelLabel;
+    overlay.classList.remove('hidden');
+
+    const finish = result => {
+      overlay.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onBackdrop);
+      titleEl.textContent   = orig.title;
+      bodyEl.textContent    = orig.body;
+      okBtn.textContent     = orig.okText;
+      okBtn.className        = orig.okClass;
+      cancelBtn.textContent = orig.cancelText;
+      resolve(result);
+    };
+    const onOk       = () => finish(true);
+    const onCancel   = () => finish(false);
+    const onBackdrop = e => { if (e.target === overlay) finish(false); };
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onBackdrop);
+  });
+}
+
+// Standard browser leave/close/reload prompt when there are unsaved edits.
+// Registered once at load. The Regenerate button opens its result via
+// window.open(new tab), which does NOT unload this page, so it never trips this.
+window.addEventListener('beforeunload', e => {
+  if (formDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
 async function handleManualSave(data, containerEl) {
   const btn = document.getElementById('preview-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
@@ -2685,8 +2778,11 @@ async function handleManualSave(data, containerEl) {
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
+    clearFormDirty();   // single choke point — clears badge/Save emphasis for all save paths
+    return true;
   } catch (err) {
     toast(`Save failed: ${err.message}`, 'error');
+    return false;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
   }
@@ -3322,6 +3418,7 @@ function renderPreview(data, autoSaved = false) {
   const { scenario = {}, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = data;
   const scenarioId = scenario.id || scenario.scenario_id || '';
   _imgPromptScenarioId = scenarioId;
+  formDirty = false;   // freshly (re)rendered editor starts clean; badge below renders hidden
 
   setTopbar(scenario.title || 'Generated Story', [
     { label: '▶ Play',        cls: 'btn-success',   action: () => { const id = document.querySelector('[data-path="scenario.id"]')?.value || scenarioId; window.open(`/game?scenarioId=${encodeURIComponent(id)}`, '_blank'); } },
@@ -3343,6 +3440,7 @@ function renderPreview(data, autoSaved = false) {
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
           <span style="font-size:18px;font-weight:700">${esc(scenario.title || 'Untitled')}</span>
           ${pillHtml}
+          <span id="dirty-badge" style="display:none;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #f59e0b;border-radius:999px;padding:2px 10px">● Unsaved changes</span>
         </div>
         <div style="font-size:12px;color:var(--text-soft);font-family:monospace">${esc(scenarioId)}</div>
       </div>
@@ -3438,6 +3536,16 @@ function renderPreview(data, autoSaved = false) {
   }
 
   const formEl = document.getElementById('preview-form');
+
+  // ── Unsaved-changes tracking — mark dirty on any persisted-field edit ──────
+  // MUST bind BOTH input and change: fate_mode is a <select>, which fires
+  // 'change' (not 'input'). An input-only listener would miss the exact field
+  // this whole guard exists to protect.
+  const onFieldEdit = e => {
+    if (e.target && e.target.matches && e.target.matches(PERSISTED_FIELD_SELECTOR)) markFormDirty();
+  };
+  formEl.addEventListener('input',  onFieldEdit);
+  formEl.addEventListener('change', onFieldEdit);
 
   // ── Image Artwork section ─────────────────────────────────────────────────
   {
@@ -3653,6 +3761,24 @@ function renderPreview(data, autoSaved = false) {
     const roleId   = btn.dataset.roleId;
     const roleName = btn.dataset.roleName || roleId;
     if (!roleId || !scenarioId) return;
+
+    // Save-before-Regenerate guard — regenerate runs against the SAVED role data
+    // (server reads persisted files; the button sends only roleId). If the form
+    // has unsaved edits (notably fate_mode), regenerating now would use the stale
+    // saved value. Force a save first; only regenerate if the save succeeds.
+    if (formDirty) {
+      const proceed = await confirmModal({
+        title: 'Save before regenerating?',
+        body: 'Regenerate uses the SAVED role data. You have unsaved changes (this may include fate_mode). Save before regenerating?',
+        confirmLabel: 'Save & Regenerate',
+        confirmClass: 'btn-primary',
+        cancelLabel: 'Cancel',
+      });
+      if (!proceed) return;                              // Cancel → nothing saved, nothing regenerated
+      const saved = await handleManualSave(data, formEl);
+      if (!saved) return;                                // Save failed → error surfaced; do NOT regenerate
+    }
+
     if (!confirm(
       `Regenerate endings for "${roleName}" in scenario "${scenarioId}"?\n\n` +
       `Regenerates this role's endings only — does not touch other roles or scenario content. ` +
