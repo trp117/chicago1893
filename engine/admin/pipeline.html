@@ -151,6 +151,7 @@
   <div class='header-actions'>
     <button class='btn btn-sm' onclick='loadVersionHistory()'>↺ Refresh History</button>
     <button class='btn btn-sm btn-primary' id='btn-approve-step' onclick='approveCurrentStep()' disabled>✓ Approve Step</button>
+    <button class='btn btn-sm btn-danger' id='btn-reject-step' onclick='rejectCurrentStep()' style='display:none'>✕ Reject</button>
   </div>
 </div>
 
@@ -399,6 +400,10 @@ function updateStepUI(pipeline) {
 // CORRECTIONS / DIFF REVIEWER
 // ============================================================
 function loadCorrections(stepName, stepData) {
+  // Default action-button visibility; the ending_notes gate overrides these below.
+  document.getElementById('btn-accept-all').style.display = '';
+  document.getElementById('btn-reject-all').style.display = '';
+  document.getElementById('btn-reject-step').style.display = 'none';
   if (stepName === 'synopsis') {
     state.currentStep = stepName;
     const synopsisText = typeof stepData.synopsis === 'string' ? stepData.synopsis : JSON.stringify(stepData.synopsis, null, 2);
@@ -442,8 +447,13 @@ function loadCorrections(stepName, stepData) {
       ? 'BLOCKED — a documented survivor was marked died in-event; regenerate before approving'
       : 'Review ending notes for all player roles';
     document.getElementById('btn-approve-step').disabled = fateBlocked;
-    document.getElementById('btn-accept-all').disabled = true;
-    document.getElementById('btn-reject-all').disabled = true;
+    // Accept All / Reject All belong to Diff Reviewer correction steps, not this gate —
+    // hide them and surface Reject (discards the pending regeneration, persists nothing).
+    document.getElementById('btn-accept-all').style.display = 'none';
+    document.getElementById('btn-reject-all').style.display = 'none';
+    const rejectBtn = document.getElementById('btn-reject-step');
+    rejectBtn.style.display = '';
+    rejectBtn.disabled = false;
     return;
   }
 
@@ -707,6 +717,38 @@ async function approveCurrentStep() {
     showToast(err.message, 'error');
     document.getElementById('btn-approve-step').disabled = false;
     document.getElementById('btn-approve-step').textContent = '✓ Approve Step';
+  }
+}
+
+// Non-destructive reject: discards the pending regeneration at the gate. Persists
+// nothing and leaves the role's stored ending_notes exactly as they were. Clears the
+// in-memory pipeline state server-side, then returns the gate to a neutral state.
+async function rejectCurrentStep() {
+  if (!state.scenarioId || !state.currentStep) return;
+  if (!confirm('Discard this regeneration? Nothing will be saved — the role keeps its existing endings.')) return;
+  const rejectBtn = document.getElementById('btn-reject-step');
+  try {
+    rejectBtn.disabled = true;
+    const res = await fetch('/admin/api/pipeline/reject-step/' + state.scenarioId + '/' + state.currentStep, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    // Stop polling first so the now-deleted pipeline can't 404-flash the gate.
+    if (state.pollInterval) { clearInterval(state.pollInterval); state.pollInterval = null; }
+    state.currentStep = null;
+    state.corrections = [];
+    document.getElementById('diff-body').innerHTML = '<div class=empty-state><div class=icon>✕</div><p>Regeneration discarded</p><p style=font-size:12px>Nothing was saved — the role keeps its existing endings</p></div>';
+    document.getElementById('diff-meta').textContent = 'Regeneration discarded';
+    document.getElementById('diff-summary').textContent = 'No corrections loaded';
+    document.getElementById('btn-approve-step').disabled = true;
+    rejectBtn.style.display = 'none';
+    showToast('Regeneration discarded — nothing saved', 'success');
+    loadVersionHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+    rejectBtn.disabled = false;
   }
 }
 

@@ -3670,7 +3670,7 @@ function renderPreview(data, autoSaved = false) {
       } else {
         toast('Endings regenerated — review and approve at the pipeline gate.', 'warn');
       }
-      window.open(`/admin/pipeline.html?scenario=${encodeURIComponent(scenarioId)}`, '_blank');
+      window.open(`/admin/pipeline.html?scenario=${encodeURIComponent(scenarioId)}`, '_blank', 'noopener,noreferrer');
     } catch (err) {
       // Hard-refuse (no fate_mode) and skip surface here with the server's message.
       toast(`Regenerate failed: ${err.message}`, 'error');

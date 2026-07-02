@@ -2261,6 +2261,21 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  // Reject an awaiting-approval step: discard the pending candidate, persist NOTHING.
+  // Used by the regenerate-endings gate so an unwanted regeneration can be thrown away
+  // without touching the role's already-stored ending_notes. Non-destructive.
+  r.post('/pipeline/reject-step/:scenarioId/:stepName', async (req, res) => {
+    try {
+      const { scenarioId, stepName } = req.params;
+      const state = PipelineOrchestrator.getStatus(scenarioId);
+      if (!state) return res.status(404).json({ error: 'No active pipeline' });
+      const result = PipelineOrchestrator.rejectStep(scenarioId, stepName);
+      res.json({ success: true, ...result });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Get version history for a scenario
   r.get('/pipeline/versions/:scenarioId', async (req, res) => {
     try {

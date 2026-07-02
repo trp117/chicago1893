@@ -194,6 +194,23 @@ class PipelineOrchestrator {
     return this.activePipelines.get(scenarioId) || null;
   }
 
+  // Non-destructive reject: discard an awaiting-approval step's pending state without
+  // persisting anything. Used by the regenerate-endings gate — throwing away the
+  // un-approved candidate leaves stored role files exactly as they were. Deletes the
+  // whole in-memory pipeline (the regen flow is a dedicated single-step pipeline), so
+  // the gate returns to a neutral state. Calls NO persist path.
+  rejectStep(scenarioId, stepName) {
+    const state = this.activePipelines.get(scenarioId);
+    if (!state) throw new Error('No active pipeline for ' + scenarioId);
+    const step = state.steps[stepName];
+    if (!step) throw new Error('Step ' + stepName + ' not found');
+    if (step.status !== 'awaiting_approval') {
+      throw new Error('Step ' + stepName + ' is not awaiting approval (status: ' + step.status + ')');
+    }
+    this.activePipelines.delete(scenarioId);
+    return { rejected: true, scenarioId, stepName };
+  }
+
   // Deterministic, structured-field-only survivor-safety guard. Shared by the full
   // pipeline (Step 6) and the per-role regenerate path so the logic cannot drift.
   // A documented survivor must not be killed in-event in any branch: a 'died' branch
