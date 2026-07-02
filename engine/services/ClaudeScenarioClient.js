@@ -163,39 +163,89 @@ FAILURE, REDEFINED FOR FIXED HISTORY. Failure is NOT a different outcome — it 
 // In-event outcomes that are consistent with a documented survivor surviving the event.
 const SURVIVOR_SAFE_OUTCOMES = new Set(['survived', 'incapacitated', 'captured']);
 
-// Deterministic survivor-safety guard. Reads the STRUCTURED in_event_outcome on each
-// generated branch — never infers from prose — against the role's anchored documented
-// outcome. A documented survivor (character_fates outcome === 'survived', resolved via
-// resolveAnchorBinding) must not be killed in-event in ANY branch. Returns structured
-// lists for the gate: a 'died' branch is a hard block; an 'unresolved' or missing field
-// is a soft warning; survived/incapacitated/captured pass. Non-survivors are silent
-// (their in-event death is authorially permitted).
+// Single source of truth for which violation types are HARD BLOCKS (drop the role
+// pre-persist + disable Approve at the gate) vs soft warnings. Consumed by the guard's
+// own partition below, by the regenerate-path filter (PipelineOrchestrator, via the named
+// import), and — through the per-violation `blocking` flag set in _applySurvivorGuard —
+// by the gate UI. No consumer hardcodes these strings; they all key off this set / flag.
+const BLOCK_TYPES = new Set(['survivor_died', 'survivor_killed', 'casualty_spared']);
+
+// Tolerant name match between the generator's self-report and character_fates.
+function normName(s) {
+  return String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+// Deterministic fate-consistency guard. Bidirectional and cross-character: no ending,
+// from ANY role, may contradict a real documented person's in-event fate. Two signals,
+// both structured (never a prose scan):
+//   (1) Own-character survivor check (existing subset): the role's own anchored documented
+//       survivor must not carry in_event_outcome 'died' in any branch — kept intact so
+//       there is no regression even if the generator omits itself from the self-report.
+//   (2) Cross-character check (the Kranz gap): the generator self-reports, per branch, the
+//       in-event fate its prose depicts for each real documented person (real_people_depicted).
+//       A documented survivor depicted as 'died' → survivor_killed; a documented casualty
+//       depicted as 'survived' → casualty_spared — BLOCK in either direction, even when the
+//       person is NOT this role's own character. 'unknown'/unmatched names impose nothing
+//       (fictional characters are not in character_fates, so their deaths are never flagged).
 function assertSurvivorSafety(scenario, endingNotes) {
-  const blocked = [];
-  const warnings = [];
+  const violations = [];
   const notes = (endingNotes && endingNotes.ending_notes) || [];
   const roles = scenario?.player_roles || scenario?.playerRoles || [];
   const roleByName = new Map(roles.map(r => [r.name, r]));
 
-  for (const note of notes) {
-    const role = roleByName.get(note.role_name);
-    if (!role) continue; // fate has no matching role → cannot bind an anchor; stay silent
-    const binding = resolveAnchorBinding(scenario, role);
-    // Only a documented figure recorded as having survived the event is guarded.
-    if (binding.kind !== 'documented' || binding.fate.outcome !== 'survived') continue;
+  // Documented-fate lookup by name for the cross-character check — only definite outcomes
+  // constrain (survived/died); 'unknown' and anything else impose no constraint.
+  const fateByName = new Map();
+  for (const f of (scenario?.epilogue?.character_fates || [])) {
+    if ((f.outcome === 'survived' || f.outcome === 'died') && f.name) {
+      fateByName.set(normName(f.name), { outcome: f.outcome, name: f.name });
+    }
+  }
 
+  for (const note of notes) {
     for (const branch of ['success', 'partial', 'failure']) {
       const b = note[branch];
       if (!b) continue;
-      const outcome = b.in_event_outcome || 'unresolved'; // missing field reads as unresolved
-      if (outcome === 'died') {
-        blocked.push({ role: note.role_name, branch, type: 'survivor_died' });
-      } else if (!SURVIVOR_SAFE_OUTCOMES.has(outcome)) {
-        // 'unresolved', missing, or any unrecognized value → soft flag, never a hard block
-        warnings.push({ role: note.role_name, branch, type: 'survivor_unresolved' });
+
+      // (1) Own-character survivor check (structured, reliable) — unchanged subset.
+      const role = roleByName.get(note.role_name);
+      if (role) {
+        const binding = resolveAnchorBinding(scenario, role);
+        if (binding.kind === 'documented' && binding.fate.outcome === 'survived') {
+          const outcome = b.in_event_outcome || 'unresolved'; // missing → unresolved
+          if (outcome === 'died') {
+            violations.push({ role: note.role_name, branch, type: 'survivor_died' });
+          } else if (!SURVIVOR_SAFE_OUTCOMES.has(outcome)) {
+            violations.push({ role: note.role_name, branch, type: 'survivor_unresolved' });
+          }
+        }
+      }
+
+      // (2) Bidirectional cross-character check against the self-report.
+      for (const dep of (b.real_people_depicted || [])) {
+        const rec = fateByName.get(normName(dep && dep.name));
+        if (!rec) continue; // fictional / unmatched → no documented fate to contradict
+        if (rec.outcome === 'survived' && dep.in_event_fate === 'died') {
+          violations.push({ role: note.role_name, branch, type: 'survivor_killed', person: rec.name });
+        } else if (rec.outcome === 'died' && dep.in_event_fate === 'survived') {
+          violations.push({ role: note.role_name, branch, type: 'casualty_spared', person: rec.name });
+        }
       }
     }
   }
+
+  // Dedup — the own-character check and the self-report can flag the same branch/person.
+  const seen = new Set();
+  const deduped = [];
+  for (const v of violations) {
+    const key = [v.role, v.branch, v.type, v.person || ''].join('|');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(v);
+  }
+
+  const blocked = deduped.filter(v => BLOCK_TYPES.has(v.type));
+  const warnings = deduped.filter(v => !BLOCK_TYPES.has(v.type));
   // A blocked role is dropped entirely — the block subsumes any warning on it, so
   // exclude blocked roles from warnings to avoid double-listing the same role.
   const blockedRoles = new Set(blocked.map(v => v.role));
@@ -205,12 +255,13 @@ function assertSurvivorSafety(scenario, endingNotes) {
 const FATE_OUTPUT_SHAPE = `Return valid JSON only — no prose, no markdown, no backticks. Exactly this shape:
 {
   "role_name": "<exact role name>",
-  "success": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" },
-  "partial": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" },
-  "failure": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved" }
+  "success": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved", "real_people_depicted": [ { "name": "<exact roster name>", "in_event_fate": "survived|died" } ] },
+  "partial": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved", "real_people_depicted": [ { "name": "<exact roster name>", "in_event_fate": "survived|died" } ] },
+  "failure": { "what_happened": "...", "who_present": "...", "emotional_weight": "...", "closing_line": "...", "in_event_outcome": "survived|died|incapacitated|captured|unresolved", "real_people_depicted": [ { "name": "<exact roster name>", "in_event_fate": "survived|died" } ] }
 }
 Each end-state commits to its outcome: success = the objective achieved cleanly; partial = achieved at a real toll; failure = not achieved. "who_present" is a comma-separated list of co-located player role names at that resolution. "closing_line" is one punchy standalone thematic sentence — not a generic wrap-up. "emotional_weight" is the precise psychological takeaway.
-"in_event_outcome" is a STRUCTURED restatement of what "what_happened" depicts for THIS character — not an independent claim. It is one of exactly: "survived" (alive and not seriously incapacitated at the end of the depicted event), "died" (killed DURING the depicted event — in-event, not later in life), "incapacitated" (alive but seriously wounded / out of action by the event's end), "captured" (taken prisoner during the event — alive, in enemy hands), or "unresolved" (the branch does not commit to a definite in-event fate). Reflect the IN-EVENT outcome only, never the character's later-life fate. Set it to match what the prose actually depicts; you MUST use "unresolved" rather than invent a definite fate the prose does not support.`;
+"in_event_outcome" is a STRUCTURED restatement of what "what_happened" depicts for THIS character — not an independent claim. It is one of exactly: "survived" (alive and not seriously incapacitated at the end of the depicted event), "died" (killed DURING the depicted event — in-event, not later in life), "incapacitated" (alive but seriously wounded / out of action by the event's end), "captured" (taken prisoner during the event — alive, in enemy hands), or "unresolved" (the branch does not commit to a definite in-event fate). Reflect the IN-EVENT outcome only, never the character's later-life fate. Set it to match what the prose actually depicts; you MUST use "unresolved" rather than invent a definite fate the prose does not support.
+"real_people_depicted" is a STRUCTURED audit signal: list every real documented person whose in-event living or dying THIS BRANCH's prose depicts — use the exact names from the DOCUMENTED FATES roster, and INCLUDE the role's own character if they are documented. "in_event_fate" is what THIS branch depicts for that person ("survived" or "died"), which may differ per branch — record what the prose actually SHOWS, not the historical record (e.g. if a failure branch's prose depicts a crew dying, list them as "died" here even if history says they lived; that is exactly the contradiction this field surfaces). OMIT fictional or composite characters (they are not on the roster) and OMIT anyone merely mentioned without a depicted in-event fate. Use [] if the branch depicts no real person's in-event fate.`;
 
 function buildFateBranch(scenario, role) {
   const mode = role.fate_mode;
@@ -325,5 +376,5 @@ Write the success/partial/failure fates for ${role.name} now, as JSON only.`;
   return { ending_notes, skipped };
 }
 
-export { assertSurvivorSafety };
-export default { fillMissingFields, generateEndingNotes, assertSurvivorSafety };
+export { assertSurvivorSafety, BLOCK_TYPES };
+export default { fillMissingFields, generateEndingNotes, assertSurvivorSafety, BLOCK_TYPES };

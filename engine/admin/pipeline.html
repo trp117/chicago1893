@@ -518,12 +518,24 @@ function renderCorrectionCard(c) {
   '</div>';
 }
 
+// Human-readable one-liner per block violation (type-aware, but the gate does not decide
+// blocking by type — that is the server's `blocking` flag).
+function describeBlock(v) {
+  const where = v.role + ' — ' + v.branch;
+  if (v.type === 'survivor_killed') return where + ': depicts documented survivor ' + (v.person || '?') + ' dying';
+  if (v.type === 'casualty_spared') return where + ': depicts documented casualty ' + (v.person || '?') + ' surviving';
+  if (v.type === 'survivor_died')   return where + ': own documented survivor marked died in-event';
+  return where + ': ' + (v.type || 'fate contradiction');
+}
+
 function renderEndingNotes(endingNotes, scenario) {
   const body = document.getElementById('diff-body');
   const notes = endingNotes.ending_notes || [];
   const violations = endingNotes.violations || [];
-  const blocks = violations.filter(v => v.type === 'survivor_died');
-  const warns = violations.filter(v => v.type === 'survivor_unresolved');
+  // Key off the semantic `blocking` flag the server sets from its single BLOCK_TYPES
+  // source — the gate never hardcodes violation-type strings.
+  const blocks = violations.filter(v => v.blocking);
+  const warns = violations.filter(v => !v.blocking);
 
   // Index warnings by role → warned branch (for per-card soft-flag annotation).
   const warnByRole = {};
@@ -532,9 +544,9 @@ function renderEndingNotes(endingNotes, scenario) {
   let banner = '';
   if (blocks.length) {
     banner += '<div style=\"background:#3a1a1a;border:2px solid var(--danger);border-radius:6px;padding:12px;margin-bottom:14px\">' +
-      '<div style=\"color:var(--danger);font-weight:700;font-size:14px;margin-bottom:6px\">⛔ BLOCKED — documented survivor marked died in-event</div>' +
-      '<div style=\"color:#e0a0a0;font-size:12px;margin-bottom:6px\">These branches kill a documented survivor and were NOT persisted. This step cannot be approved until the fate is regenerated.</div>' +
-      blocks.map(v => '<div style=\"font-family:monospace;font-size:12px;color:var(--danger)\">• ' + escHtml(v.role) + ' — died in <strong>' + escHtml(v.branch) + '</strong></div>').join('') +
+      '<div style=\"color:var(--danger);font-weight:700;font-size:14px;margin-bottom:6px\">⛔ BLOCKED — ending contradicts a documented fate</div>' +
+      '<div style=\"color:#e0a0a0;font-size:12px;margin-bottom:6px\">These branches contradict the documented record and were NOT persisted. This step cannot be approved until the fate is regenerated.</div>' +
+      blocks.map(v => '<div style=\"font-family:monospace;font-size:12px;color:var(--danger)\">• ' + escHtml(describeBlock(v)) + '</div>').join('') +
       '</div>';
   }
   if (warns.length) {

@@ -1,7 +1,7 @@
 import VersionController from './VersionController.js';
 import GeminiClient from './GeminiClient.js';
 import OpenAIClient from './OpenAIClient.js';
-import ClaudeScenarioClient from './ClaudeScenarioClient.js';
+import ClaudeScenarioClient, { BLOCK_TYPES } from './ClaudeScenarioClient.js';
 
 const PIPELINE_STEPS = [
   'synopsis',
@@ -221,15 +221,29 @@ class PipelineOrchestrator {
     const guard = ClaudeScenarioClient.assertSurvivorSafety(scenarioForAnchor, endingNotes);
     const blockedRoles = new Set(guard.blocked.map(v => v.role));
     for (const v of guard.blocked) {
-      console.error(`[FATE-GUARD] BLOCKED survivor death: ${scenarioId}/${v.role}/${v.branch}`);
+      console.error(`[FATE-GUARD] BLOCKED ${v.type}: ${scenarioId}/${v.role}/${v.branch}${v.person ? ` (${v.person})` : ''}`);
     }
     for (const v of guard.warnings) {
-      console.warn(`[FATE-GUARD] WARN survivor unresolved: ${scenarioId}/${v.role}/${v.branch}`);
+      console.warn(`[FATE-GUARD] WARN ${v.type}: ${scenarioId}/${v.role}/${v.branch}${v.person ? ` (${v.person})` : ''}`);
     }
     if (blockedRoles.size) {
       endingNotes.ending_notes = endingNotes.ending_notes.filter(n => !blockedRoles.has(n.role_name));
     }
-    endingNotes.violations = [...guard.blocked, ...guard.warnings];
+    // Tag each violation as blocking (from the single BLOCK_TYPES source) so the gate UI
+    // can key off a semantic flag rather than duplicating type strings across files.
+    endingNotes.violations = [...guard.blocked, ...guard.warnings].map(v => ({
+      ...v, blocking: BLOCK_TYPES.has(v.type)
+    }));
+    // real_people_depicted is a validation-only self-report — strip it from every branch
+    // (this is the shared choke point before both inject/persist paths) so it is never
+    // written into role files or the persisted scenario.
+    for (const note of (endingNotes.ending_notes || [])) {
+      for (const branch of ['success', 'partial', 'failure']) {
+        if (note[branch] && 'real_people_depicted' in note[branch]) {
+          delete note[branch].real_people_depicted;
+        }
+      }
+    }
     return guard;
   }
 
@@ -288,7 +302,7 @@ class PipelineOrchestrator {
     this._setStep(state, 'ending_notes', 'awaiting_approval', { endingNotes, scenario });
 
     const blocked = (endingNotes.violations || []).filter(
-      v => v.type === 'survivor_died' && v.role === targetRole.name
+      v => BLOCK_TYPES.has(v.type) && v.role === targetRole.name
     );
     return { ok: true, blocked, violations: endingNotes.violations || [], state };
   }
