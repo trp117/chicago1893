@@ -4602,7 +4602,15 @@ document.querySelector('.nav-link[data-view="review"]')
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-renderDashboard();
+// Deep-link: /admin?scenario=<id> opens that scenario's editor FRESH from canonical
+// (renderScenarioEditor → GET /scenarios/:id/full). Used by the pipeline gate to return
+// the user to a freshly-loaded editor after approving/rejecting a regenerate-endings run,
+// so the in-memory role data already includes the just-approved endings (never a stale tab).
+{
+  const _bootScenarioId = new URLSearchParams(window.location.search).get('scenario');
+  if (_bootScenarioId) renderScenarioEditor(_bootScenarioId);
+  else renderDashboard();
+}
 
 // ═══════════════════════════════════════════════════════════════
 // REVIEW PROMPTS — canonical, scenario-agnostic, section-keyed.

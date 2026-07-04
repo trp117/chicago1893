@@ -667,6 +667,21 @@ function updateDiffSummary() {
     '<span>' + accepted + '</span> accepted · <span>' + rejected + '</span> rejected · <span>' + edited + '</span> edited · <span>' + pending + '</span> pending';
 }
 
+// Return to the freshly-loaded scenario editor after a SINGLE-ROLE regenerate-endings gate
+// completes (approve or reject). Scoped by the server-set `regenerateEndings` flag, which is
+// present ONLY on the regen flow — NOT on the multi-step build pipeline (which also has an
+// ending_notes step and must stay on the gate for the next step, so we deliberately do not
+// key off currentStep here). Navigating to /admin?scenario=<id> loads the editor fresh from
+// canonical, so its in-memory role data already includes the just-approved endings — no stale
+// tab, no clobbering Save. Returns true if it navigated (caller should stop).
+function returnToEditorIfRegenEndings() {
+  if (state.pipeline && state.pipeline.regenerateEndings === true && state.scenarioId) {
+    window.location.href = '/admin?scenario=' + encodeURIComponent(state.scenarioId);
+    return true;
+  }
+  return false;
+}
+
 async function approveCurrentStep() {
   if (!state.scenarioId || !state.currentStep) return;
   if (state.currentStep === 'synopsis') {
@@ -718,6 +733,9 @@ async function approveCurrentStep() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
+    // Single-role regenerate-endings gate: return to the freshly-loaded editor (endings now
+    // approved). Multi-step build pipeline falls through and stays on the gate for next step.
+    if (returnToEditorIfRegenEndings()) return;
     showToast('Step approved — pipeline continuing', 'success');
     state.currentStep = null;
     state.corrections = [];
@@ -747,6 +765,9 @@ async function rejectCurrentStep() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
+    // Regenerate-endings gate: return to the freshly-loaded editor (role keeps its existing
+    // endings — nothing was saved). Detected via the regenerateEndings flag from last poll.
+    if (returnToEditorIfRegenEndings()) return;
     // Stop polling first so the now-deleted pipeline can't 404-flash the gate.
     if (state.pollInterval) { clearInterval(state.pollInterval); state.pollInterval = null; }
     state.currentStep = null;

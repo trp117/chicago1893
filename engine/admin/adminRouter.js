@@ -131,6 +131,32 @@ function stripEmptyEndingNotes(role) {
   return role;
 }
 
+// EDITOR-SAVE GUARD (preserve-if-client-sends-empty). ending_notes are managed by the
+// regenerate/approve pipeline (applyEndingNotesToRoles) and the dedicated
+// PATCH /player-roles/:id/ending-notes endpoint — NOT by the role editor form, which can
+// only edit a lossy subset of partial/failure fields and never carries `success`,
+// `in_event_outcome`, or `real_people_depicted`. A STALE editor tab (loaded before endings
+// were generated) posts empty ending fields; stripEmptyEndingNotes then deletes the whole
+// key and the whole-object savePlayerRole overwrites the stored endings — silently erasing
+// approved work, with no role-level version history to recover from (the McCormick data loss).
+// Fix: when the INCOMING role carries no non-empty ending_notes, carry the STORED
+// ending_notes back onto it before saving, so an editor Save can never erase them. A fresh
+// tab that legitimately carries endings (including hand-edits to partial/failure) is left
+// untouched — its endings are honored. Scoped to the editor save paths (/generate/save and
+// PUT /player-roles/:id); the approve managers are NOT routed through this and still write
+// endings normally.
+function preserveStoredEndingNotes(repos, role) {
+  // Probe a copy so stripEmptyEndingNotes never mutates the object we intend to save.
+  const probe = stripEmptyEndingNotes({
+    ...role,
+    ending_notes: role.ending_notes ? { ...role.ending_notes } : role.ending_notes
+  });
+  if (probe.ending_notes) return role;          // client sent real endings — honor them
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  if (stored && stored.ending_notes) role.ending_notes = stored.ending_notes;  // restore stored
+  return role;
+}
+
 // Persist a set of ending-notes (and the other role fields they may carry) onto the
 // scenario's player-role files. This is a MERGE: only roles named in `notes` are written
 // (one file each via savePlayerRole); roles absent from `notes` are never loaded or
@@ -1203,7 +1229,9 @@ export function createAdminRouter(repos, config = {}) {
   });
   r.put('/player-roles/:id', (req, res) => {
     if (!repos.scenarios.findPlayerRole(req.params.id)) return notFound(res);
-    res.json(repos.scenarios.savePlayerRole({ ...req.body, id: req.params.id }));
+    // Same editor-save guard as /generate/save: a whole-object PUT that omits ending_notes
+    // would clobber approved endings. Preserve stored endings when the client sends none.
+    res.json(repos.scenarios.savePlayerRole(preserveStoredEndingNotes(repos, { ...req.body, id: req.params.id })));
   });
   r.patch('/player-roles/:id/ending-notes', (req, res) => {
     const role = repos.scenarios.findPlayerRole(req.params.id);
@@ -1820,7 +1848,9 @@ Return ONLY valid JSON in this exact structure:
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
-      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(r))));
+      // preserveStoredEndingNotes FIRST: a stale editor tab posts empty endings; without
+      // this, stripEmptyEndingNotes + whole-object save would erase approved endings.
+      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredEndingNotes(repos, r)))));
       res.json({ ok: true, scenarioId: scenario.id });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -2776,3 +2806,6 @@ Return only the scene description. No preamble, no closing remarks.`,
   console.log('[admin] Pipeline routes registered');
   return r;
 }
+
+// Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
+export { stripEmptyEndingNotes, preserveStoredEndingNotes };
