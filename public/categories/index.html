@@ -75,7 +75,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <div class="footer-note">A project for America&rsquo;s 250th</div>
 </footer>
 <script>
-const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'';})();
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 (async()=>{
   const cats=await fetch('/api/categories').then(r=>r.json());

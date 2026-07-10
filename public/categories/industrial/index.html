@@ -87,7 +87,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
 </footer>
 <script type="module">
 import { renderScenarioCard } from '/js/scenario-card.js';
-const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'https://chicago1893-production.up.railway.app';})();
+const BASE_URL=(()=>{const h=window.location.hostname;return h==='localhost'||h==='127.0.0.1'?'http://localhost:3001':'';})();
 (async()=>{
   const [storiesRes,catsRes]=await Promise.all([fetch('/api/stories'),fetch('/api/categories')]);
   const all=await storiesRes.json();
