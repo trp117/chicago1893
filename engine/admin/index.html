@@ -885,12 +885,30 @@ async function renderDashboard() {
       <div class="stat-card-label">Transcripts</div>
     </div>`;
 
-  const _statusCounts = { all: scenarios.length };
+  // Feature flag (Change 1): default the scenario list to draft + published only
+  // (hidden:true excluded). Flip to false to restore the old "All" default in one line.
+  const ADMIN_DEFAULT_HIDE_ARCHIVED = true;
+
+  // A scenario is in the default view when its status is draft or published.
+  const _isDefaultVisible = s => {
+    const st = s.status || 'draft';
+    return (st === 'draft' || st === 'published');
+  };
+  const _matchesFilter = (s, f) =>
+    f === 'all'       ? true
+    : f === 'default' ? _isDefaultVisible(s)
+    :                   (s.status || 'draft') === f;
+
+  const _statusCounts = { all: scenarios.length, default: scenarios.filter(_isDefaultVisible).length };
   scenarios.forEach(s => { const st = s.status || 'draft'; _statusCounts[st] = (_statusCounts[st] || 0) + 1; });
 
-  const _activeFilter = sessionStorage.getItem('admin-scenario-filter') || 'all';
+  const _VALID_FILTERS = ['default', 'draft', 'published', 'archived', 'all'];
+  const _storedFilter = sessionStorage.getItem('admin-scenario-filter');
+  const _activeFilter = _VALID_FILTERS.includes(_storedFilter)
+    ? _storedFilter
+    : (ADMIN_DEFAULT_HIDE_ARCHIVED ? 'default' : 'all');
 
-  const _STATUS_ORDER = { draft: 0, published: 1, hidden: 2, archived: 3 };
+  const _STATUS_ORDER = { draft: 0, published: 1, archived: 2 };
   const _getUpdatedAt = s => s.updatedAt || s.updated_at || s.version || null;
   const sortedScenarios = [...scenarios].sort((a, b) => {
     const sa = a.status || 'draft', sb = b.status || 'draft';
@@ -909,14 +927,14 @@ async function renderDashboard() {
   });
 
   const _filterRow = `<div id="scenario-filter-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
-    ${[['all','All'],['draft','Draft'],['published','Published'],['hidden','Hidden'],['archived','Archived']].map(([st,lbl]) => `<button class="scenario-filter-btn${st===_activeFilter?' active':''}" data-filter="${st}">${lbl} (${_statusCounts[st]||0})</button>`).join('')}
+    ${[['default','Default'],['draft','Draft'],['published','Published'],['archived','Archived'],['all','All']].map(([st,lbl]) => `<button class="scenario-filter-btn${st===_activeFilter?' active':''}" data-filter="${st}">${lbl} (${_statusCounts[st]||0})</button>`).join('')}
   </div>`;
 
   const scenarioSection = scenarios.length ? `
     <h3 style="font-size:13px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px">Playable Scenarios</h3>
     ${_filterRow}
     <div class="scenario-cards">${sortedScenarios.map(s => `
-      <div class="scenario-play-card" data-scenario="${s.id}" data-status="${s.status || 'draft'}" style="${_activeFilter !== 'all' && (s.status || 'draft') !== _activeFilter ? 'display:none;' : ''}flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
+      <div class="scenario-play-card" data-scenario="${s.id}" data-status="${s.status || 'draft'}" style="${_matchesFilter(s, _activeFilter) ? '' : 'display:none;'}flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
           <div class="scenario-play-card-info" style="display:flex;align-items:center;gap:8px;min-width:0;">
             <span class="health-dot checking" title="Checking health…"></span>
@@ -1006,7 +1024,11 @@ async function renderDashboard() {
       const filter = btn.dataset.filter;
       sessionStorage.setItem('admin-scenario-filter', filter);
       document.querySelectorAll('.scenario-play-card').forEach(card => {
-        card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
+        const st = card.dataset.status || 'draft';
+        const show = filter === 'all'       ? true
+          : filter === 'default' ? (st === 'draft' || st === 'published')
+          :                        st === filter;
+        card.style.display = show ? '' : 'none';
       });
     });
   });
@@ -1473,7 +1495,6 @@ function statusBadge(status) {
   const cfg = {
     draft:     ['#94a3b8', 'Draft'],
     published: ['#22c55e', 'Published'],
-    hidden:    ['#f59e0b', 'Hidden'],
     archived:  ['#64748b', 'Archived'],
   };
   const [color, label] = cfg[effectiveStatus] || ['#94a3b8', effectiveStatus];

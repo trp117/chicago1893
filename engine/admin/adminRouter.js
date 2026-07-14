@@ -912,8 +912,12 @@ export function createAdminRouter(repos, config = {}) {
     } catch {}
     res.json({
       characters:  repos.characters.findAll().length,
-      locations:   repos.locations.findByScenario().length,
-      clues:       repos.clues.findByScenario().length,
+      // Change 2: findByScenario() with no arg defaulted to the lone 'chicago1893' folder
+      // (6/6). findAll() walks every scenario sub-directory for the true store-wide count.
+      locations:   repos.locations.findAll().length,
+      clues:       repos.clues.findAll().length,
+      // storyArcs has no findAll(); its no-arg findByScenario() already returns
+      // every arc store-wide (!scenarioId short-circuits the filter).
       storyArcs:   repos.storyArcs.findByScenario().length,
       playerRoles: repos.scenarios.findPlayerRoles().length,
       players:     repos.players.findAll().length,
