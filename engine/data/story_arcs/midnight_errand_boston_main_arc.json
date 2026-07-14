@@ -1,7 +1,7 @@
 {
   "id": "midnight_errand_boston_main_arc",
   "scenarioId": "midnight_errand_boston",
-  "setting": "Boston, Massachusetts, 1775"
+  "setting": "Boston, Massachusetts, 1775",
   "name": "The Errand That Cannot Be Undone",
   "premise": "A woman appears at the back door of Gill's Print Shop with a sealed dispatch and a route map that could change the course of a colonial uprising. The apprentice has less than an hour to move through a city laced with Loyalist informers and Redcoat patrols.",
   "goal": "Deliver the dispatch and the troop route map to the Sons of Liberty contact at the Green Dragon Tavern before ten o'clock, without exposing the network or destroying the Gill family.",
