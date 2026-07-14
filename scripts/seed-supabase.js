@@ -20,7 +20,10 @@ function readDir(dir) {
     .filter(f => f.endsWith('.json') && !f.startsWith('.'))
     .flatMap(f => {
       try { return [JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))]; }
-      catch { return []; }
+      catch (err) {
+        console.error(`[SEED] Failed to parse ${path.join(dir, f)}: ${err.message}`);
+        return [];
+      }
     });
 }
 
@@ -30,7 +33,10 @@ function readDirRecursive(baseDir) {
     if (entry.isDirectory()) return readDir(path.join(baseDir, entry.name));
     if (entry.name.endsWith('.json') && !entry.name.startsWith('.')) {
       try { return [JSON.parse(fs.readFileSync(path.join(baseDir, entry.name), 'utf8'))]; }
-      catch { return []; }
+      catch (err) {
+        console.error(`[SEED] Failed to parse ${path.join(baseDir, entry.name)}: ${err.message}`);
+        return [];
+      }
     }
     return [];
   });

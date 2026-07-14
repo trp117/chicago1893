@@ -37,7 +37,11 @@ export class JsonFileStore {
       const doc = JSON.parse(fs.readFileSync(this.#filePath(collection, id), 'utf8'));
       if (!NO_CACHE.has(collection)) this._cache.set(this.#itemKey(collection, id), doc);
       return doc;
-    } catch {
+    } catch (err) {
+      // ENOENT is a normal "not found", not corruption — only log real parse failures.
+      if (err.code !== 'ENOENT') {
+        console.error(`[STORE] Failed to parse ${this.#filePath(collection, id)}: ${err.message}`);
+      }
       return null;
     }
   }
@@ -52,8 +56,14 @@ export class JsonFileStore {
     const result = fs.readdirSync(dir)
       .filter(f => f.endsWith('.json') && !f.startsWith('.'))
       .map(f => {
+        // A malformed file is skipped, not fatal — but it must be visible.
+        // midnight_errand_boston_main_arc.json ran with no story arc for an
+        // unknown period because this catch was silent.
         try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); }
-        catch { return null; }
+        catch (err) {
+          console.error(`[STORE] Failed to parse ${path.join(dir, f)}: ${err.message}`);
+          return null;
+        }
       })
       .filter(Boolean)
       .sort((a, b) =>
@@ -88,10 +98,12 @@ export class JsonFileStore {
       if (entry.isDirectory()) {
         const subDir = path.join(baseDir, entry.name);
         for (const f of fs.readdirSync(subDir).filter(f => f.endsWith('.json') && !f.startsWith('.'))) {
-          try { all.push(JSON.parse(fs.readFileSync(path.join(subDir, f), 'utf8'))); } catch {}
+          try { all.push(JSON.parse(fs.readFileSync(path.join(subDir, f), 'utf8'))); }
+          catch (err) { console.error(`[STORE] Failed to parse ${path.join(subDir, f)}: ${err.message}`); }
         }
       } else if (entry.name.endsWith('.json') && !entry.name.startsWith('.')) {
-        try { all.push(JSON.parse(fs.readFileSync(path.join(baseDir, entry.name), 'utf8'))); } catch {}
+        try { all.push(JSON.parse(fs.readFileSync(path.join(baseDir, entry.name), 'utf8'))); }
+        catch (err) { console.error(`[STORE] Failed to parse ${path.join(baseDir, entry.name)}: ${err.message}`); }
       }
     }
     const result = all.filter(Boolean).sort((a, b) =>
