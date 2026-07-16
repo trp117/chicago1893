@@ -1786,7 +1786,10 @@ Return ONLY valid JSON in this exact structure:
     ].filter(Boolean).join('\n\n');
 
     try {
-      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+      // streaming is required by the SDK for long requests; timeout covers time-to-first-chunk.
+      // Epilogue output runs 3.8k–6.5k tokens, which a non-streaming request cannot finish
+      // inside the 120s request timeout.
+      const stream = getAnthropicClient(anthropicApiKey).messages.stream(
         {
           model: MODEL,
           max_tokens: 8000,
@@ -1796,11 +1799,20 @@ Return ONLY valid JSON in this exact structure:
         },
         { timeout: 120_000, maxRetries: 0 }
       );
-      console.log('[EPILOGUE-DATA] stop_reason:', msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
-      if (msg.stop_reason === 'max_tokens') {
+
+      let acc = '';
+      for await (const chunk of stream) {
+        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+          acc += chunk.delta.text;
+        }
+      }
+      const finalMsg = await stream.finalMessage();
+
+      console.log('[EPILOGUE-DATA] stop_reason:', finalMsg.stop_reason, 'output_tokens:', finalMsg.usage?.output_tokens);
+      if (finalMsg.stop_reason === 'max_tokens') {
         return res.status(500).json({ error: 'Epilogue generation truncated — the scenario has too many beats. Reduce to 3–6 essential beats and retry.' });
       }
-      const text = msg.content[0]?.text?.trim();
+      const text = acc.trim();
       if (!text) return res.status(500).json({ error: 'No response from Claude.' });
       const cleaned     = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
       const epilogueData = JSON.parse(cleaned);

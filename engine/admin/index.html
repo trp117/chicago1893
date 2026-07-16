@@ -4310,16 +4310,18 @@ function renderPreview(data, autoSaved = false) {
     if (!e.target.closest('#gen-epilogue-btn')) return;
     const btn = e.target.closest('#gen-epilogue-btn');
 
-    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 2–3 minutes.')) return;
 
     const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
     const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
     const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
     const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
     const characters = (data.characters || []).map(c => ({
-      character_id: c.id,
-      name:         c.name,
-      role:         c.role || c.publicFace || '',
+      character_id:   c.id,
+      name:           c.name,
+      role:           c.role || c.publicFace || '',
+      character_type: c.character_type,
+      represents:     c.represents,
     }));
     // Filter to structured beats only (must have both id and description).
     const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
