@@ -2668,8 +2668,16 @@ Write a 300-400 word scene description for the scenario data provided. The descr
 - The exact historical moment being depicted (specific time, place, date)
 - The figures present: who they are, what they are doing, what they are wearing, their emotional state
 - The physical environment in precise detail: architecture, objects, lighting sources, weather/atmosphere
-- The specific lighting: quality, direction, color temperature, dramatic effect
+- The specific lighting: quality, direction, color temperature, dramatic effect achieved through contrast in the environment
 - The emotional register: what mood the image should convey, what the viewer should feel
+
+LIGHTING & LEGIBILITY: Every principal figure's face must be clearly and readably lit — describe in-world light sources (bulbs, lanterns, windows, fire, work light) — for a multi-figure scene, distribute more than one source so no principal is left in shadow; do not light multiple figures with a single source. Put darkness in the environment (ceilings, corners, distance), never on the people. Do not write mood-darkness that leaves faces in shadow ("lost in darkness", "a single dim bulb", "sickly glow") — atmosphere comes from contrast and shadowed surroundings, not from underexposing the subjects. Faces must read clearly on a small, bright card thumbnail.
+
+SIGNAGE: Name only the specific signage or text that should appear in the frame (e.g. a station nameplate), and state that no other text, lettering, or signage appears. Do not invent incidental signs.
+
+WHEN THE SCENE INCLUDES UNIFORMED FIGURES (military, police, state, or transit personnel): describe their clothing by physical appearance and color ("a plain dove-grey jacket and plain peaked cap"), NOT by naming the institution ("Volkspolizei uniform", "BVG uniform") — naming a real institution causes the image model to render its branding. Describe uniform surfaces by what they are (plain, unmarked, smooth fabric), not by what they lack.
+
+WHEN THE SCENE INCLUDES PERIOD WEAPONS OR EQUIPMENT: describe the item by physical silhouette and distinctive features ("a submachine gun with a large round drum magazine and wooden stock") rather than by model name, and never by what it is NOT (do not write "not an AK" — naming a weapon, even to exclude it, causes the model to draw it). Ensure described equipment matches the scenario's specific year.
 
 Do not include technical specifications, aspect ratios, file naming, or any reference to the image generation platform. Do not write headers or labels. Write only the scene narrative as flowing prose.
 
