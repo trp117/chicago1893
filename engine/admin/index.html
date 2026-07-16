@@ -3218,7 +3218,7 @@ Generate a single AI image for use on the Ledger 250 platform as scenario card a
 - Format: PNG output is acceptable; conversion to JPEG happens downstream
 - No overlay text, watermarks, captions, or graphic elements anywhere in the frame (see the diegetic-signage note under Content & Accuracy for period-accurate in-world signage)
 - Photorealistic, cinematic lighting, period-accurate to the year specified
-- Full color — do not desaturate or apply a tonal grade. The platform does not apply any color, brightness, or mood processing; the image renders as generated, so the mood must be fully in the source image while keeping subjects brightly lit
+- Full color — do not desaturate or apply a tonal grade. The platform applies a downstream brightness multiplier (clamped, roughly 0.5x-1.5x) when deriving the card images, but it is linear and cannot recover detail from shadow — multiplying a near-black pixel yields a near-black pixel. Correct exposure must come from the source image, so the mood must be fully in the source image while keeping subjects brightly lit
 
 ---
 
@@ -3226,7 +3226,7 @@ Generate a single AI image for use on the Ledger 250 platform as scenario card a
 
 **Underexposure is the single most frequent reason an image is rejected. Read this section before you read the scene description, and let it override the mood of the scene prose.**
 
-- **What you generate is what ships.** The platform does NOT brighten, correct, or otherwise rescue the image after generation — there is no post-processing that recovers detail from shadows. The source image renders essentially as-is on the scenario card. If a face is dark in your output, it is dark on the live site. Measured card images have been coming out at 13–22% mean luminance when a well-exposed image sits near 45–50%; that gap is pure underexposure at the source, and nothing downstream fixes it. Generate at full, readable brightness.
+- **What you generate is what ships.** A downstream brightness multiplier exists, but it is frequently already at or near its maximum and cannot rescue an underexposed source, because multiplying darkness yields darkness. The source image therefore renders essentially as-is on the scenario card. If a face is dark in your output, it is dark on the live site. Measured card images have been coming out at 13–22% mean luminance when a well-exposed image sits near 45–50%; that gap is pure underexposure at the source, and nothing downstream fixes it. Generate at full, readable brightness.
 - **Every face and every piece of primary action must be clearly and individually lit,** with visible detail in the eyes and expression. No principal figure may fall into silhouette or shadow — including background and secondary figures. A face the viewer cannot read is a failed image.
 - **Light the darkest face in the frame as your exposure reference, not the brightest.** If the dimmest principal is legible, the image passes. If any principal reads as a shadow, it fails.
 - **Atmosphere comes from contrast, pools of light, and shadow in the environment — never from underexposing the subjects.** Keep the vaulted ceilings, far tunnels, and dead corners dark. Keep the people lit.
