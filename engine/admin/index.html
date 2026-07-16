@@ -3207,39 +3207,66 @@ function buildScenarioDocText(data, promptPrefix = '') {
 // IMAGE PROMPT STUDIO
 // ═══════════════════════════════════════════════════════════════
 
-const MASTER_IMAGE_SPEC = `Ledger 250 — Scenario Image Generation Prompt (Master, v1.3)
+const MASTER_IMAGE_SPEC = `# Ledger 250 — Scenario Image Generation Prompt (Master, v1.4)
 
 Generate a single AI image for use on the Ledger 250 platform as scenario card artwork. The image must satisfy the following technical specifications and content rules.
 
-OUTPUT SPECIFICATIONS
+---
+
+## OUTPUT SPECIFICATIONS
 - Aspect ratio: 16:9 horizontal, minimum 1536×864
 - Format: PNG output is acceptable; conversion to JPEG happens downstream
-- No text, no watermarks, no captions, no overlay graphics anywhere in the frame
+- No overlay text, watermarks, captions, or graphic elements anywhere in the frame (see the diegetic-signage note under Content & Accuracy for period-accurate in-world signage)
 - Photorealistic, cinematic lighting, period-accurate to the year specified
-- Full color — do not desaturate or apply a tonal grade; the platform CSS handles the final mood
+- Full color — do not desaturate or apply a tonal grade. The platform does not apply any color, brightness, or mood processing; the image renders as generated, so the mood must be fully in the source image while keeping subjects brightly lit
 
-COMPOSITION RULES — CRITICAL
-- Vertical face zone (non-negotiable): all faces and primary action must sit within the vertical band between 35% and 65% of the frame height. This is a hard requirement of the platform banner layout — the image gets cropped to a thin horizontal band that pulls from this middle zone. Faces above 35% will be cropped off the top. Faces below 65% will be cropped off the bottom. Place faces exactly in this central third.
-- Horizontal balance: main subject can be left, center, or right of frame — be intentional about which. Composition should leave room for a text overlay in the lower portion.
-- Depth: include foreground subject, middle ground action, and background environment. A single flat subject against a flat background looks weak at card scale.
-- Lower-band clearance: the lower 25% of the frame should not contain critical narrative detail (faces, primary action, key objects). A semi-opaque text overlay will be applied to this band in the final card render, so anything important placed there will be obscured.
+---
 
-CONTENT & ACCURACY RULES — STRICT
-- No copyrighted insignia, logos, or branded patches. No military unit patches, no flag-bearing badges, no corporate logos. Uniforms must be period-correct but generic.
-- No invented or stylized insignia of any kind. The following must be either omitted entirely or rendered as period-generic with no decorative content: rank marks, shoulder boards, collar tabs, cuff stripes, unit patches, sleeve chevrons, cap badges, hat emblems, helmet decals, helmet markings, lapel pins, breast pocket badges, belt buckle emblems, embroidered devices on any uniform surface, and any other decoration that would normally identify rank, branch, unit, or nationality. If a piece of headgear or uniform would historically have a visible emblem, render that surface as plain. Inventing a plausible-looking but fictional emblem is worse than omitting the emblem entirely.
-- No recognizable celebrity or real-person faces. Figures should look like historically plausible everymen — the right age, build, hair, and grooming for the era — but not portraits of specific historical figures.
-- Period accuracy in equipment, clothing, and environment. Verify the year. Helmets, weapons, vehicles, lighting fixtures, and clothing must match the specific year, not a generic era. Anachronistic technology is a disqualifying error.
-- No graphic violence, no visible blood, no wounded bodies. Tension and danger are conveyed through environment, lighting, expression, and posture — never explicit injury.
-- Lighting must be readable. Even dark or low-light scenes must have clear illumination on faces and primary action. The platform applies a dark CSS overlay; images that are already dark become unreadable. Err 20% brighter than your instinct.
+## LIGHTING — READ THIS FIRST, IT IS THE MOST COMMON FAILURE
 
-STYLE REFERENCES
-Cinematic realism in the tradition of Roger Deakins, Janusz Kaminski, or Robert Richardson. Photorealistic. Shot on 35mm film, slight grain, no digital sheen. No motion blur. No HDR. No text or graphic elements anywhere in the frame.
+**Underexposure is the single most frequent reason an image is rejected. Read this section before you read the scene description, and let it override the mood of the scene prose.**
 
-FILE NAMING AFTER GENERATION
+- **What you generate is what ships.** The platform does NOT brighten, correct, or otherwise rescue the image after generation — there is no post-processing that recovers detail from shadows. The source image renders essentially as-is on the scenario card. If a face is dark in your output, it is dark on the live site. Measured card images have been coming out at 13–22% mean luminance when a well-exposed image sits near 45–50%; that gap is pure underexposure at the source, and nothing downstream fixes it. Generate at full, readable brightness.
+- **Every face and every piece of primary action must be clearly and individually lit,** with visible detail in the eyes and expression. No principal figure may fall into silhouette or shadow — including background and secondary figures. A face the viewer cannot read is a failed image.
+- **Light the darkest face in the frame as your exposure reference, not the brightest.** If the dimmest principal is legible, the image passes. If any principal reads as a shadow, it fails.
+- **Atmosphere comes from contrast, pools of light, and shadow in the environment — never from underexposing the subjects.** Keep the vaulted ceilings, far tunnels, and dead corners dark. Keep the people lit.
+- **Overexpose relative to your instinct.** Image generators trend dark on "cinematic" and "period" scenes, and that trend is the failure mode here. If the scene feels correctly lit to you as a photographer, it is roughly one stop too dark for a scenario card. Push brighter than feels natural — aim for faces and primary action that read clearly on a small, bright card thumbnail, not on a full-screen cinema frame.
+
+### Motivated light on every face (composition requirement)
+- Each primary figure must have a **plausible in-world light source reaching their face** — a bulb, a lantern, a work light, reflected spill off tile or wet stone, or light from an off-frame source.
+- **Do not rely on a single light source for a multi-figure scene.** One bulb will always leave the far figures dark. Distribute practical light sources — or add motivated ambient fill — so that no principal is left unlit. If the scene as written names only one light, add secondary reflected or off-frame spill to reach the other faces.
+
+---
+
+## COMPOSITION RULES — CRITICAL
+- **Vertical face zone (non-negotiable):** all faces and primary action must sit within the vertical band between **35% and 65% of the frame height.** This is a hard requirement of the platform banner layout — the image gets cropped to a thin horizontal band that pulls from this middle zone. Faces above 35% will be cropped off the top. Faces below 65% will be cropped off the bottom. Place faces exactly in this central third.
+- **Horizontal balance:** the main subject can be left, center, or right of frame — be intentional about which. Leave room for a text overlay in the lower portion.
+- **Depth:** include foreground subject, middle-ground action, and background environment. A single flat subject against a flat background looks weak at card scale.
+- **Lower-band clearance:** keep the lower 25% of the frame free of critical narrative detail (faces, primary action, key objects). On featured/hero cards a semi-opaque gradient is applied to this band for title legibility, so anything important there will be obscured; on standard grid cards the title sits in a separate area below the image. Keeping the lower band clear is the safe rule for both.
+
+---
+
+## CONTENT & ACCURACY RULES — STRICT
+- **No copyrighted insignia, logos, or branded patches.** No military unit patches, no flag-bearing badges, no corporate logos. Uniforms must be period-correct but generic.
+- **No invented or stylized insignia of any kind.** The following must be either omitted entirely or rendered as period-generic with no decorative content: rank marks, shoulder boards, collar tabs, cuff stripes, unit patches, sleeve chevrons, cap badges, hat emblems, helmet decals, helmet markings, lapel pins, breast pocket badges, belt buckle emblems, embroidered devices on any uniform surface, and any other decoration that would normally identify rank, branch, unit, or nationality. If a piece of headgear or uniform would historically have a visible emblem, render that surface as plain. **Inventing a plausible-looking but fictional emblem is worse than omitting the emblem entirely.**
+- **No recognizable celebrity or real-person faces.** Figures should look like historically plausible everymen — the right age, build, hair, and grooming for the era — but not portraits of specific historical figures.
+- **Period accuracy in equipment, clothing, and environment. Verify the year.** Helmets, weapons, vehicles, lighting fixtures, and clothing must match the specific year, not a generic era. Anachronistic technology is a disqualifying error. When the scene involves military or state uniforms and weapons, confirm the specific year's issue — do not default to the most iconic version of a weapon or uniform if it postdates or predates the scene.
+- **Diegetic signage:** period-accurate in-world signage that exists physically in the scene (a station nameplate, a painted wall marking) is permitted **only** when the scene description explicitly calls for it, and must be spelled correctly and rendered in a period-correct typeface. If in doubt, omit it. This is distinct from the prohibited overlay text/captions/watermarks, which are never allowed. Garbled or misspelled signage is a failed image.
+- **No graphic violence, no visible blood, no wounded bodies.** Tension and danger are conveyed through environment, lighting, expression, and posture — never explicit injury.
+
+---
+
+## STYLE REFERENCES
+Cinematic realism in the tradition of Roger Deakins, Janusz Kaminski, or Robert Richardson. Photorealistic. Shot on 35mm film, slight grain, no digital sheen. No motion blur. No HDR. No overlay text or graphic elements anywhere in the frame. Note: the film-realism reference is for texture and grain, not for exposure — do not interpret "cinematic" as "dark." Cinematic here means well-lit subjects against atmospheric environments.
+
+---
+
+## FILE NAMING AFTER GENERATION
 Save the source PNG as [scenario_id]_source.png. Downstream processing produces [scenario_id]_wide.jpg (1600x900, 16:9) and [scenario_id]_short.jpg (1800x493, 3.65:1).
 
 ---
-SCENARIO-SPECIFIC SCENE DESCRIPTION
+
+## SCENARIO-SPECIFIC SCENE DESCRIPTION
 `;
 
 function renderSourceNarrativeSection(data) {
@@ -3269,7 +3296,7 @@ function renderImgPromptStudio(data) {
   </div>
   <div class="img-prompt-studio-body" id="img-prompt-studio-body" style="display:none">
     <div class="img-prompt-master-spec">
-      <div class="img-prompt-label">Master spec (v1.3)
+      <div class="img-prompt-label">Master spec (v1.4)
         <span class="img-prompt-toggle" onclick="toggleMasterSpec()">show ▼</span>
       </div>
       <pre id="img-prompt-master-spec-text" style="display:none" class="img-prompt-pre"></pre>
