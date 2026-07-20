@@ -4688,7 +4688,7 @@ FIELD locator conventions:
 - Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
 - Technical Facts: <fact_id>
 - Locations / Clues: <id>.<field>
-- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
 - Epilogue: <character_id> for fates; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
 
@@ -4696,6 +4696,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 - A character outcome means in-event fate, not lifespan.
 - Prefer cutting an unsourced specific to inventing a citation for it.`,
 
@@ -4782,13 +4783,13 @@ Check:
 - Internal consistency: a partial-success example must not contradict the fixed macro-outcome.
 - Any number that appears in more than one section (casualties, times) must reconcile.
 
-FIELD locator for this section: the exact condition or pressure-event text, quoted verbatim.
+FIELD locator for this section: win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1].
 
 For every correction, use EXACTLY this format — no prose between corrections:
 
 ---CORRECTION---
-SECTION: Win Conditions / Gameplay
-FIELD: [the exact condition or pressure-event text]
+SECTION: win conditions
+FIELD: <arrayName>[<index>]
 CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
 REPLACE WITH: [complete replacement text]
 REASON: [one sentence]
@@ -4807,6 +4808,7 @@ Rules:
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
 - Internal consistency: any number, date, or time appearing in more than one place must reconcile.
 - Real figures are bound by the record — rank, role, and fate must match history.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 
 DATA TO REVIEW:
 [PASTE WIN/FAIL CONDITIONS AND PRESSURE EVENTS DATA HERE]`,
@@ -5101,7 +5103,7 @@ FIELD locator conventions by section:
 - Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
 - Technical Facts: <fact_id>
 - Locations / Clues: <id>.<field>
-- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
 - Epilogue: <character_id> for fates; immediate_outcome.summary or fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
 
@@ -5118,6 +5120,7 @@ Rules:
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
 - Internal consistency: any number, date, or time appearing in more than one place must reconcile.
 - Real figures are bound by the record — rank, role, and fate must match history.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 
 DATA TO REVIEW:
 [PASTE THE COMPLETE SCENARIO DATA HERE]`,
@@ -5541,7 +5544,14 @@ function _resolveSectionNode(data, section) {
     case 'locations':         return data.locations;
     case 'clues':             return data.clues;
     case 'story arc':         return (data.storyArc?.acts || []).flatMap(a => a.beats || []);
-    case 'win conditions':    return { winConditions: sc.winConditions, failConditions: sc.failConditions, partialSuccessExamples: sc.partialSuccessExamples };
+    case 'win conditions':
+    case 'win/fail/gameplay':
+    case 'win/fail & gameplay':
+    case 'win conditions / gameplay':
+    case 'gameplay':
+    case 'fail conditions':
+    case 'partial success':
+    case 'pressure events':   return { winConditions: sc.winConditions, failConditions: sc.failConditions, partialSuccessExamples: sc.partialSuccessExamples, pressureEvents: sc.systems?.pressureEvents };
     case 'opening scene':     return { openingSituation: sc.openingSituation, introduction: sc.introduction };
     case 'period vocabulary': return sc.period_vocabulary;
     case 'technical facts':   return sc.technical_facts;
