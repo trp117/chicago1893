@@ -2285,6 +2285,17 @@ function _syncGlossaryToEditor(scenarioId, glossary, current_version) {
   if (current_version != null) d.current_version = current_version;
 }
 
+// Image endpoints save server-side and bump current_version, returning the full image object
+// (empty {} after delete). Mirror it EXACTLY into the open editor's cached snapshot and advance
+// the base — otherwise the next manual Save reverts the image (or resurrects a deleted one) or
+// 409s. Same open-scenario guard as the glossary sync.
+function _syncImageToEditor(scenarioId, image, current_version) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;
+  if (image !== undefined) { d.scenario = d.scenario || {}; d.scenario.image = image; }  // {} on delete clears it
+  if (current_version != null) d.current_version = current_version;
+}
+
 async function saveGlossaryTermEdit(term, scenarioId) {
   const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
   if (!card) return;
@@ -3457,6 +3468,7 @@ async function saveImgPromptDraft() {
     });
     const data = await resp.json();
     if (!data.success) throw new Error(data.error || 'Save failed');
+    _syncImageToEditor(scenarioId, data.image, data.current_version);
     status.textContent = '✓ Draft saved.';
     status.style.color = 'var(--success)';
   } catch (err) {
@@ -3683,8 +3695,8 @@ function renderPreview(data, autoSaved = false) {
         const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image-upload`, { method: 'POST', body: fd });
         const result = await resp.json();
         if (result.error) throw new Error(result.detail || result.error);
-        data.scenario = data.scenario || {};
-        data.scenario.image = { ...(data.scenario.image || {}), url: result.wide, shortUrl: result.short, sourceUrl: result.source };
+        // Mirror the full server image object + advance the cached version (avoids next-Save clobber).
+        _syncImageToEditor(artScenarioId, result.image, result.current_version);
         setArtPreviews(result.wide, result.short, result.source);
         showArtState('images');
         setArtStatus('Images saved.', 'success');
@@ -3716,8 +3728,8 @@ function renderPreview(data, autoSaved = false) {
         const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image`, { method: 'DELETE' });
         const result = await resp.json();
         if (result.error) throw new Error(result.error);
-        data.scenario = data.scenario || {};
-        data.scenario.image = {};
+        // Server returns image: {} (deleted). Mirror exactly so a later Save can't resurrect it.
+        _syncImageToEditor(artScenarioId, result.image, result.current_version);
         if (wideImg)  wideImg.src  = '';
         if (shortImg) shortImg.src = '';
         showArtState('upload');
@@ -3743,8 +3755,7 @@ function renderPreview(data, autoSaved = false) {
           });
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
-          data.scenario.image.shortUrl = result.short;
-          data.scenario.image.cropAnchor = anchor;
+          _syncImageToEditor(artScenarioId, result.image, result.current_version);
           if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
           setArtStatus('Crop updated.', 'success');
         } catch (err) {
@@ -3776,9 +3787,7 @@ function renderPreview(data, autoSaved = false) {
           });
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
-          data.scenario.image.url        = result.wide;
-          data.scenario.image.shortUrl   = result.short;
-          data.scenario.image.brightness = brightnessVal;
+          _syncImageToEditor(artScenarioId, result.image, result.current_version);
           if (wideImg)  { wideImg.src  = result.wide  + '?t=' + Date.now(); wideImg.style.opacity  = '1'; }
           if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
           setArtStatus('Brightness updated.', 'success');

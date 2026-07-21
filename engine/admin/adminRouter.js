@@ -2746,8 +2746,10 @@ Return only the scene description. No preamble, no closing remarks.`,
         generation_prompt: generation_prompt || '',
       },
     };
-    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true });
+    const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    // Return the full image object + version so the open editor can resync its cached
+    // scenario.image and advance its base — otherwise the next manual Save clobbers this write.
+    res.json({ success: true, image: updated.image, current_version: newVersion });
   });
 
   // ── Image upload / recrop / delete ───────────────────────────────────────────
@@ -2783,8 +2785,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), url: wideUrl, shortUrl, sourceUrl, cropAnchor, brightness: 100 },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
-      res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
+      res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-UPLOAD]', err.message);
       res.status(500).json({ error: 'Image processing failed', detail: err.message });
@@ -2810,8 +2812,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), shortUrl, cropAnchor, brightness },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
-      res.json({ short: shortUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
+      res.json({ short: shortUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-RECROP]', err.message);
       res.status(500).json({ error: 'Recrop failed', detail: err.message });
@@ -2843,8 +2845,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), url: wideUrl, shortUrl, cropAnchor, brightness },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image reprocess' });
-      res.json({ wide: wideUrl, short: shortUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image reprocess' });
+      res.json({ wide: wideUrl, short: shortUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-REPROCESS]', err.message);
       res.status(500).json({ error: 'Reprocess failed', detail: err.message });
@@ -2859,8 +2861,10 @@ Return only the scene description. No preamble, no closing remarks.`,
       await supabase.storage.from(STORAGE_BUCKET)
         .remove([`${id}_wide.jpg`, `${id}_short.jpg`, `${id}_source.jpg`]);
       const updated = { ...scenario, image: {} };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image deleted' });
-      res.json({ deleted: true });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image deleted' });
+      // Post-delete state is an empty image object — return it so the client mirrors exactly
+      // (clears its cached image) rather than holding a deleted image while claiming currency.
+      res.json({ deleted: true, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-DELETE]', err.message);
       res.status(500).json({ error: 'Delete failed', detail: err.message });
