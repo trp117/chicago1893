@@ -986,7 +986,11 @@ export function createAdminRouter(repos, config = {}) {
     const locations   = repos.locations.findByScenario(scenario.id);
     const clues       = repos.clues.findByScenario(scenario.id);
     const playerRoles = repos.scenarios.findPlayerRoles(scenario.id);
-    res.json({ scenario, storyArc: storyArc || null, characters, locations, clues, playerRoles });
+    // current_version is a column on the scenarios row (NOT inside content). Surface it at
+    // the top level so the client can echo it back as baseVersion for optimistic concurrency.
+    const { data: verRow } = await supabase
+      .from('scenarios').select('current_version').eq('id', req.params.id).single();
+    res.json({ scenario, current_version: verRow?.current_version ?? null, storyArc: storyArc || null, characters, locations, clues, playerRoles });
   });
 
   // ── Scenario health check ────────────────────────────────────────────────────
@@ -1868,7 +1872,7 @@ Return ONLY valid JSON in this exact structure:
   });
 
   r.post('/generate/save', async (req, res) => {
-    const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
+    const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [], baseVersion } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
       const existing = await repos.scenarios.findById(scenario.id);
@@ -1881,7 +1885,9 @@ Return ONLY valid JSON in this exact structure:
           }
         }
       }
-      await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
+      // baseVersion (when the client sent one) enables the optimistic-concurrency guard in
+      // saveScenario. Omitted → unguarded save (unchanged behaviour).
+      const newVersion = await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin', baseVersion });
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
@@ -1889,8 +1895,16 @@ Return ONLY valid JSON in this exact structure:
       // preserveStoredEndingNotes FIRST: a stale editor tab posts empty endings; without
       // this, stripEmptyEndingNotes + whole-object save would erase approved endings.
       playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredEndingNotes(repos, r)))));
-      res.json({ ok: true, scenarioId: scenario.id });
+      res.json({ ok: true, scenarioId: scenario.id, current_version: newVersion });
     } catch (err) {
+      if (err.code === 'VERSION_CONFLICT') {
+        return res.status(409).json({
+          error: `This scenario was changed elsewhere since you loaded it (you have v${err.expected}, current is v${err.actual}). Reload before saving.`,
+          code: 'VERSION_CONFLICT',
+          expected: err.expected,
+          actual: err.actual
+        });
+      }
       res.status(500).json({ error: err.message });
     }
   });

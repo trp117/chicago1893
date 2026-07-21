@@ -359,7 +359,10 @@ async function apiFetch(method, path, body) {
   }
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `Server error (${res.status})`);
+    const err = new Error(data.error || `Server error (${res.status})`);
+    err.status = res.status;   // lets callers special-case 409 (version conflict) etc.
+    err.body = data;
+    throw err;
   }
   return res.json();
 }
@@ -2795,14 +2798,22 @@ async function handleManualSave(data, containerEl) {
   }
 
   try {
-    await apiPost('/generate/save', data);
+    // Optimistic concurrency: send the version we loaded. The server rejects with 409 if the
+    // scenario changed elsewhere since load, instead of silently clobbering the newer save.
+    const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
+    if (resp && resp.current_version != null) data.current_version = resp.current_version;  // advance base for next save this session
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
     clearFormDirty();   // single choke point — clears badge/Save emphasis for all save paths
     return true;
   } catch (err) {
-    toast(`Save failed: ${err.message}`, 'error');
+    // 409 = version conflict. Non-destructive: keep the user's edits, tell them to reload.
+    if (err.status === 409) {
+      toast(err.message, 'error');
+    } else {
+      toast(`Save failed: ${err.message}`, 'error');
+    }
     return false;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
@@ -5465,7 +5476,10 @@ async function applyCorrections(scenarioId) {
     }
     if (appliedCount > 0) {
       // Preserve read-ground-truth → edit → dual-write: /generate/save writes local + Supabase.
-      await apiPost('/generate/save', data);
+      // baseVersion from the /full load enables the optimistic-concurrency guard: a 409 here
+      // means the scenario changed between our read and this save — reject, do not clobber.
+      const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
+      if (resp && resp.current_version != null) data.current_version = resp.current_version;
       await apiPost('/pipeline/snapshot/' + scenarioId, {
         label: 'corrections_applied',
         pipeline_step: 'manual_correction',
@@ -5474,6 +5488,7 @@ async function applyCorrections(scenarioId) {
     }
     renderInjectionResults(results, appliedCount);
   } catch (err) {
+    // 409 conflict message ("changed elsewhere… reload") surfaces here unchanged.
     toast(err.message, 'error');
   }
 }
