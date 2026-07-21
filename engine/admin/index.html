@@ -2274,6 +2274,17 @@ function cancelGlossaryTermEdit(term) {
   card.querySelector('.term-edit').hidden = true;
 }
 
+// Glossary endpoints save server-side and bump current_version. The open editor holds its
+// snapshot at window._aiPanelData (the same object handleManualSave posts). Keep that in sync
+// after a glossary write so its next manual Save carries the current version (passes the CAS)
+// and the correct glossary — instead of a spurious 409 or a stale-glossary clobber.
+function _syncGlossaryToEditor(scenarioId, glossary, current_version) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;   // a different scenario is open — do not touch
+  if (Array.isArray(glossary)) d.scenario.glossary = glossary;
+  if (current_version != null) d.current_version = current_version;
+}
+
 async function saveGlossaryTermEdit(term, scenarioId) {
   const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
   if (!card) return;
@@ -2298,18 +2309,20 @@ async function saveGlossaryTermEdit(term, scenarioId) {
   try {
     const body = { definition, source };
     if (newTerm.toLowerCase() !== term.toLowerCase()) body.newTerm = newTerm;
-    const { glossary } = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, body);
+    const resp = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, body);
     toast('Term updated', 'success');
-    renderGlossaryBody(scenarioId, glossary);
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
 }
 
 async function deleteGlossaryTerm(term, scenarioId) {
   if (!confirm(`Delete "${term}" from the glossary?`)) return;
   try {
-    const { glossary } = await apiFetch('DELETE', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`);
+    const resp = await apiFetch('DELETE', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`);
     toast('Term deleted', 'success');
-    renderGlossaryBody(scenarioId, glossary);
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
 }
 
@@ -2517,9 +2530,10 @@ function addGlossaryTermManually(scenarioId) {
     const source     = card.querySelector('.new-source-input').value.trim();
     if (!term || !definition) { toast('Term and definition are required', 'error'); return; }
     try {
-      const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+      const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
       toast(`"${term}" added`, 'success');
-      renderGlossaryBody(scenarioId, glossary);
+      renderGlossaryBody(scenarioId, resp.glossary);
+      _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
     } catch (err) { toast(`Error: ${err.message}`, 'error'); }
   });
 }
@@ -4323,11 +4337,15 @@ function renderPreview(data, autoSaved = false) {
     btn.disabled    = true;
     btn.textContent = 'Generating historical facts…';
     try {
-      const tf = await apiPost('/generate/technical-facts', {
+      const resp = await apiPost('/generate/technical-facts', {
         scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
       });
+      const tf = resp.technical_facts;
       if (!data.scenario) data.scenario = {};
       data.scenario.technical_facts = tf;
+      // Route saved server-side and bumped the version; advance our cached base so the next
+      // manual Save carries the current version and passes the CAS instead of 409-ing.
+      if (resp.current_version != null) data.current_version = resp.current_version;
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (tfDetails) {
         const newHtml = renderTechnicalFactsSection(data);
@@ -4371,12 +4389,16 @@ function renderPreview(data, autoSaved = false) {
     btn.disabled    = true;
     btn.textContent = 'Generating historical data…';
     try {
-      const epilogue = await apiPost('/generate/epilogue-data', {
+      const resp = await apiPost('/generate/epilogue-data', {
         scenarioId, title, world, stakes, characters, essential_beats,
       });
+      const epilogue = resp.epilogue;
       // Rebuild the epilogue data in the in-memory data object
       if (!data.scenario) data.scenario = {};
       data.scenario.epilogue = epilogue;
+      // Route saved server-side and bumped the version; advance our cached base so the next
+      // manual Save carries the current version and passes the CAS instead of 409-ing.
+      if (resp.current_version != null) data.current_version = resp.current_version;
       // Re-render just the epilogue section
       const epDetails = formEl.querySelector('#epilogue-data-details');
       if (epDetails) {

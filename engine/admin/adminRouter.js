@@ -1711,9 +1711,11 @@ Return ONLY valid JSON in this exact structure:
           facts,
         },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
-      res.json(updated.technical_facts);
+      // Return current_version so the client can advance its cached base and avoid a spurious
+      // 409 on the next manual Save (this route bumped the version behind the editor's back).
+      res.json({ technical_facts: updated.technical_facts, current_version: newVersion });
     } catch (err) {
       console.error('[TECHNICAL-FACTS]', err.message);
       res.status(500).json({ error: err.message });
@@ -1862,9 +1864,11 @@ Return ONLY valid JSON in this exact structure:
           choice_echoes:    epilogueData.choice_echoes     || [],
         },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
-      res.json(updated.epilogue);
+      // Return current_version so the client can advance its cached base and avoid a spurious
+      // 409 on the next manual Save (this route bumped the version behind the editor's back).
+      res.json({ epilogue: updated.epilogue, current_version: newVersion });
     } catch (err) {
       console.error('[EPILOGUE-DATA]', err.message);
       res.status(500).json({ error: err.message });
@@ -2635,8 +2639,8 @@ Return JSON only:
       return badRequest(res, `Term "${term}" already exists in glossary`);
     glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
     const updated = { ...scenario, glossary };
-    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary: updated.glossary });
+    const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary: updated.glossary, current_version: newVersion });
   });
 
   r.put('/scenarios/:id/glossary/:term', async (req, res) => {
@@ -2660,8 +2664,8 @@ Return JSON only:
         ? { ...g, term: resolvedTerm, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
         : g
     );
-    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary });
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary, current_version: newVersion });
   });
 
   r.delete('/scenarios/:id/glossary/:term', async (req, res) => {
@@ -2669,8 +2673,8 @@ Return JSON only:
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
     const glossary = (scenario.glossary || []).filter(g => g.term.toLowerCase() !== termName.toLowerCase());
-    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary });
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary, current_version: newVersion });
   });
 
   // ── Image Prompt Studio ───────────────────────────────────────────────────────
