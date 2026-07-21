@@ -4690,12 +4690,13 @@ FIELD locator conventions:
 - Locations / Clues: <id>.<field>
 - win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
-- Epilogue: <character_id> for fates; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+- Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or the exact fact text. Historical Frame: the exact entry text.
 
 Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
 - Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 - A character outcome means in-event fate, not lifespan.
 - Prefer cutting an unsourced specific to inventing a citation for it.`,
@@ -5041,7 +5042,12 @@ OPEN THREADS — each "not documented in surviving records" claim is genuinely t
 
 CHOICE ECHOES — each echo is historically accurate and does not narrate invented player action as documented fact.
 
-FIELD locator for this section: <character_id> for fates; immediate_outcome.summary or the exact fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads and echoes.
+FIELD locator for this section:
+- Character Fates: leave FIELD blank. Do NOT use the character id — fate ids are shared with the character records and will resolve to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text.
+- Open Threads: leave FIELD blank, for the same reason — thread slugs are shared with the story-arc beat ids. Use SECTION plus verbatim CURRENT.
+- Choice Echoes: leave FIELD blank, for the same reason — echo slugs are shared with the story-arc beat ids. Use SECTION plus verbatim CURRENT.
+- Immediate Outcome: immediate_outcome.summary, or the exact fact text.
+- Historical Frame: the exact entry text.
 
 For every correction, use EXACTLY this format — no prose between corrections:
 
@@ -5062,6 +5068,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
 - In-event, not lifespan: an outcome is what happened during the depicted event, not whether the person is alive today.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
@@ -5105,7 +5112,7 @@ FIELD locator conventions by section:
 - Locations / Clues: <id>.<field>
 - win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
-- Epilogue: <character_id> for fates; immediate_outcome.summary or fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+- Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or fact text. Historical Frame: the exact entry text.
 
 If a section is fully accurate: ---CONFIRMED: [section name]---
 If you cannot verify a claim: ---UNVERIFIED: [field]---
@@ -5115,6 +5122,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
 - In-event, not lifespan: a character outcome is what happened during the depicted event, not lifespan.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
