@@ -52,6 +52,7 @@ Instructions:
 - Only change the top-level `location` field if the player's input explicitly says they are moving somewhere.
 - If you change `location` this turn, the narrative must begin at the new location — do NOT include dialogue or reactions from NPCs at the previous location.
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
+{{CLOSURE_FLAG_DIRECTIVE}}
 {{CLOSING_INSTRUCTION}}
 - Return valid JSON only, per the output contract.
 

@@ -679,26 +679,157 @@ function buildVerifiedFactsBlock(state) {
   ].join('\n');
 }
 
-export function checkEndingReadiness(state) {
+// Feature flag — beat-aware session closing. Default OFF.
+// Same idiom as STRICT_FATE_VERIFICATION (gameRouter.js:46).
+const CLOSURE_BEATS_ENABLED = process.env.CLOSURE_BEATS_ENABLED === 'true';
+
+// Minimum elapsed fraction before a met closure transition may DRIVE the close.
+// Sits inside the 'middle' arc (getArcPosition: opening<0.25, middle<0.55, late<0.80).
+// 0.40 clears the opening with margin and stays well below 'late'. For a 15-min
+// target: 0.25→3.75min, 0.40→6min, 0.55→8.25min. Guards a barely-started session
+// against an early or fluky arrival at a closure location.
+const CLOSURE_MIN_ELAPSED_FRACTION = 0.40;
+
+// The closure block in force for the playing role: the role's own block if it set
+// one (captured onto state.effectiveClosure by buildInitialState at session start),
+// else the scenario-level default. Roles are NOT reachable at the evaluator call
+// sites (mergeState / composeTurnPrompt have no roles array) — that is precisely why
+// the role's block is resolved once upstream and carried on state.
+export function resolveClosureBlock(state, scenario) {
+  return state?.effectiveClosure ?? scenario?.closure ?? null;
+}
+
+// Pure evaluation of the effective (per-role) closure transition against live state.
+// Returns a serializable closure_state object. Never throws; never mutates.
+// When the flag is off or no closure block is in force, returns
+// { met:false, reason:'no_closure_block' } so nothing changes for existing scenarios.
+export function evaluateClosure(state, scenario) {
+  const block     = resolveClosureBlock(state, scenario);
+  const principal = block?.principal_transition;
+  if (!CLOSURE_BEATS_ENABLED || !principal) {
+    return { met: false, reason: 'no_closure_block' };
+  }
+
+  // Phase 2: dependent_resolution evaluated here.
+  // Read it if present, but do NOT gate on it in Phase 1. Threaded through dormant.
+  const dependentResolution = block.dependent_resolution ?? null;
+
+  if (principal.type === 'location_reached') {
+    const locations  = Array.isArray(principal.locations) ? principal.locations : [];
+    const atLocation = locations.includes(state?.location);
+
+    // require_alive: session state has NO player-survival field (verified against
+    // StateManager). The engine treats the player role as a documented survivor
+    // (macro-history invariant), so "alive" resolves to true here — this clause is
+    // currently STRUCTURAL and invents no state field. It is kept in the schema and
+    // threaded through dormant (same as dependent_resolution): a future playable
+    // committed-fate character will make it real, at which point a survival field is
+    // added and read here. Do NOT strip this clause.
+    const playerAlive = true;
+    const aliveOk     = principal.require_alive === false || playerAlive;
+
+    const met = atLocation && aliveOk;
+    return {
+      met,
+      reason: met            ? 'principal_transition_met'
+            : !atLocation    ? 'location_not_reached'
+            :                  'require_alive_unsatisfied',
+      transition_type:               'location_reached',
+      location:                      state?.location ?? null,
+      required_locations:            locations,
+      require_alive:                 principal.require_alive !== false,
+      dependent_resolution_present:  dependentResolution != null,
+    };
+  }
+
+  if (principal.type === 'flag_set') {
+    const flagName  = principal.flag;
+    const flagValue = state?.flags?.[flagName] === true;
+    const met       = !!flagName && flagValue;
+    return {
+      met,
+      reason: !flagName ? 'flag_name_missing'
+            : met       ? 'principal_transition_met'
+            :             'flag_not_set',
+      transition_type:               'flag_set',
+      flag:                          flagName ?? null,
+      flag_value:                    state?.flags?.[flagName] ?? null,
+      closure_source:                state?.effectiveClosureSource ?? 'scenario',
+      dependent_resolution_present:  dependentResolution != null,
+    };
+  }
+
   return {
-    readyForClimax: (state.remainingMinutes ?? 0) <= 5,
-    turnsAtZero:    state.turnsAtZero || 0,
+    met: false,
+    reason: 'unsupported_transition_type',
+    transition_type: principal.type ?? null,
   };
 }
 
-function buildClosingInstruction(state) {
+// Whether a met closure transition should DRIVE/PERMIT the close *right now*:
+// met AND past the elapsed floor. Single source of truth shared by the injection
+// (buildClosingInstruction) and the arc-guard exception (gameRouter), so closure
+// semantics can't drift between "engine drives close" and "engine permits close".
+export function closureShouldClose(state, scenario) {
+  const closure = evaluateClosure(state, scenario);
+  if (!closure.met) return false;
+  const total   = scenario?.sessionTargetMinutes || 15;
+  const elapsed = state?.elapsedMinutes ?? 0;
+  return elapsed >= total * CLOSURE_MIN_ELAPSED_FRACTION;
+}
+
+export function checkEndingReadiness(state, scenario) {
+  const closure = evaluateClosure(state, scenario);
+  return {
+    readyForClimax: (state.remainingMinutes ?? 0) <= 5,
+    turnsAtZero:    state.turnsAtZero || 0,
+    closureMet:     closure.met,
+  };
+}
+
+function buildClosingInstruction(state, scenario) {
   const remaining   = state.remainingMinutes ?? 0;
   const turnsAtZero = state.turnsAtZero || 0;
+
+  // (1) Absolute backstop — time exhausted. FINAL-TURN always wins; the closure
+  //     branch below can never reach this block, so it never overrides the hard
+  //     time backstop.
   if (remaining <= 0) {
     if (turnsAtZero >= 1) {
       return '⚠️ FINAL TURN (REQUIRED): The session must end now. Write one last physical moment — a sensation, a sound, the weight of what is still unresolved. Do not resolve the historical situation. Do not evaluate success or failure. Do not introduce anything new. End in the middle of the moment. You MUST set isEnding to true in your response. The session cannot continue past this turn.';
     }
     return '⚠️ FINAL TURN: Write one last moment — a physical sensation, a sound, an unresolved weight. Do not resolve the historical situation. Do not evaluate success or failure. End in the middle of the moment. You MUST set isEnding to true in your response.';
   }
+
+  // (2) Beat-aware close — the player has reached the arc-resolving transition and
+  //     is past the elapsed floor. Ranks ABOVE the soft <=5 land, BELOW the <=0
+  //     backstop above. Uses the LIVE check (not the closureFired latch) so this
+  //     instruction stops being injected once the model has actually closed.
+  //     closureShouldClose folds in the flag, the met check, and the elapsed floor;
+  //     a below-floor arrival falls through to normal time logic.
+  if (closureShouldClose(state, scenario)) {
+    return 'The player has reached the point at which this arc resolves. Bring the scene to a close now: one final grounded physical moment, then set isEnding to true. Do not introduce new characters, new locations, or new dramatic threads. Do not evaluate success or failure.';
+  }
+
+  // (3) Soft time-based land.
   if (remaining <= 5) {
     return 'The session is approaching its final moments. Begin drawing the current scene toward a natural resting point. Do not introduce new characters, new locations, or new dramatic threads. The existing tension carries the scene.';
   }
   return '';
+}
+
+// Standing per-turn directive that DRIVES the closure flag for the PLAYING ROLE.
+// Returns '' unless the effective closure is a flag_set transition and the feature
+// flag is on — a no-op for every other scenario/role and when CLOSURE_BEATS_ENABLED
+// is off. Injected every turn (NOT via the closing path) because the flag must be
+// settable before closure can detect it. Takes state so it sees the per-role block.
+export function buildClosureFlagDirective(state, scenario) {
+  const principal = resolveClosureBlock(state, scenario)?.principal_transition;
+  if (!CLOSURE_BEATS_ENABLED || principal?.type !== 'flag_set' || !principal.flag) return '';
+  const when = principal.flag_trigger
+    ? `When ${principal.flag_trigger}, `
+    : 'When the moment this arc resolves on is reached, ';
+  return `⚑ CLOSURE FLAG: ${when}you MUST emit stateChanges: { flags: { "${principal.flag}": true } } in that turn's response. Set it the instant it becomes true and never unset it.`;
 }
 
 export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues }) {
@@ -734,6 +865,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
-    .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state))
+    .replace('{{CLOSURE_FLAG_DIRECTIVE}}', buildClosureFlagDirective(state, scenario))
+    .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario))
     .replace('{{PLAYER_INPUT}}',           resolvedInput);
 }

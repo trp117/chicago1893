@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose } from './PromptComposer.js';
 
 export function buildInitialState(scenario, role, locations) {
   const scales      = scenario.systems?.scales || {};
@@ -41,6 +41,15 @@ export function buildInitialState(scenario, role, locations) {
     escapedNpcs:             [],
     physicalConflicts:       [],
     chaseState:              null,
+    closureFired:            false,
+    // Per-role closure resolved ONCE here (role IS known). Carried on state so the
+    // downstream evaluators (mergeState, composeTurnPrompt) — which have no roles
+    // array — get the playing role's block without any role plumbing. Falls back to
+    // the scenario-level default when the role defines no override.
+    effectiveClosure:        role.closure ?? scenario.closure ?? null,
+    // True provenance of effectiveClosure — the fallback collapses role vs scenario,
+    // so record which one actually supplied the block for honest closure_state reporting.
+    effectiveClosureSource:  role.closure ? 'role' : (scenario.closure ? 'scenario' : 'none'),
   };
 }
 
@@ -212,6 +221,14 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
         });
       }
     }
+  }
+
+  // Beat-aware close latch — once the arc-resolving transition has fired (met AND
+  // past the elapsed floor), remember it so a later model-driven location change
+  // cannot un-fire an ending that already correctly triggered. No-op when the
+  // closure flag is off (closureShouldClose returns false).
+  if (!next.closureFired && closureShouldClose(next, scenario)) {
+    next.closureFired = true;
   }
 
   return next;

@@ -9,6 +9,8 @@ import {
   buildSystemPrompt as buildSystemPromptLegacy,
   composeTurnPrompt,
   checkEndingReadiness,
+  evaluateClosure,
+  closureShouldClose,
   prepareForTts,
   getClueById,
   getArcPosition,
@@ -288,12 +290,13 @@ async function streamRawText(fetchResponse, onChunk) {
 
 // ── Epilogue generation ────────────────────────────────────────────────────────
 
-function buildEpilogueSummary(state, endResult) {
+function buildEpilogueSummary(state, endResult, scenario) {
   return {
     interacted_characters: state?.introducedNpcs     || [],
     completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
     resolved_threads:      (state?.resolved_threads  || []).map(t => ({ thread_id: t.thread_id })),
     outcome:               endResult || 'unknown',
+    closure_state:         { ...evaluateClosure(state, scenario), closureFired: state?.closureFired === true },
   };
 }
 
@@ -1027,7 +1030,12 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       // Prevent LLM-generated endings before the FINAL arc threshold (80% elapsed)
       if (arcPosition !== 'final' && nextState.remainingMinutes > 0) {
-        if (output.endState?.isEnding) {
+        // Closure exception — a met arc-resolving transition (or an already-latched
+        // close from an earlier turn) permits the ending to stand before 'final'.
+        // The latch (closureFired) survives a late model-driven location change that
+        // would flip the live check false.
+        const closureClosing = nextState.closureFired || closureShouldClose(nextState, scenario);
+        if (output.endState?.isEnding && !closureClosing) {
           console.log(`[ARC GUARD] arcPosition=${arcPosition} — suppressed premature isEnding`);
           output.endState.isEnding = false;
         }
@@ -1326,7 +1334,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       console.log('[EPILOGUE-CLOSE] interacted_characters:', (sessionState?.introducedNpcs || []).length, 'completed_beats:', (sessionState?.resolved_threads || []).length);
       console.log('[EPILOGUE-CLOSE] conditions — generated:', scenarioData?.epilogue?.generated, 'reviewed:', scenarioData?.epilogue?.reviewed);
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
-        const summary = buildEpilogueSummary(sessionState, endResult);
+        const summary = buildEpilogueSummary(sessionState, endResult, scenarioData);
         console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome);
 
         sendSse(res, { type: 'epilogue_pending' });
@@ -1371,7 +1379,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       // Epilogue-derived composites (requires a reviewed epilogue block)
       const epilogueComposites = (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed)
-        ? getCompositeDisclosure(scenarioData.epilogue, buildEpilogueSummary(sessionState, endResult))
+        ? getCompositeDisclosure(scenarioData.epilogue, buildEpilogueSummary(sessionState, endResult, scenarioData))
         : [];
 
       // Scenario-level fallback: top-level composite_disclosure array produced by the generator.
