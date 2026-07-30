@@ -156,6 +156,12 @@ li { margin-bottom: 8px; }
 .closing-bibliography { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-bibliography.visible { opacity: 1; }
 .closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-bibliography > summary { cursor: pointer; list-style: none; }
+.closing-bibliography > summary::-webkit-details-marker { display: none; }
+.closing-bibliography > summary::after { content: ' ↓'; font-size: 0.7rem; opacity: 0.7; }
+.closing-bibliography[open] > summary::after { content: ' ↑'; }
+.closing-bibliography:not([open]) > summary { margin-bottom: 0; }
+.closing-bibliography > summary:hover { color: #d0b06a; }
 .closing-bibliography-list { list-style: none; padding: 0; margin: 0; }
 .closing-bibliography-item { font-size: 0.8rem; color: #7a7570; line-height: 1.7; margin-bottom: 0.8em; }
 .closing-bibliography-item a { color: #7a7570; text-decoration: underline; text-underline-offset: 2px; }
@@ -827,10 +833,10 @@ li { margin-bottom: 8px; }
         <div id="closing-epilogue-record-text" class="closing-epilogue-text"></div>
       </div>
     </div>
-    <div id="closing-bibliography" class="closing-bibliography">
-      <div class="closing-bibliography-label">Primary Sources</div>
+    <details id="closing-bibliography" class="closing-bibliography">
+      <summary class="closing-bibliography-label">Primary Sources</summary>
       <ul id="closing-bibliography-list" class="closing-bibliography-list"></ul>
-    </div>
+    </details>
     <div id="closing-composite-note" class="closing-composite-note">
       <div class="closing-composite-note-label">A note on the characters</div>
       <div id="closing-composite-note-text" class="closing-composite-note-text"></div>
