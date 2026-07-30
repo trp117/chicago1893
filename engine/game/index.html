@@ -177,6 +177,10 @@ li { margin-bottom: 8px; }
 .closing-dots span:nth-child(3) { animation-delay: 1.6s; }
 .closing-dots.hidden { display: none; }
 @keyframes closing-dot-breathe { 0%,100% { opacity:0; } 50% { opacity:1; } }
+.closing-wait { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: -52px; width: 100%; max-width: 420px; text-align: center; font-family: Georgia, serif; }
+.closing-wait-primary { font-size: 0.95rem; color: #8a8378; letter-spacing: 0.02em; margin-bottom: 0.5em; }
+.closing-wait-secondary { font-size: 0.8rem; font-style: italic; color: #5a5550; }
+.closing-wait.hidden { display: none; }
 .role-overlay { position: fixed; inset: 0; z-index: 210; background: rgba(8,6,4,0.97); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
 .role-overlay.hidden { display: none; }
 .role-overlay-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 480px; }
@@ -798,6 +802,10 @@ li { margin-bottom: 8px; }
 
 <div id="closing-overlay" class="closing-overlay hidden" role="region" aria-label="Story closing">
   <button id="closing-narration-toggle" class="closing-narration-toggle" aria-label="Toggle narration" onclick="toggleClosingNarration()"></button>
+  <div id="closing-wait" class="closing-wait" aria-live="polite">
+    <div class="closing-wait-primary">The session has ended.</div>
+    <div class="closing-wait-secondary">writing what came after…</div>
+  </div>
   <div id="closing-dots" class="closing-dots" aria-hidden="true">
     <span>·</span><span>·</span><span>·</span>
   </div>
@@ -872,6 +880,9 @@ let locationShowing = false;
 let bootstrapData        = null;
 let ttsNarrationSpeed    = 1.0;
 let lastChoices          = [];
+// Single-entry guard for showClosingScreen — a second call blanks the prose and starts
+// a concurrent /closing-prose stream. Reset in the session-reset block.
+let closingShown         = false;
 
 // Pre-warmed /start request fired as soon as role is selected, resolved in startGame()
 let warmStart = null; // { promise, roleId, style, characterContext, activeHook }
@@ -1299,9 +1310,36 @@ function toggleClosingNarration() {
   updateTtsBarUI();
 }
 
+// Minimum on-screen dwell for a block of text, independent of audio.
+// Same reading curve as the end-of-session pause: 200 wpm, clamped 5–12s.
+// Returns 0 for empty text so absent blocks don't hold the sequence.
+function wordCount(text) {
+  return String(text || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function readingFloorMs(text) {
+  const words = wordCount(text);
+  if (!words) return 0;
+  return Math.min(Math.max(Math.round((words / 200) * 60000), 5000), 12000);
+}
+
+// Narrate if audio is available, but always hold for at least the reading floor.
+// Promise.all settles on the slower leg: audio wins when it actually plays,
+// the floor holds when ttsClosingSpeak resolves instantly (audio locked / TTS
+// error / autoplay reject).
+function speakAtLeast(text) {
+  return Promise.all([
+    ttsClosingSpeak(text).catch(() => {}),
+    new Promise(r => setTimeout(r, readingFloorMs(text))),
+  ]);
+}
+
 // ── Closing screen ────────────────────────────────────────────────────────────
 
 function showClosingScreen(endState, sessionId) {
+  if (closingShown) return;
+  closingShown = true;
+
   const overlay       = document.getElementById('closing-overlay');
   const dotsEl        = document.getElementById('closing-dots');
   const proseEl       = document.getElementById('closing-prose');
@@ -1317,6 +1355,7 @@ function showClosingScreen(endState, sessionId) {
   const compNoteTexEl = document.getElementById('closing-composite-note-text');
   const returnEl      = document.getElementById('closing-return');
   const epLoadingEl   = document.getElementById('closing-epilogue-loading');
+  const waitEl        = document.getElementById('closing-wait');
 
   if (!overlay || !dotsEl || !proseEl || !aftermathEl || !epilogueEl || !returnEl) {
     console.error('[CLOSING] missing DOM element — closing screen cannot show');
@@ -1334,15 +1373,14 @@ function showClosingScreen(endState, sessionId) {
 
   async function triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote) {
     if (ttsEnabled) {
-      await ttsClosingSpeak(proseEl.textContent);
+      await speakAtLeast(proseEl.textContent);
       aftermathEl.classList.add('visible');
-      if (aftermath) await ttsClosingSpeak(aftermathEl.textContent);
+      if (aftermath) await speakAtLeast(aftermathEl.textContent);
       await new Promise(r => setTimeout(r, 1500));
       if (hasEpilogue) {
-        epLoadingEl?.classList.remove('visible');
         epilogueEl.classList.add('visible');
-        if (epSessionTextEl?.textContent) await ttsClosingSpeak(epSessionTextEl.textContent);
-        if (epRecordTextEl?.textContent)  await ttsClosingSpeak(epRecordTextEl.textContent);
+        if (epSessionTextEl?.textContent) await speakAtLeast(epSessionTextEl.textContent);
+        if (epRecordTextEl?.textContent)  await speakAtLeast(epRecordTextEl.textContent);
       }
       if (hasBibliography && bibEl) {
         await new Promise(r => setTimeout(r, 500));
@@ -1356,7 +1394,7 @@ function showClosingScreen(endState, sessionId) {
       returnEl.classList.add('visible');
     } else {
       setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-      setTimeout(() => { if (hasEpilogue) { epLoadingEl?.classList.remove('visible'); epilogueEl.classList.add('visible'); } }, 5500);
+      setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
       const bibDelay = hasEpilogue ? 10000 : 8000;
       setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, bibDelay);
       const noteDelay = bibDelay + (hasBibliography ? 2000 : 0);
@@ -1369,6 +1407,7 @@ function showClosingScreen(endState, sessionId) {
   const controller = new AbortController();
   const timeoutId  = setTimeout(() => controller.abort(), 30000);
   let firstChunk   = true;
+  let epLoadingSafetyId = null;
 
   const cpParams = new URLSearchParams({ sessionId });
   if (currentRoleId) cpParams.set('roleId', currentRoleId);
@@ -1393,11 +1432,13 @@ function showClosingScreen(endState, sessionId) {
             if (firstChunk) {
               firstChunk = false;
               dotsEl.classList.add('hidden');
+              waitEl?.classList.add('hidden');
               proseEl.classList.add('visible');
             }
             proseEl.textContent += evt.text;
           } else if (evt.type === 'done') {
             clearTimeout(timeoutId);
+            clearTimeout(epLoadingSafetyId);
             let hasEpilogue      = false;
             let hasBibliography  = false;
             let hasCompositeNote = false;
@@ -1433,13 +1474,18 @@ function showClosingScreen(endState, sessionId) {
                 : names[0];
               compNoteTexEl.textContent = `${nameList} ${plural ? 'are fictional composites' : 'is a fictional composite'} placed within a documented historical context. ${plural ? 'These characters are' : 'This character is'} not based on identified historical individuals.`;
             }
-            if (!hasEpilogue) epLoadingEl?.classList.remove('visible');
+            epLoadingEl?.classList.remove('visible');
             triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote);
           } else if (evt.type === 'epilogue_pending') {
             epLoadingEl?.classList.add('visible');
+            // Backstop only: primary dismiss is the `done` event above.
+            clearTimeout(epLoadingSafetyId);
+            epLoadingSafetyId = setTimeout(() => epLoadingEl?.classList.remove('visible'), 30000);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
+            clearTimeout(epLoadingSafetyId);
             dotsEl.classList.add('hidden');
+            waitEl?.classList.add('hidden');
             epLoadingEl?.classList.remove('visible');
             triggerClosingSequence(false, false, false);
           }
@@ -1448,7 +1494,9 @@ function showClosingScreen(endState, sessionId) {
     })
     .catch(() => {
       clearTimeout(timeoutId);
+      clearTimeout(epLoadingSafetyId);
       dotsEl.classList.add('hidden');
+      waitEl?.classList.add('hidden');
       epLoadingEl?.classList.remove('visible');
       triggerClosingSequence(false, false, false);
     });
@@ -1463,6 +1511,22 @@ function buildAssistantHistoryContent(output) {
   text += output.narrative || '';
   for (const m of output.npcMoments || []) text += `\n${prettifyId(m.npc)}: ${m.text}`;
   return text.trim();
+}
+
+// Teardown shared by BOTH close paths (time expiry and isEnding beat).
+// Kept in one place so the two paths cannot drift — that drift left choice
+// buttons live on the expiry path and let a click re-enter a closing session.
+function teardownTurnControls() {
+  submitBtn.disabled = true;
+  inputEl.value = '';
+  inputEl.disabled = true;
+  renderChoices([]);                          // removes the clickable .choice-btn nodes
+  storyEl.scrollTop = storyEl.scrollHeight;   // final scene visible in full
+  const bottomBar = document.querySelector('.bottom-bar');
+  if (bottomBar) {
+    bottomBar.style.transition = 'opacity 2s ease';
+    bottomBar.style.opacity = '0';
+  }
 }
 
 async function submitTurn(playerInput, { isChoice = false } = {}) {
@@ -1607,28 +1671,21 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
     extractAndStoreFacts(output.narrative);
 
     if (gameState.remainingMinutes <= 0) {
-      submitBtn.disabled = true;
-      inputEl.disabled = true;
-      showClosingScreen(output?.endState || null, sessionId);
+      try {
+        teardownTurnControls();
+        const expiryPauseMs = Math.max(readingFloorMs(lastRenderedSpeakText), 5000);
+        console.log(`[CLOSING] time expired — ${wordCount(lastRenderedSpeakText)} words → ${expiryPauseMs}ms reading pause`);
+        await new Promise(resolve => setTimeout(resolve, expiryPauseMs));
+        showClosingScreen(output?.endState || null, sessionId);
+      } catch (e) {
+        console.error('[CLOSING] failed to show closing screen:', e);
+      }
     } else if (output?.endState?.isEnding) {
       try {
-        formEl.querySelector('button[type="submit"]').disabled = true;
-        inputEl.value = '';
-        inputEl.disabled = true;
-        renderChoices([]);
-        // Scroll to the bottom of the final scene so the player sees it in full
-        storyEl.scrollTop = storyEl.scrollHeight;
-        // Fade out the input/choices area — visual cue that the session is concluding
-        const bottomBar = document.querySelector('.bottom-bar');
-        if (bottomBar) {
-          bottomBar.style.transition = 'opacity 2s ease';
-          bottomBar.style.opacity = '0';
-        }
+        teardownTurnControls();
         // Scale reading pause to final scene length (lastRenderedSpeakText = last turn's prose)
-        const finalSceneWords = (lastRenderedSpeakText || '').trim().split(/\s+/).filter(Boolean).length;
-        const readingMs = Math.round((finalSceneWords / 200) * 60000);
-        const pauseMs = Math.min(Math.max(readingMs, 5000), 12000);
-        console.log(`[CLOSING] final scene ${finalSceneWords} words → ${pauseMs}ms reading pause`);
+        const pauseMs = Math.max(readingFloorMs(lastRenderedSpeakText), 5000);
+        console.log(`[CLOSING] final scene ${wordCount(lastRenderedSpeakText)} words → ${pauseMs}ms reading pause`);
         await new Promise(resolve => setTimeout(resolve, pauseMs));
         showClosingScreen(output.endState, sessionId);
       } catch (e) {
@@ -2719,6 +2776,8 @@ function restartGame() {
   choicesAreaWrapEl.style.transition = '';
   streamOptionsDots.classList.add('hidden');
   submitBtn.disabled = false;
+  inputEl.disabled = false;   // teardownTurnControls() disables it; nothing else re-enables it
+  closingShown = false;       // allow a second session in the same page load to close
   applyFreeInputMode(true);
 
   const bottomBar = document.querySelector('.bottom-bar');
