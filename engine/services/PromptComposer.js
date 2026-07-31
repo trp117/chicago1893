@@ -682,6 +682,10 @@ function buildVerifiedFactsBlock(state) {
 // Feature flag — beat-aware session closing. Default OFF.
 // Same idiom as STRICT_FATE_VERIFICATION (gameRouter.js:46).
 const CLOSURE_BEATS_ENABLED = process.env.CLOSURE_BEATS_ENABLED === 'true';
+// Self-report at module load so every boot log states the flag's real value. Without
+// this the only evidence was the launching shell's env, which says nothing about the
+// process that actually ended up holding the port.
+console.log(`[CLOSURE] beats ${CLOSURE_BEATS_ENABLED ? 'ENABLED' : 'disabled'}`);
 
 // Minimum elapsed fraction before a met closure transition may DRIVE the close.
 // Sits inside the 'middle' arc (getArcPosition: opening<0.25, middle<0.55, late<0.80).
