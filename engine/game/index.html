@@ -889,6 +889,12 @@ let lastChoices          = [];
 // Single-entry guard for showClosingScreen — a second call blanks the prose and starts
 // a concurrent /closing-prose stream. Reset in the session-reset block.
 let closingShown         = false;
+// Time is turn-driven: on the expiry path, if the player never picks the pause choice
+// nothing else ever fires. This backstop is the only thing that ends a hung close.
+// Module-scoped (not function-local) so the session-reset block can clear a stale timer
+// before closingShown is flipped back to false.
+const EXPIRY_BACKSTOP_MS = 120000;
+let expiryBackstop       = null;
 
 // Pre-warmed /start request fired as soon as role is selected, resolved in startGame()
 let warmStart = null; // { promise, roleId, style, characterContext, activeHook }
@@ -1139,6 +1145,22 @@ function renderChoices(choices = []) {
   choicesEl.scrollLeft = 0;
   requestAnimationFrame(syncArrows);
 
+}
+
+// Terminal single choice — deliberately NOT routed through submitTurn: the
+// remainingMinutes<=0 guard in submitTurn closes with a null endState and would
+// drop output.endState. Also skips lastChoices so the pause label can never
+// resurface as a real choice.
+function renderTerminalChoice(label, onPick) {
+  choicesEl.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'choice-btn';
+  btn.type = 'button';
+  btn.textContent = label;
+  btn.addEventListener('click', onPick, { once: true });
+  choicesEl.appendChild(btn);
+  choicesEl.scrollLeft = 0;
+  requestAnimationFrame(syncArrows);
 }
 
 choicesEl.addEventListener('scroll', syncArrows, { passive: true });
@@ -1678,13 +1700,29 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
 
     if (gameState.remainingMinutes <= 0) {
       try {
-        teardownTurnControls();
-        const expiryPauseMs = Math.max(readingFloorMs(lastRenderedSpeakText), 5000);
-        console.log(`[CLOSING] time expired — ${wordCount(lastRenderedSpeakText)} words → ${expiryPauseMs}ms reading pause`);
-        await new Promise(resolve => setTimeout(resolve, expiryPauseMs));
-        showClosingScreen(output?.endState || null, sessionId);
+        // Player-paced close. NOT teardownTurnControls() — that fades .bottom-bar to
+        // opacity 0, and #choices lives inside .bottom-bar, so it would hide the pause
+        // choice while leaving it clickable.
+        submitBtn.disabled = true;
+        inputEl.value = '';
+        inputEl.disabled = true;
+        storyEl.scrollTop = storyEl.scrollHeight;   // final scene visible in full
+
+        const expiryEndState = output?.endState || null;
+        const role = (scenario?.playerRoleOptions || []).find(r => r.id === currentRoleId);
+        const pauseLabel = role?.closing_choice?.trim() || scenario?.closing_choice?.trim() || 'Take a breath';
+
+        const closeNow = () => {
+          if (expiryBackstop) { clearTimeout(expiryBackstop); expiryBackstop = null; }
+          showClosingScreen(expiryEndState, sessionId);   // real endState, not null
+        };
+
+        renderTerminalChoice(pauseLabel, closeNow);
+        expiryBackstop = setTimeout(closeNow, EXPIRY_BACKSTOP_MS);
+        console.log(`[CLOSING] time expired — pause choice "${pauseLabel}" shown, ${EXPIRY_BACKSTOP_MS}ms backstop armed`);
       } catch (e) {
-        console.error('[CLOSING] failed to show closing screen:', e);
+        console.error('[CLOSING] failed to arm expiry pause choice:', e);
+        showClosingScreen(output?.endState || null, sessionId);   // fail closed, never hang
       }
     } else if (output?.endState?.isEnding) {
       try {
@@ -2783,6 +2821,9 @@ function restartGame() {
   streamOptionsDots.classList.add('hidden');
   submitBtn.disabled = false;
   inputEl.disabled = false;   // teardownTurnControls() disables it; nothing else re-enables it
+  // Clear before flipping closingShown — otherwise a stale expiry backstop from the
+  // previous session could pop the closing screen over this fresh one.
+  if (expiryBackstop) { clearTimeout(expiryBackstop); expiryBackstop = null; }
   closingShown = false;       // allow a second session in the same page load to close
   applyFreeInputMode(true);
 
