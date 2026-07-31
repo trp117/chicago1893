@@ -16,6 +16,10 @@
   --muted: #c1b9a6;
   --accent: #d0b06a;
   --border: #3a3429;
+  /* Quiet text tier. Readable floor: 4.53:1 on --bg, 4.75:1 on the closing overlay
+     (#0a0a0a) — clears WCAG AA while staying well under --muted (9.68:1). Text only:
+     decorative faints (borders, the epilogue separator) keep their own literals. */
+  --ink-faint: #857b6a;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -141,7 +145,7 @@ li { margin-bottom: 8px; }
 .closing-epilogue { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-epilogue.visible { opacity: 1; }
 .closing-epilogue-separator { text-align: center; color: #4a4540; font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 0.8em; }
-.closing-epilogue-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-epilogue-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 1.6em; }
 .closing-epilogue-text { font-size: 0.95rem; font-style: normal; color: #b8b4ae; line-height: 1.75; margin-bottom: 1.4em; }
 .closing-epilogue-block { display: none; }
 .closing-epilogue-block.visible { display: block; }
@@ -155,7 +159,7 @@ li { margin-bottom: 8px; }
 @keyframes epilogue-dot-breathe { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
 .closing-bibliography { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-bibliography.visible { opacity: 1; }
-.closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
+.closing-bibliography-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 1.6em; }
 .closing-bibliography > summary { cursor: pointer; list-style: none; }
 .closing-bibliography > summary::-webkit-details-marker { display: none; }
 .closing-bibliography > summary::after { content: ' ↓'; font-size: 0.7rem; opacity: 0.7; }
@@ -163,18 +167,20 @@ li { margin-bottom: 8px; }
 .closing-bibliography:not([open]) > summary { margin-bottom: 0; }
 .closing-bibliography > summary:hover { color: #d0b06a; }
 .closing-bibliography-list { list-style: none; padding: 0; margin: 0; }
-.closing-bibliography-item { font-size: 0.8rem; color: #7a7570; line-height: 1.7; margin-bottom: 0.8em; }
-.closing-bibliography-item a { color: #7a7570; text-decoration: underline; text-underline-offset: 2px; }
+.closing-bibliography-item { font-size: 0.8rem; color: var(--ink-faint); line-height: 1.7; margin-bottom: 0.8em; }
+.closing-bibliography-item a { color: var(--ink-faint); text-decoration: underline; text-underline-offset: 2px; }
 .closing-bibliography-item a:hover { color: #d0b06a; }
-.closing-bibliography-access { display: block; font-size: 0.72rem; color: #4a4540; font-style: italic; margin-top: 2px; }
+.closing-bibliography-access { display: block; font-size: 0.72rem; color: var(--ink-faint); font-style: italic; margin-top: 2px; }
 .closing-composite-note { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
 .closing-composite-note.visible { opacity: 1; }
-.closing-composite-note-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #6a6050; margin-bottom: 1.6em; }
-.closing-composite-note-text { font-size: 0.8rem; color: #5a5550; line-height: 1.7; font-style: italic; }
-.closing-return { display: block; text-align: center; font-size: 0.85rem; color: #6a6050; text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
+.closing-composite-note-label { text-align: center; font-size: 0.75rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 1.6em; }
+/* Integrity disclosure — deliberately a step above --ink-faint (5.95:1 on the closing
+   overlay): most legible of the quiet group, still clearly below the record body. */
+.closing-composite-note-text { font-size: 0.8rem; color: #948c7e; line-height: 1.7; font-style: italic; }
+.closing-return { display: block; text-align: center; font-size: 0.85rem; color: var(--ink-faint); text-decoration: none; letter-spacing: 0.04em; opacity: 0; transition: opacity 0.8s ease, color 0.15s; }
 .closing-return.visible { opacity: 1; }
 .closing-return:hover { color: #d0b06a; }
-.closing-narration-toggle { position: fixed; top: 20px; right: 20px; z-index: 221; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3429; background: transparent; color: #6a6050; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-weight: normal; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.closing-narration-toggle { position: fixed; top: 20px; right: 20px; z-index: 221; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3429; background: transparent; color: var(--ink-faint); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-weight: normal; transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .closing-narration-toggle:hover { border-color: #d0b06a; color: #d0b06a; }
 .closing-narration-toggle.active { border-color: #d0b06a; color: #d0b06a; background: rgba(208,176,106,0.1); }
 .closing-dots { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 0; letter-spacing: 0.6em; }
@@ -185,7 +191,7 @@ li { margin-bottom: 8px; }
 @keyframes closing-dot-breathe { 0%,100% { opacity:0; } 50% { opacity:1; } }
 .closing-wait { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin-top: -52px; width: 100%; max-width: 420px; text-align: center; font-family: Georgia, serif; }
 .closing-wait-primary { font-size: 0.95rem; color: #8a8378; letter-spacing: 0.02em; margin-bottom: 0.5em; }
-.closing-wait-secondary { font-size: 0.8rem; font-style: italic; color: #5a5550; }
+.closing-wait-secondary { font-size: 0.8rem; font-style: italic; color: var(--ink-faint); }
 .closing-wait.hidden { display: none; }
 .role-overlay { position: fixed; inset: 0; z-index: 210; background: rgba(8,6,4,0.97); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
 .role-overlay.hidden { display: none; }
@@ -775,7 +781,7 @@ li { margin-bottom: 8px; }
         <button type="button" class="style-btn selected" data-style="focused">Focused</button>
         <button type="button" class="style-btn" data-style="cinematic">Cinematic</button>
       </div>
-      <p style="margin:5px 0 0;font-size:0.75rem;color:#6a6050;text-align:center">Focused = faster&nbsp;|&nbsp;Cinematic = more descriptive</p>
+      <p style="margin:5px 0 0;font-size:0.75rem;color:var(--ink-faint);text-align:center">Focused = faster&nbsp;|&nbsp;Cinematic = more descriptive</p>
     </div>
     <button type="button" id="role-begin-btn" class="begin-btn" disabled>Enter</button>
   </div>
