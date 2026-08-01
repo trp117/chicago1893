@@ -1335,7 +1335,8 @@ Do not open with the historical context. Open inside the character's body. Let t
       console.log('[EPILOGUE-CLOSE] conditions — generated:', scenarioData?.epilogue?.generated, 'reviewed:', scenarioData?.epilogue?.reviewed);
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
         const summary = buildEpilogueSummary(sessionState, endResult, scenarioData);
-        console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome);
+        console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome,
+          'closure_met:', summary.closure_state?.met, 'closureFired:', summary.closure_state?.closureFired, 'reason:', summary.closure_state?.reason, 'closure_source:', summary.closure_state?.closure_source);
 
         sendSse(res, { type: 'epilogue_pending' });
 
