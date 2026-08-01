@@ -1,0 +1,763 @@
+{
+  "id": "when_the_walls_grew_warm",
+  "tone": [],
+  "genre": [
+    "historical",
+    "survival",
+    "crisis"
+  ],
+  "image": {
+    "url": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/when_the_walls_grew_warm_wide.jpg",
+    "shortUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/when_the_walls_grew_warm_short.jpg",
+    "sourceUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/when_the_walls_grew_warm_source.jpg",
+    "brightness": 100,
+    "cropAnchor": 57,
+    "generation_prompt": "The coal cellar beneath a Hammerbrook tenement block, Hamburg — approximately 01:15, 28 July 1943, the first hour of the firestorm.\nCamera: low and slightly wide, positioned at seated eye level roughly one metre above the floor. This is a hard requirement — the low camera is what lifts all three faces into the central band of the frame. Ernst stands but is stooped beneath the low vault, so his head sits only slightly above the two seated figures. All three faces must land between 35% and 65% of the frame height. The lower quarter of the frame holds only cinders, spilled coal, and the swept floor of the clearing — no faces, no hands, no key objects.\nThe room is low-vaulted brick, perhaps four metres across, its arched ceiling blackened from decades of coal dust and trembling with each concussion from above. A single wooden door stands at the far end, its planks sweating and darkening at the seams. Through its hairline gaps an orange pulse beats with terrible regularity — but this glow is dimmer on skin than the lamps inside the room. It is background atmosphere, not a key light. No figure may be silhouetted against it.\nErnst Meissner stands near the door but turned three-quarters toward the room, the door behind his shoulder and out of his sight line. He is broad-shouldered, mid-forties, in a heavy dark civilian wool overcoat over a collarless shirt, ash streaked across the collar and left shoulder. He wears a plain soft cloth cap — entirely unadorned: no badge, no emblem, no piping, no insignia of any kind. He is a civilian, not a uniformed official. He holds a carbide work lamp at chest height, angled inward so its hard white flame keys his own face from below and slightly in front — clean, precise light across his jaw, nose, and the taut skin around his eyes. His expression carries the stillness of a man calculating odds he does not like.\nLotte Voss, sixteen, sits on an upturned coal scuttle to his left in a dark wool dress with a white collar, a thin house-cardigan, and house shoes wholly wrong for the night. Her hair is loose, her knees drawn up, her gaze fixed on the door. Her face is fully lit — flushed and damp — by a small paraffin storm lantern set on the floor at the edge of the clearing, which throws warm upward fill across her and softens the shadows the carbide lamp would otherwise cut.\nTrude Harms, sixties, stout, sits upright on a low wooden crate against the far wall beneath a shelf, in a dark housecoat with a pale apron still tied at her waist, one hand pressed flat to the brickwork as though reading the building's pulse. A second paraffin storm lantern on the shelf above throws warm downward light across her grey hair and the deep lines of her face — jaw set, eyes very wide, terror under control and clearly readable.\nThree motivated light sources, one reaching each face. The ceiling is lost in darkness. The corners are black. But the three faces glow, brightly and legibly.\nThe mood is suffocating and alert: a held breath stretched across minutes, a decision forming in the room like heat itself — unbearable, inevitable, not yet spoken aloud."
+  },
+  "title": "When the Walls Grew Warm",
+  "status": "published",
+  "closure": {
+    "timer_backstop": {
+      "on_fire_report": "closure_state",
+      "fires_at_minutes": 0
+    },
+    "dependent_resolution": {
+      "_note": "Phase 2 — dormant",
+      "required": false
+    },
+    "principal_transition": {
+      "type": "location_reached",
+      "locations": [
+        "loc_wendenstrasse"
+      ],
+      "require_alive": true,
+      "source_condition": "winConditions[1]"
+    }
+  },
+  "premise": "The firestorm consuming Hammerbrook grows hotter. In the coal cellar, the rule that saved you for four years—stay hidden, stay silent, stay put—now threatens to suffocate you. Someone must break it, and fast, before the stairwell collapses.",
+  "systems": {
+    "scales": {
+      "threat": {
+        "max": 10,
+        "min": 0,
+        "default": 3
+      },
+      "authorityTrust": {
+        "max": 5,
+        "min": -3,
+        "default": 2
+      }
+    },
+    "pressureEvents": [
+      "The strip of orange light under the cellar door brightens and a wave of dry heat rolls across the floor — the corridor above is fully alight.",
+      "A child begins coughing and cannot stop; the air near the floor is noticeably thinner than it was two minutes ago.",
+      "The coal chute groans and a section of the upper brickwork cracks; fine mortar dust sifts down onto the benches.",
+      "The roar outside rises a full register — a chimney or stairwell has collapsed somewhere in the block, and the draft pulls the cellar door inward a centimeter.",
+      "Old Wachter stops speaking mid-sentence and slumps against the wall; the woman beside him cannot rouse him."
+    ],
+    "timePerTurnDefault": 2
+  },
+  "version": "1.0.0",
+  "category": "military",
+  "epilogue": {
+    "reviewed": true,
+    "generated": true,
+    "open_threads": [
+      {
+        "thread_id": "player_registers_the",
+        "historical_record": "The physical indicators that a cellar was becoming untenable — rising temperature of walls, deteriorating air quality, visible light and heat at door seals — are documented in survivor testimony collected by the Hamburg Senate and in Nossack's account. Whether these signs were recognisable in time to permit escape was a function of the specific building's position relative to the fire front and the rate at which the firestorm developed locally. No systematic investigation established a threshold at which these indicators reliably predicted the remaining window for escape; the question of what a sheltering civilian could have known, and when, was raised in post-war Hamburg Senate hearings but not resolved with any quantitative precision."
+      },
+      {
+        "thread_id": "wachter_invokes_the",
+        "historical_record": "The standing civil defence order to remain in shelters during raids was a central feature of Hamburg's Luftschutz system. Post-war investigation by the Hamburg Senate examined whether this order contributed to civilian deaths in the firestorm by preventing timely evacuation. The investigation found that the order had been designed for conventional bombing raids and did not anticipate firestorm conditions; it did not produce a finding on whether compliance or non-compliance with the order produced better survival outcomes in specific cases, as this varied by location and timing. The question of institutional responsibility for the order's application on the night of 27–28 July 1943 was not adjudicated in any post-war legal proceeding."
+      },
+      {
+        "thread_id": "player_must_gather",
+        "historical_record": "Survivor accounts consistently describe a period of uncertainty in cellar shelters during which individuals attempted to assess conditions before acting. The historical record does not establish a reliable account of how long this period typically lasted or what information proved decisive in prompting groups to leave. Testimony varies: some survivors describe rapid collective decisions, others describe prolonged paralysis. The Hamburg Senate's post-war documentation did not systematically analyse decision-making timelines within individual shelters."
+      },
+      {
+        "thread_id": "player_opens_the",
+        "historical_record": "The Luftschutz regulations required that cellar walls between adjacent buildings be breached (Durchbruch) to allow lateral movement without using street-level exits. Survivor testimony confirms that some groups used these passages successfully; others found them blocked by structural collapse or by fire in adjacent cellars. The coal-chute as an alternative exit route appears in survivor accounts from Hamburg and from other German cities subjected to heavy bombing. Whether ground-floor exits remained passable in Hammerbrook buildings during the firestorm depended on the specific building's position and the timing of the attempt; no general pattern can be established from surviving records."
+      },
+      {
+        "thread_id": "probst_the_airraid",
+        "historical_record": "The role of Hausluftschutzwarte in the firestorm night is documented in Hamburg Senate records and survivor testimony, but the accounts are contradictory. Some survivors describe wardens who moved between buildings gathering information and directing residents; others describe wardens who were absent, incapacitated, or who enforced shelter orders past the point of safety. No systematic record of warden movements or communications on the night of 27–28 July 1943 survived in Hamburg's civil defence archive, which was itself damaged during the raids. The question of what information wardens possessed and communicated to sheltering residents was raised in post-war Senate hearings but could not be answered from surviving documentation."
+      },
+      {
+        "thread_id": "the_group_splinters",
+        "historical_record": "Survivor testimony from the Hamburg firestorm and from comparable events in other German cities documents the phenomenon of groups fragmenting under the pressure of the decision to leave shelter. Some individuals refused to leave and were not seen again; others left at different times and experienced different outcomes. The historical record does not permit a determination of whether those who left earlier or later had better survival rates in Hammerbrook specifically, as the surviving testimony is drawn from those who survived — a self-selecting sample. The Hamburg Senate's post-war documentation noted this evidentiary limitation explicitly."
+      },
+      {
+        "thread_id": "the_street_outside",
+        "historical_record": "The physical conditions in Hammerbrook's streets during the firestorm are documented in survivor testimony, in the Hamburg Senate's post-war report, and in the United States Strategic Bombing Survey's physical damage assessment. The inward wind generated by the firestorm — drawing air toward the fire centre — is confirmed by multiple independent accounts. Radiant heat sufficient to ignite clothing at distances of tens of metres from burning buildings is documented in survivor testimony and is consistent with the temperature estimates produced by post-war physical analysis. The specific street-level conditions varied by location within the firestorm zone and changed rapidly as the fire front moved."
+      },
+      {
+        "thread_id": "marta_sievers_a",
+        "historical_record": "The role of individuals with practical knowledge — of the local street layout, of first-aid techniques, or of the location of water sources — in improving group survival outcomes during the firestorm is suggested by survivor testimony but cannot be quantified from surviving records. Accounts describe individuals who guided groups to the Elbe, to the Alster canals, or to open spaces such as the Stadtpark. Whether such guidance was decisive in specific cases, or whether the groups would have found these routes independently, is not established in the historical record."
+      },
+      {
+        "thread_id": "player_must_navigate",
+        "historical_record": "The geography of Hammerbrook — a district bounded by canal waterways including the Mittelkanal and the Oberhafen — meant that water was accessible within a few hundred metres for much of the district's population. Survivor testimony confirms that knowledge of this geography was a factor in survival: those who knew the canal network could navigate toward it even in conditions of reduced visibility from smoke. The Hamburg Senate's post-war report noted that the canal embankments and the Elbe waterfront served as primary refuge points for survivors from the firestorm districts. No systematic analysis of navigation decisions during the flight from the fire zone was produced by post-war investigations."
+      },
+      {
+        "thread_id": "the_mittelkanal_embankment",
+        "historical_record": "Survivor testimony from the Hamburg firestorm consistently identifies the city's waterways — the Elbe, the Alster, and the canal network including the Mittelkanal — as primary survival locations for those who escaped the fire zone. Accounts describe survivors entering the water to escape radiant heat and remaining there for extended periods. The Hamburg Senate's post-war report confirmed that the canal embankments and the water itself were among the few locations within the firestorm zone where survival was possible during the peak of the fire. The duration of the firestorm's most intense phase — approximately two to three hours — is established in both the Hamburg Senate report and the USSBS assessment."
+      }
+    ],
+    "choice_echoes": [
+      {
+        "beat_id": "player_registers_the",
+        "historical_record": "Survivor accounts from the Hammerbrook firestorm describe the physical warning signs that preceded the cellar becoming untenable: walls becoming warm to the touch, the air thickening with smoke and carbon monoxide, light visible under and around door frames, and a sustained roaring sound distinct from the noise of individual bomb detonations. These signs are documented in testimony collected by the Hamburg Senate and in Nossack's account. Survivors who acted on these signs and left their shelters before conditions became critical had a higher chance of reaching open ground; those who waited until the signs were unmistakable frequently found exits already blocked or conditions in the street already at the limit of survivability."
+      },
+      {
+        "beat_id": "wachter_invokes_the",
+        "historical_record": "The tension between civil defence standing orders and the evidence of deteriorating conditions in cellar shelters is a recurring theme in survivor testimony from the Hamburg firestorm and from comparable events in other German cities. The Hamburg Senate's post-war investigation found that the standing order to remain sheltered had been issued without provision for firestorm conditions and that no mechanism existed for local wardens to formally countermand it. In practice, the decision to leave was made by individuals or informal group leaders without official authorisation. The investigation did not assign responsibility for deaths attributable to compliance with the standing order."
+      },
+      {
+        "beat_id": "player_must_gather",
+        "historical_record": "The historical record does not establish a typical or optimal decision timeline for groups in cellar shelters during the Hammerbrook firestorm. Survivor testimony describes a range of responses: some groups left quickly on the initiative of one or two individuals; others deliberated until conditions forced the issue. In cases where deliberation continued until the stairwell or exit was blocked by fire or structural collapse, survivors who escaped did so through alternative routes — Durchbruch passages, coal chutes, or windows — or did not escape at all. The surviving testimony cannot establish what decision timeline would have been optimal for any specific building, as this depended on local fire progression."
+      },
+      {
+        "beat_id": "player_opens_the",
+        "historical_record": "Survivor accounts confirm that in some Hammerbrook buildings, the ground-floor exit remained passable for a period after upper floors were on fire, and that smoke in corridors could be partially mitigated by wet cloth over the nose and mouth. The Durchbruch passages between adjacent cellars, mandated by Luftschutz regulations, are documented as having been used successfully by some groups and found blocked or fire-affected by others. The coal chute as an exit route appears in survivor testimony from Hamburg. The window of time during which these routes were usable varied by building and is not established with precision in surviving records."
+      },
+      {
+        "beat_id": "probst_the_airraid",
+        "historical_record": "The historical record contains accounts of Hausluftschutzwarte who moved through buildings and corridors during the firestorm attempting to gather information and direct residents. Whether any such warden in Hammerbrook possessed reliable information about which street exits were passable at any given moment is not established; conditions changed rapidly and information gathered minutes earlier could be obsolete. Some survivor accounts describe receiving useful guidance from wardens or other individuals encountered in corridors; others describe receiving no guidance or incorrect information. No systematic record of warden communications on the night of 27–28 July 1943 survived."
+      },
+      {
+        "beat_id": "the_group_splinters",
+        "historical_record": "Group fragmentation during the attempt to leave cellar shelters is documented in survivor testimony from the Hamburg firestorm. Accounts describe individuals who refused to leave and were not subsequently found among the living, and individuals who left at different times from the same shelter with different outcomes. The historical record does not permit a determination of the optimal time to cease persuasion and proceed; survivors who waited for full group consensus sometimes found that the delay cost them the usable exit window. The Hamburg Senate's post-war documentation noted that the decision to leave — and the decision of how long to spend attempting to bring others — was made under conditions of extreme time pressure and incomplete information."
+      },
+      {
+        "beat_id": "the_street_outside",
+        "historical_record": "The conditions in Hammerbrook's streets during the firestorm peak are documented in survivor testimony and in physical assessments produced by the Hamburg Senate and the USSBS. The inward wind — generated by the pressure differential between the fire zone and surrounding air — is confirmed as a physical force strong enough to impede movement and carry burning debris horizontally. Radiant heat from burning buildings is documented as sufficient to ignite clothing and cause burns at distances from the fire face. Survivors who reached the street describe moving close to building walls for partial shelter, using wet coverings, and moving in the direction away from the fire centre — toward the canals and the Elbe — rather than attempting to cross open streets toward the fire."
+      },
+      {
+        "beat_id": "marta_sievers_a",
+        "historical_record": "Survivor testimony from the Hamburg firestorm includes accounts of individuals encountered outside who had already identified viable routes toward water or open ground and who guided others. The historical record does not permit a determination of how frequently such encounters occurred or what proportion of survivors benefited from them. Accounts also describe individuals who were injured, disoriented, or moving in dangerous directions, and who represented a demand on the time and resources of those who encountered them. The decision of how much assistance to render to others encountered during flight from the fire zone is documented as a recurring moral and practical dilemma in survivor testimony."
+      },
+      {
+        "beat_id": "player_must_navigate",
+        "historical_record": "Hammerbrook's canal network — including the Mittelkanal — was within a few hundred metres of most of the district's residential buildings. Survivor testimony confirms that knowledge of this geography was a practical advantage: those who knew the direction of the canals could navigate toward them through smoke and debris without relying on street-level visibility. The Hamburg Senate's post-war report confirmed that movement toward water — whether the canals or the Elbe — was the correct survival strategy for those who left their shelters. Movement in other directions, including toward open streets away from water, produced worse outcomes in the documented cases."
+      },
+      {
+        "beat_id": "the_mittelkanal_embankment",
+        "historical_record": "The Hamburg Senate's post-war report and survivor testimony confirm that the city's canal embankments and the water itself were among the primary survival locations for civilians who escaped the Hammerbrook firestorm. Survivors describe large numbers of people gathered at canal banks and in the water, with the water providing protection from radiant heat that made the embankment surface itself barely survivable. The firestorm's most intense phase lasted approximately two to three hours, after which conditions in the surrounding streets began to change. Survivors who reached the water and remained there through this period had a substantially higher survival rate than those who remained in the fire zone. The specific conditions at the Mittelkanal embankment on the night of 27–28 July 1943 are documented in Hamburg Senate records and in testimony cited by Middlebrook."
+      }
+    ],
+    "character_fates": [
+      {
+        "name": "Ernst Meissner",
+        "outcome": "unknown",
+        "character_id": "ernst_meissner",
+        "primary_source": null,
+        "historical_record": "Hamburg's fire brigade was overwhelmed during the Operation Gomorrah raids of July 1943. On the night of 27–28 July, the firestorm in Hammerbrook and surrounding districts rendered conventional firefighting impossible; water mains had failed across the affected area and temperatures in the fire zone reached an estimated 800°C at street level. Fire brigade personnel who entered the firestorm zone suffered severe casualties. Of the Hamburg Feuerwehr's strength committed during the Gomorrah raids, a significant number were killed or incapacitated. Many section leaders and their crews were cut off when streets became impassable. The names and fates of individual fire brigade personnel lost in Hammerbrook on that night are not fully documented in surviving records; the Hamburg State Archive holds partial personnel records from the period, but gaps caused by wartime destruction of administrative files mean that many individual fates remain unverified."
+      },
+      {
+        "name": "Hanna Brandt",
+        "outcome": "unknown",
+        "character_id": "hanna_brandt",
+        "primary_source": null,
+        "historical_record": "Hammerbrook was the district most severely affected by the firestorm of 27–28 July 1943. The district's population was predominantly working-class, housed in dense tenement blocks. Survivor testimony collected by the Hamburg Senate and by Hans Brunswik's post-war investigation consistently records that families sheltering in cellar bunkers faced a choice between remaining — and dying from carbon monoxide poisoning or structural collapse — or attempting to flee through streets where radiant heat and the firestorm wind made survival uncertain. Mothers with young children faced particular difficulty: children could not move at the pace required to outrun the fire front, and wet cloths used as improvised breathing protection were difficult to maintain on small children. Survivor accounts describe women carrying children through burning streets to reach the Elbe, the Alster canals, or open parks. Many did not survive. The Hamburg civil registry records for Hammerbrook show catastrophic gaps for the period August–September 1943, as identification of the dead was frequently impossible."
+      },
+      {
+        "name": "Karl-Heinz Probst",
+        "outcome": "unknown",
+        "character_id": "karl_heinz_probst",
+        "primary_source": null,
+        "historical_record": "The Luftschutz Hausluftschutzwart — the building-level air-raid warden — was the lowest tier of Hamburg's civil defence structure. These wardens were responsible for enforcing shelter discipline, maintaining the cellar Durchbruch (the breached connecting passages between adjacent cellar spaces mandated by civil defence regulations), and coordinating with block wardens during raids. On the night of 27–28 July 1943, the civil defence system in Hammerbrook effectively ceased to function as a coordinated network within the first hour of the firestorm. Wardens who attempted to move between buildings to gather information or assist residents frequently became casualties. Post-war testimony recorded by the Hamburg Senate's investigation noted that some wardens held residents in cellars past the point at which escape was possible, acting on standing orders that had not anticipated a firestorm. Others broke protocol and led residents out, saving lives. The historical record does not permit a general verdict on which course of action produced better outcomes in individual cases, as this depended entirely on local conditions at the moment of decision."
+      },
+      {
+        "name": "Lotte Voss",
+        "outcome": "unknown",
+        "character_id": "lotte_voss",
+        "primary_source": null,
+        "historical_record": "A significant proportion of Hamburg's civilian population sheltering during the Operation Gomorrah raids consisted of individuals separated from their immediate families — adults whose spouses were serving in the military, children evacuated to relatives, and young people whose parents were absent for various reasons. Adolescents sheltering without parents appear in survivor testimony from the Hammerbrook firestorm. The Hamburg Senate's post-war documentation of the dead, compiled from civil registry records, death notices, and survivor reports, identified thousands of victims whose ages placed them in their teens. In many cases, identification was impossible and cause of death could not be established. The Volksbund Deutsche Kriegsgräberfürsorge and the Hamburg State Archive hold records of the identified dead from the 1943 raids, but the proportion of unidentified victims from Hammerbrook is high."
+      },
+      {
+        "name": "Marta Sievers",
+        "outcome": "unknown",
+        "character_id": "marta_sievers",
+        "primary_source": null,
+        "historical_record": "Medical auxiliary personnel — including nurse's aides attached to Hamburg's hospitals — were present throughout the city during the Operation Gomorrah raids. The Allgemeines Krankenhaus Hamburg-Barmbek and other major hospitals received casualties throughout the raid series and were themselves damaged. Nurse's aides and auxiliary medical staff who were off-duty or travelling when raids began sheltered where they could, like other civilians. Survivor testimony from the Hammerbrook firestorm includes accounts of individuals with medical or first-aid training who assisted other survivors during the flight from the fire zone, improvising treatment for burns and smoke inhalation at canal embankments and in open spaces. The contribution of auxiliary medical personnel to civilian survival in the immediate aftermath of the firestorm is documented in Hamburg Senate records and in Martin Middlebrook's account of the raids, though individual names at this level of the medical hierarchy are rarely preserved."
+      },
+      {
+        "name": "Trude Harms",
+        "outcome": "unknown",
+        "character_id": "trude_harms",
+        "primary_source": null,
+        "historical_record": "Hammerbrook's population in 1943 was heavily composed of industrial and factory workers and their families. The district's proximity to the port and to Hamburg's manufacturing districts meant that a large proportion of residents were employed in war-related production, including textile and garment manufacture supplying military contracts. Female factory workers constituted a substantial portion of the district's adult civilian population, as male workers of military age had largely been conscripted. Survivor testimony and Hamburg Senate documentation record that factory workers and their families were among the primary victims of the Hammerbrook firestorm. The Hamburg State Archive's records of the dead from the 1943 raids reflect the working-class demographic of the district, though individual identification remains incomplete for a large fraction of the estimated dead."
+      },
+      {
+        "name": "Wilhelm Wachter",
+        "outcome": "unknown",
+        "character_id": "wilhelm_wachter",
+        "primary_source": null,
+        "historical_record": "Older male residents — men above military conscription age who remained in Hamburg's civilian districts during the 1943 raids — frequently occupied positions of informal authority in cellar shelters, reinforcing the civil defence system's emphasis on shelter discipline and compliance with warden instructions. Survivor testimony recorded in the Hamburg Senate's post-war investigation and in Hans Erich Nossack's contemporaneous account 'Der Untergang' (1948) describes the social dynamics of cellar shelters during the firestorm: the tension between those who urged compliance with standing orders to remain sheltered and those who recognised that the situation had exceeded the parameters those orders were designed for. Nossack, who survived the raids and wrote the earliest sustained literary account of the firestorm, describes the paralysis that standing orders produced in some groups. The historical record does not permit generalisation about whether older residents were more or less likely to survive; survival in Hammerbrook on that night depended primarily on the specific local conditions of each building and the moment at which any group attempted to leave."
+      }
+    ],
+    "historical_frame": [
+      {
+        "text": "The Hamburg firestorm of 27–28 July 1943 was the first time a self-sustaining firestorm had been deliberately created by aerial bombardment; the meteorological and urban conditions that produced it — a prolonged dry period, dense housing stock, and the concentration of incendiary and high-explosive ordnance — were subsequently studied by Allied planners and informed later raids, including those on Dresden in February 1945.",
+        "source": "United States Strategic Bombing Survey, 'The Effects of Incendiary Bomb Attacks on Germany' (1947); Charles Webster and Noble Frankland, 'The Strategic Air Offensive Against Germany 1939–1945', Vol. II (1961)"
+      },
+      {
+        "text": "Hans Erich Nossack, a Hamburg writer who survived the raids by being outside the city, returned to Hamburg within days and recorded what he witnessed; his account, 'Der Untergang' (written 1943, published 1948), is among the earliest and most detailed contemporaneous literary testimonies of the firestorm's aftermath and the destruction of Hammerbrook.",
+        "source": "Hans Erich Nossack, 'Der Untergang' (1948); English translation: 'The End: Hamburg 1943', trans. Joel Agee (2004)"
+      },
+      {
+        "text": "Hammerbrook was not rebuilt as a residential district after the war; the area was redeveloped as a commercial and light-industrial zone, and its pre-war population of approximately 35,000 was never reconstituted there.",
+        "source": "Hamburg Statistisches Amt, post-war population and land-use records cited in Jörg Friedrich, 'Der Brand' (2002), pp. 178–182"
+      }
+    ],
+    "immediate_outcome": {
+      "summary": "The RAF raid of 27–28 July 1943, the second major attack of Operation Gomorrah, created a firestorm centred on the Hamburg districts of Hammerbrook, Hamm, and Borgfelde. The firestorm — a self-sustaining atmospheric fire phenomenon not previously encountered at this scale in an urban bombing context — killed the majority of the civilian population who remained in the affected area. Estimates of the dead from the entire Operation Gomorrah raid series (24 July – 3 August 1943) range from approximately 34,000 to 43,000, with the firestorm night of 27–28 July accounting for the largest single share of casualties.",
+      "key_facts": [
+        {
+          "text": "The RAF dispatched 787 aircraft on the night of 27–28 July 1943; 729 were recorded as attacking Hamburg.",
+          "source": "Martin Middlebrook, 'The Battle of Hamburg' (1980), Appendix 4, RAF operational records"
+        },
+        {
+          "text": "The firestorm affected an area of approximately 4.5 square kilometres in Hamburg's eastern working-class districts, with Hammerbrook sustaining the most severe destruction.",
+          "source": "United States Strategic Bombing Survey, 'The Effects of Strategic Bombing on German Morale' (1947); Hamburg Senate post-war damage survey cited in Middlebrook (1980)"
+        },
+        {
+          "text": "Wind speeds within the firestorm were estimated at up to 240 kilometres per hour at ground level, drawing air inward toward the fire centre.",
+          "source": "United States Strategic Bombing Survey, 'A Report on Physical Damage in Germany' (1947), Hamburg case study"
+        },
+        {
+          "text": "The Hamburg civil defence authority recorded that the firestorm rendered conventional firefighting operations impossible; water pressure in the affected districts had failed before the firestorm fully developed.",
+          "source": "Hamburg Feuerwehr operational reports cited in Middlebrook (1980), pp. 244–248"
+        },
+        {
+          "text": "Estimates of total deaths from Operation Gomorrah (all raids, 24 July – 3 August 1943) have been placed at between 34,000 and 43,000 by post-war German and Allied investigations; the Hamburg Senate's own post-war estimate was approximately 35,000.",
+          "source": "Hamburg Senate, 'Bericht über die Luftangriffe auf Hamburg' (1943, declassified); Middlebrook (1980); Jörg Friedrich, 'Der Brand' (2002)"
+        }
+      ]
+    }
+  },
+  "featured": true,
+  "glossary": [
+    {
+      "term": "Blockwart",
+      "source": "",
+      "approved": true,
+      "definition": "A block warden — a civilian official responsible for enforcing air-raid procedures and ensuring residents followed shelter rules in their assigned district."
+    },
+    {
+      "term": "all-clear",
+      "source": "",
+      "approved": true,
+      "definition": "The signal (typically a steady siren tone) that announced the end of an air raid and instructed civilians to leave their shelters — waiting for it in Hammerbrook on the night of 27–28 July was fatal."
+    },
+    {
+      "term": "cellar",
+      "source": "",
+      "approved": true,
+      "definition": "In Hamburg's context, the underground shelter where civilians were instructed to wait during raids — in a firestorm, these became death traps because the inward winds created pressure and oxygen depletion rather than safety."
+    },
+    {
+      "term": "self-sustaining atmospheric fire column",
+      "source": "",
+      "approved": true,
+      "definition": "A firestorm phenomenon where the intense heat rises fast enough to create a powerful vacuum that pulls air inward at extreme speeds (240 kilometers per hour in Hamburg), feeding the fire and trapping anyone still below ground."
+    },
+    {
+      "term": "Mietskasernen",
+      "source": "",
+      "approved": true,
+      "definition": "Large rental apartment blocks built in German industrial cities in the late 1800s, typically five to six stories with ground-floor workshops and densely packed residential floors above — highly vulnerable to fire."
+    },
+    {
+      "term": "Luftschutz",
+      "source": "",
+      "approved": true,
+      "definition": "The German civil-defense system designed to protect civilians from conventional bombing through shelters, wardens, and evacuation procedures — it proved catastrophically inadequate against the firestorm's physics."
+    },
+    {
+      "term": "firestorm",
+      "source": "",
+      "approved": true,
+      "definition": "A self-sustaining atmospheric fire column that generates its own powerful inward winds — the Luftschutz system had no protocol for defending against one because nothing like it had occurred before Hamburg."
+    },
+    {
+      "term": "incendiaries",
+      "source": "",
+      "approved": true,
+      "definition": "Bombs designed to ignite fires rather than create blast damage — in Hamburg they were packed in high concentration to maximize the spread of flames across the densely packed district."
+    },
+    {
+      "term": "Air Marshal",
+      "source": "",
+      "approved": true,
+      "definition": "The highest-ranking officer in the Royal Air Force, equivalent to a general in the army — Arthur Harris held this rank and made strategic decisions about bombing targets and methods."
+    },
+    {
+      "term": "area bombing",
+      "source": "",
+      "approved": true,
+      "definition": "A strategy of concentrating bombing attacks across entire districts rather than targeting specific military or industrial sites, intended to destroy housing, infrastructure, and civilian morale simultaneously."
+    },
+    {
+      "term": "Operation Gomorrah",
+      "source": "",
+      "approved": true,
+      "definition": "The codename for the sustained bombing campaign against Hamburg in late July 1943, designed to overwhelm the city's capacity to function rather than simply damage specific targets."
+    },
+    {
+      "term": "Bomber Command",
+      "source": "",
+      "approved": true,
+      "definition": "The Royal Air Force's strategic bombing force, responsible for sustained aerial campaigns against enemy territory — by 1943, it had grown into one of the war's most destructive instruments."
+    }
+  ],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "updatedAt": "2025-01-01T00:00:00Z",
+  "playerGoal": "",
+  "description": "Hamburg, 27–28 July 1943. Operation Gomorrah's fourth wave ignites a firestorm over Hammerbrook. Sheltering in a coal cellar beneath a five-story tenement, you must decide whether the rule that has kept you alive for four years is the thing that will kill you tonight.",
+  "storyArcIds": [
+    "when_the_walls_grew_warm_main_arc"
+  ],
+  "beats_status": "not_generated",
+  "displayOrder": 4,
+  "freedomLevel": "guided",
+  "introduction": {
+    "enabled": true,
+    "sections": [
+      {
+        "text": "By the summer of 1943, the Royal Air Force's Bomber Command has refined area bombing into a science of destruction. Air Marshal Arthur Harris has assembled nearly eight hundred aircraft for Operation Gomorrah, a sustained assault on Hamburg designed not merely to damage the city but to overwhelm its capacity to exist. The raids of 24 and 25 July have already killed thousands and left 1.5 million people without gas or water in large sections of the city. On the night of 27–28 July, meteorological conditions that the planners did not engineer but cannot have failed to notice — bone-dry air, temperatures above thirty degrees Celsius, weeks without rain — will interact with the concentration of incendiaries in a way that changes the physics of fire. What happens in Hammerbrook tonight has no precedent in the history of aerial warfare.",
+        "type": "world"
+      },
+      {
+        "text": "The firestorm that forms over the eastern districts between approximately 1:00 and 3:00 AM will kill an estimated 18,000 people in a single night — some estimates reach 40,000 for the full Gomorrah campaign — the majority of them in shelters, cellars, and bunkers where they followed the instructions they had been given. The Luftschutz civil-defense system, designed for conventional bombing, has no protocol for a self-sustaining atmospheric fire column that generates its own 240-kilometer-per-hour inward winds. The people who survive Hammerbrook tonight will almost all survive because they broke the rule: they left the cellar. The people who stay, trusting the system, trusting the walls, trusting the warden's authority, will in most cases not be found until the rubble is cleared weeks later.",
+        "type": "stakes"
+      },
+      {
+        "text": "Hammerbrook in late July 1943 is a district of close-packed five- and six-story Mietskasernen — rental barracks — built in the 1890s for dockworkers and factory hands, their ground floors occupied by small workshops and coal merchants, their upper floors dense with families. The Mittelkanal runs east–west less than a hundred meters north of the tenement on Wendenstrasse; the Eilbekkanal is two streets south. The night air above the district, had anyone been standing in it, would have smelled of brick dust, of the residual char from the raids three nights before, and then, very suddenly, of something else — a dry mineral heat, the smell of a kiln, rising from every direction at once as the fire columns find each other and merge.",
+        "type": "scene"
+      },
+      {
+        "text": "You are in the coal cellar beneath number 14 Wendenstrasse, sitting on a wooden bench with eleven neighbors in a space designed to hold coal. The single bulb has been dark for twenty minutes. The brick at your back is warm — not the cold that brick always is below ground, but warm, the warmth of something transmitted through a great deal of masonry from a source that is very large and very close. You have pressed a damp rag to your mouth without quite deciding to do so. Across the cellar, old Wachter is saying, in the patient voice of a man who has been right about this before, that the rule is to wait, that the all-clear will come, that opening the door is the dangerous thing. The strip of light under that door is orange.",
+        "type": "entry",
+        "character_entries": {
+          "role_lotte_voss": "Your hands are folded in your lap the way your mother taught you to fold them in church, and the bench is hard under your thighs, and the east wall is warm. You know this and no one else in this cellar knows it yet. Zugführer Meissner is at the door with his clipboard and his certainty, and Trude Harms is three seats down murmuring something to the woman beside her, and the strip of light under the door has been orange for four minutes now — you have been counting — a color that belongs to ovens and not to corridors. The wall was warm ten minutes ago when you pressed your palm flat against it and felt the heat come through the plaster like a held breath, and you took your hand away and said nothing, because you are sixteen and Meissner has a clipboard. Your papers are in your coat pocket. You know the way to the Mittelkanal the way you know your own handwriting — north up Wendenstrasse, one hundred meters, the smell of the water before it comes into view, the path your mother walks to her shift without a torch. The orange light under the door deepens by a shade. You open your mouth, and close it, and look at Meissner's back, and open it again.",
+          "role_trude_harms": "The bench slat cuts into the backs of your thighs and the brick at your shoulder is warm in a way that brick has no business being. You press your palm flat against it — a thing you have done perhaps three times in the last twenty minutes, each time hoping you were wrong, each time finding the same answer — and the wall gives back heat the way a stove gives back heat, not the cold that comes up from the earth through a meter of foundation masonry, not the cold that has always been the one reliable thing in forty raids across four years of this war. Wachter is talking. His slow deliberate voice fills the dark the way it always does, the regulation moving through the cellar like something solid, and you know the regulation, you have obeyed the regulation, and you are pressing the damp rag harder against your mouth because each breath through it is returning a little less than it should and the strip of light under the door is the color of a forge and none of this is what the regulation was written for. Lotte is two bodies to your left, sixteen years old, her shoulder against her mother's shoulder. The Mittelkanal is one hundred meters north up Wendenstrasse — you have walked it six years of working mornings, you could walk it blind, you could walk it now. You know where the water is. The question assembling itself in the warm dark, the question you cannot unknow, is whether you are willing to open your mouth.",
+          "role_ernst_meissner": "The concrete at your back is warm through your jacket — not the ambient warmth of a summer night but something structural, something the wall has been absorbing for two hours and is now returning — and you are aware of this the way you are aware of your missing helmet, as a professional datum that has arrived too late to be useful. The Mittelkanal is below and to your left. Schreiber and Bauer are in it, chest-deep, holding a woman and two children above the surface by main force, and the children have stopped crying, which you know is not a good sign but is not the problem you are calculating right now. The problem is the cellar on Wendenstrasse. You know who is in it. You know what the regulation says to do and you know what the regulation produces in a firestorm, because you have been standing here watching the inward wind strip burning material from the rooflines and you have felt the geometry of the heat on your face and you understand, with the precision of sixteen years, that the people following instructions in that cellar are following them toward a specific outcome. You have no authority to countermand the warden. You have no radio, no water, no chain of command, and approximately the length of one held breath before the choice you have been refusing to make makes itself."
+        }
+      }
+    ],
+    "skippable": true
+  },
+  "playerRoleIds": [
+    "role_trude_harms",
+    "role_ernst_meissner",
+    "role_lotte_voss"
+  ],
+  "winConditions": [
+    "Player leads or enables at least one other person to exit the cellar and reach the Mittelkanal before the stairwell collapses.",
+    "Player reaches open water or a cleared street and survives the firestorm's peak passage.",
+    "Player locates and uses the coal-chute egress before oxygen in the cellar drops below survivable threshold."
+  ],
+  "failConditions": [
+    "Player remains in the cellar until the stairwell collapses and the exit is sealed — asphyxiation or structural collapse.",
+    "Player exits into the corridor without wet cloth protection and is overtaken by the fire-wind in the stairwell.",
+    "Player attempts the street route away from the canal and is driven back by the firestorm's radiant heat — no shelter reached within turn limit."
+  ],
+  "technical_facts": {
+    "facts": [
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "Martin Middlebrook, 'The Battle of Hamburg' (1980); British Bombing Survey Unit report, 1945",
+          "access_note": null
+        },
+        "content": "The Hamburg firestorm occurred during Operation Gomorrah, specifically during the RAF raid of the night of 27–28 July 1943, which created the firestorm conditions in Hammerbrook and adjacent districts.",
+        "fact_id": "firestorm_date_and_operation",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Hans Brunswig, 'Feuersturm über Hamburg' (1978); German civil defence post-incident analysis",
+          "access_note": null
+        },
+        "content": "The firestorm generated inward ground-level winds measured at approximately 240 kilometres per hour (150 mph) at its peak, drawn toward the fire's centre by the convection column.",
+        "fact_id": "firestorm_wind_speed",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "British Bombing Survey Unit, 'The Effects of Strategic Bombing on the German War Economy' (1945); Brunswig (1978)",
+          "access_note": null
+        },
+        "content": "Street-level temperatures in the firestorm zone reached an estimated 800°C (1,472°F) in the most severely affected areas of Hammerbrook.",
+        "fact_id": "firestorm_temperature_street_level",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Hamburg Police President's report on Operation Gomorrah, 1943; Lowe, 'Inferno: The Devastation of Hamburg' (2007)",
+          "access_note": null
+        },
+        "content": "Survivors' testimony and post-war analysis confirmed that many cellar deaths in the Hamburg firestorm resulted from carbon monoxide poisoning and oxygen depletion caused by the surrounding fires consuming available oxygen, not solely from direct heat or smoke inhalation.",
+        "fact_id": "cellar_oxygen_depletion_mechanism",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "capacity",
+        "source": {
+          "url": null,
+          "citation": "Hamburg State Archive casualty records; Brunswig (1978); Middlebrook (1980)",
+          "access_note": null
+        },
+        "content": "Hammerbrook suffered the highest concentration of casualties of any Hamburg district during Operation Gomorrah; the district's population of approximately 26,000 sustained an estimated 16,000 deaths, the majority in cellar shelters.",
+        "fact_id": "hammerbrook_casualty_concentration",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Reichsluftschutzbund shelter construction regulations; Brunswig (1978)",
+          "access_note": null
+        },
+        "content": "German Luftschutz regulations required that party walls between adjacent cellar shelters include a Durchbruch (emergency breakthrough point) constructed of single-brick-thickness masonry using a weaker mortar mix, marked with a painted arrow and the designation NOTAUSGANG, to allow evacuation between buildings.",
+        "fact_id": "durchbruch_specification",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Reichsluftschutzbund civil defence manual; Hamburg civil defence directives, 1943",
+          "access_note": null
+        },
+        "content": "Standard Luftschutz (air-raid protection) doctrine as issued to the German civilian population required occupants to remain in designated cellar shelters for the duration of an air raid and until the all-clear signal was sounded; Hausluftschutzwarte (building wardens) were responsible for enforcing this order.",
+        "fact_id": "luftschutz_stay_in_cellar_order",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Hamburg municipal survey maps, 1943; Brunswig (1978) street-level survivor accounts",
+          "access_note": null
+        },
+        "content": "The Mittelkanal runs along the northern boundary of Hammerbrook; from the residential streets of central Hammerbrook, the canal embankment is approximately 100 metres distant at the nearest accessible points.",
+        "fact_id": "mittelkanal_distance_from_hammerbrook",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Survivor testimonies collected in Brunswig (1978); Lowe (2007); Hamburg State Archive oral history collection",
+          "access_note": null
+        },
+        "content": "Documented survivor accounts confirm that individuals who reached the Mittelkanal and entered the water survived the firestorm; the water provided protection from radiant heat and the worst of the carbon monoxide concentration at street level.",
+        "fact_id": "canal_survival_accounts",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Hamburg Fire Brigade (Feuerwehr) incident reports, 1943; Brunswig (1978)",
+          "access_note": null
+        },
+        "content": "Survivor and fire service accounts from the Hamburg firestorm record that radiant heat from burning buildings was sufficient to ignite clothing and cause burns at distances of several metres from the fire front, without direct flame contact.",
+        "fact_id": "radiant_heat_clothing_ignition",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "British Bombing Survey Unit (1945); Middlebrook (1980); Brunswig (1978)",
+          "access_note": null
+        },
+        "content": "The Hamburg firestorm burned continuously for approximately three hours at its peak intensity, from roughly 01:00 to 04:00 on 28 July 1943, before beginning to diminish as fuel was exhausted.",
+        "fact_id": "firestorm_duration",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "timing",
+        "source": {
+          "url": null,
+          "citation": "RAF Bomber Command operational records; Middlebrook (1980)",
+          "access_note": null
+        },
+        "content": "The RAF raid that created the firestorm lasted approximately 50 minutes, with the main bombing concentrated between approximately 00:57 and 01:47 on 28 July 1943; the firestorm conditions developed within the first 20 minutes of bombing.",
+        "fact_id": "raid_bombing_concentration_timing",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Reichsluftschutzbund public guidance leaflets; Hamburg civil defence records",
+          "access_note": null
+        },
+        "content": "Luftschutz civil defence guidance issued to the German civilian population recommended the use of wet cloths held over the nose and mouth when moving through smoke-filled spaces; this was standard doctrine communicated through Hausluftschutzwarte.",
+        "fact_id": "wet_cloth_smoke_protection",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Brunswig (1978); British Bombing Survey Unit meteorological analysis (1945)",
+          "access_note": null
+        },
+        "content": "The firestorm's convection column drew surface air inward from all directions toward the fire's centre in Hammerbrook; movement perpendicular to the inward wind, or directly away from the fire's centre, reduced the force of wind resistance a person moving on foot would encounter.",
+        "fact_id": "firestorm_wind_direction_inward",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "Brunswig (1978); post-war German civil defence analysis; Lowe (2007)",
+          "access_note": null
+        },
+        "content": "Survivor accounts from Hamburg and subsequent fire behaviour analysis confirm that standing masonry rubble and collapsed building walls provided measurable reduction in radiant heat exposure on their shadow side, a phenomenon later termed Trümmerschatten (rubble shadow) in German civil defence literature.",
+        "fact_id": "trummerschatten_radiant_heat_blocking",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "personnel",
+        "source": {
+          "url": null,
+          "citation": "Hamburg Feuerwehr incident logs, July 1943; Brunswig (1978)",
+          "access_note": null
+        },
+        "content": "Hamburg Fire Brigade records confirm that by the time the firestorm was fully established, fire service units were unable to operate within the firestorm zone; Feuerwehr personnel were withdrawn to the perimeter and could not conduct rescue operations inside Hammerbrook during the peak burning period.",
+        "fact_id": "feuerwehr_operational_capacity_collapse",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "other",
+        "source": {
+          "url": null,
+          "citation": "RAF Bomber Command operational records; Middlebrook (1980); British Bombing Survey Unit (1945)",
+          "access_note": null
+        },
+        "content": "The RAF raid of 27–28 July 1943 involved 787 aircraft, of which 722 attacked Hamburg, dropping approximately 2,326 tons of bombs, with a high proportion of incendiaries contributing to the fire concentration that produced the firestorm.",
+        "fact_id": "aircraft_count_and_bomb_load",
+        "valid_from": null,
+        "valid_until": null
+      },
+      {
+        "domain": "navigation",
+        "source": {
+          "url": null,
+          "citation": "Hamburg municipal survey maps, 1943; Brunswig (1978) district geography",
+          "access_note": null
+        },
+        "content": "Wendenstrasse is a street in the Hammerbrook district of Hamburg running in a broadly east–west orientation; the district is bounded to the north by the Mittelkanal and to the south and east by the Billwerder Ausschlag canal system.",
+        "fact_id": "wendenstrasse_hammerbrook_geography",
+        "valid_from": null,
+        "valid_until": null
+      }
+    ],
+    "reviewed": true,
+    "generated": true
+  },
+  "allow_free_input": true,
+  "generationPrompt": "You are generating the opening narrative for an immersive first-person historical scenario. The moment is shortly after 1:00 AM on the night of 27–28 July 1943, in the coal cellar of an apartment block in Hammerbrook, a dense working-class district in the east of Hamburg criss-crossed by canals. The player is a woman named Trude Harms, twenty-nine, sheltering with a dozen neighbors below a five-story tenement. The air-raid siren sounded ninety minutes ago. She has done this many times, and the rule has never changed: when the siren sounds, you go down to the cellar, and you stay in the cellar until the all-clear. That rule is the reason most of the people around her are still sitting on the benches along the wall. But tonight something is wrong that the rule does not account for. The single bulb died twenty minutes ago. The brick wall behind her shoulder is warm — not cool, as cellar brick is always cool, but warm, and getting warmer. The air has thickened; each breath returns less than it should. From above and outside comes a sound no raid has ever made before, a low continuous roar like a train that never passes, and under the cellar door a strip of light flickers orange where the corridor should be dark. An old man by the coal chute has begun to say that they must not open the door, that the rule is to wait. He is right about the rule. Write a 400-word immersive present-tense second-person opening that conveys the specific physical reality of the cellar in the minutes the firestorm takes hold — the rising heat in the walls, the failing air, the roar outside, the wet cloth some instinct tells her to press to her face, the canal she knows is one hundred meters up the street — and the specific internal calculus of a person realizing that the drill she has trusted for four years is, tonight, the thing that will kill her, and that survival means walking out into fire against every instruction she has ever been given. Every detail must be historically grounded. The macro-outcome is fixed: the firestorm consumes Hammerbrook and tens of thousands die across the eastern districts tonight. Trude is not required to be among them. The player inhabits the cost of leaving the cellar.",
+  "openingSituation": "",
+  "review_checklist": {
+    "beat_count": {
+      "notes": "",
+      "checked": false
+    },
+    "sequence_check": {
+      "notes": "",
+      "checked": false
+    },
+    "final_beat_spec": {
+      "notes": "",
+      "checked": false
+    },
+    "reviewer_summary": {
+      "notes": "",
+      "checked": false
+    },
+    "path_independence": {
+      "notes": "",
+      "checked": false
+    },
+    "tense_attribution": {
+      "notes": "",
+      "checked": false
+    },
+    "manual_playthrough": {
+      "notes": "",
+      "checked": false
+    }
+  },
+  "historicalRealism": "high",
+  "period_vocabulary": {
+    "categories": [
+      {
+        "name": "Luftschutz Civil Defence",
+        "terms": [
+          {
+            "term": "Luftschutzkeller",
+            "meaning": "The designated air-raid cellar of a residential building — the legally mandated shelter space, reinforced to minimum Luftschutz specifications."
+          },
+          {
+            "term": "Blockwart",
+            "meaning": "The block warden — a party-appointed local official responsible for enforcing blackout, shelter compliance, and reporting within a residential block."
+          },
+          {
+            "term": "Entwarnung",
+            "meaning": "The all-clear signal — a steady, unwavering siren tone indicating the raid has passed and civilians may leave their shelters."
+          },
+          {
+            "term": "Feuersturm",
+            "meaning": "Firestorm — the self-sustaining atmospheric fire phenomenon; the word enters common German usage after this night, coined partly in survivor accounts."
+          },
+          {
+            "term": "Brandbombe",
+            "meaning": "Incendiary bomb — specifically the British magnesium-alloy stick incendiary dropped in clusters; distinguished from the Sprengbombe, the high-explosive bomb."
+          },
+          {
+            "term": "Durchbruch",
+            "meaning": "Breakthrough — the emergency wall opening between adjacent cellar compartments, required by Luftschutz regulations to allow escape if one exit was blocked."
+          },
+          {
+            "term": "Selbstschutz",
+            "meaning": "Self-protection — the civil-defence duty assigned to building residents: maintaining sand buckets, hand pumps, and first-response firefighting equipment on each landing."
+          }
+        ],
+        "context": "Used by air-raid wardens, block wardens, and civilians trained in the Reich's civil-defence system during nightly shelter drills and actual raids."
+      },
+      {
+        "name": "Hamburg Working-Class Street Speech",
+        "terms": [
+          {
+            "term": "Moin",
+            "meaning": "Universal Hamburg greeting used at any hour — not 'good morning' specifically but a general acknowledgment; its brevity carries working-class reserve."
+          },
+          {
+            "term": "Snacken",
+            "meaning": "To talk, to chat — Low German root; 'snack nich so veel' means 'don't talk so much,' used when someone is wasting time with words."
+          },
+          {
+            "term": "Döneken",
+            "meaning": "A short anecdote or cautionary tale — what older residents tell to make a point without making it directly; Wachter speaks almost entirely in Döneken."
+          },
+          {
+            "term": "Fiern",
+            "meaning": "To let out, to ease off — a rope-handling term from the docks repurposed colloquially to mean giving someone room, backing down from a confrontation."
+          },
+          {
+            "term": "Plietsch",
+            "meaning": "Clever, quick-witted, sharp — a compliment in Hamburg dialect, applied to someone who sees what others miss; also used ironically for someone who thinks too much."
+          },
+          {
+            "term": "Hinnerk",
+            "meaning": "A generic stand-in name for an ordinary man, the Hamburg equivalent of 'some fellow' — 'frag mal den Hinnerk' means 'ask whoever's in charge.'"
+          }
+        ],
+        "context": "The everyday spoken German of Hammerbrook's dock and factory families — a Hamburg dialect mixture (Missingsch) used between neighbors in the cellar and on the street."
+      },
+      {
+        "name": "Hamburg Fire Brigade and Rescue Service",
+        "terms": [
+          {
+            "term": "Glutnest",
+            "meaning": "Ember nest — a concealed pocket of burning material inside a wall or floor void that appears extinguished from the surface but continues to burn; the most dangerous post-raid hazard."
+          },
+          {
+            "term": "Strahlrohr",
+            "meaning": "The nozzle of a fire hose — by extension, the crew member assigned to hold it; 'am Strahlrohr' means at the sharp end of the work."
+          },
+          {
+            "term": "Druckabfall",
+            "meaning": "Pressure drop — the loss of water pressure in the mains when multiple fires are drawing simultaneously; a known failure mode that left crews with empty hoses on this night."
+          },
+          {
+            "term": "Trümmerschatten",
+            "meaning": "Rubble shadow — the protected zone immediately downwind of a collapsed wall or large debris pile where radiant heat is partially blocked; a survival concept learned from this raid."
+          },
+          {
+            "term": "Vollbrand",
+            "meaning": "Full burn — a building or block that is burning on all floors simultaneously and cannot be saved; the brigade's signal to withdraw and protect adjacent structures instead."
+          }
+        ],
+        "context": "Used by Feuerwehr crews and Technisches Hilfswerk personnel operating in the city during and after raids — technical shorthand for conditions and equipment under wartime pressure."
+      },
+      {
+        "name": "RAF Bomber Command Operations Room",
+        "terms": [
+          {
+            "term": "Window",
+            "meaning": "Code name for the aluminium-foil strips dropped in clouds to blind German radar — used for the first time operationally on 24 July 1943, rendering Hamburg's Würzburg sets nearly useless."
+          },
+          {
+            "term": "Aiming point",
+            "meaning": "The precise map coordinate designated as the centre of a bombing pattern; for Gomorrah's 27–28 July wave, the aiming point was shifted east into the working-class districts."
+          },
+          {
+            "term": "Creep-back",
+            "meaning": "The documented tendency of bomber crews under flak to release slightly early, causing the bomb pattern to walk back from the aiming point toward the incoming track; partially counteracted by the Master Bomber role."
+          },
+          {
+            "term": "Cookie",
+            "meaning": "RAF slang for the 4,000-pound cylindrical high-explosive blast bomb — dropped first to blow off roofs and blow out windows, opening buildings to the incendiaries that followed."
+          },
+          {
+            "term": "Concentration",
+            "meaning": "The density of aircraft over the target within a given time window — Gomorrah achieved unprecedented concentration, saturating Hamburg's defences and fire services simultaneously."
+          }
+        ],
+        "context": "The technical and procedural language used by British planners and aircrew in the briefings and after-action reports surrounding Operation Gomorrah — present in the scenario as background context for what the player is inside."
+      }
+    ]
+  },
+  "keyEvidenceClueIds": [
+    "clue_warm_wall",
+    "clue_canal_route"
+  ],
+  "composite_disclosure": [
+    "Trude Harms",
+    "Ernst Meissner",
+    "Lotte Voss",
+    "Wilhelm Wachter",
+    "Hanna Brandt",
+    "Karl-Heinz Probst",
+    "Marta Sievers"
+  ],
+  "sessionTargetMinutes": 30,
+  "partialSuccessExamples": [
+    "Player escapes but the companions who refused to follow do not survive — partial survival, full moral weight.",
+    "Player reaches the canal embankment but sustains burns that will require documented wartime medical treatment to survive.",
+    "Player persuades two of the group to follow but loses contact with them in the street smoke — their fate remains unknown at scenario close."
+  ],
+  "structured_endings_enabled": true
+}
