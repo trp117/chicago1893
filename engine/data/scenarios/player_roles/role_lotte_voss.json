@@ -1,0 +1,86 @@
+{
+  "id": "role_lotte_voss",
+  "name": "Lotte Voss — Resident, Age 16",
+  "opening": {
+    "choices": [
+      "Tell the nearest adult — whoever is closest to you on the bench — about the warm wall, exactly what you felt and when.",
+      "Move quietly to the cellar door and look at the orange strip of light more closely before deciding whether to speak.",
+      "Go to the north corner where the coal chute is and look at the Durchbruch wall — you have seen the arrow before and you want to know if the shovel is still there."
+    ],
+    "narrative": "The dark in the cellar is not complete — there is the orange strip under the door, and the shapes of the people on the benches are visible as darker shapes against the dark. You can hear Wachter's voice and Hanna Brandt's children and the sound from outside that is not like the other raids. Your hand still remembers the warmth of the wall. You are sixteen and you are alone and you know something that might matter.",
+    "npcMoments": [
+      {
+        "moment": "Hanna Brandt's younger child coughs — a sustained, wet cough — and Hanna pulls the child closer and says nothing.",
+        "characterId": "hanna_brandt"
+      },
+      {
+        "moment": "Wachter says that the all-clear will come. He says it the way he says everything — as if the saying makes it true.",
+        "characterId": "wilhelm_wachter"
+      }
+    ]
+  },
+  "briefing": "Your hands are folded in your lap and the bench is hard under you and you have been sitting very still for ninety minutes because that is what you were told to do when the siren sounded and your mother left for her shift. She said: go to the cellar, sit on the bench, wait for the all-clear, and she has been right about everything she has ever told you to do, so you are sitting and you are waiting. Ten minutes ago you put your hand flat against the wall behind the bench because it felt different from the other times, and it was warm — not the cold that walls are supposed to be but warm, like a stove that has been going a while, and you took your hand away and you have not told anyone because you did not want to cause panic and you are sixteen and no one in this room will listen to you the way they listen to Wachter. The strip of light under the door is orange. You know the way to the canal — you have walked it with your mother on her way to the night shift at Blohm und Voss, north up Wendenstrasse, one hundred meters, the smell of the water before you see it. You have been sitting with the knowledge of the warm wall for ten minutes and you have been watching the adults in this room not know what you know, and you are trying to decide if you are old enough to say it.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "fate_mode": "committed",
+  "updatedAt": "2026-07-26T19:08:05.846Z",
+  "represents": "",
+  "scenarioId": "when_the_walls_grew_warm",
+  "accessLevel": "staff",
+  "description": "You are sixteen, alone in the cellar without your parents, and you touched the warm wall ten minutes ago and told no one. You are the youngest person present who is fully conscious, and you have been watching everything.",
+  "perspective": "Write in close second person from the perspective of a sixteen-year-old with precise observational intelligence and no social authority — someone who has been watching adults manage a crisis and has specific information none of them have acted on, and who must decide whether and how to use it.",
+  "character_id": "lotte_voss",
+  "ending_notes": {
+    "failure": {
+      "who_present": "",
+      "closing_line": "You watched everything, and the one thing you were built to do — speak — was the one thing you didn't.",
+      "what_happened": "You touched the warm wall and told no one, and you kept not telling — you were sixteen and it wasn't your place, the older man had said stay put, so you stayed. By the time the stairwell smoke made your decision for you, the way out was already a wall of fire. You did not lead anyone. You crawled after the ones who bolted, tripped in the black, and a hand you never saw hauled you the last three steps into the street and shoved you into the wind. You came out coughing blood and knowing it was luck, not courage — that you had watched the wall grow warm and swallowed the words that might have moved the cellar sooner. History filled the coal cellar behind you exactly as it meant to. You simply weren't the reason anyone survived.",
+      "emotional_weight": "The corrosive certainty that you saw first, understood first, and said nothing — and that your silence bought nothing but your own accidental escape.",
+      "in_event_outcome": "survived",
+      "closing_line_override": ""
+    },
+    "partial": {
+      "who_present": "",
+      "closing_line": "You lived by a margin exactly the width of the secret you kept too long.",
+      "what_happened": "You spoke, but late — you'd hidden the warm wall for ten minutes, hoping to be wrong, and the delay cost the stair. When you finally shouted, half the cellar rose and half stayed frozen, and the argument at the door burned time you no longer had. You forced your way up through the collapsing throat of the stairwell with a handful of others, your hair singeing, one hand pressed to a beam that took the skin from your palm. You reached the street. You do not know how many behind you did. You dragged a stranger's coat over your head and ran through the storm, and when the wind finally let you go you were alive, blistered, and alone, listening for footsteps that never caught up.",
+      "emotional_weight": "Survival that feels stolen — the ten minutes of silence you'll spend the rest of your life recounting, wondering who they belonged to.",
+      "in_event_outcome": "survived",
+      "closing_line_override": ""
+    },
+    "success": {
+      "who_present": "",
+      "closing_line": "The rule that had kept you alive for four years was the thing you had to kill to stay alive one more hour.",
+      "what_happened": "You broke the silence. You said it plainly — the west wall is warm, the stair is our only way, we go now — and because you were the youngest and had watched everything, they listened before the arguing could start. You wetted a scarf at the water bucket the way you'd seen the warden do, pulled the smallest child by the wrist, and led a chain of eleven up through the smoke while the plaster on the landing began to blister. You came out into a street the colour of a furnace, ran low against the wind that wanted to drag you back into the fire, and reached the flooded crater in the canal district where the air was breathable. Most of the cellar behind you did not come. The ones who followed you lived.",
+      "emotional_weight": "The clean, terrible knowledge that speaking up ten minutes sooner is the difference between a chain of the living and a cellar of the still — and that at sixteen you were the one who spoke.",
+      "in_event_outcome": "survived"
+    }
+  },
+  "fact_checked": true,
+  "character_type": "fictional",
+  "bridge_sentence": "",
+  "character_hooks": [
+    "I put my hand on the wall ten minutes ago and it was already warm — I have not told Wachter because he will say I imagined it, but I will tell the first person who asks me directly.",
+    "My mother told me to always carry my identity papers, and I have them, and I have been thinking that if I do not come home she will at least be able to identify me — and then I stopped thinking that because it is not a useful thought.",
+    "I know this building better than most of the adults here because I have nowhere else to go after school — I know the coal chute opens on the north face and I know the Durchbruch arrow in the corner has never been used."
+  ],
+  "startLocationId": "loc_coal_cellar",
+  "context_sentence": "You are Lotte Voss, alone on the bench in the cellar, and the wall behind you is warm.",
+  "roleInitialState": {
+    "flags": {
+      "knows_canal_path": true,
+      "knows_wall_is_warm": true,
+      "has_official_authority": false
+    },
+    "inventory": [
+      "identity papers",
+      "coat",
+      "damp handkerchief"
+    ]
+  },
+  "suggested_secret": "",
+  "startingKnowledge": [
+    "The east wall was already warm ten minutes ago — earlier than anyone else has registered.",
+    "Your mother works the canal-side entrance of the Blohm und Voss yard and you know the path to the Mittelkanal by night.",
+    "You have your identity papers in your coat pocket."
+  ],
+  "entry_paragraph_flags": []
+}

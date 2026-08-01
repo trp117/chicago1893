@@ -1,0 +1,99 @@
+{
+  "id": "role_ernst_meissner",
+  "name": "Ernst Meissner — Feuerwehr Zugführer",
+  "closure": {
+    "timer_backstop": {
+      "on_fire_report": "closure_state",
+      "fires_at_minutes": 0
+    },
+    "dependent_resolution": {
+      "_note": "Phase 2 — dormant",
+      "required": false
+    },
+    "principal_transition": {
+      "flag": "evacuated_cellar",
+      "type": "flag_set",
+      "flag_trigger": "the player gets the cellar occupants out and clear of the burning block (through the coal chute or the canal-side door)",
+      "source_condition": "winConditions[0]"
+    }
+  },
+  "opening": {
+    "choices": [
+      "Tell Marta Sievers exactly what you know about the route back to Wendenstrasse and whether it is still passable.",
+      "Move south along the embankment to see if there is a route into the burning block that does not cross the open street.",
+      "Stay at the embankment and direct the people arriving from the burning blocks — there are more coming, and they need to know where to go in the water."
+    ],
+    "narrative": "The canal is dark and the city above it is not. You have been at this embankment for perhaps twenty minutes, long enough to understand that this is where you will be until the fire passes or until something changes. The roar is constant — not the sound of individual fires but the sound of a single atmospheric event, the fire column's inward draft audible as a bass note that seems to come from everywhere at once. The people in the water beside you are not speaking. Somewhere in the burning blocks to the south, there are people in cellars.",
+    "npcMoments": [
+      {
+        "moment": "Marta Sievers arrives at the embankment from the direction of Wendenstrasse, moving fast, alone. She looks at you and says: there are people still in the cellars on that street.",
+        "characterId": "marta_sievers"
+      }
+    ]
+  },
+  "briefing": "You are standing at the Mittelkanal embankment with your back to the concrete retaining wall and no helmet. You lost it somewhere between Billhorner Strasse and here, and you have stopped caring. Your two remaining crew members are in the water to your left, up to their chests, helping a woman keep two children above the surface. The pumper is three blocks south and it has been useless since 12:40 AM, when the mains pressure dropped to nothing and the hose went slack in your hands. You have been a firefighter for sixteen years and tonight you are standing at a canal watching a district burn because there is no water and no chain of command and the radio on your belt has not reached anyone since the command post on Süderstrasse stopped answering. What you have, instead of equipment, is the specific knowledge of how this fire moves: the inward wind, the radiant heat geometry, the concrete wall at your back that is blocking enough heat to keep the people beside you alive. Somewhere behind you, in the burning blocks, there are people in cellars following the regulation. You know what the regulation produces tonight. You do not have the authority to go back for them. You are not certain you have the time.",
+  "createdAt": "2025-01-01T00:00:00Z",
+  "fate_mode": "committed",
+  "updatedAt": "2026-07-29T19:19:31.351Z",
+  "represents": "",
+  "scenarioId": "when_the_walls_grew_warm",
+  "accessLevel": "staff",
+  "description": "You are a fire brigade section leader with no working equipment, no radio contact, and a professional identity built around fighting fires — none of which applies tonight. What you have is specific knowledge of how this fire behaves and where the water is.",
+  "perspective": "Write in close second person from the perspective of a professional firefighter who has run out of professional options — someone whose training gives him precise situational knowledge but no tools to act on it in the conventional sense, and who must decide what his role is when the fire cannot be fought.",
+  "character_id": "ernst_meissner",
+  "ending_notes": {
+    "failure": {
+      "who_present": "",
+      "closing_line": "You knew everything about the fire except when to stop being right and start being fast.",
+      "what_happened": "You froze on your own expertise. You knew too much — you spent the crucial minutes explaining why the street was death and the chute was blocked and the canal door had surely burned through, weighing each route while the oxygen went out of the room and the youngest stopped crying because they no longer could. When you finally moved it was not decision but panic, a stampede up the collapsing stairwell into fire that killed most of the cellar in the doorway. You lived by accident: a beam fell and knocked you back down the steps into a pocket of air that held until the wind shifted. You crawled out over the people you had failed to lead, your hands finding faces you knew. The firestorm took Hammerbrook as it was always going to. It simply took your cellar through you.",
+      "emotional_weight": "The corrosion of the expert who talked while the moment to act burned away — survival experienced not as luck but as accusation.",
+      "in_event_outcome": "survived",
+      "closing_line_override": ""
+    },
+    "partial": {
+      "who_present": "",
+      "closing_line": "A fireman learns the fire will always take its share; nobody teaches you how to choose which share.",
+      "what_happened": "You called it right too late. You argued with the old man who wanted them to stay put, you lost minutes to the arithmetic of the frightened, and by the time you forced the coal chute the neighbouring cellar was already alight. You changed the route on the run, driving them out the street door into wind that tore the breath from their lungs and set a woman's coat alight before you smothered her against the wet cobbles. You got most of them to the canal. Two you did not — an old couple who fell behind in the smoke, whose hands slipped from the chain of bodies, and whom you could not go back for without losing the rest. You lay in the Bille shallows counting the ones you'd kept, hating the ones you'd traded.",
+      "emotional_weight": "The commander's arithmetic that never balances — you saved more than you lost, and the number of the lost is the only figure you will ever recite.",
+      "in_event_outcome": "survived",
+      "closing_line_override": ""
+    },
+    "success": {
+      "who_present": "",
+      "closing_line": "You had no hose, no engine, no order to give — only the map of the fire in your skull, and tonight that was enough.",
+      "what_happened": "You read the fire before it read you. When the cellar air began to shimmer and the mortar between the coal-cellar bricks turned the colour of a stove lid, you knew the stairwell had minutes, not more. You made them wet everything — coats, blankets, the last bucket of drinking water over the children's heads — and you took them out low and fast along the route you'd mapped in your head for four years: not up into the street where the wind was a blowtorch, but through the coal chute to the neighbouring cellar, then out the canal-side loading door where the fire had already burned through and moved on. You put them into the Bille canal's shallows and made them lie in the mud. The heat passed over. By first light you had walked twelve people to the Berliner Tor rail embankment, coughing, blistered, alive.",
+      "emotional_weight": "The clean, terrible satisfaction of a professional whose knowledge finally mattered — and the private knowledge that skill, not mercy, is what saved them.",
+      "in_event_outcome": "survived"
+    }
+  },
+  "fact_checked": true,
+  "character_type": "fictional",
+  "bridge_sentence": "",
+  "character_hooks": [
+    "I sent my casualties to this embankment an hour ago — there are three of them here already, and I told them to stay in the water, and I have been here since because I could not think of anywhere else to go that was not on fire.",
+    "I know this district — I have responded to fires on Wendenstrasse twice in the last year, and I know that number 14 has a coal chute that opens at ground level on the north face of the building.",
+    "My radio has been silent for forty minutes, but the last transmission I received was from a crew on Hammerbrookstrasse who said the firestorm wind was rotating — which means the safe route north may not stay safe for more than another ten minutes."
+  ],
+  "startLocationId": "loc_mittelkanal_embankment",
+  "context_sentence": "You are Ernst Meissner, a fire section leader with no water and no radio, and the canal behind you is the last safe place on this block.",
+  "roleInitialState": {
+    "flags": {
+      "radio_contact": false,
+      "knows_wind_pattern": true,
+      "has_working_equipment": false
+    },
+    "inventory": [
+      "fire brigade tunic",
+      "empty water canteen",
+      "non-functional radio",
+      "belt axe"
+    ]
+  },
+  "suggested_secret": "",
+  "startingKnowledge": [
+    "The district's water mains have lost all pressure — no hydrant in Hammerbrook is functional.",
+    "The firestorm's inward wind is strongest at street level; moving perpendicular to it reduces exposure.",
+    "The Mittelkanal embankment's concrete retaining wall provides partial shelter from radiant heat."
+  ],
+  "entry_paragraph_flags": []
+}
