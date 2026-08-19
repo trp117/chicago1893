@@ -687,6 +687,13 @@ const CLOSURE_BEATS_ENABLED = process.env.CLOSURE_BEATS_ENABLED === 'true';
 // process that actually ended up holding the port.
 console.log(`[CLOSURE] beats ${CLOSURE_BEATS_ENABLED ? 'ENABLED' : 'disabled'}`);
 
+// Feature flag — decision-aware closure (the defining moment). Default OFF.
+// Same idiom as CLOSURE_BEATS_ENABLED above.
+const DEFINING_MOMENT_ENABLED = process.env.DEFINING_MOMENT_ENABLED === 'true';
+// Self-report at module load, beside the [CLOSURE] line and for the same reason: the
+// boot log must state the flag's real value for the process that holds the port.
+console.log(`[DEFINING] moment ${DEFINING_MOMENT_ENABLED ? 'ENABLED' : 'disabled'}`);
+
 // Minimum elapsed fraction before a met closure transition may DRIVE the close.
 // Sits inside the 'middle' arc (getArcPosition: opening<0.25, middle<0.55, late<0.80).
 // 0.40 clears the opening with margin and stays well below 'late'. For a 15-min
@@ -701,6 +708,16 @@ const CLOSURE_MIN_ELAPSED_FRACTION = 0.40;
 // the role's block is resolved once upstream and carried on state.
 export function resolveClosureBlock(state, scenario) {
   return state?.effectiveClosure ?? scenario?.closure ?? null;
+}
+
+// The defining-moment block in force for the playing role. Exact parallel of
+// resolveClosureBlock above, and ungated for the same reason: returning a block is
+// not acting on one. The `?? scenario.defining_moment` tail is load-bearing — a
+// session created before this change has no effectiveDefiningMoment on its state,
+// and the tail is what keeps those in-flight sessions resolving instead of crashing.
+// Nothing reads this yet; the evaluator that consumes it arrives in Step 3.
+export function resolveDefiningMomentBlock(state, scenario) {
+  return state?.effectiveDefiningMoment ?? scenario?.defining_moment ?? null;
 }
 
 // Pure evaluation of the effective (per-role) closure transition against live state.
@@ -770,6 +787,55 @@ export function evaluateClosure(state, scenario) {
   };
 }
 
+// Pure evaluation of the effective (per-role) DEFINING MOMENT against live state.
+// Deliberately a sibling of evaluateClosure, not a branch inside it: a role can carry
+// both blocks at once (Trude inherits the scenario's location_reached closure AND
+// defines her own decision_made defining moment), so they are two independent
+// transitions on two independent flags and must not be collapsed into one evaluator.
+// Returns a serializable object. Never throws; never mutates.
+//
+// READ CONTRACT for state.decisions (the writer arrives with the fork-selection step):
+//   state.decisions[momentId] = optionId            // canonical: the chosen option id
+//   state.decisions[momentId] = { option_id: ... }  // also read, for a richer record
+// Absent key / undefined / null all mean "no decision recorded yet". A recorded id
+// that is not one of the block's options is NOT met — it means the writer produced
+// something the block never offered, and that must surface as its own reason rather
+// than silently counting as a decision.
+export function evaluateDefiningMoment(state, scenario) {
+  const block     = resolveDefiningMomentBlock(state, scenario);
+  const principal = block?.principal_transition;
+  if (!DEFINING_MOMENT_ENABLED || !principal) {
+    return { met: false, reason: 'no_defining_moment_block' };
+  }
+
+  if (principal.type === 'decision_made') {
+    const momentId = principal.moment;
+    const recorded = momentId ? state?.decisions?.[momentId] : undefined;
+    const chosenId = typeof recorded === 'string' ? recorded : (recorded?.option_id ?? null);
+    const optionIds = Array.isArray(block.options) ? block.options.map(o => o?.id) : [];
+    const known     = chosenId != null && optionIds.includes(chosenId);
+    const met       = !!momentId && known;
+    return {
+      met,
+      reason: !momentId        ? 'moment_id_missing'
+            : chosenId == null ? 'decision_not_made'
+            : met              ? 'decision_made'
+            :                    'decision_option_unknown',
+      transition_type:        'decision_made',
+      moment:                 momentId ?? null,
+      decision:               chosenId,
+      available_options:      optionIds,
+      defining_moment_source: state?.effectiveDefiningMomentSource ?? 'scenario',
+    };
+  }
+
+  return {
+    met: false,
+    reason: 'unsupported_transition_type',
+    transition_type: principal.type ?? null,
+  };
+}
+
 // Whether a met closure transition should DRIVE/PERMIT the close *right now*:
 // met AND past the elapsed floor. Single source of truth shared by the injection
 // (buildClosingInstruction) and the arc-guard exception (gameRouter), so closure
@@ -780,6 +846,39 @@ export function closureShouldClose(state, scenario) {
   const total   = scenario?.sessionTargetMinutes || 15;
   const elapsed = state?.elapsedMinutes ?? 0;
   return elapsed >= total * CLOSURE_MIN_ELAPSED_FRACTION;
+}
+
+// Whether the defining moment should be PRESENTED to the player *this turn*. Sibling
+// of closureShouldClose above, and it reads the elapsed fraction from the same source:
+// state.elapsedMinutes over scenario.sessionTargetMinutes. (getArcPosition computes
+// the same fraction from the other end — total minus remaining, over total — but every
+// fraction THRESHOLD in this file goes through elapsedMinutes, so this one does too.)
+//
+// The latch, not "no decision recorded", is what prevents re-presentation. A player
+// shown the fork who answers with something else leaves the decision unrecorded, and
+// on the next turn the elapsed check is still satisfied — so a decision-only guard
+// would put the same fork up again every turn until they happened to pick one.
+// definingMomentPresented is read here and set by whatever presents the fork
+// (Step 5/6); on a session predating it the field is undefined, hence falsy, and this
+// predicate behaves exactly as if the latch were not there.
+//
+// Returns false rather than guessing whenever the block is unusable: no
+// at_elapsed_fraction to compare against, or no moment id to record a decision under
+// (a fork whose choice can never be recorded would be due forever).
+export function definingMomentDue(state, scenario) {
+  const block = resolveDefiningMomentBlock(state, scenario);
+  if (!DEFINING_MOMENT_ENABLED || !block) return false;
+  if (state?.definingMomentPresented) return false;
+
+  const momentId = block.principal_transition?.moment;
+  if (!momentId) return false;
+  if (state?.decisions?.[momentId] != null) return false;
+
+  const fraction = block.at_elapsed_fraction;
+  if (typeof fraction !== 'number') return false;
+  const total   = scenario?.sessionTargetMinutes || 15;
+  const elapsed = state?.elapsedMinutes ?? 0;
+  return elapsed >= total * fraction;
 }
 
 export function checkEndingReadiness(state, scenario) {
@@ -805,6 +904,16 @@ function buildClosingInstruction(state, scenario) {
     return '⚠️ FINAL TURN: Write one last moment — a physical sensation, a sound, an unresolved weight. Do not resolve the historical situation. Do not evaluate success or failure. End in the middle of the moment. You MUST set isEnding to true in your response.';
   }
 
+  // (1.5) Defining moment outranks the two branches below. The fork DRIVES toward the
+  //       ending; it does not coincide with it, so a turn that puts the choice to the
+  //       player must not also be told to close the scene. Returning '' here is what
+  //       makes the two instructions mutually exclusive — buildDefiningMomentInstruction
+  //       renders on this turn instead. Deliberately BELOW the remaining<=0 backstop:
+  //       FINAL TURN still always wins, and the fork yields to it rather than holding
+  //       a session open past its end. A no-op while DEFINING_MOMENT_ENABLED is off,
+  //       since definingMomentDue is false throughout.
+  if (definingMomentDue(state, scenario)) return '';
+
   // (2) Beat-aware close — the player has reached the arc-resolving transition and
   //     is past the elapsed floor. Ranks ABOVE the soft <=5 land, BELOW the <=0
   //     backstop above. Uses the LIVE check (not the closureFired latch) so this
@@ -820,6 +929,33 @@ function buildClosingInstruction(state, scenario) {
     return 'The session is approaching its final moments. Begin drawing the current scene toward a natural resting point. Do not introduce new characters, new locations, or new dramatic threads. The existing tension carries the scene.';
   }
   return '';
+}
+
+// The prose-side instruction for the turn the fork is put to the player. Mirrors
+// buildClosingInstruction: returns '' when it does not apply, and the '' lands in a
+// template slot, so a normal turn is byte-identical to what it was before.
+//
+// Ranked BELOW the remaining<=0 backstop and ABOVE both closing branches — the same
+// order buildClosingInstruction now enforces from its side. The two can never both
+// render: at remaining<=0 this returns '' and FINAL TURN wins; otherwise, when the
+// fork is due, buildClosingInstruction returns '' and this one renders.
+//
+// This sets up the choice ONLY. It renders no options — Step 6 presents them — and it
+// forbids the model from resolving what it has just made unavoidable.
+export function buildDefiningMomentInstruction(state, scenario) {
+  if ((state?.remainingMinutes ?? 0) <= 0) return '';
+  if (!definingMomentDue(state, scenario)) return '';
+  const block = resolveDefiningMomentBlock(state, scenario);
+  const setup = typeof block?.setup === 'string' ? block.setup.trim() : '';
+  return [
+    '⚑ DEFINING MOMENT (THIS TURN): Bring the scene to the choice this character has been carrying, and stop at it.',
+    setup
+      ? `The authored shape of this moment — narrate INTO it. Do not reproduce it verbatim, do not contradict it, do not add a resolution it does not have:\n${setup}`
+      : '',
+    'Escalate what is already in the room to its peak: what the fire, the people present, and the passing time are each doing to make this unavoidable NOW. The last line of your narrative must leave the decision standing open — end at the threshold, mid-pressure.',
+    'You MUST NOT resolve it. Do not narrate the player character choosing, moving on the choice, speaking the decision, or having already decided. Do not describe what follows from any option. Do not have an NPC decide for them. The choice belongs to the player.',
+    'Emit no choices this turn — the options for this moment are presented separately. Do not set isEnding.',
+  ].filter(Boolean).join('\n');
 }
 
 // Standing per-turn directive that DRIVES the closure flag for the PLAYING ROLE.
@@ -845,8 +981,15 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   const refContext    = buildReferenceContext(playerInput, state, locations);
   const resolvedInput = refContext ? `${playerInput}\n${refContext}` : playerInput;
 
-  // Replace raw minute count with period-appropriate time language
-  const { remainingMinutes, ...stateRest } = state;
+  // Replace raw minute count with period-appropriate time language, and withhold the
+  // resolved blocks from the serialized state. effectiveDefiningMoment carries authored
+  // prose and the fork's three answers; left in, the model reads them from turn 1 and the
+  // player cannot arrive at the moment fresh. It reaches the model ONLY through
+  // buildDefiningMomentInstruction, on the turn the fork is due. effectiveClosure goes
+  // with it for symmetry — the model is driven by buildClosureFlagDirective, never by
+  // this JSON, and every closure evaluation reads the real state object, not the prompt.
+  // Both remain on the live state; only the copy handed to the model loses them.
+  const { remainingMinutes, effectiveClosure, effectiveDefiningMoment, ...stateRest } = state;
   const promptState = {
     ...stateRest,
     timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes, scenario.sessionStartTime || null),
@@ -870,6 +1013,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
     .replace('{{CLOSURE_FLAG_DIRECTIVE}}', buildClosureFlagDirective(state, scenario))
+    .replace('{{DEFINING_MOMENT_INSTRUCTION}}', buildDefiningMomentInstruction(state, scenario))
     .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario))
     .replace('{{PLAYER_INPUT}}',           resolvedInput);
 }

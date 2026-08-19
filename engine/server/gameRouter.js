@@ -10,12 +10,15 @@ import {
   composeTurnPrompt,
   checkEndingReadiness,
   evaluateClosure,
+  evaluateDefiningMoment,
+  definingMomentDue,
+  resolveDefiningMomentBlock,
   closureShouldClose,
   prepareForTts,
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
-import { mergeState, buildInitialState } from '../services/StateManager.js';
+import { mergeState, buildInitialState, recordDefiningDecision } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -296,7 +299,12 @@ function buildEpilogueSummary(state, endResult, scenario) {
     completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
     resolved_threads:      (state?.resolved_threads  || []).map(t => ({ thread_id: t.thread_id })),
     outcome:               endResult || 'unknown',
-    closure_state:         { ...evaluateClosure(state, scenario), closureFired: state?.closureFired === true },
+    // closure_state stays exactly what it was: closure_met / reason mean CLOSURE.
+    // The defining moment rides ALONGSIDE as its own sub-object — additive only, so a
+    // recorded decision is visible in the log without ever standing in for a met
+    // closure. Making decision_made drive the close is a separate, deliberate step.
+    closure_state:         { ...evaluateClosure(state, scenario), closureFired: state?.closureFired === true,
+                             defining_moment_state: evaluateDefiningMoment(state, scenario) },
   };
 }
 
@@ -807,6 +815,23 @@ Do not open with the historical context. Open inside the character's body. Let t
       const gameData = await getScenarioData(repos, state.scenarioId);
       const { scenario, characters, locations, clues } = gameData;
 
+      // -- Defining moment ----------------------------------------------------
+      // (a) An answer to a fork put to the player on an EARLIER turn is recorded before
+      //     the prompt is composed, so this turn already sees the decision made and
+      //     definingMomentDue goes false - the same fork can never be asked twice.
+      const recordedDecision = recordDefiningDecision(state, scenario, {
+        definingChoiceId: req.body.definingChoiceId,
+        playerInput,
+      });
+      if (recordedDecision) console.log("[DEFINING] decision recorded: " + recordedDecision);
+
+      // (b) Whether THIS turn presents the fork. Read from the same state the prompt is
+      //     composed from, so the injected instruction and the options handed to the
+      //     client can never disagree about whether the moment is happening.
+      const forkDue       = definingMomentDue(state, scenario);
+      const definingBlock = forkDue ? resolveDefiningMomentBlock(state, scenario) : null;
+      if (forkDue) console.log("[DEFINING] fork due - moment=" + definingBlock?.principal_transition?.moment + " elapsed=" + state.elapsedMinutes);
+
       // Save current state so promptBuilder can read session context
       if (sessionId) appData.saveSession(sessionId, state);
 
@@ -1018,6 +1043,13 @@ Do not open with the historical context. Open inside the character's body. Let t
         }
       }
 
+      // The fork turn is authored to cost no clock (defining_moment.time_advance).
+      // Engine-owned: it overrides whatever the model emitted, and it must be set before
+      // mergeState, which is what reads modelOutput.timeAdvance.
+      if (forkDue && typeof definingBlock?.time_advance === 'number') {
+        output.timeAdvance = definingBlock.time_advance;
+      }
+
       const prevAct = state.act || 1;
       let nextState = mergeState(state, output, scenario, clues, playerInput);
 
@@ -1053,6 +1085,25 @@ Do not open with the historical context. Open inside the character's body. Let t
           timeRemaining: nextState.remainingMinutes,
           turnsPlayed:   nextState.turnCount || 0,
         };
+      }
+
+      // Present the fork. The options are ENGINE-owned - ids and text come from the block,
+      // never from the model - and they REPLACE whatever choices the model emitted, so the
+      // player answers the authored question and nothing else. definingMoment carries the
+      // ids alongside so a selection can be mapped back to one.
+      if (forkDue) {
+        const options = (definingBlock.options || [])
+          .filter(o => o?.id && typeof o.text === 'string')
+          .map(o => ({ id: o.id, text: o.text }));
+        output.choices        = options.map(o => o.text);
+        output.definingMoment = {
+          momentId: definingBlock.principal_transition?.moment ?? null,
+          options,
+        };
+        // Latch it: the fork has now been asked, and must not be asked again even if the
+        // player answers with something that records no decision.
+        nextState.definingMomentPresented = true;
+        console.log("[DEFINING] fork presented - " + options.length + " options, timeAdvance=" + output.timeAdvance);
       }
 
       if (output.npc_updates && nextState.npc_states) {
@@ -1336,7 +1387,8 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (scenarioData?.epilogue?.generated && scenarioData?.epilogue?.reviewed) {
         const summary = buildEpilogueSummary(sessionState, endResult, scenarioData);
         console.log('[EPILOGUE-CLOSE] session summary — interacted_characters:', summary.interacted_characters?.length, 'completed_beats:', summary.completed_beats?.length, 'outcome:', summary.outcome,
-          'closure_met:', summary.closure_state?.met, 'closureFired:', summary.closure_state?.closureFired, 'reason:', summary.closure_state?.reason, 'closure_source:', summary.closure_state?.closure_source);
+          'closure_met:', summary.closure_state?.met, 'closureFired:', summary.closure_state?.closureFired, 'reason:', summary.closure_state?.reason, 'closure_source:', summary.closure_state?.closure_source,
+          'defining_met:', summary.closure_state?.defining_moment_state?.met, 'defining_reason:', summary.closure_state?.defining_moment_state?.reason, 'decision:', summary.closure_state?.defining_moment_state?.decision);
 
         sendSse(res, { type: 'epilogue_pending' });
 

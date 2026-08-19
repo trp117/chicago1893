@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment } from './PromptComposer.js';
 
 export function buildInitialState(scenario, role, locations) {
   const scales      = scenario.systems?.scales || {};
@@ -50,14 +50,85 @@ export function buildInitialState(scenario, role, locations) {
     // True provenance of effectiveClosure — the fallback collapses role vs scenario,
     // so record which one actually supplied the block for honest closure_state reporting.
     effectiveClosureSource:  role.closure ? 'role' : (scenario.closure ? 'scenario' : 'none'),
+    // Per-role defining moment resolved ONCE here, for the same reason and by the
+    // same rule as effectiveClosure above: role beats scenario, and the downstream
+    // evaluators have no role in scope. NOT gated on DEFINING_MOMENT_ENABLED —
+    // resolution is inert data; the flag gates the evaluator (Step 3), exactly as
+    // CLOSURE_BEATS_ENABLED gates evaluateClosure and not this assignment.
+    effectiveDefiningMoment:       role.defining_moment ?? scenario.defining_moment ?? null,
+    // True provenance — the fallback collapses role vs scenario, same as closure.
+    effectiveDefiningMomentSource: role.defining_moment ? 'role' : (scenario.defining_moment ? 'scenario' : 'none'),
+    // Decisions recorded this session, keyed by defining-moment id; the value is the
+    // chosen option id (see evaluateDefiningMoment's read contract). Initialized to {}
+    // so new sessions carry a real object rather than undefined. Sessions created
+    // before this change have no such field and keep working — every reader
+    // optional-chains through it.
+    decisions:               {},
+    // Presentation latch for the defining moment, in the mould of closureFired above:
+    // once the fork has been put to the player it must not be put again, and "no
+    // decision recorded" alone cannot express that. Read by definingMomentDue; set by
+    // whatever presents the fork (Step 5/6). Nothing sets it yet.
+    definingMomentPresented: false,
   };
+}
+
+// Record the player's answer to a defining moment onto state.decisions, in the shape
+// evaluateDefiningMoment reads ({ option_id, turn, elapsed }). ENGINE-OWNED: the id is
+// validated against the block's own options, so a selection the block never offered is
+// refused rather than recorded — decision_option_unknown stays a genuine anomaly the
+// engine never manufactures. Mutates state in place; returns the recorded option id, or
+// null when nothing was recorded.
+//
+// Guarded on definingMomentPresented: a decision can only answer a fork that was
+// actually put to the player. That also makes this dark while DEFINING_MOMENT_ENABLED
+// is off (the latch is never set, so nothing is ever recorded) and stops a player who
+// happens to type an option's wording early from answering a question not yet asked.
+// Never overwrites an answer already recorded — the first answer stands.
+//
+// The client posts the option TEXT back as playerInput (renderChoices sends the label,
+// engine/game/index.html:1148), so an explicit definingChoiceId is preferred when the
+// client sends one and an exact text match is the fallback that works with the client
+// as it stands today.
+export function recordDefiningDecision(state, scenario, { definingChoiceId, playerInput } = {}) {
+  // Flag gate. DEFINING_MOMENT_ENABLED is private to PromptComposer, so it is read
+  // through the evaluator: 'no_defining_moment_block' is exactly what it returns when
+  // the flag is off. Without this, a session whose fork was presented while the flag
+  // was ON would still record decisions after the flag was turned OFF.
+  if (evaluateDefiningMoment(state, scenario).reason === 'no_defining_moment_block') return null;
+  if (!state?.definingMomentPresented) return null;
+  const block    = resolveDefiningMomentBlock(state, scenario);
+  const momentId = block?.principal_transition?.moment;
+  if (!momentId || !Array.isArray(block.options)) return null;
+  if (state.decisions?.[momentId] != null) return null;
+
+  const byId   = definingChoiceId ? block.options.find(o => o?.id === definingChoiceId) : null;
+  const byText = !byId && typeof playerInput === 'string'
+    ? block.options.find(o => typeof o?.text === 'string' && o.text.trim() === playerInput.trim())
+    : null;
+  const chosen = byId || byText;
+  if (!chosen) return null;
+
+  state.decisions = {
+    ...(state.decisions || {}),
+    [momentId]: { option_id: chosen.id, turn: state.turnCount ?? 0, elapsed: state.elapsedMinutes ?? 0 },
+  };
+  return chosen.id;
 }
 
 export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '') {
   const next  = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
 
-  const advance       = Number(modelOutput.timeAdvance || scenario.systems?.timePerTurnDefault || 3);
+  // An explicit timeAdvance of 0 must survive: a defining-moment turn is authored to
+  // cost nothing (defining_moment.time_advance). The old `||` chain treated that 0 as
+  // "absent" and silently substituted the 3-minute default. `??` alone would not be
+  // safe either — it guards only null/undefined, so '' and non-numeric junk, which
+  // `||` used to reject into the default, would slip through as 0 or NaN and corrupt
+  // elapsedMinutes. Take the first candidate that is genuinely a finite number; 3
+  // stays the final backstop.
+  const advance       = [modelOutput.timeAdvance, scenario.systems?.timePerTurnDefault, 3]
+    .map(v => (typeof v === 'number' ? v : (typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN)))
+    .find(Number.isFinite) ?? 3;
   const sessionTarget = currentState.extensionUsed
     ? (scenario.sessionTargetMinutes || 15) + 5
     : (scenario.sessionTargetMinutes || 15);

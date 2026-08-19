@@ -53,6 +53,7 @@ Instructions:
 - If you change `location` this turn, the narrative must begin at the new location — do NOT include dialogue or reactions from NPCs at the previous location.
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
 {{CLOSURE_FLAG_DIRECTIVE}}
+{{DEFINING_MOMENT_INSTRUCTION}}
 {{CLOSING_INSTRUCTION}}
 - Return valid JSON only, per the output contract.
 
