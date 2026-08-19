@@ -382,10 +382,23 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
   // ── Call 1: session block ────────────────────────────────────────────────────
   // Inputs: sessionSummary + closingProse ONLY.
   // Must NOT receive epilogueData, playerHistoricalNote, or compositeRule.
+  // Decision-aware framing. THE GATE: a defining decision was actually recorded this
+  // session. When it was not — every role and scenario carrying no defining moment,
+  // every session where the flag is off, and every session where the fork was put but
+  // never answered — decisionMade is false and the array below is element-for-element
+  // what it was before this change, so the prompt string is byte-identical and those
+  // epilogues cannot move. The branch is taken HERE, in the engine, rather than written
+  // into the prompt as "when X is true…", precisely so that identity is a property of
+  // the code and not something the model has to honour.
+  const definingState = sessionSummary?.closure_state?.defining_moment_state || null;
+  const decisionMade  = definingState?.met === true;
+
   const sessionSystemPrompt = [
     'You are writing the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
-    'Describe what this player did in this session: which characters they encountered, key decisions made, how the session ended for them.',
+    decisionMade
+      ? 'Convey who this person was in the room — the human experience of this session, pivoting on the defining decision they made. Name who was there with them, and let the choice carry who they became under pressure.'
+      : 'Describe what this player did in this session: which characters they encountered, key decisions made, how the session ended for them.',
     '',
     'Length: 60–100 words.',
     'Voice: reported past tense or second person. Not documentary. Not historian\'s record.',
@@ -393,7 +406,14 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     'Rules:',
     '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
     '- Name characters ONLY from the CHARACTERS PRESENT THIS SESSION list. Never invent a name or substitute a name not on that list.',
-    '- If outcome is "unknown", state plainly that the session ended without resolution — do not imply, infer, or invent a conclusion.',
+    ...(decisionMade ? [
+      '- THE DECISION IS THE RESOLUTION. A defining decision was recorded this session (closure_state.defining_moment_state). The choice in decision_text is how this session resolved — it is the crystallizing moment, not a step toward one. Write who this person was in it and what it asked of them. Never say the session ended without resolution.',
+      '- THE DECISION OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Never frame the session as unresolved, incomplete, cut short, or as a shortfall for not reaching somewhere. Reaching a location was never the objective; the human experience was.',
+      '- What followed the choice is genuinely unknown, and saying so is honest — it is not failure. If you close on the aftermath, close on the not-knowing itself: the night, the fire, what nobody was left to record. Never close on "the session ended before…" or "they never reached…".',
+      '- Ground the choice in its authored language: decision_text is what they chose. Paraphrase it, never quote it verbatim. The options they did not take appear only as internal ids in available_options — never name, translate, or paraphrase those.',
+    ] : [
+      '- If outcome is "unknown", state plainly that the session ended without resolution — do not imply, infer, or invent a conclusion.',
+    ]),
     '- Never state an outcome the player did not reach. Never import the documented historical ending of the real event, even when the player portrayed a real historical figure.',
     '- Do not write in historian\'s record voice.',
     '- Do not attribute the player\'s choices or actions to real historical people as documented fact.',

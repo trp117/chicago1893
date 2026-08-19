@@ -815,6 +815,26 @@ export function evaluateDefiningMoment(state, scenario) {
     const optionIds = Array.isArray(block.options) ? block.options.map(o => o?.id) : [];
     const known     = chosenId != null && optionIds.includes(chosenId);
     const met       = !!momentId && known;
+    // The AUTHORED TEXT OF THE CHOSEN OPTION, carried alongside the ids — never instead
+    // of them. The ids remain the contract (what is recorded, matched, logged); readers
+    // of this object were left paraphrasing snake_case ('lead_out') into English and
+    // inventing the dilemma's wording in the process. Only the CHOSEN option's text is
+    // exposed: the roads not taken are not prose any reader of this object should render.
+    //
+    // block.setup is deliberately NOT exposed, and must not be added back. It is 600-odd
+    // characters of vivid second-person prose written for the turn that PUTS the choice;
+    // a downstream writer handed that alongside a 60–100 word budget echoes its specific
+    // imagery instead of composing its own. Knowing WHAT was chosen is the requirement;
+    // the pressure it was chosen under is already carried by the closing prose and the
+    // session summary those writers receive by other routes.
+    //
+    // Attached ONLY when met. Every other case — no decision recorded, an unknown
+    // option id, the flag off, no block at all — returns exactly the object it returned
+    // before, key for key, so nothing downstream of a decision-less session can move.
+    const chosenOption = known ? block.options.find(o => o?.id === chosenId) : null;
+    const authored     = met
+      ? { decision_text: typeof chosenOption?.text === 'string' ? chosenOption.text : null }
+      : {};
     return {
       met,
       reason: !momentId        ? 'moment_id_missing'
@@ -824,6 +844,7 @@ export function evaluateDefiningMoment(state, scenario) {
       transition_type:        'decision_made',
       moment:                 momentId ?? null,
       decision:               chosenId,
+      ...authored,
       available_options:      optionIds,
       defining_moment_source: state?.effectiveDefiningMomentSource ?? 'scenario',
     };
