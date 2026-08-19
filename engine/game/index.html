@@ -1459,7 +1459,18 @@ function showClosingScreen(endState, sessionId) {
   }
 
   const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 30000);
+  // The server's budget for this ONE stream is not one number, so neither is ours.
+  // Until epilogue_pending arrives the server is inside the closing-prose call alone
+  // (gameRouter.js:1388, 30s). After it, the server still has BOTH epilogue calls ahead
+  // of it — session block and record block, 30s each (gameRouter.js:438 and :501) —
+  // plus bibliography assembly, so a HEALTHY run can legitimately stay silent for
+  // another minute. A single 30s abort armed at stream start was therefore killing runs
+  // the server had already completed: it generated the epilogue, wrote it to the
+  // transcript, and the client threw it away. The deadline is EXTENDED here, never
+  // removed — a server that genuinely hangs still aborts and still recovers.
+  const PROSE_ABORT_MS    = 30000;   // closing-prose call only
+  const EPILOGUE_ABORT_MS = 75000;   // the server's remaining 60s of LLM budget + margin
+  let timeoutId    = setTimeout(() => controller.abort(), PROSE_ABORT_MS);
   let firstChunk   = true;
   let epLoadingSafetyId = null;
 
@@ -1532,9 +1543,16 @@ function showClosingScreen(endState, sessionId) {
             triggerClosingSequence(hasEpilogue, hasBibliography, hasCompositeNote);
           } else if (evt.type === 'epilogue_pending') {
             epLoadingEl?.classList.add('visible');
-            // Backstop only: primary dismiss is the `done` event above.
+            // The server has just announced it is starting the two epilogue calls. Rearm
+            // the abort against THAT budget instead of the prose budget it was armed for.
+            // This is the whole point of the epilogue_pending signal.
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => controller.abort(), EPILOGUE_ABORT_MS);
+            // Backstop only: primary dismiss is the `done` event above. Held to the same
+            // deadline as the abort so the indicator cannot vanish while we are still
+            // legitimately waiting — at the old 30s it would have gone dark mid-wait.
             clearTimeout(epLoadingSafetyId);
-            epLoadingSafetyId = setTimeout(() => epLoadingEl?.classList.remove('visible'), 30000);
+            epLoadingSafetyId = setTimeout(() => epLoadingEl?.classList.remove('visible'), EPILOGUE_ABORT_MS);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             clearTimeout(epLoadingSafetyId);
