@@ -1137,16 +1137,36 @@ function syncArrows() {
   arrowRight.classList.toggle('visible', scrollLeft + clientWidth < scrollWidth - 4);
 }
 
-function renderChoices(choices = []) {
+// definingMoment is the engine-owned fork payload ({ momentId, options:[{id,text}] })
+// attached by the server on the turn that puts the choice. When it is present the
+// buttons are built from those options so the click can carry the option ID; the id is
+// what the server records the decision under, and the text-match fallback it replaces is
+// exactly what truncated in the logs ("...drag him to the chute if you "). When it is
+// absent — every ordinary turn — the loop below is the one that was always here and the
+// submit it fires is unchanged.
+function renderChoices(choices = [], definingMoment = null) {
   if (choices.length > 0) lastChoices = choices;
   choicesEl.innerHTML = '';
-  for (const choice of choices) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.type = 'button';
-    btn.textContent = choice;
-    btn.addEventListener('click', () => submitTurn(choice, { isChoice: true }));
-    choicesEl.appendChild(btn);
+  const forkOptions = definingMoment?.options?.length ? definingMoment.options : null;
+  if (forkOptions) {
+    for (const opt of forkOptions) {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.type = 'button';
+      btn.textContent = opt.text;
+      // Text still goes as playerInput (the narrative needs it); the DECISION rides as the id.
+      btn.addEventListener('click', () => submitTurn(opt.text, { isChoice: true, definingChoiceId: opt.id }));
+      choicesEl.appendChild(btn);
+    }
+  } else {
+    for (const choice of choices) {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.type = 'button';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => submitTurn(choice, { isChoice: true }));
+      choicesEl.appendChild(btn);
+    }
   }
   choicesEl.scrollLeft = 0;
   requestAnimationFrame(syncArrows);
@@ -1230,7 +1250,7 @@ function renderOutput(output, meta = {}) {
     storyEl.scrollTop = Math.max(0, newScrollTop);
   });
 
-  renderChoices(output.choices || []);
+  renderChoices(output.choices || [], output.definingMoment || null);
   if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(sceneEl);
 
   const messageId = ++currentMessageId;
@@ -1563,7 +1583,7 @@ function teardownTurnControls() {
   }
 }
 
-async function submitTurn(playerInput, { isChoice = false } = {}) {
+async function submitTurn(playerInput, { isChoice = false, definingChoiceId = null } = {}) {
   if (!playerInput?.trim() || submitting) return;
   if (gameState?.remainingMinutes <= 0) {
     showClosingScreen(null, sessionId);
@@ -1581,7 +1601,7 @@ async function submitTurn(playerInput, { isChoice = false } = {}) {
   const respPromise = fetch(`${API_BASE}/turn`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(isChoice ? {} : { player_action: playerInput }) })
+    body: JSON.stringify({ state: gameState, playerInput, history: conversationHistory, sessionId, ...(definingChoiceId ? { definingChoiceId } : {}), ...(isChoice ? {} : { player_action: playerInput }) })
   });
 
   // Wait for fade to finish, then clear and rebuild the zone (timeout guards against missed transitionend)
