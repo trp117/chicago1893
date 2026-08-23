@@ -376,5 +376,9 @@ Write the success/partial/failure fates for ${role.name} now, as JSON only.`;
   return { ending_notes, skipped };
 }
 
-export { assertSurvivorSafety, BLOCK_TYPES };
+// resolveAnchorBinding is also the classification resolver for the defining-moment
+// generator (adminRouter.js): an anchored/real role's fork must be bounded by the same
+// documented record its endings are. Exported rather than duplicated so both generators
+// resolve "what does this role bind to" identically.
+export { assertSurvivorSafety, BLOCK_TYPES, resolveAnchorBinding };
 export default { fillMissingFields, generateEndingNotes, assertSurvivorSafety, BLOCK_TYPES };

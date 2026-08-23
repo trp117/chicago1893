@@ -7,6 +7,9 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import PipelineOrchestrator from '../services/PipelineOrchestrator.js';
 import VersionController from '../services/VersionController.js';
+// Classification resolver shared with the endings generator — see the export note in
+// ClaudeScenarioClient.js. Already in this module's import graph via PipelineOrchestrator.
+import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -154,6 +157,60 @@ function preserveStoredEndingNotes(repos, role) {
   if (probe.ending_notes) return role;          // client sent real endings — honor them
   const stored = repos.scenarios.findPlayerRole(role.id);
   if (stored && stored.ending_notes) role.ending_notes = stored.ending_notes;  // restore stored
+  return role;
+}
+
+// A defining_moment block the ENGINE could actually act on. `id` is what
+// principal_transition.moment must match to record a decision (PromptComposer.js
+// evaluateDefiningMoment), and `options` is what the fork is built from
+// (gameRouter.js:1112-1123) — a block missing either is inert, and is treated here
+// exactly as "the client sent nothing".
+function hasRealDefiningMoment(block) {
+  return !!(block
+    && typeof block.id === 'string' && block.id.trim()
+    && Array.isArray(block.options) && block.options.length > 0);
+}
+
+// EDITOR-SAVE GUARD for defining_moment — sibling of preserveStoredEndingNotes above,
+// same preserve-if-client-sends-empty shape, same hazard. defining_moment is written
+// onto the role by the generator endpoint and the dedicated PATCH route, NOT by the
+// role editor form; both editor save paths reconstruct the role as a whole object from
+// the form, so a STALE editor tab (loaded before the block was generated) posts a role
+// with no defining_moment and the whole-object savePlayerRole deletes it — with no
+// role-level version history to recover from. This is the failure mode documented in
+// engine/data/scenarios/player_roles/_defining_moment_blocks.md, currently live against
+// Trude Harms and Harald Jäger, the two roles that carry authored blocks.
+// A client that sends a REAL block (including reviewer hand-edits to setup or options)
+// is honored untouched. Deletion is therefore not possible through the editor — same
+// as ending_notes — and goes through the dedicated PATCH route instead.
+function preserveStoredDefiningMoment(repos, role) {
+  if (hasRealDefiningMoment(role.defining_moment)) return role;   // client sent a real block — honor it
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  if (stored && hasRealDefiningMoment(stored.defining_moment)) {
+    role.defining_moment = stored.defining_moment;                // restore stored
+  }
+  return role;
+}
+
+// Both editor-save guards over ONE stored read. preserveStoredEndingNotes and
+// preserveStoredDefiningMoment each look the role up for themselves; running them
+// back to back would read it twice. The shim memoizes the single real lookup and
+// hands the same object to both, so neither function has to change (and each stays
+// independently testable). Lazy on purpose: a client that sends real content for both
+// blocks returns from both guards before any lookup happens, exactly as before.
+// Both guards mutate `role` in place and return it, so the composition is order-free.
+function preserveStoredRoleBlocks(repos, role) {
+  let stored, read = false;
+  const shim = {
+    scenarios: {
+      findPlayerRole: () => {
+        if (!read) { stored = repos.scenarios.findPlayerRole(role.id); read = true; }
+        return stored;
+      },
+    },
+  };
+  preserveStoredEndingNotes(shim, role);
+  preserveStoredDefiningMoment(shim, role);
   return role;
 }
 
@@ -602,6 +659,480 @@ Write only the sentence. No preamble, no explanation, no quotation marks.`;
   if (!text) throw new Error('No text returned from Anthropic');
   // Strip any accidentally added quotes
   return text.replace(/^["']|["']$/g, '').trim();
+}
+
+// ── Defining moment ───────────────────────────────────────────────────────────
+// The authored fork the engine puts to the player partway through a session
+// (PromptComposer.js evaluateDefiningMoment / definingMomentDue; presented by
+// gameRouter.js:1112-1123). Inert unless DEFINING_MOMENT_ENABLED is on.
+
+// The shipping exemplar. Verbatim from the two files it cites — regenerate it from them
+// rather than editing it here, so the standard the model is shown can never drift from
+// the standard actually in play.
+//   entry:  when_the_walls_grew_warm.json .introduction.sections[type=entry]
+//                                         .character_entries.role_trude_harms
+//   block:  player_roles/role_trude_harms.json .defining_moment
+const DEFINING_MOMENT_EXEMPLAR = {
+  label: 'Trude Harms — resident, Hamburg coal cellar, 28 July 1943',
+  entry: `The bench slat cuts into the backs of your thighs and the brick at your shoulder is warm in a way that brick has no business being. You press your palm flat against it — a thing you have done perhaps three times in the last twenty minutes, each time hoping you were wrong, each time finding the same answer — and the wall gives back heat the way a stove gives back heat, not the cold that comes up from the earth through a meter of foundation masonry, not the cold that has always been the one reliable thing in forty raids across four years of this war. Wachter is talking. His slow deliberate voice fills the dark the way it always does, the regulation moving through the cellar like something solid, and you know the regulation, you have obeyed the regulation, and you are pressing the damp rag harder against your mouth because each breath through it is returning a little less than it should and the strip of light under the door is the color of a forge and none of this is what the regulation was written for. Lotte is two bodies to your left, sixteen years old, her shoulder against her mother's shoulder. The Mittelkanal is one hundred meters north up Wendenstrasse — you have walked it six years of working mornings, you could walk it blind, you could walk it now. You know where the water is. The question assembling itself in the warm dark, the question you cannot unknow, is whether you are willing to open your mouth.`,
+  block: {
+    id: 'trude_defining_choice',
+    setup: `Wachter has stopped talking. The regulation has nothing left to say to a cellar this hot, and he knows it, and the silence where his voice was is worse than the voice. The strip under the door is forge-colored. Lotte is watching you — not her mother, you — because somewhere in the last hour the room decided you were the one who knew the way. You do know the way. One hundred meters north, the water, you could walk it blind. Wachter is still on the bench. He will not make that walk fast, and part of you has known that since the wall first went warm. The question you have carried since the first breath through the rag is not a question anymore. It is a door, and it is open, and you have seconds.`,
+    options: [
+      { id: 'lead_out',         text: `Get everyone up the chute now — Wachter comes or he doesn't.` },
+      { id: 'hold_for_wachter', text: `You don't leave him. Hold everyone until Wachter moves.` },
+      { id: 'force_wachter',    text: `Get him on his feet yourself — drag him to the chute if you have to.` },
+    ],
+    time_advance: 0,
+    at_elapsed_fraction: 0.6,
+    principal_transition: { type: 'decision_made', moment: 'trude_defining_choice' },
+  },
+  optionRationale: `They also pull on three different axes. The first protects the many and abandons one — it acts. The second honours the obligation to one and risks the many — it holds, and honouring the standing obligation is a real position, not a failure to choose. The third refuses the trade altogether and takes the cost onto the character's own body and conscience.`,
+  // The callback ledger is what teaches the payoff. Left of the arrow: an image the
+  // ENTRY planted. Right: where the SETUP harvests it.
+  callbacks: [
+    `"Wachter is talking… you know the regulation, you have obeyed the regulation"  →  "Wachter has stopped talking. The regulation has nothing left to say to a cellar this hot"`,
+    `"the strip of light under the door is the color of a forge"  →  "The strip under the door is forge-colored"`,
+    `"Lotte is two bodies to your left… her shoulder against her mother's shoulder"  →  "Lotte is watching you — not her mother, you"`,
+    `"one hundred meters north up Wendenstrasse — you could walk it blind"  →  "One hundred meters north, the water, you could walk it blind"`,
+    `"each breath through it is returning a little less than it should"  →  "since the first breath through the rag"`,
+    `"the wall gives back heat the way a stove gives back heat"  →  "since the wall first went warm"`,
+    `"The question assembling itself… is whether you are willing to open your mouth"  →  "The question you have carried… is not a question anymore. It is a door, and it is open"`,
+  ],
+};
+
+// STEP 1B, inserted only for roles bound to the historical record (character_type 'real'
+// or fate_mode 'anchored'). Same law the endings generator works under
+// (ClaudeScenarioClient.js UNIVERSAL_LAW): what a branch may change is cost, method and
+// self — never the fixed outcome. Stated here in fork terms.
+const DEFINING_MOMENT_ANCHORED_RULES = [
+  '════════════════════════════════════════════════════════',
+  'STEP 1B — HISTORICAL FAITHFULNESS. THIS ROLE IS ANCHORED TO THE RECORD.',
+  '════════════════════════════════════════════════════════',
+  '',
+  'This role is a documented person, or is welded to a documented outcome. The record is immutable, and the fork is bounded by it. A fork that lets the player rewrite what happened is not a dramatic beat — it is a factual error the epilogue will then have to contradict.',
+  '',
+  'THE THREE OPTIONS MUST BE ALTERNATIVES THE REAL PERSON ACTUALLY FACED. Not what a modern reader wishes had been available — the courses genuinely open to them at that moment, given their authority, their position, their orders, and what they knew at the time. If you cannot name three such courses from the record and the situation, you are being asked for a fork this moment does not contain: decline.',
+  '',
+  'NO OPTION MAY CONTRADICT THE DOCUMENTED ACT. If the record says this person did a thing, no option may make that thing impossible, or assert they did the opposite. What the three options may differ on is HOW the documented act was arrived at — by what reasoning, at what cost, at whose urging, carrying what afterwards. The player chooses the road to the recorded act, and who they were on it. They never choose it away.',
+  '',
+  'INVENTED DETAIL FILLS GAPS AND NOTHING ELSE. Where the record is silent — the interior life, the unrecorded exchange, the order in which two things were reached for, what the character noticed — you may write freely. Where the record speaks, it wins. Fiction fills the blanks history left; it never overwrites the lines history wrote.',
+  '',
+  'TIMING — THE FORK FIRES BEFORE THE DOCUMENTED ACT. The moment is presented partway through the session, upstream of the thing history recorded. Write it so the player is still approaching that act, never at it and never past it. A fork placed at or after the documented act turns the recorded event into a counterfactual, which is exactly what this rule exists to prevent.',
+  '',
+  'A note on stakes: because the outcome is fixed, the stakes of this fork are not WHAT happened but WHO this person was while it happened, and what it cost them. That is the real dramatic question for a documented figure, and it is enough. Write to it.',
+  '',
+  // Measured regression: with this step in the prompt, setups ran 163-179 words against a
+  // 140 limit and lifted 14-19 consecutive words from the entry, while the same prompt
+  // without it held both. Record fidelity does not buy length.
+  'NONE OF THIS BUYS YOU WORDS. The budgets in Step 2 and Step 6 are exactly the same for an anchored role as for any other: the setup is 90 to 140 words, and no more than six consecutive words may be lifted from the entry. Fidelity to the record is a constraint on WHAT you write, never a licence to write more of it.',
+  '',
+].join('\n');
+
+function buildDefiningMomentSystemPrompt(exemplar = DEFINING_MOMENT_EXEMPLAR, anchored = false) {
+  return [
+    'You are drafting the DEFINING MOMENT block for one player role in an immersive historical fiction experience.',
+    '',
+    'WHAT THIS BLOCK IS. Partway through a session the engine stops the ordinary flow of play and puts one authored question to the player: a fork with exactly three options. It is presented once, it costs no game time, and the option the player picks is recorded as the decision that defines who this person was under pressure. The closing prose and the epilogue both reflect that decision back to them. It is the load-bearing dramatic beat of the session, and it is the only moment in the experience where the engine speaks in authored prose rather than generated prose. Draft it accordingly.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 1 — CLASSIFY BEFORE YOU DRAFT. THIS IS A GATE.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'Do not begin drafting. First decide whether this role has a defining moment at all. Apply three tests. All three must pass.',
+    '',
+    'TEST 1 — CONVERGENT PRESSURE. Does this role face ONE crisis that comes to a point at a single moment, rather than a diffuse situation with many small pressures? A session where the player is managing several unrelated problems, or where the pressure never concentrates into a single instant, has no fork to put. Fails as: diffuse pressure.',
+    '',
+    'TEST 2 — GENUINE DILEMMA. Are there multiple defensible actions with no obvious right answer? If a reasonable person in this role would do the same thing every time — if one option is plainly correct and the others are plainly worse — there is no decision here, only a delay before the inevitable. Fails as: foregone conclusion.',
+    '',
+    'TEST 3 — CHARACTER-REVEALING AGENCY. Does the PLAYER\'S choice change what the player did? The person in this role must be an actor, not an observer. A role that is present at a fixed historical event they cannot affect — a witness, a bystander, a chronicler, a passenger, someone whose function in the scenario is to see and record — has no defining decision, however dramatic their vantage point. Fails as: observer or witness role.',
+    '',
+    'WITNESS SCENARIOS MUST DECLINE. Being close to enormous events is not agency. If the honest answer is "this person watched history happen and their choices did not alter it", you must decline. Do not manufacture a fork by inventing an intervention the role has no standing to make.',
+    '',
+    'IF ANY TEST FAILS, return exactly this and nothing else:',
+    '{ "declined": true, "reason": "<one or two sentences naming the failed test — use the exact phrase diffuse pressure, foregone conclusion, or observer or witness role — and stating specifically why this role fails it>" }',
+    '',
+    'DECLINING IS A CORRECT OUTCOME, NOT A FAILURE. A refusal that names the real reason is more valuable than a manufactured fork. Many good roles have no defining moment. A drafted fork for a role that does not have one degrades the session it is injected into — it stops play to ask a question that does not matter, and the epilogue then reports a decision that revealed nothing. Prefer declining when the case is close.',
+    '',
+    anchored ? 'Only if all three tests pass, continue to Step 1B.' : 'Only if all three tests pass, continue to Step 2.',
+    '',
+    anchored ? DEFINING_MOMENT_ANCHORED_RULES : '',
+    '════════════════════════════════════════════════════════',
+    'STEP 2 — THE SETUP MUST PAY OFF THE ENTRY PARAGRAPH.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'This is the primary quality target, and it is the thing you will be judged on.',
+    '',
+    'The player read the ENTRY PARAGRAPH before play began. It planted specific images: physical details, named people, distances, objects, a rule, a pressure, a question the character had not yet asked out loud. The setup is where those plants come due.',
+    '',
+    'EVERY IMAGE IN THE SETUP SHOULD BE A CALLBACK TO SOMETHING THE ENTRY PLANTED. You are not writing a new scene. You are collecting on the one already written. Work through the entry paragraph, list its specific plants, and harvest them — changed by the intervening time, but recognisably the same objects, the same people, the same distances, the same rule.',
+    '',
+    // v3(a) — the Kein Befehl fix. A quoted/written/foreign phrase is the entry's
+    // highest-value plant and v2 walked past it.
+    'If the entry contains a quoted phrase, a written line, or words in another language, that is almost certainly its strongest plant — harvest it. A phrase the character said, wrote, or repeated is the single most recognisable thing on the page, and the setup that lets it go has left the best material in the ground. Bring it back changed: repeated once more, or answered, or gone silent, or emptied of the meaning it had.',
+    '',
+    'The transformation is what makes it a payoff rather than a repetition. The entry says the warden is talking; the setup says he has stopped. The entry says the light under the door is the color of a forge; the setup says the strip under the door is forge-colored. The entry says the character has not asked the question out loud; the setup says the question is not a question anymore. Same object, later moment, higher cost.',
+    '',
+    // PATCH 1 — forbid contiguous re-quotation. v3(b) adds the proper-noun carve-out.
+    'You may reuse the entry\'s nouns, names, distances, and objects. You may NOT reuse more than six consecutive words from the entry. If a plant is worth harvesting, compress it — the entry spent a sentence on it, the setup should spend a clause. Same object, later moment, fewer words, a new turn on it.',
+    'Proper nouns and fixed measurements (place names, named people, distances) do not count toward the six-word contiguous-lift limit, but the clause around them must be rebuilt — do not lift the surrounding sentence.',
+    '',
+    // PATCH 2 — require the counterweight.
+    'The setup MUST name the specific thing that makes the choice hard — the person who cannot keep up, the obligation that does not travel, the cost that does not go away. This is what makes the options cost something and pull in different directions. If the setup names no counterweight, every option points the same way and the fork is dead.',
+    '',
+    'Do not introduce a new named character, a new location, or a new physical object that the entry paragraph, the briefing, or the opening did not establish. If the setup needs an image, take it from what is already on the page.',
+    '',
+    // v3(c) — "roughly" deleted; the budget is hard and Step 6 restates it as a limit.
+    'Length: 5 to 9 sentences, 90 to 140 words. Close second person, present tense. Match the literary voice of the entry paragraph exactly — its sentence rhythm, its plainness or its density, its vocabulary.',
+    '',
+    'THE SETUP MUST NOT CONTAIN A QUESTION MARK. It ends on a declarative that IS the question. The three options are the question; the prose only has to bring the player to the edge of it.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 3 — THREE DEFENSIBLE POSITIONS.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'The three options are three moral stances, not three grades of correctness. Each must be a position a thoughtful person in this role could hold and act on. Each must cost something the character can name. A player should be able to argue for any of the three and be right.',
+    '',
+    'THE FAILURE MODE TO AVOID: good / neutral / bad. If one option is the brave thing, one is the cowardly thing, and one is the passive thing, you have not written a dilemma — you have written a morality test with a scoreboard, and the player will pick the brave one and learn nothing about themselves. The same failure appears as: the correct action, a hesitation, and a mistake. Or: act, wait, panic.',
+    '',
+    'Test each draft option by asking what it protects and what it sacrifices. If an option sacrifices nothing, it is the right answer and the fork is dead. If an option protects nothing, nobody will pick it and the fork is really a two-way choice.',
+    '',
+    'The three should pull in genuinely different directions — typically along the lines of who is owed the character\'s loyalty, what the character is willing to impose on others, and what they are willing to risk of themselves. Do not label them. Do not signal which is which.',
+    '',
+    // PATCH 3 — axis diversity (not a mandated option type).
+    'The three options must pull on genuinely different AXES — not three variants of the same action (three ways to leave, three ways to fight). Consider whether the situation supports a defensible position of NOT acting — holding, waiting, honoring an existing obligation or the standing rule. When the scenario supports it, one of the three should be that hold/stay position, not only variations of how to act. Do NOT force a rule-honoring option where the dilemma isn\'t about a rule — the point is different axes, and inaction is often one of them.',
+    anchored ? 'For this anchored role, apply Step 1B here as well: each of the three must be a course the real person could actually have taken, and none may contradict the documented act.' : '',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 4 — TWO REGISTERS. THE OPTIONS ARE NOT PART OF THE PROSE.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'The setup and the option text are read by different readers at different times, and they are written differently.',
+    '',
+    'SETUP is turn-prose. The player reads it in the moment, at the fork, with everything that has happened in the session still live. It can be vivid, dense, and specific because its reader has all the context.',
+    '',
+    'OPTION TEXT is what the EPILOGUE reflects back. Only the chosen option travels forward — the setup is NOT passed to the epilogue writer, deliberately. This means each option must stand on its own words and carry its own meaning to a reader who cannot see the setup. Read each option cold, with no surrounding prose, and ask: does this state a distinct stance about what this person chose to do and who they chose to be? If it reads as a menu item, a stage direction, or a fragment that only makes sense next to the setup, rewrite it.',
+    '',
+    // v3(c) — "Roughly" deleted here too.
+    'Options are one sentence, first-or-second-person imperative in the character\'s own register — the way the decision would sound inside their head, not the way a game would label it. 8 to 18 words. They must be mutually exclusive: no two can be satisfied by the same action.',
+    '',
+    'WRONG (menu items — meaningless without the setup):',
+    '  "Leave now."  /  "Wait."  /  "Try to convince him."',
+    'WRONG (labelled morality — good/neutral/bad):',
+    '  "Bravely lead everyone to safety."  /  "Do nothing and hope."  /  "Panic and run alone."',
+    'RIGHT (distinct stances that survive being read cold):',
+    '  See the exemplar below.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 5 — MOTIVATE THE CLOSURE. DO NOT DUPLICATE IT.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'You are given the scenario\'s existing CLOSURE — the condition that ends the session. The defining moment fires before it, at sixty percent of the session, and its job is to be the decision that SENDS the character toward that ending, whichever way they answer.',
+    '',
+    'The fork is never the closure restated as a choice. If the closure is reaching a location, the fork is the decision that commits them to going — or to not going, or to going differently, or to who they take with them — and the location is reached later, by play. If the closure is a flag being set, the fork is the decision that makes setting it possible or costly, not the flag itself.',
+    '',
+    'WRONG, for a closure of "reach the canal": an option that reads "Reach the canal." That is the ending wearing the costume of a choice.',
+    'RIGHT, for the same closure: options that differ on WHO goes, WHEN, and AT WHAT COST — every one of which still leaves the walk to the canal to be played out.',
+    '',
+    'At least two of the three options must leave the closure reachable. A fork where two branches make the ending impossible is not a dilemma, it is a trap.',
+    '',
+    'If no closure is declared for this scenario, the fork still has to point somewhere: write it as the decision that commits the character to how the remaining time is spent, and do not invent an ending condition of your own.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 6 — OUTPUT SCHEMA. EXACT.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'Return only a JSON object in exactly this shape, with no other text, no markdown fence, and no explanation:',
+    '{',
+    '  "id": "snake_case_id",',
+    '  "setup": "The authored second-person prose the player reads at the fork.",',
+    '  "options": [',
+    '    { "id": "snake_case_id", "text": "One sentence in the character\'s register." },',
+    '    { "id": "snake_case_id", "text": "One sentence in the character\'s register." },',
+    '    { "id": "snake_case_id", "text": "One sentence in the character\'s register." }',
+    '  ],',
+    '  "time_advance": 0,',
+    '  "at_elapsed_fraction": 0.6,',
+    '  "principal_transition": { "type": "decision_made", "moment": "<the same string as the top-level id>" }',
+    '}',
+    '',
+    'HARD CONSTRAINTS — the engine reads these literally and a violation makes the block inert or unrecordable:',
+    '- "principal_transition.type" MUST be the exact string "decision_made". No other value is supported.',
+    '- "principal_transition.moment" MUST equal the top-level "id" character for character. It is the key the player\'s answer is recorded under; if it does not match, the decision is never found.',
+    '- "options" MUST contain EXACTLY three entries.',
+    '- Every option "id" MUST be stable snake_case: lowercase ASCII letters, digits and underscores only. The ids are a permanent contract — they are recorded in save data and matched later. They must be descriptive of the stance, never positional (no "option_1", "a", "first").',
+    '- All four option-related ids MUST be unique within the block.',
+    '- "time_advance" MUST be the number 0. The fork costs no game time. Emit it literally.',
+    '- "at_elapsed_fraction" MUST be the number 0.6. This is fixed by the system, not chosen by you. Emit it literally.',
+    '- The top-level "id" should be derived from the character: "<name_or_role>_defining_choice".',
+    // PATCH 4 — budgets as hard constraints, beside the schema rules.
+    '- "setup": 90 to 140 words. These are limits, not suggestions. Count them.',
+    '- Each option "text": 8 to 18 words. These are limits, not suggestions. Count them.',
+    '',
+    'Return either the block above or the decline object from Step 1. Never both. Never any prose outside the JSON.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'WORKED EXEMPLAR — THE STANDARD TO MATCH',
+    '════════════════════════════════════════════════════════',
+    '',
+    `This role passed all three tests in Step 1. Setting: ${exemplar.label}.`,
+    '',
+    'ITS ENTRY PARAGRAPH (what the player had already read):',
+    exemplar.entry,
+    '',
+    'THE DEFINING MOMENT BLOCK THAT WAS WRITTEN FOR IT:',
+    JSON.stringify(exemplar.block, null, 2),
+    '',
+    'WHY THAT SETUP IS CORRECT — the callback ledger. Left of the arrow is an image the entry planted; right of the arrow is where the setup collects it. Note that almost nothing in the setup is new:',
+    ...exemplar.callbacks.map(c => `  ${c}`),
+    '',
+    'Note also what the setup does NOT do: it introduces no new person, no new place, no new object; it contains no question mark; it ends on a declarative that leaves the player at the edge of the three options.',
+    '',
+    `WHY THOSE THREE OPTIONS ARE CORRECT: each is defensible and each costs something. ${exemplar.optionRationale} None is the brave one. None is the wrong one. Read cold, without the setup, each still states a stance.`,
+    '',
+    'Build the requested block to that standard, out of the material you are given below.',
+    '',
+    // The two budgets and the lift ceiling are stated in Steps 2/4/6, but the exemplar
+    // and (on the anchored path) Step 1B sit between them and the output. Restating them
+    // last is what makes them hold: without this the anchored path ran 163-179 words
+    // against a 140 limit and lifted 14-19 consecutive words from the entry.
+    '════════════════════════════════════════════════════════',
+    'BEFORE YOU RETURN — CHECK YOUR DRAFT AGAINST THESE FOUR.',
+    '════════════════════════════════════════════════════════',
+    '',
+    '1. COUNT THE SETUP. 90 to 140 words. If it is over, cut — do not rebalance, cut. What you are most reluctant to lose is usually the second image of a pair; drop one of the two.',
+    '2. CHECK EVERY LIFT. Lay the setup beside the entry paragraph and find any run of more than six consecutive words that appears in both. Proper nouns and fixed measurements do not count toward the run; every other word does. Rewrite each run that exceeds it — keep the object, rebuild the clause around it.',
+    '3. COUNT EACH OPTION. 8 to 18 words, every one of the three.',
+    '4. PLAIN PROSE ONLY. The setup is rendered to the player as plain text. No markdown, no asterisks, no italics, no underscores — a foreign or quoted phrase is written as the character would say or read it, with no formatting around it.',
+    '',
+    'A block that violates any of the four is sent back by the reviewer and regenerated. Spend the moment here.',
+  ].filter(Boolean).join('\n');
+}
+
+// The documented record this role is bound to, resolved by the same function the endings
+// generator uses (resolveAnchorBinding). Returns '' for open-outcome roles.
+function buildAnchorRecordBlock(binding) {
+  if (!binding) return '';
+  if (binding.kind === 'documented') {
+    const f   = binding.fate;
+    const src = typeof f.primary_source === 'string' ? f.primary_source : f.primary_source?.citation;
+    return [
+      'THE DOCUMENTED RECORD FOR THIS PERSON — immutable. No option may contradict it:',
+      `  name: ${f.name || binding.fate.character_id}`,
+      `  in-event outcome: ${f.outcome || 'unknown'}`,
+      f.historical_record ? `  record: ${f.historical_record}` : '',
+      src ? `  source: ${src}` : '',
+    ].filter(Boolean).join('\n');
+  }
+  if (binding.kind === 'documented_unlinked') {
+    return `THE DOCUMENTED RECORD FOR THIS PERSON: this role is linked to character "${binding.character_id}", but the scenario carries no documented fate entry for them. Treat the record as real but unstated: do not invent documented acts, and keep every option inside what the situation plainly permitted.`;
+  }
+  if (binding.kind === 'welded') {
+    const facts = (binding.macro.key_facts || []).map(k => `  - ${k.text || k}`).join('\n');
+    return [
+      'THIS ROLE IS WELDED TO A FIXED HISTORICAL OUTCOME — immutable. No option may change what happened:',
+      binding.macro.summary ? `  ${binding.macro.summary}` : '',
+      facts,
+    ].filter(Boolean).join('\n');
+  }
+  return 'THIS ROLE IS ANCHORED, but the scenario carries no documented fate or macro-outcome to bind to. Stay strictly inside what the situation permitted and invent no documented acts.';
+}
+
+function buildDefiningMomentUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null }) {
+  const section = t => (scenario.introduction?.sections || []).find(s => s.type === t)?.text || '';
+  // Per-role closure beats the scenario default — same precedence the engine resolves at
+  // session start (StateManager.js effectiveClosure).
+  const closureBlock  = role.closure ?? scenario.closure ?? null;
+  const closure       = closureBlock?.principal_transition;
+  const briefingText  = getBriefingText(role.briefing);
+  const anchorRecord  = buildAnchorRecordBlock(anchorBinding);
+
+  const closureText = closure
+    ? [
+        'EXISTING SESSION CLOSURE (the fork must precede and motivate this — never restate it):',
+        `  type: ${closure.type}`,
+        closure.locations?.length     ? `  locations: ${closure.locations.join(', ')}` : '',
+        closure.flag                  ? `  flag: ${closure.flag}` : '',
+        closure.source_condition      ? `  derived from: ${closure.source_condition}` : '',
+        `  declared on: ${role.closure ? 'this role' : 'the scenario'}`,
+      ].filter(Boolean).join('\n')
+    : 'EXISTING SESSION CLOSURE: none declared for this scenario. Apply the no-closure clause in Step 5.';
+
+  return [
+    `SCENARIO: ${scenario.title || scenario.id || 'untitled'}`,
+    scenario.premise ? `PREMISE:\n${scenario.premise}` : '',
+    section('world')  ? `WORLD:\n${section('world')}`   : '',
+    section('stakes') ? `STAKES:\n${section('stakes')}` : '',
+    section('scene')  ? `SCENE:\n${section('scene')}`   : '',
+    Array.isArray(scenario.winConditions) && scenario.winConditions.length
+      ? `WIN CONDITIONS:\n${scenario.winConditions.map(w => `- ${w}`).join('\n')}` : '',
+    Array.isArray(scenario.failConditions) && scenario.failConditions.length
+      ? `FAIL CONDITIONS:\n${scenario.failConditions.map(f => `- ${f}`).join('\n')}` : '',
+    `SESSION TARGET: ${scenario.sessionTargetMinutes || 15} minutes (the fork is presented at 0.6 of this).`,
+    closureText,
+    '',
+    `ROLE: ${role.name || role.id}`,
+    role.character_type ? `CHARACTER TYPE: ${role.character_type}` : '',
+    role.fate_mode      ? `FATE MODE: ${role.fate_mode}` : '',
+    role.represents     ? `REPRESENTS: ${role.represents}` : '',
+    anchorRecord,
+    role.description ? `ROLE DESCRIPTION:\n${role.description}` : '',
+    role.perspective ? `PERSPECTIVE INSTRUCTIONS (the voice this character is written in):\n${role.perspective}` : '',
+    briefingText ? `BRIEFING (read to the player before play):\n${briefingText}` : '',
+    role.context_sentence ? `CONTEXT SENTENCE: ${role.context_sentence}` : '',
+    Array.isArray(role.startingKnowledge) && role.startingKnowledge.length
+      ? `WHAT THIS CHARACTER ALREADY KNOWS:\n${role.startingKnowledge.map(k => `- ${k}`).join('\n')}` : '',
+    Array.isArray(role.character_hooks) && role.character_hooks.filter(Boolean).length
+      ? `CHARACTER HOOKS (session-varying personal detail):\n${role.character_hooks.filter(Boolean).map(h => `- ${h}`).join('\n')}` : '',
+    role.suggested_secret ? `SUGGESTED SECRET (something nobody in the story knows):\n${role.suggested_secret}` : '',
+    '',
+    entryParagraph
+      ? `ENTRY PARAGRAPH — THE PROSE THE PLAYER READ BEFORE PLAY BEGAN. THIS IS THE MATERIAL THE SETUP MUST HARVEST:\n${entryParagraph}`
+      : 'ENTRY PARAGRAPH: none authored for this role. Harvest the briefing and the opening narrative instead — treat them as the plant material, and never remark on the absence.',
+    '',
+    role.opening?.narrative ? `OPENING NARRATIVE (the first thing rendered in play):\n${role.opening.narrative}` : '',
+    Array.isArray(role.opening?.choices) && role.opening.choices.length
+      ? `OPENING CHOICES OFFERED:\n${role.opening.choices.map(c => `- ${c}`).join('\n')}` : '',
+    '',
+    characters.length
+      ? `CHARACTERS PRESENT IN THIS SCENARIO (the people who embody the dilemma — the fork should turn on someone here, and you may not invent anyone else):\n${characters.map(c => [
+          `- ${c.id}: ${c.name}${c.role ? ` (${c.role})` : ''}`,
+          c.publicFace ? `  ${c.publicFace}` : '',
+        ].filter(Boolean).join('\n')).join('\n')}`
+      : '',
+    '',
+    'Now perform Step 1 for this role. If it passes all three tests, draft the block. Return JSON only.',
+  ].filter(Boolean).join('\n\n');
+}
+
+// Structural validation of a generated block, run before anything is written. These are
+// the constraints the ENGINE reads literally — a block that violates one is inert or
+// unrecordable at play time (PromptComposer.js evaluateDefiningMoment / definingMomentDue,
+// gameRouter.js:1112-1123), so it is rejected here rather than persisted for a reviewer to
+// discover. Prose quality (setup length, contiguous lifts) is NOT checked here: those are
+// reviewer judgements, surfaced in the review gate, not grounds for refusing the draft.
+// Returns a list of human-readable errors; empty means valid.
+const SNAKE_CASE = /^[a-z0-9_]+$/;
+function validateDefiningMomentBlock(block) {
+  const errors = [];
+  if (!block || typeof block !== 'object') return ['Response was not a JSON object.'];
+  if (typeof block.id !== 'string' || !SNAKE_CASE.test(block.id)) {
+    errors.push(`"id" must be snake_case (got ${JSON.stringify(block.id)}).`);
+  }
+  if (typeof block.setup !== 'string' || !block.setup.trim()) errors.push('"setup" is empty.');
+  if (!Array.isArray(block.options) || block.options.length !== 3) {
+    errors.push(`"options" must contain exactly 3 entries (got ${Array.isArray(block.options) ? block.options.length : 'none'}).`);
+  } else {
+    block.options.forEach((o, i) => {
+      if (!o || typeof o.id !== 'string' || !SNAKE_CASE.test(o.id)) {
+        errors.push(`option ${i + 1}: "id" must be snake_case (got ${JSON.stringify(o?.id)}).`);
+      }
+      if (!o || typeof o.text !== 'string' || !o.text.trim()) errors.push(`option ${i + 1}: "text" is empty.`);
+    });
+    const ids = block.options.map(o => o?.id);
+    if (new Set(ids).size !== ids.length) errors.push('option ids must be unique.');
+  }
+  const pt = block.principal_transition;
+  if (!pt || pt.type !== 'decision_made') {
+    errors.push(`"principal_transition.type" must be "decision_made" (got ${JSON.stringify(pt?.type)}).`);
+  }
+  if (!pt || pt.moment !== block.id) {
+    errors.push(`"principal_transition.moment" must equal "id" (${JSON.stringify(pt?.moment)} vs ${JSON.stringify(block.id)}) — the decision is recorded under this key and would never be found.`);
+  }
+  if (block.at_elapsed_fraction != null && typeof block.at_elapsed_fraction !== 'number') {
+    errors.push(`"at_elapsed_fraction" must be a number (got ${JSON.stringify(block.at_elapsed_fraction)}).`);
+  }
+  return errors;
+}
+
+// CLASSIFICATION — which framing this role's fork is generated under. Pure, no I/O, no
+// model call: the routing is decided by the role's own stored fields and nothing else,
+// so the historical-faithfulness rules cannot fire (or fail to fire) on the model's
+// reading of the prose. Exported and returned in full by the endpoint so the reviewer
+// sees the value the generator actually routed on.
+//
+// SIGNAL. 'real' is the declared character_type; 'anchored' is the declared fate_mode.
+// Either one alone is enough. character_type never holds 'composite' on a player role —
+// the editor's Character Type select (index.html) collapses composite into fictional —
+// so composite roles arrive here as 'fictional' and route open, which is correct: a
+// composite has no documented individual record to be faithful to.
+//
+// FALLBACK. Of 71 stored roles, 6 declare no character_type and 33 no fate_mode. Both
+// absences are falsy here, so those roles route OPEN — the safe direction: an open-outcome
+// fork on a genuinely anchored role is a quality problem a reviewer catches, whereas
+// anchored framing on a role with no record to bind to would invent a record.
+export function classifyRoleForDefiningMoment(scenario, role) {
+  const isReal     = role?.character_type === 'real';
+  const isAnchored = role?.fate_mode === 'anchored';
+  const anchored   = isReal || isAnchored;
+  const signal     = isReal && isAnchored ? 'character_type:real + fate_mode:anchored'
+                   : isReal               ? 'character_type:real'
+                   : isAnchored           ? 'fate_mode:anchored'
+                   :                        'none — open outcome (default)';
+  return {
+    anchored,
+    signal,
+    framing:        anchored ? 'fixed-outcome / anchored' : 'open-outcome',
+    character_type: role?.character_type ?? null,
+    fate_mode:      role?.fate_mode ?? null,
+    // resolveAnchorBinding is the endings generator's resolver, reused so both generators
+    // answer "what does this role bind to" identically. Only meaningful when anchored.
+    binding:        anchored ? resolveAnchorBinding(scenario, role) : null,
+  };
+}
+
+// Calls the Anthropic API to draft the defining-moment block for a single role.
+// Returns EITHER the parsed block OR { declined: true, reason } — a decline is a correct
+// outcome, not an error, and is passed through untouched. Shape validation of a returned
+// block is the caller's job (the endpoint), so the reviewer sees the real failure reason.
+async function generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey) {
+  // Data-driven routing. `anchored` selects the system prompt's Step 1B (historical
+  // faithfulness); `binding` supplies the documented record to the user prompt. Both come
+  // from the role's stored fields via the classifier above — the prompt is never asked to
+  // work out from the prose whether this is a real person.
+  const classification = classifyRoleForDefiningMoment(scenario, role);
+  const { anchored, binding: anchorBinding } = classification;
+
+  // The player is not an NPC in their own fork.
+  const present = (characters || []).filter(c => c.id !== role.character_id);
+
+  const system = buildDefiningMomentSystemPrompt(DEFINING_MOMENT_EXEMPLAR, anchored);
+  const user   = buildDefiningMomentUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding });
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: MODEL, max_tokens: 2000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
+    { timeout: 90_000, maxRetries: 0 }
+  );
+  console.log(`[DEFINING-MOMENT] ${role.id} framing=${classification.framing} signal=${classification.signal}${anchorBinding ? ` binding=${anchorBinding.kind}` : ''} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
+  if (msg.stop_reason === 'max_tokens') {
+    throw new Error('Defining-moment generation truncated at max_tokens — the block would be incomplete.');
+  }
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  // Fence-strip first (the common case), then fall back to extractJson, which finds a
+  // fenced block ANYWHERE in the response and then a bare {...} span. The fallback is
+  // load-bearing for DECLINES specifically: the model reliably returns the block clean,
+  // but on a decline it tends to reason aloud first and then fence the JSON — a strict
+  // start-anchored strip turns that correct outcome into a thrown error. Salvaging a
+  // truncated object is not a risk here because stop_reason === 'max_tokens' is already
+  // rejected above.
+  const cleaned = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+  let parsed;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch {
+    try {
+      parsed = extractJson(text);
+    } catch (parseErr) {
+      console.error(`[DEFINING-MOMENT] JSON parse failed — response was ${text.length} chars, last 200: ...${text.slice(-200)}`);
+      throw new Error(`Defining-moment JSON parse failed: ${parseErr.message}`);
+    }
+  }
+  if (parsed?.declined === true) {
+    console.log(`[DEFINING-MOMENT] ${role.id} DECLINED — ${parsed.reason}`);
+    return { declined: true, reason: String(parsed.reason || '').trim() || 'No reason given.' };
+  }
+  return parsed;
 }
 
 async function generatePeriodVocabulary(scenario, characters, anthropicApiKey) {
@@ -1148,6 +1679,90 @@ export function createAdminRouter(repos, config = {}) {
     }
   });
 
+  // Generate the defining-moment block for a single player role.
+  // Role-scoped like generate-bridge-sentence above: the scenario and the role are loaded
+  // SERVER-SIDE from :id/:roleId and no role object is ever accepted from the client — the
+  // write is a read-modify-write of the stored role, so a stale editor tab cannot ride
+  // along and clobber the other fields.
+  //
+  // Returns EITHER the stamped block OR { declined, reason }. A decline is a 200: the
+  // generator judging that this role has no defining moment is a correct outcome, and the
+  // UI renders it as such. Nothing is written to the role on a decline.
+  r.post('/scenarios/:id/roles/:roleId/generate-defining-moment', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const roles = repos.scenarios.findPlayerRoles(req.params.id);
+    const role  = roles.find(r => r.id === req.params.roleId);
+    if (!role) return notFound(res);
+
+    // OVERWRITE GUARD. Some blocks are hand-authored answer keys with no role-level version
+    // history behind them (see _defining_moment_blocks.md). Regenerating replaces the block
+    // outright and resets reviewed to false, so an existing REAL block is refused at the API
+    // unless the caller says so explicitly. The client confirm() is a UI courtesy; this is
+    // the actual protection, and it also covers curl and a double-clicked button.
+    if (hasRealDefiningMoment(role.defining_moment) && req.body?.overwrite !== true) {
+      return res.status(409).json({
+        error: `"${role.name}" already has a defining_moment ("${role.defining_moment.id}"${role.defining_moment.reviewed ? ', reviewed' : ''}). Regenerating replaces it and resets review state. Send { "overwrite": true } to proceed.`,
+        existing: { id: role.defining_moment.id, reviewed: role.defining_moment.reviewed === true },
+      });
+    }
+
+    // Entry paragraph — the material the setup must harvest. Same accessor the repair route
+    // and validateStoredScenario use.
+    const entrySection  = scenario.introduction?.sections?.find(s => s.type === 'entry');
+    const entryParagraph = entrySection?.character_entries?.[role.id] || '';
+    // Characters present. The helper drops the player's own character; scenario membership
+    // is the same filter /scenarios/:id/full uses.
+    const characters = repos.characters.findAll()
+      .filter(c => c.scenarioIds?.includes(scenario.id))
+      .map(c => ({ id: c.id, name: c.name, role: c.role || c.publicFace || '', publicFace: c.publicFace || '' }));
+
+    const classification = classifyRoleForDefiningMoment(scenario, role);
+
+    try {
+      // Timeout (90s) and maxRetries:0 are set on the messages.create call inside the
+      // helper, which also logs stop_reason/output_tokens, rejects a max_tokens truncation
+      // before parsing, fence-strips, and passes a decline back untouched.
+      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey);
+
+      if (result?.declined === true) {
+        // First-class outcome. No write, no error status.
+        console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — declined, role left unchanged`);
+        return res.json({ roleId: role.id, declined: true, reason: result.reason, classification });
+      }
+
+      const errors = validateDefiningMomentBlock(result);
+      if (errors.length) {
+        console.error(`[DEFINING-MOMENT] ${role.id} invalid block — ${errors.join(' ')}`);
+        return res.status(500).json({
+          error: `The generated block is structurally invalid and was not saved: ${errors.join(' ')}`,
+          errors,
+        });
+      }
+
+      // Engine-owned fields are stamped, not trusted from the model: time_advance is what
+      // gameRouter reads to make the fork cost no clock, and at_elapsed_fraction is fixed
+      // by the system. Stamps go LAST so a model that emitted generated/reviewed of its own
+      // cannot pre-mark its own draft as reviewed.
+      const defining_moment = {
+        ...result,
+        time_advance:        0,
+        at_elapsed_fraction: typeof result.at_elapsed_fraction === 'number' ? result.at_elapsed_fraction : 0.6,
+        generated: true,
+        reviewed:  false,
+      };
+
+      // Additive write: spread the SERVER-loaded role, add one key.
+      const saved = repos.scenarios.savePlayerRole({ ...role, defining_moment });
+      console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — block "${defining_moment.id}" written (${defining_moment.options.length} options, framing=${classification.framing})`);
+      res.json({ roleId: role.id, defining_moment: saved.defining_moment, classification });
+    } catch (err) {
+      console.error(`[DEFINING-MOMENT ERROR] ${role.name}: ${err.message}`);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   r.get('/locations',      (req, res) => res.json(
     req.query.scenarioId ? repos.locations.findByScenario(req.query.scenarioId) : repos.locations.findAll()
   ));
@@ -1234,8 +1849,9 @@ export function createAdminRouter(repos, config = {}) {
   r.put('/player-roles/:id', (req, res) => {
     if (!repos.scenarios.findPlayerRole(req.params.id)) return notFound(res);
     // Same editor-save guard as /generate/save: a whole-object PUT that omits ending_notes
-    // would clobber approved endings. Preserve stored endings when the client sends none.
-    res.json(repos.scenarios.savePlayerRole(preserveStoredEndingNotes(repos, { ...req.body, id: req.params.id })));
+    // or defining_moment would clobber approved endings / an authored fork. Preserve the
+    // stored blocks when the client sends none.
+    res.json(repos.scenarios.savePlayerRole(preserveStoredRoleBlocks(repos, { ...req.body, id: req.params.id })));
   });
   r.patch('/player-roles/:id/ending-notes', (req, res) => {
     const role = repos.scenarios.findPlayerRole(req.params.id);
@@ -1852,9 +2468,10 @@ Return ONLY valid JSON in this exact structure:
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
-      // preserveStoredEndingNotes FIRST: a stale editor tab posts empty endings; without
-      // this, stripEmptyEndingNotes + whole-object save would erase approved endings.
-      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredEndingNotes(repos, r)))));
+      // preserveStoredRoleBlocks FIRST: a stale editor tab posts empty endings and no
+      // defining_moment; without this, stripEmptyEndingNotes + whole-object save would
+      // erase approved endings, and the whole-object save would erase the authored fork.
+      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredRoleBlocks(repos, r)))));
       res.json({ ok: true, scenarioId: scenario.id });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -2813,3 +3430,16 @@ Return only the scene description. No preamble, no closing remarks.`,
 
 // Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
 export { stripEmptyEndingNotes, preserveStoredEndingNotes };
+// Same, for the defining_moment guard and the two-guard composer the save paths call.
+export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks };
+// Defining-moment generator + its prompt builders. The builders are exported so a
+// validation run can swap in a HELD-OUT exemplar (the shipping exemplar is Trude, so
+// validating against Trude requires substituting a different one).
+export {
+  generateDefiningMoment,
+  buildDefiningMomentSystemPrompt,
+  buildDefiningMomentUserPrompt,
+  buildAnchorRecordBlock,
+  validateDefiningMomentBlock,
+  DEFINING_MOMENT_EXEMPLAR,
+};

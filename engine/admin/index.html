@@ -1902,6 +1902,379 @@ function renderCluesSection(data) {
   return edSection('Clues & Evidence', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// DEFINING MOMENT (per player role)
+// ═══════════════════════════════════════════════════════════════
+// FOUR states, not three. The generated/reviewed pair from technical-facts does not
+// describe a block that was written BY HAND — Trude's and Jäger's have no `generated`
+// flag and never will, and rendering those as "Not Generated" would invite a reviewer to
+// regenerate over an authored answer key that has no role-level version history behind it.
+//   none      — no block, or a block too incomplete for the engine to act on
+//   authored  — a block exists with no generated:true → hand-written, TRUSTED
+//   pending   — generated:true, reviewed:false → needs review (amber, auto-open)
+//   reviewed  — generated:true, reviewed:true
+function definingMomentState(dm) {
+  if (!dm || typeof dm.id !== 'string' || !dm.id.trim() || !Array.isArray(dm.options) || !dm.options.length) return 'none';
+  if (dm.generated !== true) return 'authored';
+  return dm.reviewed === true ? 'reviewed' : 'pending';
+}
+
+// Same signal the server routes on (classifyRoleForDefiningMoment in adminRouter.js).
+// Duplicated here rather than fetched because the gate has to evaluate it against the
+// LIVE form — a reviewer who has just switched Character Type to "real" must get the
+// timing-rule requirement without saving and reloading first.
+function roleIsAnchored(r, i, formEl) {
+  const live = f => formEl?.querySelector(`[data-path="playerRoles.${i}.${f}"]`)?.value;
+  const ct = (formEl ? live('character_type') : undefined) ?? r.character_type;
+  const fm = (formEl ? live('fate_mode')      : undefined) ?? r.fate_mode;
+  return ct === 'real' || fm === 'anchored';
+}
+
+// Declines are EPHEMERAL by decision: nothing is written to the role, so they live here
+// for the session only. Keyed by role id and deliberately NOT hung off the role object —
+// anything on data.playerRoles[i] is posted to /generate/save and would land in the file.
+const _dmDeclines = new Map();
+
+const dmWords = s => String(s || '').trim().split(/\s+/).filter(Boolean).length;
+
+// Longest contiguous word run shared by the entry paragraph and the setup. The prompt caps
+// this at six (proper nouns and measurements excepted); the generator honours it about half
+// the time, so the number is surfaced rather than enforced — the reviewer decides.
+function dmLongestLift(entry, setup) {
+  const t = s => String(s || '').toLowerCase().replace(/[^a-z0-9äöüßé\s]/gi, ' ').split(/\s+/).filter(Boolean);
+  const A = t(entry), B = t(setup);
+  let best = { n: 0, text: '' };
+  for (let i = 0; i < A.length; i++) for (let j = 0; j < B.length; j++) {
+    let n = 0;
+    while (i + n < A.length && j + n < B.length && A[i + n] === B[j + n]) n++;
+    if (n > best.n) best = { n, text: A.slice(i, i + n).join(' ') };
+  }
+  return best;
+}
+
+function renderDefiningMomentOptionRow(i, j, o) {
+  return `<div class="dm-option-row" style="border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:6px">
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:8px">
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Option ${j + 1} id <span style="opacity:.7">(snake_case)</span></div>
+        <input type="text" class="dm-option-id" data-path="playerRoles.${i}.defining_moment.options.${j}.id" value="${esc(o?.id || '')}" placeholder="stance_in_snake_case" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:monospace">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Text <span style="opacity:.7">(8–18 words; read cold by the epilogue)</span> — <span class="dm-opt-count">${dmWords(o?.text)}w</span></div>
+        <textarea class="dm-option-text" data-path="playerRoles.${i}.defining_moment.options.${j}.text" rows="2" placeholder="One sentence in the character's own register." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(o?.text || '')}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDefiningMomentSection(r, i, data) {
+  const dm      = r.defining_moment;
+  const state   = definingMomentState(dm);
+  const anchored = roleIsAnchored(r);
+  const decline = _dmDeclines.get(r.id);
+  const entry   = data?.scenario?.introduction?.sections?.find(s => s.type === 'entry')?.character_entries?.[r.id] || '';
+
+  const BADGE = {
+    none:     ['Not Generated', '#f1f5f9', 'var(--text-soft)'],
+    authored: ['✍ Hand-authored', '#eff6ff', '#1d4ed8'],
+    pending:  ['Pending Review', '#fef3c7', '#92400e'],
+    reviewed: ['Reviewed',       '#f0fdf4', '#166534'],
+  }[state];
+  const badge = `<span class="dm-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${BADGE[1]};color:${BADGE[2]}">${BADGE[0]}</span>`;
+
+  // Generate button copy escalates with what is at risk.
+  const genLabel = state === 'none'     ? '✦ Generate Defining Moment'
+                 : state === 'authored' ? '↻ Regenerate — REPLACES hand-authored block'
+                 :                        '↻ Regenerate Defining Moment';
+  const genClass = state === 'authored' ? 'btn-danger' : 'btn-primary';
+
+  const declineHtml = decline ? `
+    <div class="dm-decline-panel" style="margin:12px 0;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-left:4px solid #94a3b8;border-radius:6px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">No defining moment for this role</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.5;margin-bottom:10px">${esc(decline.reason)}</div>
+      <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px">Declining is a correct outcome — many roles have no fork. Nothing was written to this role. This note is not stored; it clears on reload.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-secondary btn-sm dm-accept-decline-btn" data-role-id="${r.id}" data-role-index="${i}">Accept — no fork for this role</button>
+        <button type="button" class="btn btn-secondary btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}">Try again</button>
+      </div>
+    </div>` : '';
+
+  let body = '';
+  if (state === 'none') {
+    body = declineHtml || `<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px">
+      No defining moment for this role. Generate one, or leave it — a role without a fork plays normally.
+    </div>`;
+  } else {
+    const moment    = dm.principal_transition?.moment ?? dm.id;
+    const setupW    = dmWords(dm.setup);
+    const lift      = entry ? dmLongestLift(entry, dm.setup) : null;
+    const optCounts = (dm.options || []).map(o => dmWords(o.text));
+    const flag = (ok, txt) => `<span style="color:${ok ? 'var(--text-soft)' : '#b45309'};font-weight:${ok ? '400' : '700'}">${txt}</span>`;
+
+    // Hidden state fields. Rendered ONLY for keys the stored block actually has: a
+    // hand-authored block carries neither generated nor reviewed, and adding them here
+    // would rewrite Trude's and Jäger's files on the next save just by opening the editor.
+    const hiddenBool = (key) => dm[key] === undefined ? ''
+      : `<input type="hidden" class="dm-${key}-input" data-path="playerRoles.${i}.defining_moment.${key}" value="${dm[key] === true}">`;
+
+    body = `
+      ${declineHtml}
+      <div style="margin:0 0 14px;padding:10px 12px;background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-soft)">
+        Presented once, partway through the session, at <code>at_elapsed_fraction</code> of the session length. Costs no game time. The chosen option is recorded and reflected back by the closing prose and the epilogue.
+        <strong style="color:var(--text)">This block is inert unless <code>DEFINING_MOMENT_ENABLED=true</code> on the server.</strong>
+      </div>
+
+      ${state === 'authored' ? `<div style="margin:0 0 14px;padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;font-size:12px;color:#1e40af">
+        <strong>Hand-authored block — treated as reviewed.</strong> Written directly onto the role, not by the generator, and there is no role-level version history to recover it from. Edit the text here if you need to; do not regenerate unless you intend to discard it.
+      </div>` : ''}
+
+      ${hiddenBool('generated')}
+      ${hiddenBool('reviewed')}
+      <input type="hidden" data-path="playerRoles.${i}.defining_moment.time_advance" data-type="number" value="0">
+      <input type="hidden" data-path="playerRoles.${i}.defining_moment.principal_transition.type" value="decision_made">
+      <input type="hidden" class="dm-moment-input" data-path="playerRoles.${i}.defining_moment.principal_transition.moment" value="${esc(moment)}">
+
+      <div style="display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Moment id <span style="opacity:.7">(snake_case — the key the decision is recorded under)</span></div>
+          <input type="text" class="dm-id-input" data-path="playerRoles.${i}.defining_moment.id" data-role-index="${i}" value="${esc(dm.id || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:monospace">
+          <div style="font-size:11px;color:var(--text-soft);margin-top:3px">principal_transition.moment tracks this automatically → <code class="dm-moment-mirror">${esc(moment)}</code></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">at_elapsed_fraction</div>
+          <input type="text" class="dm-fraction-input" data-path="playerRoles.${i}.defining_moment.at_elapsed_fraction" data-type="number" value="${dm.at_elapsed_fraction ?? 0.6}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+          <div style="font-size:11px;color:var(--text-soft);margin-top:3px">0.6 = 60% in</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Setup — the authored prose the player reads at the fork</div>
+        <textarea class="dm-setup-input" data-path="playerRoles.${i}.defining_moment.setup" rows="7" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;line-height:1.55">${esc(dm.setup || '')}</textarea>
+        <div style="font-size:11px;margin-top:5px;display:flex;gap:14px;flex-wrap:wrap">
+          ${flag(setupW >= 90 && setupW <= 140, `setup ${setupW} words (90–140)`)}
+          ${flag(optCounts.every(w => w >= 8 && w <= 18), `options ${optCounts.join('/')} words (8–18)`)}
+          ${lift ? flag(lift.n <= 6, `longest lift from the entry: ${lift.n} words${lift.n > 6 ? ` — "${esc(lift.text)}"` : ''}`) : ''}
+          ${flag(!(dm.setup || '').includes('?'), (dm.setup || '').includes('?') ? 'setup contains a question mark' : 'no question mark')}
+        </div>
+        <div style="font-size:11px;color:var(--text-soft);margin-top:3px">Amber figures are prose-quality guidance, not blocking — the reviewer decides.</div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Options <span style="font-weight:400;text-transform:none">(exactly 3, mutually exclusive)</span></div>
+      <div class="dm-options-list">${(dm.options || []).map((o, j) => renderDefiningMomentOptionRow(i, j, o)).join('')}</div>
+
+      ${anchored ? `<label style="display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 13px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;cursor:pointer">
+        <input type="checkbox" class="dm-timing-cb" data-role-index="${i}" style="margin-top:2px;flex-shrink:0">
+        <span style="font-size:12px;color:#78350f">
+          <strong>Anchored role — timing rule.</strong> I confirm this fork fires <em>before</em> the documented historical event, so no option turns the record into a counterfactual. Required before this block can be marked reviewed.
+        </span>
+      </label>` : ''}
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        ${state === 'authored'
+          ? `<span style="font-size:12px;color:#1d4ed8;font-weight:600">✍ Hand-authored — trusted, no review needed.</span>`
+          : `<button type="button" class="btn btn-primary mark-dm-reviewed-btn" data-role-index="${i}" data-role-id="${r.id}" ${state === 'reviewed' ? 'disabled' : ''}>
+               ${state === 'reviewed' ? '✓ Defining Moment Reviewed' : 'Mark Defining Moment Reviewed'}
+             </button>
+             ${state !== 'reviewed' ? '<span style="font-size:12px;color:var(--text-soft)">Read the setup and all three options against the entry paragraph before marking reviewed.</span>' : ''}`}
+      </div>`;
+  }
+
+  const pendingReview = state === 'pending';
+  return `<div id="dm-section-${i}" style="margin:10px 0">
+    <details ${pendingReview ? 'open' : ''}>
+      <summary style="padding:11px 16px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;${pendingReview ? 'background:#fffbeb;border:2px solid #d97706;border-radius:8px;' : 'background:var(--card);border:1px solid var(--border);border-radius:8px;'}">
+        <span style="display:flex;align-items:center;gap:10px">
+          Defining Moment
+          ${pendingReview ? '<span style="font-size:11px;font-weight:700;background:#d97706;color:#fff;padding:2px 8px;border-radius:10px;letter-spacing:.03em;text-transform:none">⚠ Needs Review</span>' : ''}
+        </span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
+          ${badge}
+          ${anchored ? '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f5f3ff;color:#6d28d9;font-weight:600">anchored — historical faithfulness enforced</span>' : '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f1f5f9;color:var(--text-soft);font-weight:600">open outcome</span>'}
+          <button type="button" class="btn ${genClass} btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}">${genLabel}</button>
+        </div>
+        ${body}
+      </div>
+    </details>
+  </div>`;
+}
+
+// Delegated handlers for the Defining Moment sections: generate/regenerate, the decline
+// panel, the id → principal_transition.moment mirror, and the BLOCKING mark-reviewed gate.
+// Bound once per editor render on the form root, so a section that re-renders itself after
+// generation needs no rebinding. Extracted from renderPreview so the review gate can be
+// driven directly by tests.
+function bindDefiningMomentHandlers(formEl, data, scenarioId) {
+  // ── Defining Moment: live id → principal_transition.moment mirror ─────────
+  // The engine looks the decision up under principal_transition.moment; if it drifts from
+  // the block id the choice is recorded and never found (evaluateDefiningMoment returns
+  // decision_option_unknown). Keeping them equal automatically means the reviewer cannot
+  // create that state by renaming the moment.
+  formEl.addEventListener('input', e => {
+    const idInput = e.target.closest?.('.dm-id-input');
+    if (!idInput) return;
+    const section = idInput.closest('[id^="dm-section-"]');
+    const hidden  = section?.querySelector('.dm-moment-input');
+    const mirror  = section?.querySelector('.dm-moment-mirror');
+    if (hidden) hidden.value = idInput.value;
+    if (mirror) mirror.textContent = idInput.value;
+  });
+
+  // Live word counts on option text, so the reviewer sees the budget while editing.
+  formEl.addEventListener('input', e => {
+    const ta = e.target.closest?.('.dm-option-text');
+    if (!ta) return;
+    const c = ta.closest('.dm-option-row')?.querySelector('.dm-opt-count');
+    if (c) c.textContent = `${ta.value.trim().split(/\s+/).filter(Boolean).length}w`;
+  });
+
+  // Re-render one role's Defining Moment section in place. Handlers are delegated on
+  // formEl, so nothing needs rebinding afterwards.
+  const rerenderDm = i => {
+    const el = formEl.querySelector(`#dm-section-${i}`);
+    if (!el) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = renderDefiningMomentSection(data.playerRoles[i], i, data);
+    el.replaceWith(tmp.firstElementChild);
+  };
+
+  // ── Defining Moment: accept a decline (dismiss the panel) ─────────────────
+  formEl.addEventListener('click', e => {
+    const btn = e.target.closest('.dm-accept-decline-btn');
+    if (!btn) return;
+    _dmDeclines.delete(btn.dataset.roleId);
+    rerenderDm(Number(btn.dataset.roleIndex));
+    toast('Recorded as no-fork for this session. Nothing was written to the role.', 'success');
+  });
+
+  // ── Defining Moment: generate / regenerate ────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.gen-dm-btn');
+    if (!btn) return;
+    const roleId = btn.dataset.roleId;
+    const idx    = Number(btn.dataset.roleIndex);
+    const role   = data.playerRoles[idx];
+    const state  = definingMomentState(role?.defining_moment);
+    if (!roleId || !scenarioId) return;
+
+    // Escalating confirmation. A hand-authored block is an answer key with no role-level
+    // version history behind it (the server refuses the overwrite too, with a 409); typing
+    // REPLACE is the deliberate act that gets past it.
+    if (state === 'authored') {
+      const typed = prompt(
+        `"${role.name}" carries a HAND-AUTHORED defining moment ("${role.defining_moment.id}").\n\n` +
+        `Regenerating DISCARDS it and replaces it with AI-generated prose. There is no role-level ` +
+        `version history — the only backup is engine/data/scenarios/player_roles/_defining_moment_blocks.md.\n\n` +
+        `Type REPLACE to proceed, or Cancel.`);
+      if (typed !== 'REPLACE') { toast('Regenerate cancelled — hand-authored block kept.', 'success'); return; }
+    } else if (state === 'pending' || state === 'reviewed') {
+      if (!confirm('This will replace the existing defining moment and reset its reviewed status. Continue?')) return;
+    } else {
+      if (!confirm('Generate a defining moment for this role? This calls the AI API and may take up to 30 seconds.')) return;
+    }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+    try {
+      const result = await apiPost(
+        `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/generate-defining-moment`,
+        // The server refuses an overwrite without this; the confirms above are what earn it.
+        { overwrite: state !== 'none' });
+
+      if (result.declined) {
+        // First-class outcome, not an error. Nothing was written server-side and nothing
+        // is written into data.playerRoles here — the role keeps no defining_moment.
+        _dmDeclines.set(roleId, { reason: result.reason });
+        rerenderDm(idx);
+        toast('No defining moment for this role — see the reason in the section.', 'warn');
+        return;
+      }
+
+      data.playerRoles[idx].defining_moment = result.defining_moment;
+      _dmDeclines.delete(roleId);
+      rerenderDm(idx);
+      markFormDirty();
+      toast('Defining moment generated — review the setup and all three options before marking reviewed.', 'warn');
+    } catch (err) {
+      toast(`Defining moment generation failed: ${err.message}`, 'error');
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ── Defining Moment: BLOCKING mark-reviewed gate ──────────────────────────
+  // Refuses and names every unmet precondition, the way the epilogue gate does — it does
+  // NOT warn and proceed like the technical-facts one. Everything checked here is a
+  // condition the ENGINE reads literally: a block that fails one is inert or unrecordable
+  // at play time, so it must never be able to carry a Reviewed badge.
+  formEl.addEventListener('click', e => {
+    const btn = e.target.closest('.mark-dm-reviewed-btn');
+    if (!btn) return;
+    const idx     = Number(btn.dataset.roleIndex);
+    const role    = data.playerRoles[idx];
+    const section = formEl.querySelector(`#dm-section-${idx}`);
+    if (!section) return;
+
+    const unmet = [];
+    const SNAKE = /^[a-z0-9_]+$/;
+
+    const rows = [...section.querySelectorAll('.dm-option-row')];
+    if (rows.length !== 3) unmet.push(`Exactly 3 options required — found ${rows.length}.`);
+    rows.forEach((row, j) => {
+      const oid  = row.querySelector('.dm-option-id')?.value.trim()   || '';
+      const text = row.querySelector('.dm-option-text')?.value.trim() || '';
+      if (!oid)                 unmet.push(`Option ${j + 1}: id is empty.`);
+      else if (!SNAKE.test(oid)) unmet.push(`Option ${j + 1}: id "${oid}" is not snake_case (lowercase letters, digits, underscores).`);
+      if (!text)                unmet.push(`Option ${j + 1}: text is empty.`);
+    });
+    const oids = rows.map(row => row.querySelector('.dm-option-id')?.value.trim()).filter(Boolean);
+    if (new Set(oids).size !== oids.length) unmet.push('Option ids must be unique.');
+
+    const blockId = section.querySelector('.dm-id-input')?.value.trim() || '';
+    const moment  = section.querySelector('.dm-moment-input')?.value.trim() || '';
+    if (!blockId)            unmet.push('Moment id is empty.');
+    else if (!SNAKE.test(blockId)) unmet.push(`Moment id "${blockId}" is not snake_case.`);
+    if (moment !== blockId)  unmet.push(`principal_transition.moment ("${moment}") must equal the moment id ("${blockId}") — the decision is recorded under this key and would never be found.`);
+
+    const fracRaw = section.querySelector('.dm-fraction-input')?.value.trim();
+    if (fracRaw === '' || fracRaw == null || Number.isNaN(Number(fracRaw))) {
+      unmet.push(`at_elapsed_fraction must be a number (got "${fracRaw ?? ''}").`);
+    }
+
+    const ta = Number(section.querySelector('[data-path$=".time_advance"]')?.value);
+    if (ta !== 0) unmet.push(`time_advance must be 0 — the fork costs no game time (got ${ta}).`);
+
+    if (roleIsAnchored(role, idx, formEl)) {
+      const cb = section.querySelector('.dm-timing-cb');
+      if (!cb?.checked) unmet.push('Anchored role: confirm the timing rule — the fork must fire BEFORE the documented historical event.');
+    }
+
+    if (unmet.length) {
+      toast(`Cannot mark as reviewed — ${unmet.length} unmet precondition${unmet.length === 1 ? '' : 's'}:\n\n${unmet.join('\n')}`, 'error');
+      return;
+    }
+
+    const rev = section.querySelector('.dm-reviewed-input');
+    if (rev) rev.value = 'true';
+    const badge = section.querySelector('.dm-status-badge');
+    if (badge) { badge.textContent = 'Reviewed'; badge.style.background = '#f0fdf4'; badge.style.color = '#166534'; }
+    btn.disabled = true;
+    btn.textContent = '✓ Defining Moment Reviewed';
+    if (!data.playerRoles[idx].defining_moment) data.playerRoles[idx].defining_moment = {};
+    data.playerRoles[idx].defining_moment.reviewed = true;
+    handleManualSave(data, formEl);
+  });
+}
+
+// Test seam: jsdom cannot reach top-level const bindings in a classic script, and the
+// review gate is worth testing against a real DOM rather than a string.
+window.__bindDefiningMomentHandlers = bindDefiningMomentHandlers;
+window.__dmDeclines = _dmDeclines;
+
 function renderPlayerRolesSection(data) {
   const roles = data.playerRoles || [];
   const html = roles.map((r, i) => {
@@ -1969,6 +2342,7 @@ function renderPlayerRolesSection(data) {
           ${edField('Closing Line Override', edTextarea(`playerRoles.${i}.ending_notes.failure.closing_line_override`, r.ending_notes?.failure?.closing_line_override, 2), 'Replaces "You were there." — one strong sentence. Leave blank to keep the default.')}
         </div>
       `)}
+      ${renderDefiningMomentSection(r, i, data)}
     `, i === 0);
   }).join('');
   return edSection('Player Roles', html || '<p style="font-size:13px;color:var(--text-soft)">None generated.</p>');
@@ -3774,6 +4148,9 @@ function renderPreview(data, autoSaved = false) {
       btn.textContent = originalText;
     }
   });
+
+  // ── Defining Moment (render + review gate) ────────────────────────────────
+  bindDefiningMomentHandlers(formEl, data, scenarioId);
 
   // ── Regenerate Endings (per role, Opus) ────────────────────────
   formEl.addEventListener('click', async e => {
