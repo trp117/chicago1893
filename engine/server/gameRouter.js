@@ -364,7 +364,12 @@ function getCompositeDisclosure(epilogueData, summary) {
     .map(f => ({ character_id: f.character_id, name: f.name }));
 }
 
-async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = []) {
+// proximitySession — the role carried NO defining-moment block at all, so there was never
+// a fork to answer: a witness/proximity role (the Chronicler). Classified at the CALL SITE,
+// where the role and the session state are both in scope, and defaulted false here so that
+// every existing caller and every session that is not a proximity session compiles exactly
+// the prompt it compiled before.
+async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -393,11 +398,21 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
   const definingState = sessionSummary?.closure_state?.defining_moment_state || null;
   const decisionMade  = definingState?.met === true;
 
+  // THREE arms, not two. The middle case is the one worth stating explicitly: a role that
+  // HAS a fork but never answered it — a crucible that ran out of time before its choice —
+  // keeps the honest-timeout framing below. It is NOT presence: a session that was building
+  // toward a decision and did not arrive at one was not witnessing, and telling that player
+  // they were "present at history" would flatter a session that genuinely fell short.
+  // Presence is reserved for a role that never had a fork to answer.
+  const proximity = !decisionMade && proximitySession === true;
+
   const sessionSystemPrompt = [
     'You are writing the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
     decisionMade
       ? 'Convey who this person was in the room — the human experience of this session, pivoting on the defining decision they made. Name who was there with them, and let the choice carry who they became under pressure.'
+      : proximity
+      ? 'Convey who this person was in proximity to the event — the quality of their presence: what they attended to, how they bore it, and what being there asked of them. Name who was there with them.'
       : 'Describe what this player did in this session: which characters they encountered, key decisions made, how the session ended for them.',
     '',
     'Length: 60–100 words.',
@@ -411,6 +426,12 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
       '- THE DECISION OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Never frame the session as unresolved, incomplete, cut short, or as a shortfall for not reaching somewhere. Reaching a location was never the objective; the human experience was.',
       '- What followed the choice is genuinely unknown, and saying so is honest — it is not failure. If you close on the aftermath, close on the not-knowing itself: the night, the fire, what nobody was left to record. Never close on "the session ended before…" or "they never reached…".',
       '- Ground the choice in its authored language: decision_text is what they chose. Paraphrase it, never quote it verbatim. The options they did not take appear only as internal ids in available_options — never name, translate, or paraphrase those.',
+    ] : proximity ? [
+      '- PRESENCE IS THE RESOLUTION. This role had no defining decision to make; being there was the whole of it. Write who they were while it happened — what they attended to, how they bore it, and what being present cost them. Never frame the session as unresolved, incomplete, cut short, or as a failure to finish or reach anything. Being present at history is not a task to complete.',
+      '- PRESENCE OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Reaching a location was never the objective, and an outcome of "unknown" is not a shortfall here — there was no task to complete. Never write that time ran out, that they did not finish, or that they failed to reach anywhere.',
+      '- WHERE THEY HAD SMALL AGENCY, HONOUR IT. A hand kept steady, a thing recorded, a person steadied, something they did not look away from — the small conduct of someone with no authority over the event is the character of this session. Take it only from the SESSION SUMMARY and the CLOSING PROSE; never invent an intervention they did not make.',
+      '- GROUND IT IN THE TEXTURE OF THIS SESSION. The CLOSING PROSE carries the physical particulars — an instrument in the hands, a line held open, the sound of a crowd through concrete, what the light was doing. Use those particulars. Do not write a generic account of witnessing that could belong to any session.',
+      '- IF THE EVENT WAS REACHED, HONOUR IT. If the session ended at the threshold with the event not yet arrived, close on the witnessing itself — what it was to be there as it came up to the edge. What followed is genuinely unknown, and saying so is honest. Never close on "the session ended before…", "they never reached…", or on time running out.',
     ] : [
       '- If outcome is "unknown", state plainly that the session ended without resolution — do not imply, infer, or invent a conclusion.',
     ]),
@@ -1426,7 +1447,24 @@ Do not open with the historical context. Open inside the character's body. Let t
             })
             .filter(Boolean);
           console.log('[EPILOGUE-CLOSE] sessionNpcList — count:', sessionNpcList.length, 'playerExcluded:', !!playerCharacterId);
-          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList);
+
+          // PROXIMITY CLASSIFICATION. A role with no defining-moment block in force never
+          // had a fork to answer — a witness/proximity session, which gets the presence
+          // arm instead of the "ended without resolution" framing. Resolved the same way
+          // the engine resolves it during play (resolveDefiningMomentBlock reads
+          // state.effectiveDefiningMoment, captured at session start, then falls back to
+          // the scenario), with role.defining_moment as a further fallback for a session
+          // created before that field existed. Deliberately NOT gated on
+          // DEFINING_MOMENT_ENABLED: whether a fork EXISTS for this role is a fact about
+          // the role, not about whether the engine is currently allowed to present it.
+          const forkBlock = resolveDefiningMomentBlock(sessionState, scenarioData) || role?.defining_moment || null;
+          const proximitySession = !forkBlock;
+          console.log('[EPILOGUE-CLOSE] epilogue arm —',
+            summary.closure_state?.defining_moment_state?.met === true ? 'decision-aware'
+              : proximitySession ? 'proximity/presence'
+              : 'fork-present-not-fired (unchanged)');
+
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession);
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,
