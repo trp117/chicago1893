@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node engine/server/server.js",
     "engine": "node engine/server/server.js",
-    "review": "node engine/agents/transcriptReviewer.js"
+    "review": "node engine/agents/transcriptReviewer.js",
+    "test": "node tests/run.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",
@@ -18,5 +19,8 @@
     "langfuse": "^3.38.20",
     "multer": "^2.1.1",
     "sharp": "^0.35.1"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
   }
 }

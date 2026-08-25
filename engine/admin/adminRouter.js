@@ -192,13 +192,121 @@ function preserveStoredDefiningMoment(repos, role) {
   return role;
 }
 
-// Both editor-save guards over ONE stored read. preserveStoredEndingNotes and
-// preserveStoredDefiningMoment each look the role up for themselves; running them
-// back to back would read it twice. The shim memoizes the single real lookup and
-// hands the same object to both, so neither function has to change (and each stays
-// independently testable). Lazy on purpose: a client that sends real content for both
-// blocks returns from both guards before any lookup happens, exactly as before.
-// Both guards mutate `role` in place and return it, so the composition is order-free.
+// ── Role archetype ────────────────────────────────────────────────────────────
+// ARCHETYPE — what KIND of role this is, stored durably on the role itself. It is the
+// property the artifact generators will gate on (a fork for a role that cannot carry one,
+// graded endings for a role whose outcome is fixed), so it has to be a fact about the role
+// that survives a regenerate rather than something re-derived per call: Lojka was re-forked
+// on every regenerate precisely because nothing durable said "instrument".
+//
+//   crucible-open   fork YES  graded endings YES   the character's own outcome is open
+//   crucible-fixed  fork YES  graded endings NO    outcome fixed — there is nothing to grade
+//   instrument      fork NO   graded endings NO    acts, but without the foreknowledge a fork needs
+//   witness         fork NO   graded endings NO    conduct is not a hinge
+//   unclassified    (not yet set)
+//
+// The open/fixed split keys on FATE_MODE — the character's own outcome — and NOT on
+// character_type: a fictional character welded to a fixed anchor is still crucible-fixed.
+//
+// NOTHING GATES ON THIS YET. Step 1 is the property and its guard only; the classifier,
+// the gating table and the human-confirm UI land in later steps.
+export const ROLE_ARCHETYPES = Object.freeze([
+  'crucible-open',
+  'crucible-fixed',
+  'instrument',
+  'witness',
+  'unclassified',
+]);
+
+export function isRoleArchetype(value) {
+  return typeof value === 'string' && ROLE_ARCHETYPES.includes(value);
+}
+
+// The ONLY way to read a role's archetype. Absent, empty, or unrecognised all read as
+// 'unclassified' — the safe direction once gating exists, because unclassified is the
+// value that will REFUSE artifact generation rather than permit it. Legacy roles need no
+// backfill: 68 of the 74 stored today carry no archetype at all, absent already means
+// unclassified, and writing the string into every file would buy nothing.
+export function roleArchetype(role) {
+  return isRoleArchetype(role?.archetype) ? role.archetype : 'unclassified';
+}
+
+// ── The artifact gating table (THE SAFEGUARD) ────────────────────────────────
+// What each archetype may have GENERATED for it. ONE table, exported, consulted by every
+// gate — the two routes below and the editor's two buttons — so no consumer hardcodes an
+// archetype string, the same way BLOCK_TYPES is the single source of truth for the
+// survivor guard (ClaudeScenarioClient.js).
+//
+// unclassified is PERMISSIVE, and deliberately so. It allows both, exactly as the engine
+// behaved before any of this existed. The safeguard protects roles a human has LABELLED; a
+// role nobody has classified yet is "not yet decided", not "forbidden", so the 68 legacy
+// roles are not frozen out of generation by a gate that has no opinion about them.
+export const ARCHETYPE_ARTIFACTS = Object.freeze({
+  'crucible-open':  { fork: true,  graded_endings: true  },
+  'crucible-fixed': { fork: true,  graded_endings: false },
+  'instrument':     { fork: false, graded_endings: false },
+  'witness':        { fork: false, graded_endings: false },
+  'unclassified':   { fork: true,  graded_endings: true  },
+});
+
+// Why an artifact is refused, in the reviewer's own terms. A blocked button that does not
+// say why reads as a bug, so these strings are rendered verbatim in the editor AND returned
+// verbatim by the routes: the reason a reviewer reads is the reason the server acted on,
+// never a paraphrase of it.
+export const ARCHETYPE_REFUSALS = Object.freeze({
+  'crucible-fixed': {
+    graded_endings: 'Fixed-outcome role — no graded endings. This character\'s outcome is fixed by the record, so there is nothing to grade. The fork and the epilogue carry the resolution.',
+  },
+  instrument: {
+    fork:           'Instrument role — no fork. This character performs the pivotal act without knowing its significance, so a fork would have to grant them foreknowledge they did not have. The session resolves via the proximity epilogue.',
+    graded_endings: 'Instrument role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
+  },
+  witness: {
+    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue.',
+    graded_endings: 'Witness role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
+  },
+});
+
+// THE GATE. `artifact` is 'fork' or 'graded_endings'. Reads the CONFIRMED archetype stored
+// on the role — never a classifier proposal, which is why the classifier writes nothing.
+export function archetypeAllows(role, artifact) {
+  const archetype = roleArchetype(role);
+  const allowed   = ARCHETYPE_ARTIFACTS[archetype]?.[artifact] !== false;
+  return {
+    allowed,
+    archetype,
+    reason: allowed ? null
+      : (ARCHETYPE_REFUSALS[archetype]?.[artifact] || `Archetype ${archetype} may not have ${artifact} generated.`),
+  };
+}
+
+// EDITOR-SAVE GUARD for archetype — third sibling of the two guards above, same
+// preserve-if-the-client-sends-nothing shape and the same hazard. Both editor save paths
+// rebuild the role as a whole object from the form, so a tab loaded before this field
+// existed posts a role with the archetype key ABSENT and the whole-object savePlayerRole
+// drops it — the mechanism that erased approved ending_notes and would delete an authored
+// fork. There is no role-level version history to recover from.
+//
+// Keyed on `undefined` (key absent) and deliberately NOT on falsiness, so that when the
+// confirm UI lands it can still DEMOTE a role: that select will carry the literal string
+// 'unclassified' rather than an empty value, and anything the client actually sends —
+// including a value this module does not recognise — is honored untouched here and read
+// back safely through roleArchetype above.
+function preserveStoredArchetype(repos, role) {
+  if (role.archetype !== undefined) return role;   // client sent a value — honor it
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  if (stored && stored.archetype !== undefined) role.archetype = stored.archetype;
+  return role;
+}
+
+// All three editor-save guards over ONE stored read. preserveStoredEndingNotes,
+// preserveStoredDefiningMoment and preserveStoredArchetype each look the role up for
+// themselves; running them back to back would read it three times. The shim memoizes the
+// single real lookup and hands the same object to all three, so no guard has to change
+// (and each stays independently testable). Lazy on purpose: a client that sends real
+// content for all three returns from every guard before any lookup happens, exactly as
+// before. Every guard mutates `role` in place and returns it, so the composition is
+// order-free.
 function preserveStoredRoleBlocks(repos, role) {
   let stored, read = false;
   const shim = {
@@ -211,6 +319,7 @@ function preserveStoredRoleBlocks(repos, role) {
   };
   preserveStoredEndingNotes(shim, role);
   preserveStoredDefiningMoment(shim, role);
+  preserveStoredArchetype(shim, role);
   return role;
 }
 
@@ -225,9 +334,33 @@ async function applyEndingNotesToRoles(repos, scenarioId, notes) {
   const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
   let updated = 0;
   const unmatched = [];
+  const skipped = [];
   for (const note of (notes || [])) {
     const role = playerRoles.find(r => r.name === note.role_name);
     if (!role) { unmatched.push(note.role_name); continue; }
+
+    // ARCHETYPE GATE (the safeguard), on the bulk path. Reads the same
+    // ARCHETYPE_ARTIFACTS table the per-role button and both generation routes read, so
+    // one policy governs every way endings can reach a role file.
+    //
+    // WHY THIS PATH NEEDS IT. The inject route behind "Apply to All Roles" is the legacy
+    // Gemini copy-paste workflow, superseded by the per-role Opus button and reached only
+    // through the AI Response Injector panel at the foot of the scenario editor. Left
+    // ungated it is a BACK DOOR around the entire safeguard: nothing about a button
+    // labelled "Apply to All Roles" tells a subordinate that some roles must not receive
+    // graded endings, and it writes straight to role files with no review gate in front of
+    // it. A path nobody would know to avoid has to respect the same policy as the one they
+    // are steered towards, or the policy is advisory.
+    //
+    // The whole note is skipped, not just its ending fields. These payloads also carry
+    // briefing / hooks / knowledge, but the reviewer's intent when pressing a button on the
+    // Ending Notes tab is endings; writing half a note and reporting it as skipped would be
+    // the more surprising outcome.
+    const gate = archetypeAllows(role, 'graded_endings');
+    if (!gate.allowed && (note.success || note.partial || note.failure)) {
+      skipped.push({ role_name: role.name, archetype: gate.archetype, reason: gate.reason });
+      continue;
+    }
     if (note.briefing)           role.briefing          = note.briefing;
     if (note.starting_knowledge) role.startingKnowledge = note.starting_knowledge;
     if (note.hook_1 || note.hook_2 || note.hook_3) {
@@ -251,7 +384,7 @@ async function applyEndingNotesToRoles(repos, scenarioId, notes) {
     pipeline_step: 'ending_notes',
     changes_applied: updated
   });
-  return { updated, unmatched, scenario };
+  return { updated, unmatched, skipped, scenario };
 }
 
 // ── Generation helpers ────────────────────────────────────────────────────────
@@ -1081,6 +1214,195 @@ export function classifyRoleForDefiningMoment(scenario, role) {
   };
 }
 
+// ── Archetype classifier (PROPOSES an archetype; writes nothing) ──────────────
+// Step 2 of archetype-gated artifact generation. classifyRoleForDefiningMoment above
+// answers "which prompt does this fork generate under"; it cannot answer "should this role
+// have a fork at all". Lojka and Princip carry byte-identical inputs to it —
+// character_type 'real' + fate_mode 'anchored' — so it returns byte-identical output for
+// both, which is exactly how Lojka got forked. This classifier answers the second question.
+//
+// TWO STAGES, split by what each can be trusted with:
+//   1. THE CRUCIBLE AXIS — deterministic, from the role's declared fate_mode ALONE. Open vs
+//      fixed is a property of the CHARACTER'S OWN OUTCOME, so it is not the model's to
+//      judge, and character_type is deliberately NOT consulted: a fictional character
+//      welded to a fixed anchor is crucible-fixed, and that is the case (the Chronicler)
+//      the old real/anchored signal gets wrong in the other direction.
+//   2. THE FAMILY — crucible vs instrument vs witness. Agency and foreknowledge need
+//      judgement, so this is a model call and its output is a PROPOSAL. A human confirms
+//      it (step 4) and the gating enforces the CONFIRMED value (step 3), never this one.
+//
+// Nothing here writes. The endpoint returns the proposal; the role is not touched.
+
+// Stage 1. Three outcomes, not two: 33 of the 74 stored roles declare no fate_mode at all,
+// and guessing on their behalf is how a role acquires a fixed framing with no record to be
+// faithful to. 'undeclared' is reported honestly and resolves to 'unclassified' below —
+// the same hard-refuse posture regenerateEndingNotes already takes on a missing fate_mode.
+export function resolveCrucibleAxis(role) {
+  const fate_mode = role?.fate_mode ?? null;
+  if (fate_mode === 'anchored')                               return { axis: 'fixed',  fate_mode };
+  if (fate_mode === 'committed' || fate_mode === 'suspended')  return { axis: 'open',   fate_mode };
+  return { axis: 'undeclared', fate_mode };
+}
+
+// Stage 1 + stage 2 combined into the value that would be stored. A witness or an
+// instrument never reaches the axis — neither can carry a fork or graded endings, so open
+// vs fixed would change nothing about what may be generated for them.
+export function combineArchetype(family, axis) {
+  if (family === 'witness')    return 'witness';
+  if (family === 'instrument') return 'instrument';
+  if (family === 'crucible')   return axis === 'fixed' ? 'crucible-fixed'
+                                    : axis === 'open'  ? 'crucible-open'
+                                    : 'unclassified';   // crucible, but no fate_mode to split on
+  return 'unclassified';
+}
+
+const ARCHETYPE_SYSTEM_PROMPT = [
+  'You are classifying ONE player role in an immersive historical fiction experience. You are not writing anything a player will read. You are deciding what KIND of role this is, so the engine knows which artifacts it may generate for it. Return JSON only.',
+  '',
+  'WHY THIS MATTERS. The engine can generate two things for a role: a FORK (one authored decision put to the player partway through the session, whose chosen option is recorded as who this person was under pressure) and GRADED ENDING NOTES (success / partial / failure end-states). Generating either for a role that cannot carry it damages the session. A fork put to someone who could not have known what they were deciding forces the player to answer a question their character was never asked, and the only way to write such a fork is to grant the character foreknowledge they did not have. Preventing that is what this classification is for.',
+  '',
+  'YOU ARE NOT DECIDING WHETHER THE OUTCOME IS FIXED. Whether this character\'s own fate is bound to the historical record is settled from declared data before you are called, and it is not your judgement to make. Decide the FAMILY only.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE THREE FAMILIES',
+  '════════════════════════════════════════════════════════',
+  '',
+  'CRUCIBLE — this person makes a crystallizing decision, KNOWINGLY. There is a single moment at which they choose, they understand what is at stake in choosing, and which way they went reveals who they were. Gavrilo Princip standing at the corner with a loaded pistol knows exactly what he is deciding.',
+  '',
+  'INSTRUMENT — this person performs the pivotal act WITHOUT knowing its significance. The act is real, it is theirs, and history turns on it, but at the moment of acting they do not hold the information that would make it a decision. Leopold Lojka takes the wrong turn and stops the car because he is following the car ahead of him and the route he was briefed on; he does not know the turn is fatal. The test to apply: TO WRITE A FORK FOR THIS PERSON, WOULD I HAVE TO GRANT THEM KNOWLEDGE THEY DID NOT HAVE? If yes, they are an instrument.',
+  '',
+  'WITNESS / PARTICIPANT — this person is present, and may have entirely real agency over their own conduct, but there is no crystallizing hinge. Their agency is attention and conduct sustained across the whole arc — what they attended to, how they bore it, how well they did their work — rather than one transforming act. A camera operator holding the shot; a bystander pressed against a shop window.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE TESTS, IN THIS ORDER',
+  '════════════════════════════════════════════════════════',
+  '',
+  'TEST 1 — THE HINGE. Is there a single moment at which THIS PERSON\'S OWN ACT determines what happened, rather than a role whose contribution is spread across the session? Judge the ACT ALONE here, never whether they understood it: an act performed blindly still PASSES this test, and sorting that out is Test 2\'s job, not this one. If there is no such moment — if the honest description is "they were there, they did their work, and what happened would have happened" — stop: the family is witness. Being close to enormous events is not a hinge. Neither is doing a difficult job well under pressure.',
+  '',
+  'TEST 2 — FOREKNOWLEDGE. Apply this ONLY if Test 1 passed. At the moment of the act, does this person know what is at stake in it?',
+  '  Answer from what the role is DECLARED to know — its starting knowledge, the flags and inventory of its initial state, its hooks, its briefing, the choices it opens with. Do not answer from what you know about how the day ended.',
+  '  HAD THE INFORMATION -> crucible. This includes the negligent and the culpable: someone who held what they needed to act differently and did not is still choosing. It does not require that they foresaw the exact outcome, only that the stakes of the act were available to them.',
+  '  DID NOT HAVE THE INFORMATION -> instrument. The tell is usually in the role\'s own declared state: knowledge it explicitly lacks, an order it is following, an instruction it has not received, a briefing that describes a different situation from the one it is actually in, an initial-state flag recording that something was NOT told to them.',
+  '  HINDSIGHT IS NOT FOREKNOWLEDGE. That an act turned out to be pivotal tells you nothing whatever about what the person knew while performing it. This is the single most common way this classification goes wrong.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'HOW TO ANSWER',
+  '════════════════════════════════════════════════════════',
+  '',
+  'CITE EVIDENCE. For the foreknowledge verdict, quote or name the specific declared fields you relied on. A reviewer confirms your proposal by hand and needs to see what you read, not only what you concluded.',
+  '',
+  'STATE THE COUNTER-CASE. Name the strongest argument for the family you did NOT choose. If you genuinely cannot construct one, say so plainly. A close call reported as close is worth more than a confident wrong answer, and your confidence should reflect it.',
+  '',
+  'Return exactly this JSON and nothing else:',
+  '{',
+  '  "family": "crucible" | "instrument" | "witness",',
+  '  "hinge": { "passed": true | false, "moment": "<the single act, in one clause — null if there is none>", "why": "<one or two sentences>" },',
+  '  "foreknowledge": { "verdict": "had_information" | "no_information" | "not_applicable", "why": "<one or two sentences>", "evidence": ["<the declared field or line you relied on>"] },',
+  '  "counter_case": "<the strongest argument for a different family, or a plain statement that there is none>",',
+  '  "confidence": "high" | "medium" | "low",',
+  '  "reasoning": "<two to four sentences a reviewer can confirm or overturn without reading the role themselves>"',
+  '}',
+].join('\n');
+
+function buildArchetypeUserPrompt({ scenario, role }) {
+  const list = (label, arr) => Array.isArray(arr) && arr.length
+    ? `${label}:\n${arr.map(x => `- ${typeof x === 'string' ? x : JSON.stringify(x)}`).join('\n')}` : '';
+  const st = role?.roleInitialState || {};
+  return [
+    `SCENARIO: ${scenario?.title || scenario?.id || '(untitled)'}`,
+    scenario?.premise ? `PREMISE: ${scenario.premise}` : '',
+    scenario?.epilogue?.immediate_outcome?.summary
+      ? `WHAT ACTUALLY HAPPENED (the fixed macro-outcome): ${scenario.epilogue.immediate_outcome.summary}` : '',
+    '',
+    '════════ THE ROLE ════════',
+    `NAME: ${role?.name || role?.id}`,
+    role?.description      ? `DESCRIPTION: ${role.description}`           : '',
+    role?.context_sentence ? `CONTEXT SENTENCE: ${role.context_sentence}` : '',
+    role?.perspective      ? `PERSPECTIVE (how the engine is told to write this person): ${role.perspective}` : '',
+    '',
+    role?.briefing ? `BRIEFING (what the player is handed at the start):\n${role.briefing}` : '',
+    '',
+    // The foreknowledge evidence. These four are the declared record of what this person
+    // holds at the moment play begins, and Test 2 is answered out of them.
+    list('DECLARED STARTING KNOWLEDGE (what this person knows)', role?.startingKnowledge),
+    list('CHARACTER HOOKS (what is on their mind)', role?.character_hooks),
+    list('INITIAL-STATE INVENTORY (what they are carrying)', st.inventory),
+    st.flags && Object.keys(st.flags).length
+      ? `INITIAL-STATE FLAGS (the engine's record of this person's situation — read the FALSE ones as carefully as the true ones):\n${Object.entries(st.flags).map(([k, v]) => `- ${k}: ${JSON.stringify(v)}`).join('\n')}`
+      : '',
+    '',
+    list('OPENING CHOICES OFFERED (the action space this role actually has)', role?.opening?.choices),
+    '',
+    'Apply Test 1, then Test 2 if it passed. Return JSON only.',
+  ].filter(Boolean).join('\n\n');
+}
+
+// Shape check on the model's proposal, run before it is returned. A malformed proposal is
+// refused rather than shown to a reviewer as though it meant something.
+const ARCHETYPE_FAMILIES = new Set(['crucible', 'instrument', 'witness']);
+const FOREKNOWLEDGE_VERDICTS = new Set(['had_information', 'no_information', 'not_applicable']);
+function validateArchetypeProposal(p) {
+  const errors = [];
+  if (!p || typeof p !== 'object') return ['Response was not a JSON object.'];
+  if (!ARCHETYPE_FAMILIES.has(p.family)) errors.push(`"family" must be one of crucible, instrument, witness (got ${JSON.stringify(p.family)}).`);
+  if (!p.hinge || typeof p.hinge.passed !== 'boolean') errors.push('"hinge.passed" must be a boolean.');
+  if (!p.foreknowledge || !FOREKNOWLEDGE_VERDICTS.has(p.foreknowledge.verdict)) {
+    errors.push(`"foreknowledge.verdict" must be had_information, no_information or not_applicable (got ${JSON.stringify(p.foreknowledge?.verdict)}).`);
+  }
+  if (typeof p.reasoning !== 'string' || !p.reasoning.trim()) errors.push('"reasoning" is empty — the human-confirm step would have nothing to show.');
+  // Internal consistency. The families are DEFINED by the tests, so a proposal whose family
+  // contradicts its own test verdicts is incoherent however good the prose is.
+  if (p.family === 'witness'    && p.hinge?.passed === true)                       errors.push('Incoherent: family witness, but the hinge test passed.');
+  if (p.family !== 'witness'    && p.hinge?.passed === false)                      errors.push(`Incoherent: family ${p.family}, but the hinge test failed.`);
+  if (p.family === 'instrument' && p.foreknowledge?.verdict !== 'no_information')  errors.push('Incoherent: family instrument, but the foreknowledge verdict is not no_information.');
+  if (p.family === 'crucible'   && p.foreknowledge?.verdict !== 'had_information') errors.push('Incoherent: family crucible, but the foreknowledge verdict is not had_information.');
+  return errors;
+}
+
+// Propose an archetype for one role. PURE PROPOSAL: it writes nothing, anywhere. The
+// returned object carries the reasoning and the evidence as first-class fields because
+// step 4's confirm UI has to show a reviewer WHY, not just what.
+export async function classifyRoleArchetype(scenario, role, anthropicApiKey) {
+  const { axis, fate_mode } = resolveCrucibleAxis(role);
+
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    // temperature 0: this is a judgement, not prose. Unlike the fork generator the model is
+    // not asked to work the steps aloud — the reasoning is a FIELD of the JSON, so it is
+    // captured for the reviewer rather than spent as an untracked preamble, and 2000
+    // tokens is ample for the whole object.
+    { model: MODEL, max_tokens: 2000, temperature: 0, system: ARCHETYPE_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildArchetypeUserPrompt({ scenario, role }) }] },
+    { timeout: 60_000, maxRetries: 0 }
+  );
+  if (msg.stop_reason === 'max_tokens') throw new Error('Archetype classification truncated at max_tokens.');
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  const parsed = extractJson(text);
+
+  const errors = validateArchetypeProposal(parsed);
+  if (errors.length) throw new Error(`The proposal was malformed and was not returned: ${errors.join(' ')}`);
+
+  const archetype = combineArchetype(parsed.family, axis);
+  console.log(`[ARCHETYPE] ${role.id} proposes ${archetype} (family=${parsed.family} axis=${axis} fate_mode=${fate_mode ?? 'unset'} confidence=${parsed.confidence}) output_tokens:`, msg.usage?.output_tokens);
+
+  return {
+    roleId:   role.id,
+    roleName: role.name || role.id,
+    archetype,                        // the PROPOSAL. Nothing is written; a human confirms it.
+    stored:   roleArchetype(role),    // what the role currently carries, for comparison
+    family:   parsed.family,
+    axis, fate_mode,
+    axis_note: axis === 'undeclared'
+      ? 'No fate_mode declared on this role, so crucible-open vs crucible-fixed cannot be resolved. Declare fate_mode before confirming.'
+      : null,
+    hinge:         parsed.hinge,
+    foreknowledge: parsed.foreknowledge,
+    counter_case:  parsed.counter_case ?? null,
+    confidence:    parsed.confidence ?? 'unstated',
+    reasoning:     parsed.reasoning,
+  };
+}
+
 // Calls the Anthropic API to draft the defining-moment block for a single role.
 // Returns EITHER the parsed block OR { declined: true, reason } — a decline is a correct
 // outcome, not an error, and is passed through untouched. Shape validation of a returned
@@ -1100,7 +1422,16 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
   const user   = buildDefiningMomentUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding });
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: MODEL, max_tokens: 2000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
+    // 8000, not 2000. The model works the six steps aloud before emitting the JSON when the
+    // case is hard, and that preamble is charged against the same budget. Measured on
+    // Princip (anchored/real, dense entry + briefing + hooks + knowledge + the Step 1B
+    // faithfulness block + his documented fate record): 5,035 output tokens, of which the
+    // JSON was ~7% — 16,462 chars of reasoning ahead of 1,326 chars of block. At 2000 the
+    // request died mid-reasoning without ever reaching the JSON. Trude and Jäger emitted
+    // the block directly at ~430 tokens, so the preamble is adaptive: the ceiling has to
+    // cover the hard cases, and an unused ceiling costs nothing (billing is on actual
+    // output). 8000 matches /generate/epilogue-data, the other long-form generator here.
+    { model: MODEL, max_tokens: 8000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
     { timeout: 90_000, maxRetries: 0 }
   );
   console.log(`[DEFINING-MOMENT] ${role.id} framing=${classification.framing} signal=${classification.signal}${anchorBinding ? ` binding=${anchorBinding.kind}` : ''} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
@@ -1696,6 +2027,21 @@ export function createAdminRouter(repos, config = {}) {
     const role  = roles.find(r => r.id === req.params.roleId);
     if (!role) return notFound(res);
 
+    // ARCHETYPE GATE (the safeguard). Checked before anything else about the block, so a
+    // role that may not carry a fork at all never reaches the overwrite conversation. It
+    // does NOT stand in for that conversation on roles that MAY carry one: an allowed
+    // archetype falls straight through to the hand-authored / overwrite 409 below, which is
+    // unchanged and still the thing that protects Trude's and Jäger's answer keys. 422
+    // matches the refusal shape /pipeline/regenerate-endings already uses for a missing
+    // fate_mode, so the client has one refusal shape to render, not two.
+    const forkGate = archetypeAllows(role, 'fork');
+    if (!forkGate.allowed) {
+      console.log(`[ARCHETYPE-GATE] ${req.params.id}/${role.id} — fork refused (archetype=${forkGate.archetype})`);
+      return res.status(422).json({
+        error: forkGate.reason, refused: true, artifact: 'fork', archetype: forkGate.archetype,
+      });
+    }
+
     // OVERWRITE GUARD. Some blocks are hand-authored answer keys with no role-level version
     // history behind them (see _defining_moment_blocks.md). Regenerating replaces the block
     // outright and resets reviewed to false, so an existing REAL block is refused at the API
@@ -1759,6 +2105,29 @@ export function createAdminRouter(repos, config = {}) {
       res.json({ roleId: role.id, defining_moment: saved.defining_moment, classification });
     } catch (err) {
       console.error(`[DEFINING-MOMENT ERROR] ${role.name}: ${err.message}`);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Propose an archetype for a single player role. READ-ONLY BY CONSTRUCTION: the scenario
+  // and the role are loaded server-side from :id/:roleId, the classifier is called, and the
+  // proposal is returned. Nothing is written — not the archetype, not a note, nothing. The
+  // reviewer confirms the value in the editor (step 4) and the gating enforces the CONFIRMED
+  // value (step 3), never this one. There is deliberately no overwrite guard here for the
+  // same reason: with no write there is nothing to overwrite.
+  r.post('/scenarios/:id/roles/:roleId/classify-archetype', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const roles = repos.scenarios.findPlayerRoles(req.params.id);
+    const role  = roles.find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+
+    try {
+      const proposal = await classifyRoleArchetype(scenario, role, anthropicApiKey);
+      res.json(proposal);
+    } catch (err) {
+      console.error(`[ARCHETYPE ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
     }
   });
@@ -1856,9 +2225,80 @@ export function createAdminRouter(repos, config = {}) {
   r.patch('/player-roles/:id/ending-notes', (req, res) => {
     const role = repos.scenarios.findPlayerRole(req.params.id);
     if (!role) return notFound(res);
+
+    // DELETION ARM. Same reasoning as the defining-moment route below: the editor cannot
+    // remove ending_notes by omission (preserveStoredEndingNotes restores them), so an
+    // explicit route is the only honest way. The typed token is required UNCONDITIONALLY
+    // here — unlike a defining_moment, ending_notes carry no generated flag, so there is no
+    // way to tell a regenerable block from a reviewer's hand-edits, and no role-level
+    // version history to recover either (the McCormick data loss).
+    if (req.body?.delete === true) {
+      if (!role.ending_notes) {
+        return res.status(404).json({ error: `"${role.name}" has no ending_notes to remove.`, deleted: false });
+      }
+      if (req.body?.confirm !== 'DELETE') {
+        return res.status(409).json({
+          error: `Removing ending_notes from "${role.name}" is irreversible — there is no role-level version history. Send { "delete": true, "confirm": "DELETE" } to proceed.`,
+          existing: Object.keys(role.ending_notes),
+        });
+      }
+      const removed = Object.keys(role.ending_notes);
+      const { ending_notes, ...rest } = role;
+      const saved = repos.scenarios.savePlayerRole(rest);
+      console.log(`[ENDING-NOTES] ${role.id} — [${removed}] REMOVED`);
+      return res.json({ roleId: role.id, deleted: true, removed, ending_notes: saved.ending_notes ?? null });
+    }
+
     role.ending_notes = { ...(role.ending_notes || {}), ...req.body };
     res.json(repos.scenarios.savePlayerRole(role));
   });
+
+  // Remove a role's defining_moment. THE ONLY DELETION PATH THAT EXISTS — the editor cannot
+  // delete a block by omission, and that is deliberate: preserveStoredDefiningMoment restores
+  // any block a save omits, precisely so a stale tab can never erase one. That protection
+  // makes an explicit route the only honest way to remove one, which is what this is.
+  //
+  // Role-scoped and read-modify-write from the STORED role, like the generator: no role
+  // object is accepted from the client, so a stale tab riding along cannot clobber the other
+  // fields. The write is additive — one key removed, everything else untouched.
+  //
+  // NOT ARCHETYPE-GATED, on purpose. The gate refuses GENERATION of an artifact a role may
+  // not have; removal of one it should never have had is the corrective action the gate
+  // exists to enable. Gating deletion would strand exactly the blocks that most need to go.
+  //
+  // TYPED CONFIRMATION for a hand-authored block — the same protection the regenerate route
+  // applies, for the same reason: Trude's and Jäger's blocks are answer keys with no
+  // role-level version history behind them (see _defining_moment_blocks.md), and a
+  // one-click delete would destroy them irrecoverably. A GENERATED block can be regenerated,
+  // so it needs only the client's ordinary confirm. The token is DELETE rather than REPLACE
+  // because that is the word the reviewer is typing under — nothing is being replaced.
+  r.patch('/player-roles/:id/defining-moment', (req, res) => {
+    const role = repos.scenarios.findPlayerRole(req.params.id);
+    if (!role) return notFound(res);
+    if (req.body?.delete !== true) {
+      return badRequest(res, 'Send { "delete": true }. This route only removes a defining_moment.');
+    }
+    if (!hasRealDefiningMoment(role.defining_moment)) {
+      return res.status(404).json({ error: `"${role.name}" has no defining_moment to remove.`, deleted: false });
+    }
+
+    const handAuthored = role.defining_moment.generated !== true;
+    if (handAuthored && req.body?.confirm !== 'DELETE') {
+      return res.status(409).json({
+        error: `"${role.name}" carries a HAND-AUTHORED defining_moment ("${role.defining_moment.id}"). There is no role-level version history — the only backup is engine/data/scenarios/player_roles/_defining_moment_blocks.md. Send { "delete": true, "confirm": "DELETE" } to proceed.`,
+        handAuthored: true,
+        existing: { id: role.defining_moment.id, reviewed: role.defining_moment.reviewed === true },
+      });
+    }
+
+    const removed = role.defining_moment.id;
+    const { defining_moment, ...rest } = role;
+    const saved = repos.scenarios.savePlayerRole(rest);
+    console.log(`[DEFINING-MOMENT] ${role.id} — block "${removed}" REMOVED (${handAuthored ? 'hand-authored, confirmed' : 'generated'})`);
+    res.json({ roleId: role.id, deleted: true, removed, handAuthored, defining_moment: saved.defining_moment ?? null });
+  });
+
+
   r.delete('/player-roles/:id', (req, res) => {
     return repos.scenarios.deletePlayerRole(req.params.id) ? res.json({ ok: true }) : notFound(res);
   });
@@ -2898,11 +3338,11 @@ Return ONLY valid JSON in this exact structure:
         // dropped from ending_notes by the guard, so they are not written here.
         const en = state.steps['ending_notes'] && state.steps['ending_notes'].endingNotes;
         const notes = (en && en.ending_notes) || [];
-        const { updated, unmatched } = await applyEndingNotesToRoles(repos, scenarioId, notes);
+        const { updated, unmatched, skipped } = await applyEndingNotesToRoles(repos, scenarioId, notes);
         state.steps['ending_notes'].status = 'approved';
         state.steps['ending_notes'].approvedAt = new Date().toISOString();
         state.status = 'complete';
-        return res.json({ success: true, rolesUpdated: updated, unmatched });
+        return res.json({ success: true, rolesUpdated: updated, unmatched, skipped });
       } else {
         await PipelineOrchestrator.approveStep(scenarioId, stepName, approvedScenario);
       }
@@ -2968,6 +3408,23 @@ Return ONLY valid JSON in this exact structure:
       const { scenarioId } = req.params;
       const { roleId } = req.body;
       if (!roleId) return res.status(400).json({ error: 'roleId is required' });
+
+      // ARCHETYPE GATE (the safeguard) — server-side, so the endpoint refuses a disallowed
+      // generation even when called directly with no UI in front of it. It lives on the
+      // route rather than inside regenerateEndingNotes because PipelineOrchestrator is
+      // imported BY this module, and importing the policy back would close a cycle; this
+      // route is its only caller. A roleId that resolves to nothing is deliberately NOT
+      // handled here — it falls through to the orchestrator's existing not-found, so no
+      // pre-existing response shape changes.
+      const gateRole = repos.scenarios.findPlayerRole(roleId);
+      const endingsGate = gateRole ? archetypeAllows(gateRole, 'graded_endings') : { allowed: true };
+      if (!endingsGate.allowed) {
+        console.log(`[ARCHETYPE-GATE] ${scenarioId}/${roleId} — graded endings refused (archetype=${endingsGate.archetype})`);
+        return res.status(422).json({
+          error: endingsGate.reason, refused: true, artifact: 'graded_endings', archetype: endingsGate.archetype,
+        });
+      }
+
       const result = await PipelineOrchestrator.regenerateEndingNotes(scenarioId, roleId, repos);
       if (!result.ok) {
         // 422 for refusal (no fate_mode) / skip (nothing generated); 404 for not-found.
@@ -3029,8 +3486,9 @@ Return ONLY valid JSON in this exact structure:
       }
       const scenario = await repos.scenarios.findById(scenarioId);
       if (!scenario) return res.status(404).json({ error: 'Scenario not found' });
-      const { updated, unmatched } = await applyEndingNotesToRoles(repos, scenarioId, ending_notes);
-      res.json({ success: true, rolesUpdated: updated, unmatched });
+      const { updated, unmatched, skipped } = await applyEndingNotesToRoles(repos, scenarioId, ending_notes);
+      if (skipped.length) console.log(`[ARCHETYPE-GATE] ${scenarioId} — inject skipped ${skipped.map(s => `${s.role_name} (${s.archetype})`).join(', ')}`);
+      res.json({ success: true, rolesUpdated: updated, unmatched, skipped });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -3430,8 +3888,15 @@ Return only the scene description. No preamble, no closing remarks.`,
 
 // Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
 export { stripEmptyEndingNotes, preserveStoredEndingNotes };
-// Same, for the defining_moment guard and the two-guard composer the save paths call.
+// Same, for the defining_moment guard and the three-guard composer the save paths call.
 export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks };
+// Same, for the archetype guard. The property's own accessors (ROLE_ARCHETYPES,
+// isRoleArchetype, roleArchetype) are exported at their definition — those ARE app code.
+export { preserveStoredArchetype };
+// Archetype classifier. classifyRoleArchetype and the two pure resolvers are app code
+// (the route calls them); validateArchetypeProposal and the prompt builder are exported so
+// the proposal harness can exercise the classifier without going through HTTP.
+export { validateArchetypeProposal, buildArchetypeUserPrompt, ARCHETYPE_SYSTEM_PROMPT };
 // Defining-moment generator + its prompt builders. The builders are exported so a
 // validation run can swap in a HELD-OUT exemplar (the shipping exemplar is Trude, so
 // validating against Trude requires substituting a different one).

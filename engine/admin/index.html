@@ -1919,6 +1919,414 @@ function definingMomentState(dm) {
   return dm.reviewed === true ? 'reviewed' : 'pending';
 }
 
+// ── Archetype gating table (client copy) ─────────────────────────────────────
+// The SAME table the server enforces (ARCHETYPE_ARTIFACTS / ARCHETYPE_REFUSALS in
+// adminRouter.js), duplicated here for the same reason roleIsAnchored below is: the editor
+// renders its buttons before any request is made, and a button that looks live until you
+// press it is worse than one that says up front why it is not.
+//
+// THE SERVER IS THE AUTHORITY. Both generation routes run this check independently and
+// refuse with 422, so a stale tab, a hand-rolled fetch, or a copy of this file that has
+// drifted cannot generate a disallowed artifact by getting past the UI. This copy exists to
+// EXPLAIN the refusal early, never to be the thing that enforces it.
+//
+// unclassified is permissive on purpose — a role nobody has classified yet behaves exactly
+// as it did before any of this existed.
+const ARCHETYPE_ARTIFACTS = {
+  'crucible-open':  { fork: true,  graded_endings: true  },
+  'crucible-fixed': { fork: true,  graded_endings: false },
+  'instrument':     { fork: false, graded_endings: false },
+  'witness':        { fork: false, graded_endings: false },
+  'unclassified':   { fork: true,  graded_endings: true  },
+};
+const ARCHETYPE_REFUSALS = {
+  'crucible-fixed': {
+    graded_endings: 'Fixed-outcome role — no graded endings. This character\'s outcome is fixed by the record, so there is nothing to grade. The fork and the epilogue carry the resolution.',
+  },
+  instrument: {
+    fork:           'Instrument role — no fork. This character performs the pivotal act without knowing its significance, so a fork would have to grant them foreknowledge they did not have. The session resolves via the proximity epilogue.',
+    graded_endings: 'Instrument role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
+  },
+  witness: {
+    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue.',
+    graded_endings: 'Witness role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
+  },
+};
+// Mirror of roleArchetype() on the server: absent, empty or unrecognised all read as
+// 'unclassified'. Reads the STORED value — the confirmed one — never a form field.
+function roleArchetypeOf(r) {
+  const a = r && r.archetype;
+  return Object.prototype.hasOwnProperty.call(ARCHETYPE_ARTIFACTS, a) ? a : 'unclassified';
+}
+function archetypeAllows(r, artifact) {
+  const archetype = roleArchetypeOf(r);
+  const allowed   = ARCHETYPE_ARTIFACTS[archetype][artifact] !== false;
+  return { allowed, archetype, reason: allowed ? null : (ARCHETYPE_REFUSALS[archetype] || {})[artifact] || '' };
+}
+// The badge shown wherever a gate applies, so the reviewer can see the archetype that is
+// doing the blocking without hunting for it.
+function archetypeBadge(archetype) {
+  const C = {
+    'crucible-open':  ['#f0fdf4', '#166534'],
+    'crucible-fixed': ['#f5f3ff', '#6d28d9'],
+    instrument:       ['#fff7ed', '#9a3412'],
+    witness:          ['#eff6ff', '#1d4ed8'],
+    unclassified:     ['#f1f5f9', 'var(--text-soft)'],
+  }[archetype] || ['#f1f5f9', 'var(--text-soft)'];
+  return `<span class="archetype-badge" style="font-size:11px;padding:3px 9px;border-radius:10px;background:${C[0]};color:${C[1]};font-weight:600">${archetype}</span>`;
+}
+// The standard blocked-button rendering: disabled control plus the reason in full, never a
+// disabled control on its own.
+function archetypeBlockedNotice(reason) {
+  return `<div class="archetype-blocked" style="flex:1;min-width:260px;font-size:12px;color:#78350f;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:8px 10px;line-height:1.5">
+    <strong>Blocked by archetype.</strong> ${esc(reason)}
+  </div>`;
+}
+
+// ── Archetype: human-confirm control ─────────────────────────────────────────
+// The classifier PROPOSES; the human CONFIRMS; the gate enforces what the human confirmed.
+// This is that middle step, and it is the only place an archetype is ever set.
+//
+// Proposals are EPHEMERAL, for exactly the reason declines are (see _dmDeclines below):
+// the classifier writes nothing server-side, and anything hung off data.playerRoles[i] is
+// posted to /generate/save and would land in the role file. A proposal therefore lives in
+// this Map for the session, keyed by role id, and disappears on reload. The ONLY thing that
+// persists is the value of the <select>, and only when the reviewer saves.
+const _archetypeProposals = new Map();
+
+// The select's options. Each carries what the archetype COSTS you, because that is what a
+// reviewer is actually choosing between — an archetype is only ever visible in the editor
+// through the artifacts it permits.
+const ARCHETYPE_OPTIONS = [
+  ['crucible-open',  'crucible-open — knowing decision, own outcome open  (fork ✓, graded endings ✓)'],
+  ['crucible-fixed', 'crucible-fixed — knowing decision, own outcome fixed by the record  (fork ✓, endings ✗)'],
+  ['instrument',     'instrument — performs the pivotal act without foreknowledge  (fork ✗, endings ✗)'],
+  ['witness',        'witness / participant — present, but conduct is not a hinge  (fork ✗, endings ✗)'],
+  ['unclassified',   'unclassified — not yet decided  (both allowed, exactly as before)'],
+];
+
+// Replace one section of the editor in place. Handlers are delegated on the form root, so
+// nothing needs rebinding afterwards.
+function replaceEditorSection(formEl, selector, html) {
+  const el = formEl?.querySelector(selector);
+  if (!el) return false;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  el.replaceWith(tmp.firstElementChild);
+  return true;
+}
+
+// The classifier's proposal, laid out for a reviewer who has to either confirm or overturn
+// it. Everything the classifier cited is shown — the two test verdicts, the evidence it read,
+// and the counter-case it argued against itself — because a proposal a reviewer cannot check
+// is worth no more than a guess.
+function renderArchetypeProposalPanel(r, i) {
+  const p = _archetypeProposals.get(r.id);
+  if (!p) {
+    return `<div style="font-size:12px;color:var(--text-soft);padding:10px 12px;border:1px dashed var(--border);border-radius:6px">
+      No proposal yet. <strong>Propose archetype</strong> runs the classifier against this role's declared fields — its starting knowledge, initial-state flags, hooks and briefing — and reports what it would set and why. It writes nothing: you set the value above.
+    </div>`;
+  }
+  const stored  = roleArchetypeOf(r);
+  const agrees  = p.archetype === stored;
+  const row = (label, value) => value
+    ? `<div style="display:grid;grid-template-columns:132px 1fr;gap:8px;margin-bottom:6px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft)">${esc(label)}</div><div style="font-size:12px;line-height:1.55">${value}</div></div>`
+    : '';
+  const evidence = (p.foreknowledge?.evidence || []).map(e => `<li style="margin-bottom:3px">${esc(e)}</li>`).join('');
+
+  return `<div style="border:1px solid var(--border);border-left:4px solid ${agrees ? '#22c55e' : '#d97706'};border-radius:6px;padding:12px 14px;background:var(--card)">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Classifier proposes</span>
+      ${archetypeBadge(p.archetype)}
+      <span style="font-size:11px;color:var(--text-soft)">confidence ${esc(p.confidence || 'unstated')}</span>
+      ${agrees
+        ? '<span style="font-size:11px;color:#166534;font-weight:600">— matches the value set above</span>'
+        : `<span style="font-size:11px;color:#92400e;font-weight:700">— differs from the value set above (${esc(stored)})</span>`}
+      ${agrees ? '' : `<button type="button" class="btn btn-secondary btn-sm archetype-apply-btn" data-role-id="${r.id}" data-role-index="${i}">Use this value</button>`}
+    </div>
+    ${row('Family / axis', `${esc(p.family)} · axis <strong>${esc(p.axis)}</strong> (fate_mode ${esc(p.fate_mode || 'unset')})`)}
+    ${p.axis_note ? `<div style="font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:7px 9px;margin-bottom:8px">${esc(p.axis_note)}</div>` : ''}
+    ${row('Test 1 — hinge', `<strong>${p.hinge?.passed ? 'PASSED' : 'failed'}</strong>${p.hinge?.moment ? ` — ${esc(p.hinge.moment)}` : ''}${p.hinge?.why ? `<br><span style="color:var(--text-soft)">${esc(p.hinge.why)}</span>` : ''}`)}
+    ${row('Test 2 — foreknowledge', `<strong>${esc(p.foreknowledge?.verdict || '—')}</strong>${p.foreknowledge?.why ? `<br><span style="color:var(--text-soft)">${esc(p.foreknowledge.why)}</span>` : ''}`)}
+    ${evidence ? row('Evidence cited', `<ul style="margin:0;padding-left:16px;color:var(--text-soft)">${evidence}</ul>`) : ''}
+    ${row('Reasoning', esc(p.reasoning || ''))}
+    ${row('Counter-case', `<span style="color:var(--text-soft)">${esc(p.counter_case || '—')}</span>`)}
+    <div style="font-size:11px;color:var(--text-soft);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+      Advisory only — nothing was written. This note is not stored and clears on reload. The value in the select above is what persists and what the generators are gated on.
+    </div>
+  </div>`;
+}
+
+// Does this role carry ending_notes with any real content? Mirrors the server's
+// stripEmptyEndingNotes test: an all-blank sub-object is not content.
+function roleHasEndingNotes(r) {
+  const en = r && r.ending_notes;
+  if (!en) return false;
+  return ['success', 'partial', 'failure'].some(b => en[b] && Object.entries(en[b])
+    .some(([k, v]) => k !== 'in_event_outcome' && typeof v === 'string' && v.trim()));
+}
+
+// RECLASSIFICATION CLEANUP. The gate refuses to GENERATE an artifact a role may not have —
+// but a role reclassified after the fact can still be carrying one it generated under an
+// older reading. Blocking new ones does not remove the old ones, and a fork left on an
+// instrument role still fires in play. So the moment the archetype forbids an artifact the
+// role actually holds, say so here and offer the removal.
+//
+// Re-rendered by the archetype select's change handler, so the flag appears the instant a
+// reviewer picks the new archetype — before they save, while the decision is in front of them.
+function renderArchetypeCleanupPanel(r, i) {
+  const rows = [];
+
+  const forkGate = archetypeAllows(r, 'fork');
+  const dmState  = definingMomentState(r.defining_moment);
+  if (!forkGate.allowed && dmState !== 'none') {
+    rows.push(`<div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px">
+      <div style="flex:1;min-width:260px">
+        <strong>This role now has no fork by its archetype</strong> — but it still carries the defining moment
+        <code>${esc(r.defining_moment.id)}</code>${dmState === 'authored' ? ' <em>(hand-authored — removal will ask you to type DELETE)</em>' : ''}.
+        A block left in place still fires in play.
+      </div>
+      <button type="button" class="btn btn-danger btn-sm remove-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${dmState}" style="white-space:nowrap">Remove defining moment</button>
+    </div>`);
+  }
+
+  const endGate = archetypeAllows(r, 'graded_endings');
+  if (!endGate.allowed && roleHasEndingNotes(r)) {
+    rows.push(`<div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <strong>This role now has no graded endings by its archetype</strong> — but it still carries ending notes
+        (${esc(['success', 'partial', 'failure'].filter(b => r.ending_notes?.[b]).join(', '))}).
+        They still drive the closing prose wherever <em>Structured Endings</em> is enabled.
+      </div>
+      <button type="button" class="btn btn-danger btn-sm remove-endings-btn" data-role-id="${r.id}" data-role-index="${i}" style="white-space:nowrap">Remove ending notes</button>
+    </div>`);
+  }
+
+  if (!rows.length) return '';
+  return `<div class="archetype-cleanup" style="margin-top:10px;padding:12px 14px;background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:6px;font-size:12px;line-height:1.55;color:#7f1d1d">
+    <div style="font-weight:700;margin-bottom:8px">Disallowed artifact still present</div>
+    ${rows.join('')}
+    <div style="font-size:11px;margin-top:8px;opacity:.85">Removal is immediate and server-side — it is not part of Save, and there is no role-level version history.</div>
+  </div>`;
+}
+
+// The whole archetype control: the select that persists, the propose button, and the panel.
+// Rendered as a sibling of Fate Mode because the gate's open/fixed axis is read from
+// fate_mode — a reviewer setting one wants the other in view.
+function renderArchetypeSection(r, i) {
+  const current = roleArchetypeOf(r);
+  // Every option carries a LITERAL value, including 'unclassified'. It must never be the
+  // empty string: the server-side guard (preserveStoredArchetype) distinguishes a key that
+  // is absent — a stale tab, whose stored value is restored — from a value the client
+  // actually sent. An explicit demote to unclassified has to arrive as a real value or the
+  // guard would restore the old archetype over it and the demote would silently not stick.
+  const options = ARCHETYPE_OPTIONS
+    .map(([v, label]) => `<option value="${v}"${current === v ? ' selected' : ''}>${esc(label)}</option>`)
+    .join('');
+
+  return `<div id="archetype-section-${i}">
+    ${edField('Archetype', `
+      <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+        <select class="archetype-select" data-path="playerRoles.${i}.archetype" data-role-id="${r.id}" data-role-index="${i}" style="flex:1;min-width:340px">${options}</select>
+        <button type="button" class="btn btn-secondary btn-sm propose-archetype-btn" data-role-id="${r.id}" data-role-index="${i}" style="white-space:nowrap;flex-shrink:0">✦ Propose archetype</button>
+      </div>
+      <div class="archetype-proposal" style="margin-top:10px">${renderArchetypeProposalPanel(r, i)}</div>
+      ${renderArchetypeCleanupPanel(r, i)}`,
+      'What KIND of role this is, and therefore which artifacts may be generated for it. This value is the one the generators are gated on — set by you, never by the classifier. Legacy roles read as unclassified, which allows both artifacts exactly as before.')}
+  </div>`;
+}
+
+// The endings gate panel, extracted from the role editor template so the archetype select
+// can re-render it in place when the gate moves.
+function renderEndingsGatePanel(r, i) {
+  // ARCHETYPE GATE — graded endings. The button is disabled and the reason shown in full;
+  // the server refuses the same call independently, so this is the explanation, not the
+  // enforcement.
+  const g = archetypeAllows(r, 'graded_endings');
+  return `<div style="background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary btn-sm regen-endings-btn" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}" ${g.allowed ? '' : 'disabled title="Blocked by archetype — see the reason beside this button."'} style="white-space:nowrap;flex-shrink:0${g.allowed ? '' : ';opacity:.5;cursor:not-allowed'}">↻ Regenerate Endings (Opus)</button>
+          ${archetypeBadge(g.archetype)}
+          ${g.allowed
+            ? '<span class="help-text" style="margin:0">Regenerates this role\'s success / partial / failure fates only — reviewed at the pipeline gate before saving. Does <strong>not</strong> rebuild the scenario or touch other roles. Requires a <code>fate_mode</code> on this role.</span>'
+            : archetypeBlockedNotice(g.reason)}
+        </div>
+      </div>`;
+}
+
+// Delegated handlers for the archetype control: propose, adopt a proposal, and the live
+// re-gate on change. Bound once per editor render on the form root, alongside
+// bindDefiningMomentHandlers.
+function bindArchetypeHandlers(formEl, data, scenarioId) {
+  const roleIndexOf = id => (data.playerRoles || []).findIndex(pr => pr.id === id);
+
+  // ── Propose ───────────────────────────────────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.propose-archetype-btn');
+    if (!btn) return;
+    const roleId = btn.dataset.roleId;
+    const idx    = Number(btn.dataset.roleIndex);
+    if (!roleId || !scenarioId) return;
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Classifying…';
+    try {
+      // The endpoint writes nothing — it loads the role server-side, runs the classifier and
+      // returns the proposal. Held here for the session only.
+      const proposal = await apiPost(
+        `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/classify-archetype`, {});
+      _archetypeProposals.set(roleId, proposal);
+      replaceEditorSection(formEl, `#archetype-section-${idx}`, renderArchetypeSection(data.playerRoles[idx], idx));
+      toast(`Classifier proposes: ${proposal.archetype} (${proposal.confidence}). Read the reasoning, then set the value yourself.`, 'warn');
+    } catch (err) {
+      toast(`Archetype classification failed: ${err.message}`, 'error');
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ── Adopt a proposal into the select ──────────────────────────────────────
+  // A convenience, not an authority: it moves the value into the control the human owns and
+  // then fires the same change path a manual pick would. Nothing is saved here either.
+  formEl.addEventListener('click', e => {
+    const btn = e.target.closest('.archetype-apply-btn');
+    if (!btn) return;
+    const idx = Number(btn.dataset.roleIndex);
+    const p   = _archetypeProposals.get(btn.dataset.roleId);
+    const sel = formEl.querySelector(`#archetype-section-${idx} .archetype-select`);
+    if (!p || !sel) return;
+    sel.value = p.archetype;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  // ── Live re-gate on change ────────────────────────────────────────────────
+  formEl.addEventListener('change', e => {
+    const sel = e.target.closest?.('.archetype-select');
+    if (!sel) return;
+    const idx  = Number(sel.dataset.roleIndex);
+    const role = data.playerRoles[idx];
+    if (!role) return;
+
+    role.archetype = sel.value;     // so the re-rendered sections gate on the new value
+    markFormDirty();
+
+    // Re-render each gated control ONLY when its allowed-ness actually changed. The
+    // defining-moment section carries editable setup and option text, and re-rendering it
+    // gratuitously would discard a reviewer's unsaved prose just because they touched a
+    // neighbouring select.
+    const forkAllowed = archetypeAllows(role, 'fork').allowed;
+    const dmSection   = formEl.querySelector(`#dm-section-${idx}`);
+    if (dmSection && !!dmSection.querySelector('.gen-dm-btn') !== forkAllowed) {
+      replaceEditorSection(formEl, `#dm-section-${idx}`, renderDefiningMomentSection(role, idx, data));
+    }
+    const endingsAllowed = archetypeAllows(role, 'graded_endings').allowed;
+    const endingsPanel   = formEl.querySelector(`#endings-gate-${idx}`);
+    if (endingsPanel && !endingsPanel.querySelector('.regen-endings-btn[disabled]') !== endingsAllowed) {
+      replaceEditorSection(formEl, `#endings-gate-${idx}`, `<div id="endings-gate-${idx}">${renderEndingsGatePanel(role, idx)}</div>`);
+    }
+    // The proposal panel restates "matches / differs from the value set above", so it has to
+    // follow the select. Re-rendering the archetype section preserves the select's value
+    // because it is read back off the role we just updated.
+    replaceEditorSection(formEl, `#archetype-section-${idx}`, renderArchetypeSection(role, idx));
+  });
+
+  // ── Remove a defining moment ──────────────────────────────────────────────
+  // Shared by TWO surfaces — the review gate's own "Remove defining moment" button and the
+  // reclassification cleanup panel above — so the confirmation rules live in one place and
+  // cannot drift between them. Delegated on the form root, so both reach it.
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.remove-dm-btn');
+    if (!btn) return;
+    const roleId = btn.dataset.roleId;
+    const idx    = Number(btn.dataset.roleIndex);
+    const role   = data.playerRoles[idx];
+    const state  = definingMomentState(role?.defining_moment);
+    if (!roleId || state === 'none') return;
+
+    // Escalating confirmation, mirroring the regenerate flow. A hand-authored block is an
+    // answer key with no role-level version history; typing DELETE is the deliberate act
+    // that gets past it, and the server refuses the call without the token regardless.
+    const body = { delete: true };
+    if (state === 'authored') {
+      const typed = prompt(
+        `"${role.name}" carries a HAND-AUTHORED defining moment ("${role.defining_moment.id}").\n\n` +
+        `Removing it DISCARDS it. There is no role-level version history — the only backup is ` +
+        `engine/data/scenarios/player_roles/_defining_moment_blocks.md.\n\n` +
+        `Type DELETE to proceed, or Cancel.`);
+      if (typed !== 'DELETE') { toast('Removal cancelled — hand-authored block kept.', 'success'); return; }
+      body.confirm = 'DELETE';
+    } else if (!confirm(`Remove the defining moment "${role.defining_moment.id}" from "${role.name}"?\n\nThis is immediate and server-side — it is not part of Save.`)) {
+      return;
+    }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Removing…';
+    try {
+      const result = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(roleId)}/defining-moment`, body);
+      // Mirror the deletion locally BEFORE anything re-renders. If the block stayed on
+      // data.playerRoles[idx], the reviewer's next Save would post it straight back and the
+      // editor-save guard would have nothing stored to compare it against — the removal
+      // would silently undo itself.
+      delete data.playerRoles[idx].defining_moment;
+      _archetypeProposals.delete(roleId);
+      replaceEditorSection(formEl, `#dm-section-${idx}`, renderDefiningMomentSection(data.playerRoles[idx], idx, data));
+      replaceEditorSection(formEl, `#archetype-section-${idx}`, renderArchetypeSection(data.playerRoles[idx], idx));
+      toast(`Defining moment "${result.removed}" removed.`, 'success');
+    } catch (err) {
+      toast(`Removal failed: ${err.message}`, 'error');
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ── Remove ending notes ───────────────────────────────────────────────────
+  // The typed token is required unconditionally by the server: ending_notes carry no
+  // generated flag, so a reviewer's hand-edits are indistinguishable from a regenerable
+  // block, and there is no version history behind either.
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.remove-endings-btn');
+    if (!btn) return;
+    const roleId = btn.dataset.roleId;
+    const idx    = Number(btn.dataset.roleIndex);
+    const role   = data.playerRoles[idx];
+    if (!roleId || !roleHasEndingNotes(role)) return;
+
+    const typed = prompt(
+      `Remove the ending notes from "${role.name}" (${Object.keys(role.ending_notes).join(', ')})?\n\n` +
+      `This is irreversible — there is no role-level version history.\n\nType DELETE to proceed, or Cancel.`);
+    if (typed !== 'DELETE') { toast('Removal cancelled — ending notes kept.', 'success'); return; }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Removing…';
+    try {
+      const result = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(roleId)}/ending-notes`, { delete: true, confirm: 'DELETE' });
+      delete data.playerRoles[idx].ending_notes;
+      // AND clear the editor's own ending-notes inputs. They are rendered elsewhere in the
+      // role template and still hold the old prose; collectEdits reads the DOM, so a later
+      // Save would post those values straight back and re-create what was just removed.
+      formEl.querySelectorAll(`[data-path^="playerRoles.${idx}.ending_notes."]`).forEach(inp => { inp.value = ''; });
+      replaceEditorSection(formEl, `#endings-gate-${idx}`, `<div id="endings-gate-${idx}">${renderEndingsGatePanel(data.playerRoles[idx], idx)}</div>`);
+      replaceEditorSection(formEl, `#archetype-section-${idx}`, renderArchetypeSection(data.playerRoles[idx], idx));
+      toast(`Ending notes removed (${result.removed.join(', ')}).`, 'success');
+    } catch (err) {
+      toast(`Removal failed: ${err.message}`, 'error');
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+}
+
+// Test seam, same as the defining-moment one below: the confirm flow is worth driving
+// directly rather than through a rendered string.
+window.__bindArchetypeHandlers  = bindArchetypeHandlers;
+window.__archetypeProposals     = _archetypeProposals;
+window.__renderArchetypeSection = renderArchetypeSection;
+window.__renderEndingsGatePanel = renderEndingsGatePanel;
+
 // Same signal the server routes on (classifyRoleForDefiningMoment in adminRouter.js).
 // Duplicated here rather than fetched because the gate has to evaluate it against the
 // LIVE form — a reviewer who has just switched Character Type to "real" must get the
@@ -1971,6 +2379,9 @@ function renderDefiningMomentSection(r, i, data) {
   const dm      = r.defining_moment;
   const state   = definingMomentState(dm);
   const anchored = roleIsAnchored(r);
+  // ARCHETYPE GATE — fork. Read from the STORED archetype (the confirmed value), never
+  // from a form field: the gate must not move while a reviewer is mid-edit.
+  const forkGate = archetypeAllows(r, 'fork');
   const decline = _dmDeclines.get(r.id);
   const entry   = data?.scenario?.introduction?.sections?.find(s => s.type === 'entry')?.character_entries?.[r.id] || '';
 
@@ -2001,9 +2412,13 @@ function renderDefiningMomentSection(r, i, data) {
 
   let body = '';
   if (state === 'none') {
-    body = declineHtml || `<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px">
+    body = declineHtml || (forkGate.allowed
+      ? `<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px">
       No defining moment for this role. Generate one, or leave it — a role without a fork plays normally.
-    </div>`;
+    </div>`
+      : `<div style="padding:18px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px">
+      This role has no defining moment, and by its archetype it should not have one. It resolves through the proximity epilogue instead.
+    </div>`);
   } else {
     const moment    = dm.principal_transition?.moment ?? dm.id;
     const setupW    = dmWords(dm.setup);
@@ -2076,6 +2491,7 @@ function renderDefiningMomentSection(r, i, data) {
                ${state === 'reviewed' ? '✓ Defining Moment Reviewed' : 'Mark Defining Moment Reviewed'}
              </button>
              ${state !== 'reviewed' ? '<span style="font-size:12px;color:var(--text-soft)">Read the setup and all three options against the entry paragraph before marking reviewed.</span>' : ''}`}
+        <button type="button" class="btn btn-danger btn-sm remove-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}" style="margin-left:auto">Remove defining moment</button>
       </div>`;
   }
 
@@ -2094,8 +2510,12 @@ function renderDefiningMomentSection(r, i, data) {
           <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
           ${badge}
           ${anchored ? '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f5f3ff;color:#6d28d9;font-weight:600">anchored — historical faithfulness enforced</span>' : '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f1f5f9;color:var(--text-soft);font-weight:600">open outcome</span>'}
-          <button type="button" class="btn ${genClass} btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}">${genLabel}</button>
+          ${archetypeBadge(forkGate.archetype)}
+          ${forkGate.allowed
+            ? `<button type="button" class="btn ${genClass} btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}">${genLabel}</button>`
+            : `<button type="button" class="btn btn-secondary btn-sm" disabled title="Blocked by archetype — see the reason below." style="opacity:.5;cursor:not-allowed">✦ Generate Defining Moment</button>`}
         </div>
+        ${forkGate.allowed ? '' : `<div style="display:flex;margin-bottom:14px">${archetypeBlockedNotice(forkGate.reason)}</div>`}
         ${body}
       </div>
     </details>
@@ -2159,6 +2579,13 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     const role   = data.playerRoles[idx];
     const state  = definingMomentState(role?.defining_moment);
     if (!roleId || !scenarioId) return;
+
+    // ARCHETYPE GATE, defensively. The live button is not rendered when the archetype
+    // forbids a fork, but a section rendered before the archetype was set could still carry
+    // one. The server refuses this call independently (422); refusing here means the
+    // reviewer reads the reason instead of a raw error.
+    const forkGate = archetypeAllows(role, 'fork');
+    if (!forkGate.allowed) { toast(forkGate.reason, 'error'); return; }
 
     // Escalating confirmation. A hand-authored block is an answer key with no role-level
     // version history behind it (the server refuses the overwrite too, with a 409); typing
@@ -2319,12 +2746,8 @@ function renderPlayerRolesSection(data) {
       ${edField('Represents',         edTextarea(`playerRoles.${i}.represents`, r.represents, 2), 'Required for fictional/composite — what category of real person this role represents')}
       ${edField('Fact Checked', `<select data-path="playerRoles.${i}.fact_checked"><option value="false"${r.fact_checked !== true ? ' selected' : ''}>No — needs review</option><option value="true"${r.fact_checked === true ? ' selected' : ''}>Yes — verified</option></select>`, 'Has the real vs fictional declaration been verified?')}
       ${edField('Fate Mode', `<select data-path="playerRoles.${i}.fate_mode"><option value=""${!r.fate_mode ? ' selected' : ''}>— not set —</option><option value="anchored"${r.fate_mode === 'anchored' ? ' selected' : ''}>anchored</option><option value="committed"${r.fate_mode === 'committed' ? ' selected' : ''}>committed</option><option value="suspended"${r.fate_mode === 'suspended' ? ' selected' : ''}>suspended</option></select>`, 'How this character\'s ending outcomes are bounded. ANCHORED: real, documented person whose fate is fixed by the historical record — a documented survivor cannot be killed in any branch. COMMITTED: fictional/composite character whose death is allowed in failure branches (authored tragedy, no real record contradicted). SUSPENDED: no death in any branch, by authorial choice rather than record.')}
-      <div style="background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button type="button" class="btn btn-secondary btn-sm regen-endings-btn" data-role-id="${r.id}" data-role-name="${(r.name||'').replace(/"/g,'&quot;')}" style="white-space:nowrap;flex-shrink:0">↻ Regenerate Endings (Opus)</button>
-          <span class="help-text" style="margin:0">Regenerates this role's success / partial / failure fates only — reviewed at the pipeline gate before saving. Does <strong>not</strong> rebuild the scenario or touch other roles. Requires a <code>fate_mode</code> on this role.</span>
-        </div>
-      </div>
+      ${renderArchetypeSection(r, i)}
+      <div id="endings-gate-${i}">${renderEndingsGatePanel(r, i)}</div>
       ${edDetails('Ending Notes', 'partial + failure', `
         <p class="help-text" style="margin-bottom:12px">Used when <em>Structured Endings</em> is enabled on the scenario. Notes guide the closing prose for partial and failure outcomes — success always uses the transcript.</p>
         <div style="margin-bottom:18px">
@@ -4152,6 +4575,9 @@ function renderPreview(data, autoSaved = false) {
   // ── Defining Moment (render + review gate) ────────────────────────────────
   bindDefiningMomentHandlers(formEl, data, scenarioId);
 
+  // ── Archetype (propose + human confirm + live re-gate) ────────────────────
+  bindArchetypeHandlers(formEl, data, scenarioId);
+
   // ── Regenerate Endings (per role, Opus) ────────────────────────
   formEl.addEventListener('click', async e => {
     const btn = e.target.closest('.regen-endings-btn');
@@ -4159,6 +4585,11 @@ function renderPreview(data, autoSaved = false) {
     const roleId   = btn.dataset.roleId;
     const roleName = btn.dataset.roleName || roleId;
     if (!roleId || !scenarioId) return;
+
+    // ARCHETYPE GATE, defensively — same reasoning as the fork handler. The server refuses
+    // the same call with 422 whatever this does.
+    const endingsGate = archetypeAllows((data.playerRoles || []).find(pr => pr.id === roleId), 'graded_endings');
+    if (!endingsGate.allowed) { toast(endingsGate.reason, 'error'); return; }
 
     // Save-before-Regenerate guard — regenerate runs against the SAVED role data
     // (server reads persisted files; the button sends only roleId). If the form
@@ -6039,8 +6470,20 @@ async function applyEndingNotes(scenarioId) {
     const r = await apiFetch('POST', '/pipeline/inject-ending-notes/' + scenarioId, {
       ending_notes: window._aiEndingNotes
     });
+    // Two independent reasons a role can be left out, reported in the same place: a
+    // role_name that matched nothing, and a role whose ARCHETYPE forbids graded endings.
+    // The second is the safeguard doing its job, not a mistake, so it is worded as such —
+    // this button is the legacy bulk path and a subordinate pressing it has no other cue
+    // that some roles must not receive endings.
+    const parts = [];
     if (r && r.unmatched && r.unmatched.length) {
-      toast(`${r.rolesUpdated} role(s) updated — ${r.unmatched.length} role_name(s) did NOT match and were skipped: ${r.unmatched.join(', ')}`, 'warning');
+      parts.push(`${r.unmatched.length} role_name(s) did NOT match: ${r.unmatched.join(', ')}`);
+    }
+    if (r && r.skipped && r.skipped.length) {
+      parts.push(`${r.skipped.length} skipped by archetype (no graded endings): ${r.skipped.map(sk => `${sk.role_name} — ${sk.archetype}`).join('; ')}`);
+    }
+    if (parts.length) {
+      toast(`${r.rolesUpdated} role(s) updated. ${parts.join('. ')}.`, 'warning');
     } else {
       toast(`Ending notes applied to all ${r?.rolesUpdated ?? ''} player role(s)`, 'success');
     }
