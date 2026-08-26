@@ -1,0 +1,47 @@
+{
+  "id": "char_north",
+  "fear": "That the people he protected will not protect him — that the chain of command will hold him as the lowest man who can be sacrificed.",
+  "name": "Oliver North",
+  "role": "Lt. Col., USMC; Deputy Director for Political-Military Affairs, NSC Staff",
+  "voice": "Clipped, declarative, the syntax of military briefings — subject, verb, object, no subordinate clauses he doesn't control.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The full architecture of the Enterprise: Lake Resources account numbers, Secord's operational role, the diversion mechanism from Iranian arms payments to Contra supply.",
+    "Which documents, if found intact, directly implicate the President versus which implicate only himself and Poindexter.",
+    "The DOJ investigators arrive Saturday morning — he has until first light.",
+    "The Wang terminal chronologies have already been altered in earlier sessions; tonight's work is the financial paper trail."
+  ],
+  "updatedAt": "2026-08-26T18:46:00.053Z",
+  "publicFace": "A decorated combat veteran and disciplined staff officer — crisp uniform, direct eye contact, the bearing of a man who has operated under fire and does not flinch.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "the_enterprise_ledger"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "conduct_bounds": {
+    "would_not": [
+      "Confess the diversion to an outside investigator, a senator, or the press on this night. He is protecting the chain of command, not unburdening himself.",
+      "Implicate his superiors. Whatever he says about authorization, he does not hand over the people above him.",
+      "Physically harm anyone, or threaten violence. His documented conduct in this window is destruction of documents and concealment — not force.",
+      "Abandon the operation, or cooperate with its exposure."
+    ],
+    "record_is_silent_on": "The precise contents of what he destroyed, the order in which he worked through it, and what was said in Room 392 while it was going on.",
+    "documented_in_window": [
+      "Between 21 and 25 November 1986, following the Attorney General's announcement that Justice Department investigators would examine NSC files, directed and personally carried out the destruction and alteration of NSC documents concerning the Iran arms sales and Contra resupply.",
+      "Acted to protect a chain of command he served with conviction and a covert policy he believed was righteous.",
+      "A copy of the diversion memo survived his destruction effort and was found by Justice Department reviewers on 22 November 1986."
+    ]
+  },
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Answers with a counter-question that reframes the conversation around mission and loyalty — 'What do you think we were trying to accomplish here?'",
+    "breakingPoint": "He will not name Poindexter or the President as directing the diversion — not because he is protecting himself, but because in his frame those men sanctioned a righteous operation and the fault, if there is fault, belongs to him alone.",
+    "heavyPressure": "Goes still and precise, the volume drops, the sentences shorten — he does not raise his voice when cornered, he becomes more exact."
+  },
+  "privateConstraint": "He operates under a chain of command that runs to the National Security Advisor and, in his understanding, to the President himself; he cannot expose those above him without destroying the very authority that sanctioned the Enterprise. His documented orders and his loyalty to that chain are the walls of his room."
+}

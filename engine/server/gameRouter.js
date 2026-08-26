@@ -31,11 +31,16 @@ const anchorViolationNotes = new Map(); // sessionId -> string
 // ID of the primary scenario backed by the flat data/ files
 const PRIMARY_SCENARIO_ID = appData.getScenario().id;
 
-function selectSystemPrompt(scenarioId, sessionId, scenario, locations) {
+// characters is the scenario roster, threaded through so the system prompt can state it
+// as a CLOSED SET (buildApprovedCharactersBlock). Both branches receive it: the primary
+// scenario builds its own roster block from data.getNPCs(), and the legacy path from the
+// repository records passed in here. Defaulted to [] so a caller that omits it composes
+// exactly the prompt it composed before.
+function selectSystemPrompt(scenarioId, sessionId, scenario, locations, characters = []) {
   if (scenarioId === PRIMARY_SCENARIO_ID) {
     return buildSystemPromptFromData(sessionId);
   }
-  return buildSystemPromptLegacy(scenario, locations);
+  return buildSystemPromptLegacy(scenario, locations, characters);
 }
 
 const _dir = dirname(fileURLToPath(import.meta.url));
@@ -678,7 +683,7 @@ export function createGameRouter(repos, config = {}) {
       // Per-session anchor tracker — fresh instance on every /start
       anchorTrackers.set(sessionId, new AnchorTracker(scenario.overused_anchors || []));
 
-      const systemPrompt         = selectSystemPrompt(scenarioId, sessionId, scenario, locations);
+      const systemPrompt         = selectSystemPrompt(scenarioId, sessionId, scenario, locations, characters);
       const resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', 'opening');
 
       const openingChoicesText = (role.opening?.choices || [])
@@ -876,7 +881,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Save current state so promptBuilder can read session context
       if (sessionId) appData.saveSession(sessionId, state);
 
-      const systemPrompt = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations);
+      const systemPrompt = selectSystemPrompt(state.scenarioId, sessionId, scenario, locations, characters);
       const arcPosition  = getArcPosition(state.remainingMinutes, scenario.sessionTargetMinutes || 15);
       let resolvedSystemPrompt = systemPrompt.replace('{{ARC_POSITION}}', arcPosition);
 

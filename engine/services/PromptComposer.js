@@ -432,8 +432,41 @@ export function slimCharacter(char) {
     constraint:       char.privateConstraint || char.privateGoal || null,
     knowledge:        char.knowledge,
     aggressionProfile: char.aggressionProfile || null,
-    introAnchor:      char.introAnchor || null
+    introAnchor:      char.introAnchor || null,
+    // Whether this is a documented historical person. Set on every character by the
+    // authoring pipeline (adminRouter's health check blocks a missing value) and consumed
+    // there by the survivor guard — but it was dropped here, so the TURN generator was the
+    // one stage of the pipeline that could not tell a real person from an invention.
+    // null when the source record declares none (the file-based primary-scenario NPCs do
+    // not); absent means "unspecified", never "fictional".
+    character_type:   char.character_type || null,
+    // TIER 2 (c2). Authored conduct bounds — what the record shows this person doing in
+    // this window, and what they would not do. REAL CHARACTERS ONLY: a fictional character
+    // has no record to be bounded by, and handing the model bounds for one would invite it
+    // to treat invention as documentation. null when unauthored, in which case the general
+    // real-figure rule in the system prompt (a2) is the whole constraint.
+    conduct_bounds:   char.character_type === 'real' ? (char.conduct_bounds || null) : null
   };
+}
+
+// TIER 2 (c2), shared renderer. The player character and the NPC roster reach the model
+// through different channels — the player through prose in the role section, NPCs through
+// the {{NPC_JSON}} blob — but the BOUNDS must read identically in both, or the model can
+// conclude the player is held to a different standard than the cast around them. One
+// helper, both sites. Returns '' when there is nothing authored to say.
+export function buildConductBoundsLines(bounds) {
+  if (!bounds || typeof bounds !== 'object') return '';
+  const did    = (bounds.documented_in_window || []).filter(Boolean);
+  const wont   = (bounds.would_not            || []).filter(Boolean);
+  const silent = (bounds.record_is_silent_on  || '').trim();
+  if (!did.length && !wont.length && !silent) return '';
+  return [
+    did.length  ? 'What the record shows this person doing in this window:'          : '',
+    ...did.map(d => '  - ' + d),
+    wont.length ? 'What this person would NOT do — no turn may depict any of these:' : '',
+    ...wont.map(w => '  - ' + w),
+    silent      ? 'Where the record is silent (invent freely here): ' + silent       : '',
+  ].filter(Boolean).join('\n');
 }
 
 function getCharacterLocations(charId, locations) {
@@ -496,7 +529,45 @@ export function prepareForTts(text) {
 
 // ── System prompt ──────────────────────────────────────────────────────────────
 
-export function buildSystemPrompt(scenario, locations) {
+// The roster as a CLOSED SET. Exact sibling of the "Approved Locations" block that has
+// worked in this prompt since the beginning — same phrasing, same job, applied to the one
+// axis it was never applied to. Nothing in the turn prompt previously said the cast had
+// edges: {{NPC_JSON}} is a location-scoped subset and {{NPC_ROUTES_JSON}} is labelled a
+// routing table, so both read as context rather than constraint, and the engine invented
+// people (Gutierrez, Salazar in the_enterprise_ledger) to satisfy a player's steer.
+//
+// The unnamed-functionaries clause is LOAD-BEARING and must not be trimmed: without a
+// sanctioned way to populate a room, a closed roster produces stilted scenes where nobody
+// but the principals may open a door. Texture stays legal; only NAMES are closed.
+//
+// Returns '' for an empty roster, so any caller that does not pass characters — and the
+// previous signature could not — composes exactly the prompt it composed before.
+export function buildApprovedCharactersBlock(characters = []) {
+  const roster = (characters || []).filter(c => c && (c.name || c.id));
+  if (!roster.length) return '';
+
+  // The REAL tag is a LABEL, not a conduct rule: it states what the record says a person
+  // is, not what may be depicted of them (that rule is deliberately not in this pass).
+  // Absent character_type prints no tag rather than guessing — the primary scenario’s
+  // file-based NPCs carry none, and mislabelling a real person as invented would be
+  // worse than saying nothing.
+  const lines = roster.map(c => {
+    const tag = c.character_type === 'real' ? ' — REAL (documented historical person)'
+              : c.character_type           ? ` — ${c.character_type}`
+              : '';
+    return `- ${c.id}: ${c.name}${tag}`;
+  });
+
+  return [
+    '## Approved Characters (only these people may be named, speak, or act in your narrative)',
+    lines.join('\n'),
+    '',
+    'No other person may be given a name, a line of dialogue, or an action. Unnamed functionaries are permitted ("the duty officer", "a clerk", "the switchboard operator", "a marine at the desk") and must stay unnamed — they may move through the scene and speak as texture, but they never acquire a name, a history, or a part in the story.',
+    'The player character is never an "other person" — they are the point of view, and the player-identity rules govern how they are written. This list closes who else may exist, not who the player is.',
+  ].join('\n');
+}
+
+export function buildSystemPrompt(scenario, locations, characters = []) {
   const locList = locations
     .map(l => `- ${l.id}: ${l.name} — ${(l.description || '').slice(0, 100)}`)
     .join('\n');
@@ -505,6 +576,10 @@ export function buildSystemPrompt(scenario, locations) {
   const failConds = (scenario.failConditions       || []).join('\n- ');
   const partial   = (scenario.partialSuccessExamples || []).join('\n- ');
   const pressure  = (scenario.systems?.pressureEvents || []).join('\n- ');
+
+  // '' when no roster was passed. Spread-or-nothing rather than a blank entry, so the
+  // composed prompt is byte-identical for a caller that omits characters.
+  const approvedCharacters = buildApprovedCharactersBlock(characters);
 
   const context = [
     `## Scenario: ${scenario.title}`,
@@ -518,6 +593,7 @@ export function buildSystemPrompt(scenario, locations) {
     '## Approved Locations (use only these IDs and names in your narrative)',
     locList,
     '',
+    ...(approvedCharacters ? [approvedCharacters, ''] : []),
     '## Win Conditions',
     `- ${winConds}`,
     '',
@@ -579,7 +655,21 @@ function buildAliasProtectionBlock(state) {
   ].join('\n');
 }
 
-function buildPlayerRoleSection(state) {
+// TIER 2 — THE PLUMBING FIX. The player's own character record was unreachable from the
+// turn prompt: getRelevantCharacters filters `c.id !== playerCharId`, buildNpcIntroInstruction
+// filters it again, and authoring rule 10 forbids the player character from appearing in any
+// location's linkedCharacterIds — three independent filters, each correct for its own purpose
+// (they stop the player being written as an NPC talking to themselves), and jointly fatal
+// here. The consequence: a REAL player character reached the generator with no character_type
+// and no conduct data at all, while every real NPC carried both. That is the gap the Kerry
+// transcript fell through — his own breakingPoint ("he will not claim more than the documents
+// support") sat on disk and was never sent. So the player character is resolved here, from
+// the roster this turn already loaded.
+//
+// Resolved per-turn from `characters` rather than denormalised onto session state at /start,
+// so a session already in flight picks the bounds up on its very next turn and no stored
+// session needs migrating.
+function buildPlayerRoleSection(state, characters = []) {
   const roleId      = state.playerRoleId    || 'unknown';
   const roleName    = state.playerRoleName  || 'Investigator';
   const perspective = state.playerPerspective || 'The player is an investigator.';
@@ -592,6 +682,19 @@ function buildPlayerRoleSection(state) {
     `Starting knowledge: ${knowledge || 'none'}`,
     `HARD RULE: The player is ${roleName}. Never address them as a different character. Never have ${roleName} appear as an NPC speaking to the player.`,
   ];
+
+  // The REAL marker is emitted whether or not bounds were authored: it is what the general
+  // real-figure rule in the system prompt (a2) keys on, and without it that rule has nothing
+  // to bind to for the player character. Authored bounds (c2) refine it when present.
+  const playerChar = (characters || []).find(c => c && c.id === state.playerCharacterId) || null;
+  if (playerChar?.character_type === 'real') {
+    const boundsText = buildConductBoundsLines(playerChar.conduct_bounds);
+    lines.push(
+      '',
+      'REAL PERSON — CONDUCT BOUNDS. ' + roleName + ' is a documented historical figure. The real-figure conduct rule in the system prompt applies to the PLAYER CHARACTER, not only to the NPCs around them. The player may attempt anything; what is bounded is what the narrative may depict ' + roleName + ' actually doing, and successfully bringing off.',
+      boundsText || ('No conduct bounds have been authored for ' + roleName + '. Treat the record as real but unstated: do not invent documented acts, and keep what they do inside what their documented position plainly permitted.'),
+    );
+  }
 
   const aliasBlock = buildAliasProtectionBlock(state);
   if (aliasBlock) lines.push('', aliasBlock);
@@ -1017,7 +1120,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   };
 
   return turnTemplate
-    .replace('{{PLAYER_ROLE_SECTION}}',    buildPlayerRoleSection(state))
+    .replace('{{PLAYER_ROLE_SECTION}}',    buildPlayerRoleSection(state, characters))
     .replace('{{STATE_JSON}}',             JSON.stringify(promptState))
     .replace('{{LOCATION_JSON}}',          JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}',               JSON.stringify(relevantChars))

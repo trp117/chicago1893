@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as data from './data.js';
-import { buildNarrativeStyleRules } from './services/PromptComposer.js';
+import { buildNarrativeStyleRules, buildApprovedCharactersBlock } from './services/PromptComposer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -133,6 +133,16 @@ export function buildSystemPrompt(sessionId) {
   ].join('\n')).join('\n\n');
 
   sections.push(`## ACTIVE NPCS\n\n${npcBlocks}`);
+
+  // PARITY with the legacy path (buildSystemPrompt in PromptComposer). This path already
+  // lists the full roster above, so the CLOSED-SET sentence was the only thing missing —
+  // and it is now required, not optional: the shared system prompt tells the model to check
+  // "the Approved Characters list" before honouring a name the player supplies, so a path
+  // without one would leave that instruction pointing at nothing. Same helper on both sides
+  // so the two can never drift apart in wording. The file-based NPC records carry no
+  // character_type, so the REAL tag simply does not print here.
+  const approvedCharacters = buildApprovedCharactersBlock(npcs);
+  if (approvedCharacters) sections.push(approvedCharacters);
 
   // ── CURRENT LOCATION ──────────────────────────────────────────────────────
   if (currentLocation) {

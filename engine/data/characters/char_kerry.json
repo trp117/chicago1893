@@ -1,0 +1,48 @@
+{
+  "id": "char_kerry",
+  "fear": "That the evidence will be gone by morning and the story will be reduced to a political dispute without a documentary foundation.",
+  "name": "John Kerry",
+  "role": "U.S. Senator (D-MA); Member, Senate Foreign Relations Committee",
+  "voice": "Deliberate, slightly formal, the cadence of a man who chooses words for the record — he speaks as if everything he says may be read back to him later, because it usually is.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The Ilopango air base operation in detail — flight logs, manifest dates, tail numbers of the supply aircraft.",
+    "The financial structure of the Enterprise as reconstructed from banking records his investigators have assembled over months.",
+    "That the NSC files are being reviewed — and that this means they are also being altered, right now, across town.",
+    "Which Senate colleagues he can reach tonight and which are unreachable or unsympathetic."
+  ],
+  "updatedAt": "2026-08-26T18:46:00.048Z",
+  "publicFace": "A first-term senator who has spent the better part of a year pursuing a story his colleagues consider a distraction — methodical, serious, willing to be unpopular.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "the_enterprise_ledger"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "conduct_bounds": {
+    "would_not": [
+      "Forge a document, or send an unsigned or falsely attributed document under an institutional identity that is not his own.",
+      "Run a covert deception against a foreign mission, an executive-branch office, or any other party — including a pretext or cover-story request designed to make the recipient believe it originated somewhere else. This covers an UNATTRIBUTED document as much as a falsely attributed one: what is barred is drafting, sending, or having anyone send a request whose wording is chosen to disguise what is actually being sought or who is actually asking. He may ask plainly for what he wants and be refused; he does not dress the ask up as something else.",
+      "Assert investigative authority he did not hold: represent himself or his staff as carrying subpoena power, an active committee mandate, or standing to compel the production of records.",
+      "Obtain documents by theft, burglary, impersonation, or bribery, or direct anyone else to do so on his behalf.",
+      "Overstate what his evidence showed. The entire value of the record he has spent eleven months building is that it is clean and verifiable; claiming more than the documents support would destroy the only asset he has."
+    ],
+    "record_is_silent_on": "Whom he telephoned on the evening of 21 November 1986, in what order, and what was said. The interior of the night — what he feared, what he reread, what he resolved to do in the morning — is unrecorded and is yours to write.",
+    "documented_in_window": [
+      "Ran an investigation out of his own Senate office through 1986 into Contra resupply operations and the allegations attached to them — staff investigators, interviews, and a documentary record his office assembled over months, an inquiry his colleagues largely regarded as a distraction.",
+      "Worked through Senate procedure: his route to acting on what he had was the Foreign Relations Committee, colleagues with standing, and the press — not unilateral action.",
+      "Held no subpoena power of his own on this date. Compulsory process required committee action a first-term member could not take alone."
+    ]
+  },
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Engages directly and without defensiveness — he has been questioned about this investigation for a year and has his answers ready.",
+    "breakingPoint": "He will not overstate what the evidence shows — even tonight, even under deadline, he will not claim more than the documents support.",
+    "heavyPressure": "Becomes more precise, not less — he cites specific documents, specific dates, specific amounts. The pressure makes him more specific."
+  },
+  "privateConstraint": "He has no subpoena power tonight — that requires committee action — and his staff is small. He can coordinate, verify, and apply political pressure, but he cannot compel anyone to preserve evidence. The constraint is procedural and real."
+}

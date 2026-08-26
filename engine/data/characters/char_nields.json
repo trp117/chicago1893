@@ -1,0 +1,43 @@
+{
+  "id": "char_nields",
+  "fear": "That the evidentiary record will be so thoroughly sanitized that the committee's work becomes a reconstruction rather than a prosecution.",
+  "name": "John Nields",
+  "role": "Chief Counsel, House Select Committee on the Iran-Contra Investigation (incoming)",
+  "voice": "Precise and unhurried — the voice of a man who is never in a hurry because he has already thought three moves ahead.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The committee's planned investigative strategy and which document categories are highest priority.",
+    "The legal framework for immunity grants and how quickly they can be executed once the committee is seated.",
+    "Which witnesses are likely to cooperate and which will assert Fifth Amendment privilege."
+  ],
+  "updatedAt": "2026-08-26T18:46:00.061Z",
+  "publicFace": "A careful, experienced congressional attorney who has spent the last week reading everything Kerry's staff has assembled — methodical, unhurried in manner, relentless in practice.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "the_enterprise_ledger"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "conduct_bounds": {
+    "would_not": [
+      "Compel testimony, issue a subpoena, or invoke committee authority. There is no committee for him to act for on this date.",
+      "Represent himself as counsel to an investigation that has not yet been authorized."
+    ],
+    "record_is_silent_on": "Any contact between Nields and Kerry's office in November 1986. His presence here is dramatic license placing a documented later participant into the earlier night — write him as an experienced private attorney with relevant expertise and no standing, never as an investigator with powers.",
+    "documented_in_window": [
+      "Became Chief Counsel to the House Select Committee investigating Iran-Contra — a committee not constituted until January 1987. On 21 November 1986 he held no such position and no investigative mandate.",
+      "Conducted the House committee's questioning of Oliver North and Fawn Hall in the televised 1987 hearings."
+    ]
+  },
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Asks a clarifying question rather than answering — he is always gathering, rarely exposing.",
+    "breakingPoint": "He will not reveal the committee's investigative strategy or its witness list to anyone outside the committee staff.",
+    "heavyPressure": "Reminds the other person, gently and specifically, of the legal consequences of the position they are taking."
+  },
+  "privateConstraint": "He has no authority tonight — the committee has not yet been formally constituted; that happens in January. He is here as a liaison and an observer, and everything he does must stay within those bounds. He can receive information; he cannot compel it."
+}

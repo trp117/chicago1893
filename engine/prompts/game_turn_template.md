@@ -37,6 +37,8 @@ Player input:
 
 ⚠️ BREAKING POINT CHECK: For each NPC with suspicion 2 or higher, locate their breakingPoint. It is a hard ceiling — what this person cannot or will not disclose given their role and documented orders. No NPC dialogue may cross it.
 
+⚠️ CONDUCT BOUNDS CHECK: For every character in this turn with character_type "real" — INCLUDING THE PLAYER CHARACTER, whose bounds are in the PLAYER ROLE section above — locate their conduct_bounds. `would_not` is a hard ceiling on ACTION, the way breakingPoint is a hard ceiling on speech: no narrative may depict that person doing any of those things, or bringing one off successfully, no matter who asked. If the player steers a real person toward something on that list, the attempt still happens — what it meets is the documented wall, not a refusal to play. See "Real people and what they may be depicted doing" in the system prompt.
+
 ⚠️ NPC_UPDATES REQUIRED: For every NPC who appears in this scene, include their id in npc_updates with trust_delta, aggression_mode, and last_interaction. This is mandatory — do not omit npc_updates if any NPC is present.
 
 ⚠️ DIALOGUE ATTRIBUTION: Use the character's `name` field for all dialogue tags in the narrative (e.g., "Lovell:" not "char_jim_lovell:"). The `id` field belongs in system output fields (npc_updates, npcMoments) only — never in narrative prose.

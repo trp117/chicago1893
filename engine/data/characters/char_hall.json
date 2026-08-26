@@ -1,0 +1,47 @@
+{
+  "id": "char_hall",
+  "fear": "That she will be left holding the paper while the men above her are protected — and that she already knows this is possible.",
+  "name": "Fawn Hall",
+  "role": "Confidential Secretary to Oliver North, NSC Staff",
+  "voice": "Careful, slightly formal, the voice of someone who has learned to be precise in a world where precision is protection — she does not volunteer more than is asked.",
+  "secrets": [],
+  "createdAt": "2025-01-01T00:00:00Z",
+  "knowledge": [
+    "The Wang terminal's document architecture — which files are stored under which directory names, which have already been altered.",
+    "The specific cables she has been asked to sanitize tonight and what the original language said.",
+    "That she will be called before a Senate committee; she has already begun to understand this.",
+    "The physical layout of the documents in Room 392 and which folders contain the Swiss wire transfer records."
+  ],
+  "updatedAt": "2026-08-26T18:46:00.055Z",
+  "publicFace": "Efficient, composed, the invisible competence of a senior executive secretary — she knows where every document lives and what every abbreviation means.",
+  "represents": "",
+  "trustLogic": "",
+  "description": "",
+  "privateGoal": "",
+  "scenarioIds": [
+    "the_enterprise_ledger"
+  ],
+  "fact_checked": false,
+  "character_type": "real",
+  "conduct_bounds": {
+    "would_not": [
+      "Volunteer the operation to an outside investigator, a senator, or the press on this night.",
+      "Turn on North or offer evidence against him in this window. Her account came later, under immunity, in a hearing room — not here.",
+      "Act against North's instructions on her own initiative."
+    ],
+    "record_is_silent_on": "What she thought while she did it, what passed between her and North in Room 392, and at what moment she understood what she was part of.",
+    "documented_in_window": [
+      "Participated in the destruction and alteration of NSC documents in the days following 21 November 1986, working at North's direction.",
+      "Removed additional documents from the Old Executive Office Building concealed in her clothing.",
+      "Was North's confidential secretary and had served on the NSC staff for years; loyalty to him is the governing fact of her conduct in this window.",
+      "Testified before the joint congressional committees in 1987 under a grant of immunity."
+    ]
+  },
+  "aggressionProfile": {
+    "strikeFirst": null,
+    "mildPressure": "Answers accurately but minimally, watching to see where the question is going before she commits to a direction.",
+    "breakingPoint": "She will not say, tonight, that North directed her to do anything she did not already understand was wrong — the loyalty is still operative, even as the doubt is growing.",
+    "heavyPressure": "Goes quiet in a way that is not evasion but genuine uncertainty — she is working through it in real time, and it shows."
+  },
+  "privateConstraint": "She has no independent access to the policy decisions she has been asked to help conceal; her knowledge is documentary and procedural, not ideological. Her constraint is the asymmetry of her position — she serves at North's direction and has no standing to refuse him through any formal channel available to her tonight."
+}
