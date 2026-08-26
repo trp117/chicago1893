@@ -1833,8 +1833,11 @@ export function createAdminRouter(repos, config = {}) {
     const merged = { ...SENSORY_DEFAULTS, ...(scenario.sensory_opening || {}), ...sopFields };
     const updated = { ...scenario, sensory_opening: merged };
     if (tts_narration_speed !== undefined) updated.tts_narration_speed = Number(tts_narration_speed);
-    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0 });
+    // Return current_version so the open editor can advance its cached base — same contract
+    // as the glossary and image routes. Without it this write bumps the scenario version
+    // behind the editor's back and its next manual Save 409s with nothing actually wrong.
+    const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0, current_version: newVersion });
   });
 
   // ── Locations ────────────────────────────────────────────────────────────────
@@ -1895,6 +1898,10 @@ export function createAdminRouter(repos, config = {}) {
 
     const repairs = [];
     const errors  = [];
+    // Highest version written by this repair, or null if it never touched the scenario row.
+    // Repair has TWO conditional scenario saves (character entries, period vocabulary) and
+    // either, both, or neither may run — so the version is tracked rather than assumed.
+    let scenarioVersion = null;
 
     // Repair missing briefings
     for (const role of playerRoles.filter(r => getBriefingText(r.briefing).length < 50)) {
@@ -1940,7 +1947,7 @@ export function createAdminRouter(repos, config = {}) {
             console.error(`[REPAIR ERROR] entry ${role.name}: ${err.message}`);
           }
         }
-        await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
+        scenarioVersion = await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
       }
     }
 
@@ -1974,7 +1981,7 @@ export function createAdminRouter(repos, config = {}) {
         }
         scenario.period_vocabulary = vocab;
         console.log(`[REPAIR] Writing vocabulary to ${req.params.id} — ${vocab.categories.length} categories, keys: ${Object.keys(vocab).join(', ')}`);
-        await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
+        scenarioVersion = await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
         repairs.push(`Generated period vocabulary (${vocab.categories.length} categories)`);
         console.log(`[REPAIR] ${req.params.id} — period vocabulary written successfully`);
       } catch (err) {
@@ -1984,14 +1991,16 @@ export function createAdminRouter(repos, config = {}) {
     }
 
     if (repairs.length === 0 && errors.length === 0) {
-      return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [] });
+      // scenarioVersion is null here (nothing was repaired, so the scenario row was never
+      // written). The client's null guard makes that a no-op rather than a bogus advance.
+      return res.json({ success: true, message: 'Scenario is complete — no repairs needed', repairs: [], errors: [], remaining: [], current_version: scenarioVersion });
     }
 
     const updatedRoles    = repos.scenarios.findPlayerRoles(req.params.id);
     const validationChars = repos.characters.findAll().filter(c => c.scenarioIds?.includes(scenario.id));
     const validationLocs  = repos.locations.findByScenario(scenario.id);
     const { errors: remaining } = validateStoredScenario(scenario, updatedRoles, validationChars, validationLocs);
-    res.json({ success: errors.length === 0, repairs, errors, remaining });
+    res.json({ success: errors.length === 0, repairs, errors, remaining, current_version: scenarioVersion });
   });
 
   // Generate a bridge sentence draft for a single player role

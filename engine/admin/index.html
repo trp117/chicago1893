@@ -1079,7 +1079,8 @@ async function renderDashboard() {
         tts_narration_speed: Number(document.getElementById(`sop-speed-${sid}`).value),
       };
       try {
-        await apiFetch('PATCH', `/scenarios/${encodeURIComponent(sid)}/sensory-opening`, payload);
+        const resp = await apiFetch('PATCH', `/scenarios/${encodeURIComponent(sid)}/sensory-opening`, payload);
+        _syncSensoryOpeningToEditor(sid, payload, payload.tts_narration_speed, resp?.current_version);
         const status = document.getElementById(`sop-status-${sid}`);
         status.classList.add('show');
         setTimeout(() => status.classList.remove('show'), 2000);
@@ -3124,6 +3125,39 @@ function _syncImageToEditor(scenarioId, image, current_version) {
   if (!d || d.scenario?.id !== scenarioId) return;
   if (image !== undefined) { d.scenario = d.scenario || {}; d.scenario.image = image; }  // {} on delete clears it
   if (current_version != null) d.current_version = current_version;
+}
+
+// The scene-opening panel lives on the scenario CARD, not in the editor, so it can be saved
+// while the editor holds an open snapshot of the same scenario. It writes exactly two
+// scenario fields, so mirror those two and advance the base — same shape as the glossary
+// sync above, and mirroring matters for the same reason: advancing the version without the
+// content would let the editor's next Save write the OLD scene-opening back over this one.
+function _syncSensoryOpeningToEditor(scenarioId, sensory_opening, tts_narration_speed, current_version) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;   // a different scenario is open — do not touch
+  if (sensory_opening)               d.scenario.sensory_opening    = sensory_opening;
+  if (tts_narration_speed != null)   d.scenario.tts_narration_speed = tts_narration_speed;
+  if (current_version != null)       d.current_version              = current_version;
+}
+
+// Repair is the one write that CANNOT use the mirror-a-field shape. It rewrites introduction
+// character_entries, period_vocabulary and several player-role records, and its response
+// carries none of that content — so there is nothing to mirror. Advancing the base alone
+// would be actively worse than the 409 it fixes: the editor's stale snapshot would then pass
+// the CAS and clobber the repairs. So re-read the whole scenario instead. Same goal as the
+// other syncs (leave the editor holding current content at the current version), reached the
+// only way this route allows.
+async function _resyncEditorAfterRepair(scenarioId) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;   // editor not open on this scenario
+  try {
+    const fresh = await apiGet(`/scenarios/${encodeURIComponent(scenarioId)}/full`);
+    window._aiPanelData = fresh;
+    toast('Scenario editor refreshed after repair — reload the view to see the repaired content.', 'info');
+  } catch {
+    // Could not refresh: leave the stale base in place ON PURPOSE. A spurious 409 on the next
+    // Save is the safe failure here; a silently advanced base is not.
+  }
 }
 
 async function saveGlossaryTermEdit(term, scenarioId) {
@@ -5509,6 +5543,7 @@ async function repairScenario(scenarioId) {
     if (result.repairs?.length)  toast(`Repaired: ${result.repairs.join(', ')}`, 'success');
     else                         toast(result.message || 'No repairs needed', 'info');
     if (result.errors?.length)   toast(`Errors: ${result.errors.join(', ')}`, 'error');
+    if (result.current_version != null) await _resyncEditorAfterRepair(scenarioId);
     await checkScenarioHealth(scenarioId);
   } catch (err) {
     toast(`Repair failed: ${err.message}`, 'error');
