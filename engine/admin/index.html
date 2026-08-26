@@ -366,7 +366,10 @@ async function apiFetch(method, path, body) {
   }
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `Server error (${res.status})`);
+    const err = new Error(data.error || `Server error (${res.status})`);
+    err.status = res.status;   // lets callers special-case 409 (version conflict) etc.
+    err.body = data;
+    throw err;
   }
   return res.json();
 }
@@ -3101,6 +3104,28 @@ function cancelGlossaryTermEdit(term) {
   card.querySelector('.term-edit').hidden = true;
 }
 
+// Glossary endpoints save server-side and bump current_version. The open editor holds its
+// snapshot at window._aiPanelData (the same object handleManualSave posts). Keep that in sync
+// after a glossary write so its next manual Save carries the current version (passes the CAS)
+// and the correct glossary — instead of a spurious 409 or a stale-glossary clobber.
+function _syncGlossaryToEditor(scenarioId, glossary, current_version) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;   // a different scenario is open — do not touch
+  if (Array.isArray(glossary)) d.scenario.glossary = glossary;
+  if (current_version != null) d.current_version = current_version;
+}
+
+// Image endpoints save server-side and bump current_version, returning the full image object
+// (empty {} after delete). Mirror it EXACTLY into the open editor's cached snapshot and advance
+// the base — otherwise the next manual Save reverts the image (or resurrects a deleted one) or
+// 409s. Same open-scenario guard as the glossary sync.
+function _syncImageToEditor(scenarioId, image, current_version) {
+  const d = window._aiPanelData;
+  if (!d || d.scenario?.id !== scenarioId) return;
+  if (image !== undefined) { d.scenario = d.scenario || {}; d.scenario.image = image; }  // {} on delete clears it
+  if (current_version != null) d.current_version = current_version;
+}
+
 async function saveGlossaryTermEdit(term, scenarioId) {
   const card = document.querySelector(`.glossary-term-card[data-term="${CSS.escape(term)}"]`);
   if (!card) return;
@@ -3125,18 +3150,20 @@ async function saveGlossaryTermEdit(term, scenarioId) {
   try {
     const body = { definition, source };
     if (newTerm.toLowerCase() !== term.toLowerCase()) body.newTerm = newTerm;
-    const { glossary } = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, body);
+    const resp = await apiFetch('PUT', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`, body);
     toast('Term updated', 'success');
-    renderGlossaryBody(scenarioId, glossary);
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
 }
 
 async function deleteGlossaryTerm(term, scenarioId) {
   if (!confirm(`Delete "${term}" from the glossary?`)) return;
   try {
-    const { glossary } = await apiFetch('DELETE', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`);
+    const resp = await apiFetch('DELETE', `/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}`);
     toast('Term deleted', 'success');
-    renderGlossaryBody(scenarioId, glossary);
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
 }
 
@@ -3344,9 +3371,10 @@ function addGlossaryTermManually(scenarioId) {
     const source     = card.querySelector('.new-source-input').value.trim();
     if (!term || !definition) { toast('Term and definition are required', 'error'); return; }
     try {
-      const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+      const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
       toast(`"${term}" added`, 'success');
-      renderGlossaryBody(scenarioId, glossary);
+      renderGlossaryBody(scenarioId, resp.glossary);
+      _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
     } catch (err) { toast(`Error: ${err.message}`, 'error'); }
   });
 }
@@ -3625,14 +3653,22 @@ async function handleManualSave(data, containerEl) {
   }
 
   try {
-    await apiPost('/generate/save', data);
+    // Optimistic concurrency: send the version we loaded. The server rejects with 409 if the
+    // scenario changed elsewhere since load, instead of silently clobbering the newer save.
+    const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
+    if (resp && resp.current_version != null) data.current_version = resp.current_version;  // advance base for next save this session
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
     clearFormDirty();   // single choke point — clears badge/Save emphasis for all save paths
     return true;
   } catch (err) {
-    toast(`Save failed: ${err.message}`, 'error');
+    // 409 = version conflict. Non-destructive: keep the user's edits, tell them to reload.
+    if (err.status === 409) {
+      toast(err.message, 'error');
+    } else {
+      toast(`Save failed: ${err.message}`, 'error');
+    }
     return false;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
@@ -4037,39 +4073,66 @@ function buildScenarioDocText(data, promptPrefix = '') {
 // IMAGE PROMPT STUDIO
 // ═══════════════════════════════════════════════════════════════
 
-const MASTER_IMAGE_SPEC = `Ledger 250 — Scenario Image Generation Prompt (Master, v1.3)
+const MASTER_IMAGE_SPEC = `# Ledger 250 — Scenario Image Generation Prompt (Master, v1.4)
 
 Generate a single AI image for use on the Ledger 250 platform as scenario card artwork. The image must satisfy the following technical specifications and content rules.
 
-OUTPUT SPECIFICATIONS
+---
+
+## OUTPUT SPECIFICATIONS
 - Aspect ratio: 16:9 horizontal, minimum 1536×864
 - Format: PNG output is acceptable; conversion to JPEG happens downstream
-- No text, no watermarks, no captions, no overlay graphics anywhere in the frame
+- No overlay text, watermarks, captions, or graphic elements anywhere in the frame (see the diegetic-signage note under Content & Accuracy for period-accurate in-world signage)
 - Photorealistic, cinematic lighting, period-accurate to the year specified
-- Full color — do not desaturate or apply a tonal grade; the platform CSS handles the final mood
+- Full color — do not desaturate or apply a tonal grade. The platform applies a downstream brightness multiplier (clamped, roughly 0.5x-1.5x) when deriving the card images, but it is linear and cannot recover detail from shadow — multiplying a near-black pixel yields a near-black pixel. Correct exposure must come from the source image, so the mood must be fully in the source image while keeping subjects brightly lit
 
-COMPOSITION RULES — CRITICAL
-- Vertical face zone (non-negotiable): all faces and primary action must sit within the vertical band between 35% and 65% of the frame height. This is a hard requirement of the platform banner layout — the image gets cropped to a thin horizontal band that pulls from this middle zone. Faces above 35% will be cropped off the top. Faces below 65% will be cropped off the bottom. Place faces exactly in this central third.
-- Horizontal balance: main subject can be left, center, or right of frame — be intentional about which. Composition should leave room for a text overlay in the lower portion.
-- Depth: include foreground subject, middle ground action, and background environment. A single flat subject against a flat background looks weak at card scale.
-- Lower-band clearance: the lower 25% of the frame should not contain critical narrative detail (faces, primary action, key objects). A semi-opaque text overlay will be applied to this band in the final card render, so anything important placed there will be obscured.
+---
 
-CONTENT & ACCURACY RULES — STRICT
-- No copyrighted insignia, logos, or branded patches. No military unit patches, no flag-bearing badges, no corporate logos. Uniforms must be period-correct but generic.
-- No invented or stylized insignia of any kind. The following must be either omitted entirely or rendered as period-generic with no decorative content: rank marks, shoulder boards, collar tabs, cuff stripes, unit patches, sleeve chevrons, cap badges, hat emblems, helmet decals, helmet markings, lapel pins, breast pocket badges, belt buckle emblems, embroidered devices on any uniform surface, and any other decoration that would normally identify rank, branch, unit, or nationality. If a piece of headgear or uniform would historically have a visible emblem, render that surface as plain. Inventing a plausible-looking but fictional emblem is worse than omitting the emblem entirely.
-- No recognizable celebrity or real-person faces. Figures should look like historically plausible everymen — the right age, build, hair, and grooming for the era — but not portraits of specific historical figures.
-- Period accuracy in equipment, clothing, and environment. Verify the year. Helmets, weapons, vehicles, lighting fixtures, and clothing must match the specific year, not a generic era. Anachronistic technology is a disqualifying error.
-- No graphic violence, no visible blood, no wounded bodies. Tension and danger are conveyed through environment, lighting, expression, and posture — never explicit injury.
-- Lighting must be readable. Even dark or low-light scenes must have clear illumination on faces and primary action. The platform applies a dark CSS overlay; images that are already dark become unreadable. Err 20% brighter than your instinct.
+## LIGHTING — READ THIS FIRST, IT IS THE MOST COMMON FAILURE
 
-STYLE REFERENCES
-Cinematic realism in the tradition of Roger Deakins, Janusz Kaminski, or Robert Richardson. Photorealistic. Shot on 35mm film, slight grain, no digital sheen. No motion blur. No HDR. No text or graphic elements anywhere in the frame.
+**Underexposure is the single most frequent reason an image is rejected. Read this section before you read the scene description, and let it override the mood of the scene prose.**
 
-FILE NAMING AFTER GENERATION
+- **What you generate is what ships.** A downstream brightness multiplier exists, but it is frequently already at or near its maximum and cannot rescue an underexposed source, because multiplying darkness yields darkness. The source image therefore renders essentially as-is on the scenario card. If a face is dark in your output, it is dark on the live site. Measured card images have been coming out at 13–22% mean luminance when a well-exposed image sits near 45–50%; that gap is pure underexposure at the source, and nothing downstream fixes it. Generate at full, readable brightness.
+- **Every face and every piece of primary action must be clearly and individually lit,** with visible detail in the eyes and expression. No principal figure may fall into silhouette or shadow — including background and secondary figures. A face the viewer cannot read is a failed image.
+- **Light the darkest face in the frame as your exposure reference, not the brightest.** If the dimmest principal is legible, the image passes. If any principal reads as a shadow, it fails.
+- **Atmosphere comes from contrast, pools of light, and shadow in the environment — never from underexposing the subjects.** Keep the vaulted ceilings, far tunnels, and dead corners dark. Keep the people lit.
+- **Overexpose relative to your instinct.** Image generators trend dark on "cinematic" and "period" scenes, and that trend is the failure mode here. If the scene feels correctly lit to you as a photographer, it is roughly one stop too dark for a scenario card. Push brighter than feels natural — aim for faces and primary action that read clearly on a small, bright card thumbnail, not on a full-screen cinema frame.
+
+### Motivated light on every face (composition requirement)
+- Each primary figure must have a **plausible in-world light source reaching their face** — a bulb, a lantern, a work light, reflected spill off tile or wet stone, or light from an off-frame source.
+- **Do not rely on a single light source for a multi-figure scene.** One bulb will always leave the far figures dark. Distribute practical light sources — or add motivated ambient fill — so that no principal is left unlit. If the scene as written names only one light, add secondary reflected or off-frame spill to reach the other faces.
+
+---
+
+## COMPOSITION RULES — CRITICAL
+- **Vertical face zone (non-negotiable):** all faces and primary action must sit within the vertical band between **35% and 65% of the frame height.** This is a hard requirement of the platform banner layout — the image gets cropped to a thin horizontal band that pulls from this middle zone. Faces above 35% will be cropped off the top. Faces below 65% will be cropped off the bottom. Place faces exactly in this central third.
+- **Horizontal balance:** the main subject can be left, center, or right of frame — be intentional about which. Leave room for a text overlay in the lower portion.
+- **Depth:** include foreground subject, middle-ground action, and background environment. A single flat subject against a flat background looks weak at card scale.
+- **Lower-band clearance:** keep the lower 25% of the frame free of critical narrative detail (faces, primary action, key objects). On featured/hero cards a semi-opaque gradient is applied to this band for title legibility, so anything important there will be obscured; on standard grid cards the title sits in a separate area below the image. Keeping the lower band clear is the safe rule for both.
+
+---
+
+## CONTENT & ACCURACY RULES — STRICT
+- **No copyrighted insignia, logos, or branded patches.** No military unit patches, no flag-bearing badges, no corporate logos. Uniforms must be period-correct but generic.
+- **No invented or stylized insignia of any kind.** The following must be either omitted entirely or rendered as period-generic with no decorative content: rank marks, shoulder boards, collar tabs, cuff stripes, unit patches, sleeve chevrons, cap badges, hat emblems, helmet decals, helmet markings, lapel pins, breast pocket badges, belt buckle emblems, embroidered devices on any uniform surface, and any other decoration that would normally identify rank, branch, unit, or nationality. If a piece of headgear or uniform would historically have a visible emblem, render that surface as plain. **Inventing a plausible-looking but fictional emblem is worse than omitting the emblem entirely.**
+- **No recognizable celebrity or real-person faces.** Figures should look like historically plausible everymen — the right age, build, hair, and grooming for the era — but not portraits of specific historical figures.
+- **Period accuracy in equipment, clothing, and environment. Verify the year.** Helmets, weapons, vehicles, lighting fixtures, and clothing must match the specific year, not a generic era. Anachronistic technology is a disqualifying error. When the scene involves military or state uniforms and weapons, confirm the specific year's issue — do not default to the most iconic version of a weapon or uniform if it postdates or predates the scene.
+- **Diegetic signage:** period-accurate in-world signage that exists physically in the scene (a station nameplate, a painted wall marking) is permitted **only** when the scene description explicitly calls for it, and must be spelled correctly and rendered in a period-correct typeface. If in doubt, omit it. This is distinct from the prohibited overlay text/captions/watermarks, which are never allowed. Garbled or misspelled signage is a failed image.
+- **No graphic violence, no visible blood, no wounded bodies.** Tension and danger are conveyed through environment, lighting, expression, and posture — never explicit injury.
+
+---
+
+## STYLE REFERENCES
+Cinematic realism in the tradition of Roger Deakins, Janusz Kaminski, or Robert Richardson. Photorealistic. Shot on 35mm film, slight grain, no digital sheen. No motion blur. No HDR. No overlay text or graphic elements anywhere in the frame. Note: the film-realism reference is for texture and grain, not for exposure — do not interpret "cinematic" as "dark." Cinematic here means well-lit subjects against atmospheric environments.
+
+---
+
+## FILE NAMING AFTER GENERATION
 Save the source PNG as [scenario_id]_source.png. Downstream processing produces [scenario_id]_wide.jpg (1600x900, 16:9) and [scenario_id]_short.jpg (1800x493, 3.65:1).
 
 ---
-SCENARIO-SPECIFIC SCENE DESCRIPTION
+
+## SCENARIO-SPECIFIC SCENE DESCRIPTION
 `;
 
 function renderSourceNarrativeSection(data) {
@@ -4099,7 +4162,7 @@ function renderImgPromptStudio(data) {
   </div>
   <div class="img-prompt-studio-body" id="img-prompt-studio-body" style="display:none">
     <div class="img-prompt-master-spec">
-      <div class="img-prompt-label">Master spec (v1.3)
+      <div class="img-prompt-label">Master spec (v1.4)
         <span class="img-prompt-toggle" onclick="toggleMasterSpec()">show ▼</span>
       </div>
       <pre id="img-prompt-master-spec-text" style="display:none" class="img-prompt-pre"></pre>
@@ -4235,6 +4298,7 @@ async function saveImgPromptDraft() {
     });
     const data = await resp.json();
     if (!data.success) throw new Error(data.error || 'Save failed');
+    _syncImageToEditor(scenarioId, data.image, data.current_version);
     status.textContent = '✓ Draft saved.';
     status.style.color = 'var(--success)';
   } catch (err) {
@@ -4461,8 +4525,8 @@ function renderPreview(data, autoSaved = false) {
         const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image-upload`, { method: 'POST', body: fd });
         const result = await resp.json();
         if (result.error) throw new Error(result.detail || result.error);
-        data.scenario = data.scenario || {};
-        data.scenario.image = { ...(data.scenario.image || {}), url: result.wide, shortUrl: result.short, sourceUrl: result.source };
+        // Mirror the full server image object + advance the cached version (avoids next-Save clobber).
+        _syncImageToEditor(artScenarioId, result.image, result.current_version);
         setArtPreviews(result.wide, result.short, result.source);
         showArtState('images');
         setArtStatus('Images saved.', 'success');
@@ -4494,8 +4558,8 @@ function renderPreview(data, autoSaved = false) {
         const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image`, { method: 'DELETE' });
         const result = await resp.json();
         if (result.error) throw new Error(result.error);
-        data.scenario = data.scenario || {};
-        data.scenario.image = {};
+        // Server returns image: {} (deleted). Mirror exactly so a later Save can't resurrect it.
+        _syncImageToEditor(artScenarioId, result.image, result.current_version);
         if (wideImg)  wideImg.src  = '';
         if (shortImg) shortImg.src = '';
         showArtState('upload');
@@ -4521,8 +4585,7 @@ function renderPreview(data, autoSaved = false) {
           });
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
-          data.scenario.image.shortUrl = result.short;
-          data.scenario.image.cropAnchor = anchor;
+          _syncImageToEditor(artScenarioId, result.image, result.current_version);
           if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
           setArtStatus('Crop updated.', 'success');
         } catch (err) {
@@ -4554,9 +4617,7 @@ function renderPreview(data, autoSaved = false) {
           });
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
-          data.scenario.image.url        = result.wide;
-          data.scenario.image.shortUrl   = result.short;
-          data.scenario.image.brightness = brightnessVal;
+          _syncImageToEditor(artScenarioId, result.image, result.current_version);
           if (wideImg)  { wideImg.src  = result.wide  + '?t=' + Date.now(); wideImg.style.opacity  = '1'; }
           if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
           setArtStatus('Brightness updated.', 'success');
@@ -5126,11 +5187,15 @@ function renderPreview(data, autoSaved = false) {
     btn.disabled    = true;
     btn.textContent = 'Generating historical facts…';
     try {
-      const tf = await apiPost('/generate/technical-facts', {
+      const resp = await apiPost('/generate/technical-facts', {
         scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
       });
+      const tf = resp.technical_facts;
       if (!data.scenario) data.scenario = {};
       data.scenario.technical_facts = tf;
+      // Route saved server-side and bumped the version; advance our cached base so the next
+      // manual Save carries the current version and passes the CAS instead of 409-ing.
+      if (resp.current_version != null) data.current_version = resp.current_version;
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (tfDetails) {
         const newHtml = renderTechnicalFactsSection(data);
@@ -5151,16 +5216,18 @@ function renderPreview(data, autoSaved = false) {
     if (!e.target.closest('#gen-epilogue-btn')) return;
     const btn = e.target.closest('#gen-epilogue-btn');
 
-    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
+    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 2–3 minutes.')) return;
 
     const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
     const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
     const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
     const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
     const characters = (data.characters || []).map(c => ({
-      character_id: c.id,
-      name:         c.name,
-      role:         c.role || c.publicFace || '',
+      character_id:   c.id,
+      name:           c.name,
+      role:           c.role || c.publicFace || '',
+      character_type: c.character_type,
+      represents:     c.represents,
     }));
     // Filter to structured beats only (must have both id and description).
     const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
@@ -5172,12 +5239,16 @@ function renderPreview(data, autoSaved = false) {
     btn.disabled    = true;
     btn.textContent = 'Generating historical data…';
     try {
-      const epilogue = await apiPost('/generate/epilogue-data', {
+      const resp = await apiPost('/generate/epilogue-data', {
         scenarioId, title, world, stakes, characters, essential_beats,
       });
+      const epilogue = resp.epilogue;
       // Rebuild the epilogue data in the in-memory data object
       if (!data.scenario) data.scenario = {};
       data.scenario.epilogue = epilogue;
+      // Route saved server-side and bumped the version; advance our cached base so the next
+      // manual Save carries the current version and passes the CAS instead of 409-ing.
+      if (resp.current_version != null) data.current_version = resp.current_version;
       // Re-render just the epilogue section
       const epDetails = formEl.querySelector('#epilogue-data-details');
       if (epDetails) {
@@ -5500,14 +5571,16 @@ FIELD locator conventions:
 - Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
 - Technical Facts: <fact_id>
 - Locations / Clues: <id>.<field>
-- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
-- Epilogue: <character_id> for fates; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+- Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or the exact fact text. Historical Frame: the exact entry text.
 
 Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 - A character outcome means in-event fate, not lifespan.
 - Prefer cutting an unsourced specific to inventing a citation for it.`,
 
@@ -5594,13 +5667,13 @@ Check:
 - Internal consistency: a partial-success example must not contradict the fixed macro-outcome.
 - Any number that appears in more than one section (casualties, times) must reconcile.
 
-FIELD locator for this section: the exact condition or pressure-event text, quoted verbatim.
+FIELD locator for this section: win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1].
 
 For every correction, use EXACTLY this format — no prose between corrections:
 
 ---CORRECTION---
-SECTION: Win Conditions / Gameplay
-FIELD: [the exact condition or pressure-event text]
+SECTION: win conditions
+FIELD: <arrayName>[<index>]
 CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
 REPLACE WITH: [complete replacement text]
 REASON: [one sentence]
@@ -5619,6 +5692,7 @@ Rules:
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
 - Internal consistency: any number, date, or time appearing in more than one place must reconcile.
 - Real figures are bound by the record — rank, role, and fate must match history.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 
 DATA TO REVIEW:
 [PASTE WIN/FAIL CONDITIONS AND PRESSURE EVENTS DATA HERE]`,
@@ -5851,7 +5925,12 @@ OPEN THREADS — each "not documented in surviving records" claim is genuinely t
 
 CHOICE ECHOES — each echo is historically accurate and does not narrate invented player action as documented fact.
 
-FIELD locator for this section: <character_id> for fates; immediate_outcome.summary or the exact fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads and echoes.
+FIELD locator for this section:
+- Character Fates: leave FIELD blank. Do NOT use the character id — fate ids are shared with the character records and will resolve to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text.
+- Open Threads: leave FIELD blank, for the same reason — thread slugs are shared with the story-arc beat ids. Use SECTION plus verbatim CURRENT.
+- Choice Echoes: leave FIELD blank, for the same reason — echo slugs are shared with the story-arc beat ids. Use SECTION plus verbatim CURRENT.
+- Immediate Outcome: immediate_outcome.summary, or the exact fact text.
+- Historical Frame: the exact entry text.
 
 For every correction, use EXACTLY this format — no prose between corrections:
 
@@ -5872,6 +5951,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
 - In-event, not lifespan: an outcome is what happened during the depicted event, not whether the person is alive today.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
@@ -5913,9 +5993,9 @@ FIELD locator conventions by section:
 - Story Arc: <beat_slug>.description (descriptive slug — never an ordinal like beat_3)
 - Technical Facts: <fact_id>
 - Locations / Clues: <id>.<field>
-- Win/Fail/Gameplay: the exact condition or pressure-event text, verbatim
+- win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
-- Epilogue: <character_id> for fates; immediate_outcome.summary or fact text for outcome; the exact entry text for frame; <thread_or_beat_slug> for threads/echoes
+- Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or fact text. Historical Frame: the exact entry text.
 
 If a section is fully accurate: ---CONFIRMED: [section name]---
 If you cannot verify a claim: ---UNVERIFIED: [field]---
@@ -5925,11 +6005,13 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
 - In-event, not lifespan: a character outcome is what happened during the depicted event, not lifespan.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
 - Internal consistency: any number, date, or time appearing in more than one place must reconcile.
 - Real figures are bound by the record — rank, role, and fate must match history.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 
 DATA TO REVIEW:
 [PASTE THE COMPLETE SCENARIO DATA HERE]`,
@@ -6266,7 +6348,10 @@ async function applyCorrections(scenarioId) {
     }
     if (appliedCount > 0) {
       // Preserve read-ground-truth → edit → dual-write: /generate/save writes local + Supabase.
-      await apiPost('/generate/save', data);
+      // baseVersion from the /full load enables the optimistic-concurrency guard: a 409 here
+      // means the scenario changed between our read and this save — reject, do not clobber.
+      const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
+      if (resp && resp.current_version != null) data.current_version = resp.current_version;
       await apiPost('/pipeline/snapshot/' + scenarioId, {
         label: 'corrections_applied',
         pipeline_step: 'manual_correction',
@@ -6275,6 +6360,7 @@ async function applyCorrections(scenarioId) {
     }
     renderInjectionResults(results, appliedCount);
   } catch (err) {
+    // 409 conflict message ("changed elsewhere… reload") surfaces here unchanged.
     toast(err.message, 'error');
   }
 }
@@ -6353,7 +6439,14 @@ function _resolveSectionNode(data, section) {
     case 'locations':         return data.locations;
     case 'clues':             return data.clues;
     case 'story arc':         return (data.storyArc?.acts || []).flatMap(a => a.beats || []);
-    case 'win conditions':    return { winConditions: sc.winConditions, failConditions: sc.failConditions, partialSuccessExamples: sc.partialSuccessExamples };
+    case 'win conditions':
+    case 'win/fail/gameplay':
+    case 'win/fail & gameplay':
+    case 'win conditions / gameplay':
+    case 'gameplay':
+    case 'fail conditions':
+    case 'partial success':
+    case 'pressure events':   return { winConditions: sc.winConditions, failConditions: sc.failConditions, partialSuccessExamples: sc.partialSuccessExamples, pressureEvents: sc.systems?.pressureEvents };
     case 'opening scene':     return { openingSituation: sc.openingSituation, introduction: sc.introduction };
     case 'period vocabulary': return sc.period_vocabulary;
     case 'technical facts':   return sc.technical_facts;

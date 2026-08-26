@@ -1848,7 +1848,11 @@ export function createAdminRouter(repos, config = {}) {
     const locations   = repos.locations.findByScenario(scenario.id);
     const clues       = repos.clues.findByScenario(scenario.id);
     const playerRoles = repos.scenarios.findPlayerRoles(scenario.id);
-    res.json({ scenario, storyArc: storyArc || null, characters, locations, clues, playerRoles });
+    // current_version is a column on the scenarios row (NOT inside content). Surface it at
+    // the top level so the client can echo it back as baseVersion for optimistic concurrency.
+    const { data: verRow } = await supabase
+      .from('scenarios').select('current_version').eq('id', req.params.id).single();
+    res.json({ scenario, current_version: verRow?.current_version ?? null, storyArc: storyArc || null, characters, locations, clues, playerRoles });
   });
 
   // ── Scenario health check ────────────────────────────────────────────────────
@@ -2763,9 +2767,11 @@ Return ONLY valid JSON in this exact structure:
           facts,
         },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
-      res.json(updated.technical_facts);
+      // Return current_version so the client can advance its cached base and avoid a spurious
+      // 409 on the next manual Save (this route bumped the version behind the editor's back).
+      res.json({ technical_facts: updated.technical_facts, current_version: newVersion });
     } catch (err) {
       console.error('[TECHNICAL-FACTS]', err.message);
       res.status(500).json({ error: err.message });
@@ -2808,6 +2814,28 @@ Return ONLY valid JSON in this exact structure:
       '- Include the broader historical aftermath of the event itself — what happened, what it meant, how history resolved it.',
       '- Everything stated must be verifiable. If uncertain, omit.',
       '',
+      '══ EVENT SCOPE — NAMED PEOPLE AND EVENTS ══',
+      '',
+      'Every named individual, death, injury, arrest, broadcast, funding arrangement, or documented incident you include must be documented as belonging to THIS specific operation on THIS specific date. Historically adjacent events are not interchangeable with it.',
+      '',
+      'Note that this is a different requirement from the accuracy rules above. The failure here is not invention. It is importing a real, verifiable, correctly-described fact that belongs to a neighbouring event. The same city, the same year, the same category of event, and the same kind of participant are NOT evidence that a fact belongs here.',
+      '',
+      'WRONG example, for a scenario depicting a 1964 Berlin tunnel escape:',
+      '"Stasi officers arrived at the entrance and shot Heinz Jercha, a West German student helper, who died of his wounds."',
+      'Heinz Jercha was real, was a West German escape helper, and was shot dead at a Berlin tunnel — but in March 1962, at a different tunnel, on a different street. Stating this places a real man\'s death at an event he was not present at, and erases the person who actually died there.',
+      '',
+      'RIGHT example:',
+      '"In the confusion that followed, Egon Schultz, a 21-year-old East German border soldier, was shot and killed in the courtyard; post-reunification forensic examination established he was struck by fire from his own side."',
+      '',
+      'Before including any named person or specific incident, confirm the record places it at THIS operation. If you cannot confirm that, do one of the following:',
+      '- Omit it entirely, or',
+      '- Describe the general pattern without naming anyone ("escape helpers working on the eastern side faced arrest and prosecution"), or',
+      '- State plainly that the specific detail is not established in the record.',
+      '',
+      'An honest gap is correct output. A confidently-stated fact borrowed from a neighbouring event is a failure, even when the fact is true of that other event.',
+      '',
+      'This applies with particular force to deaths. Do not name a person as having died at this operation unless the record places their death at this operation, on this date. Confirm which side they were on and who caused the death — these are frequently reversed in secondary accounts and in official contemporaneous claims.',
+      '',
       'Generate the following:',
       'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters. Set classification to match the character_type field: "real" → "real", "composite" → "composite", "fictional" → "fictional". Set verified to false for every fate — this field is set by a human review process and must never be true in generated output.',
       'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of objects. Every entry MUST include a source attribution. A dated, timed, or quantitative claim with no source must be omitted rather than stored unsourced.',
@@ -2842,7 +2870,10 @@ Return ONLY valid JSON in this exact structure:
     ].filter(Boolean).join('\n\n');
 
     try {
-      const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+      // streaming is required by the SDK for long requests; timeout covers time-to-first-chunk.
+      // Epilogue output runs 3.8k–6.5k tokens, which a non-streaming request cannot finish
+      // inside the 120s request timeout.
+      const stream = getAnthropicClient(anthropicApiKey).messages.stream(
         {
           model: MODEL,
           max_tokens: 8000,
@@ -2852,11 +2883,20 @@ Return ONLY valid JSON in this exact structure:
         },
         { timeout: 120_000, maxRetries: 0 }
       );
-      console.log('[EPILOGUE-DATA] stop_reason:', msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
-      if (msg.stop_reason === 'max_tokens') {
+
+      let acc = '';
+      for await (const chunk of stream) {
+        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+          acc += chunk.delta.text;
+        }
+      }
+      const finalMsg = await stream.finalMessage();
+
+      console.log('[EPILOGUE-DATA] stop_reason:', finalMsg.stop_reason, 'output_tokens:', finalMsg.usage?.output_tokens);
+      if (finalMsg.stop_reason === 'max_tokens') {
         return res.status(500).json({ error: 'Epilogue generation truncated — the scenario has too many beats. Reduce to 3–6 essential beats and retry.' });
       }
-      const text = msg.content[0]?.text?.trim();
+      const text = acc.trim();
       if (!text) return res.status(500).json({ error: 'No response from Claude.' });
       const cleaned     = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
       const epilogueData = JSON.parse(cleaned);
@@ -2880,9 +2920,11 @@ Return ONLY valid JSON in this exact structure:
           choice_echoes:    epilogueData.choice_echoes     || [],
         },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
-      res.json(updated.epilogue);
+      // Return current_version so the client can advance its cached base and avoid a spurious
+      // 409 on the next manual Save (this route bumped the version behind the editor's back).
+      res.json({ epilogue: updated.epilogue, current_version: newVersion });
     } catch (err) {
       console.error('[EPILOGUE-DATA]', err.message);
       res.status(500).json({ error: err.message });
@@ -2890,7 +2932,7 @@ Return ONLY valid JSON in this exact structure:
   });
 
   r.post('/generate/save', async (req, res) => {
-    const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [] } = req.body;
+    const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [], baseVersion } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
       const existing = await repos.scenarios.findById(scenario.id);
@@ -2903,7 +2945,9 @@ Return ONLY valid JSON in this exact structure:
           }
         }
       }
-      await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin' });
+      // baseVersion (when the client sent one) enables the optimistic-concurrency guard in
+      // saveScenario. Omitted → unguarded save (unchanged behaviour).
+      const newVersion = await repos.scenarios.save(scenario, { savedBy: req.adminUser?.email || 'admin', baseVersion });
       if (storyArc?.id) repos.storyArcs.save(storyArc);
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
@@ -2912,8 +2956,18 @@ Return ONLY valid JSON in this exact structure:
       // defining_moment; without this, stripEmptyEndingNotes + whole-object save would
       // erase approved endings, and the whole-object save would erase the authored fork.
       playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredRoleBlocks(repos, r)))));
-      res.json({ ok: true, scenarioId: scenario.id });
+      // current_version is returned so the open editor can advance its cached baseVersion —
+      // without it the next manual save from this tab would post a stale base and 409.
+      res.json({ ok: true, scenarioId: scenario.id, current_version: newVersion });
     } catch (err) {
+      if (err.code === 'VERSION_CONFLICT') {
+        return res.status(409).json({
+          error: `This scenario was changed elsewhere since you loaded it (you have v${err.expected}, current is v${err.actual}). Reload before saving.`,
+          code: 'VERSION_CONFLICT',
+          expected: err.expected,
+          actual: err.actual
+        });
+      }
       res.status(500).json({ error: err.message });
     }
   });
@@ -3662,8 +3716,8 @@ Return JSON only:
       return badRequest(res, `Term "${term}" already exists in glossary`);
     glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
     const updated = { ...scenario, glossary };
-    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary: updated.glossary });
+    const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary: updated.glossary, current_version: newVersion });
   });
 
   r.put('/scenarios/:id/glossary/:term', async (req, res) => {
@@ -3687,8 +3741,8 @@ Return JSON only:
         ? { ...g, term: resolvedTerm, definition: definition.trim(), source: source?.trim() ?? g.source ?? '' }
         : g
     );
-    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary });
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary, current_version: newVersion });
   });
 
   r.delete('/scenarios/:id/glossary/:term', async (req, res) => {
@@ -3696,8 +3750,8 @@ Return JSON only:
     if (!scenario) return notFound(res);
     const termName = decodeURIComponent(req.params.term);
     const glossary = (scenario.glossary || []).filter(g => g.term.toLowerCase() !== termName.toLowerCase());
-    await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true, glossary });
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary, current_version: newVersion });
   });
 
   // ── Image Prompt Studio ───────────────────────────────────────────────────────
@@ -3731,8 +3785,16 @@ Write a 300-400 word scene description for the scenario data provided. The descr
 - The exact historical moment being depicted (specific time, place, date)
 - The figures present: who they are, what they are doing, what they are wearing, their emotional state
 - The physical environment in precise detail: architecture, objects, lighting sources, weather/atmosphere
-- The specific lighting: quality, direction, color temperature, dramatic effect
+- The specific lighting: quality, direction, color temperature, dramatic effect achieved through contrast in the environment
 - The emotional register: what mood the image should convey, what the viewer should feel
+
+LIGHTING & LEGIBILITY: Every principal figure's face must be clearly and readably lit — describe in-world light sources (bulbs, lanterns, windows, fire, work light) — for a multi-figure scene, distribute more than one source so no principal is left in shadow; do not light multiple figures with a single source. Put darkness in the environment (ceilings, corners, distance), never on the people. Do not write mood-darkness that leaves faces in shadow ("lost in darkness", "a single dim bulb", "sickly glow") — atmosphere comes from contrast and shadowed surroundings, not from underexposing the subjects. Faces must read clearly on a small, bright card thumbnail.
+
+SIGNAGE: Name only the specific signage or text that should appear in the frame (e.g. a station nameplate), and state that no other text, lettering, or signage appears. Do not invent incidental signs.
+
+WHEN THE SCENE INCLUDES UNIFORMED FIGURES (military, police, state, or transit personnel): describe their clothing by physical appearance and color ("a plain dove-grey jacket and plain peaked cap"), NOT by naming the institution ("Volkspolizei uniform", "BVG uniform") — naming a real institution causes the image model to render its branding. Describe uniform surfaces by what they are (plain, unmarked, smooth fabric), not by what they lack.
+
+WHEN THE SCENE INCLUDES PERIOD WEAPONS OR EQUIPMENT: describe the item by physical silhouette and distinctive features ("a submachine gun with a large round drum magazine and wooden stock") rather than by model name, and never by what it is NOT (do not write "not an AK" — naming a weapon, even to exclude it, causes the model to draw it). Ensure described equipment matches the scenario's specific year.
 
 Do not include technical specifications, aspect ratios, file naming, or any reference to the image generation platform. Do not write headers or labels. Write only the scene narrative as flowing prose.
 
@@ -3761,8 +3823,10 @@ Return only the scene description. No preamble, no closing remarks.`,
         generation_prompt: generation_prompt || '',
       },
     };
-    await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ success: true });
+    const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
+    // Return the full image object + version so the open editor can resync its cached
+    // scenario.image and advance its base — otherwise the next manual Save clobbers this write.
+    res.json({ success: true, image: updated.image, current_version: newVersion });
   });
 
   // ── Image upload / recrop / delete ───────────────────────────────────────────
@@ -3798,8 +3862,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), url: wideUrl, shortUrl, sourceUrl, cropAnchor, brightness: 100 },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
-      res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image upload' });
+      res.json({ wide: wideUrl, short: shortUrl, source: sourceUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-UPLOAD]', err.message);
       res.status(500).json({ error: 'Image processing failed', detail: err.message });
@@ -3825,8 +3889,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), shortUrl, cropAnchor, brightness },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
-      res.json({ short: shortUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image recrop' });
+      res.json({ short: shortUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-RECROP]', err.message);
       res.status(500).json({ error: 'Recrop failed', detail: err.message });
@@ -3858,8 +3922,8 @@ Return only the scene description. No preamble, no closing remarks.`,
         ...scenario,
         image: { ...(scenario.image || {}), url: wideUrl, shortUrl, cropAnchor, brightness },
       };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image reprocess' });
-      res.json({ wide: wideUrl, short: shortUrl });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image reprocess' });
+      res.json({ wide: wideUrl, short: shortUrl, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-REPROCESS]', err.message);
       res.status(500).json({ error: 'Reprocess failed', detail: err.message });
@@ -3874,8 +3938,10 @@ Return only the scene description. No preamble, no closing remarks.`,
       await supabase.storage.from(STORAGE_BUCKET)
         .remove([`${id}_wide.jpg`, `${id}_short.jpg`, `${id}_source.jpg`]);
       const updated = { ...scenario, image: {} };
-      await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image deleted' });
-      res.json({ deleted: true });
+      const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin', changeNote: 'Image deleted' });
+      // Post-delete state is an empty image object — return it so the client mirrors exactly
+      // (clears its cached image) rather than holding a deleted image while claiming currency.
+      res.json({ deleted: true, image: updated.image, current_version: newVersion });
     } catch (err) {
       console.error('[IMAGE-DELETE]', err.message);
       res.status(500).json({ error: 'Delete failed', detail: err.message });
