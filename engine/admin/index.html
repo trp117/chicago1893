@@ -16,6 +16,13 @@
   --warn:       #f59e0b;
   --bg:         #f1f5f9;
   --card:       #ffffff;
+  /* Subtle inset panel on the light theme — the same #f8fafc the form sections use
+     (.sub-section, .act-header, .sop-panel …). Declared here because two role-editor
+     panels already referenced var(--panel-light) while nothing defined it, so their
+     near-black #1a2233 fallback was winning: dark boxes on a light form, with
+     var(--text-soft) at 3.34:1 and var(--text) at 1.09:1 on top of them. Keep this a
+     LIGHT value — the fallback is not a dark-mode intent, it is the bug. */
+  --panel-light: #f8fafc;
   --text:       #1e293b;
   --text-soft:  #64748b;
   --border:     #e2e8f0;
@@ -2151,7 +2158,33 @@ function renderEndingsGatePanel(r, i) {
             ? '<span class="help-text" style="margin:0">Regenerates this role\'s success / partial / failure fates only — reviewed at the pipeline gate before saving. Does <strong>not</strong> rebuild the scenario or touch other roles. Requires a <code>fate_mode</code> on this role.</span>'
             : archetypeBlockedNotice(g.reason)}
         </div>
+        ${endingsScenarioSwitchRemark(g.allowed)}
       </div>`;
+}
+
+// The archetype gate above is only HALF of what graded endings need — the scenario-level
+// Structured Endings switch is the other half, and a role that passes the gate with that
+// switch off still resolves via the fork and epilogue. Reviewers were reading the enabled
+// button as "this role has graded endings", so say the second half out loud.
+//
+// Keyed on the GATE, not on a named archetype: every role that can have graded endings —
+// crucible-open and unclassified alike — hits this same trap, and unclassified is permissive
+// by design, so naming archetypes here would leave half the affected roles unwarned. The
+// blocked archetypes already show their refusal notice; this would describe a step that
+// changes nothing for them.
+//
+// Riding allowed-ness also means the archetype select's existing repaint-when-allowed-ness-
+// changes rule already covers this remark — it appears and disappears exactly when the
+// button enables and disables. No extra re-render condition needed.
+//
+// Text only — it reads the gate's answer and renders a sentence; it never decides anything.
+function endingsScenarioSwitchRemark(allowed) {
+  if (!allowed) return '';
+  return `<div class="endings-scenario-remark help-text" style="margin:10px 0 0;padding-top:10px;border-top:1px solid var(--border);line-height:1.55">
+          Graded endings are allowed for this role, but they only fire in play if <em>Structured Endings</em>
+          is also enabled at the scenario level (<strong>Scenario settings → Structured Endings</strong>).
+          Without that, this role resolves via the fork and epilogue only.
+        </div>`;
 }
 
 // Delegated handlers for the archetype control: propose, adopt a proposal, and the live
