@@ -374,7 +374,7 @@ function getCompositeDisclosure(epilogueData, summary) {
 // where the role and the session state are both in scope, and defaulted false here so that
 // every existing caller and every session that is not a proximity session compiles exactly
 // the prompt it compiled before.
-async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false) {
+async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -429,14 +429,16 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     ...(decisionMade ? [
       '- THE DECISION IS THE RESOLUTION. A defining decision was recorded this session (closure_state.defining_moment_state). The choice in decision_text is how this session resolved — it is the crystallizing moment, not a step toward one. Write who this person was in it and what it asked of them. Never say the session ended without resolution.',
       '- THE DECISION OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Never frame the session as unresolved, incomplete, cut short, or as a shortfall for not reaching somewhere. Reaching a location was never the objective; the human experience was.',
-      '- What followed the choice is genuinely unknown, and saying so is honest — it is not failure. If you close on the aftermath, close on the not-knowing itself: the night, the fire, what nobody was left to record. Never close on "the session ended before…" or "they never reached…".',
+      '- CLOSE CONCRETE, NOT ABSTRACT. End on a definite particular from this session — a thing held, a sound, a gesture, what someone did with their hands — at the same grain as the CLOSING PROSE. The last image must be something that definitely happened. Never close on unknowability: not "nobody could have said", not "what only you knew", not "the night absorbed it", not "no one was left to record it". That the aftermath is undocumented may be true, but it is not the ending. Never close on "the session ended before…" or "they never reached…".',
+      '- GROUND IT IN THE TEXTURE OF THIS SESSION. The CLOSING PROSE carries the physical particulars — a thing in the hands, what the light was doing, the sound of the room, the weight of what was carried. Use those particulars. Do not write a close that could belong to any session.',
       '- Ground the choice in its authored language: decision_text is what they chose. Paraphrase it, never quote it verbatim. The options they did not take appear only as internal ids in available_options — never name, translate, or paraphrase those.',
     ] : proximity ? [
       '- PRESENCE IS THE RESOLUTION. This role had no defining decision to make; being there was the whole of it. Write who they were while it happened — what they attended to, how they bore it, and what being present cost them. Never frame the session as unresolved, incomplete, cut short, or as a failure to finish or reach anything. Being present at history is not a task to complete.',
       '- PRESENCE OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Reaching a location was never the objective, and an outcome of "unknown" is not a shortfall here — there was no task to complete. Never write that time ran out, that they did not finish, or that they failed to reach anywhere.',
       '- WHERE THEY HAD SMALL AGENCY, HONOUR IT. A hand kept steady, a thing recorded, a person steadied, something they did not look away from — the small conduct of someone with no authority over the event is the character of this session. Take it only from the SESSION SUMMARY and the CLOSING PROSE; never invent an intervention they did not make.',
       '- GROUND IT IN THE TEXTURE OF THIS SESSION. The CLOSING PROSE carries the physical particulars — an instrument in the hands, a line held open, the sound of a crowd through concrete, what the light was doing. Use those particulars. Do not write a generic account of witnessing that could belong to any session.',
-      '- IF THE EVENT WAS REACHED, HONOUR IT. If the session ended at the threshold with the event not yet arrived, close on the witnessing itself — what it was to be there as it came up to the edge. What followed is genuinely unknown, and saying so is honest. Never close on "the session ended before…", "they never reached…", or on time running out.',
+      '- IF THE EVENT WAS REACHED, HONOUR IT. If the session ended at the threshold with the event not yet arrived, close on the witnessing itself — what it was to be there as it came up to the edge. Never close on "the session ended before…", "they never reached…", or on time running out.',
+      '- CLOSE CONCRETE, NOT ABSTRACT. End on a definite particular from this session — a thing held, a sound, a gesture — at the same grain as the CLOSING PROSE. The last image must be something that definitely happened. Never close on unknowability: not "nobody could have said", not "what only you knew", not "the night absorbed it", not "no one was left to record it". That what followed is undocumented may be true, but it is not the ending.',
     ] : [
       '- If outcome is "unknown", state plainly that the session ended without resolution — do not imply, infer, or invent a conclusion.',
     ]),
@@ -457,7 +459,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     '',
     npcListSection,
     '',
-    'CLOSING PROSE (context only — do not repeat or continue its style):',
+    'CLOSING PROSE (draw physical particulars from this — do not copy its phrasing or continue its scene):',
     closingProse,
   ].join('\n');
 
@@ -481,8 +483,25 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
   //         sessionSummary scoping arrays (interacted_characters, resolved_threads,
   //         completed_beats) for fate/thread/echo filtering only.
   // Must NOT receive closingProse or any player narrative.
-  const playerNoteLayer = playerHistoricalNote
-    ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Include it in the record block.'
+  // Layer 0 exists whenever we know WHICH role was played — independent of whether that role
+  // carries a historical_record_note. Previously this layer was gated on the note alone, so a
+  // role without one (the common case) produced a prompt with no indication of who was played,
+  // and the record led with whichever figure the model found most salient. Precedence is now
+  // stated explicitly: the played figure comes first, in every case.
+  const playedLayer = playedRole
+    ? [
+        `  Layer 0 — THE PLAYED CHARACTER: the player portrayed ${playedRole.name}. Their record comes FIRST, before any other figure, and gets the most space. Never open on a secondary character.`,
+        playedRole.character_type === 'real'
+          ? `    ${playedRole.name} is a real documented figure — open with their own documented outcome from character_fates.`
+          : playedRole.character_type === 'composite' || playedRole.character_type === 'fictional'
+          ? `    ${playedRole.name} is ${playedRole.character_type}${playedRole.represents ? ` (represents: ${playedRole.represents})` : ''}. Say so plainly, then give the documented contextual record for the role they represent. Never invent or imply an individual fate for them.`
+          : `    Open with what character_fates documents for them. If character_fates carries no entry for them, say plainly that no individual record exists — never invent one.`,
+        playerHistoricalNote
+          ? '    The PLAYER CHARACTER NOTE is verified historical fact about them; include it in this layer.'
+          : '',
+      ].filter(Boolean).join('\n')
+    : playerHistoricalNote
+    ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Their record comes FIRST, before any other figure. Never open on a secondary character.'
     : '';
 
   const recordSystemPrompt = [
@@ -490,13 +509,13 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     '',
     'Voice: historian\'s record — precise, unsentimental, no literary reach, no interiority.',
     'Content — follow this concentric circle order:',
-    playerNoteLayer,
-    '  Layer 1 — Characters: the documented fate (from character_fates) of every character whose character_id appears in interacted_characters. Cover every one. Do not omit any.',
+    playedLayer,
+    '  Layer 1 — Other characters: the documented fate (from character_fates) of every OTHER character whose character_id appears in interacted_characters — that is, every one except the played character already covered in Layer 0. Cover every one. Do not omit any.',
     '  Layer 2 — Outcome: the verified result from immediate_outcome.',
     '  Layer 3 — Frame: up to two facts from historical_frame relevant to what happened in this session.',
     'Length: 100–150 words.',
     'Rules:',
-    '- Draw ONLY from the EPILOGUE DATA BLOCK. Do not describe what this player did, chose, or experienced. The player is not mentioned.',
+    '- Draw ONLY from the EPILOGUE DATA BLOCK. Do not narrate what this player did, chose, or experienced in the session. This bars recounting the session — it does NOT bar naming the historical figure they portrayed: Layer 0 is required and takes precedence.',
     '- Include open_threads entries only when the matching thread_id appears in SESSION SCOPING resolved_threads.',
     '- Include choice_echoes entries only when the matching beat_id appears in SESSION SCOPING completed_beats.',
     '- Do not invent, extrapolate, or editorialize. Every fact from epilogue data only.',
@@ -1362,7 +1381,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       const notes = role.ending_notes[endResult];
       closingPrompt = [
         'You are writing the closing interior prose for a historical interactive fiction session.',
-        `Character: ${role.name || roleId}`,
+        `Character (the "you" of this prose): ${role.name || roleId}`,
         `Ending type: session close`,
         '',
         'ENDING NOTES — ground your prose specifically in these details:',
@@ -1376,6 +1395,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         'Write 2-3 sentences of closing interior prose for this character.',
         'Ground it in the specific ending notes above — what happened, who was there, what it cost.',
         'Write in the same voice and tense as the session transcript.',
+        'POINT OF VIEW: Write in SECOND PERSON — "you", "your". The player character is addressed as "you" and is never named and never "he", "she", or "they". Other characters are named and take third person normally. This is fixed: write second person even if the transcript reads otherwise.',
         'Do not mention success or failure explicitly. Do not reference game mechanics.',
         'Write as if this is the last paragraph of a novel.',
         'Write only the prose — no title, no attribution.',
@@ -1389,6 +1409,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         'Based on the session transcript below, write 2-3 sentences of closing interior prose for this character.',
         'This is not a summary of events.',
         'Write in the same voice and tense as the session.',
+        'POINT OF VIEW: Write in SECOND PERSON — "you", "your". The player character is addressed as "you" and is never named and never "he", "she", or "they". Other characters are named and take third person normally. This is fixed: write second person even if the transcript reads otherwise.',
         'Do not mention success or failure. Do not reference game mechanics.',
         'Write as if this is the last paragraph of a novel.',
         '',
@@ -1469,7 +1490,8 @@ Do not open with the historical context. Open inside the character's body. Let t
               : proximitySession ? 'proximity/presence'
               : 'fork-present-not-fired (unchanged)');
 
-          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession);
+          epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession,
+            role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null);
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,
