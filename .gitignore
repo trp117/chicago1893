@@ -7,3 +7,17 @@ engine/data/transcripts/
 images/sources/
 engine/data/scenarios.backup/
 .claude/settings.local.json
+# --- Supabase-owned content -------------------------------------------------
+# Source of truth is Supabase (scenario_data + scenarios tables); the engine
+# rewrites these on boot via restoreFromSupabase, which churned updatedAt on
+# ~244 files every session. File globs (not directory excludes) so the
+# exceptions below can still be re-included.
+engine/data/characters/*.json
+engine/data/clues/**/*.json
+engine/data/locations/**/*.json
+engine/data/story_arcs/*.json
+engine/data/scenarios/*.json
+engine/data/scenarios/player_roles/*.json
+
+# Exception: not in Supabase, so git remains its only copy.
+!engine/data/scenarios/test_pipeline_01.json
