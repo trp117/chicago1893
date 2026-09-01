@@ -81,6 +81,18 @@ const _dir = dirname(fileURLToPath(import.meta.url));
 const TRANSCRIPTS_DIR = join(_dir, '../data/transcripts');
 const REVIEWS_DIR     = join(_dir, '../../data/reviews');
 
+// When true, open_threads / choice_echoes entries without a real source attribution are
+// DROPPED at persistence rather than stored. Default OFF (warn-only): the generator has not
+// been observed under the new sourcing floor yet, so this round logs what it WOULD drop and
+// keeps the entries. Flip on after a few clean generations.
+// Same idiom as STRICT_FATE_VERIFICATION (gameRouter.js:56).
+const STRICT_EPILOGUE_SOURCING = process.env.STRICT_EPILOGUE_SOURCING === 'true';
+
+// A source names a document a reviewer can pull. These strings name nothing — they are the
+// shapes the generator reaches for when it has no citation but the schema demands a string.
+const GENERIC_SOURCE = /^(the )?(historical record|record|survivor testimony|testimony|after[- ]action reports?|official reports?|primary sources?|contemporary accounts?|various sources?|multiple sources?|n\/?a|unknown|none|null)\.?$/i;
+const hasRealSource = s => typeof s === 'string' && s.trim() !== '' && !GENERIC_SOURCE.test(s.trim());
+
 const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC_KEY)
   ? new Langfuse({
       secretKey: process.env.LANGFUSE_SECRET_KEY,
@@ -2791,6 +2803,8 @@ Return ONLY valid JSON in this exact structure:
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const { scenarioId, title = '', world = '', stakes = '', characters = [], essential_beats = [] } = req.body;
     if (!scenarioId) return badRequest(res, 'scenarioId is required.');
+    // ?dryRun=1 → generate and return the block without persisting anything.
+    const dryRun = req.query.dryRun === '1' || req.query.dryRun === 'true' || req.body.dryRun === true;
     const scenario = await repos.scenarios.findById(scenarioId);
     if (!scenario) return notFound(res);
 
@@ -2845,20 +2859,41 @@ Return ONLY valid JSON in this exact structure:
       '',
       'This applies with particular force to deaths. Do not name a person as having died at this operation unless the record places their death at this operation, on this date. Confirm which side they were on and who caused the death — these are frequently reversed in secondary accounts and in official contemporaneous claims.',
       '',
+      '══ INSTITUTIONAL ATTRIBUTION ══',
+      '',
+      'A named body — committee, board, commission, inquiry, agency, department, court, or archive — may be credited with a finding, an acceptance, an examination, a report, or a failure to resolve ONLY in an entry that carries a source attribution naming that body\'s own output.',
+      '',
+      'This applies to negative attributions exactly as it applies to positive ones. "The Committee did not examine X" and "no committee finding on X exists" are claims about that body\'s record and require the same citation as "the Committee found X". A negative claim is not a safe hedge; it is a stronger assertion, because it claims knowledge of everything the body did not do.',
+      '',
+      'The specific failure shape to avoid: "The [Committee/Board/Commission] found / noted / accepted / documented / examined / did not resolve X" with no citation. This is the most common way invented authority enters this output, because it reads as sourced without being sourced. Attaching a real institution\'s name to an uncertain claim does not make the claim verifiable — it makes an unverifiable claim harder to catch.',
+      '',
+      'Before naming any body, confirm it existed, had jurisdiction over THIS event, and produced the output you are citing. A body that investigated a related event, a later phase of the same affair, or the same subject in another jurisdiction is not a source for this one. If you cannot name the specific report, hearing, volume, or record group, do not name the body — state what is established without an institutional subject, or omit the entry.',
+      '',
+      'WRONG: "The report of the Army Board of Review on Omaha Beach operations notes that first-wave command elements were destroyed." — no such body produced such a report. The sentence is authoritative in shape and empty in substance.',
+      'RIGHT: "Gordon Harrison, Cross-Channel Attack (U.S. Army in World War II, 1951), records that the Vierville draw was breached by mixed groups of survivors acting without intact command structures."',
+      '',
       'Generate the following:',
       'character_fates: For every named character in the scenario, apply the correct Historical Record Standard above based on their character_type. Include primary_source for real figures where one exists. Set primary_source to null for fictional/composite characters. Set classification to match the character_type field: "real" → "real", "composite" → "composite", "fictional" → "fictional". Set verified to false for every fate — this field is set by a human review process and must never be true in generated output.',
       'immediate_outcome: Two to three sentences describing the verified historical result of the event the scenario depicts. Then list the key verified facts — dates, figures, outcomes — as an array of objects. Every entry MUST include a source attribution. A dated, timed, or quantitative claim with no source must be omitted rather than stored unsourced.',
       'historical_frame: Maximum three facts that place the event in wider historical significance. Verified facts only. No interpretation. No meaning-statements. Every entry MUST include a source attribution.',
-      'open_threads: For each essential beat in the scenario, consider whether that beat corresponds to a historical question that was raised at inquiry, disputed, or never satisfactorily resolved. If so, include an entry with the beat\'s id as thread_id and the historical record of that open question.',
-      'choice_echoes: For each essential beat in the scenario, provide the verified historical record of what actually happened at that moment. This is what the epilogue will compare the player\'s choices against.',
+      'open_threads: For each essential beat, ask what a SPECIFIC CITED SOURCE establishes about that moment, and where that source stops. Do not ask what is unknown, undocumented, or unresolved — that question invites you to invent an authority that examined the matter and failed to settle it. Every entry must (1) name the source, (2) state what it records, and (3) state the limit as a property of that source. If you cannot name a source that reaches the beat at all, omit the entry.',
+      '  The gap belongs to the document, not to history. "X is unknown" is a claim you cannot support. "Source Y records A and does not record B" is a claim you can.',
+      '  WRONG: "No systematic record exists of the specific navigational choices made by individual coxswains." — an unfalsifiable claim about the entire surviving archive.',
+      '  WRONG: "The Committee noted the communication failure but did not resolve its precise cause." — a finding, and a non-finding, attributed to a real body with nothing behind it.',
+      '  RIGHT: "Wills\'s Security Officer\'s Log records the second discovery and the police call in a single undivided block reading 1:47-1:55 AM; the log does not subdivide the interval, so the order of the two events within it is not recoverable from this document."',
+      '  Every entry MUST include a source attribution. An entry with no source must be omitted rather than stored unsourced.',
+      'choice_echoes: For each essential beat, provide the verified historical record of what actually happened at that moment, drawn from a named source. This is what the epilogue will compare the player\'s choices against. Every entry MUST include a source attribution. A dated, timed, or quantitative claim with no source must be omitted rather than stored unsourced. If the record does not reach the beat, omit the entry — a missing echo is correct output; an unsourced one is not.',
       'Return only a JSON object matching this exact schema with no other text, no markdown, no explanation:',
       '{',
       '"character_fates": [{ "character_id": "string", "name": "string", "classification": "composite|real|fictional", "outcome": "survived|died|unknown", "historical_record": "string", "primary_source": "string|null", "verified": false }],',
       '"immediate_outcome": { "summary": "string", "key_facts": [{ "text": "string", "source": "string" }] },',
       '"historical_frame": [{ "text": "string", "source": "string" }],',
-      '"open_threads": [{ "thread_id": "string", "historical_record": "string", "source": "string|null" }],',
-      '"choice_echoes": [{ "beat_id": "string", "historical_record": "string", "source": "string|null" }]',
+      '"open_threads": [{ "thread_id": "string", "historical_record": "string", "source": "string" }],',
+      '"choice_echoes": [{ "beat_id": "string", "historical_record": "string", "source": "string" }]',
       '}',
+      '',
+      'source is REQUIRED and non-null on every open_threads and choice_echoes entry. null, "", "unknown", and "n/a" are not sources. Neither are generic non-citations — "the historical record", "survivor testimony", "after-action reports", "contemporary accounts". A source names a specific document, report, volume, record group, archive holding, or published work.',
+      'Both arrays may be shorter than the beat list, and either may be empty. Returning three fully-sourced entries for ten beats is correct output. Padding to one-per-beat with unsourced entries is a failure.',
     ].join('\n');
 
     const userPrompt = [
@@ -2875,6 +2910,19 @@ Return ONLY valid JSON in this exact structure:
         : '',
       essential_beats.length
         ? `ESSENTIAL BEATS (use each beat id as thread_id in open_threads and beat_id in choice_echoes):\n${essential_beats.map(b => `- id: ${b.id}, description: ${b.description}`).join('\n')}`
+        : '',
+      // The scenario's own researched, cited fact table. Without this the generator has no
+      // source list at all and must reach into model memory for every citation — which is
+      // where invented institutional authority comes from.
+      (scenario.technical_facts?.facts || []).length
+        ? `SCENARIO SOURCE TABLE — these facts were researched for this scenario and carry citations. Prefer them as the sources for open_threads and choice_echoes. Cite a source outside this table only when you can name it as specifically as these are named.\n${
+            scenario.technical_facts.facts.map(f => {
+              // the technical-facts generator emits source as a string; stored data carries
+              // the normalized { url, citation, access_note } object. Accept both.
+              const cite = typeof f.source === 'string' ? f.source : (f.source?.citation || '');
+              return `- [${f.domain || 'other'}] ${f.content}${cite ? `\n    SOURCE: ${cite}` : ''}`;
+            }).join('\n')
+          }`
         : '',
     ].filter(Boolean).join('\n\n');
 
@@ -2917,6 +2965,37 @@ Return ONLY valid JSON in this exact structure:
       );
       const rawIo = epilogueData.immediate_outcome || { summary: '', key_facts: [] };
 
+      // The prompt requires a source on every open_threads / choice_echoes entry. Enforce it
+      // here too, so a model that ignores the instruction cannot persist an unsourced
+      // historical claim. Warn-only unless STRICT_EPILOGUE_SOURCING is set: this round reports
+      // what it WOULD drop and keeps the entries.
+      const dropped = { open_threads: 0, choice_echoes: 0, entries: [] };
+      const keepSourced = (arr, label) => {
+        const all       = arr || [];
+        const unsourced = all.filter(e => !hasRealSource(e.source));
+        dropped[label]  = unsourced.length;
+        for (const e of unsourced) {
+          dropped.entries.push({
+            section: label,
+            id:      e.thread_id || e.beat_id || null,
+            source:  e.source ?? null,
+            text:    e.historical_record || '',
+          });
+          console.warn(
+            `[EPILOGUE-DATA] ${STRICT_EPILOGUE_SOURCING ? 'dropping' : 'would drop'} unsourced ${label} ` +
+            `[${e.thread_id || e.beat_id || '?'}] source=${JSON.stringify(e.source ?? null)} :: ` +
+            `${(e.historical_record || '').slice(0, 160)}`
+          );
+        }
+        if (unsourced.length) {
+          console.warn(
+            `[EPILOGUE-DATA] ${STRICT_EPILOGUE_SOURCING ? 'dropped' : 'would drop'} ` +
+            `${unsourced.length}/${all.length} unsourced ${label} entr(ies) for "${scenarioId}"`
+          );
+        }
+        return STRICT_EPILOGUE_SOURCING ? all.filter(e => hasRealSource(e.source)) : all;
+      };
+
       const updated = {
         ...scenario,
         epilogue: {
@@ -2925,15 +3004,36 @@ Return ONLY valid JSON in this exact structure:
           character_fates:  (epilogueData.character_fates || []).map(f => ({ ...f, verified: false })),
           immediate_outcome: { summary: rawIo.summary || '', key_facts: normFactArr(rawIo.key_facts) },
           historical_frame: normFactArr(epilogueData.historical_frame),
-          open_threads:     epilogueData.open_threads      || [],
-          choice_echoes:    epilogueData.choice_echoes     || [],
+          open_threads:     keepSourced(epilogueData.open_threads,  'open_threads'),
+          choice_echoes:    keepSourced(epilogueData.choice_echoes, 'choice_echoes'),
         },
       };
+
+      // dryRun: generate and return, but never write. No save, no version bump, no Supabase
+      // write — so the fix can be tested against any scenario, published ones included,
+      // without altering their data.
+      if (dryRun) {
+        console.log(`[EPILOGUE-DATA] DRY RUN for scenario "${scenarioId}" — nothing saved`);
+        return res.json({
+          epilogue: updated.epilogue,
+          dryRun: true,
+          persisted: false,
+          strict_sourcing: STRICT_EPILOGUE_SOURCING,
+          dropped,
+        });
+      }
+
       const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[EPILOGUE-DATA] Generated for scenario "${scenarioId}"`);
       // Return current_version so the client can advance its cached base and avoid a spurious
       // 409 on the next manual Save (this route bumped the version behind the editor's back).
-      res.json({ epilogue: updated.epilogue, current_version: newVersion });
+      res.json({
+        epilogue: updated.epilogue,
+        current_version: newVersion,
+        persisted: true,
+        strict_sourcing: STRICT_EPILOGUE_SOURCING,
+        dropped,
+      });
     } catch (err) {
       console.error('[EPILOGUE-DATA]', err.message);
       res.status(500).json({ error: err.message });
