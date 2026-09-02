@@ -2704,6 +2704,9 @@ Return ONLY valid JSON in this exact structure:
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const { scenarioId, title = '', world = '', stakes = '', characters = [], clues = [], period_vocabulary = '', essential_beats = [] } = req.body;
     if (!scenarioId) return badRequest(res, 'scenarioId is required.');
+    // ?dryRun=1 → generate and return the block without persisting anything. Mirrors
+    // /generate/epilogue-data so the admin Preview button behaves the same on both sections.
+    const dryRun = req.query.dryRun === '1' || req.query.dryRun === 'true' || req.body.dryRun === true;
     const scenario = await repos.scenarios.findById(scenarioId);
     if (!scenario) return notFound(res);
 
@@ -2788,11 +2791,20 @@ Return ONLY valid JSON in this exact structure:
           facts,
         },
       };
+      // dryRun: generate and return, but never write. No save, no version bump, no Supabase
+      // write — so a block can be read and fact-checked before deciding to overwrite the
+      // current one. No current_version is returned: nothing moved, so the editor's cached
+      // base is still correct and must not be advanced.
+      if (dryRun) {
+        console.log(`[TECHNICAL-FACTS] DRY RUN for scenario "${scenarioId}" — nothing saved`);
+        return res.json({ technical_facts: updated.technical_facts, dryRun: true, persisted: false });
+      }
+
       const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
       console.log(`[TECHNICAL-FACTS] Generated ${facts.length} fact(s) for scenario "${scenarioId}"`);
       // Return current_version so the client can advance its cached base and avoid a spurious
       // 409 on the next manual Save (this route bumped the version behind the editor's back).
-      res.json({ technical_facts: updated.technical_facts, current_version: newVersion });
+      res.json({ technical_facts: updated.technical_facts, current_version: newVersion, persisted: true });
     } catch (err) {
       console.error('[TECHNICAL-FACTS]', err.message);
       res.status(500).json({ error: err.message });
@@ -3040,12 +3052,98 @@ Return ONLY valid JSON in this exact structure:
     }
   });
 
+  // ── Correction tracking: technical_facts.corrected_at / epilogue.corrected_at ───────────
+  // Regenerating either block replaces it wholesale, discarding hand-injected corrections.
+  // The admin editor gates that behind a typed confirmation, but it needs to know the block
+  // HAS corrections — and `reviewed` alone misses the common corrected-but-not-yet-reviewed
+  // state, which does not survive a page reload. So /generate/save stamps corrected_at
+  // whenever an incoming block differs in content from the stored one. Both generate routes
+  // build fresh block literals that omit the key, so it clears itself on regeneration;
+  // absent means never corrected, so no backfill is required.
+  //
+  // The comparison runs over a CANONICAL PROJECTION of each block — only the fields the
+  // editor form actually round-trips, trimmed, in a fixed order. Without this, the first save
+  // after any generation would always look like a correction: the generator stores string
+  // sources (the editor round-trips them as {citation,url,access_note} objects) and adds
+  // `verified` to character_fates. Those are shape differences, not reviewer edits.
+  // Keep this projection in step with collectEdits() in index.html — a field the editor
+  // round-trips but this omits is a correction that would never stamp corrected_at.
+  const canonStr = v => (v == null ? '' : String(v)).trim();
+  const canonSrc = v => {
+    if (!v) return null;
+    const citation = canonStr(typeof v === 'string' ? v : v.citation);
+    if (!citation) return null;
+    return { citation, url: canonStr(typeof v === 'string' ? '' : v.url) || null,
+             access_note: canonStr(typeof v === 'string' ? '' : v.access_note) || null };
+  };
+  const canonTextArr = arr => (arr || [])
+    .map(f => (typeof f === 'string' ? { text: canonStr(f), source: null }
+                                     : { text: canonStr(f?.text), source: canonStr(f?.source) || null }))
+    .filter(f => f.text);
+
+  const canonicalBlock = (kind, block) => {
+    const b = block || {};
+    if (kind === 'technical_facts') {
+      return JSON.stringify((b.facts || []).map(f => ({
+        fact_id:     canonStr(f?.fact_id),
+        content:     canonStr(f?.content),
+        domain:      canonStr(f?.domain) || 'other',
+        source:      canonSrc(f?.source),
+        valid_from:  canonStr(f?.valid_from)  || null,
+        valid_until: canonStr(f?.valid_until) || null,
+      })).filter(f => f.fact_id || f.content));
+    }
+    return JSON.stringify({
+      character_fates: (b.character_fates || []).map(f => ({
+        character_id:      canonStr(f?.character_id),
+        name:              canonStr(f?.name),
+        outcome:           canonStr(f?.outcome) || 'unknown',
+        historical_record: canonStr(f?.historical_record),
+        primary_source:    canonSrc(f?.primary_source),
+      })).filter(f => f.character_id || f.name || f.historical_record),
+      immediate_outcome: {
+        summary:   canonStr(b.immediate_outcome?.summary),
+        key_facts: canonTextArr(b.immediate_outcome?.key_facts),
+      },
+      historical_frame: canonTextArr(b.historical_frame),
+      open_threads: (b.open_threads || []).map(t => ({
+        thread_id:         canonStr(t?.thread_id),
+        historical_record: canonStr(t?.historical_record),
+        source:            canonStr(t?.source) || null,
+      })).filter(t => t.thread_id || t.historical_record),
+      choice_echoes: (b.choice_echoes || []).map(c => ({
+        beat_id:           canonStr(c?.beat_id),
+        historical_record: canonStr(c?.historical_record),
+        source:            canonStr(c?.source) || null,
+      })).filter(c => c.beat_id || c.historical_record),
+    });
+  };
+
+  // Stamps corrected_at on `incoming` when its content differs from `stored`. Carries a prior
+  // stamp forward when nothing changed, so the marker survives saves that touch other parts of
+  // the scenario. Mutates the incoming block in place — it is the object about to be persisted.
+  const stampCorrections = (incoming, stored) => {
+    for (const kind of ['technical_facts', 'epilogue']) {
+      const block = incoming?.[kind];
+      if (!block || typeof block !== 'object') continue;
+      const prior = stored?.[kind]?.corrected_at ?? null;
+      if (canonicalBlock(kind, block) !== canonicalBlock(kind, stored?.[kind])) {
+        block.corrected_at = new Date().toISOString();
+      } else if (prior) {
+        block.corrected_at = prior;
+      }
+    }
+  };
+
   r.post('/generate/save', async (req, res) => {
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [], baseVersion } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
     try {
       const existing = await repos.scenarios.findById(scenario.id);
       if (!existing) scenario.status = 'draft';
+      // Mark hand-edited technical_facts / epilogue blocks so the editor can gate a
+      // destructive Regenerate. Runs before the save so the stamp is part of this version.
+      stampCorrections(scenario, existing);
       if (scenario.featured === true) {
         const allScenarios = await repos.scenarios.findAll();
         for (const other of allScenarios) {
@@ -3067,7 +3165,18 @@ Return ONLY valid JSON in this exact structure:
       playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredRoleBlocks(repos, r)))));
       // current_version is returned so the open editor can advance its cached baseVersion —
       // without it the next manual save from this tab would post a stale base and 409.
-      res.json({ ok: true, scenarioId: scenario.id, current_version: newVersion });
+      // corrected_at is returned for the same reason: the stamp was decided here, and the open
+      // tab clears its session dirty flag on save, so without this the Regenerate guard would
+      // go quiet on a block that was just corrected until the page was reloaded.
+      res.json({
+        ok: true,
+        scenarioId: scenario.id,
+        current_version: newVersion,
+        corrected_at: {
+          technical_facts: scenario.technical_facts?.corrected_at ?? null,
+          epilogue:        scenario.epilogue?.corrected_at ?? null,
+        },
+      });
     } catch (err) {
       if (err.code === 'VERSION_CONFLICT') {
         return res.status(409).json({

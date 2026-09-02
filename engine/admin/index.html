@@ -1620,18 +1620,24 @@ function collectEdits(containerEl, data) {
       if (text) frame.push({ text, source: source || null });
     });
 
+    // `source` MUST be collected on both lists. The epilogue sourcing floor treats an
+    // unsourced open_thread / choice_echo as uncitable and drops it; omitting the field here
+    // meant every editor save stripped the sources the generator had supplied, quietly
+    // converting sourced entries into droppable ones.
     const threads = [];
     epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
       const thread_id        = row.querySelector('.ep-thread-id')?.value.trim()     || '';
       const historical_record = row.querySelector('.ep-thread-record')?.value.trim() || '';
-      if (thread_id || historical_record) threads.push({ thread_id, historical_record });
+      const source            = row.querySelector('.ep-thread-source')?.value.trim() || '';
+      if (thread_id || historical_record) threads.push({ thread_id, historical_record, source: source || null });
     });
 
     const echoes = [];
     epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
       const beat_id           = row.querySelector('.ep-echo-beat-id')?.value.trim()  || '';
       const historical_record = row.querySelector('.ep-echo-record')?.value.trim()   || '';
-      if (beat_id || historical_record) echoes.push({ beat_id, historical_record });
+      const source            = row.querySelector('.ep-echo-source')?.value.trim()   || '';
+      if (beat_id || historical_record) echoes.push({ beat_id, historical_record, source: source || null });
     });
 
     data.scenario.epilogue = {
@@ -2880,19 +2886,45 @@ function renderEpilogueFrameRow(fact) {
   </div>`;
 }
 
+// open_threads and choice_echoes carry a `source` that the epilogue sourcing floor requires
+// (STRICT_EPILOGUE_SOURCING drops any entry without one). These rows used to render no source
+// field at all, so collectEdits had nothing to read and every editor save silently stripped
+// the sources off both lists. The field is rendered and collected, with the same
+// "⚠ Source required" affordance the key-facts rows use — without a visible input a reviewer
+// could neither repair an entry about to be dropped nor source a row they added themselves.
 function renderEpilogueThreadRow(t) {
-  return `<div class="ep-thread-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
-    <input type="text" class="ep-thread-id" placeholder="thread_id" value="${esc(t.thread_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
-    <textarea class="ep-thread-record" rows="2" placeholder="Historical record of this open thread…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(t.historical_record || '')}</textarea>
-    <button type="button" class="remove-ep-thread-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  const source  = t.source == null ? '' : String(t.source);
+  const record  = t.historical_record || '';
+  const missing = !source.trim();
+  return `<div class="ep-thread-row" style="border:1px solid ${missing && record ? '#f87171' : 'var(--border)'};border-radius:6px;padding:10px;margin-bottom:8px">
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+      <input type="text" class="ep-thread-id" placeholder="thread_id" value="${esc(t.thread_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      <textarea class="ep-thread-record" rows="2" placeholder="Historical record of this open thread…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(record)}</textarea>
+      <button type="button" class="remove-ep-thread-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      ${missing && record ? '<span style="font-size:11px;color:#dc2626;font-weight:600;flex-shrink:0;white-space:nowrap">⚠ Source required</span>' : '<span style="font-size:11px;color:var(--text-soft);flex-shrink:0">Source</span>'}
+      <input type="text" class="ep-thread-source" placeholder="Author, Title, Year — or primary document" value="${esc(source)}" style="flex:1;padding:5px 8px;border:1px solid ${missing && record ? '#f87171' : 'var(--border)'};border-radius:4px;font-size:12px">
+    </div>
   </div>`;
 }
 
+// Same as renderEpilogueThreadRow: `source` is mandated by the sourcing floor, so it has to be
+// rendered to be collected — see the note there.
 function renderEpilogueEchoRow(c) {
-  return `<div class="ep-echo-row" style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
-    <input type="text" class="ep-echo-beat-id" placeholder="beat_id" value="${esc(c.beat_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
-    <textarea class="ep-echo-record" rows="2" placeholder="What actually happened at this beat in documented history…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(c.historical_record || '')}</textarea>
-    <button type="button" class="remove-ep-echo-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+  const source  = c.source == null ? '' : String(c.source);
+  const record  = c.historical_record || '';
+  const missing = !source.trim();
+  return `<div class="ep-echo-row" style="border:1px solid ${missing && record ? '#f87171' : 'var(--border)'};border-radius:6px;padding:10px;margin-bottom:8px">
+    <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+      <input type="text" class="ep-echo-beat-id" placeholder="beat_id" value="${esc(c.beat_id || '')}" style="width:160px;flex-shrink:0;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
+      <textarea class="ep-echo-record" rows="2" placeholder="What actually happened at this beat in documented history…" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(record)}</textarea>
+      <button type="button" class="remove-ep-echo-btn" style="background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:20px;line-height:1;flex-shrink:0;padding:8px 0">×</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      ${missing && record ? '<span style="font-size:11px;color:#dc2626;font-weight:600;flex-shrink:0;white-space:nowrap">⚠ Source required</span>' : '<span style="font-size:11px;color:var(--text-soft);flex-shrink:0">Source</span>'}
+      <input type="text" class="ep-echo-source" placeholder="Author, Title, Year — or primary document" value="${esc(source)}" style="flex:1;padding:5px 8px;border:1px solid ${missing && record ? '#f87171' : 'var(--border)'};border-radius:4px;font-size:12px">
+    </div>
   </div>`;
 }
 
@@ -2951,6 +2983,7 @@ function renderTechnicalFactsSection(data) {
   const tf         = data.scenario?.technical_facts || {};
   const generated  = tf.generated === true;
   const reviewed   = tf.reviewed  === true;
+  const atRisk     = generated && regenAtRisk(tf, 'tf');
   const hasPrereqs = !!(data.scenario?.world || data.scenario?.stakes || (data.characters || []).length > 0);
   const genDisabled = !hasPrereqs;
   const genTitle    = genDisabled ? 'Complete scenario world, stakes, and characters first' : '';
@@ -2999,9 +3032,13 @@ function renderTechnicalFactsSection(data) {
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
           <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
           ${badge}
-          <button type="button" id="gen-tf-btn" class="btn btn-primary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
-            ${generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts'}
+          <button type="button" id="gen-tf-btn" class="btn ${atRisk ? 'btn-danger' : 'btn-primary'} btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
+            ${regenBtnLabel(generated, atRisk, 'Technical Facts')}
           </button>
+          <button type="button" id="preview-tf-btn" class="btn btn-secondary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genDisabled ? genTitle : 'Generate and display without saving — the current block is untouched'}">
+            👁 Preview
+          </button>
+          ${atRisk ? '<span style="font-size:12px;color:#991b1b">This block carries corrections — Regenerate discards them.</span>' : ''}
         </div>
         <div style="margin-top:16px">${fieldsHtml}</div>
       </div>
@@ -3417,6 +3454,7 @@ function renderEpilogueSection(data) {
   const ep           = data.scenario?.epilogue || {};
   const generated    = ep.generated  === true;
   const reviewed     = ep.reviewed   === true;
+  const atRisk       = generated && regenAtRisk(ep, 'ep');
   const chars        = data.characters || [];
   const beats        = (data.storyArc?.acts || []).flatMap(a => a.beats || []);
   const hasPrereqs   = chars.length > 0 && beats.length > 0; // enabled as long as there is at least one beat
@@ -3500,9 +3538,13 @@ function renderEpilogueSection(data) {
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
           <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
           ${badge}
-          <button type="button" id="gen-epilogue-btn" class="btn btn-primary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
-            ${generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data'}
+          <button type="button" id="gen-epilogue-btn" class="btn ${atRisk ? 'btn-danger' : 'btn-primary'} btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
+            ${regenBtnLabel(generated, atRisk, 'Epilogue Data')}
           </button>
+          <button type="button" id="preview-epilogue-btn" class="btn btn-secondary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genDisabled ? genTitle : 'Generate and display without saving — the current block is untouched'}">
+            👁 Preview
+          </button>
+          ${atRisk ? '<span style="font-size:12px;color:#991b1b">This block carries corrections — Regenerate discards them.</span>' : ''}
         </div>
         ${fieldsHtml}
       </div>
@@ -3605,7 +3647,104 @@ function clearFormDirty() {
   if (badge) badge.style.display = 'none';
   const saveBtn = document.getElementById('preview-save');
   if (saveBtn) saveBtn.style.boxShadow = '';
+  // Saved edits are no longer "unsaved corrections" — the server has taken them and stamped
+  // corrected_at, which is what carries the risk state from here on.
+  _sectionDirty.tf = false;
+  _sectionDirty.ep = false;
   // Header pill is set to "✓ Saved" by handleManualSave's success path.
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REGENERATE RISK — technical_facts / epilogue
+// ═══════════════════════════════════════════════════════════════
+// Regenerating either block replaces it wholesale with fresh AI output, discarding any
+// hand-injected corrections. A block is AT RISK when it holds corrections worth protecting,
+// which is three conditions OR'd — each catches a case the others miss:
+//   reviewed      — corrected, reviewed and saved. Free; survives reload; covers existing
+//                   scenarios with no corrected_at stamp yet, so no backfill is needed.
+//   corrected_at  — stamped by /generate/save when a block's content changed. The only one
+//                   that catches corrected → saved → NOT reviewed → reloaded, which is the
+//                   state where a silent overwrite actually happens.
+//   sectionDirty  — corrected in this tab, not yet saved. No persisted flag can see this yet.
+// Cleared by regeneration itself: the fresh block is unreviewed, carries no stamp, and its
+// section re-render resets the dirty flag.
+const _sectionDirty = { tf: false, ep: false };
+
+function markSectionDirty(section) { if (section in _sectionDirty) _sectionDirty[section] = true; }
+
+function regenAtRisk(block, section) {
+  const b = block || {};
+  return b.reviewed === true || b.corrected_at != null || _sectionDirty[section] === true;
+}
+
+// Regenerate button copy and colour escalate with what is at risk, so the danger is visible
+// before the click rather than only in the confirmation. Mirrors the defining-moment
+// escalation (genLabel / genClass) in renderDefiningMomentSection.
+function regenBtnLabel(generated, atRisk, noun) {
+  if (!generated) return `✦ Generate ${noun}`;
+  return atRisk ? '↻ Regenerate — replaces corrections' : `↻ Regenerate ${noun}`;
+}
+
+// Repaints both Regenerate buttons in place. Used after a save, where the risk state changes
+// (corrected_at arrives from the server) but re-rendering the sections would throw away
+// scroll position and any open row the reviewer is working in.
+function refreshRegenRiskUI(formEl, data) {
+  const specs = [
+    ['#gen-tf-btn',       data?.scenario?.technical_facts, 'tf', 'Technical Facts'],
+    ['#gen-epilogue-btn', data?.scenario?.epilogue,        'ep', 'Epilogue Data'],
+  ];
+  for (const [sel, block, section, noun] of specs) {
+    const btn = formEl?.querySelector(sel);
+    if (!btn || btn.disabled) continue;
+    const atRisk = regenAtRisk(block, section);
+    btn.className   = `btn ${atRisk ? 'btn-danger' : 'btn-primary'} btn-sm`;
+    btn.textContent = regenBtnLabel(block?.generated === true, atRisk, noun);
+  }
+}
+
+// The typed-token confirmation. Soft by design: it gates a destructive regeneration behind a
+// deliberate act, it never forbids one — correcting Technical Facts and then regenerating
+// Epilogue Data to inherit the fixes is the correct workflow and costs one typed word.
+function confirmDestructiveRegen({ sectionName, scenarioTitle, version }) {
+  const vNote = version != null
+    ? `The current block is RECOVERABLE from version history (v${version}).`
+    : 'The current block is recoverable from version history.';
+  const typed = prompt(
+    `${sectionName} on "${scenarioTitle}" has been corrected/reviewed.\n\n` +
+    `Regenerating replaces the whole block, including injected corrections, with fresh AI ` +
+    `output and resets reviewed. ${vNote}\n\n` +
+    `Type REPLACE to proceed, or Cancel.`);
+  if (typed !== 'REPLACE') {
+    toast('Regenerate cancelled — corrections kept.', 'success');
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRY-RUN PREVIEW WINDOW
+// ═══════════════════════════════════════════════════════════════
+// Opens generated-but-unsaved output in a new tab for a fact-check pass. New tab, so it does
+// not unload the editor and never trips the beforeunload guard. Same shape as
+// previewAdminVersion. `notes` surfaces route metadata (strict sourcing, dropped entries)
+// that nothing in the editor shows today.
+function openDryRunWindow(title, payload, notes) {
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) { toast('Preview blocked — allow pop-ups for this site.', 'error'); return; }
+  const noteHtml = (notes || [])
+    .map(n => `<div style="margin-bottom:4px">${escapeHtml(n)}</div>`).join('');
+  win.document.write(
+    `<title>${escapeHtml(title)}</title>` +
+    '<div style="background:#1a2332;color:#e8eaf0;font-family:system-ui,sans-serif;padding:20px 20px 0">' +
+      `<div style="font-size:15px;font-weight:700;margin-bottom:8px">${escapeHtml(title)}</div>` +
+      '<div style="font-size:12px;color:#fbbf24;margin-bottom:10px">' +
+        'DRY RUN — nothing was saved. The scenario is unchanged and no version was created.' +
+      '</div>' +
+      (noteHtml ? `<div style="font-size:12px;color:#93c5fd;margin-bottom:10px">${noteHtml}</div>` : '') +
+    '</div>' +
+    '<pre style="background:#1a2332;color:#e8eaf0;padding:0 20px 20px;font-size:12px;margin:0;white-space:pre-wrap">' +
+      escapeHtml(JSON.stringify(payload, null, 2)) +
+    '</pre>');
 }
 
 // Promise-based confirm reusing the shared #modal-overlay. Captures and restores
@@ -3691,10 +3830,19 @@ async function handleManualSave(data, containerEl) {
     // scenario changed elsewhere since load, instead of silently clobbering the newer save.
     const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
     if (resp && resp.current_version != null) data.current_version = resp.current_version;  // advance base for next save this session
+    // Adopt the corrected_at stamps the server just decided. Without this the in-memory
+    // blocks would lag until reload, and since clearFormDirty() drops the session dirty
+    // flags below, a block corrected and saved a moment ago would stop reading as at-risk.
+    if (resp?.corrected_at && data.scenario) {
+      if (data.scenario.technical_facts) data.scenario.technical_facts.corrected_at = resp.corrected_at.technical_facts ?? null;
+      if (data.scenario.epilogue)        data.scenario.epilogue.corrected_at        = resp.corrected_at.epilogue ?? null;
+    }
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
     clearFormDirty();   // single choke point — clears badge/Save emphasis for all save paths
+    // Repaint the Regenerate buttons: risk state just moved from session-dirty to a stamp.
+    if (containerEl) refreshRegenRiskUI(containerEl, data);
     return true;
   } catch (err) {
     // 409 = version conflict. Non-destructive: keep the user's edits, tell them to reload.
@@ -4491,10 +4639,30 @@ function renderPreview(data, autoSaved = false) {
   // 'change' (not 'input'). An input-only listener would miss the exact field
   // this whole guard exists to protect.
   const onFieldEdit = e => {
-    if (e.target && e.target.matches && e.target.matches(PERSISTED_FIELD_SELECTOR)) markFormDirty();
+    if (e.target && e.target.matches && e.target.matches(PERSISTED_FIELD_SELECTOR)) {
+      markFormDirty();
+      // Section-scoped dirty, feeding the Regenerate guard: an edit inside either block is a
+      // correction that a regeneration would discard, and no persisted flag can see it yet.
+      if (e.target.closest('#tf-data-details'))       markSectionDirty('tf');
+      if (e.target.closest('#epilogue-data-details')) markSectionDirty('ep');
+    }
   };
   formEl.addEventListener('input',  onFieldEdit);
   formEl.addEventListener('change', onFieldEdit);
+
+  // Adding or removing a row changes the block without firing input/change, and deleting a
+  // bad fact is exactly the kind of correction this guard exists to protect. Delegated
+  // separately so the existing add/remove handlers stay untouched.
+  const TF_ROW_BTNS = '#add-tf-fact-btn, .remove-tf-fact-btn';
+  const EP_ROW_BTNS = [
+    '#add-ep-fate-btn', '#add-ep-fact-btn', '#add-ep-frame-btn', '#add-ep-thread-btn', '#add-ep-echo-btn',
+    '.remove-ep-fate-btn', '.remove-ep-fact-btn', '.remove-ep-frame-btn', '.remove-ep-thread-btn', '.remove-ep-echo-btn',
+  ].join(', ');
+  formEl.addEventListener('click', e => {
+    if (!e.target.closest) return;
+    if (e.target.closest(TF_ROW_BTNS)) { markFormDirty(); markSectionDirty('tf'); }
+    if (e.target.closest(EP_ROW_BTNS)) { markFormDirty(); markSectionDirty('ep'); }
+  });
 
   // ── Image Artwork section ─────────────────────────────────────────────────
   {
@@ -4931,18 +5099,25 @@ function renderPreview(data, autoSaved = false) {
 
     // Mark Historical Data Reviewed
     if (e.target.closest('#mark-epilogue-reviewed-btn')) {
-      // Gate: block if any key_facts or historical_frame entries lack a source attribution.
+      // Gate: block if any sourced-content entry lacks a source attribution. Covers all four
+      // lists the sourcing floor judges — open_threads and choice_echoes included, since
+      // STRICT_EPILOGUE_SOURCING drops an unsourced entry outright. Without them here,
+      // "Reviewed" could be granted to a block whose threads and echoes will not survive the
+      // floor. Each check mirrors its row's own "⚠ Source required" warning exactly, so the
+      // gate never blocks on something the reviewer cannot see highlighted.
       const unsourced = [];
-      formEl.querySelectorAll('#epilogue-data-details .ep-fact-row').forEach((row, i) => {
-        const text   = row.querySelector('.ep-fact-val')?.value.trim()    || '';
-        const source = row.querySelector('.ep-fact-source')?.value.trim() || '';
-        if (text && !source) unsourced.push(`Key Fact ${i + 1}: "${text.length > 70 ? text.slice(0, 70) + '…' : text}"`);
-      });
-      formEl.querySelectorAll('#epilogue-data-details .ep-frame-row').forEach((row, i) => {
-        const text   = row.querySelector('.ep-frame-val')?.value.trim()    || '';
-        const source = row.querySelector('.ep-frame-source')?.value.trim() || '';
-        if (text && !source) unsourced.push(`Historical Frame ${i + 1}: "${text.length > 70 ? text.slice(0, 70) + '…' : text}"`);
-      });
+      const clip = t => (t.length > 70 ? t.slice(0, 70) + '…' : t);
+      const gate = (rowSel, textSel, srcSel, label) => {
+        formEl.querySelectorAll(`#epilogue-data-details ${rowSel}`).forEach((row, i) => {
+          const text   = row.querySelector(textSel)?.value.trim() || '';
+          const source = row.querySelector(srcSel)?.value.trim()  || '';
+          if (text && !source) unsourced.push(`${label} ${i + 1}: "${clip(text)}"`);
+        });
+      };
+      gate('.ep-fact-row',   '.ep-fact-val',    '.ep-fact-source',   'Key Fact');
+      gate('.ep-frame-row',  '.ep-frame-val',   '.ep-frame-source',  'Historical Frame');
+      gate('.ep-thread-row', '.ep-thread-record', '.ep-thread-source', 'Open Thread');
+      gate('.ep-echo-row',   '.ep-echo-record',   '.ep-echo-source',   'Choice Echo');
       if (unsourced.length > 0) {
         toast(`Cannot mark as reviewed — ${unsourced.length} entr${unsourced.length === 1 ? 'y lacks a' : 'ies lack'} source attribution. Add a source to each highlighted entry first:\n\n${unsourced.join('\n')}`, 'error');
         return;
@@ -5190,17 +5365,10 @@ function renderPreview(data, autoSaved = false) {
     data.scenario.technical_facts.reviewed = true;
   });
 
-  // ── Generate Technical Facts (delegated — survives section re-render) ────────
-  formEl.addEventListener('click', async e => {
-    if (!e.target.closest('#gen-tf-btn')) return;
-    const btn = e.target.closest('#gen-tf-btn');
-
-    if (!confirm('Generate technical facts for this scenario? This will call the AI API and may take up to 30 seconds.')) return;
-
-    const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
-    const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
-    const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
-    const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+  // Payload assembly, shared by Generate and Preview so a dry run is generated from exactly
+  // the same inputs as the real thing — a preview built from a different payload would be
+  // worthless as a fact-check of what Regenerate is about to write.
+  const collectTechnicalFactsPayload = () => {
     const characters = (data.characters || []).map(c => ({
       character_id:     c.id,
       name:             c.name,
@@ -5212,24 +5380,79 @@ function renderPreview(data, autoSaved = false) {
       name:        cl.name,
       description: cl.description || cl.content || '',
     }));
-    const period_vocabulary = data.scenario?.period_vocabulary || '';
-    const essential_beats = (data.storyArc?.acts || [])
-      .flatMap(a => a.beats || [])
-      .filter(b => b.id?.trim() && b.description?.trim())
-      .slice(0, 10);
+    return {
+      scenarioId: formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '',
+      title:      formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '',
+      world:      formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '',
+      stakes:     formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '',
+      characters,
+      clues,
+      period_vocabulary: data.scenario?.period_vocabulary || '',
+      essential_beats: (data.storyArc?.acts || [])
+        .flatMap(a => a.beats || [])
+        .filter(b => b.id?.trim() && b.description?.trim())
+        .slice(0, 10),
+    };
+  };
+
+  // ── Preview Technical Facts (dry run — generates, displays, saves nothing) ───
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#preview-tf-btn')) return;
+    const btn = e.target.closest('#preview-tf-btn');
+    if (!confirm('Preview technical facts? This calls the AI API (up to 30 seconds) and saves nothing — the current block is untouched.')) return;
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating preview…';
+    try {
+      const resp = await apiPost('/generate/technical-facts', { ...collectTechnicalFactsPayload(), dryRun: true });
+      const facts = resp.technical_facts?.facts || [];
+      openDryRunWindow(
+        'Technical Facts — dry run preview',
+        resp.technical_facts,
+        [`${facts.length} fact(s) generated.`]);
+      toast('Preview opened in a new tab. Nothing was saved.', 'success');
+    } catch (err) {
+      toast(`Preview failed: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ── Generate Technical Facts (delegated — survives section re-render) ────────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#gen-tf-btn')) return;
+    const btn = e.target.closest('#gen-tf-btn');
+
+    // Destructive-regeneration gate. Only when the block actually holds corrections; an
+    // untouched or never-generated block keeps the plain cost warning it has always had.
+    if (regenAtRisk(data.scenario?.technical_facts, 'tf')) {
+      if (!confirmDestructiveRegen({
+        sectionName:   'Technical Facts',
+        scenarioTitle: data.scenario?.title || data.scenario?.id || 'this scenario',
+        version:       data.current_version,
+      })) return;
+    } else if (!confirm('Generate technical facts for this scenario? This will call the AI API and may take up to 30 seconds.')) {
+      return;
+    }
+
+    const payload    = collectTechnicalFactsPayload();
+    const scenarioId = payload.scenarioId;
 
     btn.disabled    = true;
     btn.textContent = 'Generating historical facts…';
     try {
-      const resp = await apiPost('/generate/technical-facts', {
-        scenarioId, title, world, stakes, characters, clues, period_vocabulary, essential_beats,
-      });
+      const resp = await apiPost('/generate/technical-facts', payload);
       const tf = resp.technical_facts;
       if (!data.scenario) data.scenario = {};
       data.scenario.technical_facts = tf;
       // Route saved server-side and bumped the version; advance our cached base so the next
       // manual Save carries the current version and passes the CAS instead of 409-ing.
       if (resp.current_version != null) data.current_version = resp.current_version;
+      // The block was just replaced wholesale — whatever was pending in the form is gone by
+      // intent, so the section starts clean rather than looking corrected on the next click.
+      _sectionDirty.tf = false;
       const tfDetails = formEl.querySelector('#tf-data-details');
       if (tfDetails) {
         const newHtml = renderTechnicalFactsSection(data);
@@ -5241,21 +5464,15 @@ function renderPreview(data, autoSaved = false) {
     } catch (err) {
       toast(`Technical facts generation failed: ${err.message}`, 'error');
       btn.disabled    = false;
-      btn.textContent = data.scenario?.technical_facts?.generated ? '↻ Regenerate Technical Facts' : '✦ Generate Technical Facts';
+      // Nothing was written, so the block still carries whatever risk it had — restore the
+      // escalated label, not the plain one.
+      refreshRegenRiskUI(formEl, data);
     }
   });
 
-  // ── Generate Epilogue Data (delegated — survives section re-render) ──────────
-  formEl.addEventListener('click', async e => {
-    if (!e.target.closest('#gen-epilogue-btn')) return;
-    const btn = e.target.closest('#gen-epilogue-btn');
-
-    if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 2–3 minutes.')) return;
-
-    const scenarioId = formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '';
-    const title      = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '';
-    const world      = formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '';
-    const stakes     = formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '';
+  // Payload assembly, shared by Generate and Preview so a dry run is generated from exactly
+  // the same inputs as the real thing.
+  const collectEpiloguePayload = () => {
     const characters = (data.characters || []).map(c => ({
       character_id:   c.id,
       name:           c.name,
@@ -5266,16 +5483,75 @@ function renderPreview(data, autoSaved = false) {
     // Filter to structured beats only (must have both id and description).
     const allBeats = (data.storyArc?.acts || []).flatMap(a => a.beats || [])
       .filter(b => b.id?.trim() && b.description?.trim());
-    // Cap at 10 — the epilogue system is built around the 3-6 essential beats checklist;
-    // sending all raw act beats overruns the token budget.
-    const essential_beats = allBeats.slice(0, 10);
+    return {
+      scenarioId: formEl.querySelector('[data-path="scenario.id"]')?.value.trim() || data.scenario?.id || '',
+      title:      formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || '',
+      world:      formEl.querySelector('[data-path="storyArc.premise"]')?.value.trim() || '',
+      stakes:     formEl.querySelector('[data-path="storyArc.goal"]')?.value.trim() || '',
+      characters,
+      // Cap at 10 — the epilogue system is built around the 3-6 essential beats checklist;
+      // sending all raw act beats overruns the token budget.
+      essential_beats: allBeats.slice(0, 10),
+    };
+  };
+
+  // Route metadata the editor has never surfaced: whether strict sourcing is on, and which
+  // unsourced open_threads / choice_echoes entries were dropped (or would be).
+  const epilogueDryRunNotes = resp => {
+    const notes = [`Strict sourcing: ${resp.strict_sourcing ? 'ON — unsourced entries are dropped' : 'OFF — unsourced entries are kept and only warned about'}`];
+    const d = resp.dropped || {};
+    const total = (d.open_threads || 0) + (d.choice_echoes || 0);
+    notes.push(total
+      ? `${resp.strict_sourcing ? 'Dropped' : 'Would drop'} ${total} unsourced entr(ies): open_threads ${d.open_threads || 0}, choice_echoes ${d.choice_echoes || 0}. See "dropped" below.`
+      : 'No unsourced open_threads or choice_echoes entries.');
+    return notes;
+  };
+
+  // ── Preview Epilogue Data (dry run — generates, displays, saves nothing) ─────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#preview-epilogue-btn')) return;
+    const btn = e.target.closest('#preview-epilogue-btn');
+    if (!confirm('Preview historical epilogue data? This calls the AI API (up to 2–3 minutes) and saves nothing — the current block is untouched.')) return;
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Generating preview…';
+    try {
+      const resp = await apiPost('/generate/epilogue-data', { ...collectEpiloguePayload(), dryRun: true });
+      openDryRunWindow(
+        'Historical Epilogue Data — dry run preview',
+        { epilogue: resp.epilogue, dropped: resp.dropped },
+        epilogueDryRunNotes(resp));
+      toast('Preview opened in a new tab. Nothing was saved.', 'success');
+    } catch (err) {
+      toast(`Preview failed: ${err.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ── Generate Epilogue Data (delegated — survives section re-render) ──────────
+  formEl.addEventListener('click', async e => {
+    if (!e.target.closest('#gen-epilogue-btn')) return;
+    const btn = e.target.closest('#gen-epilogue-btn');
+
+    // Destructive-regeneration gate. Only when the block actually holds corrections; an
+    // untouched or never-generated block keeps the plain cost warning it has always had.
+    if (regenAtRisk(data.scenario?.epilogue, 'ep')) {
+      if (!confirmDestructiveRegen({
+        sectionName:   'Historical Epilogue Data',
+        scenarioTitle: data.scenario?.title || data.scenario?.id || 'this scenario',
+        version:       data.current_version,
+      })) return;
+    } else if (!confirm('Generate historical epilogue data for this scenario? This will call the AI API and may take up to 2–3 minutes.')) {
+      return;
+    }
 
     btn.disabled    = true;
     btn.textContent = 'Generating historical data…';
     try {
-      const resp = await apiPost('/generate/epilogue-data', {
-        scenarioId, title, world, stakes, characters, essential_beats,
-      });
+      const resp = await apiPost('/generate/epilogue-data', collectEpiloguePayload());
       const epilogue = resp.epilogue;
       // Rebuild the epilogue data in the in-memory data object
       if (!data.scenario) data.scenario = {};
@@ -5283,6 +5559,9 @@ function renderPreview(data, autoSaved = false) {
       // Route saved server-side and bumped the version; advance our cached base so the next
       // manual Save carries the current version and passes the CAS instead of 409-ing.
       if (resp.current_version != null) data.current_version = resp.current_version;
+      // The block was just replaced wholesale — whatever was pending in the form is gone by
+      // intent, so the section starts clean rather than looking corrected on the next click.
+      _sectionDirty.ep = false;
       // Re-render just the epilogue section
       const epDetails = formEl.querySelector('#epilogue-data-details');
       if (epDetails) {
@@ -5295,7 +5574,9 @@ function renderPreview(data, autoSaved = false) {
     } catch (err) {
       toast(`Epilogue generation failed: ${err.message}`, 'error');
       btn.disabled    = false;
-      btn.textContent = data.scenario?.epilogue?.generated ? '↻ Regenerate Epilogue Data' : '✦ Generate Epilogue Data';
+      // Nothing was written, so the block still carries whatever risk it had — restore the
+      // escalated label, not the plain one.
+      refreshRegenRiskUI(formEl, data);
     }
   });
 
