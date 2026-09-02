@@ -2928,6 +2928,123 @@ function renderEpilogueEchoRow(c) {
   </div>`;
 }
 
+// ── Export text builders — shared by the plain-text and AI-prompt copy buttons ──
+// Every sourced field emits a Source: line so a fresh-eyes reviewer sees the claim
+// AND its citation. An empty citation reads "(missing)" rather than vanishing —
+// an invisible gap is one the review cannot catch.
+function exportSourceLine(el) {
+  const v = el?.value.trim() || '';
+  return `Source: ${v || '(missing)'}`;
+}
+
+function buildEpilogueFactsExportText(formEl) {
+  const epDetails = formEl.querySelector('#epilogue-data-details');
+  if (!epDetails) return null;
+
+  const lines = [];
+  const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
+  lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
+  lines.push('');
+
+  lines.push('=== CHARACTER FATES ===');
+  lines.push('');
+  epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
+    const name    = row.querySelector('.ep-char-name')?.value.trim()   || '(unnamed)';
+    const id      = row.querySelector('.ep-char-id')?.value.trim()     || '';
+    const outcome = row.querySelector('.ep-char-outcome')?.value       || '';
+    const record  = row.querySelector('.ep-char-record')?.value.trim() || '';
+    lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
+    if (record) lines.push(record);
+    lines.push(exportSourceLine(row.querySelector('.ep-char-citation')));
+    lines.push('');
+  });
+
+  lines.push('=== IMMEDIATE OUTCOME ===');
+  lines.push('');
+  const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
+  if (ioSummary) { lines.push(ioSummary); lines.push(''); }
+  const factRows = [...epDetails.querySelectorAll('.ep-fact-row')]
+    .filter(row => (row.querySelector('.ep-fact-val')?.value.trim() || ''));
+  if (factRows.length) {
+    lines.push('Key Facts:');
+    factRows.forEach(row => {
+      lines.push(`- ${row.querySelector('.ep-fact-val').value.trim()}`);
+      lines.push(exportSourceLine(row.querySelector('.ep-fact-source')));
+      lines.push('');
+    });
+  }
+
+  lines.push('=== HISTORICAL FRAME ===');
+  lines.push('');
+  epDetails.querySelectorAll('.ep-frame-row').forEach(row => {
+    const v = row.querySelector('.ep-frame-val')?.value.trim() || '';
+    if (!v) return;
+    lines.push(`- ${v}`);
+    lines.push(exportSourceLine(row.querySelector('.ep-frame-source')));
+    lines.push('');
+  });
+
+  lines.push('=== OPEN THREADS ===');
+  lines.push('');
+  epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
+    const id     = row.querySelector('.ep-thread-id')?.value.trim()     || '';
+    const record = row.querySelector('.ep-thread-record')?.value.trim() || '';
+    if (!id && !record) return;
+    if (id) lines.push(`Thread: ${id}`);
+    if (record) lines.push(record);
+    lines.push(exportSourceLine(row.querySelector('.ep-thread-source')));
+    lines.push('');
+  });
+
+  lines.push('=== CHOICE ECHOES ===');
+  lines.push('');
+  epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
+    const id     = row.querySelector('.ep-echo-beat-id')?.value.trim() || '';
+    const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
+    if (!id && !record) return;
+    if (id) lines.push(`Beat: ${id}`);
+    if (record) lines.push(record);
+    lines.push(exportSourceLine(row.querySelector('.ep-echo-source')));
+    lines.push('');
+  });
+
+  return lines.join('\n');
+}
+
+function buildTechFactsExportText(formEl) {
+  const tfDetails = formEl.querySelector('#tf-data-details');
+  if (!tfDetails) return null;
+
+  const lines = [];
+  const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
+  lines.push(`TECHNICAL FACTS — ${scenarioTitle}`);
+  lines.push('');
+
+  tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
+    const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()          || '';
+    const content     = row.querySelector('.tf-fact-content')?.value.trim()     || '';
+    const domain      = row.querySelector('.tf-fact-domain')?.value             || '';
+    const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()  || '';
+    const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim() || '';
+    if (!fact_id && !content) return;
+    if (fact_id) lines.push(`[${fact_id}]${domain ? ` (${domain})` : ''}`);
+    if (content) lines.push(content);
+    lines.push(exportSourceLine(row.querySelector('.tf-fact-citation')));
+    if (valid_from || valid_until) lines.push(`Valid: ${valid_from || '—'} → ${valid_until || '—'}`);
+    lines.push('');
+  });
+
+  return lines.join('\n');
+}
+
+function copyExportToClipboard(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied to clipboard';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }).catch(() => toast('Clipboard write failed', 'error'));
+}
+
 function buildTfFactRow(f) {
   f = f || {};
   const src = normSourceClient(f.source);
@@ -5105,198 +5222,39 @@ function renderPreview(data, autoSaved = false) {
 
     // Download epilogue facts as plain text
     if (e.target.closest('#download-epilogue-facts-btn')) {
-      const epDetails = formEl.querySelector('#epilogue-data-details');
-      if (!epDetails) return;
-
-      const lines = [];
-      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
-      lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
-      lines.push('');
-
-      lines.push('=== CHARACTER FATES ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
-        const name    = row.querySelector('.ep-char-name')?.value.trim()     || '(unnamed)';
-        const id      = row.querySelector('.ep-char-id')?.value.trim()       || '';
-        const outcome = row.querySelector('.ep-char-outcome')?.value         || '';
-        const record  = row.querySelector('.ep-char-record')?.value.trim()   || '';
-        const source  = row.querySelector('.ep-char-citation')?.value.trim() || '';
-        lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
-        if (record)  lines.push(record);
-        if (source)  lines.push(`Source: ${source}`);
-        lines.push('');
-      });
-
-      lines.push('=== IMMEDIATE OUTCOME ===');
-      lines.push('');
-      const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
-      if (ioSummary) { lines.push(ioSummary); lines.push(''); }
-      const facts = [...epDetails.querySelectorAll('.ep-fact-val')]
-        .map(el => el.value.trim()).filter(Boolean);
-      if (facts.length) {
-        lines.push('Key Facts:');
-        facts.forEach(f => lines.push(`- ${f}`));
-        lines.push('');
-      }
-
-      lines.push('=== HISTORICAL FRAME ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-frame-val').forEach(el => {
-        const v = el.value.trim();
-        if (v) { lines.push(`- ${v}`); lines.push(''); }
-      });
-
-      lines.push('=== OPEN THREADS ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
-        const id     = row.querySelector('.ep-thread-id')?.value.trim()     || '';
-        const record = row.querySelector('.ep-thread-record')?.value.trim() || '';
-        if (id || record) {
-          if (id) lines.push(`Thread: ${id}`);
-          if (record) lines.push(record);
-          lines.push('');
-        }
-      });
-
-      lines.push('=== CHOICE ECHOES ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
-        const id     = row.querySelector('.ep-echo-beat-id')?.value.trim() || '';
-        const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
-        if (id || record) {
-          if (id) lines.push(`Beat: ${id}`);
-          if (record) lines.push(record);
-          lines.push('');
-        }
-      });
-
-      const btn = e.target.closest('#download-epilogue-facts-btn');
-      navigator.clipboard.writeText(lines.join('\n')).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = '✓ Copied to clipboard';
-        setTimeout(() => { btn.textContent = orig; }, 2000);
-      }).catch(() => toast('Clipboard write failed', 'error'));
+      const text = buildEpilogueFactsExportText(formEl);
+      if (text === null) return;
+      copyExportToClipboard(e.target.closest('#download-epilogue-facts-btn'), text);
       return;
     }
 
     // Copy epilogue facts with AI review prompt
     if (e.target.closest('#download-epilogue-facts-with-prompt-btn')) {
-      const epDetails = formEl.querySelector('#epilogue-data-details');
-      if (!epDetails) return;
-      const lines = [];
-      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
-      lines.push(`EPILOGUE FACTS — ${scenarioTitle}`);
-      lines.push('');
-      lines.push('=== CHARACTER FATES ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-fate-row').forEach(row => {
-        const name    = row.querySelector('.ep-char-name')?.value.trim()     || '(unnamed)';
-        const id      = row.querySelector('.ep-char-id')?.value.trim()       || '';
-        const outcome = row.querySelector('.ep-char-outcome')?.value         || '';
-        const record  = row.querySelector('.ep-char-record')?.value.trim()   || '';
-        const source  = row.querySelector('.ep-char-citation')?.value.trim() || '';
-        lines.push(`${name}${id ? ` (${id})` : ''} — ${outcome}`);
-        if (record)  lines.push(record);
-        if (source)  lines.push(`Source: ${source}`);
-        lines.push('');
-      });
-      lines.push('=== IMMEDIATE OUTCOME ===');
-      lines.push('');
-      const ioSummary = epDetails.querySelector('.ep-io-summary')?.value.trim() || '';
-      if (ioSummary) { lines.push(ioSummary); lines.push(''); }
-      const facts = [...epDetails.querySelectorAll('.ep-fact-val')].map(el => el.value.trim()).filter(Boolean);
-      if (facts.length) { lines.push('Key Facts:'); facts.forEach(f => lines.push(`- ${f}`)); lines.push(''); }
-      lines.push('=== HISTORICAL FRAME ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-frame-val').forEach(el => {
-        const v = el.value.trim();
-        if (v) { lines.push(`- ${v}`); lines.push(''); }
-      });
-      lines.push('=== OPEN THREADS ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-thread-row').forEach(row => {
-        const id     = row.querySelector('.ep-thread-id')?.value.trim()     || '';
-        const record = row.querySelector('.ep-thread-record')?.value.trim() || '';
-        if (id || record) { if (id) lines.push(`Thread: ${id}`); if (record) lines.push(record); lines.push(''); }
-      });
-      lines.push('=== CHOICE ECHOES ===');
-      lines.push('');
-      epDetails.querySelectorAll('.ep-echo-row').forEach(row => {
-        const id     = row.querySelector('.ep-echo-beat-id')?.value.trim() || '';
-        const record = row.querySelector('.ep-echo-record')?.value.trim()  || '';
-        if (id || record) { if (id) lines.push(`Beat: ${id}`); if (record) lines.push(record); lines.push(''); }
-      });
-      const btnWp = e.target.closest('#download-epilogue-facts-with-prompt-btn');
-      navigator.clipboard.writeText(REVIEW_PROMPTS.epilogue.replace('[PASTE EPILOGUE DATA HERE]', () => lines.join('\n'))).then(() => {
-        const orig = btnWp.textContent;
-        btnWp.textContent = '✓ Copied to clipboard';
-        setTimeout(() => { btnWp.textContent = orig; }, 2000);
-      }).catch(() => toast('Clipboard write failed', 'error'));
+      const text = buildEpilogueFactsExportText(formEl);
+      if (text === null) return;
+      copyExportToClipboard(
+        e.target.closest('#download-epilogue-facts-with-prompt-btn'),
+        REVIEW_PROMPTS.epilogue.replace('[PASTE EPILOGUE DATA HERE]', () => text)
+      );
       return;
     }
 
     // Copy technical facts as plain text
     if (e.target.closest('#download-tf-facts-btn')) {
-      const tfDetails = formEl.querySelector('#tf-data-details');
-      if (!tfDetails) return;
-
-      const lines = [];
-      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
-      lines.push(`TECHNICAL FACTS — ${scenarioTitle}`);
-      lines.push('');
-
-      tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
-        const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()           || '';
-        const content     = row.querySelector('.tf-fact-content')?.value.trim()      || '';
-        const domain      = row.querySelector('.tf-fact-domain')?.value              || '';
-        const source      = row.querySelector('.tf-fact-citation')?.value.trim()     || '';
-        const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()   || '';
-        const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim()  || '';
-        if (!fact_id && !content) return;
-        if (fact_id) lines.push(`[${fact_id}]${domain ? ` (${domain})` : ''}`);
-        if (content) lines.push(content);
-        if (source)  lines.push(`Source: ${source}`);
-        if (valid_from || valid_until) lines.push(`Valid: ${valid_from || '—'} → ${valid_until || '—'}`);
-        lines.push('');
-      });
-
-      const btnTf = e.target.closest('#download-tf-facts-btn');
-      navigator.clipboard.writeText(lines.join('\n')).then(() => {
-        const orig = btnTf.textContent;
-        btnTf.textContent = '✓ Copied to clipboard';
-        setTimeout(() => { btnTf.textContent = orig; }, 2000);
-      }).catch(() => toast('Clipboard write failed', 'error'));
+      const text = buildTechFactsExportText(formEl);
+      if (text === null) return;
+      copyExportToClipboard(e.target.closest('#download-tf-facts-btn'), text);
       return;
     }
 
     // Copy technical facts with AI review prompt
     if (e.target.closest('#download-tf-facts-with-prompt-btn')) {
-      const tfDetails = formEl.querySelector('#tf-data-details');
-      if (!tfDetails) return;
-      const lines = [];
-      const scenarioTitle = formEl.querySelector('[data-path="scenario.title"]')?.value.trim() || 'Scenario';
-      lines.push(`TECHNICAL FACTS — ${scenarioTitle}`);
-      lines.push('');
-      tfDetails.querySelectorAll('.tf-fact-row').forEach(row => {
-        const fact_id     = row.querySelector('.tf-fact-id')?.value.trim()           || '';
-        const content     = row.querySelector('.tf-fact-content')?.value.trim()      || '';
-        const domain      = row.querySelector('.tf-fact-domain')?.value              || '';
-        const source      = row.querySelector('.tf-fact-citation')?.value.trim()     || '';
-        const valid_from  = row.querySelector('.tf-fact-valid-from')?.value.trim()   || '';
-        const valid_until = row.querySelector('.tf-fact-valid-until')?.value.trim()  || '';
-        if (!fact_id && !content) return;
-        if (fact_id) lines.push(`[${fact_id}]${domain ? ` (${domain})` : ''}`);
-        if (content) lines.push(content);
-        if (source)  lines.push(`Source: ${source}`);
-        if (valid_from || valid_until) lines.push(`Valid: ${valid_from || '—'} → ${valid_until || '—'}`);
-        lines.push('');
-      });
-      const btnTfWp = e.target.closest('#download-tf-facts-with-prompt-btn');
-      navigator.clipboard.writeText(REVIEW_PROMPTS.techfacts.replace('[PASTE TECHNICAL FACTS DATA HERE]', () => lines.join('\n'))).then(() => {
-        const orig = btnTfWp.textContent;
-        btnTfWp.textContent = '✓ Copied to clipboard';
-        setTimeout(() => { btnTfWp.textContent = orig; }, 2000);
-      }).catch(() => toast('Clipboard write failed', 'error'));
+      const text = buildTechFactsExportText(formEl);
+      if (text === null) return;
+      copyExportToClipboard(
+        e.target.closest('#download-tf-facts-with-prompt-btn'),
+        REVIEW_PROMPTS.techfacts.replace('[PASTE TECHNICAL FACTS DATA HERE]', () => text)
+      );
       return;
     }
   }, true); // capture phase so it fires before the existing click delegation
