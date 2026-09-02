@@ -5759,7 +5759,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
-- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates, open threads and echoes that is the historical_record text only, never the outcome line, the Thread:/Beat: id line, or the Source: line, which are stored in separate fields. Every entry in every epilogue sub-section is exported with its Source: line; that line is a separate stored field and is never part of CURRENT.
 - Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (+, ✕, ~, •, -, bullets) — buildGameplaySection and similar renderers add these at display time; they are not part of the stored string.
 - A character outcome means in-event fate, not lifespan.
 - Prefer cutting an unsourced specific to inventing a citation for it.`,
@@ -6131,7 +6131,8 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
-- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates, open threads and echoes that is the historical_record text only, never the outcome line, the Thread:/Beat: id line, or the Source: line, which are stored in separate fields. Every entry in every epilogue sub-section is exported with its Source: line; that line is a separate stored field and is never part of CURRENT.
+- Quote CURRENT as the STORED value only. Never include display prefixes or list glyphs (the "- " bullet on Key Facts and Historical Frame entries, or any •, +, ~) — the export adds these at display time; they are not part of the stored string.
 - In-event, not lifespan: an outcome is what happened during the depicted event, not whether the person is alive today.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
@@ -6185,7 +6186,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
-- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates and echoes that is the historical_record text only, not the outcome line or the Source: line, which are stored in separate fields.
+- When FIELD is blank, CURRENT must be unique within that section. Quote the complete stored string — for fates, open threads and echoes that is the historical_record text only, never the outcome line, the Thread:/Beat: id line, or the Source: line, which are stored in separate fields. Every entry in every epilogue sub-section is exported with its Source: line; that line is a separate stored field and is never part of CURRENT.
 - In-event, not lifespan: a character outcome is what happened during the depicted event, not lifespan.
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
