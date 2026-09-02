@@ -1,0 +1,827 @@
+{
+  "version": 1,
+  "label": "ending_notes_injected",
+  "scenarioId": "schiller_corner_1914",
+  "createdAt": "2026-08-24T17:13:33.149Z",
+  "pipeline_step": "ending_notes",
+  "changes_applied": 1,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "schiller_corner_1914",
+    "tone": [],
+    "genre": [
+      "historical",
+      "tragedy",
+      "witness"
+    ],
+    "image": {
+      "url": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/schiller_corner_1914_wide.jpg",
+      "shortUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/schiller_corner_1914_short.jpg",
+      "sourceUrl": "https://keghiyciocjqprrfrncu.supabase.co/storage/v1/object/public/scenario-images/schiller_corner_1914_source.jpg",
+      "cropAnchor": 32,
+      "generation_prompt": "The corner of Franz Josef Street and the Appel Quay, Sarajevo, 28 June 1914, approximately 10:45 in the morning. Summer light falls hard and white over the city, the kind of Balkan midsummer glare that flattens shadows and makes the cobblestones look bleached, almost lunar. The Miljacka river catches the sun in cold flashes beyond the quay wall. The air smells of horse dung, exhaust, and the faint sweetness of a pastry shop open somewhere nearby — Schiller's delicatessen, its pale green awning throwing a narrow bar of shade onto the pavement.\n\nThe open touring car, a dark Graf und Stift Double Phaeton, has stopped at the corner, idling badly, then stalling altogether. Leopold Lojka sits rigid at the wheel in his chauffeur's uniform — dark coat, peaked cap, white gloves already damp at the palms. His body has the tension of a man who has made a mistake and knows it but cannot yet measure the size of it. His head is turned slightly to the left, toward the street, as if calculating whether there is room to reverse. His face is young, earnest, mortified.\n\nOn the pavement, no more than five feet from the car's right running board, stands Gavrilo Princip. He is twenty years old and slight, almost frail-looking in a dark suit that does not quite fit him — too broad in the shoulder, the collar slightly loose. He has a round, serious face, dark eyes that are not wild but very still. In his right hand, lowered against his thigh, half-concealed by the fabric of his jacket, is the FN Model 1910 pistol. He is not moving. He is barely breathing. He has the expression of someone who has rehearsed this moment so many times that the reality of it has arrived before he has.\n\nPressed against the awning post behind him, partly in shadow, is Mila Vidaković — a young Sarajevan woman in a white cotton blouse and dark skirt, a woven market basket over one arm. She has stopped walking mid-step. Her eyes are on Princip. She does not yet understand what she is looking at, only that something is wrong, that the stillness around this young man is the wrong kind of stillness. Her mouth is slightly open. Her free hand has come up toward her sternum without her knowing it.\n\nThe light falls equally on all three of them, indifferent and blazing, the city continuing noisily in every direction. Inside the stalled car, visible through the open hood of the passenger compartment, the Archduke and his wife sit in their ceremonial finery, unaware. The image should carry the unbearable weight of the suspended second — not dread exactly, but the particular grief of hindsight, the ache of watching something irrevocable that has not yet happened."
+    },
+    "title": "The Schiller Corner",
+    "status": "draft",
+    "premise": "",
+    "systems": {
+      "scales": {
+        "threat": {
+          "max": 10,
+          "min": 0,
+          "default": 2
+        },
+        "authorityTrust": {
+          "max": 5,
+          "min": -3,
+          "default": 2
+        }
+      },
+      "pressureEvents": [
+        "A distant brass band strikes up 'Gott erhalte Franz den Kaiser' — the crowd surges forward along the quay, compressing the space around Schiller's corner.",
+        "A courier on foot runs from the direction of the Town Hall with a folded paper — he cannot reach the motorcade through the crowd.",
+        "Governor Potiorek's voice rises sharply from the jump seat; the word 'falsch' — wrong — cuts through the cheering."
+      ],
+      "timePerTurnDefault": 2
+    },
+    "version": "1.0.0",
+    "category": "",
+    "epilogue": {
+      "reviewed": false,
+      "generated": true,
+      "open_threads": [
+        {
+          "thread_id": "the_motorcade_departs",
+          "historical_record": "The precise sequence of decisions about the motorcade route after the grenade attack — who ordered what, when, and to whom — was never fully reconstructed to the satisfaction of later historians. The Austrian investigation established that a decision was made at the Town Hall to alter the return route along the Appel Quay, but documentary evidence of how that order was communicated, and to whom, remains incomplete."
+        },
+        {
+          "thread_id": "players_in_their",
+          "historical_record": "The degree to which the festive public atmosphere on the morning of June 28 — a Sunday, and the Feast of St. Vitus (Vidovdan), a date of deep significance in Serbian national memory — affected security decisions and crowd management was raised at the 1914 trial but not definitively resolved. Potiorek's decision not to call in military troops to line the route, despite the earlier grenade attack, was criticized but never formally adjudicated."
+        },
+        {
+          "thread_id": "first_npc_interactions",
+          "historical_record": "Whether Lojka was ever verbally informed of the route change before the motorcade departed the Town Hall remains disputed. Albertini's investigation concluded that the changed route was announced at the Town Hall but that the announcement did not reach the drivers. No written order for the route change has been located in the surviving Austrian records."
+        },
+        {
+          "thread_id": "princip_at_schillers",
+          "historical_record": "Princip's precise state of mind and movements between the failure of Čabrinović's grenade attack and the moment the Archduke's car appeared in front of him were examined at the 1914 trial. Princip testified that he had given up on the mission and had stopped at Schiller's Delicatessen. Whether he had moved to that position deliberately or by chance has been debated by historians; the trial record does not resolve it conclusively."
+        },
+        {
+          "thread_id": "the_lead_car",
+          "historical_record": "The identity and role of the driver of the lead car — who turned onto Franz Josef Street, prompting Lojka to follow — was examined in the Austrian investigation. The lead car's turn has been established as the proximate navigational error, but the question of whether any officer in the lead car attempted to correct the turn before Potiorek's shout, and why the lead car itself turned, was not fully resolved in the surviving record."
+        },
+        {
+          "thread_id": "potiorek_shouts_falsch",
+          "historical_record": "Potiorek's shout correcting the route is attested in multiple accounts, but the exact words he used and the precise moment he shouted — before or after Lojka had already begun braking — vary between sources. The question of whether an earlier intervention by Potiorek could have prevented the stop at Schiller's corner was raised in historical analysis but cannot be answered from the surviving record."
+        },
+        {
+          "thread_id": "lojka_applies_the",
+          "historical_record": "The mechanical behavior of the Gräf & Stift Double Phaeton — specifically why it stalled rather than simply stopping and reversing — has been attributed to the combination of the footbrake application, the reverse gear engagement on the gradient of Franz Josef Street, and the engine characteristics of the vehicle. No mechanical inspection report from 1914 has been located in the historical record; the reconstruction of the stall is based on eyewitness testimony and later automotive analysis."
+        },
+        {
+          "thread_id": "players_encounter_the",
+          "historical_record": "The duration of the car's stationary pause — the window during which Princip fired — was not precisely timed in any contemporary account. Estimates based on witness testimony range from several seconds to approximately half a minute. The exact interval has never been established from a contemporaneous source."
+        },
+        {
+          "thread_id": "the_car_stops",
+          "historical_record": "The distance between the stationary car and Princip at the moment of firing has been given variously in historical accounts. Albertini's reconstruction, based on testimony and site examination, placed Princip approximately five feet (roughly 1.5 meters) from the car. This figure has been widely cited but is derived from witness reconstruction rather than a contemporary measurement."
+        },
+        {
+          "thread_id": "gavrilo_princip_standing",
+          "historical_record": "Whether Princip fired one continuous sequence of shots or paused between the two shots, and the exact order in which Franz Ferdinand and Sophie were struck, was disputed at the 1914 trial and has not been definitively resolved. Princip himself testified that he did not intend to shoot Sophie and that the shot that struck her was not deliberately aimed at her. The forensic and medical evidence from 1914 is insufficient to reconstruct the precise sequence with certainty."
+        }
+      ],
+      "choice_echoes": [
+        {
+          "beat_id": "the_motorcade_departs",
+          "historical_record": "The motorcade departed the Town Hall on the Appel Quay at approximately 10:45 a.m. on June 28, 1914. The Archduke had insisted on proceeding with the visit despite the earlier grenade attack, and had requested that the route be altered to pass by the hospital where the wounded from Čabrinović's attack were being treated. The altered route was communicated verbally at the Town Hall but was not conveyed in writing to the drivers."
+        },
+        {
+          "beat_id": "players_in_their",
+          "historical_record": "Contemporary accounts describe crowds lining the Appel Quay. June 28, 1914, was a Sunday and the Feast of St. Vitus (Vidovdan). The motorcade moved slowly through the city. Six conspirators remained positioned along the route after Čabrinović's failed attack; none of the remaining five acted before the motorcade reached the Town Hall."
+        },
+        {
+          "beat_id": "first_npc_interactions",
+          "historical_record": "No written order for the route change was issued. The announcement of the altered route was made verbally inside the Town Hall. Leopold Lojka, the driver of the Archduke's car, was not effectively informed of the change before the motorcade departed. Potiorek, who was in the car and knew the intended route, did not intervene until after the lead car had already turned onto Franz Josef Street."
+        },
+        {
+          "beat_id": "princip_at_schillers",
+          "historical_record": "Gavrilo Princip testified at his trial that after the failure of Čabrinović's grenade attack and the passage of the motorcade, he believed the mission had failed. He stated that he had gone to Schiller's Delicatessen at the corner of Franz Josef Street and the Appel Quay. He was standing at or near that corner when the Archduke's car appeared in front of him."
+        },
+        {
+          "beat_id": "the_lead_car",
+          "historical_record": "The lead car in the motorcade turned right from the Appel Quay onto Franz Josef Street — the pre-attack route, not the altered route. Lojka, driving the Archduke's car immediately behind, followed the lead car in the turn. This was the navigational error that placed the Archduke's car in front of Schiller's Delicatessen."
+        },
+        {
+          "beat_id": "potiorek_shouts_falsch",
+          "historical_record": "General Potiorek, seated in the Archduke's car, recognized that the car had turned onto the wrong street and shouted a correction to the driver. His intervention came after the turn had already been made. The shout prompted Lojka to brake."
+        },
+        {
+          "beat_id": "lojka_applies_the",
+          "historical_record": "Lojka applied the footbrake in response to Potiorek's correction. The heavy Gräf & Stift Double Phaeton — a large open touring car — braked on the cobbled surface of Franz Josef Street. In attempting to reverse, the car stalled. The combination of the gradient, the weight of the vehicle, and the gear engagement has been cited in historical reconstructions as the cause of the stall."
+        },
+        {
+          "beat_id": "players_encounter_the",
+          "historical_record": "The Gräf & Stift Double Phaeton used in the motorcade was a large, heavy open touring car. Franz Josef Street was a narrow cobbled street with a slight gradient. The car stalled after the brake was applied and a reverse gear was engaged. The vehicle came to a complete stop."
+        },
+        {
+          "beat_id": "the_car_stops",
+          "historical_record": "The Archduke's car came to a complete stop on Franz Josef Street at a point reconstructed by Albertini as approximately five feet from the corner of Schiller's Delicatessen. The car was stationary and the engine was stalled. Count Harrach was on the left running board. Princip was on the right side of the street."
+        },
+        {
+          "beat_id": "gavrilo_princip_standing",
+          "historical_record": "Gavrilo Princip drew his FN Model 1910 pistol and fired two shots at a range of approximately five feet. Franz Ferdinand was struck in the jugular vein; Sophie was struck in the abdomen. Princip was immediately seized by bystanders and police. He attempted to swallow a cyanide capsule and to fire a third shot at himself; both attempts failed. Both Franz Ferdinand and Sophie died within approximately one hour."
+        }
+      ],
+      "character_fates": [
+        {
+          "name": "Leopold Lojka",
+          "outcome": "survived",
+          "character_id": "leopold_lojka",
+          "primary_source": {
+            "url": null,
+            "citation": "Vladimir Dedijer, 'The Road to Sarajevo' (1966); testimony recorded in Austrian investigation files, 1914",
+            "access_note": null
+          },
+          "historical_record": "Leopold Lojka survived the assassination and continued to live in Vienna. He was the Imperial chauffeur who drove the Gräf & Stift Double Phaeton on June 28, 1914. He gave testimony about the events of that morning. He died in Vienna in 1926. History records him primarily as the driver who, following the lead car, turned onto Franz Josef Street — the navigational error that placed the Archduke's car in front of Gavrilo Princip."
+        },
+        {
+          "name": "Mila Vidaković",
+          "outcome": "unknown",
+          "character_id": "mila_vidakovic",
+          "primary_source": null,
+          "historical_record": "Sarajevo had a civilian population of approximately 51,919 at the time of the 1910 census. The city's residents — Bosnian Muslims, Orthodox Serbs, Catholic Croats, Sephardic Jews, and others — witnessed the events of June 28, 1914, from the streets, windows, and doorways of the city. Civilian witnesses to the assassination left fragmentary accounts. In the days following the assassination, anti-Serb riots broke out in Sarajevo, organized in part by Bosnian Croat and Muslim groups, resulting in deaths, injuries, and the destruction of Serb-owned property. Martial law was declared in Bosnia-Herzegovina. Ordinary Sarajevo residents, regardless of ethnicity, lived under the consequences of that morning for the remainder of their lives and through two world wars."
+        },
+        {
+          "name": "Gavrilo Princip",
+          "outcome": "survived",
+          "character_id": "gavrilo_princip",
+          "primary_source": {
+            "url": null,
+            "citation": "Vladimir Dedijer, 'The Road to Sarajevo' (1966); Austro-Hungarian court records, October 1914; death records, Theresienstadt, 1918",
+            "access_note": null
+          },
+          "historical_record": "Gavrilo Princip was seized immediately after firing the shots on June 28, 1914. He attempted to swallow a cyanide capsule and to shoot himself; both attempts failed. He was tried before an Austro-Hungarian court in October 1914. Because he was nineteen years and eleven months old at the time of the assassination — under the age of twenty, the threshold for the death penalty under Austro-Hungarian law — he was sentenced to twenty years of hard labor rather than execution. He was imprisoned at the Theresienstadt fortress in Bohemia. He developed tuberculosis of the bone, which led to the amputation of his right arm. He died at Theresienstadt on April 28, 1918, at the age of twenty-three."
+        },
+        {
+          "name": "General Oskar Potiorek",
+          "outcome": "survived",
+          "character_id": "oskar_potiorek",
+          "primary_source": {
+            "url": null,
+            "citation": "John Keegan, 'The First World War' (1998); Austro-Hungarian military records; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "historical_record": "Oskar Potiorek survived the assassination uninjured. As Military Governor of Bosnia-Herzegovina, he bore significant responsibility for the security failures of June 28, 1914. He subsequently commanded Austro-Hungarian forces in the Balkan campaigns of 1914. After suffering catastrophic defeats against Serbian forces at the Battle of Kolubara in December 1914 — one of the most significant Serbian military victories of the war — he was relieved of command in January 1915. He was retired from military service and received no further commands. He died in Klagenfurt on December 17, 1933."
+        },
+        {
+          "name": "Count Franz von Harrach",
+          "outcome": "survived",
+          "character_id": "franz_harrach",
+          "primary_source": {
+            "url": null,
+            "citation": "Count Franz von Harrach, eyewitness account, reproduced in Albertini, 'The Origins of the War of 1914,' Vol. 2 (1953)",
+            "access_note": null
+          },
+          "historical_record": "Count Franz von Harrach survived the assassination. He was riding on the left running board of the Gräf & Stift — the side facing away from Princip, who fired from the right — when the shots were fired. He recorded the Archduke's last audible words. His account states that Franz Ferdinand repeated 'Sopherl! Sopherl! Sterbe nicht! Bleibe am Leben für unsere Kinder!' ('Sophie dear! Sophie dear! Don't die! Stay alive for our children!') before losing consciousness. Harrach's testimony is one of the primary eyewitness accounts of the moments immediately following the shooting."
+        },
+        {
+          "name": "Edmund Gerde",
+          "outcome": "unknown",
+          "character_id": "edmund_gerde",
+          "primary_source": null,
+          "historical_record": "The Sarajevo police and security apparatus on June 28, 1914, was widely criticized for its failures before and during the assassination. The security detail assigned to the motorcade was inadequate: there were no soldiers lining the Appel Quay route, the conspirators' positions along the route were not identified in advance despite prior intelligence warnings, and the changed route after the grenade attack was not effectively communicated or enforced. A Sarajevo police report filed after the assassination acknowledged that the conspirators had been positioned along the route. The broader failure of Austro-Hungarian security and intelligence services to act on prior warnings — including a warning from Serbian military intelligence passed through diplomatic channels — was examined at the subsequent trial and in later historical investigations."
+        },
+        {
+          "name": "Nedeljko Čabrinović",
+          "outcome": "survived",
+          "character_id": "nedeljko_cabrinovic",
+          "primary_source": {
+            "url": null,
+            "citation": "Vladimir Dedijer, 'The Road to Sarajevo' (1966); Austro-Hungarian court records, October 1914",
+            "access_note": null
+          },
+          "historical_record": "Nedeljko Čabrinović threw a grenade at the Archduke's car on the Appel Quay earlier on the morning of June 28, 1914. The grenade struck the folded-back convertible roof of the car, bounced off, and exploded under the following vehicle, wounding several members of that car's occupants and bystanders. Čabrinović swallowed a cyanide capsule and jumped into the Miljacka River, which was shallow at that point. The cyanide caused him to vomit rather than die. He was pulled from the river and arrested. He was tried alongside Princip in October 1914 and, also being under twenty years of age, was sentenced to twenty years of hard labor. He was imprisoned at Theresienstadt. He died there of tuberculosis on January 23, 1916, at the age of twenty."
+        },
+        {
+          "name": "Archduke Franz Ferdinand",
+          "outcome": "died",
+          "character_id": "franz_ferdinand",
+          "primary_source": "Verdict of the Sarajevo trial, October 1914; Vladimir Dedijer, The Road to Sarajevo (Simon & Schuster, 1966); autopsy findings summarised in Christopher Clark, The Sleepwalkers (Allen Lane, 2012).",
+          "historical_record": "Archduke Franz Ferdinand, heir presumptive to the Austro-Hungarian throne, was shot in the neck at Schiller’s corner on the Appel Quay in Sarajevo at approximately 10:45 on the morning of 28 June 1914, after his driver stopped and began to reverse the car. The bullet severed his jugular vein. He was carried to the Konak, the governor’s residence, and was pronounced dead there shortly afterwards. He was 50 years old."
+        },
+        {
+          "name": "Sophie, Duchess of Hohenberg",
+          "outcome": "died",
+          "character_id": "sophie_hohenberg",
+          "primary_source": "Verdict of the Sarajevo trial, October 1914; Vladimir Dedijer, The Road to Sarajevo (Simon & Schuster, 1966); Christopher Clark, The Sleepwalkers (Allen Lane, 2012).",
+          "historical_record": "Sophie, Duchess of Hohenberg, was shot in the abdomen in the same volley that killed her husband at Schiller’s corner on 28 June 1914. She had insisted on remaining beside him in the car. She died en route to the Konak, before the Archduke. She was 46 years old."
+        }
+      ],
+      "historical_frame": [
+        {
+          "text": "The First World War, which began with the chain of mobilizations triggered by the assassination, resulted in an estimated 17 million deaths — military and civilian — between 1914 and 1918.",
+          "source": "John Keegan, 'The First World War' (1998)"
+        },
+        {
+          "text": "The Austro-Hungarian and Ottoman Empires ceased to exist as political entities by 1918; the Russian Empire collapsed in 1917. The map of Europe was redrawn by the Paris Peace Conference of 1919.",
+          "source": "Margaret MacMillan, 'Paris 1919' (2001)"
+        },
+        {
+          "text": "The Kingdom of Serbia, which Austria-Hungary held responsible for the assassination, became the core of the Kingdom of Serbs, Croats and Slovenes — later Yugoslavia — established in 1918, incorporating Bosnia-Herzegovina.",
+          "source": "Ivo Banac, 'The National Question in Yugoslavia' (1984)"
+        }
+      ],
+      "immediate_outcome": {
+        "summary": "Archduke Franz Ferdinand, heir presumptive to the Austro-Hungarian throne, and his wife Sophie, Duchess of Hohenberg, were shot by Gavrilo Princip at approximately 10:45 a.m. on June 28, 1914, on Franz Josef Street in Sarajevo. Sophie died before the car reached the Governor's residence; Franz Ferdinand died shortly after arrival. Austria-Hungary issued an ultimatum to Serbia on July 23, 1914, and declared war on July 28, 1914, initiating the chain of mobilizations that became the First World War.",
+        "key_facts": [
+          {
+            "text": "Franz Ferdinand was shot in the jugular vein; Sophie was shot in the abdomen. Both died within approximately one hour of the shooting.",
+            "source": "Luigi Albertini, 'The Origins of the War of 1914,' Vol. 2 (1953)"
+          },
+          {
+            "text": "The grenade attack by Čabrinović earlier that morning wounded Lieutenant Colonel Erik von Merizzi and several bystanders; the Archduke's car was not stopped.",
+            "source": "Vladimir Dedijer, 'The Road to Sarajevo' (1966)"
+          },
+          {
+            "text": "Austria-Hungary's ultimatum to Serbia was delivered on July 23, 1914, and contained terms Serbia could not fully accept; Austria-Hungary declared war on Serbia on July 28, 1914.",
+            "source": "Christopher Clark, 'The Sleepwalkers: How Europe Went to War in 1914' (2012)"
+          },
+          {
+            "text": "Seven conspirators were positioned along the Appel Quay route on the morning of June 28, 1914.",
+            "source": "Vladimir Dedijer, 'The Road to Sarajevo' (1966)"
+          },
+          {
+            "text": "The pistol used by Princip was an FN Model 1910 semi-automatic, caliber 9mm Browning Short (.380 ACP).",
+            "source": "David MacKenzie, 'Apis: The Congenial Conspirator' (1989); Austro-Hungarian forensic evidence, 1914 trial record"
+          }
+        ]
+      }
+    },
+    "featured": false,
+    "glossary": [
+      {
+        "term": "touring car",
+        "source": "",
+        "approved": true,
+        "definition": "An open or semi-open motor vehicle designed for cross-country travel with passengers visible to crowds — the heavy Gräf & Stift model, while robust, offered no protection from weapons fired at close range."
+      },
+      {
+        "term": "folded canvas hood",
+        "source": "",
+        "approved": true,
+        "definition": "The retractable fabric top of the Gräf & Stift touring car that was pulled back for visibility during the procession — the hood's fold design became relevant when Nedeljko Čabrinović's grenade bounced off it before detonating."
+      },
+      {
+        "term": "South Slav nationalism",
+        "source": "",
+        "approved": true,
+        "definition": "A political movement among Serbs, Croats, and other Slavic peoples under Austro-Hungarian rule who wanted independence or union with Serbia — by 1914, it was an armed struggle conducted through conspiracies and secret military societies."
+      },
+      {
+        "term": "royal governor",
+        "source": "",
+        "approved": true,
+        "definition": "An Austro-Hungarian administrator appointed to rule a regional province like Bosnia-Herzegovina — in this case, Sophie would be a guest of the governor, allowing her to appear publicly beside Franz Ferdinand despite her low rank."
+      },
+      {
+        "term": "Latin Bridge",
+        "source": "",
+        "approved": true,
+        "definition": "A bridge over the Miljacka river in Sarajevo where one of the conspirators was positioned — the location would become historically significant within the hour."
+      },
+      {
+        "term": "Appel Quay",
+        "source": "",
+        "approved": true,
+        "definition": "A major street running along the Miljacka river in Sarajevo where the seven conspirators had been stationed with loaded pistols and grenades to intercept the Archduke's motorcade."
+      },
+      {
+        "term": "motorcade",
+        "source": "",
+        "approved": true,
+        "definition": "A procession of motor vehicles, in this case carrying Archduke Franz Ferdinand and his entourage through Sarajevo — the route, speed, and composition of which proved fatally predictable."
+      },
+      {
+        "term": "alliance obligations",
+        "source": "",
+        "approved": true,
+        "definition": "Binding commitments between nations to aid each other militarily if either was attacked — by 1914, these formed an interlocking web where Austria-Hungary's conflict with Serbia could automatically trigger Russian, French, and German involvement."
+      },
+      {
+        "term": "mobilization timetables",
+        "source": "",
+        "approved": true,
+        "definition": "Rigid schedules that determined exactly when each nation's army would deploy troops if war was declared — once activated, they became nearly impossible to stop, creating a mechanical rush toward conflict."
+      },
+      {
+        "term": "Battle of Kosovo",
+        "source": "",
+        "approved": true,
+        "definition": "A 1389 military defeat where Ottoman forces routed Serbian medieval forces — commemorated annually on Vidovdan as a foundational tragedy of Serbian identity and nationhood."
+      },
+      {
+        "term": "Vidovdan",
+        "source": "",
+        "approved": true,
+        "definition": "The feast of St. Vitus on June 28th, marking the anniversary of Serbia's 1389 defeat at the Battle of Kosovo — the most symbolically charged date in Serbian nationalism, making this the worst possible day for an Austro-Hungarian archduke to visit Sarajevo."
+      },
+      {
+        "term": "annexation",
+        "source": "",
+        "approved": true,
+        "definition": "When Austria-Hungary formally incorporated Bosnia-Herzegovina into its empire in 1908 — an act that provoked Serbian nationalism because many Serbs believed the territory should be part of Serbia."
+      },
+      {
+        "term": "Black Hand",
+        "source": "",
+        "approved": true,
+        "definition": "The Austro-Hungarian designation for Ujedinjenje ili smrt, the Serbian secret military society that had been funneling weapons and trained operatives across the Serbian border into Bosnia."
+      },
+      {
+        "term": "Ujedinjenje ili smrt",
+        "source": "",
+        "approved": true,
+        "definition": "A Serbian nationalist secret society whose name means 'Union or Death' — the Austro-Hungarian authorities called them the Black Hand, and they orchestrated the network of conspirators in Sarajevo."
+      },
+      {
+        "term": "heir presumptive",
+        "source": "",
+        "approved": true,
+        "definition": "The person next in line to inherit a throne, whose claim is secure unless the reigning monarch has a direct child born after them."
+      }
+    ],
+    "createdAt": "2025-01-01T00:00:00Z",
+    "updatedAt": "2025-01-01T00:00:00Z",
+    "playerGoal": "",
+    "description": "Sarajevo, June 28, 1914. A wrong turn, a stalled engine, and five seconds of stillness that will unmake the world. Three people stand at the hinge of the century — none of them knowing what they are about to become.",
+    "storyArcIds": [
+      "schiller_corner_1914_main_arc"
+    ],
+    "beats_status": "not_generated",
+    "displayOrder": 99,
+    "freedomLevel": "guided",
+    "introduction": {
+      "enabled": true,
+      "sections": [
+        {
+          "text": "Europe in the summer of 1914 is a continent of interlocking mobilization timetables, dynastic anxieties, and alliance obligations so automatic they have ceased to require thought. The Austro-Hungarian Empire — fifty-one million people across eleven nations — is ruled from Vienna by an eighty-three-year-old emperor who has already outlived two heirs. Bosnia-Herzegovina, annexed only six years earlier, seethes with South Slav nationalism; the secret society Ujedinjenje ili smrt — Union or Death, known to the Austrians as the Black Hand — has been running weapons and trained men across the Serbian border for months. In Belgrade, Colonel Dragutin Dimitrijević has approved a mission. Six young men, most of them teenagers, have been positioned along the Appel Quay in Sarajevo with pistols and grenades. The Austro-Hungarian Empire does not know they are there.",
+          "type": "world"
+        },
+        {
+          "text": "What hangs on this Sunday morning is not yet legible to anyone inside it. Archduke Franz Ferdinand, heir presumptive to the throne, has come to Sarajevo to observe military maneuvers and to bring his wife Sophie — a woman of insufficient aristocratic rank to appear beside him at court in Vienna — to a place where, as a royal governor's guest, she may finally ride at his side in public. For Sophie, this procession is a rare dignity. For Franz Ferdinand, it is a political visit to a restless province, complicated by the fact that the date — the feast of St. Vitus, Vidovdan — is the most charged day in the Serbian nationalist calendar, the anniversary of the 1389 Battle of Kosovo. The security arrangements are, by any later standard, catastrophic: no soldiers lining the route, no search of the crowds, seven conspirators standing in the open with loaded weapons.",
+          "type": "stakes"
+        },
+        {
+          "text": "The morning rain has dried to a faint damp on the cobblestones of Franz Josef Street by half past ten. The smell of roasted chestnuts drifts from a vendor's cart near the Latin Bridge; somewhere up the quay a brass band is still playing, though the motorcade has already passed once and the crowd is beginning to thin at the edges, parents lifting tired children, vendors counting coins. The limestone facades of the shops — Schiller's Delicatessen, its green-painted sign bright in the late-morning sun — throw short shadows across the narrow street. The Miljacka river glitters thirty meters away. It is an ordinary festive Sunday in a provincial Austro-Hungarian city, and the air smells of chestnut smoke and horse dung and the faint mineral tang of the river.",
+          "type": "scene"
+        },
+        {
+          "text": "You are somewhere on this street or near it — in the leather seat of a heavy touring car, pressed against a shop window in a crowd, or standing alone at a corner with your hands in your coat — and the morning is about to change in a way that will not be understood for years. The motorcade has already survived one attack today: a grenade thrown by Nedeljko Čabrinović bounced off the folded canvas hood of a trailing car and detonated under its rear axle, wounding several officers. The Archduke continued to the Town Hall, delivered his speech with barely concealed fury, and is now returning — to visit the wounded, he insisted — on a route that has been changed at the last moment by General Oskar Potiorek. The lead driver has been told. You have not been told. The cars are moving.",
+          "type": "entry",
+          "character_entries": {
+            "role_mila": "Your shoulders have been against the cold limestone of Schiller's window long enough that you can no longer feel the difference between the stone and your own back. The crowd smells of wool and sweat and the roasted chestnuts from the cart near the bridge, and the child on the shoulders to your left has been drooping for twenty minutes and is now suddenly, inexplicably awake, waving a small yellow pennant at nothing yet. You heard the explosion earlier — a flat crack from the direction of the river, then a sound like a wagon wheel shattering, then silence, then cheering, which made no sense and still makes no sense — and you have been watching the corner since then, watching a young man who has not cheered once, whose arm hangs at a particular angle, whose eyes are not on the crowd or the sky or the pennants but on the space where the street bends. The engine noise is growing from the direction of the Town Hall now. Your handkerchief is already out. The great car swings onto the street, and it is moving too slowly — hesitating, almost — and the young man at the corner lifts his chin, and you understand, before you have words for it, that you are about to see something, and that seeing it will be the whole of what you can do.",
+            "role_lojka": "White gloves on the wheel, engine idling beneath you — that is the whole of your world right now, the low shudder of the Gräf & Stift coming up through the leather seat and into your palms like a pulse. You know this engine the way you know your own breathing: the slight roughness at low revs that smooths out above fifteen kilometers, the gear lever's resistance when the transmission is cold, the way reverse will stiffen and drag if you brake hard before engaging it. The Town Hall is behind you. The band is still playing somewhere up the quay. Ahead, the Chief of Police's car sits with its engine running, exhaust curling in the warm air, and you are watching its rear wheels the way you have watched them all morning — for the first movement, the first signal of direction. You heard the explosion on the Appel Quay. You saw the smoke. No one in your car has told you what it means for the route, and Governor Potiorek has said nothing from the jump seat behind your right shoulder, and so you have your orders from this morning, which are the only orders you have. The lead car's engine note shifts. Your right hand closes on the gear lever, and you wait to see which way it turns.",
+            "role_princip": "The corner where Franz Josef Street meets the Appel Quay is the wrong place to stand if you do not want to be remembered, and you have been standing here for forty minutes. Your back is to Schiller's green-painted sign. The cough is in your chest again — you press your tongue to the roof of your mouth and swallow it down, the way you have been swallowing it all morning, because you have already drawn one glance from a woman with a market basket who looked at your coat and then at the sky and moved away. The coat stays on. You know where each of the others was positioned along the quay — Mehmedbašić nearest the Town Hall, Čubrilović and Popović further down, Grabež and Ilić beyond them — and you know that none of them moved after the grenade went off and the cars kept driving and the morning simply continued, the brass band continuing, the chestnut vendor continuing, everything continuing as though a man had not just tried to kill the heir to the empire fifty meters up the road. You know the capsule is in your left pocket. You know the pistol against your ribs has nothing between its hammer and the round in the chamber but your own decision, and you have been making and unmaking that decision for forty minutes in the growing certainty that there is nothing left to make it about. Then the engine note of a large car changes — drops — the sound of a gear working against itself, a vehicle slowing, turning — and you look up, and the grey automobile is coming directly toward you, and it is stopping, and the Archduke is sitting in it, four meters away, and the morning air smells of chestnuts and the river and everything in the world has just become very simple."
+          }
+        }
+      ],
+      "skippable": true
+    },
+    "playerRoleIds": [
+      "role_lojka",
+      "role_mila",
+      "role_princip"
+    ],
+    "winConditions": [
+      "Player has witnessed or participated in the full sequence of events with historical fidelity, accumulating understanding of how the assassination occurred through documented constraints rather than individual malice.",
+      "Player has spoken with at least 3 NPCs and discovered at least 1 key evidence clue before the event resolves.",
+      "Player reaches the proximity epilogue — the moment after the shots — and receives their character's documented or faithful historical fate."
+    ],
+    "failConditions": [
+      "Player runs out of time (30 minutes) without reaching any NPC interaction or clue discovery.",
+      "Player attempts to alter the immutable historical anchor in a way that breaks the scenario's dramatic frame — the engine redirects, but repeated attempts exhaust the session."
+    ],
+    "technical_facts": {
+      "facts": [
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian Imperial Court records; Harrach family documentation; confirmed in Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "The Archduke's car was a 1910 Gräf & Stift Double Phaeton, chassis number 287, a four-cylinder open touring car with a 32-horsepower engine, owned by Count Franz von Harrach.",
+          "fact_id": "graef_stift_model",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; confirmed in Vladimir Dedijer, 'The Road to Sarajevo' (1966); weapon preserved in the Heeresgeschichtliches Museum, Vienna",
+            "access_note": null
+          },
+          "content": "Gavrilo Princip was armed with a FN Model 1910 semi-automatic pistol chambered in .380 ACP (9mm Browning Short), serial number 19074.",
+          "fact_id": "fn_model_1910_caliber",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "capacity",
+          "source": {
+            "url": null,
+            "citation": "FN Herstal technical specifications; confirmed in Heeresgeschichtliches Museum, Vienna, weapon records",
+            "access_note": null
+          },
+          "content": "The FN Model 1910 pistol has a magazine capacity of seven rounds of .380 ACP ammunition.",
+          "fact_id": "fn_model_1910_capacity",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "timing",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966); David MacKenzie, 'Apis: The Congenial Conspirator' (1989)",
+            "access_note": null
+          },
+          "content": "The shots were fired at approximately 10:45 a.m. on June 28, 1914, on Franz Josef Street at the corner of Schiller's Delicatessen, Sarajevo.",
+          "fact_id": "assassination_timestamp",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "timing",
+          "source": {
+            "url": null,
+            "citation": "Medical testimony, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Duchess Sophie died en route to the Konak (Governor's residence) before the car arrived; Franz Ferdinand died approximately ten minutes after the shooting, at approximately 11:00 a.m.",
+          "fact_id": "sophie_death_timing",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "timing",
+          "source": {
+            "url": null,
+            "citation": "Čabrinović's testimony, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "The grenade thrown by Nedeljko Čabrinović was a Serbian Army Model 1912 hand grenade with a twelve-second percussion-delay fuse, requiring the thrower to strike the detonator cap against a hard surface before throwing.",
+          "fact_id": "cabrinovic_grenade_fuse",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Eyewitness testimony compiled in Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Čabrinović's grenade struck the folded canvas hood of the fourth car in the motorcade and detonated beneath its rear axle, wounding two occupants of that car and several bystanders; the Archduke's car was approximately thirty feet ahead at the moment of detonation.",
+          "fact_id": "cabrinovic_grenade_detonation_point",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "capacity",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "The motorcade from the Town Hall consisted of six automobiles.",
+          "fact_id": "motorcade_car_count",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "navigation",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "The Gräf & Stift carrying Franz Ferdinand and Sophie was the third car in the motorcade.",
+          "fact_id": "archduke_car_position_in_motorcade",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Count Franz von Harrach's personal testimony, cited in Vladimir Dedijer, 'The Road to Sarajevo' (1966); Harrach's own published account",
+            "access_note": null
+          },
+          "content": "Count Franz von Harrach stood on the left running board of the Gräf & Stift for the return journey after the Town Hall, having positioned himself there to shield the Archduke from a repeat attack from the right side of the quay where Čabrinović had thrown the grenade.",
+          "fact_id": "harrach_running_board_position",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Count Franz von Harrach's personal testimony, cited in Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Count von Harrach recorded Franz Ferdinand's last audible words as 'Sopherl! Sopherl! Sterbe nicht! Bleibe am Leben für unsere Kinder!' ('Sophie dear! Sophie dear! Don't die! Stay alive for our children!'), followed by repeated utterances of 'Es ist nichts' ('It is nothing') before he lost consciousness.",
+          "fact_id": "harrach_last_words_account",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; testimony of motorcade participants cited in Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "General Potiorek communicated the decision to alter the return route — proceeding along the Appel Quay to the hospital to visit the wounded from the grenade attack, rather than continuing into the city — verbally at the Town Hall steps; no written order was issued and the instruction was not confirmed to have reached all drivers in the motorcade.",
+          "fact_id": "potiorek_route_change_verbal",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Lojka's testimony, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Leopold Lojka turned the Gräf & Stift onto Franz Josef Street by following the lead car, in accordance with standard motorcade driving protocol; he had not received Potiorek's verbal route change instruction.",
+          "fact_id": "lojka_turn_protocol",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "General Potiorek shouted a correction to Lojka upon realizing the car had turned onto Franz Josef Street in error; Lojka applied the footbrake and brought the car to a stop.",
+          "fact_id": "potiorek_shout_falsch",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Princip's testimony, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Gavrilo Princip was standing at the corner of Franz Josef Street and the Appel Quay, in front of Schiller's Delicatessen, when the Gräf & Stift stopped; he had walked there after the grenade attack failed and the motorcade passed, and was not positioned there as a planned firing position.",
+          "fact_id": "princip_position_at_corner",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "navigation",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; physical survey of the site cited in Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Princip fired from a distance of approximately five feet (roughly 1.5 meters) from the stationary car.",
+          "fact_id": "princip_firing_distance",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Medical autopsy reports, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Princip fired two shots: the first struck Franz Ferdinand in the jugular vein, and the second struck Sophie in the abdomen.",
+          "fact_id": "princip_shots_fired",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Čabrinović's testimony and arresting officers' reports, Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "After throwing the grenade, Čabrinović swallowed a cyanide capsule and jumped into the Miljacka River; the cyanide was degraded and produced only vomiting, and the river was approximately four inches deep at that point, leaving him alive and was arrested on the riverbank.",
+          "fact_id": "cabrinovic_cyanide_failure",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "capacity",
+          "source": {
+            "url": null,
+            "citation": "Austro-Hungarian court proceedings, October 1914; Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Seven conspirators were positioned along the Appel Quay motorcade route on the morning of June 28, 1914: Muhamed Mehmedbašić, Vaso Čubrilović, Nedeljko Čabrinović, Gavrilo Princip, Cvijetko Popović, Danilo Ilić, and Trifko Grabež.",
+          "fact_id": "conspirator_count_on_route",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Habsburg House Laws; Gordon Brook-Shepherd, 'Archduke of Sarajevo' (1984); Vladimir Dedijer, 'The Road to Sarajevo' (1966)",
+            "access_note": null
+          },
+          "content": "Duchess Sophie von Hohenberg held the rank of Fürstin (Princess) by marriage but was of non-imperial birth (Czech countess), and by the rules of the Imperial House of Habsburg she was not permitted to appear beside Franz Ferdinand in the imperial court at Vienna or ride in the imperial carriage on state occasions; Sarajevo, as a provincial governor's reception, fell outside those restrictions.",
+          "fact_id": "sophie_rank_restriction",
+          "valid_from": null,
+          "valid_until": null
+        }
+      ],
+      "reviewed": false,
+      "generated": true
+    },
+    "allow_free_input": true,
+    "generationPrompt": "SHARED SCENARIO CONTEXT (paste with each role):\n\nScenario: Sarajevo, 1914 — The Schiller Corner\nPremise: Sunday, June 28, 1914, Sarajevo. After a failed grenade attack on the Appel Quay that morning, Archduke Franz Ferdinand's motorcade route is hastily changed — but the lead drivers aren't told. At ~10:45 AM the imperial Gräf & Stift touring car mistakenly turns right onto Franz Josef Street toward Moritz Schiller's Delicatessen. Governor Potiorek shouts to halt and reverse; the car brakes and stalls dead in the narrow turn, five feet from where Gavrilo Princip is standing. Franz Ferdinand and Duchess Sophie are shot moments later — the spark of the July Crisis and the First World War.\nThe immutable historical anchor: the Archduke and Duchess are fatally shot; this begins WWI. Nothing any character does changes this outcome.\nStakes/scene: A festive Sunday procession — brass bands, crowds, handkerchiefs, roasted chestnuts, morning rain drying on the cobbles — that becomes, in a five-second navigational accident, the hinge of the century. The dramatic irony: the player knows what this moment is; the characters do not.\nSession target: 30 minutes.\nExisting closure: none declared.\n\nROLE A — LEOPOLD LOJKA, THE CHAUFFEUR (real historical figure)\n\ncharacter_type: real · fate_mode: anchored\n(Historical fate: Lojka survived, drove the dying couple to the Konak, and lived until 1926, reportedly haunted by the wrong turn.)\n\nEntry paragraph:\nYour gloved hands grip the polished wood of the Gräf & Stift's wheel. The smell of hot motor grease and exhaust mixes with roasted chestnuts and the morning's rain drying off the cobbles. The copper-and-brass gear lever is stiff under your right palm. You are following the Chief of Police's car, as you were told to, and no one has handed you the changed route to the hospital — so when the lead car turns right onto Franz Josef Street, you turn right too, because that is what the car ahead did and that is your job. Then Governor Potiorek is shouting from the jump seat that this is the wrong road, and you have the footbrake down and your hand going to the reverse gear, and the heavy transmission is not answering the way it should.\n\nRole framing / perspective: You are a professional driver doing exactly what a professional driver does — following the car ahead, obeying the order to reverse. You do not know, cannot know, that the turn and the stall are about to put your passengers stationary in front of a loaded pistol. The horror is not a choice you make knowingly; it is an ordinary act of your trade that history will turn into a hinge.\n\nNote to the generator: This role is the \"unwitting instrument\" — a real figure whose defining act (the turn, the stall) is one he does NOT experience as a decision. If a genuine, historically faithful fork exists here, it must NOT grant Lojka false foreknowledge — he cannot \"sense danger\" or knowingly choose the fatal path, because he didn't. Faithful options are alternatives a driver actually had in the moment (e.g. how he responds to Potiorek's shout, how he handles the stall) — none contradicting the record that he turned, stalled, and the couple were shot. If no defensible fork exists without inventing awareness he didn't have, DECLINE is the correct answer (he may be a proximity/witness role, not a crucible).\n\nROLE B — MILA VIDAKOVIĆ, THE BYSTANDER (composite witness)\n\ncharacter_type: fictional (composite) · fate_mode: committed\nRepresents: ordinary Sarajevo civilians who witnessed the assassination at close range.\n\nEntry paragraph:\nYour shoulders are pressed against the cold limestone of Schiller's shop window. You came to wave a handkerchief and glimpse the Duchess's gown; instead you are pinned shoulder-to-shoulder in a festive crowd, brass bands and cheering echoing off the river quay, a child beside you dropping a small yellow pennant into the wet gutter. The great open motorcar swings onto your street, brakes hard, and stalls — and a gaunt young man in a dark jacket steps off the curb beside you, one hand going to his coat, and you have a half-second to understand that the morning has stopped being a celebration.\n\nRole framing / perspective: A pure witness — a resident who came to see royalty and finds herself feet from an execution. She has no power over the event; her experience is the ordinary Sunday shattering in front of her.\n\nNote to the generator: This is a PURE RUPTURE WITNESS. Expect a DECLINE — she has no defining decision; her resolution is the quality of her witnessing (the proximity epilogue). This is the correct outcome. (Engine note for the human, not the generator: Mila also requires the \"event-fires-before-close\" mechanism so the shooting actually occurs in her session — without it, her session ends before the rupture, which for a rupture witness is fatal. That mechanism is not yet built.)\n\nROLE C — GAVRILO PRINCIP, THE ASSASSIN (real historical figure)\n\ncharacter_type: real · fate_mode: anchored\n(Historical fate: Princip fired, killing both; was seized, tried, and — too young for execution — died of tuberculosis in prison in 1918 at 23. He believed to the end he was a liberator, not a murderer.)\n\nEntry paragraph:\nThe oil-blued steel of the loaded FN Model 1910 presses cold against your ribs inside your coat. Your lungs burn with the dry cough you have been swallowing all morning, hidden under the festive noise. You had believed it was over — Čabrinović's grenade failed hours ago, the Archduke long gone, and you walked to Schiller's corner in bitter defeat, a nineteen-year-old with a pistol and nothing left to shoot at. Then the great motorcar turns onto your exact street. It brakes to reverse. It stalls, motionless, five feet from where you stand. You have less than five seconds, and the thing you came here believing was lost is suddenly, impossibly, in front of you.\n\nRole framing / perspective: A nineteen-year-old member of Mlada Bosna (Young Bosnia), convinced he is striking a blow for the liberation of the South Slavs from Austro-Hungarian rule. He believes he is a liberator. History will judge the act as the trigger of a war that killed twenty million. Both things are true of the person in this moment.\n\nNote to the generator: This is a FIXED-OUTCOME ANCHORED crucible (same class as the Bornholmer gatekeeper) AND an antagonist role. Historical faithfulness required: the options must be alternatives Princip actually faced in those seconds (act now / hesitate / fail to fire) — no option may contradict the documented act (he fired, killing both). A counterfactual (he hesitates) is permitted as a reading of who he was, not a claim that history went otherwise. The epilogue must read his character with MORAL WEIGHT, honestly — neither endorsing nor neutral: understand the nineteen-year-old's conviction from inside without excusing the act or its consequences.",
+    "openingSituation": "",
+    "review_checklist": {
+      "beat_count": {
+        "notes": "",
+        "checked": false
+      },
+      "sequence_check": {
+        "notes": "",
+        "checked": false
+      },
+      "final_beat_spec": {
+        "notes": "",
+        "checked": false
+      },
+      "reviewer_summary": {
+        "notes": "",
+        "checked": false
+      },
+      "path_independence": {
+        "notes": "",
+        "checked": false
+      },
+      "tense_attribution": {
+        "notes": "",
+        "checked": false
+      },
+      "manual_playthrough": {
+        "notes": "",
+        "checked": false
+      }
+    },
+    "historicalRealism": "high",
+    "period_vocabulary": {
+      "categories": [
+        {
+          "name": "Austro-Hungarian Military Protocol",
+          "terms": [
+            {
+              "term": "Hoheit",
+              "meaning": "His/Her Imperial Highness — the correct form of address for Franz Ferdinand and Sophie in official contexts"
+            },
+            {
+              "term": "Adjutant",
+              "meaning": "Staff officer attached to a senior commander or royal personage, responsible for relaying orders and managing logistics"
+            },
+            {
+              "term": "Eskorte",
+              "meaning": "The armed escort detail assigned to protect the motorcade"
+            },
+            {
+              "term": "Befehl",
+              "meaning": "A direct order — in Austro-Hungarian military usage, an instruction that does not invite discussion"
+            },
+            {
+              "term": "Konak",
+              "meaning": "The governor's residence in Sarajevo, the destination for the wounded and, later, for the dying Archduke and Duchess"
+            },
+            {
+              "term": "Landesregierung",
+              "meaning": "The provincial administration — the Austro-Hungarian civil government of Bosnia-Herzegovina, headed by Potiorek"
+            },
+            {
+              "term": "Gendarmerie",
+              "meaning": "The militarized police force responsible for public order in Austro-Hungarian Bosnia"
+            }
+          ],
+          "context": "Used by officers, aides-de-camp, and imperial staff when managing the movements of the imperial household in public ceremonial contexts."
+        },
+        {
+          "name": "Mlada Bosna — Young Bosnia Argot",
+          "terms": [
+            {
+              "term": "Vidovdan",
+              "meaning": "St. Vitus Day, June 28 — the anniversary of the 1389 Battle of Kosovo, sacred to Serbian nationalism and deliberately chosen as the date of the Archduke's visit"
+            },
+            {
+              "term": "Oslobođenje",
+              "meaning": "Liberation — the stated goal of the Young Bosnia movement, the freeing of South Slavs from Austro-Hungarian rule"
+            },
+            {
+              "term": "Akcija",
+              "meaning": "The action — the conspirators' term for the assassination mission itself"
+            },
+            {
+              "term": "Ujedinjenje ili smrt",
+              "meaning": "Union or Death — the motto of the Black Hand society that supplied the weapons and training for the mission"
+            },
+            {
+              "term": "Bomba",
+              "meaning": "The Serbian/Bosnian term for the grenades issued to the conspirators — Serbian Army surplus, with a twelve-second fuse"
+            },
+            {
+              "term": "Pištolj",
+              "meaning": "Pistol — specifically here the FN Model 1910 semi-automatic, .380 ACP, issued to Princip and several other conspirators"
+            }
+          ],
+          "context": "Used among members of the South Slav nationalist underground, particularly the student conspirators of Young Bosnia, when speaking of their mission and ideology."
+        },
+        {
+          "name": "Chauffeur and Motoring Trade",
+          "terms": [
+            {
+              "term": "Gräf & Stift",
+              "meaning": "The Austrian luxury automobile manufacturer whose open touring car carried Franz Ferdinand — a double-phaeton body on a 28/32 PS chassis"
+            },
+            {
+              "term": "Rückwärtsgang",
+              "meaning": "Reverse gear — the gear Lojka attempted to engage when ordered to back out of Franz Josef Street"
+            },
+            {
+              "term": "Fußbremse",
+              "meaning": "Footbrake — the primary braking mechanism on the Gräf & Stift, which Lojka applied when Potiorek shouted"
+            },
+            {
+              "term": "Getriebe",
+              "meaning": "Transmission — the gear mechanism that stalled under the combined stress of braking and attempted reverse on the narrow street"
+            },
+            {
+              "term": "Abblenden",
+              "meaning": "To dip or reduce speed — a driver's signal to the car behind that a change of pace or direction is coming"
+            },
+            {
+              "term": "Vorausfahrzeug",
+              "meaning": "Lead vehicle — the car Lojka was following and whose turn onto Franz Josef Street he replicated"
+            }
+          ],
+          "context": "Used by professional drivers and mechanics of early touring automobiles in Central Europe, circa 1910–1914, when discussing their vehicles and duties."
+        },
+        {
+          "name": "Sarajevo Street Life",
+          "terms": [
+            {
+              "term": "Čaršija",
+              "meaning": "The old market district of Sarajevo — the Ottoman-era bazaar quarter, source of most street vendors and tradespeople present on the quay"
+            },
+            {
+              "term": "Sokak",
+              "meaning": "A narrow street or alley — Turkish loanword still in common Bosnian use for the side streets off the main quay"
+            },
+            {
+              "term": "Krajcar",
+              "meaning": "A small-denomination coin — the Kreuzer in Austro-Hungarian currency, what a chestnut vendor or pennant seller would make per transaction"
+            },
+            {
+              "term": "Marama",
+              "meaning": "A headscarf or handkerchief — women in the crowd waved white marame as the motorcade passed"
+            },
+            {
+              "term": "Dućan",
+              "meaning": "A shop — the word a local would use for Schiller's Delicatessen or any of the storefronts along Franz Josef Street"
+            }
+          ],
+          "context": "The vernacular of Bosnian market streets and public gatherings, mixing Serbo-Croatian, Austro-Hungarian German, and Ottoman-era Turkish loanwords still common in 1914 Sarajevo."
+        }
+      ]
+    },
+    "keyEvidenceClueIds": [
+      "clue_route_change_order",
+      "clue_fn_pistol_range"
+    ],
+    "composite_disclosure": [
+      "Mila Vidaković"
+    ],
+    "sessionTargetMinutes": 30,
+    "partialSuccessExamples": [
+      "Player discovers the route change order but does not reach Schiller's corner before the event fires — they understand the mechanism but experience the rupture from a distance.",
+      "Player speaks with Potiorek but not with any street-level witness — they hold the command perspective without the civilian one.",
+      "Player discovers the pistol clue but does not piece together Čabrinović's earlier grenade failure — they see the act without the full context of the conspiracy's near-collapse."
+    ],
+    "structured_endings_enabled": false
+  }
+}
