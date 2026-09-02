@@ -3035,9 +3035,6 @@ function renderTechnicalFactsSection(data) {
           <button type="button" id="gen-tf-btn" class="btn ${atRisk ? 'btn-danger' : 'btn-primary'} btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
             ${regenBtnLabel(generated, atRisk, 'Technical Facts')}
           </button>
-          <button type="button" id="preview-tf-btn" class="btn btn-secondary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genDisabled ? genTitle : 'Generate and display without saving — the current block is untouched'}">
-            👁 Preview
-          </button>
           ${atRisk ? '<span style="font-size:12px;color:#991b1b">This block carries corrections — Regenerate discards them.</span>' : ''}
         </div>
         <div style="margin-top:16px">${fieldsHtml}</div>
@@ -3541,9 +3538,6 @@ function renderEpilogueSection(data) {
           <button type="button" id="gen-epilogue-btn" class="btn ${atRisk ? 'btn-danger' : 'btn-primary'} btn-sm" ${genDisabled ? 'disabled' : ''} title="${genTitle}">
             ${regenBtnLabel(generated, atRisk, 'Epilogue Data')}
           </button>
-          <button type="button" id="preview-epilogue-btn" class="btn btn-secondary btn-sm" ${genDisabled ? 'disabled' : ''} title="${genDisabled ? genTitle : 'Generate and display without saving — the current block is untouched'}">
-            👁 Preview
-          </button>
           ${atRisk ? '<span style="font-size:12px;color:#991b1b">This block carries corrections — Regenerate discards them.</span>' : ''}
         </div>
         ${fieldsHtml}
@@ -3719,32 +3713,6 @@ function confirmDestructiveRegen({ sectionName, scenarioTitle, version }) {
     return false;
   }
   return true;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// DRY-RUN PREVIEW WINDOW
-// ═══════════════════════════════════════════════════════════════
-// Opens generated-but-unsaved output in a new tab for a fact-check pass. New tab, so it does
-// not unload the editor and never trips the beforeunload guard. Same shape as
-// previewAdminVersion. `notes` surfaces route metadata (strict sourcing, dropped entries)
-// that nothing in the editor shows today.
-function openDryRunWindow(title, payload, notes) {
-  const win = window.open('', '_blank', 'width=900,height=700');
-  if (!win) { toast('Preview blocked — allow pop-ups for this site.', 'error'); return; }
-  const noteHtml = (notes || [])
-    .map(n => `<div style="margin-bottom:4px">${escapeHtml(n)}</div>`).join('');
-  win.document.write(
-    `<title>${escapeHtml(title)}</title>` +
-    '<div style="background:#1a2332;color:#e8eaf0;font-family:system-ui,sans-serif;padding:20px 20px 0">' +
-      `<div style="font-size:15px;font-weight:700;margin-bottom:8px">${escapeHtml(title)}</div>` +
-      '<div style="font-size:12px;color:#fbbf24;margin-bottom:10px">' +
-        'DRY RUN — nothing was saved. The scenario is unchanged and no version was created.' +
-      '</div>' +
-      (noteHtml ? `<div style="font-size:12px;color:#93c5fd;margin-bottom:10px">${noteHtml}</div>` : '') +
-    '</div>' +
-    '<pre style="background:#1a2332;color:#e8eaf0;padding:0 20px 20px;font-size:12px;margin:0;white-space:pre-wrap">' +
-      escapeHtml(JSON.stringify(payload, null, 2)) +
-    '</pre>');
 }
 
 // Promise-based confirm reusing the shared #modal-overlay. Captures and restores
@@ -5365,9 +5333,8 @@ function renderPreview(data, autoSaved = false) {
     data.scenario.technical_facts.reviewed = true;
   });
 
-  // Payload assembly, shared by Generate and Preview so a dry run is generated from exactly
-  // the same inputs as the real thing — a preview built from a different payload would be
-  // worthless as a fact-check of what Regenerate is about to write.
+  // Payload assembly for the generate call, kept as a named collector so the inputs handed to
+  // the route read as one block rather than being inlined in the click handler.
   const collectTechnicalFactsPayload = () => {
     const characters = (data.characters || []).map(c => ({
       character_id:     c.id,
@@ -5394,31 +5361,6 @@ function renderPreview(data, autoSaved = false) {
         .slice(0, 10),
     };
   };
-
-  // ── Preview Technical Facts (dry run — generates, displays, saves nothing) ───
-  formEl.addEventListener('click', async e => {
-    if (!e.target.closest('#preview-tf-btn')) return;
-    const btn = e.target.closest('#preview-tf-btn');
-    if (!confirm('Preview technical facts? This calls the AI API (up to 30 seconds) and saves nothing — the current block is untouched.')) return;
-
-    const original = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Generating preview…';
-    try {
-      const resp = await apiPost('/generate/technical-facts', { ...collectTechnicalFactsPayload(), dryRun: true });
-      const facts = resp.technical_facts?.facts || [];
-      openDryRunWindow(
-        'Technical Facts — dry run preview',
-        resp.technical_facts,
-        [`${facts.length} fact(s) generated.`]);
-      toast('Preview opened in a new tab. Nothing was saved.', 'success');
-    } catch (err) {
-      toast(`Preview failed: ${err.message}`, 'error');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = original;
-    }
-  });
 
   // ── Generate Technical Facts (delegated — survives section re-render) ────────
   formEl.addEventListener('click', async e => {
@@ -5470,8 +5412,8 @@ function renderPreview(data, autoSaved = false) {
     }
   });
 
-  // Payload assembly, shared by Generate and Preview so a dry run is generated from exactly
-  // the same inputs as the real thing.
+  // Payload assembly for the generate call, kept as a named collector so the inputs handed to
+  // the route read as one block rather than being inlined in the click handler.
   const collectEpiloguePayload = () => {
     const characters = (data.characters || []).map(c => ({
       character_id:   c.id,
@@ -5494,42 +5436,6 @@ function renderPreview(data, autoSaved = false) {
       essential_beats: allBeats.slice(0, 10),
     };
   };
-
-  // Route metadata the editor has never surfaced: whether strict sourcing is on, and which
-  // unsourced open_threads / choice_echoes entries were dropped (or would be).
-  const epilogueDryRunNotes = resp => {
-    const notes = [`Strict sourcing: ${resp.strict_sourcing ? 'ON — unsourced entries are dropped' : 'OFF — unsourced entries are kept and only warned about'}`];
-    const d = resp.dropped || {};
-    const total = (d.open_threads || 0) + (d.choice_echoes || 0);
-    notes.push(total
-      ? `${resp.strict_sourcing ? 'Dropped' : 'Would drop'} ${total} unsourced entr(ies): open_threads ${d.open_threads || 0}, choice_echoes ${d.choice_echoes || 0}. See "dropped" below.`
-      : 'No unsourced open_threads or choice_echoes entries.');
-    return notes;
-  };
-
-  // ── Preview Epilogue Data (dry run — generates, displays, saves nothing) ─────
-  formEl.addEventListener('click', async e => {
-    if (!e.target.closest('#preview-epilogue-btn')) return;
-    const btn = e.target.closest('#preview-epilogue-btn');
-    if (!confirm('Preview historical epilogue data? This calls the AI API (up to 2–3 minutes) and saves nothing — the current block is untouched.')) return;
-
-    const original = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Generating preview…';
-    try {
-      const resp = await apiPost('/generate/epilogue-data', { ...collectEpiloguePayload(), dryRun: true });
-      openDryRunWindow(
-        'Historical Epilogue Data — dry run preview',
-        { epilogue: resp.epilogue, dropped: resp.dropped },
-        epilogueDryRunNotes(resp));
-      toast('Preview opened in a new tab. Nothing was saved.', 'success');
-    } catch (err) {
-      toast(`Preview failed: ${err.message}`, 'error');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = original;
-    }
-  });
 
   // ── Generate Epilogue Data (delegated — survives section re-render) ──────────
   formEl.addEventListener('click', async e => {
