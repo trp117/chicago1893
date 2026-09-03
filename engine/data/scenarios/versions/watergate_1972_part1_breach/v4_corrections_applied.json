@@ -1,0 +1,761 @@
+{
+  "version": 4,
+  "label": "corrections_applied",
+  "scenarioId": "watergate_1972_part1_breach",
+  "createdAt": "2026-09-02T18:24:05.573Z",
+  "pipeline_step": "manual_correction",
+  "changes_applied": 3,
+  "changes_rejected": 0,
+  "manually_edited": false,
+  "approved_by": "admin",
+  "restored_from": null,
+  "scenario": {
+    "id": "watergate_1972_part1_breach",
+    "tone": [],
+    "genre": [
+      "historical",
+      "political",
+      "thriller"
+    ],
+    "image": {
+      "generation_prompt": ""
+    },
+    "title": "The Second Round - Watergate Part 1",
+    "status": "draft",
+    "premise": "",
+    "systems": {
+      "scales": {
+        "threat": {
+          "max": 10,
+          "min": 0,
+          "default": 1
+        },
+        "authorityTrust": {
+          "max": 5,
+          "min": -3,
+          "default": 1
+        }
+      },
+      "pressureEvents": [
+        "Wills completes his second round and finds the garage latch taped again — the call to the Second District becomes unavoidable.",
+        "McCord's walkie-talkie, volume turned low, fails to carry Baldwin's belated warning before the stairwell door opens.",
+        "Officers Shoffler, Barrett, and Leeper reach the sixth-floor landing and begin working the corridor toward Suite 600."
+      ],
+      "timePerTurnDefault": 2
+    },
+    "version": "1.0.0",
+    "category": "",
+    "epilogue": {
+      "reviewed": false,
+      "generated": true,
+      "open_threads": [
+        {
+          "source": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970",
+          "thread_id": "wills_completes_his",
+          "historical_record": "Frank Wills's Security Officer's Log for June 17, 1972 (National Archives, NAID 304970) records the discovery of tape on the garage-level stairwell door latch bolts and the call to the Second District. The log records the second discovery and the police call in a single block entered at 1:47 AM; it does not subdivide the interval or separately record the moment Wills completed his earlier round and first encountered and removed the tape, so the precise timing of the first discovery and removal is not recoverable from this document."
+        },
+        {
+          "source": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; Los Angeles Times interview with Baldwin, October 5, 1972",
+          "thread_id": "baldwin_watches_three",
+          "historical_record": "Alfred Baldwin's testimony before the Senate Select Committee on Presidential Campaign Activities and his October 5, 1972 Los Angeles Times interview establish that he was stationed in Room 723 of the Howard Johnson Motor Lodge and was serving as lookout and radio monitor. These sources record that Baldwin transmitted a warning to the entry team. They do not record the specific visual details Baldwin observed — what he saw, in what sequence, and what assessment he formed — before transmitting; the content of his observation at that moment is not recoverable from these sources."
+        },
+        {
+          "source": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; Los Angeles Times interview with Baldwin, October 5, 1972",
+          "thread_id": "baldwin_transmits_his",
+          "historical_record": "Alfred Baldwin's testimony before the Senate Select Committee on Presidential Campaign Activities and his Los Angeles Times interview of October 5, 1972 establish that he transmitted a warning and that the warning was received too late to allow the entry team to evade arrest. These sources record the outcome — the team did not escape — but do not establish the precise content of the transmission, the exact moment it was sent relative to the officers' entry into the building, or the specific volume setting of McCord's walkie-talkie at the moment of receipt."
+        }
+      ],
+      "choice_echoes": [
+        {
+          "source": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+          "beat_id": "wills_finds_fresh",
+          "historical_record": "Frank Wills discovered tape on the garage-level stairwell door latch bolts for the second time at approximately 1:47 AM on June 17, 1972. He had removed tape from the same doors during an earlier round on the same night. The Security Officer's Log and the Metropolitan Police Department arrest report both record the second discovery as the event that prompted his call to the Second District."
+        },
+        {
+          "source": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+          "beat_id": "wills_logs_the",
+          "historical_record": "Frank Wills placed his call to the Metropolitan Police Department Second District at approximately 1:47 AM on June 17, 1972. The call is recorded in both his Security Officer's Log and the Metropolitan Police Department arrest report as the initiating event of the police response."
+        },
+        {
+          "source": "Washington Metropolitan Police Department arrest report, June 17, 1972; Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973",
+          "beat_id": "three_plainclothes_officers",
+          "historical_record": "Officers Carl Shoffler, John Barrett, and Paul Leeper, riding in unmarked unit 727 assigned to the Tactical Enforcement Branch of the Metropolitan Police Department Second District, were alerted by radio dispatcher at approximately 1:52 AM on June 17, 1972. They arrived at the Watergate office building within a few minutes of the call, working in plainclothes as standard Tactical Enforcement Branch procedure, and arrived without activated lights or siren. A floor-by-floor search of the building followed, resulting in the arrests inside Suite 600."
+        },
+        {
+          "source": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; Los Angeles Times interview with Baldwin, October 5, 1972",
+          "beat_id": "baldwin_is_at",
+          "historical_record": "Alfred Baldwin was stationed in Room 723 of the Howard Johnson Motor Lodge on Virginia Avenue NW, directly across from the Watergate complex, serving as lookout and to monitor radio transmissions intercepted from previously planted listening devices."
+        },
+        {
+          "source": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Washington Metropolitan Police Department arrest report, June 17, 1972; Senate Select Committee on Presidential Campaign Activities exhibit records",
+          "beat_id": "mccord_and_the",
+          "historical_record": "Five men were working inside the Democratic National Committee offices in Suite 600 of the Watergate office building at the time of arrest: Bernard Barker, Virgilio Gonzalez, Eugenio Martinez, James McCord, and Frank Sturgis. Evidence inventoried at arrest included bugging equipment, two 35mm cameras, forty rolls of unexposed film, lock picks, and consecutively serialized cash. A short-wave radio receiver tuned to the Metropolitan Police Department's dispatch frequency was also recovered and inventoried as part of the team's secondary warning system."
+        }
+      ],
+      "character_fates": [
+        {
+          "name": "Alfred Baldwin",
+          "outcome": "survived",
+          "character_id": "char_baldwin",
+          "primary_source": {
+            "url": null,
+            "citation": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; Los Angeles Times interview with Baldwin, October 5, 1972",
+            "access_note": null
+          },
+          "historical_record": "Alfred Baldwin cooperated with federal investigators and became a key witness for the prosecution. He gave a detailed account of his role as lookout and radio monitor to the Senate Select Committee on Presidential Campaign Activities and provided an extended interview to the Los Angeles Times published on October 5, 1972, which was among the first detailed public accounts of the operation from a participant's perspective. Baldwin pleaded guilty to a reduced charge and received a suspended sentence in exchange for his cooperation. He was not among the men tried in United States v. Liddy et al."
+        },
+        {
+          "name": "Bernard Barker",
+          "outcome": "survived",
+          "character_id": "char_barker",
+          "primary_source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia; Washington Metropolitan Police Department arrest inventory, June 17, 1972",
+            "access_note": null
+          },
+          "historical_record": "Bernard Barker was arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building in the early hours of June 17, 1972. He was tried in United States v. Liddy et al. in the U.S. District Court for the District of Columbia and pleaded guilty. He was sentenced to prison. His personal address book, recovered at arrest, contained the notation 'H.H.' beside a White House telephone number belonging to E. Howard Hunt, a detail that contributed to investigators tracing the operation toward the White House."
+        },
+        {
+          "name": "Carl Shoffler",
+          "outcome": "survived",
+          "character_id": "char_shoffler",
+          "primary_source": {
+            "url": null,
+            "citation": "Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "historical_record": "Carl Shoffler, a plainclothes officer of the Tactical Enforcement Branch of the Metropolitan Police Department Second District, was one of the three officers who responded to Frank Wills's call and conducted the floor-by-floor search that resulted in the arrests inside Suite 600. He testified before the Senate Select Committee on Presidential Campaign Activities on May 18, 1973, providing a detailed account of the response and arrest. He inventoried the evidence recovered at the scene, including the notebook belonging to Eugenio Martinez. Shoffler continued his career with the Metropolitan Police Department."
+        },
+        {
+          "name": "Eugenio Martinez",
+          "outcome": "survived",
+          "character_id": "char_martinez",
+          "primary_source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest inventory logged by Officer Shoffler, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities exhibit records",
+            "access_note": null
+          },
+          "historical_record": "Eugenio Martinez was arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building in the early hours of June 17, 1972. A spiral notebook recovered from him at arrest contained the words 'White House' in his handwriting, and his personal directory contained an entry reading 'W. House.' He was tried in United States v. Liddy et al. and pleaded guilty. He was sentenced to prison. Martinez later gave accounts of his role as a locksmith and CIA operative on the entry team."
+        },
+        {
+          "name": "Frank Sturgis",
+          "outcome": "survived",
+          "character_id": "char_sturgis",
+          "primary_source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities records",
+            "access_note": null
+          },
+          "historical_record": "Frank Sturgis was arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building in the early hours of June 17, 1972. He was tried in United States v. Liddy et al. and pleaded guilty. He was sentenced to prison. His background as a former U.S. military serviceman and anti-Castro operative with connections to CIA-linked Cuban exile groups was established in the trial record and in Senate Select Committee proceedings."
+        },
+        {
+          "name": "Frank Wills",
+          "outcome": "survived",
+          "character_id": "char_wills",
+          "primary_source": {
+            "url": null,
+            "citation": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "historical_record": "Frank Wills, employed by General Security Services as a night security guard at the Watergate office building, discovered tape on the garage-level stairwell door latch bolts for the second time at approximately 1:47 AM on June 17, 1972, and placed the call to the Metropolitan Police Department Second District that initiated the response leading to the arrests. His Security Officer's Log for that night is preserved at the National Archives under NAID 304970. Wills received public recognition for his role in initiating the discovery of the break-in, though he did not benefit materially from the notoriety and faced significant financial hardship in subsequent years."
+        },
+        {
+          "name": "James McCord",
+          "outcome": "survived",
+          "character_id": "char_mccord",
+          "primary_source": {
+            "url": null,
+            "citation": "United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities testimony of James McCord; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "historical_record": "James McCord was arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building in the early hours of June 17, 1972. His identity as a former CIA physical security officer and the sitting Security Coordinator for the Committee for the Re-election of the President was established at arrest and became one of the first threads connecting the break-in to the Nixon re-election campaign. He was tried in United States v. Liddy et al. and convicted. Before sentencing, McCord wrote a letter to Judge John Sirica stating that political pressure had been applied to the defendants to plead guilty and remain silent, and that perjury had been committed at trial. This letter, read in open court on March 23, 1973, was a pivotal moment in the unraveling of the cover-up. McCord testified before the Senate Select Committee on Presidential Campaign Activities."
+        }
+      ],
+      "historical_frame": [
+        {
+          "text": "The arrests of June 17, 1972 led to United States v. Liddy et al. in the U.S. District Court for the District of Columbia, in which all five men arrested at the Watergate were convicted or pleaded guilty; the trial and its aftermath initiated the chain of congressional and judicial proceedings that became the Watergate scandal.",
+          "source": "United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities final report, 1974"
+        },
+        {
+          "text": "The Senate Select Committee on Presidential Campaign Activities, established by Senate Resolution 60 on February 7, 1973, conducted public hearings beginning May 17, 1973, at which participants including McCord, Baldwin, and Shoffler testified under oath about the events of June 17, 1972 and the broader campaign of political espionage and sabotage.",
+          "source": "Senate Select Committee on Presidential Campaign Activities final report, 1974; Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973"
+        },
+        {
+          "text": "James McCord's letter to Judge John Sirica, read in open court on March 23, 1973, stated that political pressure had been applied to the Watergate defendants to plead guilty and remain silent and that perjury had been committed at trial; the letter is identified in the historical record as a pivotal moment in the collapse of the cover-up that followed the June 17, 1972 arrests.",
+          "source": "Senate Select Committee on Presidential Campaign Activities final report, 1974; 'Watergate Revisited,' The Washington Post, June 14, 1992"
+        }
+      ],
+      "immediate_outcome": {
+        "summary": "Five men — Bernard Barker, Virgilio Gonzalez, Eugenio Martinez, James McCord, and Frank Sturgis — were arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building in the early hours of June 17, 1972, following a floor-by-floor search by plainclothes Metropolitan Police Department officers responding to Frank Wills's call. Evidence recovered at the scene included bugging equipment, cameras, film, consecutively serialized cash, lock picks, and personal materials linking the arrested men to the White House and to the Committee for the Re-election of the President.",
+        "key_facts": [
+          {
+            "text": "Frank Wills discovered tape on the garage-level stairwell door latch bolts for the second time at approximately 1:47 AM on June 17, 1972, and placed his call to the Metropolitan Police Department Second District at that time.",
+            "source": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972"
+          },
+          {
+            "text": "Officers Carl Shoffler, John Barrett, and Paul Leeper, riding in unmarked police unit 727 assigned to the Tactical Enforcement Branch of the Metropolitan Police Department Second District, were alerted by radio dispatcher at approximately 1:52 AM on June 17, 1972 and arrived at the Watergate office building within a few minutes of the call.",
+            "source": "Washington Metropolitan Police Department arrest report, June 17, 1972; Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973"
+          },
+          {
+            "text": "Five men were arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building: Bernard Barker, Virgilio Gonzalez, Eugenio Martinez, James McCord, and Frank Sturgis.",
+            "source": "Washington Metropolitan Police Department arrest report, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia"
+          },
+          {
+            "text": "Approximately $2,300 in consecutively serialized $100 bills recovered from the arrested men was traceable through the Federal Reserve to the Republic National Bank of Miami, where Bernard Barker held an account.",
+            "source": "FBI investigation records cited in Senate Select Committee on Presidential Campaign Activities final report; Washington Metropolitan Police Department arrest inventory, June 17, 1972"
+          },
+          {
+            "text": "Bernard Barker's personal address book, recovered at arrest, contained the notation 'H.H.' beside a White House telephone number belonging to E. Howard Hunt.",
+            "source": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Senate Select Committee on Presidential Campaign Activities exhibit records"
+          },
+          {
+            "text": "Two 35mm cameras and forty rolls of unexposed film were recovered from Suite 600 of the Watergate office building at the time of arrest and inventoried alongside bugging equipment, cash, and lock picks.",
+            "source": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Senate Select Committee on Presidential Campaign Activities exhibit records"
+          },
+          {
+            "text": "A short-wave radio receiver found in Suite 600 was tuned to the Metropolitan Police Department's dispatch frequency and was part of the team's secondary warning system.",
+            "source": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Senate Select Committee on Presidential Campaign Activities testimony"
+          }
+        ]
+      }
+    },
+    "featured": false,
+    "glossary": [
+      {
+        "term": "presidential election year",
+        "source": "",
+        "approved": true,
+        "definition": "1972, when Richard Nixon was seeking re-election against Democrat George McGovern and held a commanding polling lead that made his victory appear certain."
+      },
+      {
+        "term": "Frank Wills",
+        "source": "",
+        "approved": true,
+        "definition": "The Watergate building's security guard working the night shift, whose eighty-dollar-a-week salary and job security hinge on his discretion in handling what might be a routine custodian's mistake."
+      },
+      {
+        "term": "security lamp",
+        "source": "",
+        "approved": true,
+        "definition": "A fixed light fixture mounted above the lobby reception desk that provides the only interior illumination of the Watergate office building's ground floor after hours."
+      },
+      {
+        "term": "latch bolt",
+        "source": "",
+        "approved": true,
+        "definition": "The spring-loaded bolt that extends from a door lock into the strike plate—without it engaging, a door can be opened from the inside at any time."
+      },
+      {
+        "term": "strike plate",
+        "source": "",
+        "approved": true,
+        "definition": "The metal plate on a doorframe that the latch bolt slides into when a door closes—taping over it prevents the bolt from catching and locking the door."
+      },
+      {
+        "term": "the tape",
+        "source": "",
+        "approved": true,
+        "definition": "Adhesive tape used to keep stairwell door latches open so the team can move freely through the building without triggering alarms—discovered by the security guard on multiple rounds."
+      },
+      {
+        "term": "Room 723",
+        "source": "",
+        "approved": true,
+        "definition": "The specific Howard Johnson hotel room where a lookout has spent eight or nine consecutive nights monitoring audio feeds and watching for security problems across the street."
+      },
+      {
+        "term": "Howard Johnson Motor Lodge",
+        "source": "",
+        "approved": true,
+        "definition": "The hotel across Virginia Avenue from the Watergate office building, where operatives monitored the listening device from an upper-floor room and coordinated the break-in."
+      },
+      {
+        "term": "transmitter",
+        "source": "",
+        "approved": true,
+        "definition": "A listening device planted in the DNC office in May that had been broadcasting audio to monitors across the street—the 'technical correction' that brings the team back inside on this night."
+      },
+      {
+        "term": "Democratic National Committee",
+        "source": "",
+        "approved": true,
+        "definition": "The administrative headquarters and nerve center of the Democratic Party, occupying the sixth floor of the Watergate complex where campaign strategy, voter files, and internal documents were stored."
+      },
+      {
+        "term": "campaign finance disclosure law",
+        "source": "",
+        "approved": true,
+        "definition": "New legislation effective April 7, 1972, that required campaigns to report donations publicly—which is why the Committee moved money through intermediary accounts before the deadline."
+      },
+      {
+        "term": "Committee for the Re-election of the President",
+        "source": "",
+        "approved": true,
+        "definition": "Nixon's official campaign organization in 1972, which raised unprecedented amounts of cash and coordinated financial transfers through Mexico and Miami to avoid the new campaign finance disclosure requirements."
+      },
+      {
+        "term": "the Watergate",
+        "source": "",
+        "approved": true,
+        "definition": "A mixed-use development of office and residential buildings on Virginia Avenue near the Kennedy Center, opened in 1965 on the Potomac's east bank—known simply by its address rather than a proper name."
+      }
+    ],
+    "createdAt": "2025-06-17T01:47:00Z",
+    "updatedAt": "2025-06-17T01:47:00Z",
+    "playerGoal": "",
+    "description": "Washington, D.C., June 17, 1972, twelve minutes before two in the morning. A night guard has found the same tape twice. Five men are working on the sixth floor of the Watergate office building, and the lookout across Virginia Avenue is watching a street that tells him nothing. The macro-outcome is fixed. The ninety minutes before it are yours.",
+    "storyArcIds": [
+      "watergate_1972_part1_breach_main_arc"
+    ],
+    "beats_status": "not_generated",
+    "displayOrder": 99,
+    "freedomLevel": "guided",
+    "introduction": {
+      "enabled": true,
+      "sections": [
+        {
+          "text": "It is the summer of a presidential election year, and Richard Nixon leads George McGovern by margins that make the outcome look settled. The Committee for the Re-election of the President has raised more money than any campaign in American history, some of it in cash, some of it moved through accounts in Mexico and Miami before the new campaign finance disclosure law takes effect on April 7. The Democratic National Committee occupies the sixth floor of a glass-and-concrete complex on Virginia Avenue, a building whose name is simply its address — the Watergate — a residential and office development opened in 1965 on the Potomac's east bank, a short walk from the Kennedy Center. Washington in June 1972 is a city that believes it has seen everything, and it has not.",
+          "type": "world"
+        },
+        {
+          "text": "For the five men on the sixth floor, tonight is a technical correction — a transmitter that has been feeding poor audio since May needs to be replaced, and internal campaign documents need to be photographed before the building opens Monday morning. For the man across the street in Room 723, it is the eighth or ninth consecutive night of nothing, and nothing is what he expects. For Frank Wills, what is at stake is narrower and more immediate: eighty dollars a week, a job he cannot afford to lose, and the specific social cost of calling the police over what is probably a custodian's oversight. Nobody in this building, and nobody across the street, understands that the night's outcome will be read in every subsequent decade of American political life.",
+          "type": "stakes"
+        },
+        {
+          "text": "Virginia Avenue is empty at this hour, the pavement holding the day's heat in a way that makes the air feel used. The Watergate office building's lobby is dark behind its glass facade, the only interior light a security lamp above the reception desk. Across six lanes of asphalt, the Howard Johnson Motor Lodge shows a few lit windows on the upper floors, the television glow of insomnia or a late shift. The Potomac is two blocks west and the night smells of river mud and car exhaust and the particular staleness of a city that has been awake too long. Inside the building, the air conditioning runs at a level calibrated for a full office day, which means it is too cold for one man walking a circuit with a flashlight.",
+          "type": "scene"
+        },
+        {
+          "text": "You are at the threshold of ninety minutes that will not feel like history because they do not feel like anything yet — they feel like a shift, a round, a job, a decision about whether to pick up a phone. The tape is there again. The stairwell smells of concrete and motor oil. The flashlight beam catches the adhesive edge, and you are the only person in the building who knows it.",
+          "type": "entry",
+          "character_entries": {
+            "role_wills": "",
+            "role_mccord": "",
+            "role_baldwin": ""
+          }
+        }
+      ],
+      "skippable": true
+    },
+    "playerRoleIds": [
+      "role_wills",
+      "role_mccord",
+      "role_baldwin"
+    ],
+    "winConditions": [
+      "As Wills: log the second tape discovery, reach the security phone, and complete the call to the Second District before the round expires.",
+      "As McCord: finish replacing the transmitter and clear the team's most compromising pocket litter before the stairwell door opens — the hard floor items cannot be removed, but exposure above the floor can be minimized.",
+      "As Baldwin: transmit a warning early enough that McCord receives it on the walkie-talkie before the officers reach the sixth floor."
+    ],
+    "failConditions": [
+      "As Wills: second tape is not reported before 2:00 AM, allowing the team additional time to sanitize the suite.",
+      "As McCord: transmitter housing is left open and the Miami crew's documents are still spread on the desk when the door opens.",
+      "As Baldwin: warning goes out after officers are already on the sixth floor, giving McCord no actionable lead time."
+    ],
+    "technical_facts": {
+      "facts": [
+        {
+          "domain": "timing",
+          "source": {
+            "url": "https://catalog.archives.gov/id/304970",
+            "citation": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": "Page images published in the National Archives Catalog."
+          },
+          "content": "Frank Wills discovered tape on the garage-level stairwell door latch bolts for the second time at approximately 1:47 AM on June 17, 1972, and placed his call to the Metropolitan Police Department Second District at that time.",
+          "fact_id": "wills_second_tape_discovery_time",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "timing",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972; Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973; 'Watergate Revisited,' The Washington Post, June 14, 1992",
+            "access_note": null
+          },
+          "content": "Officers Carl Shoffler, John Barrett, and Paul Leeper, riding in unmarked police unit 727, were alerted by radio dispatcher at approximately 1:52 AM on June 17, 1972 and arrived at the Watergate office building within a few minutes of the call. The arrests inside the Democratic National Committee offices followed after a floor-by-floor search of the building.",
+          "fact_id": "police_arrival_time",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "navigation",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "content": "The unmarked police vehicle carrying Shoffler, Barrett, and Leeper was unit 727, assigned to the Second District plainclothes tactical squad of the Metropolitan Police Department.",
+          "fact_id": "shoffler_unit_designation",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Carl Shoffler testimony, Senate Select Committee on Presidential Campaign Activities, May 18, 1973; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "content": "Officers Shoffler, Barrett, and Leeper were working in plainclothes as standard practice for the Second District plainclothes tactical squad, and arrived without activated lights or siren.",
+          "fact_id": "officers_plainclothes_status",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "navigation",
+          "source": {
+            "url": null,
+            "citation": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; Los Angeles Times interview with Baldwin, October 5, 1972",
+            "access_note": null
+          },
+          "content": "Alfred Baldwin was stationed in Room 723 of the Howard Johnson Motor Lodge on Virginia Avenue NW, directly across from the Watergate complex, serving as lookout and radio monitor.",
+          "fact_id": "baldwin_room_number_and_location",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "capacity",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia",
+            "access_note": null
+          },
+          "content": "Five men were arrested inside the Democratic National Committee offices in Suite 600 of the Watergate office building: Bernard Barker, Virgilio Gonzalez, Eugenio Martinez, James McCord, and Frank Sturgis.",
+          "fact_id": "arrested_persons_count",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "NARA, Watergate burglary evidence records, 'Address Book Belonging to Bernard Barker, Discovered in a Room at the Watergate Hotel, June 18, 1972'; Senate Select Committee on Presidential Campaign Activities exhibit records",
+            "access_note": null
+          },
+          "content": "Bernard Barker's personal address book contained the notation 'H.H.' beside a White House telephone number belonging to E. Howard Hunt. It was recovered from a room at the Watergate Hotel in a search following the arrests, not from Barker's person at the time of arrest.",
+          "fact_id": "barker_address_book_notation",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "FBI investigation records cited in Senate Select Committee on Presidential Campaign Activities final report; Washington Metropolitan Police Department arrest inventory, June 17, 1972",
+            "access_note": null
+          },
+          "content": "Approximately $2,300 in consecutively serialized $100 bills recovered from the arrested men was traceable through the Federal Reserve to the Republic National Bank of Miami, where Bernard Barker held an account.",
+          "fact_id": "sequential_bills_amount_and_origin",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest inventory logged by Officer Shoffler, June 17, 1972; Senate Select Committee on Presidential Campaign Activities exhibit records",
+            "access_note": null
+          },
+          "content": "Eugenio Martinez's personal directory contained an entry reading 'W. House.' The address books and directories belonging to the burglars, including Martinez's, were recovered when investigators searched Room 214 of the Watergate Hotel following the arrests, not from the men's persons at the time of arrest. Whether a separate item bearing the words 'White House' was recovered, and its provenance, is not established by the sources reviewed.",
+          "fact_id": "martinez_notebook_white_house_notation",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Senate Select Committee on Presidential Campaign Activities exhibit records",
+            "access_note": null
+          },
+          "content": "Two 35mm cameras and forty rolls of unexposed film were recovered from Suite 600 of the Watergate office building at the time of arrest and inventoried alongside the bugging equipment, cash, and lock picks.",
+          "fact_id": "camera_equipment_recovered",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "other",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest inventory, June 17, 1972; Senate Select Committee on Presidential Campaign Activities testimony",
+            "access_note": null
+          },
+          "content": "A short-wave radio receiver capable of receiving Metropolitan Police Department dispatch calls was among the equipment seized in connection with the arrests. The record establishes the receiver's presence but does not establish a designed role for it in the team's warning arrangements; the documented lookout arrangement was Alfred Baldwin monitoring from Room 723 of the Howard Johnson Motor Lodge, whose warning failed to prevent the arrests.",
+          "fact_id": "shortwave_receiver_police_frequency",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities testimony of James McCord",
+            "access_note": null
+          },
+          "content": "James McCord served as a physical security officer with the Central Intelligence Agency before becoming Security Coordinator for the Committee for the Re-election of the President.",
+          "fact_id": "mccord_professional_background",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Alfred Baldwin testimony, Senate Select Committee on Presidential Campaign Activities; James McCord testimony, Senate Select Committee on Presidential Campaign Activities",
+            "access_note": null
+          },
+          "content": "Alfred Baldwin was a former FBI agent recruited by James McCord, who selected his name from the roster of the Society of Former Special Agents of the FBI, to serve as lookout and to monitor radio transmissions intercepted from previously planted listening devices.",
+          "fact_id": "baldwin_former_fbi_status",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "content": "Frank Wills was employed by General Security Services as a night security guard assigned to the Watergate office building on the night of June 16–17, 1972.",
+          "fact_id": "wills_employer",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "navigation",
+          "source": {
+            "url": null,
+            "citation": "Washington Metropolitan Police Department arrest report, June 17, 1972; United States v. Liddy et al., U.S. District Court for the District of Columbia",
+            "access_note": null
+          },
+          "content": "The Democratic National Committee offices were located in Suite 600 of the Watergate office building at 2600 Virginia Avenue NW, Washington, D.C.",
+          "fact_id": "dnc_suite_number",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "timing",
+          "source": {
+            "url": "https://catalog.archives.gov/id/304970",
+            "citation": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": "Page images published in the National Archives Catalog."
+          },
+          "content": "Frank Wills discovered tape on the garage-level stairwell door latch bolts for the first time during an earlier round on the night of June 16–17, 1972, removed it, and continued his patrol before discovering fresh tape on the same doors during his subsequent round.",
+          "fact_id": "first_tape_discovery_timing",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities records",
+            "access_note": null
+          },
+          "content": "Frank Sturgis was a former U.S. military serviceman and anti-Castro operative who had worked with CIA-connected Cuban exile groups prior to his participation in the Watergate entry operation.",
+          "fact_id": "sturgis_background",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": null,
+            "citation": "United States v. Liddy et al., U.S. District Court for the District of Columbia; Senate Select Committee on Presidential Campaign Activities records",
+            "access_note": null
+          },
+          "content": "Bernard Barker was born in Havana in 1917 to an American father and held United States citizenship. He served in the United States Army Air Forces as a bombardier in the Second World War, was shot down over Germany, and was held as a prisoner of war. He later served in the Cuban police and worked for the CIA, including on operations connected to the Bay of Pigs. He led the Miami-based entry team members participating in the Watergate operation.",
+          "fact_id": "barker_background",
+          "valid_from": null,
+          "valid_until": null
+        },
+        {
+          "domain": "personnel",
+          "source": {
+            "url": "https://catalog.archives.gov/id/304970",
+            "citation": "Frank Wills, Security Officer's Log, Watergate Office Building, June 17, 1972, National Archives, NAID 304970; Washington Metropolitan Police Department arrest report, June 17, 1972",
+            "access_note": null
+          },
+          "content": "Frank Wills did not testify before the Senate Select Committee (Ervin Committee); no committee finding concerning his account exists. His actions are documented in his Security Officer's Log (National Archives, NAID 304970) and the Metropolitan Police Department arrest report.",
+          "fact_id": "wills_did_not_testify",
+          "valid_from": null,
+          "valid_until": null
+        }
+      ],
+      "reviewed": true,
+      "generated": true,
+      "corrected_at": "2026-09-02T18:24:04.724Z"
+    },
+    "allow_free_input": true,
+    "generationPrompt": "\"scenario_id\": \"watergate_1972_part1_breach\",\n  \"title\": \"The Second Round\",\n  \"category\": \"Political Crisis\",\n  \"date\": \"17 June 1972\",\n  \"setting\": \"The Watergate office building, 2600 Virginia Avenue NW, Washington, D.C., and Room 723 of the Howard Johnson Motor Lodge directly across Virginia Avenue. Midnight to 2:10 AM. A humid Saturday in June; the building is empty except for a night guard, five men on the sixth floor, and a lookout with a radio.\",\n  \"macro_outcome_fixed\": \"Frank Wills finds the tape a second time and calls the Second District. Three plainclothes officers arrive in an unmarked car without sirens; the lookout across the street sees nothing worth reporting until it is too late. Five men are arrested inside the Democratic National Committee offices in Suite 600 at 2:10 AM, carrying cash in sequential hundred-dollar bills, camera equipment, and address books containing a White House telephone number. The player inhabits the ninety minutes in which a professional operation is undone by an ordinary man doing his job twice.\",\n  \"player_roles\": [\n    {\n      \"id\": \"wills\",\n      \"label\": \"Frank Wills, night security guard\",\n      \"type\": \"real\",\n      \"perspective\": \"The ordinary man at the hinge. Not a hero and not yet aware he is in history — a twenty-four-year-old on eighty dollars a week deciding whether a second irregularity is worth the risk of looking foolish.\",\n      \"lead\": true,\n      \"opening_prompt\": \"You are generating the opening narrative for an immersive first-person historical scenario. The moment is approximately 1:45 AM, Saturday, June 17, 1972, in the sub-basement stairwell of the Watergate office building, 2600 Virginia Avenue NW, Washington, D.C. The player is Frank Wills, twenty-four, a private guard employed by General Security Services, working the midnight-to-seven shift at eighty dollars a week. Sometime between 12:30 and 1:00 he found masking tape holding the latch bolts of the garage-level doors so they would close without locking. He peeled it off, assumed the cleaning crew had left it, and went on with his round. He is now standing in front of the same strike plates and the tape is back. He does not know that five men are working on the sixth floor. What he knows is that calling the Second District over what is probably a custodial oversight is the kind of thing that costs a man a job like this one. Write a 400-word immersive present-tense second-person opening that conveys the specific physical world of the underground level at that hour — the weight of the master key ring against his hip, the cool draft carrying damp concrete and motor oil, the yellow flashlight beam, the adhesive going tacky on his thumb — and the specific cognitive state of a young man on a low-wage shift who has just registered that the same small wrong thing has happened twice, and is deciding alone whether twice means anything. All details historically grounded. Do not depict him as suspecting a political burglary; do not foreshadow. The macro-outcome is fixed: he calls, and five men are arrested at 2:10 AM. The player inhabits the minutes before the call.\"\n    },\n    {\n      \"id\": \"mccord\",\n      \"label\": \"James McCord, security coordinator, Committee for the Re-election of the President\",\n      \"type\": \"real\",\n      \"perspective\": \"The professional inside his own failing operation. Former CIA physical security; competent, methodical, and increasingly aware that the men he is working with are not. His register is technical irritation, not fear — until it is fear.\",\n      \"opening_prompt\": \"You are generating the opening narrative for an immersive first-person historical scenario. The moment is approximately 1:40 AM, Saturday, June 17, 1972, inside Suite 600 — the offices of the Democratic National Committee — on the sixth floor of the Watergate office building, Washington, D.C. The player is James McCord, security coordinator for the Committee for the Re-election of the President and a former CIA physical security officer. He is working under a masked penlight in surgical gloves, replacing a transmitter that has been feeding poor audio since May, while four men from the Miami crew photograph campaign documents at a desk behind him. The doors between the garage and this floor have been taped at the latch so the team can move without keys. McCord has turned down the volume on his walkie-talkie so it will not carry in an empty building. Across Virginia Avenue, in Room 723 of the Howard Johnson, a man is supposed to be watching the front of the building. Write a 400-word immersive present-tense second-person opening that conveys the specific sensory world of professional entry work at that hour — talc inside tight rubber gloves, the dry click of a housing screw under a jeweler's driver, conditioned air and carpet shampoo, the discipline of moving through a lit-from-outside office without casting a shadow on a window — and the specific state of a technically exact man who has begun to notice how much of tonight depends on people who are not technically exact. All details historically grounded. Do not have him anticipate arrest. The macro-outcome is fixed: the tape is found, the police come in plainclothes, and all five men are taken in this room at 2:10 AM. The player inhabits the work being done in the last thirty minutes before that.\"\n    },\n    {\n      \"id\": \"baldwin\",\n      \"label\": \"Alfred Baldwin, lookout\",\n      \"type\": \"real\",\n      \"perspective\": \"The man who did his job correctly and failed anyway. Bored, cold, and eight floors up across a six-lane avenue with a radio nobody is listening to. His tragedy is that there was nothing obvious to see.\",\n      \"opening_prompt\": \"You are generating the opening narrative for an immersive first-person historical scenario. The moment is approximately 1:50 AM, Saturday, June 17, 1972, in Room 723 of the Howard Johnson Motor Lodge, directly across Virginia Avenue from the Watergate office building, Washington, D.C. The player is Alfred Baldwin, a former FBI agent hired as a lookout and monitor, who has spent weeks in this room listening to a bugged telephone extension in the Democratic National Committee offices and writing up logs. Tonight his job is simpler: watch the front of the building and the eighth-floor terrace, and call it in on the radio if anything moves. The television is on, low, because it covers the sound of his radio traffic through a motel wall. He has a pair of binoculars and a clear line to the Watergate's front. Down on the street, three men in casual clothes have just gotten out of an unremarkable car. No uniforms. No lights. No siren. Write a 400-word immersive present-tense second-person opening that conveys the specific texture of eight hours of nothing — motel-room air, a cooling cup of coffee, the low murmur of a late film, the particular numbness of surveillance that has never once produced anything — and the specific problem of a competent man trying to distinguish, at two in the morning across six lanes of empty avenue, between three men going somewhere and three men coming for you. All details historically grounded. Baldwin's own account holds that the television was cover for his radio, not a distraction; render it that way. The macro-outcome is fixed: his warning goes out too late, and five men are arrested in Suite 600 at 2:10 AM. The player inhabits the interval in which the warning was still possible.\"\n    }\n  ],\n  \"shared_fact_ledger\": {\n    \"Door_Latch_Tamper_Status\": {\n      \"type\": \"enum\",\n      \"values\": [\n        \"Clear\",\n        \"Taped\",\n        \"Re-Taped\",\n        \"Discovered\"\n      ],\n      \"note\": \"The single most three-sided object in the scenario. McCord's crew push it toward Taped; Wills pushes it toward Clear and then Discovered; Baldwin can never see it at all. Re-Taped is the state that ends the night.\"\n    },\n    \"Lookout_Warning_Latency\": {\n      \"type\": \"scale\",\n      \"range\": \"0-100\",\n      \"note\": \"How far behind events the radio warning runs. Baldwin pushes it down; McCord's turned-down volume and the unmarked plainclothes arrival push it up. Never reaches zero — the warning is historically late.\"\n    },\n    \"Pocket_Litter_Exposure\": {\n      \"type\": \"enum\",\n      \"values\": [\n        \"Documented floor\",\n        \"Elevated\",\n        \"Maximal\"\n      ],\n      \"note\": \"HARD FLOOR: no player action may remove Barker's address book with a White House number under 'H.H.', Martinez's directory entry reading 'W. House', the spiral notebook in Martinez's jacket, or the sequential hundred-dollar bills. These are inventoried at arrest in the record and must survive every playthrough. The ledger tracks only what accumulates above that floor.\"\n    }\n  },\n  \"essential_beats\": [\n    {\n      \"id\": \"first_tape_cleared\",\n      \"label\": \"Wills finds and removes the first tape (12:30-1:00 AM)\",\n      \"essential\": true\n    },\n    {\n      \"id\": \"sixth_floor_work\",\n      \"label\": \"The transmitter is worked and documents are photographed in Suite 600\",\n      \"essential\": true\n    },\n    {\n      \"id\": \"tape_replaced\",\n      \"label\": \"The latches are taped a second time\",\n      \"essential\": true\n    },\n    {\n      \"id\": \"second_discovery_and_call\",\n      \"label\": \"Wills finds fresh tape and calls the Second District (logged 1:47)\",\n      \"essential\": true\n    },\n    {\n      \"id\": \"plainclothes_sweep\",\n      \"label\": \"Three officers in an unmarked car work the building floor by floor\",\n      \"essential\": false\n    },\n    {\n      \"id\": \"arrest_in_suite_600\",\n      \"label\": \"Five men taken in the DNC offices, 2:10 AM\",\n      \"essential\": true,\n      \"closure_trigger\": true\n    }\n  ],\n  \"closing_mode\": {\n    \"engage_when\": \"closure_trigger reached OR timer <= 0\",\n    \"on_timer_expiry\": \"if within one beat of arrest_in_suite_600, advance to it before closing; else close on the last essential beat reached\",\n    \"forbid\": \"closing before second_discovery_and_call\"\n  },\n  \"character_declarations\": {\n    \"player_roles\": [\n      {\n        \"character\": \"Frank Wills\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"James McCord\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Alfred Baldwin\",\n        \"declared_type\": \"real\"\n      }\n    ],\n    \"npcs\": [\n      {\n        \"character\": \"Bernard Barker\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Eugenio Martinez\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Frank Sturgis\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Virgilio Gonzalez\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Officer Carl Shoffler\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Officer John Barrett\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"Officer Paul Leeper\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"E. Howard Hunt (referenced, not present)\",\n        \"declared_type\": \"real\"\n      },\n      {\n        \"character\": \"G. Gordon Liddy (referenced, not present)\",\n        \"declared_type\": \"real\"\n      }\n    ],\n    \"note\": \"This scenario contains no fictional characters. Every named person is documented. Hunt and Liddy were in Room 214 of the Howard Johnson that night but must remain off-stage and referenced only. No composite names required; no collision check needed.\"\n  },\n  \"technical_facts\": [\n    \"Five men were arrested inside the Democratic National Committee headquarters on the sixth floor of the Watergate office building: James McCord, Bernard Barker, Eugenio Martinez, Frank Sturgis, and Virgilio Gonzalez.\",\n    \"Do NOT describe the four as 'Cubans' or 'four Cuban nationals.' Sturgis was American-born (Frank Fiorini, of Norfolk, Virginia); Barker was Cuban-born of American parentage. 'The Miami crew' is the accurate collective.\",\n    \"Frank Wills was twenty-four, employed by General Security Services, working a midnight-to-seven shift.\",\n    \"Wills found and removed tape on the garage-level doors between approximately 12:30 and 1:00 AM, and found fresh tape on a later round.\",\n    \"Wills's own security log records the call to police at 1:47 AM. Other accounts place the second discovery at approximately 1:50. Sources disagree by minutes; render as 'just before two.'\",\n    \"The arrest occurred at 2:10 AM.\",\n    \"Tape was placed over latch bolts on multiple doors between the basement and the sixth floor so that doors would close without locking.\",\n    \"The ORIENTATION of the tape (horizontal versus vertical) is NOT documented in any primary or mainstream secondary source. It circulates in retellings. Do not state it as fact. It may appear only as McCord's own professional judgment about visibility.\",\n    \"Alfred Baldwin occupied Room 723 of the Howard Johnson Motor Lodge across Virginia Avenue and had monitored a bugged DNC extension for weeks.\",\n    \"Baldwin publicly called the story that he was distracted by a late movie 'a blatant fabrication,' stating the television was on to mask his radio traffic. Render it his way.\",\n    \"McCord had turned down the volume on his walkie-talkie. The responding officers arrived in an unmarked car, in plainclothes, with no siren. There was no visible signal for a lookout to read.\",\n    \"Baldwin's eventual radio call was substantially: 'we've got some people dressed casually, and they've got guns.' It came too late.\",\n    \"The arresting officers were plainclothes Tactical Enforcement Branch officers Carl Shoffler, John Barrett, and Paul Leeper, in unmarked car 727, dressed casually. June 17 was Shoffler's twenty-seventh birthday.\",\n    \"The claim that Shoffler volunteered for an extra shift on his birthday traces to Jim Hougan's 'Secret Agenda' and conspiracy-oriented literature, not mainstream sourcing. It may appear as squad-room rumor. It may not be stated as fact.\",\n    \"Recovered at arrest: lock picks and door jimmies; approximately $2,300 in cash, largely in hundred-dollar bills with sequential serial numbers (later reckonings total roughly $3,600); a short-wave receiver tuned to police calls; forty rolls of unexposed film; two 35mm cameras; three pen-sized tear-gas guns; electronic bugging devices; hotel room keys.\",\n    \"Barker's address book contained a White House telephone number listed under 'H.H.' (E. Howard Hunt). Martinez's directory contained an entry reading 'W. House.' Shoffler personally found a small spiral notebook in Martinez's jacket containing 'White House.'\",\n    \"The cash was later traced through the Federal Reserve Banks of Atlanta and Philadelphia to the Republic National Bank of Miami, where Barker held an account.\",\n    \"The team's stated purpose was to repair a transmitter that had been producing poor audio and to photograph internal campaign documents.\"\n  ],\n  \"period_vocabulary\": {\n    \"use\": [\n      \"the Committee\",\n      \"CRP\",\n      \"the DNC\",\n      \"the Second District\",\n      \"special police officer\",\n      \"General Security Services\",\n      \"walkie-talkie\",\n      \"the unit\",\n      \"transmitter\",\n      \"strike plate\",\n      \"latch bolt\",\n      \"penlight\",\n      \"Room 723\",\n      \"the Miami men\"\n    ],\n    \"avoid\": [\n      \"Watergate (as the name of a scandal rather than a building)\",\n      \"the Watergate scandal\",\n      \"cover-up\",\n      \"smoking gun\",\n      \"Deep Throat\",\n      \"CREEP (a press coinage the Committee never used of itself)\",\n      \"third-rate burglary (Ziegler, June 19 - two days after this scenario)\",\n      \"wiretapping ring\",\n      \"break-in of the century\",\n      \"any language implying the participants understand what tonight will become\"\n    ],\n    \"register_notes\": \"Nobody in this scenario knows it is historic, and the narration must not know either. Wills is a low-wage guard worried about looking foolish and about his job. McCord is a careful professional annoyed by carelessness. Baldwin is cold, bored, and eight hours into nothing. The night is mundane until it is not, and the prose must stay mundane for as long as the characters do. No character may voice the significance of the evening; no narration may foreshadow it.\"\n  },\n  \"primary_sources\": [\n    {\n      \"claim\": \"Break-in team composition, arrest location and floor\",\n      \"source\": \"Miller Center — The Watergate Break-In\",\n      \"url\": \"https://millercenter.org/the-presidency/educational-resources/watergate/watergate-break\"\n    },\n    {\n      \"claim\": \"Frank Wills's security log, times of discovery and police call\",\n      \"source\": \"Watergate.info — Frank Wills Watergate Security Log\",\n      \"url\": \"https://watergate.info/burglary/frank-wills-watergate-security-log/\"\n    },\n    {\n      \"claim\": \"Arrest inventory, officer identities, incident timeline\",\n      \"source\": \"ASIS Security Management — The Watergate Incident Report\",\n      \"url\": \"https://www.asisonline.org/security-management-magazine/articles/2025/01/incident-reports/watergate-incident-report/\"\n    },\n    {\n      \"claim\": \"Baldwin's account of Room 723 and his rejection of the movie story\",\n      \"source\": \"Portland Press Herald — Alfred Baldwin obituary\",\n      \"url\": \"https://www.pressherald.com/2022/05/05/alfred-baldwin-chief-watergate-eavesdropper-and-lookout-dies-at-83/\"\n    },\n    {\n      \"claim\": \"Barker's address book containing a White House number under 'H.H.'\",\n      \"source\": \"U.S. Capitol Visitor Center — Address Book of Watergate Burglar Bernard Barker\",\n      \"url\": \"https://www.visitthecapitol.gov/artifact/address-book-watergate-burglar-bernard-barker-june-18-1972\"\n    },\n    {\n      \"claim\": \"Tracing of the sequential hundred-dollar bills\",\n      \"source\": \"Moneyness — The Watergate Banknotes\",\n      \"url\": \"https://www.moneyness.ca/2019/12/the-watergate-banknotes.html\"\n    }\n  ]\n}",
+    "openingSituation": "",
+    "review_checklist": {
+      "beat_count": {
+        "notes": "",
+        "checked": false
+      },
+      "sequence_check": {
+        "notes": "",
+        "checked": false
+      },
+      "final_beat_spec": {
+        "notes": "",
+        "checked": false
+      },
+      "reviewer_summary": {
+        "notes": "",
+        "checked": false
+      },
+      "path_independence": {
+        "notes": "",
+        "checked": false
+      },
+      "tense_attribution": {
+        "notes": "",
+        "checked": false
+      },
+      "manual_playthrough": {
+        "notes": "",
+        "checked": false
+      }
+    },
+    "historicalRealism": "high",
+    "period_vocabulary": {
+      "categories": [
+        {
+          "name": "Private Security Trade Language",
+          "terms": [
+            {
+              "term": "the round",
+              "meaning": "a single complete circuit of all assigned checkpoints in a building, logged by time at each station"
+            },
+            {
+              "term": "strike plate",
+              "meaning": "the metal plate mortised into a door frame that receives the latch bolt; the surface the tape was placed against"
+            },
+            {
+              "term": "latch bolt",
+              "meaning": "the spring-loaded bolt that snaps into the strike plate when a door closes; taping it prevents the door from locking"
+            },
+            {
+              "term": "the log",
+              "meaning": "the written incident record a guard is required to maintain; an entry in the log is the formal act that initiates a response"
+            },
+            {
+              "term": "the Second District",
+              "meaning": "Metropolitan Police Department Second District, the jurisdiction covering the Watergate address; the station Wills called"
+            },
+            {
+              "term": "special police officer",
+              "meaning": "the formal designation for a licensed private security guard in the District of Columbia; not a sworn officer"
+            },
+            {
+              "term": "General Security Services",
+              "meaning": "the contract firm employing Wills; a private guard company, not a government agency"
+            }
+          ],
+          "context": "Used by contract guards employed by firms such as General Security Services when logging incidents, communicating with dispatch, and writing up irregularities on a shift report."
+        },
+        {
+          "name": "Intelligence and Entry Operations Language",
+          "terms": [
+            {
+              "term": "the unit",
+              "meaning": "the team conducting the operation, referred to obliquely to avoid naming individuals on radio"
+            },
+            {
+              "term": "penlight",
+              "meaning": "a narrow-beam flashlight small enough to hold in the mouth or palm, used to work in a lit-from-outside office without silhouetting against windows"
+            },
+            {
+              "term": "pocket litter",
+              "meaning": "items found on a person at arrest — documents, address books, cash, hotel keys — that establish identity and association"
+            },
+            {
+              "term": "transmitter",
+              "meaning": "the listening device placed inside a telephone or room fixture; the specific piece of equipment McCord came to replace"
+            },
+            {
+              "term": "the Committee",
+              "meaning": "the Committee for the Re-election of the President; how the operation's sponsors referred to themselves internally"
+            },
+            {
+              "term": "walkie-talkie",
+              "meaning": "the handheld two-way radio used for communication between the sixth floor and Room 723; McCord had turned the volume down"
+            },
+            {
+              "term": "the Miami men",
+              "meaning": "the four-man crew from Florida working under McCord — Barker, Martinez, Sturgis, and Gonzalez"
+            }
+          ],
+          "context": "Used by McCord and the Miami crew during the operation — drawn from CIA physical security tradecraft and the vocabulary of professional entry work."
+        },
+        {
+          "name": "Surveillance Post Language",
+          "terms": [
+            {
+              "term": "Room 723",
+              "meaning": "Baldwin's fixed observation post at the Howard Johnson Motor Lodge, directly across Virginia Avenue from the Watergate office building"
+            },
+            {
+              "term": "the log",
+              "meaning": "Baldwin's written record of intercepted DNC telephone conversations, maintained over several weeks; a separate document from Wills's security log"
+            },
+            {
+              "term": "the front",
+              "meaning": "the Virginia Avenue facade of the Watergate office building, the primary field of observation from Room 723"
+            },
+            {
+              "term": "the terrace",
+              "meaning": "the eighth-floor outdoor terrace of the Watergate, a secondary observation point Baldwin was instructed to watch"
+            },
+            {
+              "term": "cover traffic",
+              "meaning": "ambient sound — in this case, the television — used to mask the sound of radio transmissions through a motel wall"
+            },
+            {
+              "term": "call it in",
+              "meaning": "to transmit an observation to the command post by walkie-talkie; the action Baldwin delayed too long"
+            }
+          ],
+          "context": "Used by Baldwin in Room 723 when logging monitored calls and reporting to the command post; drawn from FBI surveillance tradecraft of the early 1970s."
+        },
+        {
+          "name": "Metropolitan Police Department Tactical Language",
+          "terms": [
+            {
+              "term": "plainclothes",
+              "meaning": "officers working without uniform, badge displayed only on identification; the mode of dress that made the three officers invisible to Baldwin from across the avenue"
+            },
+            {
+              "term": "unmarked car",
+              "meaning": "a police vehicle without markings, light bar, or siren — unit 727, the car the three officers arrived in"
+            },
+            {
+              "term": "floor by floor",
+              "meaning": "the systematic method of clearing a building, working upward from the entry level; the procedure the officers followed after Wills admitted them"
+            },
+            {
+              "term": "the Second District plainclothes tactical squad",
+              "meaning": "the plainclothes unit of the Metropolitan Police Second District from which Shoffler, Barrett, and Leeper were drawn"
+            }
+          ],
+          "context": "Used by Shoffler, Barrett, and Leeper — plainclothes officers of the Second District tactical squad — when communicating during the building sweep."
+        }
+      ]
+    },
+    "keyEvidenceClueIds": [
+      "clue_address_book",
+      "clue_sequential_bills"
+    ],
+    "composite_disclosure": [],
+    "sessionTargetMinutes": 30,
+    "partialSuccessExamples": [
+      "Wills makes the call but cannot locate a supervisor to log the irregularity, leaving the chain of custody incomplete.",
+      "McCord secures the transmitter housing but cannot recover the spiral notebook from Martinez's jacket before the door opens.",
+      "Baldwin transmits in time for McCord to hear the warning but not in time for the team to reach the stairwell — five men are still taken, but with fewer documents spread on the desk."
+    ],
+    "structured_endings_enabled": false
+  }
+}
