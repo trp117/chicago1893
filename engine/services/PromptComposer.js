@@ -702,8 +702,21 @@ function buildPlayerRoleSection(state, characters = []) {
   return lines.join('\n');
 }
 
-function buildLocationConstraint(locationId) {
-  return `Current location (authoritative): ${locationId}\n⚠️ The player is at ${locationId}. Do NOT place the player at a different location unless they explicitly move.`;
+// Location is model-reported, so this block does two jobs: it fixes where the turn STARTS,
+// and it supplies the only id roster the model ever sees. The old text pinned the player in
+// place for the whole turn ("do NOT place the player at a different location unless they
+// explicitly move"), which is why a scene that narratively moved them left `location` behind
+// and every later turn composed its prose and choices against a room they had left. The
+// roster matters as much as the wording: LOCATION_JSON carries only the CURRENT location, so
+// "use a valid id" was previously a choice between one id and itself.
+function buildLocationConstraint(locationId, locations = []) {
+  const roster = (locations || []).map(l => `  ${l.id} — ${l.name}`).join('\n');
+  return [
+    `Location at the START of this turn: ${locationId}`,
+    'Begin the narrative here — do not silently relocate the player before the first line.',
+    'If your narration moves them during the turn, set the top-level `location` field to where they END it. If it does not, return this same id.',
+    roster ? `VALID LOCATIONS — \`location\` must be exactly one of these ids:\n${roster}` : '',
+  ].filter(Boolean).join('\n');
 }
 
 function buildNpcIntroInstruction(state, location, characters, playerInput = '') {
@@ -1126,7 +1139,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NPC_JSON}}',               JSON.stringify(relevantChars))
     .replace('{{NPC_ROUTES_JSON}}',        JSON.stringify(charRoutes))
     .replace('{{ENDING_SIGNALS_JSON}}',    JSON.stringify(endingSignals))
-    .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location))
+    .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location, locations))
     .replace('{{VERIFIED_FACTS}}',          buildVerifiedFactsBlock(state))
     .replace('{{OBJECT_STATE}}',           buildObjectStateBlock(state))
     .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))

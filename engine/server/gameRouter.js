@@ -797,7 +797,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         output.narrative = fixCharacterIdLeaks(output.narrative, characters);
       }
 
-      const nextState = mergeState(seededInitial, output, scenario, clues, '');
+      const nextState = mergeState(seededInitial, output, scenario, clues, '', locations);
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
@@ -1116,7 +1116,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const prevAct = state.act || 1;
-      let nextState = mergeState(state, output, scenario, clues, playerInput);
+      let nextState = mergeState(state, output, scenario, clues, playerInput, locations);
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
@@ -1220,7 +1220,13 @@ Do not open with the historical context. Open inside the character's body. Let t
         const char = characters.find(c => c.id === m.npc);
         return char?.name || m.npc;
       });
-      console.log(`[TURN] loc_out=${output.location || state.location} npcs=${JSON.stringify(npcNames)} isEnding=${output.endState?.isEnding ?? false}`);
+      // loc_out reports the location COMMITTED to state, not the model's raw emit. The two
+      // diverge exactly when the reconciliation guard rejects an invented id or a display
+      // name — the case this line exists to make visible — and logging the emit made a
+      // rejected move read as a successful one. Surface the rejected emit alongside.
+      const locEmit  = output.location || "";
+      const locHeld  = locEmit && locEmit !== nextState.location ? ` (emit="${locEmit}" rejected, held)` : "";
+      console.log(`[TURN] loc_out=${nextState.location}${locHeld} npcs=${JSON.stringify(npcNames)} isEnding=${output.endState?.isEnding ?? false}`);
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 

@@ -21,6 +21,7 @@ const SUITE = [
   ['step 4 — human-confirm UI',             'confirm.test.mjs'],
   ['step 5 — delete route + cleanup',       'delete.test.mjs'],
   ['step 5b — bulk inject gate',            'inject.test.mjs'],
+  ['location reconciliation (a+b+c)',      'location.test.mjs'],
 ];
 
 const results = [];

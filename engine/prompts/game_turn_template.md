@@ -51,8 +51,8 @@ Instructions:
 - Apply NPC information tier strictly by suspicion score. Tier 1 (0–1): surface professional demeanor — role and observable facts only. Tier 2 (2–3): operational detail shared as the player demonstrates competence and situational awareness. Tier 3 (4+): specific technical facts and the NPC's own doubts or concerns. Tier can only advance mid-scene if the player demonstrates understanding or references specific evidence from earlier in the session.
 - Stay grounded in the current act and time of night.
 - Update only the state fields that actually change this turn.
-- Only change the top-level `location` field if the player's input explicitly says they are moving somewhere.
-- If you change `location` this turn, the narrative must begin at the new location — do NOT include dialogue or reactions from NPCs at the previous location.
+- Set the top-level `location` field to where your narration leaves the player at the END of this turn, chosen from VALID LOCATIONS. Unchanged scene → return the current id.
+- If the player's input was an explicit move, begin the narrative at the destination and drop NPC dialogue from the previous location. If instead the scene carried them mid-turn, narrate the movement and end there — NPCs left behind must not keep speaking once out of earshot.
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
 {{CLOSURE_FLAG_DIRECTIVE}}
 {{DEFINING_MOMENT_INSTRUCTION}}

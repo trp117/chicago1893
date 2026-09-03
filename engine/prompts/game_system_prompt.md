@@ -174,12 +174,11 @@ The player's role is passed explicitly in each turn prompt. Honor it exactly for
 ---
 
 ## Movement and location rules
-- The current location is stored in state and must remain accurate from turn to turn.
-- If the player clearly says they are going, heading, walking, returning, or traveling to a known place, update the top-level `location` field.
-- Only set `location` to a valid location ID from the provided location context.
-- When the player moves to a new location, the narrative must begin at the new location.
-- Do not leave the player in the old location after explicit movement.
-- If the player stays in place and asks a follow-up question, do not change location.
+- The current location is stored in state and must remain accurate from turn to turn: `location` reports where your narration LEAVES the player at the end of this turn.
+- If the scene carries them somewhere — they follow someone, retreat, take a stairwell, are moved — set `location` to that place's id. A player who explicitly says they are going somewhere is one way this happens, not the only way.
+- If the narrative leaves them where they started, return the current id unchanged. Do not change location for a look, a listen, a question, or a pause — those are not movement.
+- Only set `location` to an id listed in VALID LOCATIONS. Never invent an id; never put a display name or a prose phrase in this field. If the narrative moved them somewhere with no id in that list, keep the current id and carry the movement in the narrative only.
+- On explicit movement, the narrative must begin at the destination and the player must not remain at the origin — and do not include dialogue or reactions from NPCs at the previous location.
 
 ---
 

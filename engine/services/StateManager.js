@@ -115,7 +115,7 @@ export function recordDefiningDecision(state, scenario, { definingChoiceId, play
   return chosen.id;
 }
 
-export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '') {
+export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '', locations = []) {
   const next  = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
 
@@ -137,10 +137,20 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
   next.turnCount   = (currentState.turnCount   || 0) + 1;
   next.turnsAtZero = next.remainingMinutes <= 0 ? (currentState.turnsAtZero || 0) + 1 : 0;
 
+  // Location is model-emitted. Validate it against the scenario's own ids before it becomes
+  // state: an invented slug, a display name, or a prose phrase used to be written straight
+  // through, and every later turn then composed its prose and choices against a location that
+  // does not exist. Reject and hold position — same shape as the clue guard below. Skipped
+  // when no roster is passed, so a caller without `locations` behaves exactly as before.
   if (typeof modelOutput.location === 'string' && modelOutput.location) {
-    next.location = modelOutput.location;
-    if (!next.visitedLocations.includes(modelOutput.location)) {
-      next.visitedLocations.push(modelOutput.location);
+    const known = (locations || []).length === 0 || locations.some(l => l.id === modelOutput.location);
+    if (!known) {
+      console.warn(`[LOCATION] Rejected "${modelOutput.location}" — not a location in ${scenario?.id ?? 'this scenario'}; holding at ${next.location}`);
+    } else {
+      next.location = modelOutput.location;
+      if (!next.visitedLocations.includes(modelOutput.location)) {
+        next.visitedLocations.push(modelOutput.location);
+      }
     }
   }
 
