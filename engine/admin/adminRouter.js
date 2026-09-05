@@ -183,6 +183,69 @@ function hasRealDefiningMoment(block) {
     && Array.isArray(block.options) && block.options.length > 0);
 }
 
+// Whether REPLACING this stored block destroys work nothing else carries. Server-side twin of
+// definingMomentAtRisk in index.html; both must agree or the editor will offer a button the
+// API then refuses. Hand-authored blocks are answer keys; a REVIEWED generated block is
+// reviewed prose. Neither is in any version snapshot (scenario_versions carry the `scenario`
+// object only — no playerRoles, no defining_moment) and role JSON is gitignored as
+// Supabase-owned, so there is no git history either. "Replace" means "gone".
+function definingMomentAtRisk(block) {
+  if (!hasRealDefiningMoment(block)) return false;
+  return block.generated !== true || block.reviewed === true || block.corrected_at != null;
+}
+
+// Append a block that is ABOUT TO BE DESTROYED to the recovery file, before the overwrite.
+// This is the durable half of the protection, and the half that would have saved Alfred
+// Baldwin's reviewed block on 2026-09-05: a guard only lowers the odds of an accident, this
+// makes even a deliberate REPLACE reversible.
+//
+// The target is plain markdown, is TRACKED IN GIT (unlike the role JSON beside it, which
+// .gitignore treats as Supabase-owned), and nothing reads it at runtime — so an append can
+// neither corrupt play nor be undone by restoreFromSupabase at the next boot. That is what
+// makes it the cheapest durable backup: one append, no schema change, no new table, and it
+// reaches GitHub with the next commit. Putting playerRoles into scenario_versions instead
+// would carry blocks only for roles whose SCENARIO happened to be versioned, on the
+// version-controller's cadence rather than the destroying action's.
+//
+// BEST-EFFORT BY DESIGN: a failed append is logged loudly and does NOT abort the
+// regeneration. The reviewer has already typed REPLACE; refusing the write they asked for
+// because a docs file was read-only would be the wrong trade. The log line is the record.
+function backupDefiningMomentBlock(role, block, reason) {
+  const file = join(_dir, '../data/scenarios/player_roles/_defining_moment_blocks.md');
+  try {
+    const state = block.generated !== true ? 'hand-authored'
+                : block.reviewed === true  ? 'generated, reviewed'
+                :                            'generated, unreviewed';
+    const entry = [
+      '',
+      '---',
+      '',
+      `## ${role.name || role.id} — auto-backup before ${reason}`,
+      '',
+      `- role id: \`${role.id}\``,
+      `- scenario: \`${role.scenarioId ?? 'unknown'}\``,
+      `- moment id: \`${block.principal_transition?.moment ?? block.id}\``,
+      `- state when replaced: ${state}`,
+      `- replaced at: ${new Date().toISOString()}`,
+      '',
+      `Written automatically by the ${reason} route. This block is no longer on the role, so`,
+      'it cannot be regenerated from stored data — restore it with the snippet under "How to',
+      'restore a block" above.',
+      '',
+      '```json',
+      JSON.stringify(block, null, 2),
+      '```',
+      '',
+    ].join('\n');
+    writeFileSync(file, (existsSync(file) ? readFileSync(file, 'utf8') : '') + entry, 'utf8');
+    console.log(`[DEFINING-MOMENT] ${role.id} — outgoing block "${block.id}" (${state}) backed up to _defining_moment_blocks.md`);
+    return true;
+  } catch (err) {
+    console.error(`[DEFINING-MOMENT] ⚠ BACKUP FAILED for ${role.id} ("${block?.id}") — proceeding with overwrite anyway: ${err.message}`);
+    return false;
+  }
+}
+
 // EDITOR-SAVE GUARD for defining_moment — sibling of preserveStoredEndingNotes above,
 // same preserve-if-client-sends-empty shape, same hazard. defining_moment is written
 // onto the role by the generator endpoint and the dedicated PATCH route, NOT by the
@@ -2079,6 +2142,25 @@ export function createAdminRouter(repos, config = {}) {
       });
     }
 
+    // TYPED-TOKEN GUARD, mirroring the delete route below. `overwrite: true` is what a
+    // one-click confirm can send, so it cannot be the whole protection for a block that
+    // carries authored or REVIEWED work — that needs the deliberate act on top of it, and
+    // the server is where it must be enforced: a stale tab, a curl, or a replayed request
+    // never sees the client prompt. The 409 body states the stakes accurately — there is no
+    // version history to fall back on — because the reviewer may only ever read this text.
+    if (definingMomentAtRisk(role.defining_moment) && req.body?.confirm !== 'REPLACE') {
+      const kind = role.defining_moment.generated !== true ? 'HAND-AUTHORED' : 'REVIEWED';
+      return res.status(409).json({
+        error: `"${role.name}" carries a ${kind} defining_moment ("${role.defining_moment.id}"). Defining moments have NO version-history backup — this cannot be recovered. Send { "overwrite": true, "confirm": "REPLACE" } to proceed.`,
+        atRisk: true,
+        existing: {
+          id:        role.defining_moment.id,
+          reviewed:  role.defining_moment.reviewed === true,
+          generated: role.defining_moment.generated === true,
+        },
+      });
+    }
+
     // Entry paragraph — the material the setup must harvest. Same accessor the repair route
     // and validateStoredScenario use.
     const entrySection  = scenario.introduction?.sections?.find(s => s.type === 'entry');
@@ -2123,6 +2205,14 @@ export function createAdminRouter(repos, config = {}) {
         generated: true,
         reviewed:  false,
       };
+
+      // BACK UP WHAT THIS WRITE DESTROYS, immediately before destroying it. Placed here and
+      // not earlier on purpose: the model may decline, or emit a block that fails validation,
+      // and both paths return above without touching the role — backing up before those
+      // would file a copy of a block that was never replaced.
+      if (hasRealDefiningMoment(role.defining_moment)) {
+        backupDefiningMomentBlock(role, role.defining_moment, 'regenerate');
+      }
 
       // Additive write: spread the SERVER-loaded role, add one key.
       const saved = repos.scenarios.savePlayerRole({ ...role, defining_moment });
@@ -2315,6 +2405,11 @@ export function createAdminRouter(repos, config = {}) {
         existing: { id: role.defining_moment.id, reviewed: role.defining_moment.reviewed === true },
       });
     }
+
+    // Same backup the regenerate route takes, for the same reason: this is the other path
+    // that destroys a block, and the typed DELETE above only lowers the odds of doing it by
+    // accident — it does not make the block recoverable afterwards.
+    backupDefiningMomentBlock(role, role.defining_moment, 'delete');
 
     const removed = role.defining_moment.id;
     const { defining_moment, ...rest } = role;

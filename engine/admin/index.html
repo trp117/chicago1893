@@ -1936,6 +1936,25 @@ function definingMomentState(dm) {
   return dm.reviewed === true ? 'reviewed' : 'pending';
 }
 
+// Whether regenerating this block DESTROYS work that nothing else carries. The
+// defining-moment sibling of regenAtRisk (which covers technical_facts / epilogue), and it
+// exists because those two were guarded and this one was not: a hand-authored block is an
+// answer key, and a REVIEWED generated block is reviewed prose, and BOTH are gone the moment
+// they are replaced. Nothing carries a copy — scenario_versions snapshot the `scenario`
+// object only (no playerRoles, no defining_moment), and role JSON is gitignored as
+// Supabase-owned, so there is no git history either.
+//
+// This is the gap that lost Alfred Baldwin's reviewed block on 2026-09-05: `generated: true`
+// meant state was 'reviewed', not 'authored', and the old handler gave 'reviewed' a
+// one-click confirm. reviewed must escalate exactly as authored does.
+//
+// corrected_at is read for symmetry with regenAtRisk. Nothing writes it onto a defining
+// moment today; reading it costs nothing the day something does.
+function definingMomentAtRisk(dm) {
+  if (definingMomentState(dm) === 'none') return false;
+  return dm.generated !== true || dm.reviewed === true || dm.corrected_at != null;
+}
+
 // ── Archetype gating table (client copy) ─────────────────────────────────────
 // The SAME table the server enforces (ARCHETYPE_ARTIFACTS / ARCHETYPE_REFUSALS in
 // adminRouter.js), duplicated here for the same reason roleIsAnchored below is: the editor
@@ -2436,11 +2455,17 @@ function renderDefiningMomentSection(r, i, data) {
   }[state];
   const badge = `<span class="dm-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${BADGE[1]};color:${BADGE[2]}">${BADGE[0]}</span>`;
 
-  // Generate button copy escalates with what is at risk.
+  // Generate button copy and colour escalate with what is at risk, so the danger is visible
+  // before the click and not only in the confirmation. A REVIEWED block escalates exactly as
+  // a hand-authored one does — see definingMomentAtRisk. Previously 'reviewed' fell through
+  // to neutral copy on a blue button, which is how a reviewed block came to be overwritten
+  // through a one-click confirm.
+  const dmAtRisk = definingMomentAtRisk(dm);
   const genLabel = state === 'none'     ? '✦ Generate Defining Moment'
                  : state === 'authored' ? '↻ Regenerate — REPLACES hand-authored block'
+                 : dmAtRisk             ? '↻ Regenerate — REPLACES reviewed block'
                  :                        '↻ Regenerate Defining Moment';
-  const genClass = state === 'authored' ? 'btn-danger' : 'btn-primary';
+  const genClass = dmAtRisk ? 'btn-danger' : 'btn-primary';
 
   const declineHtml = decline ? `
     <div class="dm-decline-panel" style="margin:12px 0;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-left:4px solid #94a3b8;border-radius:6px">
@@ -2630,18 +2655,28 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     const forkGate = archetypeAllows(role, 'fork');
     if (!forkGate.allowed) { toast(forkGate.reason, 'error'); return; }
 
-    // Escalating confirmation. A hand-authored block is an answer key with no role-level
-    // version history behind it (the server refuses the overwrite too, with a 409); typing
-    // REPLACE is the deliberate act that gets past it.
-    if (state === 'authored') {
+    // Escalating confirmation. Any block carrying authored or reviewed work is destroyed
+    // outright by regeneration, so it takes the typed token — hand-authored and reviewed
+    // alike (definingMomentAtRisk). The server refuses the same call with a 409 unless the
+    // token rides along, so a stale tab cannot get past this by being old.
+    //
+    // NOT confirmDestructiveRegen: that helper's copy promises the block is "RECOVERABLE
+    // from version history", which is true for technical_facts and epilogue and FALSE here.
+    // A guard that misstates the stakes is worse than no guard, because it is believed.
+    const atRisk = definingMomentAtRisk(role?.defining_moment);
+    if (atRisk) {
+      const kind = state === 'authored' ? 'HAND-AUTHORED' : 'REVIEWED';
       const typed = prompt(
-        `"${role.name}" carries a HAND-AUTHORED defining moment ("${role.defining_moment.id}").\n\n` +
-        `Regenerating DISCARDS it and replaces it with AI-generated prose. There is no role-level ` +
-        `version history — the only backup is engine/data/scenarios/player_roles/_defining_moment_blocks.md.\n\n` +
-        `Type REPLACE to proceed, or Cancel.`);
-      if (typed !== 'REPLACE') { toast('Regenerate cancelled — hand-authored block kept.', 'success'); return; }
-    } else if (state === 'pending' || state === 'reviewed') {
-      if (!confirm('This will replace the existing defining moment and reset its reviewed status. Continue?')) return;
+        `"${role.name}" carries a ${kind} defining moment ("${role.defining_moment.id}").\n\n` +
+        `Defining moments have NO version-history backup — this cannot be recovered. ` +
+        `Regenerating DISCARDS the setup and all three options and replaces them with fresh ` +
+        `AI prose.\n\n` +
+        `A copy of the outgoing block is appended to _defining_moment_blocks.md before the ` +
+        `overwrite, so it can be restored by hand from there.\n\n` +
+        `Type REPLACE to overwrite permanently, or Cancel.`);
+      if (typed !== 'REPLACE') { toast('Regenerate cancelled — existing block kept.', 'success'); return; }
+    } else if (state === 'pending') {
+      if (!confirm('This will replace the existing (unreviewed) defining moment. Continue?')) return;
     } else {
       if (!confirm('Generate a defining moment for this role? This calls the AI API and may take up to 30 seconds.')) return;
     }
@@ -2653,7 +2688,9 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
       const result = await apiPost(
         `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/generate-defining-moment`,
         // The server refuses an overwrite without this; the confirms above are what earn it.
-        { overwrite: state !== 'none' });
+        // `confirm` is the second token, required by the server whenever the stored block
+        // carries authored or reviewed work — the typed REPLACE above is what earns THAT.
+        { overwrite: state !== 'none', ...(atRisk ? { confirm: 'REPLACE' } : {}) });
 
       if (result.declined) {
         // First-class outcome, not an error. Nothing was written server-side and nothing
@@ -4839,7 +4876,14 @@ function renderPreview(data, autoSaved = false) {
 
     formEl.addEventListener('click', async e => {
       if (!e.target.closest('#btn-img-delete')) return;
-      if (!confirm('Delete all images for this scenario? This cannot be undone.')) return;
+      // Irreversible and immediate — the binaries leave the storage bucket on this call, and
+      // no version snapshot carries image data. A bare confirm() was the whole protection.
+      const typed = prompt(
+        'Delete ALL images for this scenario?\n\n' +
+        'The files are removed from storage immediately. There is no version-history copy of ' +
+        'the image binaries — this cannot be undone.\n\n' +
+        'Type DELETE to proceed, or Cancel.');
+      if (typed !== 'DELETE') { toast('Deletion cancelled — images kept.', 'success'); return; }
       setArtStatus('Deleting…');
       try {
         const resp = await fetch(`${API}/scenarios/${encodeURIComponent(artScenarioId)}/image`, { method: 'DELETE' });
@@ -5448,8 +5492,21 @@ function renderPreview(data, autoSaved = false) {
   const genBeatsBtn = document.getElementById('gen-beats-btn');
   if (genBeatsBtn) {
     genBeatsBtn.addEventListener('click', async () => {
-      const existing = [...formEl.querySelectorAll('.beat-desc')].some(el => el.value.trim());
-      if (existing && !confirm('This will replace existing beats. Continue?')) return;
+      // An authored beat sheet is discarded wholesale by this button, and story arcs are not
+      // carried by scenario_versions any more than defining moments are — so it takes the
+      // typed token, same as those. Milder than the defining-moment case in one respect and
+      // the wording says so: this replaces the FORM fields only, so a reviewer who has not
+      // saved can still reload the page to get the stored beats back.
+      const existingBeats = [...formEl.querySelectorAll('.beat-desc')].map(el => el.value.trim()).filter(Boolean);
+      if (existingBeats.length) {
+        const typed = prompt(
+          `This scenario already has ${existingBeats.length} authored beat${existingBeats.length === 1 ? '' : 's'}.\n\n` +
+          `Generating REPLACES all of them with fresh AI output. Beats are not carried by ` +
+          `version snapshots — once saved, the current ones cannot be recovered.\n\n` +
+          `(Nothing is written until you Save; reloading without saving restores them.)\n\n` +
+          `Type REPLACE to proceed, or Cancel.`);
+        if (typed !== 'REPLACE') { toast('Generate cancelled — existing beats kept.', 'success'); return; }
+      }
 
       const title    = formEl.querySelector('[data-path="scenario.title"]')?.value.trim()   || '';
       const premise  = formEl.querySelector('[data-path="scenario.premise"]')?.value.trim() || '';
