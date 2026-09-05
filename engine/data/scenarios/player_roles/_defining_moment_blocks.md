@@ -112,3 +112,46 @@ mirrors to disk at boot. Both must carry the block.
 
 _Regenerate this file from the stored roles rather than editing it by hand, so it can never
 drift from what is actually saved._
+
+---
+
+## Alfred Baldwin — Lookout, Room 723 — auto-backup before regenerate
+
+- role id: `role_baldwin`
+- scenario: `watergate_1972_part1_breach`
+- moment id: `baldwin_defining_choice`
+- state when replaced: generated, reviewed
+- replaced at: 2026-09-05T17:08:16.098Z
+
+Written automatically by the regenerate route. This block is no longer on the role, so
+it cannot be regenerated from stored data — restore it with the snippet under "How to
+restore a block" above.
+
+```json
+{
+  "id": "baldwin_defining_choice",
+  "setup": "The binoculars are in your hand and the three men are at the entrance and the car is still sitting where they left it — no light bar, no markings, nothing about it that names itself as anything other than a car. The cold that has been in the layer beneath your skin for eight hours is still there. The television is still running at the volume you set over weeks — quiet enough for the wall, strong enough for the radio — and it is doing neither of those things for you now. The walkie-talkie is in your other hand. McCord's volume is down for noise discipline, and your words have to be worth the air they travel on. An early warning is the only kind that does anything, and early is already seconds behind you, and the three men are inside.",
+  "options": [
+    {
+      "id": "transmit_observed_facts",
+      "text": "You call it as you see it — three men, casual clothes, entering — and McCord decides."
+    },
+    {
+      "id": "transmit_police_call",
+      "text": "You call them police and give McCord the one word that means move now."
+    },
+    {
+      "id": "transmit_uncertainty",
+      "text": "You tell McCord you have three unknowns and the read is his to make."
+    }
+  ],
+  "reviewed": true,
+  "generated": true,
+  "time_advance": 0,
+  "at_elapsed_fraction": 0.6,
+  "principal_transition": {
+    "type": "decision_made",
+    "moment": "baldwin_defining_choice"
+  }
+}
+```
