@@ -1,10 +1,87 @@
 import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment } from './PromptComposer.js';
 
+// When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
+//
+// 0.0 — the wall is up from the first turn — and the alternative was min(fork_fraction, 0.70).
+// That alternative was rejected on evidence, not taste: McCord's fork fires at 0.6, so
+// min(0.6, 0.70) = 0.6 would still leave the first eighteen minutes of a thirty-minute
+// session wide open, and the bug this exists to fix is a session in which the prose walked
+// him into the stairwell at minute six. A default that cannot close the reported bug is not
+// a default worth having.
+//
+// The deeper reason is what the field MEANS. anchored_location is opt-in by presence: an
+// author who writes one has asserted "the record fixes this person to this place." Absent a
+// stated time, the honest reading of that assertion is the whole session, not its last
+// third. A role that genuinely moved before its fixed event is the case that needs authoring
+// — and it gets `enforce_from`, which is exactly what that parameter is for.
+//
+// The two failure directions are not symmetrical, and that settles it. Defaulting EARLY can
+// over-constrain a role that should have roamed: visible on the first playthrough, and
+// corrected by setting one number. Defaulting LATE reproduces the original bug: invisible
+// until an epilogue describes an arrest in a room the prose never staged it in. Prefer the
+// failure you can see.
+export const ANCHOR_ENFORCE_FROM_DEFAULT = 0.0;
+
+function normalizeEnforceFrom(raw, roleId) {
+  const v = raw?.enforce_from;
+  // Absent is the common case and is not a warning. The admin form posts every field as a
+  // trimmed STRING, so '0.6' has to coerce as readily as 0.6 does.
+  if (v === undefined || v === null || v === '') return ANCHOR_ENFORCE_FROM_DEFAULT;
+  const n = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(n) || n < 0 || n > 1) {
+    console.warn(`[ANCHOR] role ${roleId} has enforce_from ${JSON.stringify(v)} outside 0.0–1.0 — using default ${ANCHOR_ENFORCE_FROM_DEFAULT}.`);
+    return ANCHOR_ENFORCE_FROM_DEFAULT;
+  }
+  return n;
+}
+
+// The role's ANCHORED LOCATION, normalized. OPT-IN BY PRESENCE: a role that authors no
+// `anchored_location` returns null, and every downstream reader then compiles exactly what
+// it compiled before. Deliberately NOT derived — not from `fate_mode`, and not from
+// `startLocationId` even though all 80 stored roles carry one. 8 of the 9 fork-carrying
+// roles declare fate_mode 'anchored', Frank Wills among them, and the record has Wills
+// moving between the stairwell, the garage-level door and the security desk all night.
+// Binding him to the room he happened to start in would contradict the record this exists
+// to protect. The start location is the right DEFAULT to OFFER an author in the editor; it
+// is the wrong thing to INFER.
+//
+// `enforce_from` is the per-role wall timing, the sibling of defining_moment's
+// `at_elapsed_fraction` and read the same way: a fraction of sessionTargetMinutes. It is
+// what lets a role who genuinely MOVED before their fixed event stay mobile until they
+// didn't — set it to the fraction at which the record has them arrive. See
+// ANCHOR_ENFORCE_FROM_DEFAULT above for why an unstated one means "from the first turn".
+//
+// VALIDATED against the scenario's own locations. An id no location carries is treated as
+// absent and logged, because the roster-narrowing reader downstream would otherwise hand
+// the model a destination list containing an id that does not resolve — a worse failure
+// than the one this fixes.
+//
+// `reviewed` rides along rather than gating, the same convention scenario-level
+// anchored_outcome uses (gameRouter.js buildEpilogueSummary): framing may run on an
+// unconfirmed anchor, since the cost of being wrong is one misplaced scene. Any future
+// ENFORCEMENT gate must require reviewed === true.
+export function resolveAnchoredLocation(role, locations = []) {
+  const raw = role?.anchored_location;
+  const id  = typeof raw?.location_id === 'string' ? raw.location_id.trim() : '';
+  if (!id) return null;
+  if (Array.isArray(locations) && locations.length && !locations.some(l => l && l.id === id)) {
+    console.warn(`[ANCHOR] role ${role?.id} names anchored_location "${id}", which is not a location in this scenario — ignoring.`);
+    return null;
+  }
+  return {
+    location_id:  id,
+    enforce_from: normalizeEnforceFrom(raw, role?.id),
+    reviewed:     raw.reviewed === true,
+    rationale:    typeof raw.rationale === 'string' ? raw.rationale.trim() : '',
+  };
+}
+
 export function buildInitialState(scenario, role, locations) {
   const scales      = scenario.systems?.scales || {};
   const startLoc    = role.startLocationId || role.startLocation || (locations[0]?.id ?? 'start');
   const startLocData = locations.find(l => l.id === startLoc);
   const linkedChars = startLocData?.linkedCharacterIds || startLocData?.linkedNPCs || [];
+  const anchoredLocation = resolveAnchoredLocation(role, locations);
 
   return {
     scenarioId:              scenario.id,
@@ -69,6 +146,17 @@ export function buildInitialState(scenario, role, locations) {
     // decision recorded" alone cannot express that. Read by definingMomentDue; set by
     // whatever presents the fork (Step 5/6). Nothing sets it yet.
     definingMomentPresented: false,
+    // Per-role ANCHORED LOCATION, resolved ONCE here for the same reason and by the same
+    // mechanism as effectiveClosure and effectiveDefiningMoment above: the role IS in scope
+    // here and is NOT in scope downstream (composeTurnPrompt takes { scenario, characters,
+    // locations, clues } and never a role). Unlike those two there is NO scenario-level
+    // fallback — an anchor is a fact about one person's documented night, not a property a
+    // scenario can hold for every seat in it. null for every role without one.
+    effectiveAnchoredLocation:       anchoredLocation,
+    // True provenance, in the mould of the two Source fields above. There is only one
+    // supplier today, but the field is written so a later scenario-level or generated
+    // anchor is distinguishable from a hand-authored one without changing any reader.
+    effectiveAnchoredLocationSource: anchoredLocation ? 'role' : 'none',
   };
 }
 

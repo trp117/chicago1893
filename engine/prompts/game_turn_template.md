@@ -55,6 +55,7 @@ Instructions:
 - If the player's input was an explicit move, begin the narrative at the destination and drop NPC dialogue from the previous location. If instead the scene carried them mid-turn, narrate the movement and end there — NPCs left behind must not keep speaking once out of earshot.
 - If the player is stuck, inject a pressure event from the scenario's pressureEvents list.
 {{CLOSURE_FLAG_DIRECTIVE}}
+{{ANCHORED_OUTCOME_DIRECTIVE}}
 {{DEFINING_MOMENT_INSTRUCTION}}
 {{CLOSING_INSTRUCTION}}
 - Return valid JSON only, per the output contract.

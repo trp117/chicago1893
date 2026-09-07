@@ -510,6 +510,27 @@ const ENTITIES = {
         { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
         { key: 'opening.choices',   label: 'Opening Choices',   type: 'list',     help: 'The three initial actions offered to the player (aim for exactly 3).' },
       ]},
+      // ANCHORED LOCATION — hand-authorable, and clearable. The select carries an empty
+      // "Choose…" option, and preserveStoredAnchoredLocation honors a cleared value from a
+      // current tab while restoring the field for a stale one, so choosing nothing here
+      // genuinely unbinds the role rather than being silently put back.
+      //
+      // The right DEFAULT for a history-fixed role is its Starting Location above — the nine
+      // stored fork blocks are each authored in their role's start location — but it is
+      // offered, never pre-filled: leaving it blank is what keeps mobile roles (Frank Wills
+      // on his rounds, Alfred Baldwin across the street) free to move, and a default that
+      // filled itself in would bind them by accident.
+      { title: 'Anchored Location', fields: [
+        { key: 'anchored_location.location_id', label: 'Anchored Location', type: 'select', source: 'locations',
+          help: 'Only for roles whose documented outcome happened in ONE place (McCord arrested in Suite 600). In the last stretch of a session this becomes the only location the role can be in. Leave blank for roles who moved — a blank here is what keeps them free.' },
+        { key: 'anchored_location.enforce_from', label: 'Wall opens at (fraction)', type: 'number',
+          placeholder: '0.0',
+          help: 'When the location wall opens, as a fraction of session length — the same scale as the defining moment's at_elapsed_fraction. Blank means 0.0: fixed in place from the first turn, which is right for a role who never left. Set a later fraction (0.6) only for a role the record has MOVING before their fixed event.' },
+        { key: 'anchored_location.reviewed', label: 'Verified', type: 'checkbox',
+          checkboxLabel: 'Checked against the historical record' },
+        { key: 'anchored_location.rationale', label: 'Rationale', type: 'textarea',
+          help: 'What in the record puts this role in this place. Not shown to the player.' },
+      ]},
       { title: 'Alternate Identities', type: 'aliases' },
     ],
   },

@@ -709,12 +709,61 @@ function buildPlayerRoleSection(state, characters = []) {
 // and every later turn composed its prose and choices against a room they had left. The
 // roster matters as much as the wording: LOCATION_JSON carries only the CURRENT location, so
 // "use a valid id" was previously a choice between one id and itself.
-function buildLocationConstraint(locationId, locations = []) {
-  const roster = (locations || []).map(l => `  ${l.id} — ${l.name}`).join('\n');
+//
+// ROSTER NARROWING (the anchored half). For a role that authors an anchored_location, the
+// roster is the strongest lever in this whole block: the model is told these ids are the
+// valid values of `location`, so removing an id is materially different from asking it not
+// to go there. An anchored role past its enforce_from sees a roster of its anchor and
+// nothing else, which turns "please stay in Suite 600" into "the stairwell is not a
+// destination that exists for you". No adjacency data is needed to do it — only the one
+// authored id.
+//
+// TIMED PER ROLE, not globally. This used to open at the directive's ANCHORED_OUTCOME_FRACTION
+// (0.70), which left a hole big enough to drive the original bug through: McCord's fork fires
+// at 0.6 and the reported session had the prose walk him into the stairwell at minute six of
+// thirty, so a wall that went up at minute twenty-one arrived long after the damage. The
+// opening time is now the role's own `enforce_from`, the sibling of defining_moment's
+// at_elapsed_fraction, defaulting to 0.0 — see ANCHOR_ENFORCE_FROM_DEFAULT in StateManager.
+// A role who genuinely moved before their fixed event authors a later fraction and stays
+// mobile until it.
+//
+// The CURRENT location is always kept even when it is not the anchor. Without that, a
+// session already narrated off-anchor before the wall opens would be sitting at an id the
+// roster calls invalid while the line above tells it to return that same id when nobody
+// moves — a contradiction the model resolves by moving somewhere, which is the opposite of
+// the intent. Keeping it means the roster collapses to exactly one id once the player is
+// home, and offers exactly one way back while they are not.
+//
+// Unanchored roles are untouched: same full roster, same wording, byte-identical prompt.
+// enforce_from is meaningless for them and is never read — Wills has no anchor, so no
+// timing on earth narrows him.
+function buildLocationConstraint(state, locations = [], scenario = null) {
+  const locationId = state?.location;
+  const anchor     = state?.effectiveAnchoredLocation || null;
+  const anchorId   = typeof anchor?.location_id === 'string' ? anchor.location_id : '';
+  const total      = scenario?.sessionTargetMinutes || 15;
+  const elapsed    = state?.elapsedMinutes ?? 0;
+  const fraction   = total > 0 ? elapsed / total : 0;
+  const enforceFrom = typeof anchor?.enforce_from === 'number' ? anchor.enforce_from : 0;
+  const anchored = !!anchorId
+    && fraction >= enforceFrom
+    && (locations || []).some(l => l && l.id === anchorId);
+
+  const offered = anchored
+    ? (locations || []).filter(l => l && (l.id === anchorId || l.id === locationId))
+    : (locations || []);
+  const roster     = offered.map(l => `  ${l.id} — ${l.name}`).join('\n');
+  const anchorName = anchored
+    ? ((locations || []).find(l => l && l.id === anchorId)?.name || anchorId)
+    : '';
+
   return [
     `Location at the START of this turn: ${locationId}`,
     'Begin the narrative here — do not silently relocate the player before the first line.',
     'If your narration moves them during the turn, set the top-level `location` field to where they END it. If it does not, return this same id.',
+    anchored
+      ? `THIS ROLE'S SCENE IS FIXED AT ${anchorName} (${anchorId}). The rest of the building is not a place this session goes; the locations below are the only ones available to it.`
+      : '',
     roster ? `VALID LOCATIONS — \`location\` must be exactly one of these ids:\n${roster}` : '',
   ].filter(Boolean).join('\n');
 }
@@ -816,6 +865,107 @@ console.log(`[DEFINING] moment ${DEFINING_MOMENT_ENABLED ? 'ENABLED' : 'disabled
 // target: 0.25→3.75min, 0.40→6min, 0.55→8.25min. Guards a barely-started session
 // against an early or fluky arrival at a closure location.
 const CLOSURE_MIN_ELAPSED_FRACTION = 0.40;
+
+// THE ANCHORED-LOCATION WALL, in prose. Split out of buildAnchoredOutcomeDirective below and
+// gated on the ROLE'S OWN enforce_from — the same instant the roster narrows in
+// buildLocationConstraint — because the two halves being on different clocks is a defect the
+// behavioural test caught. With the roster narrowing moved to enforce_from (0.0 for a
+// stationary role) and these bullets left at ANCHORED_OUTCOME_FRACTION (0.70), a McCord
+// session at minute six handed the model a one-id roster and NO guidance about how to honour
+// it. What came back was a flat contradiction of the player's move — "The stairwell door is
+// not here. The suite opens onto the sixth-floor corridor, not a stairwell" — which is true
+// about the building and still the wrong answer: it argues with the player's picture of the
+// place instead of putting something in their way. Enforcement and narration now open
+// together, always.
+//
+// Independent of historical_record, unlike the outcome directive it used to live inside. The
+// anchor is a fact about WHERE this character was, and it can be honoured whether or not a
+// documented fate is authored. A role with an anchor and no record still gets a coherent
+// scene; it simply gets no outcome framing.
+//
+// HONEST CEILING, unchanged: prompt-enforced, not engine-enforced. The narrowed roster is the
+// mechanism; this is what stops the mechanism reading as a refusal.
+export function buildAnchoredLocationDirective(state, scenario, locations = []) {
+  const anchor   = state?.effectiveAnchoredLocation || null;
+  const anchorId = typeof anchor?.location_id === 'string' ? anchor.location_id : '';
+  if (!anchorId) return '';
+
+  const total       = scenario?.sessionTargetMinutes || 15;
+  const elapsed     = state?.elapsedMinutes ?? 0;
+  const fraction    = total > 0 ? elapsed / total : 0;
+  const enforceFrom = typeof anchor.enforce_from === 'number' ? anchor.enforce_from : 0;
+  if (fraction < enforceFrom) return '';
+  if (!(locations || []).some(l => l && l.id === anchorId)) return '';
+
+  const anchorName = (locations || []).find(l => l && l.id === anchorId)?.name || anchorId;
+  const name       = state?.playerRoleName || 'This character';
+
+  return [
+    `⚑ THE SCENE IS ANCHORED — ${anchorName}. The record fixes ${name} to this place for what happens tonight, and the session does not leave it. The valid-location roster above already reflects this; these lines are how to HONOUR it in the prose.`,
+    '- THE ATTEMPT IS ALWAYS REAL. If the player moves to leave, they move. Write them crossing the room, taking hold of the door, going for the stairs — in full, with their competence intact. Never skip the attempt, never have them decline it on their own, and never write them as having thought better of it.',
+    '- RESIST IN THE FICTION, NEVER IN THE GEOGRAPHY. Do not tell the player the exit is not there, that the door does not exist, that they have misremembered the building, or that this room does not open the way they think. Never correct their picture of the place and never argue with the premise of their move — that is the game refusing them, and it reads as one. The exits are exactly where they believe they are.',
+    `- WHAT STOPS THEM IS ON THE OTHER SIDE, OR IN THEIR HANDS. The obstacle is concrete, present, and arrives through the senses: voices coming up the stairwell, a torch beam swinging across the landing below, a door that is already open when it should be shut, someone standing in the frame, a radio going off in the corridor — or the thing they cannot walk out without, still unfinished on the desk behind them. Choose what this session has actually built toward, and make it physical.`,
+    `- THEY END THE TURN HERE. However the attempt goes, the turn closes with ${name} still at ${anchorName}, and \`location\` is ${anchorId}. Being turned back is not a failed turn: it is the night closing, and it should read like pressure arriving, never like a wall the author put up.`,
+  ].join('\n');
+}
+
+// When the anchored-outcome directive starts being injected, as a fraction of the session
+// target. 0.70 sits inside 'late' (getArcPosition: late < 0.80) and ABOVE the defining
+// moment's 0.6, so the fork is put to the player first and the inevitability pressure begins
+// after it rather than on top of it. Below this, nothing is injected and a turn is
+// byte-identical to what it was before.
+const ANCHORED_OUTCOME_FRACTION = 0.70;
+
+// Per-turn reinforcement that the PLAYER CHARACTER's documented outcome is arriving, injected
+// only over the last stretch of an anchored session. This exists because the standing
+// real-figure rule in the system prompt binds CONDUCT ("what may be depicted them doing") and
+// says nothing about OUTCOME, and because a static rule stated once at the top of a long
+// prompt is not what the model is weighing on turn fourteen. A McCord session ended with the
+// escape SUCCEEDING — the danger passing, the player hidden and clear — which the epilogue
+// then contradicted by reporting his arrest.
+//
+// GENERAL BY CONSTRUCTION — no per-character authoring. Two things are read, both already in
+// the runtime bundle:
+//   character_type === 'real'   on the player's own character record (the same marker
+//                               buildPlayerRoleSection keys the conduct-bounds block on)
+//   scenario.epilogue.character_fates[…].historical_record   for that same character id
+// Returns '' the moment either is missing, so a fictional protagonist, a scenario with no
+// epilogue data, or a role with no fate entry all behave exactly as before.
+//
+// IT BINDS THE OUTCOME, NOT THE ESCAPE. The distinction is load-bearing and it is why this
+// does not say "escape attempts must fail": in this very scenario McCord's documented outcome
+// is arrest and Baldwin's is that he was NOT among those arrested — he got clear, and that IS
+// the record. A blanket escape-fails rule would falsify Baldwin as surely as the missing rule
+// falsified McCord. What is enforced is that the scene moves toward the DOCUMENTED outcome and
+// that attempts to reach a different one visibly fail, whichever direction that runs.
+//
+// HONEST CEILING: this is prompt-enforced, not engine-enforced. It reduces the dissonance; it
+// cannot guarantee its absence. Nothing downstream reads or verifies the result.
+export function buildAnchoredOutcomeDirective(state, scenario, characters = []) {
+  const total   = scenario?.sessionTargetMinutes || 15;
+  const elapsed = state?.elapsedMinutes ?? 0;
+  if (elapsed < total * ANCHORED_OUTCOME_FRACTION) return '';
+
+  const playerChar = (characters || []).find(c => c && c.id === state?.playerCharacterId) || null;
+  if (playerChar?.character_type !== 'real') return '';
+
+  const fate = (scenario?.epilogue?.character_fates || [])
+    .find(f => f && f.character_id === state.playerCharacterId) || null;
+  const record = typeof fate?.historical_record === 'string' ? fate.historical_record.trim() : '';
+  if (!record) return '';
+
+  const name = playerChar.name || state?.playerRoleName || 'This character';
+  return [
+    `⚑ DOCUMENTED OUTCOME — CLOSING IN. ${name} is a real person whose outcome on this night is on the record. The session is near its end, and that outcome is no longer something the player can steer away from. It is arriving.`,
+    'THE RECORD:',
+    record,
+    'How to hold this, every turn from here:',
+    '- The documented outcome ARRIVES. Whatever the player does with the remaining time, the scene moves toward what the record says happened, and the pressure of its approach is present in the prose — what is audible, what is visible, how little time is left.',
+    `- An attempt to reach a DIFFERENT outcome — to escape, evade, hide, undo, or talk the moment away — may be made, and must VISIBLY FAIL in the fiction. Show the attempt, then show the concrete thing that defeats it: the sound that does not stop, the door that opens anyway, the person already standing there. Never narrate the danger passing, the player getting clear, or the threat turning out to be nothing — unless the record above says that is what happened to ${name}.`,
+    '- Do NOT resolve the session into safety. It ends with the documented outcome bearing down or arriving, never with it averted.',
+    `- This binds the OUTCOME ONLY, never the player's conduct on the way to it. What ${name} protects, what they say, what they refuse, and who they turn out to be in the last minutes is entirely the player's — that is the whole of what is still open, and it is where the drama is.`,
+  ].join('\n');
+}
 
 // The closure block in force for the playing role: the role's own block if it set
 // one (captured onto state.effectiveClosure by buildInitialState at session start),
@@ -1126,7 +1276,17 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // with it for symmetry — the model is driven by buildClosureFlagDirective, never by
   // this JSON, and every closure evaluation reads the real state object, not the prompt.
   // Both remain on the live state; only the copy handed to the model loses them.
-  const { remainingMinutes, effectiveClosure, effectiveDefiningMoment, ...stateRest } = state;
+  // effectiveAnchoredLocation and its Source join them for the same reason: the model is
+  // driven by buildLocationConstraint's roster and the directive's bullets, never by this
+  // JSON, and leaving a raw `{ location_id, reviewed, rationale }` in the state block would
+  // put an authoring note (and the word "reviewed") in front of the narrator. Stripping
+  // them also keeps the promise this change was built on — a role with no anchor composes a
+  // turn byte-identical to the one it composed before.
+  const {
+    remainingMinutes, effectiveClosure, effectiveDefiningMoment,
+    effectiveAnchoredLocation, effectiveAnchoredLocationSource,
+    ...stateRest
+  } = state;
   const promptState = {
     ...stateRest,
     timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes, scenario.sessionStartTime || null),
@@ -1139,7 +1299,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NPC_JSON}}',               JSON.stringify(relevantChars))
     .replace('{{NPC_ROUTES_JSON}}',        JSON.stringify(charRoutes))
     .replace('{{ENDING_SIGNALS_JSON}}',    JSON.stringify(endingSignals))
-    .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state.location, locations))
+    .replace('{{LOCATION_CONSTRAINT}}',    buildLocationConstraint(state, locations, scenario))
     .replace('{{VERIFIED_FACTS}}',          buildVerifiedFactsBlock(state))
     .replace('{{OBJECT_STATE}}',           buildObjectStateBlock(state))
     .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))
@@ -1150,6 +1310,10 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
     .replace('{{CLOSURE_FLAG_DIRECTIVE}}', buildClosureFlagDirective(state, scenario))
+    .replace('{{ANCHORED_OUTCOME_DIRECTIVE}}', [
+      buildAnchoredLocationDirective(state, scenario, locations),
+      buildAnchoredOutcomeDirective(state, scenario, characters),
+    ].filter(Boolean).join('\n\n'))
     .replace('{{DEFINING_MOMENT_INSTRUCTION}}', buildDefiningMomentInstruction(state, scenario))
     .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario))
     .replace('{{PLAYER_INPUT}}',           resolvedInput);

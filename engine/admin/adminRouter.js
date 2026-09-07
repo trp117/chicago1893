@@ -374,14 +374,64 @@ function preserveStoredArchetype(repos, role) {
   return role;
 }
 
-// All three editor-save guards over ONE stored read. preserveStoredEndingNotes,
-// preserveStoredDefiningMoment and preserveStoredArchetype each look the role up for
-// themselves; running them back to back would read it three times. The shim memoizes the
-// single real lookup and hands the same object to all three, so no guard has to change
-// (and each stays independently testable). Lazy on purpose: a client that sends real
-// content for all three returns from every guard before any lookup happens, exactly as
-// before. Every guard mutates `role` in place and returns it, so the composition is
-// order-free.
+// EDITOR-SAVE GUARD for anchored_location — fourth sibling of the three above, same hazard:
+// both editor save paths rebuild the role as a whole object from the form, so a tab loaded
+// before this field existed posts a role with the key ABSENT and the whole-object
+// savePlayerRole drops it. That is the mechanism that erased approved ending_notes and
+// Alfred Baldwin's reviewed fork, and role JSON is gitignored as Supabase-owned with no
+// role-level version history, so "dropped" means gone.
+//
+// KEYED ON `undefined`, like preserveStoredArchetype and deliberately NOT like
+// preserveStoredDefiningMoment. The two guards differ because the two fields differ. A
+// defining_moment is a page of authored prose that must never be removable by omission, so
+// its guard restores anything that does not look like a real block and deletion gets its own
+// confirmed route. An anchored_location is one id: a reviewer who decides a role should roam
+// after all needs to clear it, and a select the editor renders always posts the key. So a
+// CURRENT tab that sends `{ location_id: '' }` is honored as an explicit clear, while a
+// STALE tab that sends no key at all is restored. Both requirements, one rule.
+//
+// The empty husk is then stripped rather than stored. Clearing the select still leaves the
+// reviewed checkbox and the rationale textarea posting alongside it, and writing
+// `{ location_id: '', reviewed: false, rationale: '' }` would persist a shape every reader
+// has to special-case. resolveAnchoredLocation already treats it as absent; this makes the
+// stored file agree with that reading.
+function preserveStoredAnchoredLocation(repos, role) {
+  if (role.anchored_location === undefined) {
+    const stored = repos.scenarios.findPlayerRole(role.id);
+    if (stored && stored.anchored_location !== undefined) role.anchored_location = stored.anchored_location;
+  }
+  const id = role.anchored_location?.location_id;
+  if (role.anchored_location !== undefined && !(typeof id === 'string' && id.trim())) {
+    delete role.anchored_location;
+    return role;
+  }
+  // The form posts every field as a trimmed STRING, so a fraction typed into the editor
+  // arrives as '0.6'. resolveAnchoredLocation coerces on read either way, but storing the
+  // string would leave the role file disagreeing with the fork block beside it, where
+  // at_elapsed_fraction is a real number. Coerce here so what lands on disk is a number, and
+  // drop the key entirely when it is blank or unparseable rather than persisting a value the
+  // reader will only discard and warn about.
+  if (role.anchored_location) {
+    const ef = role.anchored_location.enforce_from;
+    if (ef === undefined || ef === null || ef === '') {
+      delete role.anchored_location.enforce_from;
+    } else {
+      const n = typeof ef === 'number' ? ef : Number(ef);
+      if (Number.isFinite(n) && n >= 0 && n <= 1) role.anchored_location.enforce_from = n;
+      else delete role.anchored_location.enforce_from;
+    }
+  }
+  return role;
+}
+
+// All four editor-save guards over ONE stored read. preserveStoredEndingNotes,
+// preserveStoredDefiningMoment, preserveStoredArchetype and preserveStoredAnchoredLocation
+// each look the role up for themselves; running them back to back would read it four
+// times. The shim memoizes the single real lookup and hands the same object to all four,
+// so no guard has to change (and each stays independently testable). Lazy on purpose: a
+// client that sends real content for all four returns from every guard before any lookup
+// happens, exactly as before. Every guard mutates `role` in place and returns it, so the
+// composition is order-free.
 function preserveStoredRoleBlocks(repos, role) {
   let stored, read = false;
   const shim = {
@@ -395,6 +445,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredEndingNotes(shim, role);
   preserveStoredDefiningMoment(shim, role);
   preserveStoredArchetype(shim, role);
+  preserveStoredAnchoredLocation(shim, role);
   return role;
 }
 
