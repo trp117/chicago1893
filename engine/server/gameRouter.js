@@ -817,23 +817,131 @@ Do not open with the historical context. Open inside the character's body. Let t
           messages: [{ role: 'user', content: prompt }]
         })
       });
-      const { text } = await collectAnthropicStream(
+      const { text, stopReason: openingStopReason } = await collectAnthropicStream(
         resp,
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
       );
       startTrace?.update({ output: { text: text?.slice(0, 200) } });
 
+      // ── UNUSABLE OPENING ─────────────────────────────────────────────────
+      // Same failure family as the unusable-turn recovery in /turn, with one difference that
+      // shapes the whole fix: there is no previous turn to fall back to. This is the FIRST
+      // thing a player sees — click Play, and a failure here means they never enter the
+      // scenario at all — so the only honest recovery is to re-run the opening generation,
+      // and the only honest degradation is a clean "try again", never the model's own words.
+      //
+      // THREE shapes of unusable, ONE recovery:
+      //   no text        — the stream produced nothing at all.
+      //   invalid JSON   — nothing parseable came back.
+      //   no choices     — a valid object with nothing for the player to press. This is the
+      //                    opening equivalent of the turn handler's Symptom A, and it dead-ends
+      //                    harder here: on a scenario with allow_free_input:false there is no
+      //                    text box either, so the session is over at the door.
+      //
+      // Unlike the turn path this needs NO exemptions. An opening is never a defining-moment
+      // fork (the fork can only come due after time has passed) and never an ending (the
+      // opening rules forbid endState.isEnding), so an opening with no choices is always broken.
+      //
+      // THIS IS NOT AN EXTRACTION PROBLEM. extractJson already strips markdown fences and
+      // slices from the first brace to the last (gameRouter.js:84-91), so text that reaches
+      // here has no balanced JSON span in it. That is why the lever is a corrective re-prompt.
+      const hasUsableChoices = o =>
+        Array.isArray(o?.choices) && o.choices.some(c => typeof c === 'string' && c.trim());
+
+      // Two attempts is the ceiling, matching recoverUnusableTurn. The player is already
+      // staring at a loading screen; a third ask buys nothing a second did not.
+      const MAX_OPENING_RETRIES = 2;
+
+      // Non-streaming, mirroring callModel in /turn. Deliberately not streamed: the client has
+      // already painted chunks from the failed attempt, and a second stream would interleave
+      // with them. The client drops that partial prose when the recovered `done` arrives.
+      const callOpeningModel = async (messages, callName) => {
+        const gen = startTrace?.generation({
+          name: callName, model: MODEL,
+          modelParameters: { max_tokens: 1600, temperature: 0.8 },
+          input: [{ role: 'system', content: resolvedSystemPrompt }, ...messages],
+        });
+        const retrySignal = AbortSignal.timeout(55000);
+        const retryResp   = await fetch(ANTHROPIC_URL, {
+          method: 'POST', signal: retrySignal,
+          headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
+          body: JSON.stringify({
+            model: MODEL, max_tokens: 1600, temperature: 0.8,
+            system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
+            messages,
+          }),
+        });
+        const data     = await retryResp.json();
+        const retryTxt = data?.content?.[0]?.text;
+        gen?.end({ output: retryTxt, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens }, metadata: { stop_reason: data?.stop_reason } });
+        return retryTxt;
+      };
+
+      // Returns a usable opening object, or null when every attempt failed. Never throws:
+      // a recovery that blows up must degrade to the retry screen, not to a 500.
+      const recoverUnusableOpening = async (reason, priorText) => {
+        for (let attempt = 1; attempt <= MAX_OPENING_RETRIES; attempt++) {
+          console.log(`[START RETRY] unusable-opening (${reason}) attempt ${attempt}/${MAX_OPENING_RETRIES} scenario=${scenarioId} role=${roleId} session=${sessionId}`);
+          let retryText = null;
+          try {
+            const retryMessages = [{ role: 'user', content: prompt }];
+            // Only echo the bad attempt back when there IS one — the no-text case has nothing
+            // to quote, and an empty assistant turn is rejected by the API outright.
+            if (priorText?.trim()) retryMessages.push({ role: 'assistant', content: priorText });
+            retryMessages.push({ role: 'user', content: `Your previous response was not usable: ${reason}. Return ONLY a single valid JSON object — no prose before or after it, no markdown code fences, no explanation — following the output contract exactly. It MUST contain the opening scene narrative and a non-empty "choices" array of 2-4 short actions the player can take next.` });
+            retryText = await callOpeningModel(retryMessages, `retry-unusable-opening-${attempt}`);
+          } catch (e) {
+            console.error(`[START RETRY] attempt ${attempt} threw: ${e.message}`);
+            retryText = null;
+          }
+          if (!retryText) continue;
+          let candidate = null;
+          try { candidate = extractJson(retryText); } catch { candidate = null; }
+          if (candidate && hasUsableChoices(candidate)) return candidate;
+        }
+        return null;
+      };
+
+      let output = null;
+      let openingFailure = null;   // technical reason — logs and Langfuse only, never the screen
       if (!text) {
-        sendSse(res, { type: 'error', error: 'No text returned from Anthropic.' });
-        res.end();
-        return;
+        openingFailure = `no text returned (stop_reason: ${openingStopReason || 'unknown'})`;
+      } else {
+        try { output = extractJson(text); } catch { output = null; }
+        if (!output) {
+          openingFailure = `it was not valid JSON (stop_reason: ${openingStopReason || 'unknown'}, len: ${text.length})`;
+        } else if (!hasUsableChoices(output)) {
+          openingFailure = 'it contained no "choices" for the player to pick from';
+          output = null;   // force the recovery path; a choice-less opening is not usable
+        }
       }
 
-      let output;
-      try { output = extractJson(text); } catch {
-        sendSse(res, { type: 'error', error: 'Model returned invalid JSON for opening.' });
-        res.end();
-        return;
+      if (openingFailure) {
+        // Logged with scenario and role so the opening-failure rate is countable per scenario,
+        // not just anecdotal. Previously this path logged nothing at all.
+        console.error(`[START ERROR] unusable opening — ${openingFailure} scenario=${scenarioId} role=${roleId} session=${sessionId} — recovering`);
+        const recovered = await recoverUnusableOpening(openingFailure, text);
+        if (recovered) {
+          output = recovered;
+          output.location = output.location || initialState.location;
+          startTrace?.update({ tags: ['opening-unusable', 'opening-recovered'] });
+          console.log(`[START RETRY] recovered usable opening scenario=${scenarioId} role=${roleId} session=${sessionId}`);
+        } else {
+          // DEGRADE, don't dump. No prior turn exists to fall back to, so the honest end state
+          // is a clean retry screen. The player-facing string carries no stop_reason, no model
+          // output, and no JSON; the technical reason rides in `detail` for the browser console.
+          startTrace?.update({ tags: ['opening-unusable', 'opening-failed'] });
+          console.error(`[START ERROR] unusable opening UNRECOVERED after ${MAX_OPENING_RETRIES} retries — scenario=${scenarioId} role=${roleId} session=${sessionId} reason=${openingFailure}`);
+          sendSse(res, {
+            type:      'error',
+            stage:     'opening',
+            retryable: true,
+            error:     'This scenario had trouble loading — please try again.',
+            detail:    openingFailure,
+          });
+          res.end();
+          return;
+        }
       }
 
       output.timeAdvance = 0;  // guard: opening never advances the clock
@@ -1008,7 +1116,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           messages: baseMessages,
         }),
       });
-      const { text, stopReason: streamStopReason } = await collectAnthropicStream(
+      let { text, stopReason: streamStopReason } = await collectAnthropicStream(
         streamResp,
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
       );
@@ -1020,6 +1128,59 @@ Do not open with the historical context. Open inside the character's body. Let t
         return;
       }
 
+      // ── UNUSABLE TURN OUTPUT ─────────────────────────────────────────────
+      // ONE definition of "unusable", ONE recovery, TWO places it is detected: the JSON parse
+      // just below (the model returned nothing that is an object at all) and the choices check
+      // after the retry chain (it returned a valid object with nothing for the player to do).
+      // Both used to end the turn badly — the first by sending `type:'error'`, which the client
+      // renders verbatim, so a player read "Model returned invalid JSON (stop_reason: end_turn)";
+      // the second silently, as prose with no buttons under it. On a scenario with
+      // allow_free_input:false the second is unrecoverable: applyFreeInputMode hides the text
+      // box, so no choices means no way to act at all, and the session is simply over.
+      //
+      // THIS IS NOT AN EXTRACTION PROBLEM. extractJson already strips markdown fences and
+      // slices from the first brace to the last (gameRouter.js:84-91), so text that reaches the
+      // failure path has no balanced JSON span in it. And stop_reason 'end_turn' means the model
+      // believed it had finished — a formatting slip, not truncation. That is why the fix is a
+      // corrective re-prompt and not a more forgiving parser.
+      const hasUsableChoices = o =>
+        Array.isArray(o?.choices) && o.choices.some(c => typeof c === 'string' && c.trim());
+
+      // Two attempts is the ceiling. Each costs a full turn of latency on top of the one the
+      // player already waited through, and a model that has ignored an explicit contract twice
+      // is not going to honour it on the third ask.
+      const MAX_UNUSABLE_RETRIES = 2;
+
+      // Returns { output, text } on success, null when every attempt failed. Never throws:
+      // a recovery that itself blows up must degrade, not take the turn down with it.
+      const recoverUnusableTurn = async (reason, priorText) => {
+        for (let attempt = 1; attempt <= MAX_UNUSABLE_RETRIES; attempt++) {
+          traceTags.push('has-retry', 'unusable-output');
+          console.log(`[RETRY] unusable-output (${reason}) attempt ${attempt}/${MAX_UNUSABLE_RETRIES}`);
+          let retryText = null;
+          try {
+            ({ text: retryText } = await callModel([
+              ...baseMessages,
+              { role: 'assistant', content: priorText || '' },
+              { role: 'user', content: `Your previous response was not usable: ${reason}. Return ONLY a single valid JSON object — no prose before or after it, no markdown code fences, no explanation — following the output contract exactly. It MUST include a non-empty "choices" array of 2-4 short actions the player can take next.` },
+            ], null, `retry-unusable-${attempt}`));
+          } catch { retryText = null; }
+          if (!retryText) continue;
+          let candidate = null;
+          try { candidate = extractJson(retryText); } catch { candidate = null; }
+          if (candidate && hasUsableChoices(candidate)) return { output: candidate, text: retryText };
+        }
+        return null;
+      };
+
+      // Whatever prose the model wrote before it went off-contract, so a degraded turn still
+      // reads as a scene rather than a blank card. Everything from the first brace onward is
+      // the malformed structure and is dropped.
+      const prosePart = raw => {
+        const s = (raw || '').trim();
+        const brace = s.indexOf('{');
+        return (brace === -1 ? s : s.slice(0, brace)).trim();
+      };
       let output;
       try {
         output = extractJson(text);
@@ -1053,13 +1214,32 @@ Do not open with the historical context. Open inside the character's body. Let t
             },
           };
         }
+        // DETECTION POINT 1 — nothing parseable came back. Recover, then degrade; never dump
+        // the stop_reason on the player. The old branch here sent type:'error', which the
+        // client renders verbatim (engine/game/index.html:1689).
         if (!output) {
           traceTags.push('json-error');
-          scoreTrace(0, `invalid-json stop_reason=${stopReason}`);
-          console.error(`[TURN ERROR] invalid JSON stop_reason=${stopReason} len=${text.length}`);
-          sendSse(res, { type: 'error', error: `Model returned invalid JSON (stop_reason: ${stopReason}).` });
-          res.end();
-          return;
+          console.error(`[TURN ERROR] invalid JSON stop_reason=${stopReason} len=${text.length} — recovering`);
+          const recovered = await recoverUnusableTurn(`it was not valid JSON (stop_reason: ${stopReason})`, text);
+          if (recovered) {
+            output = recovered.output;
+            text   = recovered.text;
+            console.log('[RETRY] unusable-output recovered valid JSON with choices');
+          } else {
+            // DEGRADE, don't dump. The turn ships as a normal `done` carrying whatever prose
+            // survived, with no choices; the client turns that into a friendly retry action
+            // rather than a dead end or a raw error string.
+            traceTags.push('degraded-json');
+            scoreTrace(0, `invalid-json-unrecovered stop_reason=${stopReason}`);
+            console.error(`[TURN ERROR] invalid JSON unrecovered after ${MAX_UNUSABLE_RETRIES} retries — degrading to prose-only turn`);
+            output = {
+              narrative:    prosePart(text),
+              choices:      [],
+              npcMoments:   [],
+              stateChanges: {},
+              location:     state.location,
+            };
+          }
         }
       }
 
@@ -1135,6 +1315,37 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Fix raw character ID leaks (e.g. "char_jim_lovell:" → "Jim Lovell:")
       if (output.narrative) {
         output.narrative = fixCharacterIdLeaks(output.narrative, characters);
+      }
+
+
+      // DETECTION POINT 2 — valid JSON, nothing to press. Same failure, caught later.
+      //
+      // BEFORE mergeState, deliberately. Retrying after the merge would commit the bad turn's
+      // stateChanges and then narrate a different turn on top of them.
+      //
+      // TWO EXEMPTIONS, both load-bearing:
+      //   forkDue — the fork's options are ENGINE-owned and injected further down (the block
+      //     that sets output.choices from definingBlock.options), so a fork turn legitimately
+      //     arrives here with none. Catching it would retry the authored question away.
+      //   endState.isEnding — an ending turn legitimately carries no choices; the
+      //     closing-coerce path above sets choices:[] on purpose and the client transitions to
+      //     /closing-prose. Catching it would burn two retries on every ending and then degrade
+      //     the last scene of the session.
+      if (!forkDue && !output.endState?.isEnding && !hasUsableChoices(output)) {
+        traceTags.push('no-choices');
+        // Symptom A logged for the first time. It previously shipped in total silence, so a
+        // dead-ended session left no server-side trace at all and its rate was unmeasurable.
+        console.error(`[TURN ERROR] no usable choices stop_reason=${streamStopReason || 'unknown'} loc=${state.location} act=${state.act} elapsed=${state.elapsedMinutes} session=${sessionId} — recovering`);
+        const recovered = await recoverUnusableTurn('it contained no "choices" for the player to pick from', text);
+        if (recovered) {
+          output = recovered.output;
+          text   = recovered.text;
+          console.log('[RETRY] unusable-output recovered choices');
+        } else {
+          traceTags.push('degraded-no-choices');
+          scoreTrace(0, 'no-choices-unrecovered');
+          console.error(`[TURN ERROR] no usable choices unrecovered after ${MAX_UNUSABLE_RETRIES} retries — degrading (client shows retry action)`);
+        }
       }
 
       // Anchor violation check — runs after all retries, before streaming done

@@ -1173,6 +1173,70 @@ function renderChoices(choices = [], definingMoment = null) {
 
 }
 
+// A turn that came back unusable must still leave the player something to press. Both failure
+// shapes route here: an SSE `error` event, and a `done` whose choices arrived empty. Neither
+// puts the server's own words on screen — "Model returned invalid JSON (stop_reason: end_turn)"
+// is not a sentence a player can act on, and it was being rendered verbatim.
+//
+// The DEFAULT action re-sends the same input, which is safe mid-session: the failed turn never
+// reached mergeState on the server in the degraded case, and re-submitting is exactly what a
+// player had to work out for themselves before this existed.
+//
+// `onRetry` overrides that, because the default is meaningless at the OPENING — there is no
+// last input there, lastPlayerInput is still '', and the button would render and then do
+// nothing at all when pressed. renderOpeningFailure passes its own action (re-attempt /start).
+function renderRetryAction(label = 'Try that again', onRetry = null) {
+  choicesEl.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'choice-btn';
+  btn.type = 'button';
+  btn.textContent = label;
+  btn.addEventListener('click', () => {
+    if (onRetry) { onRetry(); return; }
+    if (lastPlayerInput) submitTurn(lastPlayerInput, { isChoice: true });
+  });
+  choicesEl.appendChild(btn);
+  choicesAreaWrapEl.classList.remove('hidden');
+  choicesEl.scrollLeft = 0;
+  requestAnimationFrame(syncArrows);
+}
+
+// The player-facing copy for a failed turn. The real reason goes to the console for us, never
+// to the screen.
+function renderTurnFailure(container, detail) {
+  console.error('[TURN FAILURE]', detail);
+  const el = document.createElement('div');
+  el.className = 'scene-card scene-error';
+  const p = document.createElement('p');
+  p.textContent = 'That moment didn\u2019t come through. Nothing has been lost \u2014 try it again.';
+  el.appendChild(p);
+  container.appendChild(el);
+  renderRetryAction();
+}
+
+// The /start sibling of renderTurnFailure. Separate function, same rule: the server's words
+// never reach the screen. The copy differs because the situations differ — no moment has been
+// lost at the opening, nothing happened yet — and so does the action: renderTurnFailure
+// re-submits a turn, this re-attempts /start from the top.
+//
+// The card removes itself before retrying. startGame appends to the feed without clearing it,
+// so a second failure would otherwise stack a second error card under the first.
+function renderOpeningFailure(roleId, narrativeStyle, briefingContext, detail) {
+  console.error('[START FAILURE]', detail);
+  const el = document.createElement('div');
+  el.className = 'scene-card scene-error';
+  const p = document.createElement('p');
+  p.textContent = 'This scenario had trouble loading \u2014 please try again.';
+  el.appendChild(p);
+  feedAppend(el);
+  feedScrollTop(el);
+  renderRetryAction('Try again', () => {
+    el.remove();
+    choicesEl.innerHTML = '';
+    startGame(roleId, narrativeStyle, briefingContext);
+  });
+}
+
 // Terminal single choice — deliberately NOT routed through submitTurn: the
 // remainingMinutes<=0 guard in submitTurn closes with a null endState and would
 // drop output.endState. Also skips lastChoices so the pause label can never
@@ -1250,7 +1314,19 @@ function renderOutput(output, meta = {}) {
     storyEl.scrollTop = Math.max(0, newScrollTop);
   });
 
-  renderChoices(output.choices || [], output.definingMoment || null);
+  // A done can legitimately carry no choices in exactly two cases — the fork supplies its own
+  // options, and an ending hands off to /closing-prose. Anything else with an empty list is the
+  // dead-end this guards: prose with nothing under it, and on a scenario with
+  // allow_free_input:false there is no text box either, so the session would simply stop.
+  const usableChoices = (output.choices || []).filter(c => typeof c === 'string' && c.trim());
+  const hasForkOptions = !!output.definingMoment?.options?.length;
+  const isEndingTurn   = !!output.endState?.isEnding;
+  if (usableChoices.length === 0 && !hasForkOptions && !isEndingTurn) {
+    renderChoices([], null);   // clear stale buttons without latching lastChoices
+    renderRetryAction();
+  } else {
+    renderChoices(output.choices || [], output.definingMoment || null);
+  }
   if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(sceneEl);
 
   const messageId = ++currentMessageId;
@@ -1577,6 +1653,8 @@ function showClosingScreen(endState, sessionId) {
 // ── Turn submission ───────────────────────────────────────────────────────────
 
 let submitting = false;
+// The input behind the turn currently in flight, so a failed turn can offer to re-send it.
+let lastPlayerInput      = '';
 
 function buildAssistantHistoryContent(output) {
   let text = output.sensory_opening ? `${output.sensory_opening}\n\n` : '';
@@ -1608,6 +1686,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     return;
   }
   submitting = true;
+  lastPlayerInput = playerInput;
   inputEl.value = '';
   scrollHintEl.classList.remove('visible');
   choicesAreaWrapEl.classList.add('hidden');
@@ -1684,10 +1763,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
           submitBtn.disabled = false;
           if (streamEl) streamEl.remove();
           else dotsEl.remove();
-          const errEl = document.createElement('div');
-          errEl.className = 'scene-card scene-error';
-          errEl.innerHTML = `<p>${evt.error}</p>`;
-          entryEl.appendChild(errEl);
+          renderTurnFailure(entryEl, evt.error);
           pendingEntryEl = null;
           return;
         }
@@ -1700,10 +1776,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
       submitBtn.disabled = false;
       if (streamEl) streamEl.remove();
       else dotsEl.remove();
-      const errEl = document.createElement('div');
-      errEl.className = 'scene-card scene-error';
-      errEl.innerHTML = `<p>No response received.</p>`;
-      entryEl.appendChild(errEl);
+      renderTurnFailure(entryEl, 'no response received');
       pendingEntryEl = null;
       return;
     }
@@ -2793,7 +2866,12 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
           openingOutput    = evt.output;
           openingNextState = evt.nextState;
         } else if (evt.type === 'error') {
-          throw new Error(evt.error || '/start SSE error');
+          // evt.error is now player-facing copy and evt.detail the technical reason. Carry the
+          // detail so the console keeps it; the catch renders its own copy either way, so an
+          // older server sending a raw string can no longer put it on screen.
+          const startErr = new Error(evt.detail || evt.error || '/start SSE error');
+          startErr.openingFailure = true;
+          throw startErr;
         }
       }
     }
@@ -2801,16 +2879,18 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
     if (!openingOutput || !openingNextState) throw new Error('No opening data received');
 
   } catch (err) {
+    // The opening never arrived. This used to silently substitute the authored role.opening and
+    // play on, which LOOKED like a working scenario but was not one: openingNextState was never
+    // promoted, so the server session seeded by /start and the client's gameState were two
+    // different games for the rest of the run. A retry screen is the honest end state — the
+    // player loses nothing but a click, and the next /start seeds a session both sides share.
     warmStart = null;
     loadingEl.remove();
     streamOptionsDots.classList.add('hidden');
-    choicesAreaWrapEl.classList.remove('hidden');
-    submitBtn.disabled = false;
-    console.error('[START]', err);
-    const fallback = role.opening?.narrative
-      ? role.opening
-      : { narrative: `The investigation begins. You are ${role.name}.`, choices: [] };
-    renderOutput(fallback);
+    // Submission stays disabled: there is no opened scenario to submit a turn against, and the
+    // retry button is the only action that can make progress from here.
+    submitBtn.disabled = true;
+    renderOpeningFailure(roleId, narrativeStyle, briefingContext, err?.message || err);
     return;
   }
 

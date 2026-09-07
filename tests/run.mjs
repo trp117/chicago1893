@@ -9,7 +9,9 @@
 // scratch role or edit one and restore it byte-for-byte, so do not run two at once.
 //
 // Requirements: confirm.test needs ANTHROPIC_API_KEY (it skips itself without one) and
-// delete.test needs Supabase credentials to verify the dual write.
+// delete.test needs Supabase credentials to verify the dual write. degradation.test needs
+// Supabase credentials for the scenario lookup (it skips itself without them) but makes NO
+// model calls — it scripts api.anthropic.com so the /start failure paths can be forced.
 import { spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,6 +24,7 @@ const SUITE = [
   ['step 5 — delete route + cleanup',       'delete.test.mjs'],
   ['step 5b — bulk inject gate',            'inject.test.mjs'],
   ['location reconciliation (a+b+c)',      'location.test.mjs'],
+  ['graceful degradation on unusable output', 'degradation.test.mjs'],
 ];
 
 const results = [];
