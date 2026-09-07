@@ -304,6 +304,34 @@ function buildEpilogueSummary(state, endResult, scenario) {
     completed_beats:       (state?.resolved_threads  || []).map(t => t.thread_id),
     resolved_threads:      (state?.resolved_threads  || []).map(t => ({ thread_id: t.thread_id })),
     outcome:               endResult || 'unknown',
+    // The scenario's DOCUMENTED OUTCOME — what the record says happened on this night,
+    // stated ONCE per scenario and inherited by every role that plays it, because history is
+    // one fixed event experienced from different seats. FRAMING CONTEXT ONLY: nothing gates,
+    // rejects, or overrides on this, and no code reads it to decide anything.
+    //
+    // It exists because `outcome` above is endResult, and endResult is usually ABSENT —
+    // game_system_prompt.md tells the model not to emit endState.result ("there is no win or
+    // loss"), so `outcome` reads 'unknown' on most sessions and the Your-Session block had
+    // nothing solid to weigh a decision against. This is present on every authored scenario,
+    // so it is the reliable half of that pair.
+    //
+    // `reviewed` rides along rather than gating. Framing prose may use an unconfirmed
+    // description — the cost of being wrong there is one imprecise sentence. A future
+    // ENFORCEMENT gate must NOT: it has to require reviewed === true, in the mould of
+    // technical_facts (gameRouter.js:670) and epilogue (:1477), which both refuse to act on
+    // generated-but-unreviewed content. Do not add a gate that reads this without that check.
+    //
+    // null when the scenario has no anchored_outcome, or one with no usable description.
+    // Every reader must handle null; on null the Your-Session prompt compiles byte-identical
+    // to what it compiled before.
+    anchored_outcome:      (typeof scenario?.anchored_outcome?.description === 'string'
+                            && scenario.anchored_outcome.description.trim())
+      ? {
+          id:          scenario.anchored_outcome.id ?? null,
+          description: scenario.anchored_outcome.description.trim(),
+          reviewed:    scenario.anchored_outcome.reviewed === true,
+        }
+      : null,
     // closure_state stays exactly what it was: closure_met / reason mean CLOSURE.
     // The defining moment rides ALONGSIDE as its own sub-object — additive only, so a
     // recorded decision is visible in the log without ever standing in for a met
@@ -403,6 +431,15 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
   const definingState = sessionSummary?.closure_state?.defining_moment_state || null;
   const decisionMade  = definingState?.met === true;
 
+  // The documented outcome for this scenario, when one is authored. Read from the SESSION
+  // SUMMARY rather than a scenario object — this function never receives one — which is also
+  // what puts it in front of the model, since sessionSummary is JSON.stringify'd whole into
+  // the user message below. '' on every scenario with no anchored_outcome, and the rule array
+  // then compiles exactly what it compiled before.
+  const anchoredDesc = typeof sessionSummary?.anchored_outcome?.description === 'string'
+    ? sessionSummary.anchored_outcome.description.trim()
+    : '';
+
   // THREE arms, not two. The middle case is the one worth stating explicitly: a role that
   // HAS a fork but never answered it — a crucible that ran out of time before its choice —
   // keeps the honest-timeout framing below. It is NOT presence: a session that was building
@@ -432,7 +469,14 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
       '- CLOSE CONCRETE, NOT ABSTRACT. End on a definite particular from this session — a thing held, a sound, a gesture, what someone did with their hands — at the same grain as the CLOSING PROSE. The last image must be something that definitely happened. Never close on unknowability: not "nobody could have said", not "what only you knew", not "the night absorbed it", not "no one was left to record it". That the aftermath is undocumented may be true, but it is not the ending. Never close on "the session ended before…" or "they never reached…".',
       '- GROUND IT IN THE TEXTURE OF THIS SESSION. The CLOSING PROSE carries the physical particulars — a thing in the hands, what the light was doing, the sound of the room, the weight of what was carried. Use those particulars. Do not write a close that could belong to any session.',
       '- Ground the choice in its authored language: decision_text is what they chose. Paraphrase it, never quote it verbatim. The options they did not take appear only as internal ids in available_options — never name, translate, or paraphrase those.',
-      '- READ THE CHOICE AGAINST WHAT IT LED TO. The SESSION SUMMARY carries `outcome`, and the CLOSING PROSE carries how this session actually ended. Weigh the decision against both. A choice does not become admirable for having been carried out well: a task finished cleanly inside a session that ended in ruin is exactly that, and this block must hold both halves — what they did, and what it turned out to be worth. Write no line of approval the ending does not support.',
+      // Fix A at full strength when the scenario declares its documented outcome, and
+      // exactly the previous rule when it does not. The anchored outcome is the STANDARD to
+      // judge the choice against — deliberately not an event to report: asserting it landed
+      // when the session's prose never showed it would manufacture the same contradiction
+      // this whole line of work exists to remove.
+      anchoredDesc
+        ? '- READ THE CHOICE AGAINST WHAT THE NIGHT WAS. The SESSION SUMMARY carries `anchored_outcome` — what the documented record says happened here: ' + anchoredDesc + ' That is the fixed fact this decision must be weighed against. Use it as the STANDARD, not as an event to report: do not narrate it as something that happened in this session, and never assert it occurred on the page if the prose did not show it. `outcome` is often "unknown" and settles nothing; the CLOSING PROSE carries how this particular session ended. A choice does not become admirable for having been carried out well: a task finished cleanly inside a night that ended in ruin is exactly that, and this block must hold both halves — what they did, and what it turned out to be worth. Write no line of approval the documented outcome does not support.'
+        : '- READ THE CHOICE AGAINST WHAT IT LED TO. The SESSION SUMMARY carries `outcome`, and the CLOSING PROSE carries how this session actually ended. Weigh the decision against both. A choice does not become admirable for having been carried out well: a task finished cleanly inside a session that ended in ruin is exactly that, and this block must hold both halves — what they did, and what it turned out to be worth. Write no line of approval the ending does not support.',
       '- COMPETENCE IS NOT VINDICATION. Many of these decisions are practical — a thing seated, a desk cleared, a call placed, a sentence composed before keying. Performing one well is not a victory and must never be written as one. Name the act plainly, let the ending stand next to it, and leave the two touching: the meaning is in the collision, not in the accomplishment. "The job was whole" is the failure mode — it praises the craft and omits the world it landed in.',
     ] : proximity ? [
       '- PRESENCE IS THE RESOLUTION. This role had no defining decision to make; being there was the whole of it. Write who they were while it happened — what they attended to, how they bore it, and what being present cost them. Never frame the session as unresolved, incomplete, cut short, or as a failure to finish or reach anything. Being present at history is not a task to complete.',
