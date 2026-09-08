@@ -56,10 +56,18 @@ function normalizeEnforceFrom(raw, roleId) {
 // the model a destination list containing an id that does not resolve — a worse failure
 // than the one this fixes.
 //
-// `reviewed` rides along rather than gating, the same convention scenario-level
-// anchored_outcome uses (gameRouter.js buildEpilogueSummary): framing may run on an
-// unconfirmed anchor, since the cost of being wrong is one misplaced scene. Any future
-// ENFORCEMENT gate must require reviewed === true.
+// `reviewed` RIDES ALONG HERE AND GATES DOWNSTREAM. This resolver still returns an
+// unreviewed anchor in full, the same convention scenario-level anchored_outcome uses
+// (gameRouter.js buildEpilogueSummary): framing may run on an unconfirmed anchor, since the
+// cost of being wrong there is one misplaced scene. ENFORCEMENT is the other case, and it is
+// gated — resolveEnforcingAnchor (PromptComposer) narrows nothing unless reviewed === true.
+// That gate is what lets the admin proposer write a machine-drafted anchor straight into a
+// role file as `reviewed: false` without pinning anybody: the proposal is visible to the
+// reviewer and inert to the engine until they tick Verified.
+//
+// The unenforced case is LOGGED, once per session, because it is otherwise silent: an author
+// who picked a location and never confirmed it would see a role roam and have nothing to read
+// about why.
 export function resolveAnchoredLocation(role, locations = []) {
   const raw = role?.anchored_location;
   const id  = typeof raw?.location_id === 'string' ? raw.location_id.trim() : '';
@@ -68,10 +76,15 @@ export function resolveAnchoredLocation(role, locations = []) {
     console.warn(`[ANCHOR] role ${role?.id} names anchored_location "${id}", which is not a location in this scenario — ignoring.`);
     return null;
   }
+  const reviewed = raw.reviewed === true;
+  if (!reviewed) {
+    console.warn(`[ANCHOR] role ${role?.id} has an UNREVIEWED anchored_location ("${id}") — proposal only, not enforced. Tick "Verified" in the role editor to make it bind.`);
+  }
+
   return {
     location_id:  id,
     enforce_from: normalizeEnforceFrom(raw, role?.id),
-    reviewed:     raw.reviewed === true,
+    reviewed,
     rationale:    typeof raw.rationale === 'string' ? raw.rationale.trim() : '',
   };
 }

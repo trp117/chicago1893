@@ -737,25 +737,62 @@ function buildPlayerRoleSection(state, characters = []) {
 // Unanchored roles are untouched: same full roster, same wording, byte-identical prompt.
 // enforce_from is meaningless for them and is never read — Wills has no anchor, so no
 // timing on earth narrows him.
+
+// THE ENFORCEMENT GATE for an anchored location, shared by the two halves that enforce one:
+// the roster narrowing in buildLocationConstraint below, and the prose directive in
+// buildAnchoredLocationDirective further down. Both computed this inline and identically,
+// which is a drift hazard on its own — but the reason it is factored out now is that both
+// were missing a condition.
+//
+// REVIEWED === TRUE, OR NOTHING NARROWS. Enforcement keys on human confirmation, never on
+// the mere presence of the field. This is the law the rest of the system already works
+// under — an unreviewed epilogue does not fire (gameRouter.js), unreviewed technical_facts
+// are not injected — and StateManager's resolveAnchoredLocation says in as many words that
+// any enforcement gate must require it. This is that gate.
+//
+// It is what makes a GENERATED anchor safe to write. The proposer (adminRouter
+// proposeAnchoredLocation) drafts one for every history-fixed role and lands it
+// `reviewed: false`, so a machine-drafted anchor sits in the role file as a proposal and
+// pins nobody until a human has read it and ticked Verified. Without this gate, generating
+// anchors across a scenario would silently bind the roles that MOVED — Wills to the
+// stairwell he was walking away from, Princip to a corner he had not reached yet — which is
+// the exact failure the review step exists to catch, arriving invisibly.
+//
+// A hand-authored anchor is held to the same rule, and that is intended rather than
+// collateral: an author who picked a location from the select and did not confirm it against
+// the record has stated an intention, not a verified fact. The cost of the stricter reading
+// is one unchecked box, and it is visible — resolveAnchoredLocation logs every unenforced
+// anchor once, at session start, naming the role.
+//
+// Returns null when nothing is enforcing, or { anchorId, anchorName } when something is.
+function resolveEnforcingAnchor(state, scenario, locations = []) {
+  const anchor   = state?.effectiveAnchoredLocation || null;
+  const anchorId = typeof anchor?.location_id === 'string' ? anchor.location_id : '';
+  if (!anchorId) return null;
+  if (anchor.reviewed !== true) return null;
+
+  const total       = scenario?.sessionTargetMinutes || 15;
+  const elapsed     = state?.elapsedMinutes ?? 0;
+  const fraction    = total > 0 ? elapsed / total : 0;
+  const enforceFrom = typeof anchor.enforce_from === 'number' ? anchor.enforce_from : 0;
+  if (fraction < enforceFrom) return null;
+
+  const loc = (locations || []).find(l => l && l.id === anchorId);
+  if (!loc) return null;
+  return { anchorId, anchorName: loc.name || anchorId };
+}
+
 function buildLocationConstraint(state, locations = [], scenario = null) {
   const locationId = state?.location;
-  const anchor     = state?.effectiveAnchoredLocation || null;
-  const anchorId   = typeof anchor?.location_id === 'string' ? anchor.location_id : '';
-  const total      = scenario?.sessionTargetMinutes || 15;
-  const elapsed    = state?.elapsedMinutes ?? 0;
-  const fraction   = total > 0 ? elapsed / total : 0;
-  const enforceFrom = typeof anchor?.enforce_from === 'number' ? anchor.enforce_from : 0;
-  const anchored = !!anchorId
-    && fraction >= enforceFrom
-    && (locations || []).some(l => l && l.id === anchorId);
+  const enforcing  = resolveEnforcingAnchor(state, scenario, locations);
+  const anchored   = !!enforcing;
+  const anchorId   = enforcing?.anchorId   || '';
+  const anchorName = enforcing?.anchorName || '';
 
   const offered = anchored
     ? (locations || []).filter(l => l && (l.id === anchorId || l.id === locationId))
     : (locations || []);
-  const roster     = offered.map(l => `  ${l.id} — ${l.name}`).join('\n');
-  const anchorName = anchored
-    ? ((locations || []).find(l => l && l.id === anchorId)?.name || anchorId)
-    : '';
+  const roster  = offered.map(l => `  ${l.id} — ${l.name}`).join('\n');
 
   return [
     `Location at the START of this turn: ${locationId}`,
@@ -886,19 +923,11 @@ const CLOSURE_MIN_ELAPSED_FRACTION = 0.40;
 // HONEST CEILING, unchanged: prompt-enforced, not engine-enforced. The narrowed roster is the
 // mechanism; this is what stops the mechanism reading as a refusal.
 export function buildAnchoredLocationDirective(state, scenario, locations = []) {
-  const anchor   = state?.effectiveAnchoredLocation || null;
-  const anchorId = typeof anchor?.location_id === 'string' ? anchor.location_id : '';
-  if (!anchorId) return '';
+  const enforcing = resolveEnforcingAnchor(state, scenario, locations);
+  if (!enforcing) return '';
 
-  const total       = scenario?.sessionTargetMinutes || 15;
-  const elapsed     = state?.elapsedMinutes ?? 0;
-  const fraction    = total > 0 ? elapsed / total : 0;
-  const enforceFrom = typeof anchor.enforce_from === 'number' ? anchor.enforce_from : 0;
-  if (fraction < enforceFrom) return '';
-  if (!(locations || []).some(l => l && l.id === anchorId)) return '';
-
-  const anchorName = (locations || []).find(l => l && l.id === anchorId)?.name || anchorId;
-  const name       = state?.playerRoleName || 'This character';
+  const { anchorId, anchorName } = enforcing;
+  const name = state?.playerRoleName || 'This character';
 
   return [
     `⚑ THE SCENE IS ANCHORED — ${anchorName}. The record fixes ${name} to this place for what happens tonight, and the session does not leave it. The valid-location roster above already reflects this; these lines are how to HONOUR it in the prose.`,

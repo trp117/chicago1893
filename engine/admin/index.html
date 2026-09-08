@@ -3218,6 +3218,150 @@ function renderTechnicalFactsSection(data) {
   </div>`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ANCHORED LOCATIONS — propose, review, apply
+// ═══════════════════════════════════════════════════════════════
+// The generate half of a hand-authoring surface that already exists. The per-role editor
+// carries the Anchored Location form (location, wall timing, Verified, rationale); this
+// fills it for every history-fixed role in one pass, as a PROPOSAL, so a reviewer edits and
+// approves instead of typing four fields per role from scratch.
+//
+// ON DEMAND, beside "Suggest terms", not a step in the pipeline — most scenarios anchor no
+// roles at all, and a forced step is a step people learn to click through.
+//
+// NOTHING APPLIED HERE ENFORCES. Applying writes reviewed:false, and the engine narrows no
+// roster until a human ticks Verified in the role editor. That sentence is on the panel too,
+// because a reviewer who believes the button pinned the role will not go and check the box.
+function renderAnchoredLocationsSection(data) {
+  return `<div style="margin-bottom:20px">
+    <details id="anchor-details">
+      <summary style="padding:14px 20px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+        <span style="display:flex;align-items:center;gap:10px">Anchored Locations <span id="anchor-count-badge" style="font-size:11px;font-weight:600;background:var(--border);color:var(--text-soft);padding:2px 8px;border-radius:10px;text-transform:none;letter-spacing:0"></span></span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <div style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.5">
+          An anchor fixes a role to one location for the session — for a documented person whose recorded night happened in one room. This drafts one for every role declared <strong>character_type: real</strong> and <strong>fate_mode: anchored</strong>, using the role's own starting location.
+          <br><strong>A draft binds nobody.</strong> What lands in the role file is <code>reviewed: false</code>; the engine narrows no location roster until you open the role, check the record, and tick <strong>Verified</strong>. Clear the ones who moved.
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <button type="button" class="btn btn-primary btn-sm" id="anchor-propose-btn">✦ Propose anchored locations</button>
+        </div>
+        <div id="anchor-results-area" style="font-size:13px;color:var(--text-soft)"></div>
+      </div>
+    </details>
+  </div>`;
+}
+
+function initAnchoredLocationsSection(scenarioId) {
+  document.getElementById('anchor-propose-btn')
+    ?.addEventListener('click', () => runAnchorPropose(scenarioId));
+}
+
+async function runAnchorPropose(scenarioId) {
+  const btn  = document.getElementById('anchor-propose-btn');
+  const area = document.getElementById('anchor-results-area');
+  if (!btn || !area) return;
+  btn.disabled = true;
+  btn.textContent = 'Reading roles…';
+  area.innerHTML = '';
+  try {
+    const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/propose-anchored-locations`, {});
+    const proposals = resp.proposals || [];
+    const skipped   = resp.skipped   || [];
+    const locations = resp.locations || [];
+
+    const badge = document.getElementById('anchor-count-badge');
+    if (badge) badge.textContent = `${proposals.length} proposal${proposals.length === 1 ? '' : 's'}`;
+
+    const proposalsHtml = proposals.length
+      ? proposals.map((p, i) => buildAnchorProposalCard(p, i, scenarioId, locations)).join('')
+      : `<div style="padding:14px;border:1px dashed var(--border);border-radius:6px;margin-bottom:12px">No new proposals — no role in this scenario is declared real + anchored without an anchor already on it.</div>`;
+
+    area.innerHTML = `
+      ${proposals.length ? `<div class="suggestions-header"><span class="suggestions-header-text">${proposals.length} proposal${proposals.length === 1 ? '' : 's'} — nothing is written until you click Apply, and nothing enforces until you tick Verified in the role.</span></div>` : ''}
+      ${proposalsHtml}
+      ${buildAnchorSkippedList(skipped)}`;
+  } catch (err) {
+    area.innerHTML = `<p style="color:#e74c3c;font-size:13px">Error: ${esc(err.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦ Propose anchored locations';
+  }
+}
+
+function buildAnchorProposalCard(p, i, scenarioId, locations) {
+  const id  = `anc-${i}`;
+  const a   = p.anchored_location || {};
+  const opts = locations.map(l =>
+    `<option value="${esc(l.id)}" ${l.id === a.location_id ? 'selected' : ''}>${esc(l.name || l.id)} (${esc(l.id)})</option>`
+  ).join('');
+  return `<div id="${id}" class="anchor-proposal-card" data-role-id="${esc(p.role_id)}" data-role-name="${esc(p.role_name)}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--bg)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <span style="font-weight:700;font-size:13px">${esc(p.role_name)}</span>
+      <span style="font-size:11px;background:var(--border);color:var(--text-soft);padding:2px 8px;border-radius:10px">real + anchored</span>
+      <span style="font-size:11px;color:#b45309;font-weight:700">proposal — will not enforce</span>
+    </div>
+    <label style="font-size:12px;color:var(--text-soft);display:block;margin-bottom:2px">Anchored location</label>
+    <select id="${id}-loc" style="width:100%;font-size:13px;margin-bottom:8px">${opts}</select>
+    <label style="font-size:12px;color:var(--text-soft);display:block;margin-bottom:2px">Wall opens at (fraction of session) — 0.0 means fixed from the first turn</label>
+    <input type="number" id="${id}-from" step="0.05" min="0" max="1" value="${a.enforce_from ?? 0}" style="width:100%;font-size:13px;margin-bottom:8px">
+    <label style="font-size:12px;color:var(--text-soft);display:block;margin-bottom:2px">Rationale (yours to rewrite)</label>
+    <textarea id="${id}-why" rows="6" style="width:100%;font-size:12px;margin-bottom:10px;resize:vertical">${esc(a.rationale || '')}</textarea>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button type="button" class="btn btn-primary btn-sm" onclick="applyAnchorProposal('${id}','${esc(scenarioId)}')">Apply as proposal</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Discard</button>
+      <span style="font-size:11px;color:var(--text-soft)">Then open this role and tick Verified to make it bind.</span>
+    </div>
+  </div>`;
+}
+
+function buildAnchorSkippedList(skipped) {
+  if (!skipped.length) return '';
+  const rows = skipped.map(s => {
+    const tag = s.existing
+      ? (s.existing.reviewed
+          ? '<span style="font-size:11px;color:#15803d;font-weight:700">anchored &amp; verified</span>'
+          : '<span style="font-size:11px;color:#b45309;font-weight:700">proposal awaiting review</span>')
+      : '';
+    return `<div style="padding:8px 0;border-top:1px solid var(--border)">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:12px;color:var(--text)">${esc(s.role_name)}</span>
+        ${tag}
+      </div>
+      <div style="font-size:11px;color:var(--text-soft);margin-top:2px">${esc(s.reason)}</div>
+    </div>`;
+  }).join('');
+  return `<div style="margin-top:16px">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Not drafted (${skipped.length})</div>
+    ${rows}
+  </div>`;
+}
+
+async function applyAnchorProposal(cardId, scenarioId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const roleId       = card.dataset.roleId;
+  const roleName     = card.dataset.roleName || roleId;
+  const location_id  = document.getElementById(`${cardId}-loc`)?.value || '';
+  const enforce_from = document.getElementById(`${cardId}-from`)?.value ?? '';
+  const rationale    = document.getElementById(`${cardId}-why`)?.value?.trim() || '';
+  if (!location_id) { toast('Pick a location', 'error'); return; }
+  try {
+    const resp = await apiPost(
+      `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/anchored-location`,
+      { location_id, enforce_from, rationale });
+    card.innerHTML = `<div style="font-size:13px">
+      <strong>${esc(roleName)}</strong> — proposal written to <code>${esc(resp.anchored_location?.location_id || location_id)}</code>.
+      <div style="font-size:12px;color:#b45309;margin-top:4px">Not enforcing. Open this role in the Player Roles editor, check it against the record, and tick <strong>Verified</strong> — or clear the field if they moved.</div>
+    </div>`;
+    card.style.opacity = '0.85';
+    toast('Proposal written (reviewed: false)', 'success');
+  } catch (err) {
+    toast(`Error: ${err.message}`, 'error');
+  }
+}
+
 function renderGlossarySection(data) {
   const scenarioId = data.scenario?.id || '';
   return `<div style="margin-bottom:20px">
@@ -4705,6 +4849,7 @@ function renderPreview(data, autoSaved = false) {
         ? `<div id="approval-warn" style="margin-bottom:12px;padding:10px 14px;background:#fef3c7;border:1px solid #d97706;border-radius:6px;font-size:13px;color:#92400e">This scenario has not been reviewer-approved. It can be saved but not published.</div>`
         : ''}
       ${renderGlossarySection(data)}
+      ${renderAnchoredLocationsSection(data)}
       ${renderTechnicalFactsSection(data)}
       ${renderEpilogueSection(data)}
       ${renderImgPromptStudio(data)}
@@ -4721,6 +4866,7 @@ function renderPreview(data, autoSaved = false) {
     document.getElementById('content').insertAdjacentHTML('beforeend', buildAIPanel(scenarioId));
     initAIPanel(scenarioId);
     initGlossarySection(scenarioId);
+    initAnchoredLocationsSection(scenarioId);
     const declMount = document.getElementById('char-declarations-mount');
     if (declMount) renderCharacterDeclarationsSection(scenarioId, declMount);
 

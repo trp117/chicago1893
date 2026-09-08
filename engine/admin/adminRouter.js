@@ -10,6 +10,9 @@ import VersionController from '../services/VersionController.js';
 // Classification resolver shared with the endings generator — see the export note in
 // ClaudeScenarioClient.js. Already in this module's import graph via PipelineOrchestrator.
 import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
+// The runtime default for an anchor's wall timing. Imported rather than restated so a
+// proposal and the engine that will one day enforce it cannot drift apart.
+import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -405,6 +408,18 @@ function preserveStoredAnchoredLocation(repos, role) {
     delete role.anchored_location;
     return role;
   }
+  // PROVENANCE SURVIVES THE FIRST HUMAN SAVE. The editor form has no field for `generated`,
+  // so a reviewer who opens a proposed anchor, ticks Verified and saves would post the block
+  // without that key and quietly erase the fact that a machine drafted it. Carried forward
+  // from the stored role the same way the whole block is above — and only ever carried, never
+  // set here: the only writer of `generated: true` is the proposal route.
+  if (role.anchored_location && role.anchored_location.generated === undefined) {
+    const stored = repos.scenarios.findPlayerRole(role.id);
+    if (stored?.anchored_location?.generated !== undefined) {
+      role.anchored_location.generated = stored.anchored_location.generated;
+    }
+  }
+
   // The form posts every field as a trimmed STRING, so a fraction typed into the editor
   // arrives as '0.6'. resolveAnchoredLocation coerces on read either way, but storing the
   // string would leave the role file disagreeing with the fork block beside it, where
@@ -1338,6 +1353,105 @@ export function classifyRoleForDefiningMoment(scenario, role) {
     // answer "what does this role bind to" identically. Only meaningful when anchored.
     binding:        anchored ? resolveAnchorBinding(scenario, role) : null,
   };
+}
+
+// ── ANCHORED-LOCATION PROPOSER ────────────────────────────────────────────────
+// Drafts the anchored_location block a reviewer would otherwise hand-author per role.
+// PURE — no I/O, no model call. Everything it needs is already on the role: the two declared
+// fields that say "the record fixes this person" and the start location the scenario opens
+// them at. A model is not consulted because there is nothing here for one to decide: the
+// judgement this block needs is whether the person MOVED, and that judgement is the
+// reviewer's, made against the record, not a thing to be inferred from prose.
+//
+// WHO GETS ONE: character_type 'real' AND fate_mode 'anchored'. Deliberately narrower than
+// classifyRoleForDefiningMoment, which takes either signal alone. That classifier chooses a
+// PROMPT; this proposes to PIN a role to one room for a whole session, so it wants both
+// declarations present before it drafts anything. A role carrying only one signal is left
+// for the reviewer to author by hand.
+//
+// WHAT IT PROPOSES: the role's own startLocationId, enforce_from 0.0, reviewed FALSE. Note
+// what it does NOT try to do — decide whether this role is stationary. resolveAnchoredLocation
+// refuses to infer an anchor from startLocationId for exactly that reason, and this does not
+// overturn it: it drafts a proposal into the review queue, where the start location is the
+// right thing to OFFER, and the engine ignores the draft until a human confirms it. The
+// mobile ones are cleared at the APPROVE step — Wills, who spent the night between the
+// stairwell, the garage door and the security desk; Princip, who was still on the motorcade
+// route when the session opens. Machine drafts, human judges.
+//
+// NEVER OVERWRITES. A role that already carries an anchored_location — verified or still a
+// proposal — is reported as skipped and left byte-identical. Role JSON is Supabase-owned and
+// gitignored, with no role-level version history: a proposer that clobbered an approved
+// anchor would be destroying the reviewed work it exists to feed.
+//
+// INDEPENDENT OF THE EPILOGUE. The proposal needs startLocationId and nothing else, so this
+// runs on a scenario whose historical record has not been generated yet. A documented fate,
+// where one exists, is quoted into the rationale to give the reviewer something to check
+// against — an enrichment, never a requirement. There is no epilogue-first sequencing here.
+export function proposeAnchoredLocation(scenario, role, locations = []) {
+  const base = {
+    role_id:        role?.id   || '',
+    role_name:      role?.name || role?.id || '',
+    character_type: role?.character_type ?? null,
+    fate_mode:      role?.fate_mode ?? null,
+  };
+
+  if (role?.character_type !== 'real' || role?.fate_mode !== 'anchored') {
+    return { ...base, proposed: false,
+      reason: 'not history-fixed — a proposal is drafted only for character_type "real" AND fate_mode "anchored"' };
+  }
+
+  const existingId = typeof role?.anchored_location?.location_id === 'string'
+    ? role.anchored_location.location_id.trim() : '';
+  if (existingId) {
+    const verified = role.anchored_location.reviewed === true;
+    return { ...base, proposed: false,
+      reason: `already carries an anchored_location (${existingId}) — ${verified ? 'verified and enforcing' : 'a proposal awaiting review'}. Clear it in the role editor to draft a new one.`,
+      existing: { location_id: existingId, reviewed: verified } };
+  }
+
+  const startId = typeof role?.startLocationId === 'string' ? role.startLocationId.trim() : '';
+  if (!startId) {
+    return { ...base, proposed: false, reason: 'role has no startLocationId, so there is no location to propose' };
+  }
+  const loc = (locations || []).find(l => l && l.id === startId);
+  if (!loc) {
+    return { ...base, proposed: false,
+      reason: `startLocationId "${startId}" is not a location in this scenario — fix the role's starting location first` };
+  }
+
+  return {
+    ...base,
+    proposed:      true,
+    location_name: loc.name || startId,
+    anchored_location: {
+      location_id:  startId,
+      enforce_from: ANCHOR_ENFORCE_FROM_DEFAULT,
+      reviewed:     false,
+      generated:    true,
+      rationale:    buildAnchorProposalRationale(scenario, role, loc),
+    },
+  };
+}
+
+// The rationale a proposal carries into the editor. It is written TO THE REVIEWER, not to the
+// model — nothing downstream reads it — so it says plainly what the draft is based on, quotes
+// the documented fate when the scenario has one to quote, and names the case that should make
+// the reviewer clear the field instead of approving it.
+function buildAnchorProposalRationale(scenario, role, loc) {
+  const name  = role?.name || role?.id || 'This role';
+  const fate  = (scenario?.epilogue?.character_fates || [])
+    .find(f => f && f.character_id && f.character_id === role?.character_id);
+  const rec   = typeof fate?.historical_record === 'string' ? fate.historical_record.trim() : '';
+  // First sentence, or a hard clip — the reviewer wants a pointer into the record, not the
+  // whole entry pasted into a role file.
+  const firstSentence = rec ? (rec.match(/^[\s\S]{40,300}?\.\s/)?.[0]?.trim() || rec.slice(0, 300).trim()) : '';
+
+  return [
+    'PROPOSED — NOT VERIFIED. Drafted by the anchored-location proposer from this role\u2019s own declared fields; nothing here has been checked against a source.',
+    `${name} is declared character_type "real" and fate_mode "anchored", and the scenario opens them at ${loc.name || loc.id} (${loc.id}), which is what is proposed.`,
+    firstSentence ? `Documented outcome on file: ${firstSentence}` : 'The scenario carries no documented fate for this character yet, so there is nothing on file to check the place against.',
+    'Before ticking Verified: confirm the record actually holds this person in this one place for the whole session. If they MOVED \u2014 a guard on rounds, a lookout across the street, anyone still travelling toward the event that fixes them \u2014 clear this field instead, or set "Wall opens at" to the fraction at which the record has them arrive. Replace this note with what in the record puts them here.',
+  ].join('\n\n');
 }
 
 // ── Archetype classifier (PROPOSES an archetype; writes nothing) ──────────────
@@ -2296,6 +2410,98 @@ export function createAdminRouter(repos, config = {}) {
       console.error(`[ARCHETYPE ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
     }
+  });
+
+  // Propose anchored locations across a scenario. READ-ONLY BY CONSTRUCTION, exactly like
+  // classify-archetype above: the scenario, its roles and its locations are loaded
+  // server-side, the pure proposer runs over each role, and the result is returned. Nothing
+  // is written — the reviewer sees every draft, clears the roles that moved, and applies the
+  // ones that stand, one role at a time through the route below.
+  //
+  // ON DEMAND, NOT A PIPELINE STEP. An anchor is a claim about one person's documented night;
+  // most scenarios want it for none of their roles and some for one. A forced step would put
+  // that claim in front of a reviewer for every scenario generated, which is how a review
+  // step becomes a thing people click through. It sits beside "Suggest terms" instead.
+  //
+  // Returns EVERY role, drafted or not, with the reason it was skipped — the skips are the
+  // interesting half. A reviewer who sees "not history-fixed" against a role they believe is
+  // anchored has found a missing character_type or fate_mode, which is worth knowing.
+  r.post('/scenarios/:id/propose-anchored-locations', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const roles     = repos.scenarios.findPlayerRoles(req.params.id);
+    const locations = repos.locations.findByScenario(req.params.id);
+
+    const results  = roles.map(role => proposeAnchoredLocation(scenario, role, locations));
+    const proposed = results.filter(r0 => r0.proposed);
+    console.log(`[ANCHOR-PROPOSE] ${req.params.id} — ${proposed.length} proposal(s) from ${roles.length} role(s), nothing written`);
+    res.json({
+      scenarioId: req.params.id,
+      persisted:  false,
+      proposals:  proposed,
+      skipped:    results.filter(r0 => !r0.proposed),
+      locations:  locations.map(l => ({ id: l.id, name: l.name })),
+    });
+  });
+
+  // Apply ONE proposal to ONE role. The write that the read-only route above deliberately
+  // does not do, taken per role so a reviewer can accept McCord and drop Wills in the same
+  // sitting.
+  //
+  // reviewed:false IS THE POINT. What lands is a proposal in the role file: visible in the
+  // editor's Anchored Location form, and inert to the engine — resolveEnforcingAnchor
+  // (PromptComposer) narrows no roster and injects no directive until reviewed === true. The
+  // reviewer approves by ticking Verified in that form and saving, which is the same
+  // approve step the field has always had. Stamps go LAST, as on the defining-moment write
+  // above, so a client that posts reviewed:true cannot approve its own draft.
+  //
+  // NEVER OVERWRITES, for the reason the proposer does not: 409 when the role already carries
+  // an anchor. Clearing one is a decision made in the editor, on purpose, not a side effect
+  // of pressing a generate button twice.
+  r.post('/scenarios/:id/roles/:roleId/anchored-location', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+
+    const existingId = typeof role.anchored_location?.location_id === 'string'
+      ? role.anchored_location.location_id.trim() : '';
+    if (existingId) {
+      return res.status(409).json({
+        error: `Role "${role.name}" already carries an anchored_location (${existingId}). Clear it in the role editor before applying a proposal.`,
+      });
+    }
+
+    const locations  = repos.locations.findByScenario(req.params.id);
+    const locationId = typeof req.body?.location_id === 'string' ? req.body.location_id.trim() : '';
+    if (!locationId) return badRequest(res, '"location_id" is required.');
+    if (!locations.some(l => l && l.id === locationId)) {
+      return badRequest(res, `"${locationId}" is not a location in this scenario.`);
+    }
+
+    // Same coercion the editor-save guard applies, for the same reason: a fraction typed
+    // into the review card arrives as a string, and what lands on disk should be a number.
+    const rawFrom = req.body?.enforce_from;
+    let enforceFrom = ANCHOR_ENFORCE_FROM_DEFAULT;
+    if (rawFrom !== undefined && rawFrom !== null && rawFrom !== '') {
+      const n = typeof rawFrom === 'number' ? rawFrom : Number(rawFrom);
+      if (!Number.isFinite(n) || n < 0 || n > 1) {
+        return badRequest(res, '"enforce_from" must be a number between 0.0 and 1.0.');
+      }
+      enforceFrom = n;
+    }
+
+    const anchored_location = {
+      location_id:  locationId,
+      enforce_from: enforceFrom,
+      rationale:    typeof req.body?.rationale === 'string' ? req.body.rationale.trim() : '',
+      generated:    true,
+      reviewed:     false,
+    };
+
+    const saved = repos.scenarios.savePlayerRole({ ...role, anchored_location });
+    console.log(`[ANCHOR-PROPOSE] ${req.params.id}/${role.id} — proposal written for ${locationId} (reviewed:false, not enforcing)`);
+    res.json({ roleId: role.id, anchored_location: saved.anchored_location });
   });
 
   r.get('/locations',      (req, res) => res.json(
