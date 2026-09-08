@@ -1049,7 +1049,23 @@ Do not open with the historical context. Open inside the character's body. Let t
       //     client can never disagree about whether the moment is happening.
       const forkDue       = definingMomentDue(state, scenario);
       const definingBlock = forkDue ? resolveDefiningMomentBlock(state, scenario) : null;
-      if (forkDue) console.log("[DEFINING] fork due - moment=" + definingBlock?.principal_transition?.moment + " elapsed=" + state.elapsedMinutes);
+      // DRIFT INSTRUMENTATION — measurement only. Nothing reads these values; forkDue is
+      // unchanged. `loc` is where the PREVIOUS turn left the player (reliable since the
+      // location-reconciliation fix). `start` is visitedLocations[0], which buildInitialState
+      // seeds with the role's startLocationId and nothing ever rewrites — a free stand-in for
+      // the scene the setup was authored in, since all 9 stored blocks are written in their
+      // role's start location. `intended` reads an explicit authored field for the day one
+      // exists; it is null until then, and drift falls back to comparing against start.
+      if (forkDue) {
+        const startLoc = state.visitedLocations?.[0] ?? null;
+        const intended = definingBlock?.scene_location ?? definingBlock?.location ?? null;
+        console.log("[DEFINING] fork due - moment=" + definingBlock?.principal_transition?.moment
+          + " elapsed=" + state.elapsedMinutes
+          + " loc=" + state.location
+          + " start=" + startLoc
+          + (intended ? " intended=" + intended : "")
+          + " drift=" + (state.location !== (intended ?? startLoc)));
+      }
 
       // Save current state so promptBuilder can read session context
       if (sessionId) appData.saveSession(sessionId, state);
