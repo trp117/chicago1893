@@ -25,6 +25,7 @@ const SUITE = [
   ['step 5b — bulk inject gate',            'inject.test.mjs'],
   ['location reconciliation (a+b+c)',      'location.test.mjs'],
   ['anchored location: gate + proposer',    'anchor.test.mjs'],
+  ['anchor dropdown: scope + None clears',  'anchor-scope.test.mjs'],
   ['graceful degradation on unusable output', 'degradation.test.mjs'],
 ];
 

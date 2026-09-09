@@ -4529,6 +4529,11 @@ export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRole
 // Same, for the archetype guard. The property's own accessors (ROLE_ARCHETYPES,
 // isRoleArchetype, roleArchetype) are exported at their definition — those ARE app code.
 export { preserveStoredArchetype };
+// Same, for the anchored-location guard. Exported so anchor-scope.test.mjs can assert the
+// half of its contract the UI depends on: an EMPTY location_id (what the "— None (role roams
+// free) —" option posts) deletes the block, while an ABSENT key (a stale tab) still restores
+// it. Those two cases are one `if` apart and the editor's clear action rides on the first.
+export { preserveStoredAnchoredLocation };
 // Archetype classifier. classifyRoleArchetype and the two pure resolvers are app code
 // (the route calls them); validateArchetypeProposal and the prompt builder are exported so
 // the proposal harness can exercise the classifier without going through HTTP.

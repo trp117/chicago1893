@@ -510,10 +510,15 @@ const ENTITIES = {
         { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
         { key: 'opening.choices',   label: 'Opening Choices',   type: 'list',     help: 'The three initial actions offered to the player (aim for exactly 3).' },
       ]},
-      // ANCHORED LOCATION — hand-authorable, and clearable. The select carries an empty
-      // "Choose…" option, and preserveStoredAnchoredLocation honors a cleared value from a
-      // current tab while restoring the field for a stale one, so choosing nothing here
-      // genuinely unbinds the role rather than being silently put back.
+      // ANCHORED LOCATION — hand-authorable, and clearable. The select's first option is
+      // "— None (role roams free) —", selected whenever no anchor is set, and
+      // preserveStoredAnchoredLocation honors a cleared value from a current tab while
+      // restoring the field for a stale one, so choosing None here genuinely unbinds the
+      // role rather than being silently put back. The blank had always been rendered, but
+      // as "Choose…" — a label that reads as an empty slot waiting to be filled, not as the
+      // un-anchor action the help text below promises. Naming it is the whole fix: a role
+      // that had been anchored looked un-clearable, and the panel's own advice ("clear it in
+      // the role editor") pointed at a control nobody could see.
       //
       // The right DEFAULT for a history-fixed role is its Starting Location above — the nine
       // stored fork blocks are each authored in their role's start location — but it is
@@ -522,7 +527,8 @@ const ENTITIES = {
       // filled itself in would bind them by accident.
       { title: 'Anchored Location', fields: [
         { key: 'anchored_location.location_id', label: 'Anchored Location', type: 'select', source: 'locations',
-          help: 'Only for roles whose documented outcome happened in ONE place (McCord arrested in Suite 600). In the last stretch of a session this becomes the only location the role can be in. Leave blank for roles who moved — a blank here is what keeps them free.' },
+          blankLabel: '— None (role roams free) —',
+          help: 'Only for roles whose documented outcome happened in ONE place (McCord arrested in Suite 600). In the last stretch of a session this becomes the only location the role can be in. Choose "— None (role roams free) —" for roles who moved — that is also how you un-anchor a role: select None and save, and the whole anchored_location block is removed.' },
         { key: 'anchored_location.enforce_from', label: 'Wall opens at (fraction)', type: 'number',
           placeholder: '0.0',
           help: 'When the location wall opens, as a fraction of session length — the same scale as the defining moment\'s at_elapsed_fraction. Blank means 0.0: fixed in place from the first turn, which is right for a role who never left. Set a later fraction (0.6) only for a role the record has MOVING before their fixed event.' },
@@ -598,6 +604,37 @@ function buildCheckboxGroup(key, relatedItems, selectedIds = [], labelField = 'n
   return `<div class="checkboxes-group">${boxes || '<em style="font-size:12px;color:#94a3b8">No items available</em>'}</div>`;
 }
 
+// SCENARIO SCOPE for the location selects. /locations returns EVERY location in the project
+// — 222 across 29 scenarios — but a role or clue may only ever name one from its OWN
+// scenario. Rendering the global list put a cross-scenario id one mis-click away and nothing
+// downstream said no: the editor's PUT validates only that location_id is a non-empty string
+// (preserveStoredAnchoredLocation in adminRouter.js), so a phantom anchor saved clean and
+// then silently did nothing at runtime — resolveEnforcingAnchor drops an anchor whose
+// location is not in the scenario, leaving the editor showing "anchored — historical
+// faithfulness enforced" over a session that ran unanchored. Removing the choice is the fix;
+// catching it afterwards would still let a reviewer believe they had anchored someone.
+//
+// Filtered CLIENT-SIDE rather than by passing ?scenarioId= to /locations, which looks tidier
+// and is wrong: LocationRepository.col() maps 'chicago_1893_v1' onto a directory named
+// 'chicago1893' which does not exist on disk, so findByScenario returns [] for every Chicago
+// role and the select would render empty. The scenarioId FIELD is reliable where that mapping
+// is not — all 222 files carry one equal to their directory, verified — so match on it.
+//
+// Unfiltered when the item has no scenarioId: a NEW role has no scenario until it is saved.
+// That is the pre-existing behaviour for that case, not a regression.
+function scopeLocationsToItem(locations, item) {
+  const scenarioId = item?.scenarioId;
+  if (!scenarioId) return locations || [];
+  return (locations || []).filter(l => l && l.scenarioId === scenarioId);
+}
+
+// The blank option is the CLEAR action, not decoration: posting value "" is what the
+// editor-save guard reads as "the reviewer emptied this field" (preserveStoredAnchoredLocation
+// in adminRouter.js deletes the block on an empty id, and restores it only when the key is
+// absent — a stale tab). It is explicitly `selected` when nothing is chosen so an unset field
+// shows the blank label rather than relying on the browser's first-option default, and callers
+// can name it (`blankLabel`) — "Choose…" reads as "not filled in yet", which is wrong for a
+// field whose empty state is a decision.
 function buildSelectField(key, options, selected, placeholder = 'Choose…') {
   const opts = options.map(opt => {
     const value = typeof opt === 'string' ? opt : opt.id;
@@ -605,7 +642,7 @@ function buildSelectField(key, options, selected, placeholder = 'Choose…') {
     const sel   = value === selected ? 'selected' : '';
     return `<option value="${value}" ${sel}>${label}</option>`;
   }).join('');
-  return `<select name="${key}" id="field-${key}"><option value="">${placeholder}</option>${opts}</select>`;
+  return `<select name="${key}" id="field-${key}"><option value=""${selected ? '' : ' selected'}>${placeholder}</option>${opts}</select>`;
 }
 
 function buildActsEditor(arc) {
@@ -656,7 +693,7 @@ function buildField(field, item, related) {
   }
   if (field.type === 'select') {
     if (field.source && related[field.source]) {
-      return buildSelectField(field.key, related[field.source], value);
+      return buildSelectField(field.key, related[field.source], value, field.blankLabel || 'Choose…');
     }
     const opts = (field.options || []).map(o => {
       const v = typeof o === 'string' ? o : (o.value !== undefined ? o.value : o.id);
@@ -1140,6 +1177,9 @@ async function renderScenarioEditor(scenarioId) {
 // ═══════════════════════════════════════════════════════════════
 // RENDER — List view
 // ═══════════════════════════════════════════════════════════════
+// The list's delegated click handler, so the next render can remove it before adding its own.
+let _listClickHandler = null;
+
 async function renderList(entityType) {
   const cfg = ENTITIES[entityType];
   setTopbar(cfg.plural, cfg.canAdd ? [{ label: `＋ New ${cfg.label}`, cls: 'btn-primary', action: () => renderForm(entityType, null) }] : []);
@@ -1208,12 +1248,24 @@ async function renderList(entityType) {
     renderList(entityType);
   });
 
-  document.getElementById('content').addEventListener('click', async e => {
+  // ONE live delegate, swapped on each render. #content is a permanent element — only its
+  // innerHTML is replaced — so listeners added here ACCUMULATE across renders. This used to
+  // be registered `{ once: true }`, which made a re-rendered list behave two wrong ways at
+  // once: the first click anywhere in #content fired every handler still registered from
+  // earlier renders (Edit opening several times over, Delete stacking confirmations), and
+  // then removed all of them, leaving the list dead — cards visible, Edit and Delete inert.
+  // Returning from a save re-renders, so that is exactly the state a reviewer lands in after
+  // saving a role: a list that no longer responds, which reads as "the other roles are gone".
+  // The data was never involved. Remove the previous delegate, add one, keep it live.
+  const contentEl = document.getElementById('content');
+  if (_listClickHandler) contentEl.removeEventListener('click', _listClickHandler);
+  _listClickHandler = e => {
     const editBtn   = e.target.closest('[data-edit]');
     const deleteBtn = e.target.closest('[data-delete]');
     if (editBtn)   renderForm(entityType, editBtn.dataset.edit);
     if (deleteBtn) confirmDelete(entityType, deleteBtn.dataset.delete, deleteBtn.dataset.name);
-  }, { once: true });
+  };
+  contentEl.addEventListener('click', _listClickHandler);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1233,7 +1285,11 @@ async function renderForm(entityType, editId) {
     apiGet('/locations'),
   ]);
 
-  state.related = { characters, locations };
+  // Locations are scoped to the item's own scenario — see scopeLocationsToItem. This is the
+  // only place the location list enters the form, so scoping it here covers every select fed
+  // by `source: 'locations'`: the role's Starting Location and Anchored Location, and a
+  // clue's Found At.
+  state.related = { characters, locations: scopeLocationsToItem(locations, item) };
 
   const html = buildFormHTML(cfg, item, state.related);
   document.getElementById('content').innerHTML = html;
