@@ -1654,6 +1654,26 @@ Do not open with the historical context. Open inside the character's body. Let t
       && (endResult === 'partial' || endResult === 'failure')
       && role.ending_notes?.[endResult]?.what_happened;
 
+    // ENDRESULT SHOULD NEVER ARRIVE. It is set from endState.result, and the closing section
+    // of game_system_prompt.md tells the model not to emit that field ("there is no win or
+    // loss") — the engine does not evaluate success, the epilogue reports what the record
+    // says happened. Until now the output contract in that same prompt still ADVERTISED
+    // `"result": "success|failure|partial"`, so the model was reading one instruction and its
+    // contradiction; the advertisement is gone as of this commit.
+    //
+    // A model can still emit a field nobody asked for, and if it does on one of the scenarios
+    // carrying structured_endings_enabled it silently swaps which closing-prose prompt the
+    // player gets. That switch was previously invisible in the logs — nothing recorded that a
+    // stray value had arrived, let alone that it changed the output. This makes it loud.
+    // Nothing GATES on this log; it is instrumentation, and the spurious path is left exactly
+    // as it was so this commit stays prompt-only in behaviour.
+    if (endResult) {
+      console.warn(`[ENDRESULT] unexpected endState.result="${endResult}" arrived for session=${sessionId} scenario=${scenarioId} role=${roleId}`
+        + ` — the prompt forbids this field. structured_endings_enabled=${!!scenarioData?.structured_endings_enabled}`
+        + ` notes_present=${!!role?.ending_notes?.[endResult]?.what_happened}`
+        + ` -> closing prose path ${useStructured ? 'CHANGED to notes-guided' : 'unchanged (transcript)'}`);
+    }
+
     let closingPrompt;
 
     if (useStructured) {

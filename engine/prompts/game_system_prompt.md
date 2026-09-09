@@ -107,7 +107,6 @@ Return JSON only. No markdown fences. Fields:
   "choices": ["action 1", "action 2", "action 3"],
   "endState": {
     "isEnding": true,
-    "result": "success|failure|partial",
     "scene": "immediate resolution prose",
     "situationSummary": "what happened — the constraints that shaped the outcome, the decisions that mattered, and what the historical moment cost",
     "whatPlayerDiscovered": "evidence, facts, and operational details uncovered",
