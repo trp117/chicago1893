@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 
 import { DualWriteStore }       from '../../lib/DualWriteStore.js';
-import { restoreFromSupabase } from '../../lib/restoreFromSupabase.js';
+import { restoreFromSupabase, getRestoredCounts } from '../../lib/restoreFromSupabase.js';
 import { CharacterRepository }  from '../repositories/CharacterRepository.js';
 import { LocationRepository }   from '../repositories/LocationRepository.js';
 import { ClueRepository }       from '../repositories/ClueRepository.js';
@@ -19,7 +19,8 @@ import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
-import { checkSupabaseConnection, supabaseAuth } from '../../lib/supabase.js';
+import { checkSupabaseConnection, isSupabaseConnected, supabaseAuth } from '../../lib/supabase.js';
+import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/PromptComposer.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
 
@@ -157,6 +158,34 @@ app.get('/api/stories', async (req, res) => {
 
 // Keep-warm ping — Railway and uptime monitors hit this to prevent cold starts
 app.get('/ping', (_, res) => res.json({ ok: true, ts: Date.now() }));
+
+// Deploy verification — answers "is prod running the commit I just pushed, with the flags
+// I expect?" without a Railway dashboard login. Deliberately UNAUTHENTICATED: the whole
+// point is to check it in one curl, and an auth gate would defeat that.
+//
+// The flags come from PromptComposer's own exported bindings, NOT a fresh read of
+// process.env, so this endpoint and the [CLOSURE]/[DEFINING] boot lines can never
+// disagree. supabaseConnected and restoredCounts likewise mirror the [SUPABASE] and
+// [RESTORE] boot lines from the modules that print them.
+//
+// KEEP THIS TO OPERATIONAL FACTS ONLY. It is world-readable, so it must never carry
+// env values, connection strings, keys, paths, scenario content, or session data. A SHA,
+// two booleans, restore counts and an uptime are safe; anything describing configuration
+// or data is not.
+app.get('/health', (_, res) => {
+  // Railway injects RAILWAY_GIT_COMMIT_SHA; it is absent on localhost, hence the fallback.
+  const commit = process.env.RAILWAY_GIT_COMMIT_SHA || 'unknown';
+  const restoredCounts = getRestoredCounts();
+  res.set('Cache-Control', 'no-store').json({
+    commit,
+    closureBeatsEnabled:   CLOSURE_BEATS_ENABLED,
+    definingMomentEnabled: DEFINING_MOMENT_ENABLED,
+    supabaseConnected:     isSupabaseConnected(),
+    // Omitted entirely when the restore never reached its write loop, per the spec.
+    ...(restoredCounts ? { restoredCounts } : {}),
+    uptime: process.uptime(),
+  });
+});
 
 const HTML_HEADERS = { headers: { 'Cache-Control': 'public, max-age=300, must-revalidate' } };
 

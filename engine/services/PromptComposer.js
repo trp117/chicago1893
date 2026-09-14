@@ -883,7 +883,9 @@ function buildVerifiedFactsBlock(state) {
 
 // Feature flag — beat-aware session closing. Default OFF.
 // Same idiom as STRICT_FATE_VERIFICATION (gameRouter.js:46).
-const CLOSURE_BEATS_ENABLED = process.env.CLOSURE_BEATS_ENABLED === 'true';
+// Exported so GET /health can report the flag from THIS binding rather than re-reading
+// process.env — /health and the boot line below are then guaranteed to agree.
+export const CLOSURE_BEATS_ENABLED = process.env.CLOSURE_BEATS_ENABLED === 'true';
 // Self-report at module load so every boot log states the flag's real value. Without
 // this the only evidence was the launching shell's env, which says nothing about the
 // process that actually ended up holding the port.
@@ -891,7 +893,8 @@ console.log(`[CLOSURE] beats ${CLOSURE_BEATS_ENABLED ? 'ENABLED' : 'disabled'}`)
 
 // Feature flag — decision-aware closure (the defining moment). Default OFF.
 // Same idiom as CLOSURE_BEATS_ENABLED above.
-const DEFINING_MOMENT_ENABLED = process.env.DEFINING_MOMENT_ENABLED === 'true';
+// Exported for GET /health, same reason as CLOSURE_BEATS_ENABLED above.
+export const DEFINING_MOMENT_ENABLED = process.env.DEFINING_MOMENT_ENABLED === 'true';
 // Self-report at module load, beside the [CLOSURE] line and for the same reason: the
 // boot log must state the flag's real value for the process that holds the port.
 console.log(`[DEFINING] moment ${DEFINING_MOMENT_ENABLED ? 'ENABLED' : 'disabled'}`);
