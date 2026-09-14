@@ -6364,6 +6364,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- Quote CURRENT as the STORED value only — one field, no display scaffolding. Each fact is exported as a "[fact_id] (domain)" header line, then the content sentence, then a "Source: " line, then an optional "Valid: " line; those four are SEPARATE stored fields and the header, the "Source: " prefix and the "Valid: " prefix are added at display time. To correct the fact text, quote the content sentence alone. To correct a citation, quote the citation alone WITHOUT the "Source: " prefix. Never put the "[fact_id] (domain)" header line, the "Source: "/"Valid: " prefixes, or list glyphs into CURRENT.
 - Prefer an empty citation to an uncertain one — flag any fact whose source doesn't support it.
 - Internal consistency: a fact must not contradict the same figure used elsewhere in the scenario.
 
@@ -6832,19 +6833,47 @@ async function applyCorrections(scenarioId) {
 // every correction returns an explicit outcome (applied / field-not-found /
 // current-mismatch / ambiguous), surfaced in the UI rather than a toast count.
 
-function _normWs(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
+// Canonical Unicode form for every side of the CURRENT match. A reviewer quoting "Íñigo"
+// can hand it back DECOMPOSED (NFD: I + U+0301, n + U+0303) where storage holds it
+// COMPOSED (NFC: U+00CD, U+00F1) — byte-different, pixel-identical, and undebuggable by
+// eye. Without this, 18 of the 20 facts in two_kinds_of_daydream, and every one of the 15
+// accent-bearing scenarios, can never be corrected.
+//
+// NFC is CANONICAL composition only, so it closes exactly that gap and no other: "Inigo"
+// remains a different string from "Íñigo", so a reviewer who DE-ACCENTS the text still
+// yields current-mismatch — that is a real alteration and must stay caught. Verified: NFD
+// quotes go 2/20 → 20/20 applied, while de-accented / ñ→n / curly-quote / dash-swap /
+// quoted / truncated / paraphrased all still mismatch at their prior rates.
+//
+// NEVER NFKC. That is COMPATIBILITY folding — ﬁ→fi, ²→2, №→No — which would silently
+// coerce genuine differences into matches and defeat the point of verifying CURRENT.
+function _nfc(s) { return String(s == null ? '' : s).normalize('NFC'); }
+
+function _normWs(s) { return _nfc(s).replace(/\s+/g, ' ').trim(); }
 
 // Whitespace-tolerant literal pattern. Quotes/dashes must match literally — a
 // smart-quote / em-dash / paraphrase variant deliberately yields current-mismatch
-// (surfaced) rather than being silently coerced.
+// (surfaced) rather than being silently coerced. Unicode composition form is normalised
+// (see _nfc) because that is not a difference in the text.
 function _flexPattern(s) {
-  return String(s).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return _nfc(s).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
 }
+// All three sides go through _nfc: the pattern (via _flexPattern), the stored string it
+// runs against, and REPLACE WITH before write-back. Normalising only the locate step in
+// _normWs would just move the failure downstream — CURRENT would be found and then fail
+// here, reported as "located but exact replace failed" instead of "not found".
+//
+// Write-back therefore stores the NFC form of the edited field. All 36 scenarios (10,080
+// string leaves) are already NFC, so this rewrites nothing today; it would only ever
+// recompose a single canonical-equivalent value if non-NFC content entered later.
 function _replaceOnce(raw, current, replacewith) {
+  const pattern = _flexPattern(current);
+  if (!pattern) return { ok: false, value: raw };  // empty pattern would match everything
   let re;
-  try { re = new RegExp(_flexPattern(current)); } catch { return { ok: false, value: raw }; }
-  if (!re.test(raw)) return { ok: false, value: raw };
-  return { ok: true, value: raw.replace(re, () => replacewith) };  // fn-replacer: no $ interpretation
+  try { re = new RegExp(pattern); } catch { return { ok: false, value: raw }; }
+  const target = _nfc(raw);
+  if (!re.test(target)) return { ok: false, value: raw };
+  return { ok: true, value: target.replace(re, () => _nfc(replacewith)) };  // fn-replacer: no $ interpretation
 }
 
 // Editable string leaves within a scope, as {container, key} so we can mutate in place.
