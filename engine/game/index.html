@@ -3288,25 +3288,69 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Anything interpolated into an HTML attribute goes through this. The old escape covered only
+// `"`, which left a definition containing <, > or & able to inject markup on its own. The &
+// substitution must run first or it would double-escape the entities introduced after it.
+function escapeHtmlAttr(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ONE alternation pass over the text — never a term-at-a-time loop.
+//
+// WHY THIS SHAPE. The previous version looped per term and spliced each <span data-def="...">
+// back into the working string UNSTASHED. Definitions are dense with other glossary terms, so
+// the next term's search would match inside an earlier term's data-def, nest a <span> inside a
+// quoted attribute, collapse that attribute at its first `"`, and leak the definition tail plus
+// a raw `">` into player-visible prose — while the real prose occurrence went unwrapped, the
+// non-global replace having already spent its single match on the attribute.
+//
+// A single pass closes that off structurally: String.replace evaluates every match against the
+// ORIGINAL text and assembles the result only at the end, so no term can ever see the markup
+// another term produced. Re-stashing each injected span would also work, but this needs no
+// bookkeeping and cannot drift.
 function markupGlossaryTerms(html) {
   const glossary = gameState?.glossary;
   if (!glossary?.length) return html;
 
-  const terms = [...glossary].sort((a, b) => b.term.length - a.term.length);
+  // Longest first: alternation is leftmost-FIRST-ALTERNATIVE, not longest-match, so at a given
+  // position the order here breaks ties — "Vita Christi" must precede a bare "Christi".
+  const terms = [...glossary]
+    .filter(g => g && typeof g.term === 'string' && g.term.trim())
+    .sort((a, b) => b.term.length - a.term.length);
+  if (!terms.length) return html;
 
-  // Stash HTML tags behind placeholders so we only replace text content
-  const stash = [];
-  let safe = html.replace(/<[^>]+>/g, m => { stash.push(m); return `\x00${stash.length - 1}\x00`; });
-
+  // First definition wins for a duplicated term, consistent with the longest-first order above.
+  const defByTerm = new Map();
   for (const { term, definition } of terms) {
-    const escapedDef = (definition || '').replace(/"/g, '&quot;');
-    const re = new RegExp(`(?<![\\w\\-])(${escapeRegex(term)})(?![\\w\\-])`, 'i');
-    if (re.test(safe)) {
-      safe = safe.replace(re, `<span class="gloss-term" data-def="${escapedDef}">$1</span>`);
-    }
+    const key = term.toLowerCase();
+    if (!defByTerm.has(key)) defByTerm.set(key, definition || '');
   }
 
-  return safe.replace(/\x00(\d+)\x00/g, (_, i) => stash[+i]);
+  // Stash the caller's tags so only text content is ever matched. \x00 is not a word character,
+  // so a term sitting flush against a stashed tag (<em>Flos Sanctorum</em>) still satisfies the
+  // word-boundary guards below.
+  const stash = [];
+  const safe = html.replace(/<[^>]+>/g, m => { stash.push(m); return `\x00${stash.length - 1}\x00`; });
+
+  // `g` so every occurrence in the turn is wrapped. The old flags were `i` alone, so each term
+  // got one match per render — which the sensory opening routinely consumed before the body was
+  // reached. The guards still reject substring hits ("breach" inside "breached") and hyphenated
+  // neighbours.
+  const re = new RegExp(`(?<![\\w\\-])(?:${terms.map(t => escapeRegex(t.term)).join('|')})(?![\\w\\-])`, 'gi');
+
+  // Function replacer, never a replacement string: $&, $', $` and $1 inside a definition are
+  // inert here. As a replacement string, a definition containing $' would splice the remainder
+  // of the document into the page. (engine/admin/index.html carries this guard for the same reason.)
+  const marked = safe.replace(re, (match) => {
+    const def = defByTerm.get(match.toLowerCase()) || '';
+    return `<span class="gloss-term" data-def="${escapeHtmlAttr(def)}">${match}</span>`;
+  });
+
+  return marked.replace(/\x00(\d+)\x00/g, (_, i) => stash[+i]);
 }
 
 document.addEventListener('click', e => {
