@@ -3159,10 +3159,16 @@ function copyExportToClipboard(btn, text) {
   }).catch(() => toast('Clipboard write failed', 'error'));
 }
 
+// The fact-domain vocabulary, shared by the form editor's <select> and the ---NEW FACT---
+// validator. A domain outside this list cannot be represented by the select, so the next
+// form save would silently reset it to the first option — which is why insertNewFact
+// rejects an unrecognised DOMAIN instead of storing it.
+const TF_FACT_DOMAINS = ['power','flooding','timing','capacity','navigation','personnel','other'];
+
 function buildTfFactRow(f) {
   f = f || {};
   const src = normSourceClient(f.source);
-  const DOMAINS = ['power','flooding','timing','capacity','navigation','personnel','other'];
+  const DOMAINS = TF_FACT_DOMAINS;
   const domainOptions = DOMAINS.map(d =>
     `<option value="${d}" ${(f.domain || '') === d ? 'selected' : ''}>${d}</option>`
   ).join('');
@@ -6356,6 +6362,17 @@ REASON: [one sentence]
 SOURCE: [primary source citation]
 ---END---
 
+To ADD a fact that is missing entirely — never to change one that exists — use:
+
+---NEW FACT---
+SECTION: Technical Facts
+FIELD: [new fact_id — lowercase_with_underscores, not already in the data above]
+DOMAIN: [exactly one of: power | flooding | timing | capacity | navigation | personnel | other]
+CONTENT: [the fact, one sentence]
+SOURCE: [primary source citation]
+REASON: [why the scenario needs it]
+---END---
+
 If the section is fully accurate: ---CONFIRMED: Technical Facts---
 If you cannot verify a claim: ---UNVERIFIED: [fact_id]---
 
@@ -6366,6 +6383,8 @@ Rules:
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
 - Quote CURRENT as the STORED value only — one field, no display scaffolding. Each fact is exported as a "[fact_id] (domain)" header line, then the content sentence, then a "Source: " line, then an optional "Valid: " line; those four are SEPARATE stored fields and the header, the "Source: " prefix and the "Valid: " prefix are added at display time. To correct the fact text, quote the content sentence alone. To correct a citation, quote the citation alone WITHOUT the "Source: " prefix. Never put the "[fact_id] (domain)" header line, the "Source: "/"Valid: " prefixes, or list glyphs into CURRENT.
 - Prefer an empty citation to an uncertain one — flag any fact whose source doesn't support it.
+- NEW FACT adds only. Use it when a fact the scenario relies on is absent; if the fact_id already appears in the data above, the block is rejected — correct that fact with ---CORRECTION--- instead.
+- Do not invent a DOMAIN. Use one of the seven listed values exactly; anything else is rejected.
 - Internal consistency: a fact must not contradict the same figure used elsewhere in the scenario.
 
 DATA TO REVIEW:
@@ -6567,11 +6586,11 @@ function buildAIPanel(scenarioId) {
     <div id='corrections-diff'></div>
     <div id='corrections-actions' style='display:none;margin-top:12px'>
       <div style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'>
-        <button onclick='acceptAllDiffs()' class='btn btn-success' style='font-size:12px'>Accept All</button>
-        <button onclick='rejectAllDiffs()' class='btn btn-danger' style='font-size:12px'>Reject All</button>
+        <button id='diff-accept-all' onclick='acceptAllDiffs()' class='btn btn-success' style='font-size:12px'>Accept All</button>
+        <button id='diff-reject-all' onclick='rejectAllDiffs()' class='btn btn-danger' style='font-size:12px'>Reject All</button>
         <span id='diff-summary-text' style='font-size:12px;color:var(--text-muted)'></span>
       </div>
-      <button onclick='applyCorrections("${scenarioId}")' class='btn btn-primary' style='margin-top:10px'>Apply Accepted Changes</button>
+      <button id='diff-apply' onclick='applyCorrections("${scenarioId}")' class='btn btn-primary' style='margin-top:10px'>Apply Accepted Changes</button>
     </div>
   </div>
 
@@ -6658,23 +6677,37 @@ function parseCorrections(scenarioId) {
   const raw = document.getElementById('corrections-paste').value.trim();
   if (!raw) return toast('Paste a response first', 'error');
   const blocks = [];
-  const regex = /---CORRECTION---([\s\S]*?)---END---/g;
+  // ONE scan for both block types, so the cards keep the order the reviewer wrote them in.
+  // ---CORRECTION--- matches a stored value and replaces it; ---NEW FACT--- appends a
+  // technical fact and never touches an existing one (see insertNewFact).
+  const regex = /---(CORRECTION|NEW FACT)---([\s\S]*?)---END---/g;
   let match;
   while ((match = regex.exec(raw)) !== null) {
-    const block = match[1].trim();
+    const kind = match[1] === 'NEW FACT' ? 'newfact' : 'correction';
+    const block = match[2].trim();
     const get = (label) => {
       // Terminate a field only at a KNOWN label line, so a body containing an
-      // internal label-like line (e.g. "NOTE:") isn't silently truncated.
-      const re = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\n(?:SECTION|FIELD|CURRENT|REPLACE WITH|REASON|SOURCE):|$)');
+      // internal label-like line (e.g. "NOTE:") isn't silently truncated. DOMAIN and
+      // CONTENT are ---NEW FACT--- labels and must terminate too, or a NEW FACT body
+      // swallows every label that follows it.
+      // [ \t]* after the colon, NOT \s* — \s* crosses the newline, so an EMPTY field
+      // ("CONTENT:" with nothing after it) started its capture on the next label line and
+      // swallowed it: the fact would have been stored with the SOURCE line as its content
+      // instead of being rejected as contentless. A value that legitimately begins on the
+      // next line still works — the capture keeps the leading newline and .trim() removes it.
+      const re = new RegExp(label + ':[ \\t]*([\\s\\S]*?)(?=\\n(?:SECTION|FIELD|CURRENT|REPLACE WITH|REASON|SOURCE|DOMAIN|CONTENT):|$)');
       const m = block.match(re);
       return m ? m[1].trim() : '';
     };
     blocks.push({
       id: blocks.length,
+      kind,
       section: get('SECTION'),
       field: get('FIELD'),
       current: get('CURRENT'),
       replacewith: get('REPLACE WITH'),
+      domain: get('DOMAIN'),
+      content: get('CONTENT'),
       reason: get('REASON'),
       source: get('SOURCE'),
       decision: 'pending'
@@ -6684,7 +6717,12 @@ function parseCorrections(scenarioId) {
   const confirmedRe = /---CONFIRMED:\s*([^-\n]+)---/g;
   let cm;
   while ((cm = confirmedRe.exec(raw)) !== null) confirmed.push(cm[1].trim());
-  if (blocks.length === 0 && confirmed.length === 0) return toast('No corrections or confirmations found — check the format', 'error');
+  // Say what was scanned. "check the format" sent the reviewer back to a 40k-character
+  // paste with no way to tell whether the markers were wrong, the paste was truncated,
+  // or the textarea held something else entirely — the character count answers that.
+  if (blocks.length === 0 && confirmed.length === 0) {
+    return toast(`0 ---CORRECTION--- / ---NEW FACT--- markers found in ${raw.length} characters.`, 'error');
+  }
   window._aiDiffs = blocks;
   renderDiffReviewer(blocks, confirmed);
 }
@@ -6704,7 +6742,22 @@ function renderDiffReviewer(blocks, confirmed) {
     actions.style.display = 'none';
     return;
   }
-  html += blocks.map(b => `
+  // Two card shapes: a correction shows current → replacement, a new fact shows only the
+  // value being ADDED. They must not look alike — "accept" means something different on each.
+  html += blocks.map(b => b.kind === 'newfact' ? _newFactCard(b) : _correctionCard(b)).join('');
+  diff.innerHTML = html;
+  actions.style.display = '';
+  // A previous apply pass retires these (renderInjectionResults); a fresh parse brings
+  // them back, or the new batch would be unacceptable and unappliable.
+  ['diff-accept-all', 'diff-reject-all', 'diff-apply'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.style.display = '';
+  });
+  updateDiffSummary();
+}
+
+function _correctionCard(b) {
+  return `
     <div id='diff-card-${b.id}' style='border:1px solid var(--border-color);border-radius:6px;margin-bottom:10px;overflow:hidden'>
       <div style='padding:8px 12px;background:var(--bg-secondary,#f5f5f5);display:flex;align-items:center;justify-content:space-between;gap:8px'>
         <span style='font-size:12px;font-family:monospace;color:var(--accent)'>${b.section}${b.field ? ' → ' + b.field : ''}</span>
@@ -6728,10 +6781,37 @@ function renderDiffReviewer(blocks, confirmed) {
           <button onclick='editDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>✎ Edit</button>
         </div>
       </div>
-    </div>`).join('');
-  diff.innerHTML = html;
-  actions.style.display = '';
-  updateDiffSummary();
+    </div>`;
+}
+
+// ---NEW FACT--- card. Teal, no red "current" panel and no replacement arrow: nothing
+// is being overwritten, so showing a diff would misrepresent what Accept does here.
+function _newFactCard(b) {
+  return `
+    <div id='diff-card-${b.id}' style='border:1px solid #1f6f8b;border-radius:6px;margin-bottom:10px;overflow:hidden'>
+      <div style='padding:8px 12px;background:#eef7fb;display:flex;align-items:center;justify-content:space-between;gap:8px'>
+        <span style='font-size:12px;font-family:monospace;color:#1f6f8b'>+ NEW FACT → ${escapeHtml(b.field || '(no FIELD)')}</span>
+        <span id='diff-status-${b.id}' style='font-size:11px;color:var(--text-muted)'>pending</span>
+      </div>
+      <div style='padding:10px 12px'>
+        <div style='font-size:11px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px'>Domain</div>
+        <div style='font-size:12px;font-family:monospace;margin-bottom:8px'>${escapeHtml(b.domain || '(missing)')}</div>
+        <div style='font-size:11px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px'>Content — added, nothing replaced</div>
+        <div style='padding:6px 8px;background:#f0f8fc;border-left:3px solid #1f6f8b;border-radius:3px;font-size:12px;margin-bottom:8px;white-space:pre-wrap'>${escapeHtml(b.content)}</div>
+        ${b.reason ? '<div style=font-size:11px;color:var(--text-muted);font-style:italic;margin-bottom:6px>' + escapeHtml(b.reason) + '</div>' : ''}
+        ${b.source ? '<div style=font-size:11px;color:var(--text-muted);margin-bottom:8px>Source: ' + escapeHtml(b.source) + '</div>' : ''}
+        <div id='manual-editor-${b.id}' style='display:none;margin-bottom:8px'>
+          <textarea id='manual-text-${b.id}' style='width:100%;height:80px;padding:8px;border:1px solid var(--accent);border-radius:4px;font-size:12px;font-family:inherit;resize:vertical'>${escapeHtml(b.content)}</textarea>
+          <button onclick='saveManualDiff(${b.id})' style='padding:4px 10px;font-size:11px;border:1px solid #2ecc71;border-radius:4px;background:#f5fff5;cursor:pointer;margin-top:4px'>Save Edit</button>
+          <button onclick='cancelManualDiff(${b.id})' style='padding:4px 10px;font-size:11px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer;margin-top:4px;margin-left:4px'>Cancel</button>
+        </div>
+        <div style='display:flex;gap:6px'>
+          <button onclick='acceptDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid #2ecc71;border-radius:4px;background:#f5fff5;cursor:pointer'>✓ Accept</button>
+          <button onclick='rejectDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid #e74c3c;border-radius:4px;background:#fff5f5;cursor:pointer'>✕ Reject</button>
+          <button onclick='editDiff(${b.id})' style='padding:4px 12px;font-size:12px;border:1px solid var(--border-color);border-radius:4px;background:white;cursor:pointer'>✎ Edit</button>
+        </div>
+      </div>
+    </div>`;
 }
 
 function escapeHtml(str) {
@@ -6768,7 +6848,12 @@ function cancelManualDiff(id) {
 function saveManualDiff(id) {
   const d = window._aiDiffs.find(x => x.id === id);
   if (d) {
-    d.replacewith = document.getElementById('manual-text-' + id).value;
+    // The editor box holds the value that will be WRITTEN: a correction's replacement
+    // text, or a new fact's content. Editing a new fact must never touch `replacewith`,
+    // which insertNewFact does not read.
+    const value = document.getElementById('manual-text-' + id).value;
+    if (d.kind === 'newfact') d.content = value;
+    else                     d.replacewith = value;
     d.decision = 'edited';
   }
   document.getElementById('diff-card-' + id).style.borderColor = '#f39c12';
@@ -6802,25 +6887,34 @@ async function applyCorrections(scenarioId) {
   try {
     const data = await apiFetch('GET', '/scenarios/' + scenarioId + '/full');
     const results = [];
-    let appliedCount = 0;
+    // writeCount = successful WRITES (replacements + insertions), not accepted cards.
+    // It gates the save, sizes the snapshot, and is what the results panel reports.
+    let writeCount = 0;
+    const sawNewFacts = accepted.some(d => d.kind === 'newfact');
+    const factsBefore = (data.scenario?.technical_facts?.facts || []).length;
     for (const d of accepted) {
-      const res = resolveAndApply(data, d);
-      results.push({ section: d.section, field: d.field, current: d.current, ...res });
-      if (res.outcome === 'applied') appliedCount++;
+      // ---NEW FACT--- appends; ---CORRECTION--- matches and replaces. Both mutate the
+      // same in-memory composite, which one /generate/save below persists.
+      const res = d.kind === 'newfact' ? insertNewFact(data, d) : resolveAndApply(data, d);
+      results.push({ kind: d.kind, section: d.section, field: d.field, current: d.current, ...res });
+      if (res.outcome === 'applied' || res.outcome === 'added') writeCount++;
     }
-    if (appliedCount > 0) {
+    const factsAfter = (data.scenario?.technical_facts?.facts || []).length;
+    if (writeCount > 0) {
       // Preserve read-ground-truth → edit → dual-write: /generate/save writes local + Supabase.
       // baseVersion from the /full load enables the optimistic-concurrency guard: a 409 here
       // means the scenario changed between our read and this save — reject, do not clobber.
+      // One writer for both block types: the version bump, the scenario_versions row (with
+      // base_version) and the technical_facts.corrected_at stamp all happen here, once.
       const resp = await apiPost('/generate/save', { ...data, baseVersion: data.current_version });
       if (resp && resp.current_version != null) data.current_version = resp.current_version;
       await apiPost('/pipeline/snapshot/' + scenarioId, {
         label: 'corrections_applied',
         pipeline_step: 'manual_correction',
-        changes_applied: appliedCount
+        changes_applied: writeCount
       });
     }
-    renderInjectionResults(results, appliedCount);
+    renderInjectionResults(results, writeCount, sawNewFacts ? { before: factsBefore, after: factsAfter } : null);
   } catch (err) {
     // 409 conflict message ("changed elsewhere… reload") surfaces here unchanged.
     toast(err.message, 'error');
@@ -6969,6 +7063,42 @@ function _stripVocabTermPrefix(s, terms) {
   return str;
 }
 
+// ── Mismatch echo ───────────────────────────────────────────────────────────────
+// One clipped line each for what was submitted and what is stored, so the difference is
+// readable side by side. Whitespace is collapsed (a stored newline would otherwise push
+// the two lines out of alignment) and the clip is generous enough to reach the end of a
+// typical fact sentence, where near-miss quotes usually diverge.
+function _clip(s, n) {
+  const t = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  return t.length > n ? t.slice(0, n) + '…' : t;
+}
+
+function _mismatchDetail(head, submitted, stored) {
+  const lines = [head, `Submitted: ${_clip(submitted, 120)}`];
+  if (stored != null && stored !== '') lines.push(`Stored:    ${_clip(stored, 120)}`);
+  return lines.join('\n');
+}
+
+// Which stored leaf to echo when the scope holds several. Ranked by the length of the
+// shared opening run with the submitted CURRENT — a near-miss quote agrees for a long
+// way and then diverges — with the longer leaf winning ties. For a FIELD-scoped fact
+// record that picks `content` over its fact_id, domain or citation even when the quote
+// is wrong from the first word.
+function _closestSlotValue(slots, cur) {
+  const target = String(cur || '').toLowerCase();
+  let best = null, bestScore = -1;
+  for (const s of slots) {
+    const value = s.container[s.key];
+    if (typeof value !== 'string' || !value) continue;
+    const norm = _normWs(value).toLowerCase();
+    let i = 0;
+    while (i < norm.length && i < target.length && norm[i] === target[i]) i++;
+    const score = i * 100000 + Math.min(norm.length, 99999);
+    if (score > bestScore) { bestScore = score; best = value; }
+  }
+  return best;
+}
+
 function resolveAndApply(data, corr) {
   const field = (corr.field || '').trim();
 
@@ -7020,31 +7150,153 @@ function resolveAndApply(data, corr) {
   if (!slots) { slots = []; _collectSlots(scopeNode, slots); }
   const matches = slots.filter(s => _normWs(s.container[s.key]).includes(cur));
 
-  if (matches.length === 0) return { outcome: 'current-mismatch', detail: `CURRENT not found in ${label}` };
+  // A mismatch ECHOES the stored value. The comparison above already had it in hand, and
+  // without it the reviewer re-quotes blind: a smart quote, a trailing period, a dropped
+  // clause and a genuinely different sentence all read as the same one-line failure.
+  // `echoed` tells the results panel not to print the submitted CURRENT a second time.
+  if (matches.length === 0) {
+    return { outcome: 'current-mismatch', echoed: true,
+             detail: _mismatchDetail(`CURRENT not found in ${label}`, curRaw, _closestSlotValue(slots, cur)) };
+  }
   if (matches.length > 1)  return { outcome: 'ambiguous', count: matches.length, detail: `CURRENT matches ${matches.length} fields in ${label} — none applied` };
 
   const slot = matches[0];
   const rep = _replaceOnce(slot.container[slot.key], curRaw, repRaw);
-  if (!rep.ok) return { outcome: 'current-mismatch', detail: `CURRENT located but exact replace failed in ${label}` };
+  if (!rep.ok) {
+    // Located (whitespace-normalised) but the literal replace missed — quotes, dashes or
+    // composition differ. Here the stored value is exact, not a best guess.
+    return { outcome: 'current-mismatch', echoed: true,
+             detail: _mismatchDetail(`CURRENT located but exact replace failed in ${label}`, curRaw, slot.container[slot.key]) };
+  }
   slot.container[slot.key] = rep.value;  // bounded: single field only
   return { outcome: 'applied', detail: label };
 }
 
-function renderInjectionResults(results, appliedCount) {
+// ── ---NEW FACT---: append-only insert into scenario.technical_facts.facts ──────────
+// The CURRENT-match step does not run here — there is nothing to match. In exchange this
+// path may only ever ADD: a fact_id that already exists is REJECTED, never overwritten,
+// because overwriting a stored fact is what ---CORRECTION--- is for and only that path
+// makes the reviewer quote the value they are destroying. Existing entries are neither
+// reordered nor rewritten; the new fact is pushed onto the end.
+//
+// There is no second writer: this mutates the same in-memory composite as the
+// corrections and rides out on the one /generate/save in applyCorrections, which bumps
+// current_version, writes the scenario_versions row with base_version, and (server-side,
+// in stampCorrections) stamps technical_facts.corrected_at because the block changed.
+
+// The domains in use are TF_FACT_DOMAINS — the same list the fact editor's <select>
+// offers (timing, personnel, navigation and other among them). An unrecognised DOMAIN is
+// rejected, never coerced: coerced to 'other' it would read as a deliberate choice
+// forever, and stored as itself the next form save would silently reset it to the first
+// option in the select. A domain the editor cannot represent must not enter the data.
+function _allowedFactDomains() {
+  return TF_FACT_DOMAINS;
+}
+
+function insertNewFact(data, blk) {
+  const factId  = String(blk.field   == null ? '' : blk.field).trim();
+  const content = String(blk.content == null ? '' : blk.content).trim();
+  const section = _normWs(blk.section).toLowerCase();
+
+  // Facts are the only thing this block type can create. A NEW FACT aimed at another
+  // section is a misunderstanding of the grammar, not a fact to file under Characters.
+  if (section && section !== 'technical facts') {
+    return { outcome: 'invalid-new-fact', detail: `NEW FACT supports SECTION: Technical Facts only (got "${blk.section}")` };
+  }
+  if (!factId)  return { outcome: 'invalid-new-fact', detail: 'FIELD (fact_id) is required' };
+  if (!content) return { outcome: 'invalid-new-fact', detail: 'CONTENT is required' };
+
+  const allowed = _allowedFactDomains();
+  const domain  = String(blk.domain == null ? '' : blk.domain).trim().toLowerCase();
+  if (!domain) {
+    return { outcome: 'invalid-domain', detail: `DOMAIN is required — one of: ${allowed.join(', ')}` };
+  }
+  if (!allowed.includes(domain)) {
+    return { outcome: 'invalid-domain', detail: `DOMAIN "${blk.domain}" is not one of: ${allowed.join(', ')}` };
+  }
+
+  const sc = data.scenario || (data.scenario = {});
+  const tf = sc.technical_facts || (sc.technical_facts = {});
+  if (!Array.isArray(tf.facts)) tf.facts = [];
+
+  // The clash check runs against the LIVE array, which already holds anything appended
+  // earlier in this same batch — so the second copy of a duplicated block is rejected
+  // too, not just a collision with something saved on a previous pass.
+  // Case-insensitive: "Xavier_Arrival" would not overwrite xavier_arrival, it would sit
+  // beside it as a near-twin, which is the same mess reached by a different route.
+  const clash = tf.facts.find(f => String(f?.fact_id == null ? '' : f.fact_id).trim().toLowerCase() === factId.toLowerCase());
+  if (clash) {
+    const named = clash.fact_id === factId ? `"${factId}"` : `"${factId}" (stored as "${clash.fact_id}")`;
+    return {
+      outcome: 'duplicate-fact-id', echoed: true,
+      detail: _mismatchDetail(`fact_id ${named} already exists — use ---CORRECTION--- to change it`, content, clash.content),
+    };
+  }
+
+  const citation = String(blk.source == null ? '' : blk.source).trim();
+  tf.facts.push({
+    fact_id:     factId,
+    domain,
+    content:     _nfc(content),
+    // source is the nested object the schema stores, not a bare string. No citation →
+    // null, matching canonicalBlock's canonSrc server-side, so a sourceless new fact does
+    // not read as a shape change on the next save.
+    source:      citation ? { citation, url: null, access_note: null } : null,
+    valid_from:  null,
+    valid_until: null,
+  });
+  // REASON is deliberately not stored — it is review commentary about the insert, not
+  // part of the fact.
+  return { outcome: 'added', detail: `${factId} (${domain})` };
+}
+
+function renderInjectionResults(results, writeCount, factCounts) {
   const el = document.getElementById('corrections-diff');
-  const C = o => o === 'applied' ? '#2a7a2a' : o === 'ambiguous' ? '#b8860b' : '#c0392b';
-  const BG = o => o === 'applied' ? '#f0faf0' : o === 'ambiguous' ? '#fff8e6' : '#fff5f5';
-  const L = o => ({ 'applied': '✓ applied', 'field-not-found': '✕ field not found', 'current-mismatch': '✕ current mismatch', 'ambiguous': '⚠ ambiguous — not applied' }[o] || o);
-  const failed = results.length - appliedCount;
-  let html = `<div style="margin-bottom:10px;font-weight:600;font-size:13px">Injection results — ${appliedCount}/${results.length} applied${appliedCount > 0 ? ' &amp; saved' : ''}</div>`;
-  html += results.map(r => `
+  const WROTE = o => o === 'applied' || o === 'added';
+  const C = o => o === 'applied' ? '#2a7a2a' : o === 'added' ? '#1f6f8b' : o === 'ambiguous' ? '#b8860b' : '#c0392b';
+  const BG = o => o === 'applied' ? '#f0faf0' : o === 'added' ? '#eef7fb' : o === 'ambiguous' ? '#fff8e6' : '#fff5f5';
+  const L = o => ({
+    'applied': '✓ applied', 'added': '+ added (new fact)',
+    'field-not-found': '✕ field not found', 'current-mismatch': '✕ current mismatch',
+    'ambiguous': '⚠ ambiguous — not applied',
+    'duplicate-fact-id': '✕ fact_id already exists — not added',
+    'invalid-domain': '✕ unknown domain — not added',
+    'invalid-new-fact': '✕ invalid NEW FACT — not added',
+  }[o] || o);
+  const addedCount = results.filter(r => r.outcome === 'added').length;
+  const replacedCount = results.filter(r => r.outcome === 'applied').length;
+  const failed = results.length - writeCount;
+  const breakdown = addedCount > 0 ? ` — ${replacedCount} replaced, ${addedCount} added` : '';
+  // The header counts WRITES, never accepted cards: "11 accepted / 4 applied" invited the
+  // reviewer to assume the other 7 had landed somewhere.
+  let html = `<div style="margin-bottom:10px;font-weight:600;font-size:13px">Injection results — ${writeCount}/${results.length} written${writeCount > 0 ? ' and saved' : ''}${breakdown}</div>`;
+  if (factCounts) {
+    html += `<div style="margin-bottom:10px;font-size:12px;color:var(--text-muted)">Technical facts: ${factCounts.before} → ${factCounts.after}</div>`;
+  }
+  html += results.map(r => {
+    const locator = r.kind === 'newfact'
+      ? '+ NEW FACT → ' + escapeHtml(r.field || '(no FIELD)')
+      : escapeHtml(r.section || '') + (r.field ? ' → ' + escapeHtml(r.field) : '');
+    // The submitted text is echoed here only when the detail does not already carry it.
+    const echoCurrent = !WROTE(r.outcome) && !r.echoed && r.current;
+    return `
     <div style="border:1px solid var(--border-color);border-left:4px solid ${C(r.outcome)};border-radius:4px;background:${BG(r.outcome)};padding:8px 10px;margin-bottom:6px;font-size:12px">
-      <div style="font-family:monospace;color:var(--accent)">${escapeHtml(r.section || '')}${r.field ? ' → ' + escapeHtml(r.field) : ''}</div>
-      <div style="color:${C(r.outcome)};font-weight:600">${L(r.outcome)}${r.detail ? ': ' + escapeHtml(r.detail) : ''}</div>
-      ${r.outcome !== 'applied' ? `<div style="color:var(--text-muted);margin-top:3px;white-space:pre-wrap">CURRENT: ${escapeHtml((r.current || '').slice(0, 140))}</div>` : ''}
-    </div>`).join('');
+      <div style="font-family:monospace;color:var(--accent)">${locator}</div>
+      <div style="color:${C(r.outcome)};font-weight:600;white-space:pre-wrap">${L(r.outcome)}${r.detail ? ': ' + escapeHtml(r.detail) : ''}</div>
+      ${echoCurrent ? `<div style="color:var(--text-muted);margin-top:3px;white-space:pre-wrap">CURRENT: ${escapeHtml((r.current || '').slice(0, 140))}</div>` : ''}
+    </div>`;
+  }).join('');
   if (el) el.innerHTML = html;
-  toast(`${appliedCount} applied${failed ? ', ' + failed + ' need attention (see results panel)' : ' &amp; saved'}`, failed ? 'warning' : 'success');
+  // The decision footer said "11 accepted" while the panel above it said 4 applied. Once
+  // the cards are gone those decisions are history; replace the line with the write tally
+  // and retire the buttons that acted on cards no longer on screen.
+  const summary = document.getElementById('diff-summary-text');
+  if (summary) summary.textContent = `${writeCount} written${breakdown}${failed ? ' · ' + failed + ' not written' : ''}`;
+  ['diff-accept-all', 'diff-reject-all', 'diff-apply'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.style.display = 'none';
+  });
+  toast(`${writeCount} written${failed ? ', ' + failed + ' need attention (see results panel)' : ' and saved'}`, failed ? 'warning' : 'success');
 }
 
 function parseEndingNotes(scenarioId) {
