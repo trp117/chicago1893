@@ -21,3 +21,10 @@ engine/data/scenarios/player_roles/*.json
 
 # Exception: not in Supabase, so git remains its only copy.
 !engine/data/scenarios/test_pipeline_01.json
+
+# Version snapshots written at runtime by VersionController.saveVersion (one
+# v<n>_<label>.json per apply/pipeline step). Each embeds a full copy of a
+# scenario — the same content already excluded above — and Supabase holds the
+# real lineage in scenario_versions, with base_version. Directory exclude: the
+# dirs are created on demand per scenario, so a glob would miss new ones.
+engine/data/scenarios/versions/
