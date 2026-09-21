@@ -3433,6 +3433,18 @@ function renderGlossarySection(data) {
         <span style="font-weight:400;font-size:10px">▸ expand</span>
       </summary>
       <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
+        <!-- Export toolbar lives OUTSIDE #glossary-section-body: renderGlossaryBody
+             replaces that element's innerHTML on every glossary write, which would take
+             the toggle and its current selection with it. -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <label for="glossary-export-scope" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Review scope</label>
+          <select id="glossary-export-scope" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+            <option value="unapproved" selected>Unapproved only</option>
+            <option value="all">All terms</option>
+          </select>
+          <button type="button" id="copy-glossary-with-prompt-btn" class="btn btn-secondary btn-sm">⎘ Copy with AI Prompt</button>
+          <button type="button" id="copy-glossary-btn" class="btn btn-secondary btn-sm">⎘ Copy Glossary</button>
+        </div>
         <div id="glossary-section-body" style="font-size:13px;color:var(--text-soft)">Loading…</div>
       </div>
     </details>
@@ -4526,6 +4538,67 @@ function buildEpilogueSection(data) {
   return out;
 }
 
+// ── Glossary export for the review loop ─────────────────────────────────────────
+// Built from data.scenario.glossary, never by scraping the DOM: the glossary section
+// renders display cards (buildApprovedTermCard) rather than form inputs, it is loaded on
+// its own endpoint, and _syncGlossaryToEditor refreshes this array after every glossary
+// write — so the data is the only copy that is reliably current.
+//
+// SCOPE. 'unapproved' (the default) splits the export: entries awaiting review go under
+// UNDER REVIEW, and the approved ones still ship under ALREADY APPROVED. The reference
+// block is not decoration — check 2 in REVIEW_PROMPTS.glossary asks the reviewer to
+// reconcile definitions against each other, and without the approved list they would
+// define a new term that contradicts one they cannot see. 'all' puts every entry under
+// review and omits the reference block, which is the only mode that does anything today:
+// every stored entry is currently approved:true.
+//
+// BYTE-FAITHFUL. NFC out, no list glyphs, no display prefix welded onto a stored value.
+// The "[term]" header line and the "Source: " prefix are scaffolding, and the prompt says
+// so in the same words the technical-facts prompt uses for its own header line.
+function buildGlossarySection(data, mode = 'unapproved') {
+  const { scenario = {} } = data;
+  const out = [];
+  const entries = (scenario.glossary || []).filter(g => g && typeof g.term === 'string' && g.term.trim());
+  if (!entries.length) return out;
+
+  const nfc = s => String(s == null ? '' : s).normalize('NFC');
+  const all = mode === 'all';
+  const unapproved = entries.filter(g => g.approved !== true);
+  const approved   = entries.filter(g => g.approved === true);
+  const review     = all ? entries : unapproved;
+  const reference  = all ? []      : approved;
+
+  out.push(sec('Glossary'));
+  out.push(`Status: ${entries.length} term(s) — ${unapproved.length} unapproved, ${approved.length} approved`);
+  out.push(`Scope: ${all ? 'ALL TERMS — every entry below is under review' : 'UNAPPROVED ONLY'}`);
+  out.push('');
+
+  const block = g => {
+    out.push(`[${nfc(g.term)}]`);
+    out.push(indent(nfc(g.definition)));
+    out.push(indent(`Source: ${nfc(g.source) || '—'}`));
+    out.push('');
+  };
+
+  out.push('UNDER REVIEW');
+  out.push('');
+  if (review.length) {
+    review.forEach(block);
+  } else {
+    out.push(indent('(none — every term is already approved. Switch the scope toggle to "All terms" to re-review them.)'));
+    out.push('');
+  }
+
+  if (!all) {
+    out.push('ALREADY APPROVED — reference only, do not correct');
+    out.push('');
+    if (reference.length) reference.forEach(block);
+    else { out.push(indent('(none)')); out.push(''); }
+  }
+
+  return out;
+}
+
 function buildTechFactsSection(data) {
   const { scenario = {} } = data;
   const out = [];
@@ -5530,6 +5603,23 @@ function renderPreview(data, autoSaved = false) {
       );
       return;
     }
+
+    // Copy the glossary, with or without the review prompt. Built from `data`, not the
+    // DOM — see buildGlossarySection. The scope toggle decides which entries are under
+    // review and whether the approved ones ride along as reference.
+    const glossPlain  = e.target.closest('#copy-glossary-btn');
+    const glossPrompt = e.target.closest('#copy-glossary-with-prompt-btn');
+    if (glossPlain || glossPrompt) {
+      const mode = document.getElementById('glossary-export-scope')?.value === 'all' ? 'all' : 'unapproved';
+      const text = buildGlossarySection(data, mode).join('\n');
+      if (!text.trim()) { toast('No glossary terms to export', 'error'); return; }
+      copyExportToClipboard(
+        glossPrompt || glossPlain,
+        // Function replacer: a definition containing $&, $' or $1 stays literal.
+        glossPrompt ? REVIEW_PROMPTS.glossary.replace('[PASTE GLOSSARY DATA HERE]', () => text) : text
+      );
+      return;
+    }
   }, true); // capture phase so it fires before the existing click delegation
 
   // ── Mark as Approved — warn if technical facts or epilogue not reviewed ───────────
@@ -6442,6 +6532,58 @@ Rules:
 DATA TO REVIEW:
 [PASTE EPILOGUE DATA HERE]`,
 
+  glossary: `Review the GLOSSARY of this interactive historical fiction scenario. Each entry is a term a player can click in the narrative to see its definition.
+
+Work the entries under UNDER REVIEW. Entries under ALREADY APPROVED are reference only — do not correct them; they are included so you can check the entries under review against them.
+
+Run these three checks, in this order:
+
+1. ACCURACY — each definition against the documented record. Flag anachronism, invented specifics presented as fact, and any claim the sources do not support. Check period terms one at a time; an unsourced "authentic-sounding" term is a liability, not a feature.
+
+2. CONSISTENCY WITH CORRECTIONS ELSEWHERE — this is the check specific to the glossary, and the one that matters most. The glossary is GENERATED FROM the scenario, so regenerating it re-introduces framings that were already corrected out of the Technical Facts or the Epilogue. Read every definition against the scenario's current corrected content and flag each contradiction: a date, a title, a rank, a place name, a causal claim or an outcome that the corrected sections no longer say. If a definition asserts something the corrected scenario contradicts, the definition is wrong — not the correction.
+
+3. TERM STILL FIRES — fix the DEFINITION, never the term. The term string is the literal the prose matcher searches for, so renaming it silently stops the term from ever lighting up in the narrative. If a term is misspelled, badly chosen, or should not exist, do NOT rewrite it: use the RECOMMEND REMOVAL verdict below and say why.
+
+EVERY entry under review gets exactly one of these three verdicts:
+
+(a) A correction, when the definition needs to change:
+
+---CORRECTION---
+SECTION: Glossary
+FIELD:
+CURRENT: [the COMPLETE stored definition, copied verbatim — exact bytes, not a paraphrase]
+REPLACE WITH: [complete replacement definition]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+(b) Approved as-is, when the definition is accurate and consistent:
+
+---CONFIRMED: [exact term]---
+
+(c) Recommend removal, when the entry should not be a glossary term at all — a game mechanic rather than a historical term, an ordinary English word a general reader knows, or a term the sources do not support:
+
+---RECOMMEND REMOVAL---
+TERM: [exact term]
+REASON: [why it should not be a glossary term]
+---END---
+
+Removal is a recommendation to a human, not an instruction to the tool: the injector never deletes. Removals and renames are actioned by hand in the glossary editor.
+
+Rules:
+- Leave FIELD BLANK on every correction. Glossary entries have no id — the definition text is the locator, so CURRENT must be the complete stored definition and must be unique.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes.
+- Quote the COMPLETE definition — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located.
+- Quote CURRENT as the STORED value only. Each entry is exported as a "[term]" header line, then the definition, then a "Source: " line. Those are SEPARATE stored fields; the header brackets and the "Source: " prefix are added at display time. To correct the definition, quote the definition alone. Never put the "[term]" line, the "Source: " prefix or any list glyph into CURRENT.
+- Never put the term into REPLACE WITH as a prefix. The stored definition does not begin with its own term.
+- Populate SOURCE whenever a definition makes a factual claim — a date, a figure, a title, a rank, an attribution. Most entries currently have no source; an unsourced factual claim should gain one or be softened to what the record supports.
+- Prefer cutting an unverifiable specific to inventing a citation for it.
+- Do not invent corrections. A definition that is accurate, consistent and clear gets ---CONFIRMED---, not a rewrite.
+
+DATA TO REVIEW:
+[PASTE GLOSSARY DATA HERE]`,
+
   allstory: `Review this COMPLETE interactive historical fiction scenario for historical accuracy and internal consistency. Check every section against primary sources: Opening Scene, Player Roles, Win/Fail Conditions and Pressure Events, Story Arc, Characters, Locations, Clues, Period Vocabulary, Technical Facts, and the Epilogue (Character Fates, Immediate Outcome, Historical Frame, Open Threads, Choice Echoes — each checked separately).
 
 Apply, for each section, the checks appropriate to it:
@@ -6520,6 +6662,9 @@ const PICKER_SECTION_DATA = {
   clues:      { marker: '[PASTE CLUES DATA HERE]',                                 build: d => buildCluesSection(d) },
   vocabulary: { marker: '[PASTE PERIOD VOCABULARY DATA HERE]',                     build: d => buildVocabSection(d) },
   techfacts:  { marker: '[PASTE TECHNICAL FACTS DATA HERE]',                       build: d => buildTechFactsSection(d) },
+  // The picker has no scope toggle, so it exports in 'all' mode: every stored entry is
+  // approved today, and 'unapproved' would hand the reviewer an empty review block.
+  glossary:   { marker: '[PASTE GLOSSARY DATA HERE]',                              build: d => buildGlossarySection(d, 'all') },
   epilogue:   { marker: '[PASTE EPILOGUE DATA HERE]',                              build: d => buildEpilogueSection(d) },
   allstory:   { marker: '[PASTE THE COMPLETE SCENARIO DATA HERE]',                 build: d => [buildScenarioDocText(d)] },
 };
@@ -6574,6 +6719,7 @@ function buildAIPanel(scenarioId) {
       <option value='clues'>Clues</option>
       <option value='vocabulary'>Period Vocabulary</option>
       <option value='techfacts'>Technical Facts</option>
+      <option value='glossary'>Glossary</option>
       <option value='epilogue'>Epilogue</option>
       <option value='allstory'>All-Story (first-pass sweep)</option>
     </select>
@@ -6721,7 +6867,14 @@ function parseCorrections(scenarioId) {
   // paste with no way to tell whether the markers were wrong, the paste was truncated,
   // or the textarea held something else entirely — the character count answers that.
   if (blocks.length === 0 && confirmed.length === 0) {
-    return toast(`0 ---CORRECTION--- / ---NEW FACT--- markers found in ${raw.length} characters.`, 'error');
+    // A glossary review can legitimately come back as removal recommendations only. The
+    // injector never deletes, so there is nothing to parse — but "0 markers found" on its
+    // own reads like a failed paste, so say what IS there and where it has to be actioned.
+    const removals = (raw.match(/---RECOMMEND REMOVAL---/g) || []).length;
+    const tail = removals
+      ? ` ${removals} ---RECOMMEND REMOVAL--- block(s) are present: the injector does not delete — action those in the glossary editor.`
+      : '';
+    return toast(`0 ---CORRECTION--- / ---NEW FACT--- markers found in ${raw.length} characters.${tail}`, 'error');
   }
   window._aiDiffs = blocks;
   renderDiffReviewer(blocks, confirmed);
@@ -7034,6 +7187,7 @@ function _resolveSectionNode(data, section) {
     case 'opening scene':     return { openingSituation: sc.openingSituation, introduction: sc.introduction };
     case 'period vocabulary': return sc.period_vocabulary;
     case 'technical facts':   return sc.technical_facts;
+    case 'glossary':          return sc.glossary;
     case 'epilogue':          return sc.epilogue;
     case 'character fates':   return sc.epilogue?.character_fates;
     case 'immediate outcome': return sc.epilogue?.immediate_outcome;
@@ -7102,6 +7256,10 @@ function _closestSlotValue(slots, cur) {
 function resolveAndApply(data, corr) {
   const field = (corr.field || '').trim();
 
+  // Glossary ONLY: `definition` is the single writable leaf — see the guard further down,
+  // after the slot has been resolved.
+  const isGlossary = _normWs(corr.section).toLowerCase() === 'glossary';
+
   // Period Vocabulary ONLY: reconcile the "term: meaning" display form against the
   // bare `meaning` leaf. Strip an exact "<term>: " prefix from CURRENT and
   // REPLACE WITH symmetrically — so locate + replace act on the bare meaning, and we
@@ -7161,6 +7319,33 @@ function resolveAndApply(data, corr) {
   if (matches.length > 1)  return { outcome: 'ambiguous', count: matches.length, detail: `CURRENT matches ${matches.length} fields in ${label} — none applied` };
 
   const slot = matches[0];
+
+  // ── Glossary: only a definition is writable ────────────────────────────────────
+  // `term` and `source` ARE collected into `slots` above, deliberately, so a CURRENT
+  // that quotes one is caught here — either as ambiguous (the term also occurs inside
+  // some other entry's definition) or by this explicit reject. Dropping them from the
+  // slot set instead would be worse than useless: a bare term would then quietly match
+  // the ONE definition that happens to mention it and splice the replacement into the
+  // middle of that neighbouring entry. In this scenario "Miyako" is both a term and a
+  // phrase inside the "Yamaguchi" definition, so that is not hypothetical.
+  //
+  // WHY `term` is never writable. The term string is three things at once: the storage
+  // key (glossary entries have no id), the :term route param on the PUT/DELETE glossary
+  // endpoints, and the literal the runtime prose matcher searches for — markupGlossaryTerms
+  // in engine/game/index.html builds one alternation of the exact term strings, word-
+  // boundary guarded, with no stemming. Rename a term through here and the hover gloss
+  // simply stops firing on that word: no error, no log, nothing a reviewer can see in the
+  // admin or in play. Renames and removals stay in the glossary editor, where the person
+  // doing it can see what they are changing.
+  if (isGlossary && slot.key !== 'definition') {
+    return {
+      outcome: 'glossary-term-locked', echoed: true,
+      detail: _mismatchDetail(
+        `CURRENT matched the "${slot.key}" field, which the injector will not write — only a glossary definition is editable here. Rename or remove the term in the glossary editor.`,
+        curRaw, slot.container[slot.key]),
+    };
+  }
+
   const rep = _replaceOnce(slot.container[slot.key], curRaw, repRaw);
   if (!rep.ok) {
     // Located (whitespace-normalised) but the literal replace missed — quotes, dashes or
@@ -7260,6 +7445,7 @@ function renderInjectionResults(results, writeCount, factCounts) {
     'field-not-found': '✕ field not found', 'current-mismatch': '✕ current mismatch',
     'ambiguous': '⚠ ambiguous — not applied',
     'duplicate-fact-id': '✕ fact_id already exists — not added',
+    'glossary-term-locked': '✕ term/source not editable — not applied',
     'invalid-domain': '✕ unknown domain — not added',
     'invalid-new-fact': '✕ invalid NEW FACT — not added',
   }[o] || o);
