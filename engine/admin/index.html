@@ -3469,36 +3469,100 @@ function renderGlossaryBody(scenarioId, glossary) {
   if (badge) badge.textContent = glossary.length ? `${glossary.length} term${glossary.length === 1 ? '' : 's'}` : '';
 
   const approvedHtml = glossary.length
-    ? glossary.map(g => buildApprovedTermCard(g, scenarioId)).join('')
+    ? glossary.map(g => buildGlossaryTermCard(g, scenarioId)).join('')
     : `<div id="glossary-empty-state" style="padding:16px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px;margin-bottom:12px">
         No terms yet. Click "Suggest terms" to generate a first draft, or add terms manually.
        </div>`;
 
+  const pending = glossary.filter(g => g.approved !== true).length;
+
   body.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-      <span style="font-size:12px;color:var(--text-soft)">Dotted-gold underline in player sessions. Nothing saves until you click Approve or Save.</span>
+      <span style="font-size:12px;color:var(--text-soft)">Dotted-gold underline in player sessions. Nothing saves until you click Add or Save.</span>
       <button type="button" class="btn btn-primary btn-sm" id="glossary-suggest-btn">✦ Suggest terms</button>
     </div>
     <div id="glossary-suggestions-area"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span id="glossary-approved-count" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Approved terms (${glossary.length})</span>
-      <button type="button" class="btn btn-secondary btn-sm" id="glossary-add-btn">+ Add term manually</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+      <span id="glossary-count-label" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">${glossaryCountLabel(glossary)}</span>
+      <span style="display:flex;gap:8px">
+        ${pending ? `<button type="button" class="btn btn-primary btn-sm" id="glossary-review-all-btn">Mark all reviewed (${pending})</button>` : ''}
+        <button type="button" class="btn btn-secondary btn-sm" id="glossary-add-btn">+ Add term manually</button>
+      </span>
     </div>
-    <div id="glossary-approved-list">${approvedHtml}</div>`;
+    ${pending ? `<div style="margin-bottom:10px;padding:8px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px;color:#92400e">
+      ${pending} term${pending === 1 ? '' : 's'} not yet reviewed. Unreviewed terms are still live to players — this marks what has been checked, it does not hide anything.
+    </div>` : ''}
+    <div id="glossary-term-list">${approvedHtml}</div>`;
 
   document.getElementById('glossary-suggest-btn')?.addEventListener('click', () => runGlossarySuggest(scenarioId));
   document.getElementById('glossary-add-btn')?.addEventListener('click',    () => addGlossaryTermManually(scenarioId));
+  document.getElementById('glossary-review-all-btn')?.addEventListener('click', () => markAllGlossaryReviewed(scenarioId));
 }
 
-function buildApprovedTermCard(g, scenarioId) {
+// "Approved terms (N)" lied as soon as the list could hold unreviewed entries. Count both.
+function glossaryCountLabel(glossary) {
+  const total = glossary.length;
+  const pending = glossary.filter(g => g.approved !== true).length;
+  if (!total) return 'Terms (0)';
+  return pending ? `Terms (${total}) — ${pending} not reviewed` : `Terms (${total}) — all reviewed`;
+}
+
+// Mark reviewed is the only producer of approved:true. It posts to a route that touches
+// nothing but the flag, then re-renders from the server's copy so the card state and the
+// editor snapshot can never disagree with what was stored.
+async function markGlossaryTermReviewed(term, scenarioId) {
+  try {
+    const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary/${encodeURIComponent(term)}/reviewed`, {});
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
+    toast(`"${term}" marked reviewed`, 'success');
+  } catch (err) { toast(`Error: ${err.message}`, 'error'); }
+}
+
+async function markAllGlossaryReviewed(scenarioId) {
+  const btn = document.getElementById('glossary-review-all-btn');
+  const pending = [...document.querySelectorAll('.glossary-term-card')].filter(c => c.dataset.approved !== 'true').length;
+  if (!confirm(`Mark all ${pending} unreviewed term${pending === 1 ? '' : 's'} as reviewed?\n\nDo this after a review pass — it records that the pass happened.`)) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Marking…'; }
+  try {
+    const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary/reviewed-all`, {});
+    renderGlossaryBody(scenarioId, resp.glossary);
+    _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
+    toast(`${resp.reviewed} term${resp.reviewed === 1 ? '' : 's'} marked reviewed`, 'success');
+  } catch (err) {
+    toast(`Error: ${err.message}`, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = `Mark all reviewed (${pending})`; }
+  }
+}
+
+// Term card. The review state is the point of the card, not a decoration: without it a
+// reviewer cannot see which definitions still need checking, which is the whole reason the
+// flag exists. An entry with no `approved` key reads as NOT reviewed — that is the safe
+// direction, and it is what the in-place inserts below pass when a term is first added.
+//
+// The badge says "Not reviewed" and nothing stronger on purpose. Unreviewed terms are
+// still fully live to players today: the load filter and the publish gate are a separate
+// change. Wording this as "hidden" or "blocked" would describe enforcement that does not
+// exist yet, and a reviewer who believed it would leave bad definitions in play.
+function buildGlossaryTermCard(g, scenarioId) {
   const te = esc(g.term); const de = esc(g.definition); const se = esc(g.source || '');
+  const reviewed = g.approved === true;
   const srcLine = g.source ? `<div style="margin-top:4px;font-size:11px;color:var(--text-soft)">Source: ${se}</div>` : '';
-  return `<div class="glossary-term-card" data-term="${te}" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--card)">
+  const badge = reviewed
+    ? `<span class="term-review-badge" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;padding:1px 7px;border-radius:9px">Reviewed</span>`
+    : `<span class="term-review-badge" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;background:#fffbeb;color:#92400e;border:1px solid #fcd34d;padding:1px 7px;border-radius:9px">Not reviewed</span>`;
+  const reviewBtn = reviewed
+    ? ''
+    : `<button type="button" class="btn btn-primary btn-sm" onclick="markGlossaryTermReviewed('${te}','${esc(scenarioId)}')">Mark reviewed</button>`;
+  return `<div class="glossary-term-card" data-term="${te}" data-approved="${reviewed}" style="border:1px solid var(--border);border-left:4px solid ${reviewed ? 'var(--border)' : '#d97706'};border-radius:8px;padding:14px 16px;margin-bottom:10px;background:var(--card)">
     <div class="term-display">
-      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${te}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-weight:700;font-size:13px">${te}</span>${badge}
+      </div>
       <div style="font-size:13px;color:var(--text)">${de}</div>
       ${srcLine}
       <div style="margin-top:10px;display:flex;gap:8px">
+        ${reviewBtn}
         <button type="button" class="btn btn-secondary btn-sm" onclick="editGlossaryTerm('${te}')">Edit</button>
         <button type="button" class="btn btn-danger btn-sm" onclick="deleteGlossaryTerm('${te}','${esc(scenarioId)}')">Delete</button>
       </div>
@@ -3640,13 +3704,13 @@ async function runGlossarySuggest(scenarioId) {
     if (!suggestions?.length) { area.innerHTML = '<p style="font-size:13px;color:var(--text-soft)">No new suggestions found.</p>'; return; }
     area.innerHTML = `
       <div class="suggestions-header">
-        <span id="suggestions-header-text" class="suggestions-header-text">Review suggestions — ${suggestions.length} found. Nothing saves until you click Approve.</span>
-        <button type="button" class="btn btn-secondary btn-sm" id="approve-all-btn">Approve all</button>
+        <span id="suggestions-header-text" class="suggestions-header-text">Review suggestions — ${suggestions.length} found. Nothing saves until you click Add.</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="add-all-btn">Add all</button>
         <button type="button" class="btn btn-danger btn-sm" id="delete-all-btn">Delete all</button>
       </div>
       ${suggestions.map((s, i) => buildSuggestionCard(s, i, scenarioId)).join('')}
       <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">`;
-    document.getElementById('approve-all-btn')?.addEventListener('click', () => approveAll(scenarioId));
+    document.getElementById('add-all-btn')?.addEventListener('click', () => addAll(scenarioId));
     document.getElementById('delete-all-btn')?.addEventListener('click', () => deleteAll(scenarioId));
   } catch (err) {
     area.innerHTML = `<p style="color:#e74c3c;font-size:13px">Error: ${esc(err.message)}</p>`;
@@ -3670,20 +3734,32 @@ function buildSuggestionCard(s, i, scenarioId) {
     <textarea id="${id}-def" rows="3" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical">${de}</textarea>
     <input type="text" id="${id}-src" placeholder="Source (optional)" style="width:100%;font-size:12px;margin-bottom:10px">
     <div style="display:flex;gap:8px">
-      <button type="button" class="btn btn-primary btn-sm" onclick="approveSuggestion('${id}','${te}','${esc(scenarioId)}')">Approve</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="addSuggestion('${id}','${te}','${esc(scenarioId)}')">Add</button>
       <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Delete suggestion</button>
     </div>
   </div>`;
 }
 
-async function approveSuggestion(cardId, term, scenarioId) {
+// Adds a suggested term to the glossary. It does NOT approve it — `approved: false` is
+// explicit here, and the term arrives on the list badged "Not reviewed" until a human
+// marks it. The button used to say Approve, which is what made "reviewed" mean nothing:
+// ten terms in xavier_yamaguchi_1551 were approved:true by that button.
+//
+// _syncGlossaryToEditor is the load-bearing line. handleManualSave no longer rebuilds the
+// glossary from the DOM, so this is the only thing that tells the open editor snapshot
+// about the new term and the version bump. Without it, the next scenario Save would post
+// a glossary missing every term added in this session — and /generate/save writes the
+// scenario whole, so "missing" means deleted.
+async function addSuggestion(cardId, term, scenarioId) {
   const card = document.getElementById(cardId);
   if (!card) return;
   const definition = card.querySelector(`#${cardId}-def`)?.value?.trim();
   const source     = card.querySelector(`#${cardId}-src`)?.value?.trim() || '';
   if (!definition) { toast('Definition cannot be empty', 'error'); return; }
   try {
-    const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+    const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source, approved: false });
+    const glossary = resp.glossary;
+    _syncGlossaryToEditor(scenarioId, glossary, resp.current_version);
     // Fade and remove only this card — never re-render the whole section
     card.style.transition = 'opacity 0.2s';
     card.style.opacity = '0';
@@ -3694,20 +3770,21 @@ async function approveSuggestion(cardId, term, scenarioId) {
         restoreSuggestButton(scenarioId);
       } else {
         const headerText = document.getElementById('suggestions-header-text');
-        if (headerText) headerText.textContent = `Review suggestions — ${remaining} remaining. Nothing saves until you click Approve.`;
+        if (headerText) headerText.textContent = `Review suggestions — ${remaining} remaining. Nothing saves until you click Add.`;
       }
     }, 210);
-    // Insert new approved card without re-rendering approved list
-    const list  = document.getElementById('glossary-approved-list');
+    // Insert the new card without re-rendering the list. No `approved` key is passed, so
+    // buildGlossaryTermCard renders it as not reviewed — which is what it is.
+    const list  = document.getElementById('glossary-term-list');
     const empty = document.getElementById('glossary-empty-state');
     if (empty) empty.remove();
-    if (list) list.insertAdjacentHTML('afterbegin', buildApprovedTermCard({ term, definition, source }, scenarioId));
+    if (list) list.insertAdjacentHTML('afterbegin', buildGlossaryTermCard({ term, definition, source }, scenarioId));
     // Update counts in-place
-    const countEl = document.getElementById('glossary-approved-count');
-    if (countEl) countEl.textContent = `Approved terms (${glossary.length})`;
+    const countEl = document.getElementById('glossary-count-label');
+    if (countEl) countEl.textContent = glossaryCountLabel(glossary);
     const badge = document.getElementById('glossary-count-badge');
     if (badge) badge.textContent = `${glossary.length} term${glossary.length === 1 ? '' : 's'}`;
-    toast(`"${term}" approved`, 'success');
+    toast(`"${term}" added — not yet reviewed`, 'success');
   } catch (err) { toast(`Error: ${err.message}`, 'error'); }
 }
 
@@ -3718,13 +3795,15 @@ function restoreSuggestButton(scenarioId) {
   document.getElementById('glossary-suggest-btn').addEventListener('click', () => runGlossarySuggest(scenarioId));
 }
 
-async function approveAll(scenarioId) {
-  const approveBtn = document.getElementById('approve-all-btn');
-  const deleteBtn  = document.getElementById('delete-all-btn');
-  if (approveBtn) { approveBtn.disabled = true; approveBtn.textContent = 'Approving…'; }
+// Bulk ADD, not bulk approve. Every term lands unreviewed, exactly as the one-at-a-time
+// path does; there is no way to reach approved:true from the suggestions list at all.
+async function addAll(scenarioId) {
+  const addBtn    = document.getElementById('add-all-btn');
+  const deleteBtn = document.getElementById('delete-all-btn');
+  if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Adding…'; }
   if (deleteBtn)  deleteBtn.disabled = true;
   const cards = [...document.querySelectorAll('.suggestion-card')];
-  let approved = 0;
+  let added = 0;
   for (const card of cards) {
     const cardId     = card.id;
     const term       = card.dataset.term;
@@ -3732,29 +3811,31 @@ async function approveAll(scenarioId) {
     const source     = card.querySelector(`#${cardId}-src`)?.value?.trim() || '';
     if (!term || !definition) continue;
     try {
-      const { glossary } = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
+      const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source, approved: false });
+      const glossary = resp.glossary;
+      _syncGlossaryToEditor(scenarioId, glossary, resp.current_version);
       card.style.transition = 'opacity 0.15s';
       card.style.opacity = '0';
       await new Promise(r => setTimeout(r, 160));
       card.remove();
-      approved++;
+      added++;
       const remaining = document.querySelectorAll('.suggestion-card').length;
       const headerText = document.getElementById('suggestions-header-text');
-      if (headerText && remaining > 0) headerText.textContent = `Approving — ${remaining} remaining…`;
-      const countEl = document.getElementById('glossary-approved-count');
-      if (countEl) countEl.textContent = `Approved terms (${glossary.length})`;
+      if (headerText && remaining > 0) headerText.textContent = `Adding — ${remaining} remaining…`;
+      const countEl = document.getElementById('glossary-count-label');
+      if (countEl) countEl.textContent = glossaryCountLabel(glossary);
       const badge = document.getElementById('glossary-count-badge');
       if (badge) badge.textContent = `${glossary.length} term${glossary.length === 1 ? '' : 's'}`;
-      const list  = document.getElementById('glossary-approved-list');
+      const list  = document.getElementById('glossary-term-list');
       const empty = document.getElementById('glossary-empty-state');
       if (empty) empty.remove();
-      if (list) list.insertAdjacentHTML('afterbegin', buildApprovedTermCard({ term, definition, source }, scenarioId));
+      if (list) list.insertAdjacentHTML('afterbegin', buildGlossaryTermCard({ term, definition, source }, scenarioId));
     } catch (_) { /* skip failed card, continue */ }
   }
   if (document.querySelectorAll('.suggestion-card').length === 0) {
     restoreSuggestButton(scenarioId);
   }
-  toast(`${approved} term${approved === 1 ? '' : 's'} approved`, 'success');
+  toast(`${added} term${added === 1 ? '' : 's'} added — not yet reviewed`, 'success');
 }
 
 function deleteAll(scenarioId) {
@@ -3772,7 +3853,7 @@ function deleteAll(scenarioId) {
 }
 
 function addGlossaryTermManually(scenarioId) {
-  const list = document.getElementById('glossary-approved-list');
+  const list = document.getElementById('glossary-term-list');
   if (!list) return;
   const empty = document.getElementById('glossary-empty-state');
   if (empty) empty.remove();
@@ -3832,8 +3913,10 @@ function addGlossaryTermManually(scenarioId) {
     const source     = card.querySelector('.new-source-input').value.trim();
     if (!term || !definition) { toast('Term and definition are required', 'error'); return; }
     try {
-      const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source });
-      toast(`"${term}" added`, 'success');
+      // approved:false explicit — a hand-typed definition is no more reviewed than a
+      // generated one. Same failure mode: asserted without anyone checking the source.
+      const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/glossary`, { term, definition, source, approved: false });
+      toast(`"${term}" added — not yet reviewed`, 'success');
       renderGlossaryBody(scenarioId, resp.glossary);
       _syncGlossaryToEditor(scenarioId, resp.glossary, resp.current_version);
     } catch (err) { toast(`Error: ${err.message}`, 'error'); }
@@ -4171,20 +4254,19 @@ async function handleManualSave(data, containerEl) {
     data.scenario.image = { ...(data.scenario.image || {}), generation_prompt: imgPromptTextarea.value };
   }
 
-  // Glossary is managed via dedicated API endpoints (not form fields), so collectEdits
-  // never sees it. Read approved term cards from the DOM and inject into the payload.
-  // If a card is in edit mode (Edit clicked but term-level Save not yet clicked), the
-  // in-progress textarea value is captured here — scenario Save commits whatever is typed.
-  const glossaryList = document.getElementById('glossary-approved-list');
-  if (glossaryList && data.scenario) {
-    const cards = [...glossaryList.querySelectorAll('.glossary-term-card')];
-    data.scenario.glossary = cards.map(card => ({
-      term: card.querySelector('.edit-term')?.value?.trim() || card.dataset.term || '',
-      definition: card.querySelector('.edit-definition')?.value?.trim() || '',
-      source: card.querySelector('.edit-source')?.value?.trim() || '',
-      approved: true,
-    })).filter(g => g.term && g.definition);
-  }
+  // The glossary is NOT rebuilt here. It used to be scraped out of the term cards and
+  // re-injected with `approved: true` hardcoded on every entry, which made the main Save
+  // button a second, silent producer of review state: mark terms unreviewed, press Save
+  // for any unrelated reason, and every one of them was approved again. It also meant a
+  // stale tab could push old card text over a definition corrected through the injector.
+  //
+  // data.scenario.glossary is already authoritative — _syncGlossaryToEditor refreshes it
+  // after every glossary write (add, edit, delete, mark reviewed), so collectEdits not
+  // seeing the glossary is exactly right: there is nothing here to collect.
+  //
+  // One deliberate consequence: a term card left in edit mode is no longer committed by
+  // the scenario Save. The term-level Save button commits it. Silently persisting
+  // half-typed text from a control the user never confirmed was never a feature.
 
   try {
     // Optimistic concurrency: send the version we loaded. The server rejects with 409 if the
@@ -4540,7 +4622,7 @@ function buildEpilogueSection(data) {
 
 // ── Glossary export for the review loop ─────────────────────────────────────────
 // Built from data.scenario.glossary, never by scraping the DOM: the glossary section
-// renders display cards (buildApprovedTermCard) rather than form inputs, it is loaded on
+// renders display cards (buildGlossaryTermCard) rather than form inputs, it is loaded on
 // its own endpoint, and _syncGlossaryToEditor refreshes this array after every glossary
 // write — so the data is the only copy that is reliably current.
 //

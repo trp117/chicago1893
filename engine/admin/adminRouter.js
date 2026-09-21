@@ -4276,18 +4276,61 @@ Return JSON only:
     }
   });
 
+  // ── Adding a term ───────────────────────────────────────────────────────────────
+  // `approved` defaults to FALSE when the caller omits it, so a forgotten caller fails
+  // safe. Adding a term is not reviewing it: a hand-typed definition is no more checked
+  // against a source than a generated one, and the failure this guards against — a
+  // definition asserted without anyone verifying it — is equally available to both paths.
+  // No caller in this app passes true; the only producer of approved:true is the
+  // mark-reviewed route below, which records that a human review pass actually happened.
   r.post('/scenarios/:id/glossary', async (req, res) => {
     const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
-    const { term, definition, source } = req.body;
+    const { term, definition, source, approved } = req.body;
     if (!term?.trim() || !definition?.trim()) return badRequest(res, 'term and definition required');
     const glossary = scenario.glossary || [];
     if (glossary.some(g => g.term.toLowerCase() === term.trim().toLowerCase()))
       return badRequest(res, `Term "${term}" already exists in glossary`);
-    glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: true });
+    glossary.push({ term: term.trim(), definition: definition.trim(), source: source?.trim() || '', approved: approved === true });
     const updated = { ...scenario, glossary };
     const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
     res.json({ success: true, glossary: updated.glossary, current_version: newVersion });
+  });
+
+  // ── Mark reviewed — the ONLY producer of approved:true ───────────────────────────
+  // Deliberately not folded into PUT /:term. That route's contract is "replace this
+  // entry's text", it requires a definition, and flipping a flag through it would mean
+  // re-sending the definition — which is how review state ends up silently rewriting the
+  // text it is supposed to be vouching for. These two routes touch `approved` and nothing
+  // else: every other field is carried through by spread, byte for byte.
+  //
+  // Bulk is legitimate and is not a shortcut past the judgment: the reviewer has just
+  // worked the export through the review loop, and the click records that the pass ran.
+  // It is the same act technical_facts.reviewed records for facts.
+  r.post('/scenarios/:id/glossary/reviewed-all', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const existing = scenario.glossary || [];
+    const pending = existing.filter(g => g.approved !== true).length;
+    if (!pending) return res.json({ success: true, glossary: existing, reviewed: 0, current_version: null });
+    const glossary = existing.map(g => (g.approved === true ? g : { ...g, approved: true }));
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    console.log(`[GLOSSARY] marked ${pending} term(s) reviewed for "${req.params.id}"`);
+    res.json({ success: true, glossary, reviewed: pending, current_version: newVersion });
+  });
+
+  r.post('/scenarios/:id/glossary/:term/reviewed', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const termName = decodeURIComponent(req.params.term);
+    const existing = scenario.glossary || [];
+    if (!existing.some(g => g.term.toLowerCase() === termName.toLowerCase()))
+      return notFound(res);
+    const glossary = existing.map(g =>
+      g.term.toLowerCase() === termName.toLowerCase() ? { ...g, approved: true } : g
+    );
+    const newVersion = await repos.scenarios.save({ ...scenario, glossary }, { savedBy: req.adminUser?.email || 'admin' });
+    res.json({ success: true, glossary, current_version: newVersion });
   });
 
   r.put('/scenarios/:id/glossary/:term', async (req, res) => {
