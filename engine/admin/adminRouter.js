@@ -3493,6 +3493,27 @@ Return ONLY valid JSON in this exact structure:
     try {
       const existing = await repos.scenarios.findById(scenario.id);
       if (!existing) scenario.status = 'draft';
+
+      // ── Publish gate: no publishing with unreviewed glossary terms ─────────────────
+      // "Glossary reviewed" is DERIVED — zero unapproved terms — and never stored. A
+      // stored section flag would be a second copy of a fact the terms already carry,
+      // free to drift the moment anyone adds a term without touching the flag.
+      //
+      // Only fires on the draft → published TRANSITION. Re-saving an already-published
+      // scenario is not blocked: those 12 scenarios predate the review model and would
+      // otherwise become unsaveable, which would make this gate something to route
+      // around rather than satisfy. The transition is the moment the decision is made.
+      if (scenario.status === 'published' && (existing?.status || 'draft') !== 'published') {
+        const unreviewed = (scenario.glossary || []).filter(g => g?.term?.trim() && g.approved !== true);
+        if (unreviewed.length) {
+          return res.status(400).json({
+            error: `Cannot publish: ${unreviewed.length} glossary term(s) have not been reviewed — ${unreviewed.slice(0, 5).map(g => `"${g.term}"`).join(', ')}${unreviewed.length > 5 ? ', …' : ''}. Mark them reviewed in the Glossary section, then publish.`,
+            code: 'GLOSSARY_UNREVIEWED',
+            unreviewed: unreviewed.map(g => g.term),
+          });
+        }
+      }
+
       // Mark hand-edited technical_facts / epilogue blocks so the editor can gate a
       // destructive Regenerate. Runs before the save so the stamp is part of this version.
       stampCorrections(scenario, existing);

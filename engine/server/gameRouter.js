@@ -728,11 +728,26 @@ export function createGameRouter(repos, config = {}) {
         initialState.technicalFacts = [];
       }
 
-      // Pass approved glossary terms to the client
-      initialState.glossary = (scenario.glossary || []).filter(g =>
-        g.term?.trim() && g.definition?.trim()
-      );
-      console.log(`[GLOSSARY] scenario=${scenarioId} total=${(scenario.glossary || []).length} passed=${initialState.glossary.length} terms=[${initialState.glossary.map(g => g.term).join(', ')}]`);
+      // Glossary terms passed to the client, gated on review state by SCENARIO STATUS.
+      //
+      // The comment here used to say "approved glossary terms" while the filter checked
+      // only that the strings were non-empty — `approved` was written in two places and
+      // read in none. It is read here now.
+      //
+      // DRAFT passes everything, reviewed or not: a scenario in development is being
+      // playtested by the person building it, and hiding half the glossary from them
+      // would make the hover gloss look broken exactly when it is being checked.
+      //
+      // EVERYTHING ELSE passes approved terms only. Not just 'published' — archived and
+      // hidden are player-reachable surfaces too, and an unreviewed definition is no
+      // safer in one of them than on the live site. A MISSING status also lands here,
+      // deliberately: lib/scenarioStore.js stores `content.status || 'published'`, so
+      // absent already means published everywhere else in the system, and this agrees
+      // with that rather than inventing a second rule. Every branch fails closed.
+      const glossStatus = scenario.status || 'published';
+      const glossAll = (scenario.glossary || []).filter(g => g.term?.trim() && g.definition?.trim());
+      initialState.glossary = glossStatus === 'draft' ? glossAll : glossAll.filter(g => g.approved === true);
+      console.log(`[GLOSSARY] scenario=${scenarioId} status=${glossStatus} total=${(scenario.glossary || []).length} passed=${initialState.glossary.length} withheld_unreviewed=${glossAll.length - initialState.glossary.length} terms=[${initialState.glossary.map(g => g.term).join(', ')}]`);
 
       // Attach briefing context from the briefing screen
       if (character_context)   initialState.character_context = character_context;

@@ -4244,7 +4244,23 @@ window.addEventListener('beforeunload', e => {
 async function handleManualSave(data, containerEl) {
   const btn = document.getElementById('preview-save');
   if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  // Captured BEFORE collectEdits, which overwrites data.scenario.status from the select —
+  // after that line the transition being gated is no longer visible from here.
+  const priorStatus = data.scenario?.status || 'draft';
   if (containerEl) collectEdits(containerEl, data);
+
+  // Publish gate, client half. Mirrors the server check in /generate/save: same derived
+  // count, same draft → published transition only. Stopping here means the reviewer never
+  // sees a save appear to start and then fail.
+  if (data.scenario?.status === 'published' && priorStatus !== 'published') {
+    const unreviewed = (data.scenario.glossary || []).filter(g => g?.term?.trim() && g.approved !== true);
+    if (unreviewed.length) {
+      const names = unreviewed.slice(0, 5).map(g => `"${g.term}"`).join(', ');
+      toast(`Cannot publish: ${unreviewed.length} glossary term(s) have not been reviewed — ${names}${unreviewed.length > 5 ? ', …' : ''}. Mark them reviewed in the Glossary section, then publish.`, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
+      return false;
+    }
+  }
 
   // Image Prompt Studio — textarea is outside the data-path form system, so collectEdits
   // never picks it up. Inject the current value here so main Save never overwrites a
@@ -5704,6 +5720,20 @@ function renderPreview(data, autoSaved = false) {
     }
   }, true); // capture phase so it fires before the existing click delegation
 
+  // ── Publish gate, client half — warn AT THE SELECT, not after the save ────────────
+  // The server rejects the save (GLOSSARY_UNREVIEWED), but a 400 arriving at the end of a
+  // Save the user believed was succeeding teaches them that Save is unreliable. The
+  // decision is made here, at the moment they choose Published, so the objection belongs
+  // here too. The server stays the backstop: this is a courtesy, not the enforcement.
+  formEl.addEventListener('change', e => {
+    const sel = e.target.closest('[data-path="scenario.status"]');
+    if (!sel || sel.value !== 'published') return;
+    const unreviewed = (data.scenario?.glossary || []).filter(g => g?.term?.trim() && g.approved !== true);
+    if (!unreviewed.length) return;
+    const names = unreviewed.slice(0, 3).map(g => `"${g.term}"`).join(', ');
+    toast(`Cannot publish yet: ${unreviewed.length} glossary term(s) not reviewed — ${names}${unreviewed.length > 3 ? ', …' : ''}. Mark them reviewed in the Glossary section first; saving as Published will be rejected.`, 'error');
+  });
+
   // ── Mark as Approved — warn if technical facts or epilogue not reviewed ───────────
   formEl.addEventListener('click', e => {
     if (!e.target.closest('#mark-approved-btn')) return;
@@ -6643,7 +6673,7 @@ SOURCE: [primary source citation]
 
 ---CONFIRMED: [exact term]---
 
-(c) Recommend removal, when the entry should not be a glossary term at all — a game mechanic rather than a historical term, an ordinary English word a general reader knows, or a term the sources do not support:
+(c) Recommend removal, when the entry should not be a glossary term at all — a game mechanic rather than a historical term, an ordinary English word a general reader knows, a term the sources do not support, or a term that will never fire. The term is matched against narrative prose as a literal string, whole-word, with no stemming: a long sentence fragment such as "jurisdictional claims between Louisiana's National Guard and federal military commands" will never appear verbatim in a sentence, so its definition is one nobody will ever see. Flag anything that reads as a description rather than a term someone would write:
 
 ---RECOMMEND REMOVAL---
 TERM: [exact term]
@@ -6905,13 +6935,22 @@ function parseCorrections(scenarioId) {
   const raw = document.getElementById('corrections-paste').value.trim();
   if (!raw) return toast('Paste a response first', 'error');
   const blocks = [];
-  // ONE scan for both block types, so the cards keep the order the reviewer wrote them in.
-  // ---CORRECTION--- matches a stored value and replaces it; ---NEW FACT--- appends a
-  // technical fact and never touches an existing one (see insertNewFact).
-  const regex = /---(CORRECTION|NEW FACT)---([\s\S]*?)---END---/g;
+  // ONE scan for all three block types, so the cards keep the order the reviewer wrote
+  // them in. ---CORRECTION--- matches a stored value and replaces it; ---NEW FACT---
+  // appends a technical fact and never touches an existing one (see insertNewFact);
+  // ---RECOMMEND REMOVAL--- is a judgment addressed to a human and is never applied.
+  //
+  // Removals used to be counted in one branch of the empty-paste toast and nowhere else,
+  // which meant a review returning corrections AND removals dropped the removals on the
+  // floor with no hint that anything had been discarded. They are parsed as first-class
+  // blocks now, and carry decision:'informational' so nothing downstream can mistake one
+  // for work to apply.
+  const regex = /---(CORRECTION|NEW FACT|RECOMMEND REMOVAL)---([\s\S]*?)---END---/g;
   let match;
   while ((match = regex.exec(raw)) !== null) {
-    const kind = match[1] === 'NEW FACT' ? 'newfact' : 'correction';
+    const kind = match[1] === 'NEW FACT' ? 'newfact'
+               : match[1] === 'RECOMMEND REMOVAL' ? 'removal'
+               : 'correction';
     const block = match[2].trim();
     const get = (label) => {
       // Terminate a field only at a KNOWN label line, so a body containing an
@@ -6923,7 +6962,7 @@ function parseCorrections(scenarioId) {
       // swallowed it: the fact would have been stored with the SOURCE line as its content
       // instead of being rejected as contentless. A value that legitimately begins on the
       // next line still works — the capture keeps the leading newline and .trim() removes it.
-      const re = new RegExp(label + ':[ \\t]*([\\s\\S]*?)(?=\\n(?:SECTION|FIELD|CURRENT|REPLACE WITH|REASON|SOURCE|DOMAIN|CONTENT):|$)');
+      const re = new RegExp(label + ':[ \\t]*([\\s\\S]*?)(?=\\n(?:SECTION|FIELD|CURRENT|REPLACE WITH|REASON|SOURCE|DOMAIN|CONTENT|TERM):|$)');
       const m = block.match(re);
       return m ? m[1].trim() : '';
     };
@@ -6938,7 +6977,13 @@ function parseCorrections(scenarioId) {
       content: get('CONTENT'),
       reason: get('REASON'),
       source: get('SOURCE'),
-      decision: 'pending'
+      // TERM is a ---RECOMMEND REMOVAL--- label. It is read for every block so the
+      // getter set stays uniform; only the removal card displays it.
+      term: get('TERM'),
+      // A removal is a judgment for a person, not a pending decision. It is never
+      // accepted, rejected or applied, so it starts and stays 'informational' — which
+      // is what keeps it out of the counters and the bulk sweeps.
+      decision: kind === 'removal' ? 'informational' : 'pending'
     });
   }
   const confirmed = [];
@@ -6949,14 +6994,8 @@ function parseCorrections(scenarioId) {
   // paste with no way to tell whether the markers were wrong, the paste was truncated,
   // or the textarea held something else entirely — the character count answers that.
   if (blocks.length === 0 && confirmed.length === 0) {
-    // A glossary review can legitimately come back as removal recommendations only. The
-    // injector never deletes, so there is nothing to parse — but "0 markers found" on its
-    // own reads like a failed paste, so say what IS there and where it has to be actioned.
-    const removals = (raw.match(/---RECOMMEND REMOVAL---/g) || []).length;
-    const tail = removals
-      ? ` ${removals} ---RECOMMEND REMOVAL--- block(s) are present: the injector does not delete — action those in the glossary editor.`
-      : '';
-    return toast(`0 ---CORRECTION--- / ---NEW FACT--- markers found in ${raw.length} characters.${tail}`, 'error');
+    // Removals are parsed as blocks now, so a removal-only review no longer lands here.
+    return toast(`0 ---CORRECTION--- / ---NEW FACT--- / ---RECOMMEND REMOVAL--- markers found in ${raw.length} characters.`, 'error');
   }
   window._aiDiffs = blocks;
   renderDiffReviewer(blocks, confirmed);
@@ -6977,11 +7016,19 @@ function renderDiffReviewer(blocks, confirmed) {
     actions.style.display = 'none';
     return;
   }
-  // Two card shapes: a correction shows current → replacement, a new fact shows only the
-  // value being ADDED. They must not look alike — "accept" means something different on each.
-  html += blocks.map(b => b.kind === 'newfact' ? _newFactCard(b) : _correctionCard(b)).join('');
+  // Three card shapes. A correction shows current → replacement, a new fact shows only the
+  // value being ADDED, and a removal shows a judgment with nothing to press. They must not
+  // look alike — "accept" means something different on each, and nothing at all on the third.
+  html += blocks.map(b => b.kind === 'newfact' ? _newFactCard(b)
+                        : b.kind === 'removal' ? _removalCard(b)
+                        : _correctionCard(b)).join('');
   diff.innerHTML = html;
-  actions.style.display = '';
+
+  // A batch can be removals only — a reviewer who found nothing to correct but three terms
+  // that should not exist. There is nothing to accept or apply then, and showing the
+  // buttons would invite a click that silently does nothing.
+  const actionable = blocks.filter(b => b.decision !== 'informational').length;
+  actions.style.display = actionable ? '' : 'none';
   // A previous apply pass retires these (renderInjectionResults); a fresh parse brings
   // them back, or the new batch would be unacceptable and unappliable.
   ['diff-accept-all', 'diff-reject-all', 'diff-apply'].forEach(id => {
@@ -6989,6 +7036,23 @@ function renderDiffReviewer(blocks, confirmed) {
     if (btn) btn.style.display = '';
   });
   updateDiffSummary();
+}
+
+// ---RECOMMEND REMOVAL--- card. Grey, no action row: the injector never deletes, and a
+// button here would imply it might. This is the reviewer's judgment parked where the
+// person who can act on it will read it — the term and the reason, nothing else.
+function _removalCard(b) {
+  return `
+    <div id='diff-card-${b.id}' style='border:1px solid var(--border-color);border-left:4px solid #6b7280;border-radius:6px;margin-bottom:10px;overflow:hidden;background:#f8fafc'>
+      <div style='padding:8px 12px;background:#f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:8px'>
+        <span style='font-size:12px;font-family:monospace;color:#475569'>⌫ RECOMMEND REMOVAL → ${escapeHtml(b.term || b.field || '(no TERM)')}</span>
+        <span id='diff-status-${b.id}' style='font-size:11px;color:var(--text-muted)'>informational</span>
+      </div>
+      <div style='padding:10px 12px'>
+        ${b.reason ? '<div style=font-size:12px;color:var(--text);margin-bottom:8px;white-space:pre-wrap>' + escapeHtml(b.reason) + '</div>' : ''}
+        <div style='font-size:11px;color:var(--text-muted);font-style:italic'>Not applied by the injector — remove this term in the glossary editor if you agree.</div>
+      </div>
+    </div>`;
 }
 
 function _correctionCard(b) {
@@ -7098,22 +7162,32 @@ function saveManualDiff(id) {
   updateDiffSummary();
 }
 
+// The bulk sweeps act on decisions, and a removal has no decision to make. Filtering on
+// 'pending' alone already skips them — 'informational' is not 'pending' — but that is an
+// accident of the value chosen, so it is stated here rather than relied on.
 function acceptAllDiffs() {
-  window._aiDiffs.forEach(d => { if (d.decision === 'pending') acceptDiff(d.id); });
+  window._aiDiffs.forEach(d => { if (d.kind !== 'removal' && d.decision === 'pending') acceptDiff(d.id); });
 }
 
 function rejectAllDiffs() {
-  window._aiDiffs.forEach(d => { if (d.decision === 'pending') rejectDiff(d.id); });
+  window._aiDiffs.forEach(d => { if (d.kind !== 'removal' && d.decision === 'pending') rejectDiff(d.id); });
 }
 
+// Counters run over ACTIONABLE blocks only. Counting removals in `total` would leave
+// `pending` permanently non-zero — "3 pending" on a batch where everything had been
+// decided, which reads as unfinished work and makes Apply look incomplete forever.
+// They are reported separately instead, because silently omitting them was the bug.
 function updateDiffSummary() {
-  const total = window._aiDiffs.length;
-  const accepted = window._aiDiffs.filter(d => d.decision === 'accepted').length;
-  const rejected = window._aiDiffs.filter(d => d.decision === 'rejected').length;
-  const edited = window._aiDiffs.filter(d => d.decision === 'edited').length;
+  const actionable = window._aiDiffs.filter(d => d.kind !== 'removal');
+  const removals = window._aiDiffs.length - actionable.length;
+  const total = actionable.length;
+  const accepted = actionable.filter(d => d.decision === 'accepted').length;
+  const rejected = actionable.filter(d => d.decision === 'rejected').length;
+  const edited = actionable.filter(d => d.decision === 'edited').length;
   const pending = total - accepted - rejected - edited;
   document.getElementById('diff-summary-text').textContent =
-    accepted + ' accepted · ' + rejected + ' rejected · ' + edited + ' edited · ' + pending + ' pending';
+    accepted + ' accepted · ' + rejected + ' rejected · ' + edited + ' edited · ' + pending + ' pending'
+    + (removals ? ` · ${removals} removal recommendation${removals === 1 ? '' : 's'} (not applied)` : '');
 }
 
 async function applyCorrections(scenarioId) {
@@ -7133,6 +7207,13 @@ async function applyCorrections(scenarioId) {
       const res = d.kind === 'newfact' ? insertNewFact(data, d) : resolveAndApply(data, d);
       results.push({ kind: d.kind, section: d.section, field: d.field, current: d.current, ...res });
       if (res.outcome === 'applied' || res.outcome === 'added') writeCount++;
+    }
+    // Removal recommendations were never in `accepted` and are never applied, but they
+    // must survive the pass: the apply replaces the whole panel, so a removal that is not
+    // carried across here is gone from the screen the moment the reviewer presses Apply —
+    // which is the data loss this commit exists to stop.
+    for (const d of window._aiDiffs.filter(d => d.kind === 'removal')) {
+      results.push({ kind: 'removal', term: d.term, field: d.field, reason: d.reason, outcome: 'removal-recommended' });
     }
     const factsAfter = (data.scenario?.technical_facts?.facts || []).length;
     if (writeCount > 0) {
@@ -7520,8 +7601,8 @@ function insertNewFact(data, blk) {
 function renderInjectionResults(results, writeCount, factCounts) {
   const el = document.getElementById('corrections-diff');
   const WROTE = o => o === 'applied' || o === 'added';
-  const C = o => o === 'applied' ? '#2a7a2a' : o === 'added' ? '#1f6f8b' : o === 'ambiguous' ? '#b8860b' : '#c0392b';
-  const BG = o => o === 'applied' ? '#f0faf0' : o === 'added' ? '#eef7fb' : o === 'ambiguous' ? '#fff8e6' : '#fff5f5';
+  const C = o => o === 'applied' ? '#2a7a2a' : o === 'added' ? '#1f6f8b' : o === 'ambiguous' ? '#b8860b' : o === 'removal-recommended' ? '#475569' : '#c0392b';
+  const BG = o => o === 'applied' ? '#f0faf0' : o === 'added' ? '#eef7fb' : o === 'ambiguous' ? '#fff8e6' : o === 'removal-recommended' ? '#f8fafc' : '#fff5f5';
   const L = o => ({
     'applied': '✓ applied', 'added': '+ added (new fact)',
     'field-not-found': '✕ field not found', 'current-mismatch': '✕ current mismatch',
@@ -7530,27 +7611,36 @@ function renderInjectionResults(results, writeCount, factCounts) {
     'glossary-term-locked': '✕ term/source not editable — not applied',
     'invalid-domain': '✕ unknown domain — not added',
     'invalid-new-fact': '✕ invalid NEW FACT — not added',
+    'removal-recommended': '⌫ removal recommended — action in the glossary editor',
   }[o] || o);
-  const addedCount = results.filter(r => r.outcome === 'added').length;
-  const replacedCount = results.filter(r => r.outcome === 'applied').length;
-  const failed = results.length - writeCount;
+  // Removals are not attempts at a write, so they are excluded from every denominator:
+  // counting them as failures would report "2/5 written" on a batch where both corrections
+  // applied and the other three were judgments nobody asked the injector to carry out.
+  const attempts = results.filter(r => r.outcome !== 'removal-recommended');
+  const removals = results.length - attempts.length;
+  const addedCount = attempts.filter(r => r.outcome === 'added').length;
+  const replacedCount = attempts.filter(r => r.outcome === 'applied').length;
+  const failed = attempts.length - writeCount;
   const breakdown = addedCount > 0 ? ` — ${replacedCount} replaced, ${addedCount} added` : '';
   // The header counts WRITES, never accepted cards: "11 accepted / 4 applied" invited the
   // reviewer to assume the other 7 had landed somewhere.
-  let html = `<div style="margin-bottom:10px;font-weight:600;font-size:13px">Injection results — ${writeCount}/${results.length} written${writeCount > 0 ? ' and saved' : ''}${breakdown}</div>`;
+  let html = `<div style="margin-bottom:10px;font-weight:600;font-size:13px">Injection results — ${writeCount}/${attempts.length} written${writeCount > 0 ? ' and saved' : ''}${breakdown}${removals ? ` · ${removals} removal recommendation${removals === 1 ? '' : 's'}` : ''}</div>`;
   if (factCounts) {
     html += `<div style="margin-bottom:10px;font-size:12px;color:var(--text-muted)">Technical facts: ${factCounts.before} → ${factCounts.after}</div>`;
   }
   html += results.map(r => {
     const locator = r.kind === 'newfact'
       ? '+ NEW FACT → ' + escapeHtml(r.field || '(no FIELD)')
+      : r.kind === 'removal'
+      ? '⌫ RECOMMEND REMOVAL → ' + escapeHtml(r.term || r.field || '(no TERM)')
       : escapeHtml(r.section || '') + (r.field ? ' → ' + escapeHtml(r.field) : '');
     // The submitted text is echoed here only when the detail does not already carry it.
-    const echoCurrent = !WROTE(r.outcome) && !r.echoed && r.current;
+    const echoCurrent = !WROTE(r.outcome) && r.kind !== 'removal' && !r.echoed && r.current;
     return `
     <div style="border:1px solid var(--border-color);border-left:4px solid ${C(r.outcome)};border-radius:4px;background:${BG(r.outcome)};padding:8px 10px;margin-bottom:6px;font-size:12px">
       <div style="font-family:monospace;color:var(--accent)">${locator}</div>
       <div style="color:${C(r.outcome)};font-weight:600;white-space:pre-wrap">${L(r.outcome)}${r.detail ? ': ' + escapeHtml(r.detail) : ''}</div>
+      ${r.kind === 'removal' && r.reason ? `<div style="color:var(--text-muted);margin-top:3px;white-space:pre-wrap">${escapeHtml(r.reason)}</div>` : ''}
       ${echoCurrent ? `<div style="color:var(--text-muted);margin-top:3px;white-space:pre-wrap">CURRENT: ${escapeHtml((r.current || '').slice(0, 140))}</div>` : ''}
     </div>`;
   }).join('');

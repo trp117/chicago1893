@@ -3299,6 +3299,28 @@ function escapeHtmlAttr(str) {
     .replace(/"/g, '&quot;');
 }
 
+// OVERLAPPING TERMS — measured, and deliberately NOT guarded against in code.
+//
+// Longest-first means a shorter term never gets its own span at a position where a longer
+// one also matches. That is usually the RIGHT answer: where "bascule span" appears you
+// want that gloss, not "bascule". The failure case is a term whose every occurrence sits
+// inside a longer one, so it is defined and then never fires, with nothing saying so.
+//
+// Census over all 481 live terms in 25 scenarios: 0 exact duplicates, 6 whole-word
+// containment pairs, of which exactly 1 is fully shadowed in practice.
+//   five_days_under_water          "bascule"           in "bascule span"        <- shadowed
+//   apollo_13_lifeboat             "PC+2"              in "PC+2 burn"
+//   dead_reckoning_ninth_ward      "National Guard"    in "jurisdictional claims between …"
+//   dead_reckoning_ninth_ward_old  "National Guard"    in "jurisdictional claims between …"
+//   dead_reckoning_lower_nine      "grid sweeps"       in "reconnaissance aircraft running grid sweeps"
+//   two_kinds_of_daydream          "rebreak and reset" in "operation to rebreak and reset the bone"
+//
+// Six pairs and one real instance did not justify a detector that would have to duplicate
+// this function's matching rules to stay honest. The larger version of the same problem —
+// 25 of 481 terms are five or more words, up to ten, and can never appear verbatim in
+// prose — is handled by the reviewer instead: REVIEW_PROMPTS.glossary asks for those to be
+// flagged as RECOMMEND REMOVAL candidates. Revisit if a census shows the pairs multiplying.
+//
 // ONE alternation pass over the text — never a term-at-a-time loop.
 //
 // WHY THIS SHAPE. The previous version looped per term and spliced each <span data-def="...">
