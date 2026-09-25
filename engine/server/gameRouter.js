@@ -312,8 +312,20 @@ function buildEpilogueSummary(state, endResult, scenario) {
     // It exists because `outcome` above is endResult, and endResult is usually ABSENT —
     // game_system_prompt.md tells the model not to emit endState.result ("there is no win or
     // loss"), so `outcome` reads 'unknown' on most sessions and the Your-Session block had
-    // nothing solid to weigh a decision against. This is present on every authored scenario,
-    // so it is the reliable half of that pair.
+    // nothing solid to weigh a decision against.
+    //
+    // OPTIONAL, and absent far more often than present. It is hand-authored per scenario as
+    // each one is worked on — deliberately NOT batch-filled — so most scenarios will not carry
+    // it for a long while. As of this writing NO scenario carries it, which means every
+    // epilogue ever generated has taken the absent path.
+    //
+    // ABSENCE IS A NORMAL STATE, NOT A GAP TO REPAIR. When the field is missing this resolves
+    // to null and generateEpilogueText falls back to Fix A's rule (gameRouter.js:491): weigh
+    // the decision against `outcome` and the CLOSING PROSE — how THIS session actually ended.
+    // That fallback is a complete rule, not a stub, and carries the same "both halves"
+    // requirement (what they did, and what it turned out to be worth). The anchored variant
+    // differs only in WHICH standard it judges against: the documented record instead of the
+    // session's own ending. Never write a reader that treats absence as an error.
     //
     // `reviewed` rides along rather than gating. Framing prose may use an unconfirmed
     // description — the cost of being wrong there is one imprecise sentence. A future
