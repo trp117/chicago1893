@@ -872,7 +872,13 @@ function buildResolvedThreadsBlock(state) {
 function buildVerifiedFactsBlock(state) {
   const facts = (state.technicalFacts || []).filter(f => f.pre_seeded);
   if (facts.length === 0) return '';
-  const lines = facts.map(f => `- [VERIFIED] ${f.content}\n  Source: ${f.source}`);
+  // source is stored as { citation, url, access_note }; a bare string is the legacy
+  // shape. Only the citation goes to the model — interpolating the object printed
+  // "Source: [object Object]". No citation → no Source line.
+  const lines = facts.map(f => {
+    const cite = (typeof f.source === 'string' ? f.source : f.source?.citation || '').trim();
+    return `- [VERIFIED] ${f.content}` + (cite ? `\n  Source: ${cite}` : '');
+  });
   return [
     'VERIFIED HISTORICAL FACTS — use these exactly; do not generate alternative values:',
     lines.join('\n'),
