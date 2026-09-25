@@ -6690,6 +6690,8 @@ Rules:
 - Quote CURRENT as the STORED value only. Each entry is exported as a "[term]" header line, then the definition, then a "Source: " line. Those are SEPARATE stored fields; the header brackets and the "Source: " prefix are added at display time. To correct the definition, quote the definition alone. Never put the "[term]" line, the "Source: " prefix or any list glyph into CURRENT.
 - Never put the term into REPLACE WITH as a prefix. The stored definition does not begin with its own term.
 - Populate SOURCE whenever a definition makes a factual claim — a date, a figure, a title, a rank, an attribution. Most entries currently have no source; an unsourced factual claim should gain one or be softened to what the record supports.
+- SOURCE on a correction is stored as that entry's source, replacing any source it had. Leave SOURCE blank to keep the stored one. Do not write "none", "n/a" or "unknown" — those are treated as blank.
+- To add a source to an entry whose definition is already correct, use a correction: repeat the definition unchanged in REPLACE WITH and include the SOURCE. That is the only way to attach a source; ---CONFIRMED--- cannot carry one.
 - Prefer cutting an unverifiable specific to inventing a citation for it.
 - Do not invent corrections. A definition that is accurate, consistent and clear gets ---CONFIRMED---, not a rewrite.
 
@@ -7416,6 +7418,9 @@ function _closestSlotValue(slots, cur) {
   return best;
 }
 
+// SOURCE values a reviewer writes to mean "no source". Compared trimmed and lower-cased.
+const GLOSSARY_SOURCE_PLACEHOLDERS = ['none', 'n/a', 'na', 'unknown', '-', '—', 'tbd'];
+
 function resolveAndApply(data, corr) {
   const field = (corr.field || '').trim();
 
@@ -7517,7 +7522,16 @@ function resolveAndApply(data, corr) {
              detail: _mismatchDetail(`CURRENT located but exact replace failed in ${label}`, curRaw, slot.container[slot.key]) };
   }
   slot.container[slot.key] = rep.value;  // bounded: single field only
-  return { outcome: 'applied', detail: label };
+  // Glossary: the reviewer's SOURCE is the citation for the definition just written, so it
+  // is stored with it, replacing any older source. It is written only after the definition
+  // replace succeeded, and only on the entry that replace resolved to (the guard above
+  // guarantees slot.key === 'definition', so slot.container IS the entry). A blank SOURCE
+  // keeps the stored one, and so does a placeholder — "none" stored as a citation is worse
+  // than an empty source, because it reads as one.
+  let glossSrc = isGlossary ? _nfc(corr.source).trim() : '';
+  if (GLOSSARY_SOURCE_PLACEHOLDERS.includes(glossSrc.toLowerCase())) glossSrc = '';
+  if (glossSrc) slot.container.source = glossSrc;
+  return { outcome: 'applied', detail: glossSrc ? `${label} (+ source)` : label };
 }
 
 // ── ---NEW FACT---: append-only insert into scenario.technical_facts.facts ──────────
