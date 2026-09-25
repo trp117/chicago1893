@@ -7332,7 +7332,10 @@ function _navigateSub(rec, sub) {
 
 // SECTION label → subtree of the composite.
 function _resolveSectionNode(data, section) {
-  const s = _normWs(section).toLowerCase();
+  // "Epilogue — Character Fates" is how the full-scenario prompt names the epilogue
+  // subsections, so strip a leading "epilogue" + separator (—, –, -, :) onto the bare
+  // subsection case. Bare "Epilogue" has no separator and still reaches the whole-epilogue case.
+  const s = _normWs(section).toLowerCase().replace(/^epilogue\s*[—–:-]\s*/, '');
   const sc = data.scenario || {};
   if (!s) return undefined;
   switch (s) {
@@ -7340,11 +7343,27 @@ function _resolveSectionNode(data, section) {
     case 'player roles':      return data.playerRoles;
     case 'locations':         return data.locations;
     case 'clues':             return data.clues;
-    case 'story arc':         return (data.storyArc?.acts || []).flatMap(a => a.beats || []);
+    case 'story arc': {
+      // The beats, plus the arc's own prose fields — the export prints premise, goal and
+      // OPENING SITUATION under Story Arc, so a reviewer quotes them there. They go in as a
+      // write-through view onto data.storyArc (which /generate/save persists): a plain copy
+      // would take the replacement and drop it. Only these three keys — the arc's id, name,
+      // scenarioId and timestamps are strings too and must never become match targets.
+      const arc = data.storyArc || {};
+      const view = {};
+      for (const k of ['premise', 'goal', 'openingSituation']) {
+        if (typeof arc[k] === 'string') {
+          Object.defineProperty(view, k, { enumerable: true, get: () => arc[k], set: v => { arc[k] = v; } });
+        }
+      }
+      return [...(arc.acts || []).flatMap(a => a.beats || []), view];
+    }
     case 'win conditions':
     case 'win/fail/gameplay':
     case 'win/fail & gameplay':
     case 'win conditions / gameplay':
+    case 'win/fail conditions and pressure events':  // the full-scenario prompt's section name
+    case 'win / fail conditions':                     // the gameplay export's header
     case 'gameplay':
     case 'fail conditions':
     case 'partial success':
