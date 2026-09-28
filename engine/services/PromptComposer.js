@@ -703,8 +703,14 @@ function buildPlayerRoleSection(state, characters = [], playerRoles = []) {
   // an edited register reaches a session already in flight on its next turn, and there is
   // no stale copy riding in STATE_JSON to strip. Absent or blank emits nothing, so a role
   // without one composes exactly the prompt it composed before.
+  //
+  // REVIEWED === TRUE, OR NOTHING STEERS — the same law resolveEnforcingAnchor keys on. The
+  // proposer (adminRouter proposeChoiceRegister) drafts a register for every role and lands it
+  // choice_register_reviewed:false, so a machine draft sits in the role file inert until a
+  // human approves it. A register that predates the flag counts as unreviewed too.
   const role     = (playerRoles || []).find(r => r && r.id === state.playerRoleId) || null;
-  const register = typeof role?.choice_register === 'string' ? role.choice_register.trim() : '';
+  const register = role?.choice_register_reviewed === true && typeof role.choice_register === 'string'
+    ? role.choice_register.trim() : '';
   if (register) lines.push('', `CHOICE REGISTER: ${register}`);
 
   const aliasBlock = buildAliasProtectionBlock(state);

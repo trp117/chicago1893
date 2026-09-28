@@ -1,15 +1,21 @@
-// CHOICE REGISTER — the authored steer on what KIND of choices a role is offered.
+// CHOICE REGISTER — the authored steer on what KIND of choices a role is offered, and the
+// generate-review-approve component that drafts it.
 //
-// Three properties, each one the reason the feature is safe to ship:
+//   (1) BACKWARD-COMPATIBLE. A role with no register, a blank one, or an UNREVIEWED one
+//       composes a turn prompt byte-identical to the call shape that existed before the
+//       field did. Drafts are inert.
 //
-//   (1) BACKWARD-COMPATIBLE. A role with no register (absent, or blank) composes a turn
-//       prompt byte-identical to the call shape that existed before the field did.
+//   (2) REVIEWED STEERS, ONE COPY, IN THE ROLE SECTION. choice_register_reviewed === true
+//       and non-blank text: exactly one CHOICE REGISTER line, in the PLAYER ROLE section,
+//       never in STATE_JSON.
 //
-//   (2) ONE COPY, IN THE ROLE SECTION. A set register appears exactly once, as a
-//       CHOICE REGISTER line inside the PLAYER ROLE section, and never in STATE_JSON.
+//   (3) READ FRESH. Read from the role record each turn, never copied onto state, so an
+//       approval or an edit reaches a session already in flight.
 //
-//   (3) READ FRESH. The register is read from the role record each turn, not copied onto
-//       state at /start, so a session already in flight picks up an edited register.
+//   (4) THE EDITOR-SAVE GUARD restores the keys a stale tab omits and honors a clear.
+//
+//   (5) THE PROPOSER never drafts over — and the write route never writes over — approved
+//       or hand-authored text; its prompt carries the role and never the fork's options.
 //
 // Runs against the real scenario data through the real repositories. No API calls, no
 // writes — every role change is made to an in-memory copy.
@@ -28,6 +34,11 @@ const { CharacterRepository } = await import(`${ROOT}/engine/repositories/Charac
 const { buildInitialState }   = await import(`${ROOT}/engine/services/StateManager.js`);
 const { composeTurnPrompt, buildSystemPrompt } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
+const {
+  preserveStoredChoiceRegister, preserveStoredRoleBlocks,
+  choiceRegisterSkip, choiceRegisterWriteRefusal,
+  buildChoiceRegisterUserPrompt, validateChoiceRegisterProposal, CHOICE_REGISTER_SYSTEM_PROMPT,
+} = await import(`${ROOT}/engine/admin/adminRouter.js`);
 
 const SCENARIO_ID = 'joan_trial_rouen_1431';
 const ROLE_ID     = 'role_joan';
@@ -53,13 +64,15 @@ const check = (name, cond, detail = '') => {
 };
 const head = t => console.log(`\n-- ${t} ${'-'.repeat(Math.max(0, 72 - t.length))}`);
 
-// The stored role with its register replaced in memory. `undefined` removes the key.
-function roleWith(register) {
-  const { choice_register, ...rest } = stored;
-  return register === undefined ? rest : { ...rest, choice_register: register };
+// The stored role with its register keys replaced in memory. `undefined` text removes all
+// three keys; `flags` sets choice_register_reviewed / choice_register_generated.
+const REVIEWED = { choice_register_reviewed: true };
+function roleWith(register, flags = {}) {
+  const { choice_register, choice_register_reviewed, choice_register_generated, ...rest } = stored;
+  return register === undefined ? rest : { ...rest, choice_register: register, ...flags };
 }
-function rolesWith(register) {
-  return roles.map(r => (r.id === ROLE_ID ? roleWith(register) : r));
+function rolesWith(register, flags = {}) {
+  return roles.map(r => (r.id === ROLE_ID ? roleWith(register, flags) : r));
 }
 function stateFrom(role) {
   const real = console.warn;
@@ -73,44 +86,59 @@ const roleSection = p => p.slice(0, p.indexOf('Current game state:'));
 const stateJson   = p => p.slice(p.indexOf('Current game state:'), p.indexOf('Current location:'));
 const count       = (s, sub) => s.split(sub).length - 1;
 
-// ── (1) backward-compatible ─────────────────────────────────────────────────
-head('no register: byte-identical to the pre-field call shape');
+// ── (1) backward-compatible; drafts inert ───────────────────────────────────
+head('no register, blank, or unreviewed: byte-identical to the pre-field call shape');
 {
   const state    = stateFrom(roleWith(undefined));
   const baseline = compose(state, undefined);   // no playerRoles at all: the old call shape
-  for (const [label, reg] of [['absent', undefined], ['empty string', ''], ['whitespace only', '   \n ']]) {
-    const p = compose(state, rolesWith(reg));
+  for (const [label, reg, flags] of [
+    ['absent',                                   undefined, {}],
+    ['empty string',                             '',        REVIEWED],
+    ['whitespace only, reviewed',                '   \n ',  REVIEWED],
+    ['text, no reviewed flag (pre-gate register)', REGISTER, {}],
+    ['text, reviewed:false',                     REGISTER,  { choice_register_reviewed: false }],
+    ['generated draft, reviewed:false',          REGISTER,  { choice_register_reviewed: false, choice_register_generated: true }],
+    ['reviewed:"true" (a string is not approval)', REGISTER, { choice_register_reviewed: 'true' }],
+  ]) {
+    const p = compose(state, rolesWith(reg, flags));
     check(`${label}: turn prompt byte-identical`, p === baseline);
     check(`${label}: no CHOICE REGISTER line`, !p.includes('CHOICE REGISTER'));
   }
 }
 
-// ── (2) one copy, in the role section ───────────────────────────────────────
-head('register set: one line, in the role section, not in STATE_JSON');
+// ── (2) reviewed steers: one line, in the role section ──────────────────────
+head("reviewed register (Joan's case): one line, in the role section, not in STATE_JSON");
 {
-  const role = roleWith(REGISTER);
-  const p    = compose(stateFrom(role), rolesWith(REGISTER));
+  const role = roleWith(REGISTER, REVIEWED);
+  const p    = compose(stateFrom(role), rolesWith(REGISTER, REVIEWED));
   check('CHOICE REGISTER line in the PLAYER ROLE section', roleSection(p).includes(`CHOICE REGISTER: ${REGISTER}`));
   check('register text appears exactly once in the whole prompt', count(p, REGISTER) === 1, `found ${count(p, REGISTER)}`);
   check('not in STATE_JSON', !stateJson(p).includes(REGISTER) && !stateJson(p).includes('choice_register'));
   // The turn template may carry CRLF endings, so the line may end \r\n; either is a trimmed register.
   check('register is trimmed', /CHOICE REGISTER: Choices of conviction[^\n]*tactics\.\r?\n/.test(
-    compose(stateFrom(role), rolesWith(`  ${REGISTER}\n`))));
+    compose(stateFrom(role), rolesWith(`  ${REGISTER}\n`, REVIEWED))));
+  check('a reviewed GENERATED register steers the same as a hand-authored one',
+    compose(stateFrom(role), rolesWith(REGISTER, { ...REVIEWED, choice_register_generated: true })) === p);
 }
 
 // ── (3) read fresh ──────────────────────────────────────────────────────────
-head('read fresh: an in-flight session picks up an edited register');
+head('read fresh: an in-flight session picks up an approval or an edit');
 {
   const state = stateFrom(roleWith(undefined));   // session started before any register existed
   check('buildInitialState carries no copy of the register',
-    !JSON.stringify(stateFrom(roleWith(REGISTER))).includes(REGISTER));
-  check('register set after /start reaches the next turn', compose(state, rolesWith(REGISTER)).includes(`CHOICE REGISTER: ${REGISTER}`));
+    !JSON.stringify(stateFrom(roleWith(REGISTER, REVIEWED))).includes(REGISTER));
+  check('draft approved after /start steers the next turn', (() => {
+    const before = compose(state, rolesWith(REGISTER, { choice_register_reviewed: false }));
+    const after  = compose(state, rolesWith(REGISTER, REVIEWED));
+    return !before.includes('CHOICE REGISTER') && after.includes(`CHOICE REGISTER: ${REGISTER}`);
+  })());
   check('register edited mid-session: new text wins, old text gone', (() => {
-    const p = compose(state, rolesWith('Edited register.'));
+    const p = compose(state, rolesWith('Edited register.', REVIEWED));
     return p.includes('CHOICE REGISTER: Edited register.') && !p.includes(REGISTER);
   })());
-  check("another role's register never leaks in",
-    !compose(state, roles.map(r => (r.id === ROLE_ID ? roleWith(undefined) : { ...r, choice_register: REGISTER }))).includes('CHOICE REGISTER'));
+  check("another role's reviewed register never leaks in",
+    !compose(state, roles.map(r => (r.id === ROLE_ID ? roleWith(undefined)
+      : { ...r, choice_register: REGISTER, choice_register_reviewed: true }))).includes('CHOICE REGISTER'));
 }
 
 // ── the override the line exists for ────────────────────────────────────────
@@ -121,6 +149,80 @@ head('system prompt: RULE 8 defers to a CHOICE REGISTER');
   const cr  = sys.indexOf('### Choice register (overrides the escalation default):');
   check('override section present, after RULE 8', r8 >= 0 && cr > r8);
   check('override names CHOICE REGISTER and OVERRIDES', /CHOICE REGISTER[\s\S]{0,200}OVERRIDES the escalation rule/.test(sys.slice(cr)));
+}
+
+// ── (4) the editor-save guard ───────────────────────────────────────────────
+head('editor-save guard: restores what a stale tab omits, honors a clear');
+{
+  const storedRole = { id: 'r1', name: 'R', choice_register: REGISTER, choice_register_reviewed: true, choice_register_generated: true };
+  const fakeRepos  = { scenarios: { findPlayerRole: () => storedRole } };
+  const guard = incoming => preserveStoredChoiceRegister(fakeRepos, { id: 'r1', name: 'R', ...incoming });
+
+  const stale = guard({});
+  check('stale tab (no keys): all three restored', stale.choice_register === REGISTER
+    && stale.choice_register_reviewed === true && stale.choice_register_generated === true);
+  const noFlag = guard({ choice_register: REGISTER });
+  check('tab that predates the flag: approval restored, not dropped', noFlag.choice_register_reviewed === true);
+  const untick = guard({ choice_register: REGISTER, choice_register_reviewed: false });
+  check('current tab unticks Reviewed: honored', untick.choice_register_reviewed === false);
+  const edited = guard({ choice_register: 'New text.', choice_register_reviewed: true });
+  check('current tab edits text: honored, provenance carried', edited.choice_register === 'New text.' && edited.choice_register_generated === true);
+  const cleared = guard({ choice_register: '   ', choice_register_reviewed: true });
+  check('blank register clears all three keys (no husk)', !('choice_register' in cleared)
+    && !('choice_register_reviewed' in cleared) && !('choice_register_generated' in cleared));
+  check('string "true" from a select is stored as boolean', guard({ choice_register: REGISTER, choice_register_reviewed: 'true' }).choice_register_reviewed === true);
+  check('string "false" from a select is stored as boolean', guard({ choice_register: REGISTER, choice_register_reviewed: 'false' }).choice_register_reviewed === false);
+  const noStored = preserveStoredChoiceRegister({ scenarios: { findPlayerRole: () => null } }, { id: 'x' });
+  check('role with no register anywhere: nothing added', !Object.keys(noStored).some(k => k.startsWith('choice_register')));
+  check('guard is in the chain both editor saves run', preserveStoredRoleBlocks(fakeRepos, { id: 'r1', name: 'R' }).choice_register_reviewed === true);
+}
+
+// ── (5) the proposer's rules ────────────────────────────────────────────────
+head('proposer: never drafts over, never writes over, approved or hand-authored text');
+{
+  const cases = [
+    ['blank role',                          {},                                                                                          false],
+    ['whitespace register',                 { choice_register: '  ' },                                                                  false],
+    ['unreviewed machine draft',            { choice_register: REGISTER, choice_register_generated: true, choice_register_reviewed: false }, false],
+    ['hand-authored, unreviewed (Joan now)', { choice_register: REGISTER },                                                               true],
+    ['approved',                            { choice_register: REGISTER, choice_register_reviewed: true },                               true],
+    ['approved machine draft',              { choice_register: REGISTER, choice_register_generated: true, choice_register_reviewed: true },  true],
+  ];
+  for (const [label, fields, protectedText] of cases) {
+    const role = { id: 'r1', name: 'R', ...fields };
+    check(`${label}: ${protectedText ? 'skipped by proposer' : 'proposable'}`, !!choiceRegisterSkip(role) === protectedText);
+    check(`${label}: ${protectedText ? 'write refused (409)' : 'write allowed'}`, !!choiceRegisterWriteRefusal(role) === protectedText);
+  }
+  const skip = choiceRegisterSkip({ id: 'r1', choice_register: ` ${REGISTER} ` });
+  check('skip carries the protected text for the panel', skip?.existing?.choice_register === REGISTER && skip.existing.reviewed === false);
+}
+
+head('proposer prompt: the role in, the fork options out');
+{
+  const character = characters.find(c => c.id === stored.character_id) || null;
+  const user = buildChoiceRegisterUserPrompt({ scenario, role: stored, character });
+  check('names the role', user.includes(stored.name));
+  check('carries the scenario title', user.includes(scenario.title));
+  check('carries the dilemma setup', user.includes(stored.defining_moment.setup.trim().slice(0, 60)));
+  check('never carries a defining-moment option',
+    (stored.defining_moment.options || []).every(o => !user.includes(o.text)));
+  check('conduct bounds included for a real person with bounds',
+    !(character?.character_type === 'real' && character?.conduct_bounds) || user.includes('CONDUCT BOUNDS'));
+  const sys = CHOICE_REGISTER_SYSTEM_PROMPT;
+  check('system prompt asks for the moral axis, OFFER, AVOID and BOLDNESS',
+    ['MORAL AXIS', 'OFFER', 'AVOID', 'BOLDNESS'].every(k => sys.includes(k)));
+  check('system prompt asks for JSON with choice_register and rationale',
+    sys.includes('"choice_register"') && sys.includes('"rationale"'));
+}
+
+head('proposal validator');
+{
+  const good = 'x'.repeat(200);
+  check('good proposal passes', validateChoiceRegisterProposal({ choice_register: good, rationale: 'why' }).length === 0);
+  check('missing register fails', validateChoiceRegisterProposal({ rationale: 'why' }).length > 0);
+  check('too-short register fails', validateChoiceRegisterProposal({ choice_register: 'Be moral.' }).length > 0);
+  check('too-long register fails', validateChoiceRegisterProposal({ choice_register: 'x'.repeat(2500) }).length > 0);
+  check('non-object fails', validateChoiceRegisterProposal('text').length > 0);
 }
 
 console.log(`\n${fails ? `${fails} FAILED` : 'ALL PASS'}`);

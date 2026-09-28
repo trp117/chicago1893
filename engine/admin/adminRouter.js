@@ -13,6 +13,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // The runtime default for an anchor's wall timing. Imported rather than restated so a
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
+import { buildConductBoundsLines } from '../services/PromptComposer.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -439,7 +440,37 @@ function preserveStoredAnchoredLocation(repos, role) {
   return role;
 }
 
-// All four editor-save guards over ONE stored read. preserveStoredEndingNotes,
+// EDITOR-SAVE GUARD for the choice register — fifth sibling, same hazard, same `undefined`
+// rule as preserveStoredAnchoredLocation. The register is three flat keys, not a block: the
+// text (which shipped first, bare, in 4d4efdb), the reviewed flag the runtime gates on, and
+// the provenance flag only the proposal routes set. A tab loaded before any of them existed
+// posts the key ABSENT and the whole-object save would drop it — which for the reviewed flag
+// would silently un-approve a register. Each key absent from the post is restored from the
+// stored role; each key present is honored, so a CURRENT tab can clear or un-tick on purpose.
+//
+// A blank register is stored as no register at all: the text is cleared, so the reviewed
+// and generated flags beside it describe nothing and are stripped with it rather than left
+// as a husk every reader has to special-case.
+const CHOICE_REGISTER_KEYS = ['choice_register', 'choice_register_reviewed', 'choice_register_generated'];
+function preserveStoredChoiceRegister(repos, role) {
+  if (CHOICE_REGISTER_KEYS.some(k => role[k] === undefined)) {
+    const stored = repos.scenarios.findPlayerRole(role.id);
+    for (const k of CHOICE_REGISTER_KEYS) {
+      if (role[k] === undefined && stored && stored[k] !== undefined) role[k] = stored[k];
+    }
+  }
+  if (role.choice_register !== undefined
+      && !(typeof role.choice_register === 'string' && role.choice_register.trim())) {
+    for (const k of CHOICE_REGISTER_KEYS) delete role[k];
+    return role;
+  }
+  if (role.choice_register_reviewed !== undefined) {
+    role.choice_register_reviewed = role.choice_register_reviewed === true || role.choice_register_reviewed === 'true';
+  }
+  return role;
+}
+
+// All five editor-save guards over ONE stored read. preserveStoredEndingNotes,
 // preserveStoredDefiningMoment, preserveStoredArchetype and preserveStoredAnchoredLocation
 // each look the role up for themselves; running them back to back would read it four
 // times. The shim memoizes the single real lookup and hands the same object to all four,
@@ -461,6 +492,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredDefiningMoment(shim, role);
   preserveStoredArchetype(shim, role);
   preserveStoredAnchoredLocation(shim, role);
+  preserveStoredChoiceRegister(shim, role);
   return role;
 }
 
@@ -1452,6 +1484,137 @@ function buildAnchorProposalRationale(scenario, role, loc) {
     firstSentence ? `Documented outcome on file: ${firstSentence}` : 'The scenario carries no documented fate for this character yet, so there is nothing on file to check the place against.',
     'Before ticking Verified: confirm the record actually holds this person in this one place for the whole session. If they MOVED \u2014 a guard on rounds, a lookout across the street, anyone still travelling toward the event that fixes them \u2014 clear this field instead, or set "Wall opens at" to the fraction at which the record has them arrive. Replace this note with what in the record puts them here.',
   ].join('\n\n');
+}
+
+// ── CHOICE-REGISTER PROPOSER ──────────────────────────────────────────────────
+// Drafts the choice_register a reviewer would otherwise hand-author per role: the steer that
+// tells the narrator what KIND of choices this role is offered, and overrides RULE 8's
+// escalation default (PromptComposer buildPlayerRoleSection). Unlike the anchor proposer this
+// one asks the model — the judgement here IS reading the role (what this person would suffer
+// for, and which default moves would betray it), which is prose work, not a field lookup.
+//
+// Machine drafts, human judges, exactly as with anchors: what the apply route writes is
+// choice_register_reviewed:false, and the runtime steers nothing until a human approves.
+//
+// WHO GETS ONE: every role, except those whose register is already someone's work —
+//   - a REVIEWED register is approved and live;
+//   - a HAND-AUTHORED one (non-blank, never marked generated) is a person's text, possibly
+//     live before the reviewed gate existed (Joan's). A proposal is never drafted over it.
+// A blank role, or one holding an unreviewed machine draft, is proposable — redrafting a
+// draft destroys nothing a human wrote.
+export function choiceRegisterSkip(role) {
+  const text = typeof role?.choice_register === 'string' ? role.choice_register.trim() : '';
+  if (!text) return null;
+  if (role.choice_register_reviewed === true) {
+    return { reason: 'already carries a REVIEWED register — approved and steering. Clear it in the role editor to draft a new one.',
+      existing: { choice_register: text, reviewed: true, generated: role.choice_register_generated === true } };
+  }
+  if (role.choice_register_generated !== true) {
+    return { reason: 'carries a HAND-AUTHORED register awaiting review — not steering until you tick Reviewed in the role editor. Clear it there to draft a new one instead.',
+      existing: { choice_register: text, reviewed: false, generated: false } };
+  }
+  return null;
+}
+
+// The write route's refusal, as a pure function. Same two protected states as the skip
+// above: the route writes over a blank role or an unreviewed machine draft, never over
+// approved or hand-authored text.
+export function choiceRegisterWriteRefusal(role) {
+  const skip = choiceRegisterSkip(role);
+  return skip ? `Role "${role?.name || role?.id}" ${skip.reason}` : null;
+}
+
+export const CHOICE_REGISTER_SYSTEM_PROMPT = [
+  'You write the CHOICE REGISTER for one player role in an interactive historical fiction engine.',
+  '',
+  'Each turn, the engine\'s narrator offers the player 2–3 short choices. By default it leads with an ESCALATION — a bold, confrontational or tactical move that forces an NPC\'s hand. For many roles that default is wrong: it turns a saint on trial into a lawyer fencing with her judges. The register is an instruction the narrator reads every turn that says what KIND of choices this role is offered. It overrides the escalation default.',
+  '',
+  'Write the register as 3–6 sentences of plain prose addressed to the narrator, covering, in order:',
+  '1. THE MORAL AXIS — what this person is willing to suffer or risk for in this situation; what their choices are really about.',
+  '2. OFFER — the kinds of choices to put in front of the player, named concretely for this person (what they might affirm, refuse, endure, confess, protect, hold to).',
+  '3. AVOID — the kinds of choices NOT to offer: name the legal, procedural, tactical, investigative or strategic moves the default would reach for in THIS scenario.',
+  '4. BOLDNESS — state explicitly that even the boldest choice is an act of the register (conviction, courage, endurance, loyalty — whatever the axis is), not an argument, a maneuver, or confrontation for its own sake.',
+  '',
+  'SHAPE ONLY — do not reuse this content for any other role:',
+  '"Joan\'s choices are about fidelity: to her voices, to what she has done, to the truth as she knows it, at the cost of her life. Offer choices of what she will affirm, refuse to deny, endure, or hold to in silence. Do not offer legal or procedural moves — objecting to the court\'s jurisdiction as a tactic, trapping her judges on points of canon law, bargaining over the oath. Even her most defiant answer is an act of faith, not a debating point."',
+  '',
+  'RULES:',
+  '- Ground it in this role and this scenario. A generic register ("meaningful moral choices") is useless.',
+  '- If this role\'s documented story genuinely IS maneuver — an operative, an investigator, a fixer — say so honestly: the register then names the right KIND of tactics and what to avoid. Do not force a moral register onto a role whose story is not one.',
+  '- For a real person, keep what is offered inside what the documented person could plausibly do. Conduct bounds, where given, are hard limits.',
+  '- Do not write the choices themselves, name plot outcomes, or reveal the role\'s defining-moment options. The register is read by the narrator and never shown to the player.',
+  '',
+  'Return JSON only, no prose before or after:',
+  '{"choice_register": "the register text", "rationale": "one or two sentences TO THE HUMAN REVIEWER: what in the role and record the register is built on, and what they should check before approving."}',
+].join('\n');
+
+export function buildChoiceRegisterUserPrompt({ scenario, role, character = null }) {
+  const list = (label, arr) => Array.isArray(arr) && arr.filter(Boolean).length
+    ? `${label}:\n${arr.filter(Boolean).map(x => `- ${typeof x === 'string' ? x : (x?.text || JSON.stringify(x))}`).join('\n')}` : '';
+  const genre  = [].concat(scenario?.genre || scenario?.tone || []).filter(Boolean).join(', ');
+  const bounds = character?.character_type === 'real' ? buildConductBoundsLines(character.conduct_bounds) : '';
+  return [
+    `SCENARIO: ${scenario?.title || scenario?.id || '(untitled)'}`,
+    (scenario?.description || scenario?.premise) ? `PREMISE: ${scenario.description || scenario.premise}` : '',
+    genre ? `GENRE / TONE: ${genre}` : '',
+    scenario?.epilogue?.immediate_outcome?.summary
+      ? `WHAT ACTUALLY HAPPENED (the fixed macro-outcome): ${scenario.epilogue.immediate_outcome.summary}` : '',
+    '',
+    '════════ THE ROLE ════════',
+    `NAME: ${role?.name || role?.id}`,
+    `CHARACTER TYPE: ${role?.character_type || 'unspecified'}${role?.fate_mode ? ` | FATE MODE: ${role.fate_mode}` : ''}${role?.archetype ? ` | ARCHETYPE: ${role.archetype}` : ''}`,
+    role?.description      ? `DESCRIPTION: ${role.description}`           : '',
+    role?.context_sentence ? `CONTEXT SENTENCE: ${role.context_sentence}` : '',
+    role?.perspective      ? `PERSPECTIVE (how the engine is told to write this person): ${role.perspective}` : '',
+    role?.briefing         ? `BRIEFING (what the player is handed at the start):\n${role.briefing}` : '',
+    list('STARTING KNOWLEDGE', role?.startingKnowledge),
+    list('CHARACTER HOOKS (what is on their mind)', role?.character_hooks),
+    list('OPENING CHOICES (the action space as first authored — judge whether it is the right KIND)', role?.opening?.choices),
+    // The setup only — never the options. The register must not steer toward one answer.
+    typeof role?.defining_moment?.setup === 'string' && role.defining_moment.setup.trim()
+      ? `THE DILEMMA THIS SESSION BUILDS TO (setup only):\n${role.defining_moment.setup.trim()}` : '',
+    bounds ? `CONDUCT BOUNDS (documented real person — hard limits):\n${bounds}` : '',
+    '',
+    'Write this role\'s choice register. Return JSON only.',
+  ].filter(Boolean).join('\n\n');
+}
+
+// Shape check on the model's proposal, run before it is returned. A malformed proposal is
+// an error, never a half-filled card a reviewer might approve without noticing.
+export function validateChoiceRegisterProposal(parsed) {
+  const errors = [];
+  if (!parsed || typeof parsed !== 'object') return ['not a JSON object'];
+  const text = typeof parsed.choice_register === 'string' ? parsed.choice_register.trim() : '';
+  if (!text) errors.push('"choice_register" is missing or blank.');
+  else if (text.length < 80)   errors.push('"choice_register" is too short to be a register.');
+  else if (text.length > 2000) errors.push('"choice_register" is too long for a per-turn instruction.');
+  if (parsed.rationale !== undefined && typeof parsed.rationale !== 'string') errors.push('"rationale" must be a string.');
+  return errors;
+}
+
+// Propose a register for one role. PURE PROPOSAL: it writes nothing, anywhere.
+export async function proposeChoiceRegister(scenario, role, character, anthropicApiKey) {
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    { model: MODEL, max_tokens: 1000, temperature: 0.4, system: CHOICE_REGISTER_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildChoiceRegisterUserPrompt({ scenario, role, character }) }] },
+    { timeout: 60_000, maxRetries: 1 }
+  );
+  if (msg.stop_reason === 'max_tokens') throw new Error('Choice-register proposal truncated at max_tokens.');
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  const parsed = extractJson(text);
+  const errors = validateChoiceRegisterProposal(parsed);
+  if (errors.length) throw new Error(`The proposal was malformed and was not returned: ${errors.join(' ')}`);
+  const current = typeof role?.choice_register === 'string' ? role.choice_register.trim() : '';
+  return {
+    role_id:         role.id,
+    role_name:       role.name || role.id,
+    proposed:        true,
+    choice_register: parsed.choice_register.trim(),
+    rationale:       typeof parsed.rationale === 'string' ? parsed.rationale.trim() : '',
+    // An unreviewed machine draft already on the role, shown beside the new one.
+    current_draft:   current || null,
+  };
 }
 
 // ── Archetype classifier (PROPOSES an archetype; writes nothing) ──────────────
@@ -2502,6 +2665,89 @@ export function createAdminRouter(repos, config = {}) {
     const saved = repos.scenarios.savePlayerRole({ ...role, anchored_location });
     console.log(`[ANCHOR-PROPOSE] ${req.params.id}/${role.id} — proposal written for ${locationId} (reviewed:false, not enforcing)`);
     res.json({ roleId: role.id, anchored_location: saved.anchored_location });
+  });
+
+  // Propose a CHOICE REGISTER for every role in a scenario — or for one, when the body names
+  // a roleId (the panel's per-card Regenerate). READ-ONLY, like propose-anchored-locations:
+  // model calls, no writes. On demand, run per scenario like technical facts; not a pipeline
+  // step. Returns every role: proposals, the skipped (approved or hand-authored registers,
+  // with their text, so the reviewer sees what is protected), and any per-role failures —
+  // one role's malformed proposal never costs the others theirs.
+  r.post('/scenarios/:id/propose-choice-registers', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const roles  = repos.scenarios.findPlayerRoles(req.params.id);
+    const onlyId = typeof req.body?.roleId === 'string' ? req.body.roleId.trim() : '';
+    const targets = onlyId ? roles.filter(pr => pr.id === onlyId) : roles;
+    if (onlyId && !targets.length) return notFound(res);
+
+    const skipped = [], todo = [];
+    for (const role of targets) {
+      const skip = choiceRegisterSkip(role);
+      if (skip) skipped.push({ role_id: role.id, role_name: role.name || role.id, proposed: false, ...skip });
+      else todo.push(role);
+    }
+
+    // Four at a time: a scenario carries a handful of roles, and serial calls would keep the
+    // reviewer waiting a minute for a panel that could fill in fifteen seconds.
+    const results = new Array(todo.length);
+    let next = 0;
+    await Promise.all(Array.from({ length: Math.min(4, todo.length) }, async () => {
+      while (next < todo.length) {
+        const i = next++;
+        const role = todo[i];
+        try {
+          const character = role.character_id ? repos.characters.findById(role.character_id) : null;
+          results[i] = await proposeChoiceRegister(scenario, role, character, anthropicApiKey);
+        } catch (err) {
+          console.error(`[REGISTER-PROPOSE ERROR] ${req.params.id}/${role.id}: ${err.message}`);
+          results[i] = { role_id: role.id, role_name: role.name || role.id, proposed: false, error: err.message };
+        }
+      }
+    }));
+
+    const proposals = results.filter(p => p.proposed);
+    const failed    = results.filter(p => !p.proposed);
+    console.log(`[REGISTER-PROPOSE] ${req.params.id} — ${proposals.length} proposal(s), ${skipped.length} skipped, ${failed.length} failed, from ${targets.length} role(s); nothing written`);
+    res.json({ scenarioId: req.params.id, persisted: false, proposals, skipped, failed });
+  });
+
+  // Write ONE register to ONE role, from a proposal card: as a draft (reviewed:false), or —
+  // when the reviewer presses Approve — approved (reviewed:true). Unlike the anchor apply
+  // route, approval IS taken here: the panel's Approve is the human act the gate waits for,
+  // the same act as ticking Reviewed in the role editor, so a reviewer who has read and
+  // edited the card does not have to open the role to make it count.
+  //
+  // NEVER OVERWRITES approved or hand-authored text (choiceRegisterWriteRefusal): 409, clear
+  // it in the role editor first. A blank role or an unreviewed machine draft is written over.
+  // Read-modify-write of the stored role; no role object is taken from the client.
+  r.post('/scenarios/:id/roles/:roleId/choice-register', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+
+    const refusal = choiceRegisterWriteRefusal(role);
+    if (refusal) return res.status(409).json({ error: refusal });
+
+    const text = typeof req.body?.choice_register === 'string' ? req.body.choice_register.trim() : '';
+    if (!text) return badRequest(res, '"choice_register" is required.');
+    const approve = req.body?.approve === true;
+
+    const saved = repos.scenarios.savePlayerRole({
+      ...role,
+      choice_register:           text,
+      choice_register_generated: true,
+      choice_register_reviewed:  approve,
+    });
+    console.log(`[REGISTER-PROPOSE] ${req.params.id}/${role.id} — register written (${approve ? 'reviewed:true, steering' : 'reviewed:false, not steering'})`);
+    res.json({
+      roleId:                    role.id,
+      choice_register:           saved.choice_register,
+      choice_register_reviewed:  saved.choice_register_reviewed,
+      choice_register_generated: saved.choice_register_generated,
+    });
   });
 
   r.get('/locations',      (req, res) => res.json(
@@ -4598,6 +4844,9 @@ export { preserveStoredArchetype };
 // free) —" option posts) deletes the block, while an ABSENT key (a stale tab) still restores
 // it. Those two cases are one `if` apart and the editor's clear action rides on the first.
 export { preserveStoredAnchoredLocation };
+// Same, for the choice-register guard — choice-register.test.mjs asserts it restores the
+// flags a stale tab omits, and honors a current tab's clear.
+export { preserveStoredChoiceRegister };
 // Archetype classifier. classifyRoleArchetype and the two pure resolvers are app code
 // (the route calls them); validateArchetypeProposal and the prompt builder are exported so
 // the proposal harness can exercise the classifier without going through HTTP.
