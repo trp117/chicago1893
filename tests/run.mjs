@@ -27,6 +27,7 @@ const SUITE = [
   ['anchored location: gate + proposer',    'anchor.test.mjs'],
   ['anchor dropdown: scope + None clears',  'anchor-scope.test.mjs'],
   ['graceful degradation on unusable output', 'degradation.test.mjs'],
+  ['choice register: compat + fresh read',  'choice-register.test.mjs'],
 ];
 
 const results = [];
