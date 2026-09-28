@@ -1525,27 +1525,65 @@ export function choiceRegisterWriteRefusal(role) {
 }
 
 export const CHOICE_REGISTER_SYSTEM_PROMPT = [
-  'You write the CHOICE REGISTER for one player role in an interactive historical fiction engine.',
+  'You are proposing the CHOICE REGISTER for ONE player role in an immersive historical fiction experience. You are not writing anything a player will read. A human reviewer — often NOT an expert on this history — will read your reasoning and decide whether to approve it. Return JSON only.',
   '',
-  'Each turn, the engine\'s narrator offers the player 2–3 short choices. By default it leads with an ESCALATION — a bold, confrontational or tactical move that forces an NPC\'s hand. For many roles that default is wrong: it turns a saint on trial into a lawyer fencing with her judges. The register is an instruction the narrator reads every turn that says what KIND of choices this role is offered. It overrides the escalation default.',
+  'WHY THIS MATTERS. Each turn, the engine\'s narrator offers the player 2–3 short choices. Its DEFAULT is escalation: in a high-stakes scene the first choice is a bold, confrontational or tactical move that forces someone\'s hand. The register is an instruction the narrator reads every turn, telling it what KIND of choices this role is offered; when approved it overrides that default. A wrong register is worse than none. Offer tactical fencing to someone whose story is about what they would suffer for, and the session becomes a courtroom drama about the wrong thing. Offer quiet endurance to someone whose documented moment was a fight, and it becomes a meditation nobody lived.',
   '',
-  'Write the register as 3–6 sentences of plain prose addressed to the narrator, covering, in order:',
-  '1. THE MORAL AXIS — what this person is willing to suffer or risk for in this situation; what their choices are really about.',
-  '2. OFFER — the kinds of choices to put in front of the player, named concretely for this person (what they might affirm, refuse, endure, confess, protect, hold to).',
-  '3. AVOID — the kinds of choices NOT to offer: name the legal, procedural, tactical, investigative or strategic moves the default would reach for in THIS scenario.',
-  '4. BOLDNESS — state explicitly that even the boldest choice is an act of the register (conviction, courage, endurance, loyalty — whatever the axis is), not an argument, a maneuver, or confrontation for its own sake.',
+  '════════════════════════════════════════════════════════',
+  'POSTURE COMES FROM THE SITUATION, NOT THE PERSON',
+  '════════════════════════════════════════════════════════',
   '',
-  'SHAPE ONLY — do not reuse this content for any other role:',
-  '"Joan\'s choices are about fidelity: to her voices, to what she has done, to the truth as she knows it, at the cost of her life. Offer choices of what she will affirm, refuse to deny, endure, or hold to in silence. Do not offer legal or procedural moves — objecting to the court\'s jurisdiction as a tactic, trapping her judges on points of canon law, bargaining over the oath. Even her most defiant answer is an act of faith, not a debating point."',
+  'Decide the POSTURE first: the stance this person\'s real choices take IN THIS SCENARIO\'S WINDOW. The same person takes different postures in different parts of their life. A future saint defending a fortress as a soldier is in an escalate posture; the conviction posture belongs to a later part of the story. Read what THIS scenario puts in front of THIS role — never what the person is famous for.',
+  '',
+  'Name the posture in one or two lowercase words. Common postures (use another if none fits):',
+  '  escalate     — the right choices ARE bold action: fight, press, seize, defend, force the issue.',
+  '  conviction   — choices are what they will affirm, refuse, or hold to, whatever it costs.',
+  '  endurance    — choices are how they bear what cannot be changed: what they carry, protect, keep going for.',
+  '  discernment  — choices are what they notice, whom they trust, what they judge true before acting.',
+  '  duty         — choices are how well they do a job under pressure, and what they will not cut.',
+  '  loyalty      — choices are whom they stand with, and what they will risk for them.',
+  '  maneuver     — choices are tactics, leverage and timing, and that is honestly what the story is about.',
+  'ESCALATION IS SOMETIMES CORRECT. If the situation calls for it, say so: the register then names WHICH bold moves fit this person and which reckless or anachronistic ones do not.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE REGISTER',
+  '════════════════════════════════════════════════════════',
+  '',
+  'Write 3–6 sentences of plain prose addressed to the narrator, in this order:',
+  '1. THE AXIS — what this person\'s choices are really about in this situation: what they will risk, suffer, or fight for.',
+  '2. OFFER — the kinds of choices to put in front of the player, named concretely for THIS person and THIS scenario.',
+  '3. AVOID — the kinds of choices NOT to offer: name the moves the escalation default would reach for here that betray the posture (or, for an escalate posture, the reckless, anachronistic or out-of-character ones).',
+  '4. BOLDNESS — say explicitly what the boldest choice looks like in this register: an act of the posture (conviction, endurance, duty, a decisive attack…), never a move for its own sake.',
+  '',
+  'SHAPE ONLY — a fictional example. Do not reuse its words, people or situation:',
+  '  A garrison captain, first part (the walls are being breached): posture "escalate". "His choices are about holding the breach long enough for the town to evacuate. Offer choices of where to commit the reserve, whom to send to the wall, when to counter-attack and at what cost. Avoid parley, flight, or speeches about honour while the wall is falling. His boldest choice is a charge he leads himself, not a gesture."',
+  '  The same captain, second part (the town has fallen, he is a prisoner offered terms): posture "conviction". "His choices are about what he will sign and what he will not. Offer choices of what he refuses, whom he protects by his silence, what he admits. Avoid escape plans and tactical bargaining. His boldest choice is a refusal he knows will cost him."',
+  '',
+  '════════════════════════════════════════════════════════',
+  'HOW TO ANSWER',
+  '════════════════════════════════════════════════════════',
+  '',
+  'CITE EVIDENCE. Quote or name the specific scenario and role content you relied on — the premise, the briefing, the starting knowledge, the dilemma setup, the conduct bounds. The reviewer checks your reading against it.',
+  '',
+  'STATE THE COUNTER-CASE. Name the register a non-expert would most likely assume for this role, and why it is wrong HERE — or, if your proposal IS the obvious one, the strongest case for a different posture and why you rejected it. This is the part the reviewer most needs: it is how they catch what they would not have caught themselves.',
+  '',
+  'CONFIDENCE. high = the scenario content plainly fixes the posture; medium = a defensible reading with a real alternative; low = the role is thin or genuinely ambiguous. A close call reported as close is worth more than a confident wrong answer.',
   '',
   'RULES:',
-  '- Ground it in this role and this scenario. A generic register ("meaningful moral choices") is useless.',
-  '- If this role\'s documented story genuinely IS maneuver — an operative, an investigator, a fixer — say so honestly: the register then names the right KIND of tactics and what to avoid. Do not force a moral register onto a role whose story is not one.',
+  '- Ground everything in THIS scenario and role. A generic register ("meaningful moral choices") is useless.',
   '- For a real person, keep what is offered inside what the documented person could plausibly do. Conduct bounds, where given, are hard limits.',
-  '- Do not write the choices themselves, name plot outcomes, or reveal the role\'s defining-moment options. The register is read by the narrator and never shown to the player.',
+  '- Do not write the choices themselves, name plot outcomes, or reveal the role\'s defining-moment options.',
+  '- Never say which way this person decides at the dilemma, or describe what they historically chose there — not even as the example of boldness. The register steers every turn, including that one, and must leave the player\'s answer open. Describe boldness as a KIND of act, never as the documented act.',
   '',
-  'Return JSON only, no prose before or after:',
-  '{"choice_register": "the register text", "rationale": "one or two sentences TO THE HUMAN REVIEWER: what in the role and record the register is built on, and what they should check before approving."}',
+  'Return exactly this JSON and nothing else:',
+  '{',
+  '  "posture": "<one or two lowercase words>",',
+  '  "confidence": "high" | "medium" | "low",',
+  '  "choice_register": "<the register text, 3-6 sentences, addressed to the narrator>",',
+  '  "rationale": "<two to four sentences a non-expert reviewer can confirm or overturn: why this posture and register fit THIS scenario and role>",',
+  '  "counter_case": "<the register a non-expert would wrongly assume, and why it is rejected here — or the strongest alternative and why you rejected it>",',
+  '  "evidence": ["<a specific scenario or role line or field you relied on>", "..."]',
+  '}',
 ].join('\n');
 
 export function buildChoiceRegisterUserPrompt({ scenario, role, character = null }) {
@@ -1575,27 +1613,39 @@ export function buildChoiceRegisterUserPrompt({ scenario, role, character = null
       ? `THE DILEMMA THIS SESSION BUILDS TO (setup only):\n${role.defining_moment.setup.trim()}` : '',
     bounds ? `CONDUCT BOUNDS (documented real person — hard limits):\n${bounds}` : '',
     '',
-    'Write this role\'s choice register. Return JSON only.',
+    'Decide this role\'s posture from the situation above, then write its choice register, citing the evidence and stating the counter-case. Return JSON only.',
   ].filter(Boolean).join('\n\n');
 }
 
-// Shape check on the model's proposal, run before it is returned. A malformed proposal is
-// an error, never a half-filled card a reviewer might approve without noticing.
+// Shape check on the model's proposal, run before it is returned — the archetype classifier's
+// rule: a malformed proposal is an error, never a half-filled card a reviewer might approve
+// without noticing. Every reasoning field is required, because the reviewer is often not the
+// domain expert and the reasoning is what they are actually approving.
+export const CHOICE_REGISTER_CONFIDENCE = new Set(['high', 'medium', 'low']);
 export function validateChoiceRegisterProposal(parsed) {
   const errors = [];
-  if (!parsed || typeof parsed !== 'object') return ['not a JSON object'];
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return ['Response was not a JSON object.'];
   const text = typeof parsed.choice_register === 'string' ? parsed.choice_register.trim() : '';
   if (!text) errors.push('"choice_register" is missing or blank.');
   else if (text.length < 80)   errors.push('"choice_register" is too short to be a register.');
   else if (text.length > 2000) errors.push('"choice_register" is too long for a per-turn instruction.');
-  if (parsed.rationale !== undefined && typeof parsed.rationale !== 'string') errors.push('"rationale" must be a string.');
+  const posture = typeof parsed.posture === 'string' ? parsed.posture.trim() : '';
+  if (!posture || posture.length > 40) errors.push(`"posture" must be one or two words (got ${JSON.stringify(parsed.posture)}).`);
+  if (!CHOICE_REGISTER_CONFIDENCE.has(parsed.confidence)) errors.push(`"confidence" must be high, medium or low (got ${JSON.stringify(parsed.confidence)}).`);
+  if (typeof parsed.rationale !== 'string' || !parsed.rationale.trim()) errors.push('"rationale" is empty — the reviewer would have nothing to check.');
+  if (typeof parsed.counter_case !== 'string' || !parsed.counter_case.trim()) errors.push('"counter_case" is empty — the reviewer would not see what was ruled out.');
+  if (!Array.isArray(parsed.evidence) || !parsed.evidence.some(e => typeof e === 'string' && e.trim())) errors.push('"evidence" must be a non-empty list of strings.');
   return errors;
 }
 
-// Propose a register for one role. PURE PROPOSAL: it writes nothing, anywhere.
+// Propose a register for one role. PURE PROPOSAL: it writes nothing, anywhere. Like
+// classifyRoleArchetype, the reasoning comes back as first-class fields, because the review
+// UI has to show a non-expert WHY, not just what.
 export async function proposeChoiceRegister(scenario, role, character, anthropicApiKey) {
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
-    { model: MODEL, max_tokens: 1000, temperature: 0.4, system: CHOICE_REGISTER_SYSTEM_PROMPT,
+    // Low temperature: posture is a judgement, and the register is short prose that should
+    // not drift between regenerations of an unchanged role.
+    { model: MODEL, max_tokens: 2000, temperature: 0.3, system: CHOICE_REGISTER_SYSTEM_PROMPT,
       messages: [{ role: 'user', content: buildChoiceRegisterUserPrompt({ scenario, role, character }) }] },
     { timeout: 60_000, maxRetries: 1 }
   );
@@ -1606,14 +1656,23 @@ export async function proposeChoiceRegister(scenario, role, character, anthropic
   const errors = validateChoiceRegisterProposal(parsed);
   if (errors.length) throw new Error(`The proposal was malformed and was not returned: ${errors.join(' ')}`);
   const current = typeof role?.choice_register === 'string' ? role.choice_register.trim() : '';
+  console.log(`[REGISTER-PROPOSE] ${role.id} proposes posture=${parsed.posture.trim().toLowerCase()} confidence=${parsed.confidence} output_tokens:`, msg.usage?.output_tokens);
   return {
     role_id:         role.id,
     role_name:       role.name || role.id,
     proposed:        true,
+    posture:         parsed.posture.trim().toLowerCase(),
+    confidence:      parsed.confidence,
     choice_register: parsed.choice_register.trim(),
-    rationale:       typeof parsed.rationale === 'string' ? parsed.rationale.trim() : '',
-    // An unreviewed machine draft already on the role, shown beside the new one.
-    current_draft:   current || null,
+    rationale:       parsed.rationale.trim(),
+    counter_case:    parsed.counter_case.trim(),
+    evidence:        parsed.evidence.filter(e => typeof e === 'string' && e.trim()).map(e => e.trim()),
+    // What the role carries now, shown beside the proposal so the reviewer compares the two.
+    existing: current ? {
+      choice_register: current,
+      reviewed:        role.choice_register_reviewed === true,
+      generated:       role.choice_register_generated === true,
+    } : null,
   };
 }
 
@@ -2682,9 +2741,15 @@ export function createAdminRouter(repos, config = {}) {
     const targets = onlyId ? roles.filter(pr => pr.id === onlyId) : roles;
     if (onlyId && !targets.length) return notFound(res);
 
+    // A batch run skips protected roles — it must not put a card over approved or
+    // hand-authored text for a reviewer to click through. A request NAMING one role is a
+    // reviewer asking about that role on purpose (the role card's Propose, a Regenerate), so
+    // it is proposed regardless, exactly as classify-archetype proposes over a confirmed
+    // archetype: this route writes nothing, and the proposal carries `existing` so the
+    // reviewer compares. Overwriting is still the write route's decision, made separately.
     const skipped = [], todo = [];
     for (const role of targets) {
-      const skip = choiceRegisterSkip(role);
+      const skip = onlyId ? null : choiceRegisterSkip(role);
       if (skip) skipped.push({ role_id: role.id, role_name: role.name || role.id, proposed: false, ...skip });
       else todo.push(role);
     }
@@ -2719,9 +2784,13 @@ export function createAdminRouter(repos, config = {}) {
   // the same act as ticking Reviewed in the role editor, so a reviewer who has read and
   // edited the card does not have to open the role to make it count.
   //
-  // NEVER OVERWRITES approved or hand-authored text (choiceRegisterWriteRefusal): 409, clear
-  // it in the role editor first. A blank role or an unreviewed machine draft is written over.
-  // Read-modify-write of the stored role; no role object is taken from the client.
+  // DOES NOT OVERWRITE approved or hand-authored text (choiceRegisterWriteRefusal) unless the
+  // body says `replace: true` — 409 otherwise, with the text it protected. The batch panel
+  // never sends it. The role card sends it only after showing the reviewer the existing text
+  // beside the proposal and asking them to confirm the replacement, which is the deliberate
+  // act the refusal exists to require. A blank role or an unreviewed machine draft is written
+  // over either way. Read-modify-write of the stored role; no role object is taken from the
+  // client.
   r.post('/scenarios/:id/roles/:roleId/choice-register', async (req, res) => {
     const scenario = await repos.scenarios.findById(req.params.id);
     if (!scenario) return notFound(res);
@@ -2729,7 +2798,10 @@ export function createAdminRouter(repos, config = {}) {
     if (!role) return notFound(res);
 
     const refusal = choiceRegisterWriteRefusal(role);
-    if (refusal) return res.status(409).json({ error: refusal });
+    if (refusal && req.body?.replace !== true) {
+      return res.status(409).json({ error: refusal, existing: choiceRegisterSkip(role)?.existing ?? null });
+    }
+    if (refusal) console.log(`[REGISTER-PROPOSE] ${req.params.id}/${role.id} — replacing protected register on explicit request`);
 
     const text = typeof req.body?.choice_register === 'string' ? req.body.choice_register.trim() : '';
     if (!text) return badRequest(res, '"choice_register" is required.');

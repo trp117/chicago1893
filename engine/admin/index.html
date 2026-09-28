@@ -505,9 +505,10 @@ const ENTITIES = {
       { title: 'AI Perspective', fields: [
         { key: 'perspective',    label: 'Perspective Instructions', type: 'textarea', help: 'Tells the AI how to write for this role. e.g. "The player is Burnham\'s assistant. Burnham may speak to the player as a superior."' },
         { key: 'startingKnowledge', label: 'Starting Knowledge', type: 'list', help: 'What the player already knows at the start.' },
-        { key: 'choice_register', label: 'Choice register', type: 'textarea', help: 'What KIND of choices the AI offers this role each turn, e.g. "Choices of conviction and conscience: what she will affirm, refuse, or hold to. Not legal or procedural tactics." Overrides the default of leading with an escalation. Steers ONLY once Reviewed is ticked below. Leave blank for the default. Takes effect on the next turn, even mid-session. Drafts can be generated from the scenario\'s Choice Registers panel.' },
+        { key: 'choice_register', label: 'Choice register', type: 'textarea', help: 'What KIND of choices the AI offers this role each turn, e.g. "Choices of conviction and conscience: what she will affirm, refuse, or hold to. Not legal or procedural tactics." Overrides the default of leading with an escalation. Steers ONLY once Reviewed is ticked below. Leave blank for the default. Takes effect on the next turn, even mid-session. To get an AI proposal with its reasoning, open the scenario and use ✦ Propose register on this role\'s card, or the Choice Registers panel.' },
         { key: 'choice_register_reviewed', label: 'Choice register reviewed', type: 'checkbox',
-          checkboxLabel: 'Reviewed — this register steers the offered choices' },
+          checkboxLabel: 'Choice register reviewed',
+          help: 'When checked, this role\'s choice register steers the choices offered in play (and overrides the escalation default). Unchecked = the role uses the default. A generated register stays unchecked until you review and approve it.' },
       ]},
       { title: 'Opening Scene', fields: [
         { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
@@ -1598,7 +1599,9 @@ function collectEdits(containerEl, data) {
     const dtype = el.dataset.type;
     const raw   = el.value;
     let val;
-    if      (dtype === 'array')  val = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    // A checkbox's value is always 'on'; what it means is whether it is ticked.
+    if      (el.type === 'checkbox') val = el.checked;
+    else if (dtype === 'array')  val = raw.split('\n').map(s => s.trim()).filter(Boolean);
     else if (dtype === 'csv')    val = raw.split(',').map(s => s.trim()).filter(Boolean);
     else if (dtype === 'json')   { try { val = JSON.parse(raw); } catch { return; } }
     else if (dtype === 'number') val = raw === '' ? null : Number(raw);
@@ -2252,6 +2255,177 @@ function renderArchetypeSection(r, i) {
   </div>`;
 }
 
+// ── Choice register: propose, review, approve ────────────────────────────────
+// Mirrors the archetype section above. The model PROPOSES a register with its reasoning —
+// posture, confidence, rationale, counter-case, evidence — because the reviewer is often not
+// the domain expert and the reasoning is what they are really approving. The human APPROVES;
+// the runtime steers only on choice_register_reviewed === true.
+//
+// Proposals are EPHEMERAL, like _archetypeProposals: held here for the session, keyed by
+// role id, never hung off data.playerRoles (the main Save would post them into the role
+// file). The only writes are Approve (the choice-register route, which also syncs this page)
+// and the ordinary Save of the text box and Reviewed checkbox below.
+const _choiceRegisterProposals = new Map();
+
+// Where a role stands, from the stored (or on-screen) register and flag.
+function choiceRegisterStatusBadge(r, i) {
+  const text = typeof r?.choice_register === 'string' ? r.choice_register.trim() : '';
+  const [color, label] = !text ? ['var(--text-soft)', 'no register — default choices']
+    : r.choice_register_reviewed === true ? ['#15803d', 'reviewed — steering']
+    : ['#b45309', 'not reviewed — not steering'];
+  return `<span id="creg-status-${i}" style="font-size:11px;font-weight:700;color:${color}">${label}</span>`;
+}
+
+function renderChoiceRegisterSection(r, i) {
+  return `<div id="creg-section-${i}">
+    ${edField('Choice Register', `
+      <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+        <textarea class="creg-text" data-path="playerRoles.${i}.choice_register" data-role-index="${i}" rows="3" style="flex:1;min-width:340px">${esc(r.choice_register)}</textarea>
+        <button type="button" class="btn btn-secondary btn-sm propose-creg-btn" data-role-id="${r.id}" data-role-index="${i}" style="white-space:nowrap;flex-shrink:0">✦ Propose register</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px">
+        <label class="checkbox-row" style="margin:0"><input type="checkbox" class="creg-reviewed-cb" data-path="playerRoles.${i}.choice_register_reviewed" data-role-index="${i}"${r.choice_register_reviewed === true ? ' checked' : ''}> Choice register reviewed</label>
+        ${choiceRegisterStatusBadge(r, i)}
+      </div>
+      <p class="help-text">When checked, this role's choice register steers the choices offered in play (and overrides the escalation default). Unchecked = the role uses the default. A generated register stays unchecked until you review and approve it.</p>
+      ${renderChoiceRegisterProposalPanel(r, i)}`,
+      'What KIND of choices this role is offered each turn. Edit it here and Save, or use Propose register for an AI proposal with its reasoning.')}
+  </div>`;
+}
+
+// The reasoning rows, shared by the role card and the scenario-level Choice Registers panel,
+// laid out like the archetype proposal: everything the model argued, so a reviewer who is not
+// the expert can confirm or overturn it.
+function choiceRegisterReasoningRows(p) {
+  const row = (label, value) => value
+    ? `<div style="display:grid;grid-template-columns:132px 1fr;gap:8px;margin-bottom:6px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft)">${esc(label)}</div><div style="font-size:12px;line-height:1.55">${value}</div></div>`
+    : '';
+  const evidence = (p.evidence || []).map(e => `<li style="margin-bottom:3px">${esc(e)}</li>`).join('');
+  return `${row('Why this fits', esc(p.rationale || ''))}
+    ${row('Counter-case', `<span style="color:var(--text-soft)">${esc(p.counter_case || '—')}</span>`)}
+    ${evidence ? row('Evidence cited', `<ul style="margin:0;padding-left:16px;color:var(--text-soft)">${evidence}</ul>`) : ''}`;
+}
+
+function choiceRegisterPostureHeader(p) {
+  const confColor = { high: '#166534', medium: '#92400e', low: '#b91c1c' }[p.confidence] || 'var(--text-soft)';
+  return `<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">AI proposes</span>
+    <span style="font-size:12px;font-weight:700;background:var(--border);padding:2px 9px;border-radius:10px">posture: ${esc(p.posture || '—')}</span>
+    <span style="font-size:11px;font-weight:700;color:${confColor}">confidence ${esc(p.confidence || 'unstated')}</span>`;
+}
+
+function renderChoiceRegisterProposalPanel(r, i) {
+  const p = _choiceRegisterProposals.get(r.id);
+  if (!p) {
+    return `<div id="creg-proposal-${i}" style="margin-top:10px;font-size:12px;color:var(--text-soft);padding:10px 12px;border:1px dashed var(--border);border-radius:6px">
+      No proposal yet. <strong>Propose register</strong> reads this role in this scenario and proposes a posture and a register, with its reasoning, the counter-case it ruled out, and the evidence it used. Nothing is written until you Approve.
+    </div>`;
+  }
+  if (p.error) {
+    return `<div id="creg-proposal-${i}" style="margin-top:10px;font-size:12px;color:#b91c1c;padding:10px 12px;border:1px solid #fecaca;border-radius:6px">
+      Proposal failed: ${esc(p.error)}
+      <div style="margin-top:6px"><button type="button" class="btn btn-secondary btn-sm propose-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Try again</button></div>
+    </div>`;
+  }
+  const ex = p.existing;
+  const border = { high: '#22c55e', medium: '#d97706', low: '#dc2626' }[p.confidence] || 'var(--border)';
+  return `<div id="creg-proposal-${i}" style="margin-top:10px;border:1px solid var(--border);border-left:4px solid ${border};border-radius:6px;padding:12px 14px;background:var(--card)">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${choiceRegisterPostureHeader(p)}</div>
+    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-soft);display:block;margin-bottom:3px">Proposed register (edit before approving)</label>
+    <textarea class="creg-proposal-text" data-role-index="${i}" rows="6" style="width:100%;font-size:13px;margin-bottom:10px;resize:vertical">${esc(p.choice_register)}</textarea>
+    ${choiceRegisterReasoningRows(p)}
+    ${ex ? `<div style="font-size:12px;margin:8px 0;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:4px">
+      <strong>On this role now</strong> (${ex.reviewed ? 'reviewed — steering' : ex.generated ? 'unreviewed draft' : 'hand-authored, not reviewed'}) — Approve replaces it:
+      <div style="margin-top:3px;white-space:pre-wrap;color:var(--text-soft)">${esc(ex.choice_register)}</div></div>` : ''}
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px">
+      <button type="button" class="btn btn-success btn-sm approve-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Approve</button>
+      <button type="button" class="btn btn-secondary btn-sm propose-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Regenerate</button>
+      <button type="button" class="btn btn-secondary btn-sm discard-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Discard</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-soft);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+      Nothing has been written. <strong>Approve</strong> saves the text above to this role and marks it reviewed — it steers from the next turn. Generating never approves.
+    </div>
+  </div>`;
+}
+
+// Bound once per editor render on the form root, alongside bindArchetypeHandlers.
+function bindChoiceRegisterHandlers(formEl, data, scenarioId) {
+  const rerenderProposal = i =>
+    replaceEditorSection(formEl, `#creg-proposal-${i}`, renderChoiceRegisterProposalPanel(data.playerRoles[i], i));
+
+  formEl.addEventListener('click', async e => {
+    // ── Propose / Regenerate / Try again ───────────────────────────────────
+    const proposeBtn = e.target.closest('.propose-creg-btn');
+    if (proposeBtn) {
+      const roleId = proposeBtn.dataset.roleId;
+      const i      = Number(proposeBtn.dataset.roleIndex);
+      if (!roleId || !scenarioId) return;
+      proposeBtn.disabled = true;
+      proposeBtn.textContent = 'Reading the role…';
+      try {
+        // Names the role, so it is proposed even over approved or hand-authored text —
+        // advisory, nothing is written; `existing` comes back for comparison.
+        const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/propose-choice-registers`, { roleId });
+        const p = (resp.proposals || [])[0];
+        _choiceRegisterProposals.set(roleId, p || { error: (resp.failed || [])[0]?.error || 'No proposal returned.' });
+      } catch (err) {
+        _choiceRegisterProposals.set(roleId, { error: err.message });
+      }
+      rerenderProposal(i);
+      return;
+    }
+
+    // ── Discard ─────────────────────────────────────────────────────────────
+    const discardBtn = e.target.closest('.discard-creg-btn');
+    if (discardBtn) {
+      _choiceRegisterProposals.delete(discardBtn.dataset.roleId);
+      rerenderProposal(Number(discardBtn.dataset.roleIndex));
+      return;
+    }
+
+    // ── Approve ─────────────────────────────────────────────────────────────
+    const approveBtn = e.target.closest('.approve-creg-btn');
+    if (!approveBtn) return;
+    const roleId = approveBtn.dataset.roleId;
+    const i      = Number(approveBtn.dataset.roleIndex);
+    const p      = _choiceRegisterProposals.get(roleId);
+    const text   = formEl.querySelector(`#creg-proposal-${i} .creg-proposal-text`)?.value?.trim() || '';
+    if (!p || !text) { toast('The proposed register is empty', 'error'); return; }
+    // Approved or hand-authored text is protected server-side. Replacing it is allowed only
+    // as a deliberate act — the reviewer has it on screen beside the proposal; confirm it.
+    const ex = p.existing;
+    const protectedText = !!ex && (ex.reviewed || !ex.generated);
+    if (protectedText && ex.choice_register !== text
+        && !confirm(`${data.playerRoles[i]?.name || roleId} already has a ${ex.reviewed ? 'reviewed' : 'hand-authored'} register. Replace it with this one and mark it reviewed?`)) return;
+    approveBtn.disabled = true;
+    try {
+      const resp = await apiPost(
+        `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/choice-register`,
+        { choice_register: text, approve: true, replace: protectedText });
+      syncRoleRegisterInPage(roleId, resp);
+      _choiceRegisterProposals.delete(roleId);
+      rerenderProposal(i);
+      toast(`${data.playerRoles[i]?.name || roleId}: register approved — steering from the next turn`, 'success');
+    } catch (err) {
+      approveBtn.disabled = false;
+      toast(`Approve failed: ${err.message}`, 'error');
+    }
+  });
+
+  // Live status while the reviewer edits the text or ticks the box — before they Save.
+  // Both events: a checkbox is only guaranteed to fire `change`.
+  const liveStatus = e => {
+    const el = e.target.closest('.creg-text, .creg-reviewed-cb');
+    if (!el) return;
+    const i  = Number(el.dataset.roleIndex);
+    const ta = formEl.querySelector(`#creg-section-${i} .creg-text`);
+    const cb = formEl.querySelector(`#creg-section-${i} .creg-reviewed-cb`);
+    const badge = document.getElementById(`creg-status-${i}`);
+    if (badge) badge.outerHTML = choiceRegisterStatusBadge({ choice_register: ta?.value, choice_register_reviewed: !!cb?.checked }, i);
+  };
+  formEl.addEventListener('input',  liveStatus);
+  formEl.addEventListener('change', liveStatus);
+}
+
 // The endings gate panel, extracted from the role editor template so the archetype select
 // can re-render it in place when the gate moves.
 function renderEndingsGatePanel(r, i) {
@@ -2876,8 +3050,7 @@ function renderPlayerRolesSection(data) {
       ${edField('Description',        edTextarea(`playerRoles.${i}.description`, r.description, 2))}
       ${edField('Access Level', `<select data-path="playerRoles.${i}.accessLevel"><option${r.accessLevel === 'staff' ? ' selected' : ''}>staff</option><option${r.accessLevel === 'investigator' ? ' selected' : ''}>investigator</option><option${r.accessLevel === 'admin' ? ' selected' : ''}>admin</option></select>`)}
       ${edField('Perspective',        edTextarea(`playerRoles.${i}.perspective`,       r.perspective,       2))}
-      ${edField('Choice Register',    edTextarea(`playerRoles.${i}.choice_register`,   r.choice_register,   2), 'What KIND of choices to offer each turn. Overrides the escalation default once Reviewed. Blank = default.')}
-      ${edField('Choice Register Reviewed', `<select data-path="playerRoles.${i}.choice_register_reviewed"><option value="false"${r.choice_register_reviewed === true ? '' : ' selected'}>No — not steering</option><option value="true"${r.choice_register_reviewed === true ? ' selected' : ''}>Yes — steering</option></select>`)}
+      ${renderChoiceRegisterSection(r, i)}
       ${edField('Starting Knowledge', edTextarea(`playerRoles.${i}.startingKnowledge`, knowledgeVal,        3, 'data-type="array"'), 'One per line')}
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
       ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}
@@ -3454,7 +3627,8 @@ function renderChoiceRegistersSection(data) {
       <div style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:20px">
         <div style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.5">
           A choice register tells the engine what KIND of choices to offer a role each turn: its moral axis, what to offer, what to avoid. It overrides the default of leading with an escalation (a confrontational or tactical move). This drafts one per role with the model.
-          <br><strong>A draft steers nothing.</strong> Edit it, then <strong>Approve</strong> to make it steer — or <strong>Save as draft</strong> to finish later in the role editor. Approved and hand-authored registers are never drafted over.
+          Each proposal comes with its posture, confidence, reasoning, the counter-case it ruled out, and the evidence it used — read those before approving.
+          <br><strong>A draft steers nothing.</strong> Edit it, then <strong>Approve</strong> to make it steer — or <strong>Save as draft</strong> to finish later in the role editor. This batch skips approved and hand-authored registers; to get a proposal for one of those, use <strong>✦ Propose register</strong> on that role's card in the Player Roles section above.
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <button type="button" class="btn btn-primary btn-sm" id="creg-propose-btn">✦ Generate Choice Registers</button>
@@ -3510,10 +3684,11 @@ function buildChoiceRegisterCard(p, i, scenarioId) {
       <span style="font-weight:700;font-size:13px">${esc(p.role_name)}</span>
       <span id="${id}-state" style="font-size:11px;color:#b45309;font-weight:700">proposal — not steering</span>
     </div>
-    ${p.current_draft ? `<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px"><strong>Unreviewed draft already on this role</strong> (replaced if you save this one):<div style="margin-top:2px;white-space:pre-wrap">${esc(p.current_draft)}</div></div>` : ''}
+    <div id="${id}-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">${p.posture ? choiceRegisterPostureHeader(p) : ''}</div>
+    ${p.existing ? `<div style="font-size:12px;color:var(--text-soft);margin-bottom:8px"><strong>Unreviewed draft already on this role</strong> (replaced if you save this one):<div style="margin-top:2px;white-space:pre-wrap">${esc(p.existing.choice_register)}</div></div>` : ''}
     <label style="font-size:12px;color:var(--text-soft);display:block;margin-bottom:2px">Choice register (yours to edit)</label>
     <textarea id="${id}-text" rows="7" style="width:100%;font-size:13px;margin-bottom:6px;resize:vertical">${esc(p.choice_register || '')}</textarea>
-    <div id="${id}-why" style="font-size:12px;color:var(--text-soft);margin-bottom:10px;white-space:pre-wrap">${p.rationale ? `<strong>Why:</strong> ${esc(p.rationale)}` : ''}</div>
+    <div id="${id}-why" style="margin-bottom:10px">${p.error ? `<div style="font-size:12px;color:#b91c1c">${esc(p.error)}</div>` : choiceRegisterReasoningRows(p)}</div>
     <div id="${id}-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button type="button" class="btn btn-success btn-sm" onclick="writeChoiceRegister('${id}','${esc(scenarioId)}',true)">Approve</button>
       <button type="button" class="btn btn-primary btn-sm" onclick="writeChoiceRegister('${id}','${esc(scenarioId)}',false)">Save as draft</button>
@@ -3530,7 +3705,7 @@ function buildChoiceRegisterFailedList(failed, scenarioId, offset) {
   return `<div style="margin-top:12px">
     <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#b91c1c;margin-bottom:6px">Proposal failed (${failed.length})</div>
     ${failed.map((f, j) => buildChoiceRegisterCard(
-        { ...f, choice_register: '', rationale: `Proposal failed: ${f.error || 'unknown error'} — Regenerate, or write one yourself.` },
+        { ...f, choice_register: '', error: `Proposal failed: ${f.error || 'unknown error'} — Regenerate, or write one yourself.` },
         offset + j, scenarioId)).join('')}
   </div>`;
 }
@@ -3568,10 +3743,12 @@ function syncRoleRegisterInPage(roleId, stored) {
     choice_register_reviewed:  stored.choice_register_reviewed,
     choice_register_generated: stored.choice_register_generated,
   });
-  const ta  = document.querySelector(`[data-path="playerRoles.${i}.choice_register"]`);
-  const sel = document.querySelector(`[data-path="playerRoles.${i}.choice_register_reviewed"]`);
-  if (ta)  ta.value  = stored.choice_register || '';
-  if (sel) sel.value = stored.choice_register_reviewed === true ? 'true' : 'false';
+  const ta = document.querySelector(`[data-path="playerRoles.${i}.choice_register"]`);
+  const cb = document.querySelector(`[data-path="playerRoles.${i}.choice_register_reviewed"]`);
+  if (ta) ta.value   = stored.choice_register || '';
+  if (cb) cb.checked = stored.choice_register_reviewed === true;
+  const status = document.getElementById(`creg-status-${i}`);
+  if (status) status.outerHTML = choiceRegisterStatusBadge(roles[i], i);
 }
 
 async function writeChoiceRegister(cardId, scenarioId, approve) {
@@ -3609,19 +3786,22 @@ async function regenerateChoiceRegister(cardId, scenarioId) {
   const card = document.getElementById(cardId);
   if (!card) return;
   const roleId = card.dataset.roleId;
-  const ta  = document.getElementById(`${cardId}-text`);
-  const why = document.getElementById(`${cardId}-why`);
+  const ta   = document.getElementById(`${cardId}-text`);
+  const why  = document.getElementById(`${cardId}-why`);
+  const headEl = document.getElementById(`${cardId}-head`);
   if (ta) { ta.disabled = true; ta.value = 'Regenerating…'; }
   try {
     const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/propose-choice-registers`, { roleId });
     const p = (resp.proposals || [])[0];
     if (p) {
-      if (ta)  ta.value = p.choice_register || '';
-      if (why) why.innerHTML = p.rationale ? `<strong>Why:</strong> ${esc(p.rationale)}` : '';
+      if (ta)     ta.value = p.choice_register || '';
+      if (why)    why.innerHTML = choiceRegisterReasoningRows(p);
+      if (headEl) headEl.innerHTML = choiceRegisterPostureHeader(p);
     } else {
-      const s = (resp.skipped || [])[0] || (resp.failed || [])[0];
-      if (ta)  ta.value = '';
-      if (why) why.textContent = s?.reason || s?.error || 'No proposal returned.';
+      const s = (resp.failed || [])[0];
+      if (ta)     ta.value = '';
+      if (why)    why.innerHTML = `<div style="font-size:12px;color:#b91c1c">${esc(s?.error || 'No proposal returned.')}</div>`;
+      if (headEl) headEl.innerHTML = '';
     }
   } catch (err) {
     if (ta) ta.value = '';
@@ -5611,6 +5791,7 @@ function renderPreview(data, autoSaved = false) {
 
   // ── Archetype (propose + human confirm + live re-gate) ────────────────────
   bindArchetypeHandlers(formEl, data, scenarioId);
+  bindChoiceRegisterHandlers(formEl, data, scenarioId);
 
   // ── Regenerate Endings (per role, Opus) ────────────────────────
   formEl.addEventListener('click', async e => {

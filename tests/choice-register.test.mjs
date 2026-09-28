@@ -38,6 +38,7 @@ const {
   preserveStoredChoiceRegister, preserveStoredRoleBlocks,
   choiceRegisterSkip, choiceRegisterWriteRefusal,
   buildChoiceRegisterUserPrompt, validateChoiceRegisterProposal, CHOICE_REGISTER_SYSTEM_PROMPT,
+  proposeChoiceRegister,
 } = await import(`${ROOT}/engine/admin/adminRouter.js`);
 
 const SCENARIO_ID = 'joan_trial_rouen_1431';
@@ -209,20 +210,78 @@ head('proposer prompt: the role in, the fork options out');
   check('conduct bounds included for a real person with bounds',
     !(character?.character_type === 'real' && character?.conduct_bounds) || user.includes('CONDUCT BOUNDS'));
   const sys = CHOICE_REGISTER_SYSTEM_PROMPT;
-  check('system prompt asks for the moral axis, OFFER, AVOID and BOLDNESS',
-    ['MORAL AXIS', 'OFFER', 'AVOID', 'BOLDNESS'].every(k => sys.includes(k)));
-  check('system prompt asks for JSON with choice_register and rationale',
-    sys.includes('"choice_register"') && sys.includes('"rationale"'));
+  check('system prompt: posture from the situation, not the person',
+    sys.includes('POSTURE COMES FROM THE SITUATION, NOT THE PERSON') && sys.includes('ESCALATION IS SOMETIMES CORRECT'));
+  check('system prompt asks for the axis, OFFER, AVOID and BOLDNESS',
+    ['THE AXIS', 'OFFER', 'AVOID', 'BOLDNESS'].every(k => sys.includes(k)));
+  check('system prompt asks for evidence, counter-case and confidence',
+    ['CITE EVIDENCE', 'STATE THE COUNTER-CASE', 'CONFIDENCE'].every(k => sys.includes(k)));
+  check('system prompt JSON carries all six fields',
+    ['"posture"', '"confidence"', '"choice_register"', '"rationale"', '"counter_case"', '"evidence"'].every(k => sys.includes(k)));
+  check('neutral example: no Joan, no real trial', !/Joan|voices|canon law|Cauchon/i.test(sys));
+  check('forbids naming the dilemma answer, even as boldness', sys.includes('Never say which way this person decides at the dilemma'));
 }
 
-head('proposal validator');
+head('proposal validator: the full classifier shape is required');
 {
-  const good = 'x'.repeat(200);
-  check('good proposal passes', validateChoiceRegisterProposal({ choice_register: good, rationale: 'why' }).length === 0);
-  check('missing register fails', validateChoiceRegisterProposal({ rationale: 'why' }).length > 0);
-  check('too-short register fails', validateChoiceRegisterProposal({ choice_register: 'Be moral.' }).length > 0);
-  check('too-long register fails', validateChoiceRegisterProposal({ choice_register: 'x'.repeat(2500) }).length > 0);
+  const good = { posture: 'conviction', confidence: 'medium', choice_register: 'x'.repeat(200),
+    rationale: 'why', counter_case: 'what was ruled out', evidence: ['briefing line'] };
+  check('complete proposal passes', validateChoiceRegisterProposal(good).length === 0);
+  for (const [label, patch] of [
+    ['missing register',     { choice_register: undefined }],
+    ['too-short register',   { choice_register: 'Be moral.' }],
+    ['too-long register',    { choice_register: 'x'.repeat(2500) }],
+    ['missing posture',      { posture: '' }],
+    ['confidence not in set', { confidence: 'certain' }],
+    ['empty rationale',      { rationale: ' ' }],
+    ['missing counter-case', { counter_case: undefined }],
+    ['empty evidence',       { evidence: [] }],
+    ['evidence not a list',  { evidence: 'briefing' }],
+  ]) check(`${label} fails`, validateChoiceRegisterProposal({ ...good, ...patch }).length > 0);
   check('non-object fails', validateChoiceRegisterProposal('text').length > 0);
+}
+
+// ── the proposal's shape, end to end, with the model scripted ───────────────
+// proposeChoiceRegister resolves `fetch` from the global scope at call time (as
+// degradation.test relies on), so a canned api.anthropic.com reply exercises the real parse,
+// validate and return path with no network call.
+head('proposeChoiceRegister: returns the full classifier shape (scripted model)');
+{
+  const ANTHROPIC = 'https://api.anthropic.com/v1/messages';
+  const realFetch = globalThis.fetch;
+  let reply = null, sent = null;
+  globalThis.fetch = async (url, opts) => {
+    const u = typeof url === 'string' ? url : url?.url;
+    if (!u || !u.startsWith(ANTHROPIC)) return realFetch(url, opts);
+    sent = JSON.parse(opts.body);
+    return new Response(JSON.stringify({ content: [{ type: 'text', text: reply }], stop_reason: 'end_turn',
+      usage: { input_tokens: 10, output_tokens: 20 } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const character = characters.find(c => c.id === stored.character_id) || null;
+  try {
+    reply = '```json\n' + JSON.stringify({
+      posture: 'Conviction', confidence: 'high', choice_register: REGISTER.repeat(3),
+      rationale: 'The scenario is a trial.', counter_case: 'A non-expert might offer legal fencing.',
+      evidence: ['briefing: the chapel is cold', ''],
+    }) + '\n```';
+    const role = { ...stored, choice_register: 'Hand text.', choice_register_reviewed: true };
+    const p = await proposeChoiceRegister(scenario, role, character, 'test-key');
+    check('returns register, posture, confidence, rationale, counter-case, evidence',
+      p.proposed === true && p.choice_register === REGISTER.repeat(3) && p.posture === 'conviction'
+      && p.confidence === 'high' && p.rationale && p.counter_case && p.evidence.length === 1,
+      JSON.stringify({ posture: p.posture, evidence: p.evidence }));
+    check('carries the existing register for comparison, never overwriting it',
+      p.existing?.choice_register === 'Hand text.' && p.existing.reviewed === true && role.choice_register === 'Hand text.');
+    check('sent the classifier-shape system prompt', sent?.system === CHOICE_REGISTER_SYSTEM_PROMPT);
+    check('sent this role in the user prompt', sent?.messages?.[0]?.content?.includes(stored.name));
+
+    reply = JSON.stringify({ choice_register: REGISTER.repeat(3), rationale: 'bare text, no reasoning' });
+    let threw = null;
+    try { await proposeChoiceRegister(scenario, stored, character, 'test-key'); } catch (err) { threw = err.message; }
+    check('a proposal without the reasoning fields is refused, not returned', /malformed/.test(threw || ''), threw || 'did not throw');
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 }
 
 console.log(`\n${fails ? `${fails} FAILED` : 'ALL PASS'}`);
