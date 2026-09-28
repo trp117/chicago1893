@@ -505,6 +505,7 @@ const ENTITIES = {
       { title: 'AI Perspective', fields: [
         { key: 'perspective',    label: 'Perspective Instructions', type: 'textarea', help: 'Tells the AI how to write for this role. e.g. "The player is Burnham\'s assistant. Burnham may speak to the player as a superior."' },
         { key: 'startingKnowledge', label: 'Starting Knowledge', type: 'list', help: 'What the player already knows at the start.' },
+        { key: 'choice_register', label: 'Choice register', type: 'textarea', help: 'What KIND of choices the AI offers this role each turn, e.g. "Choices of conviction and conscience: what she will affirm, refuse, or hold to. Not legal or procedural tactics." Overrides the default of leading with an escalation. Leave blank for the default. Takes effect on the next turn, even mid-session.' },
       ]},
       { title: 'Opening Scene', fields: [
         { key: 'opening.narrative', label: 'Opening Narrative', type: 'textarea', help: 'The scene-setting text the player reads at the very start.' },
@@ -2873,6 +2874,7 @@ function renderPlayerRolesSection(data) {
       ${edField('Description',        edTextarea(`playerRoles.${i}.description`, r.description, 2))}
       ${edField('Access Level', `<select data-path="playerRoles.${i}.accessLevel"><option${r.accessLevel === 'staff' ? ' selected' : ''}>staff</option><option${r.accessLevel === 'investigator' ? ' selected' : ''}>investigator</option><option${r.accessLevel === 'admin' ? ' selected' : ''}>admin</option></select>`)}
       ${edField('Perspective',        edTextarea(`playerRoles.${i}.perspective`,       r.perspective,       2))}
+      ${edField('Choice Register',    edTextarea(`playerRoles.${i}.choice_register`,   r.choice_register,   2), 'What KIND of choices to offer each turn. Overrides the escalation default. Blank = default.')}
       ${edField('Starting Knowledge', edTextarea(`playerRoles.${i}.startingKnowledge`, knowledgeVal,        3, 'data-type="array"'), 'One per line')}
       ${edField('Briefing',           edTextarea(`playerRoles.${i}.briefing`,          r.briefing,          4), '5 sentences, 2nd person — read aloud before play')}
       ${edField('Context Sentence',   edInput(`playerRoles.${i}.context_sentence`,  r.context_sentence), '1 sentence, 2nd person — shown before entry prose on intro screen 3B')}

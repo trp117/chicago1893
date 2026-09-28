@@ -669,7 +669,7 @@ function buildAliasProtectionBlock(state) {
 // Resolved per-turn from `characters` rather than denormalised onto session state at /start,
 // so a session already in flight picks the bounds up on its very next turn and no stored
 // session needs migrating.
-function buildPlayerRoleSection(state, characters = []) {
+function buildPlayerRoleSection(state, characters = [], playerRoles = []) {
   const roleId      = state.playerRoleId    || 'unknown';
   const roleName    = state.playerRoleName  || 'Investigator';
   const perspective = state.playerPerspective || 'The player is an investigator.';
@@ -695,6 +695,17 @@ function buildPlayerRoleSection(state, characters = []) {
       boundsText || ('No conduct bounds have been authored for ' + roleName + '. Treat the record as real but unstated: do not invent documented acts, and keep what they do inside what their documented position plainly permitted.'),
     );
   }
+
+  // CHOICE REGISTER — the authored steer on what KIND of choices this role is offered (Joan:
+  // conviction, not legal fencing). The system prompt's RULE 8 defers to it; this line is
+  // what it defers to. Read FRESH from the role record every turn, the way the conduct
+  // bounds above are read from the character record, and never copied onto session state:
+  // an edited register reaches a session already in flight on its next turn, and there is
+  // no stale copy riding in STATE_JSON to strip. Absent or blank emits nothing, so a role
+  // without one composes exactly the prompt it composed before.
+  const role     = (playerRoles || []).find(r => r && r.id === state.playerRoleId) || null;
+  const register = typeof role?.choice_register === 'string' ? role.choice_register.trim() : '';
+  if (register) lines.push('', `CHOICE REGISTER: ${register}`);
 
   const aliasBlock = buildAliasProtectionBlock(state);
   if (aliasBlock) lines.push('', aliasBlock);
@@ -1297,7 +1308,7 @@ export function buildClosureFlagDirective(state, scenario) {
   return `⚑ CLOSURE FLAG: ${when}you MUST emit stateChanges: { flags: { "${principal.flag}": true } } in that turn's response. Set it the instant it becomes true and never unset it.`;
 }
 
-export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues }) {
+export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues, playerRoles = [] }) {
   const location      = getLocationById(state.location, locations);
   const relevantChars = getRelevantCharacters(state, location, characters, locations);
   const charRoutes    = buildCharacterRoutes(characters, locations, state.playerCharacterId);
@@ -1331,7 +1342,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   };
 
   return turnTemplate
-    .replace('{{PLAYER_ROLE_SECTION}}',    buildPlayerRoleSection(state, characters))
+    .replace('{{PLAYER_ROLE_SECTION}}',    buildPlayerRoleSection(state, characters, playerRoles))
     .replace('{{STATE_JSON}}',             JSON.stringify(promptState))
     .replace('{{LOCATION_JSON}}',          JSON.stringify(slimLocation(location)))
     .replace('{{NPC_JSON}}',               JSON.stringify(relevantChars))

@@ -441,6 +441,9 @@ At the end of every response, offer exactly 2–3 choices reflecting the current
 ### High-stakes scenes (Act 2 or 3, primary conspirator present, suspicion 2+):
 The first choice must be an escalation option — a bold move that could credibly trigger a confrontation, chase, or force the NPC's hand.
 
+### Choice register (overrides the escalation default):
+When the PLAYER ROLE section carries a CHOICE REGISTER, it decides what kind of choices to offer, on every turn and in every scene. It OVERRIDES the escalation rule above: do not make the first choice an escalation, confrontation, or tactical move unless the register itself calls for one. Offer every choice in the register's spirit. The ACTION OPTIONS RULE still governs how each choice is worded.
+
 ---
 
 ## Session pacing rules
