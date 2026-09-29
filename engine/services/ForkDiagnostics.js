@@ -12,7 +12,7 @@
 // the closing-prose model, and a line saying "fork: PRESENTED via fallback" must never become
 // something it writes about. Stripping a transcript with no such line returns it unchanged.
 
-import { forkTimingStatus, storyPosition, arcBeats, resolveDefiningMomentBlock } from './PromptComposer.js';
+import { forkTimingStatus, storyPosition, storyPacingNudge, arcBeats, resolveDefiningMomentBlock } from './PromptComposer.js';
 
 export const DIAG_PREFIX = '> ⚑ DIAG ';
 
@@ -51,30 +51,40 @@ export function describeBinding(status) {
   return `${on} · fallback ${status.fallbackFraction}${status.fallbackDefault ? ' (default)' : ''} = ${mins(status.fallbackMinutes)} of ${mins(status.totalMinutes)} min`;
 }
 
+// The fork verdict is taken against the state the turn STARTED from — the fork turn's prompt
+// has to be composed before the model writes the turn, so a beat reported in this turn's output
+// can only count from the next turn. The wording says so, because the position column beside it
+// shows where the turn LEFT the story, and a line reading "binding unmet" next to "Act 4" was
+// read as an ordering bug when it was the honest pre-turn verdict.
 function describeFork(status, decisionRecorded) {
   if (status.due) {
     const why = status.via === 'binding'
-      ? `${status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`} met`
+      ? `${status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`} met at turn start`
       : status.via === 'fallback'
-      ? `${mins(status.elapsed)} ≥ ${mins(status.fallbackMinutes)} min; binding unmet`
+      ? `${mins(status.elapsed)} ≥ ${mins(status.fallbackMinutes)} min; binding unmet at turn start`
       : 'clock';
     return `PRESENTED this turn via ${status.via} (${why})`;
   }
   if (decisionRecorded) return `answered this turn: ${decisionRecorded}`;
   if (status.decision)  return `answered earlier: ${status.decision}`;
   if (status.presented) return 'presented earlier, not yet answered';
-  return `waiting (binding unmet; fallback at ${mins(status.fallbackMinutes)} min)`;
+  return `waiting (binding unmet at turn start; fallback at ${mins(status.fallbackMinutes)} min)`;
 }
 
-// One line per turn. `state` is the state the turn STARTED from (the fork verdict is taken
-// against it, exactly as gameRouter takes forkDue); `nextState` is where it left the story.
+const describePosition = pos => (pos ? `Act ${pos.actNumber} (${pos.id})` : 'no beat');
+
+// One line per turn. `state` is the state the turn STARTED from (the fork verdict and the
+// pacing nudge are both taken against it, exactly as gameRouter takes forkDue and the prompt
+// composes the nudge); `nextState` is where it left the story. Position shows both.
 export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, output, newBeats = [], decisionRecorded = null, opening = false }) {
   const status   = forkTimingStatus(state, scenario, storyArc);
   const raw      = output?.stateChanges?.beats_reached;
   const known    = new Set(arcBeats(storyArc).map(b => b.id));
   const reported = Array.isArray(raw) ? raw : (typeof raw === 'string' ? [raw] : []);
   const rejected = storyArc ? reported.filter(id => typeof id === 'string' && !known.has(id.trim())) : [];
-  const pos      = storyPosition(nextState, storyArc);
+  const before   = storyPosition(state, storyArc);
+  const after    = storyPosition(nextState, storyArc);
+  const nudge    = storyPacingNudge(state, scenario, storyArc);
   return [
     `${DIAG_PREFIX}turn ${turn}${opening ? ' (opening)' : ''}`,
     `${mins(state?.elapsedMinutes ?? 0)}→${mins(nextState?.elapsedMinutes ?? 0)} min`,
@@ -82,7 +92,8 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
     `beats_reached: ${describeReported(raw)}`,
     `new: ${list(newBeats)}`,
     ...(rejected.length ? [`rejected: ${list(rejected)}`] : []),
-    `position: ${pos ? `Act ${pos.actNumber} (${pos.id})` : 'no beat yet'}`,
+    `position: ${describePosition(before)} → ${describePosition(after)}`,
+    ...(nudge ? [`pacing: nudged toward ${nudge.target.id} (~${nudge.turnsLeft} turn${nudge.turnsLeft === 1 ? '' : 's'} left)`] : []),
     `fork: ${describeFork(status, decisionRecorded)}`,
   ].join(' · ');
 }

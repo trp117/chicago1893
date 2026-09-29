@@ -1449,6 +1449,76 @@ export function storyPosition(state, storyArc) {
 
 const STORY_BEAT_LIST_CHARS = 220;
 
+// PACING — how many turns before a bound fork's fallback the story starts being pushed toward
+// the bound act/beat. The Watergate/McCord play-test showed why this exists: beats reported
+// reliably across all four acts, but the story was still in Act 3 at 25.5 minutes, so the
+// fallback put the fork — and its Act 4 setup dragged the narration into Act 4 in one turn.
+// The fallback did its job; the story just never got there on its own.
+//
+// Three turns: one turn cannot honestly carry the story across several beats (that is the jump
+// the nudge exists to prevent), and starting much earlier would compress the whole arc rather
+// than its last stretch. Measured in the scenario's own turn length (timePerTurnDefault, or
+// mergeState's backstop of 3), so a 30-minute, 2-minutes-a-turn session with the default 0.85
+// fallback starts nudging at 25.5 − 3×2 = 19.5 minutes.
+export const PACING_NUDGE_TURNS = 3;
+
+// The beat a bound fork is waiting for: its at_beat, or the first beat of its at_act (or of
+// the first act after it, if that act has no beats). null when neither names a beat of the arc.
+function bindingTargetBeat(block, beats) {
+  const atBeat = typeof block?.at_beat === 'string' ? block.at_beat.trim() : '';
+  if (atBeat) return beats.find(b => b.id === atBeat) || null;
+  return typeof block?.at_act === 'number' ? (beats.find(b => b.actNumber >= block.at_act) || null) : null;
+}
+
+// Whether the story should be nudged toward a bound fork's target THIS turn, and toward what.
+// null unless: the fork is story-bound, not yet put or answered, not due this turn, its binding
+// is not yet met, its target is a beat of the arc, and the clock is inside the nudge window.
+// Shared by buildStoryPositionDirective (which renders it) and the transcript diagnostics.
+export function storyPacingNudge(state, scenario, storyArc) {
+  const block = resolveDefiningMomentBlock(state, scenario);
+  if (!storyArc || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
+  const momentId = block.principal_transition?.moment;
+  if (!momentId || state?.decisions?.[momentId] != null) return null;
+  if (definingMomentDue(state, scenario, storyArc) || storyBindingReached(block, state, storyArc)) return null;
+
+  const beats  = arcBeats(storyArc);
+  const target = bindingTargetBeat(block, beats);
+  if (!target) return null;
+
+  const total    = scenario?.sessionTargetMinutes || 15;
+  const fb       = typeof block.fallback_at_elapsed_fraction === 'number' && Number.isFinite(block.fallback_at_elapsed_fraction)
+    ? block.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
+  const tpt      = scenario?.systems?.timePerTurnDefault;
+  const turnMin  = typeof tpt === 'number' && Number.isFinite(tpt) && tpt > 0 ? tpt : 3;
+  const fbMin    = total * fb;
+  const startMin = Math.max(0, fbMin - PACING_NUDGE_TURNS * turnMin);
+  const elapsed  = state?.elapsedMinutes ?? 0;
+  if (elapsed < startMin) return null;
+
+  const reached  = new Set(Array.isArray(state?.reachedBeats) ? state.reachedBeats : []);
+  const furthest = storyPosition(state, storyArc);
+  const between  = beats.filter(b => b.index > (furthest ? furthest.index : -1) && b.index < target.index && !reached.has(b.id));
+  return {
+    target,
+    between,
+    turnsLeft: Math.max(1, Math.ceil((fbMin - elapsed) / turnMin)),
+    startMinutes: startMin,
+    fallbackMinutes: fbMin,
+  };
+}
+
+function buildPacingNudgeLine(nudge) {
+  const { target, between, turnsLeft } = nudge;
+  const where = `ACT ${target.actNumber}${target.actTitle ? ` — ${target.actTitle}` : ''}, beat ${target.id}`;
+  const path  = between.length
+    ? `Move through ${between.map(b => b.id).join(', ')}, in that order, and reach ${target.id}`
+    : `Bring the story to ${target.id}`;
+  return [
+    `⚑ PACING: The story is running behind its arc. It should now be reaching ${where} — move toward it. About ${turnsLeft} turn${turnsLeft === 1 ? '' : 's'} remain${turnsLeft === 1 ? 's' : ''} before this session's defining moment must be put to the player without it.`,
+    `- ${path} within those turns: escalate what is already in motion so the next beat arrives now, not later. Do not skip a beat, do not narrate one out of order, and report each as it happens.`,
+  ].join('\n');
+}
+
 // Standing per-turn directive for a STORY-BOUND fork — the closure-flag pattern above applied
 // to story position. The roster tells the model where the story is (every beat, in order,
 // with the ones already reached ticked and the next one given in full); the MUST line has it
@@ -1486,6 +1556,10 @@ export function buildStoryPositionDirective(state, scenario, storyArc) {
     '- The story moves through these beats in order. Play toward the next beat; do not narrate a later beat as happening before the earlier ones have.',
     '- When a beat HAPPENS — in the scene, or the player learns that it has happened — you MUST emit stateChanges: { beats_reached: ["<beat_id>"] } in that turn\'s response, using the id exactly as listed. Report each beat once. Never report a beat that has not happened.',
   );
+  // The pacing nudge (storyPacingNudge) — only inside the window before a bound fork's
+  // fallback, and only while its binding is still unmet.
+  const nudge = storyPacingNudge(state, scenario, storyArc);
+  if (nudge) lines.push(buildPacingNudgeLine(nudge));
   return lines.join('\n');
 }
 

@@ -454,7 +454,7 @@ head('TRANSCRIPT DIAGNOSTICS — durable beat/fork evidence, invisible to the cl
   check('a turn with an empty list reads "[]"', lines[1].includes('beats_reached: [] · new: []'), lines[1]);
   check('a bad id is shown as rejected', lines[4].includes('rejected: [the_arrest]') && lines[4].includes('new: [wills_finds_fresh]'), lines[4]);
   const forkLine = lines.find(l => l.includes('PRESENTED'));
-  check('the fork line says it fired via fallback, and why', /fork: PRESENTED this turn via fallback \(26 ≥ 25\.5 min; binding unmet\)/.test(forkLine || ''), forkLine);
+  check('the fork line says it fired via fallback, and why — judged at turn start', /fork: PRESENTED this turn via fallback \(26 ≥ 25\.5 min; binding unmet at turn start\)/.test(forkLine || ''), forkLine);
   check('the answer is recorded on the following turn', lines.some(l => l.includes('fork: answered this turn: close_the_housing')));
 
   const sum = withDiag.text.split('\n').filter(l => l.startsWith(DIAG_PREFIX) && !l.startsWith(DIAG_PREFIX + 'turn'));
@@ -464,12 +464,62 @@ head('TRANSCRIPT DIAGNOSTICS — durable beat/fork evidence, invisible to the cl
   check('summary: decision with turn and clock', sum.some(l => /decision: close_the_housing \(turn \d+, 26 min\)/.test(l)));
 
   const bindingNight = simulate(bound({ at_act: 4 }), [...LIVE.slice(0, 12), ['officers_reach_the'], [], []], { diag: true }).text;
-  check('a night that reaches Act 4 records the fork via binding', /fork: PRESENTED this turn via binding \(at_act 4 met\)/.test(bindingNight));
+  check('a night that reaches Act 4 records the fork via binding', /fork: PRESENTED this turn via binding \(at_act 4 met at turn start\)/.test(bindingNight));
+
+  // FIX 1 — the position column shows BEFORE → AFTER, so a verdict taken at turn start can be
+  // read against both. The McCord shape: the fork turn's own output reports the Act 4 beat.
+  const forkTurnNight = simulate(bound({ at_act: 4 }), [...LIVE.slice(0, 14), ['officers_reach_the'], []], { diag: true }).text;
+  const ftl = forkTurnNight.split('\n').find(l => l.includes('PRESENTED'));
+  check('fork-turn line: "Act 3 (…) → Act 4 (officers_reach_the)" beside "binding unmet at turn start"',
+    /position: Act 3 \(the_officers_begin\) → Act 4 \(officers_reach_the\)/.test(ftl || '') && ftl.includes('binding unmet at turn start'), ftl);
+  check('turn 0 position starts from "no beat"', lines[0].includes('position: no beat → Act 1 (mccord_and_the)'), lines[0]);
+
+  // EARLY REACH — the story gets to Act 4 at minute 16; the binding fires at 18, far before 25.5.
+  const EARLY = [['wills_completes_his', 'mccord_and_the', 'baldwin_is_at'], ['wills_finds_fresh'], [], ['mccord_registers_a'],
+    ['wills_logs_the'], [], ['three_plainclothes_officers'], ['the_officers_begin'], [], ['officers_reach_the'], [], [], []];
+  const early = simulate(bound({ at_act: 4 }), EARLY, { diag: true }).text;
+  const el    = early.split('\n').find(l => l.includes('PRESENTED'));
+  check('EARLY: Act 4 reached by minute 16 (turn 9 ends at 18 min) — beat recorded that turn', early.includes('turn 9 · 16→18 min') && /turn 9 · 16→18 min .*new: \[officers_reach_the\]/.test(early));
+  check('EARLY: fork fires via BINDING at 18 min, far before the 25.5 fallback', /^> ⚑ DIAG turn 10 · 18→18 min .*fork: PRESENTED this turn via binding \(at_act 4 met at turn start\)/.test(el || ''), el);
+  check('EARLY: footer reports it', early.includes('fork: presented turn 10 at 18 min via binding'));
+  check('EARLY: no pacing nudge was ever needed', !early.includes('pacing: nudged'));
+
+  // STALL — the story never reaches Act 4: the nudge runs, then the fallback still fires.
+  const stall = simulate(bound({ at_act: 4 }), LIVE.slice(0, 13).concat([[], [], []]), { diag: true }).text;
+  const sl    = stall.split('\n').filter(l => l.startsWith(DIAG_PREFIX + 'turn'));
+  check('STALL: nudge lines appear from 19.5 min and only while the binding is unmet', sl.filter(l => l.includes('pacing: nudged toward officers_reach_the')).every(l => /· (2\d|19\.5|20)(\.\d)?→/.test(l)) && sl.some(l => l.includes('pacing: nudged')));
+  check('STALL: fallback still fires the fork at 26 min', sl.some(l => /turn \d+ · 26→26 min .*PRESENTED this turn via fallback/.test(l)));
+  check('STALL: no nudge on or after the fork turn', !sl.some(l => l.includes('PRESENTED') && l.includes('pacing:')));
   const silent = simulate(bound({ at_act: 4 }), LIVE.map(() => undefined), { diag: true }).text;
   check('a model that never reports: summary says NONE, every line (absent)', silent.includes('beats reached: NONE') && parseForkDiagLines(silent).beats.length === 0 && !/beats_reached: \[/.test(silent));
   const gone = forkDiagSummaryLines({ transcript: withDiag.text, sessionState: null, scenario: WG.scenario, storyArc: WG_ARC });
   check('summary still built with session state gone (from the transcript alone)', gone.some(l => l.includes('beats reached (8)')) && gone.some(l => l.includes('(session state gone')));
   check('no diagnostic lines → no summary', forkDiagSummaryLines({ transcript: without.plain, sessionState: withDiag.state, scenario: WG.scenario, storyArc: WG_ARC }).length === 0);
+
+  // PACING NUDGE in the prompt — the threshold, the target, and when it stays silent.
+  const { storyPacingNudge, PACING_NUDGE_TURNS } = await import(`${ROOT}/engine/services/PromptComposer.js`);
+  const at = (role, elapsed, reached = ['wills_completes_his', 'mccord_and_the', 'baldwin_is_at', 'wills_finds_fresh', 'wills_logs_the']) => {
+    const st = stateFor(role); st.elapsedMinutes = elapsed; st.remainingMinutes = 30 - elapsed; st.reachedBeats = [...reached]; return st;
+  };
+  const boundM = bound({ at_act: 4 });
+  const start  = 30 * 0.85 - PACING_NUDGE_TURNS * WG.scenario.systems.timePerTurnDefault;
+  check(`nudge window opens at ${start} min (fallback 25.5 − ${PACING_NUDGE_TURNS} turns × ${WG.scenario.systems.timePerTurnDefault} min)`, start === 19.5);
+  const pBelow = promptFor(WG, at(boundM, 19), WG_ARC);
+  const pAbove = promptFor(WG, at(boundM, 20), WG_ARC);
+  check('below the threshold: no PACING line', pBelow.includes('⚑ STORY POSITION') && !pBelow.includes('⚑ PACING'));
+  const { buildStoryPositionDirective } = await import(`${ROOT}/engine/services/PromptComposer.js`);
+  const dBelow = buildStoryPositionDirective(at(boundM, 19), WG.scenario, WG_ARC);
+  const dAbove = buildStoryPositionDirective(at(boundM, 20), WG.scenario, WG_ARC);
+  check('past it, the directive is the below-threshold directive + the PACING lines, nothing else', dAbove.startsWith(dBelow + '\n⚑ PACING:') && dAbove.split('\n').length === dBelow.split('\n').length + 2);
+  check('past the threshold: names the bound act\'s first beat', pAbove.includes('It should now be reaching ACT 4 — Suite 600, 2:10 AM, beat officers_reach_the — move toward it.'));
+  check('...and walks the unreached beats AHEAD of the position in order (never back to skipped Act 2 beats)', pAbove.includes('Move through three_plainclothes_officers, baldwin_watches_three, baldwin_transmits_his, the_officers_begin, in that order, and reach officers_reach_the') && !pAbove.includes('Move through the_decision_point'));
+  check('...with the turns left before the fallback (20 → 25.5 at 2 min/turn = 3)', pAbove.includes('About 3 turns remain'));
+  check('at_beat binding: the nudge targets that beat', storyPacingNudge(at(bound({ at_beat: 'mccord_barker_martinez' }), 22), WG.scenario, WG_ARC)?.target.id === 'mccord_barker_martinez');
+  check('binding already met → no nudge', storyPacingNudge(at(boundM, 22, ['officers_reach_the']), WG.scenario, WG_ARC) === null);
+  check('fork due (fallback reached) → no nudge', storyPacingNudge(at(boundM, 26), WG.scenario, WG_ARC) === null && !promptFor(WG, at(boundM, 26), WG_ARC).includes('⚑ PACING'));
+  const presentedSt = at(boundM, 22); presentedSt.definingMomentPresented = true;
+  check('fork already presented → no nudge', storyPacingNudge(presentedSt, WG.scenario, WG_ARC) === null);
+  check('unbound McCord past the threshold → no nudge, no STORY POSITION', storyPacingNudge(at(mccord, 22), WG.scenario, WG_ARC) === null && !promptFor(WG, at(mccord, 22), WG_ARC).includes('⚑ PACING'));
 
   // Every real transcript on disk comes back as the same string.
   const tdir = path.join(REPO_DIR, 'engine/data/transcripts');
