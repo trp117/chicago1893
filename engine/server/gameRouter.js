@@ -422,7 +422,72 @@ function getCompositeDisclosure(epilogueData, summary) {
 // where the role and the session state are both in scope, and defaulted false here so that
 // every existing caller and every session that is not a proximity session compiles exactly
 // the prompt it compiled before.
-async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null) {
+// Cut text back to its last complete sentence: the last . ! or ? (with any closing quote or
+// bracket) that is followed by whitespace or the end. A decimal or a time ("1:47", "3.5") is
+// never a boundary, because no whitespace follows its point. '' when there is no complete
+// sentence at all — the callers already treat an empty block as "no block".
+export function trimToLastSentence(text) {
+  const s = typeof text === 'string' ? text.trimEnd() : '';
+  let end = -1;
+  for (const m of s.matchAll(/[.!?]["'”’)\]]*(?=\s|$)/g)) end = m.index + m[0].length;
+  return end === -1 ? '' : s.slice(0, end);
+}
+
+// One epilogue model call that never hands back a cut-off sentence. The Watergate/McCord
+// Historical Record rendered "…at approximately 1" because the record call ran out of tokens
+// and nothing looked at stop_reason. Now: stop_reason and length are always logged (these calls
+// are not traced in Langfuse); a max_tokens stop is retried once at `retryMaxTokens`; if that is
+// cut too, the text is trimmed to its last complete sentence. `label` names the block in errors,
+// exactly as the inline calls did.
+async function completeEpilogueCall({ apiKey, system, content, maxTokens, retryMaxTokens, label }) {
+  const call = async (cap) => {
+    const resp = await fetch(ANTHROPIC_URL, {
+      method: 'POST', signal: AbortSignal.timeout(30000),
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: MODEL, max_tokens: cap, temperature: 0.5,
+        system,
+        messages: [{ role: 'user', content }],
+      }),
+    });
+    if (!resp.ok) throw new Error(`Anthropic API error (${label}): ${resp.status}`);
+    const data = await resp.json();
+    return { text: (data.content?.[0]?.text?.trim()) || '', stop: data.stop_reason ?? 'unknown' };
+  };
+  let { text, stop } = await call(maxTokens);
+  console.log(`[EPILOGUE] ${label} stop_reason=${stop} len=${text.length} max_tokens=${maxTokens}`);
+  if (stop === 'max_tokens' && retryMaxTokens > maxTokens) {
+    ({ text, stop } = await call(retryMaxTokens));
+    console.warn(`[EPILOGUE] ${label} hit max_tokens — retried at ${retryMaxTokens}: stop_reason=${stop} len=${text.length}`);
+  }
+  if (stop === 'max_tokens') {
+    const trimmed = trimToLastSentence(text);
+    console.warn(`[EPILOGUE] ${label} still at max_tokens — trimmed to the last complete sentence (${text.length} → ${trimmed.length} chars)`);
+    text = trimmed;
+  }
+  return text;
+}
+
+// The Historical Record's word budget, scaled by how many documented fates Layer 1 must
+// cover. The prompt used to ask for 100–150 words AND "cover every one, do not omit any",
+// with max_tokens 400 behind it: a session that met six documented figures could not satisfy
+// both, and the cap settled it mid-sentence. Scaling the budget keeps "do not omit any" — the
+// fates of people the player actually met are the record — and caps the total so the block
+// stays a record, not a roll call. With no Layer 1 fates it is exactly the old 100–150.
+const RECORD_WORDS_BASE_MIN   = 100;
+const RECORD_WORDS_BASE_MAX   = 150;
+const RECORD_WORDS_PER_FATE_MIN = 20;
+const RECORD_WORDS_PER_FATE_MAX = 30;
+const RECORD_WORDS_CAP        = 330;
+export function recordWordBudget(layer1Fates) {
+  const n   = Math.max(0, layer1Fates | 0);
+  const max = Math.min(RECORD_WORDS_CAP, RECORD_WORDS_BASE_MAX + RECORD_WORDS_PER_FATE_MAX * n);
+  const min = Math.min(RECORD_WORDS_BASE_MIN + RECORD_WORDS_PER_FATE_MIN * n, max - 50);
+  return { min, max, capped: RECORD_WORDS_BASE_MAX + RECORD_WORDS_PER_FATE_MAX * n > RECORD_WORDS_CAP };
+}
+
+// Exported for tests/epilogue.test.mjs, which drives it against a scripted Anthropic.
+export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -529,19 +594,11 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     closingProse,
   ].join('\n');
 
-  const sessionSignal = AbortSignal.timeout(30000);
-  const sessionResp = await fetch(ANTHROPIC_URL, {
-    method: 'POST', signal: sessionSignal,
-    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model: MODEL, max_tokens: 200, temperature: 0.5,
-      system: sessionSystemPrompt,
-      messages: [{ role: 'user', content: sessionUserContent }],
-    }),
+  // 60–100 words is ~130 tokens; 200 left almost no headroom. 400, retried at 800, then trimmed.
+  const session_block = await completeEpilogueCall({
+    apiKey: anthropicApiKey, system: sessionSystemPrompt, content: sessionUserContent,
+    maxTokens: 400, retryMaxTokens: 800, label: 'session block',
   });
-  if (!sessionResp.ok) throw new Error(`Anthropic API error (session block): ${sessionResp.status}`);
-  const sessionData = await sessionResp.json();
-  const session_block = (sessionData.content?.[0]?.text?.trim()) || '';
   if (!session_block) throw new Error('No session block text returned');
 
   // ── Call 2: record block ─────────────────────────────────────────────────────
@@ -570,6 +627,12 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     ? '  Layer 0 — Player character: the PLAYER CHARACTER NOTE is verified historical fact about the person the player portrayed. Their record comes FIRST, before any other figure. Never open on a secondary character.'
     : '';
 
+  // Layer 1 = documented fates of the OTHER characters met. interacted_characters is the
+  // session's introducedNpcs, which never contains the player's own character; composites are
+  // left out because the composite rule forbids giving them an individual fate.
+  const layer1Fates = fatesForLLM.filter(f => interactedSet.has(f.character_id) && f.classification !== 'composite').length;
+  const budget      = recordWordBudget(layer1Fates);
+
   const recordSystemPrompt = [
     'You are writing the "Historical Record" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
@@ -579,7 +642,7 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
     '  Layer 1 — Other characters: the documented fate (from character_fates) of every OTHER character whose character_id appears in interacted_characters — that is, every one except the played character already covered in Layer 0. Cover every one. Do not omit any.',
     '  Layer 2 — Outcome: the verified result from immediate_outcome.',
     '  Layer 3 — Frame: up to two facts from historical_frame relevant to what happened in this session.',
-    'Length: 100–150 words.',
+    `Length: ${budget.min}–${budget.max} words.${budget.capped ? ' That is tight for this many figures: give each Layer 1 figure one short sentence, and cover every one.' : ''}`,
     'Rules:',
     '- Draw ONLY from the EPILOGUE DATA BLOCK. Do not narrate what this player did, chose, or experienced in the session. This bars recounting the session — it does NOT bar naming the historical figure they portrayed: Layer 0 is required and takes precedence.',
     '- Include open_threads entries only when the matching thread_id appears in SESSION SCOPING resolved_threads.',
@@ -609,19 +672,12 @@ async function generateEpilogueText(epilogueData, sessionSummary, closingProse, 
   );
   const recordUserContent = recordUserParts.join('\n');
 
-  const recordSignal = AbortSignal.timeout(30000);
-  const recordResp = await fetch(ANTHROPIC_URL, {
-    method: 'POST', signal: recordSignal,
-    headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model: MODEL, max_tokens: 400, temperature: 0.5,
-      system: recordSystemPrompt,
-      messages: [{ role: 'user', content: recordUserContent }],
-    }),
+  // max_tokens follows the word budget (~2.5 tokens a word leaves room), never below 800.
+  const recordCap = Math.max(800, Math.ceil(budget.max * 2.5));
+  let record_block = await completeEpilogueCall({
+    apiKey: anthropicApiKey, system: recordSystemPrompt, content: recordUserContent,
+    maxTokens: recordCap, retryMaxTokens: recordCap * 2, label: 'record block',
   });
-  if (!recordResp.ok) throw new Error(`Anthropic API error (record block): ${recordResp.status}`);
-  const recordData = await recordResp.json();
-  let record_block = (recordData.content?.[0]?.text?.trim()) || '';
   if (!record_block) throw new Error('No record block text returned');
 
   // Post-generation guard: strip any surviving turn-number patterns from the record block.

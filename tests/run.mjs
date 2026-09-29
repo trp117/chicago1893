@@ -29,6 +29,7 @@ const SUITE = [
   ['graceful degradation on unusable output', 'degradation.test.mjs'],
   ['choice register: compat + fresh read',  'choice-register.test.mjs'],
   ['story-bound forks: opt-in gate',         'storybound.test.mjs'],
+  ['epilogue: no cut-off sentences',         'epilogue.test.mjs'],
 ];
 
 const results = [];
