@@ -1338,7 +1338,81 @@ export function buildClosureFlagDirective(state, scenario) {
   return `⚑ CLOSURE FLAG: ${when}you MUST emit stateChanges: { flags: { "${principal.flag}": true } } in that turn's response. Set it the instant it becomes true and never unset it.`;
 }
 
-export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues, playerRoles = [] }) {
+// The story arc's beats flattened into story order, each carrying the act it sits in. Only
+// beats with an id are included: the id is what the model reports and what at_beat names, so
+// a beat without one can be neither reached nor bound to. Shared by the story-position
+// directive, the beat recorder (StateManager.recordReachedBeats) and the bound due-check.
+export function arcBeats(storyArc) {
+  const out = [];
+  for (const act of (Array.isArray(storyArc?.acts) ? storyArc.acts : [])) {
+    for (const beat of (Array.isArray(act?.beats) ? act.beats : [])) {
+      const id = typeof beat?.id === 'string' ? beat.id.trim() : '';
+      if (!id) continue;
+      out.push({
+        id,
+        description: typeof beat.description === 'string' ? beat.description.trim() : '',
+        actNumber:   act.actNumber,
+        actTitle:    act.title || act.name || '',
+        index:       out.length,
+      });
+    }
+  }
+  return out;
+}
+
+// The furthest point the story has reached: the reached beat latest in arc order, or null.
+// Beats are reported by the model and can arrive out of order or with gaps (a beat that
+// happens off-screen may never be reported), so position is the MAX, not the last reported.
+export function storyPosition(state, storyArc) {
+  const reached = new Set(Array.isArray(state?.reachedBeats) ? state.reachedBeats : []);
+  let furthest = null;
+  for (const b of arcBeats(storyArc)) if (reached.has(b.id)) furthest = b;
+  return furthest;
+}
+
+const STORY_BEAT_LIST_CHARS = 220;
+
+// Standing per-turn directive for a STORY-BOUND fork — the closure-flag pattern above applied
+// to story position. The roster tells the model where the story is (every beat, in order,
+// with the ones already reached ticked and the next one given in full); the MUST line has it
+// report each beat as it happens, the way buildClosureFlagDirective has it set a flag; and
+// StateManager.recordReachedBeats reads the report back onto state.reachedBeats, the way
+// evaluateClosure reads the flag.
+//
+// Returns '' unless storyBoundForkActive AND an arc with beats was loaded — so every session
+// whose fork is not story-bound composes the prompt it composed before. It is rendered into
+// the CLOSURE_FLAG_DIRECTIVE slot beside the closure line rather than into a new template
+// slot, because an empty new slot would still leave a blank line in every prompt.
+export function buildStoryPositionDirective(state, scenario, storyArc) {
+  if (!storyArc || !storyBoundForkActive(state, scenario)) return '';
+  const beats = arcBeats(storyArc);
+  if (!beats.length) return '';
+
+  const reached  = new Set(Array.isArray(state?.reachedBeats) ? state.reachedBeats : []);
+  const furthest = storyPosition(state, storyArc);
+  const next     = beats.find(b => b.index > (furthest ? furthest.index : -1) && !reached.has(b.id)) || null;
+  const clip     = t => (t.length > STORY_BEAT_LIST_CHARS ? `${t.slice(0, STORY_BEAT_LIST_CHARS).trimEnd()}…` : t);
+
+  const lines = ['⚑ STORY POSITION: This session follows an authored arc. Its beats, in story order ([x] = has happened):'];
+  let act = null;
+  for (const b of beats) {
+    if (b.actNumber !== act) {
+      act = b.actNumber;
+      lines.push(`ACT ${b.actNumber}${b.actTitle ? ` — ${b.actTitle}` : ''}`);
+    }
+    lines.push(`  [${reached.has(b.id) ? 'x' : ' '}] ${b.id} — ${clip(b.description)}`);
+  }
+  lines.push(next
+    ? `NEXT BEAT (${next.id}): ${next.description}`
+    : 'Every beat of the arc has happened.');
+  lines.push(
+    '- The story moves through these beats in order. Play toward the next beat; do not narrate a later beat as happening before the earlier ones have.',
+    '- When a beat HAPPENS — in the scene, or the player learns that it has happened — you MUST emit stateChanges: { beats_reached: ["<beat_id>"] } in that turn\'s response, using the id exactly as listed. Report each beat once. Never report a beat that has not happened.',
+  );
+  return lines.join('\n');
+}
+
+export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues, playerRoles = [], storyArc = null }) {
   const location      = getLocationById(state.location, locations);
   const relevantChars = getRelevantCharacters(state, location, characters, locations);
   const charRoutes    = buildCharacterRoutes(characters, locations, state.playerCharacterId);
@@ -1361,9 +1435,12 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // put an authoring note (and the word "reviewed") in front of the narrator. Stripping
   // them also keeps the promise this change was built on — a role with no anchor composes a
   // turn byte-identical to the one it composed before.
+  // reachedBeats (story-bound forks only) goes too: buildStoryPositionDirective already renders
+  // it as the ticked roster, and a session without it has no such key to strip.
   const {
     remainingMinutes, effectiveClosure, effectiveDefiningMoment,
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
+    reachedBeats,
     ...stateRest
   } = state;
   const promptState = {
@@ -1388,7 +1465,10 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     ].filter(Boolean).join('\n\n'))
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
-    .replace('{{CLOSURE_FLAG_DIRECTIVE}}', buildClosureFlagDirective(state, scenario))
+    .replace('{{CLOSURE_FLAG_DIRECTIVE}}', [
+      buildClosureFlagDirective(state, scenario),
+      buildStoryPositionDirective(state, scenario, storyArc),
+    ].filter(Boolean).join('\n\n'))
     .replace('{{ANCHORED_OUTCOME_DIRECTIVE}}', [
       buildAnchoredLocationDirective(state, scenario, locations),
       buildAnchoredOutcomeDirective(state, scenario, characters),

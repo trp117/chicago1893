@@ -18,7 +18,7 @@ import {
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
-import { mergeState, buildInitialState, recordDefiningDecision, loadForkStoryArc } from '../services/StateManager.js';
+import { mergeState, buildInitialState, recordDefiningDecision, loadForkStoryArc, recordReachedBeats } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -990,6 +990,12 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const nextState = mergeState(seededInitial, output, scenario, clues, '', locations);
+      // Story-bound fork only (gameData.storyArc is attached for no other session): the
+      // opening can already reach the arc's first beat.
+      if (gameData.storyArc) {
+        const beats = recordReachedBeats(nextState, output, gameData.storyArc);
+        if (beats.length) console.log('[STORY-BOUND] beats reached: ' + beats.join(', '));
+      }
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
@@ -1428,6 +1434,14 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const prevAct = state.act || 1;
       let nextState = mergeState(state, output, scenario, clues, playerInput, locations);
+
+      // Story-bound fork only: record the beats this turn reached. Read by the NEXT turn's
+      // definingMomentDue, so a fork bound to a beat is put to the player on the turn after
+      // the story arrives at it — the same one-turn lag the closure flag has.
+      if (gameData.storyArc) {
+        const beats = recordReachedBeats(nextState, output, gameData.storyArc);
+        if (beats.length) console.log('[STORY-BOUND] beats reached: ' + beats.join(', '));
+      }
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };

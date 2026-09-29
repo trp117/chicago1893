@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -233,6 +233,37 @@ export function recordDefiningDecision(state, scenario, { definingChoiceId, play
     [momentId]: { option_id: chosen.id, turn: state.turnCount ?? 0, elapsed: state.elapsedMinutes ?? 0 },
   };
   return chosen.id;
+}
+
+// Record the beats the model reports as reached (stateChanges.beats_reached, asked for by
+// buildStoryPositionDirective) onto state.reachedBeats. The reader half of the closure-flag
+// pattern, for story position. Mutates state in place; returns the ids newly recorded.
+//
+// Called ONLY when a story arc was loaded, i.e. only for a story-bound fork — so it is kept
+// out of mergeState, which every session runs, and a session without a bound fork never
+// gains the key. mergeState itself ignores beats_reached, as it ignores any key it does not
+// read.
+//
+// ENGINE-VALIDATED, in the mould of the clue and location guards: an id that is not a beat
+// of this arc is refused and logged rather than recorded, since at_beat matching and the
+// story position both key on it. Accepts a single string as well as an array. Order on state
+// is arrival order; story position is computed from arc order (PromptComposer.storyPosition).
+export function recordReachedBeats(state, modelOutput, storyArc) {
+  if (!storyArc) return [];
+  const reported = modelOutput?.stateChanges?.beats_reached;
+  const list     = Array.isArray(reported) ? reported : (typeof reported === 'string' ? [reported] : []);
+  const known    = new Set(arcBeats(storyArc).map(b => b.id));
+  const prior    = Array.isArray(state.reachedBeats) ? state.reachedBeats : [];
+  const added    = [];
+  for (const raw of list) {
+    const id = typeof raw === 'string' ? raw.trim() : '';
+    if (!id) continue;
+    if (!known.has(id)) { console.warn(`[STORY-BOUND] Rejected beat "${id}" — not a beat of ${storyArc.id}`); continue; }
+    if (prior.includes(id) || added.includes(id)) continue;
+    added.push(id);
+  }
+  state.reachedBeats = [...prior, ...added];
+  return added;
 }
 
 export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '', locations = []) {
