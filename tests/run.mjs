@@ -28,6 +28,7 @@ const SUITE = [
   ['anchor dropdown: scope + None clears',  'anchor-scope.test.mjs'],
   ['graceful degradation on unusable output', 'degradation.test.mjs'],
   ['choice register: compat + fresh read',  'choice-register.test.mjs'],
+  ['story-bound forks: opt-in gate',         'storybound.test.mjs'],
 ];
 
 const results = [];

@@ -18,7 +18,7 @@ import {
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
-import { mergeState, buildInitialState, recordDefiningDecision } from '../services/StateManager.js';
+import { mergeState, buildInitialState, recordDefiningDecision, loadForkStoryArc } from '../services/StateManager.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -69,14 +69,20 @@ const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC
 
 // ── Data helpers ───────────────────────────────────────────────────────────────
 
-async function getScenarioData(repos, scenarioId) {
+// `state` is passed only by /turn, where the playing role's fork is known. The story arc is
+// attached ONLY when that fork is story-bound (loadForkStoryArc); every other session gets
+// exactly the five keys it always got. /start attaches it itself, once the role is resolved.
+async function getScenarioData(repos, scenarioId, { state = null } = {}) {
   const scenario = await repos.scenarios.findById(scenarioId);
   if (!scenario) throw new Error(`Scenario "${scenarioId}" not found.`);
   const playerRoles = repos.scenarios.findPlayerRoles(scenarioId);
   const characters  = repos.characters.findAll().filter(c => (c.scenarioIds || []).includes(scenarioId));
   const locations   = repos.locations.findByScenario(scenarioId);
   const clues       = repos.clues.findByScenario(scenarioId);
-  return { scenario, playerRoles, characters, locations, clues };
+  const data        = { scenario, playerRoles, characters, locations, clues };
+  const storyArc    = state ? loadForkStoryArc(repos, scenario, state) : null;
+  if (storyArc) data.storyArc = storyArc;
+  return data;
 }
 
 // ── JSON extraction ────────────────────────────────────────────────────────────
@@ -722,6 +728,11 @@ export function createGameRouter(repos, config = {}) {
       initialState.narrativeStyle  = narrativeStyle || 'focused';
       initialState.introducedNpcs  = [];
 
+      // Story-bound fork: the arc joins the game data now that the role is known (see
+      // getScenarioData). No key is added for any other session.
+      const startArc = loadForkStoryArc(repos, scenario, initialState);
+      if (startArc) gameData.storyArc = startArc;
+
       // Pre-seed verified technical facts
       if (scenario.technical_facts?.reviewed === true) {
         initialState.technicalFacts = (scenario.technical_facts.facts || []).map(f => ({
@@ -1058,7 +1069,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       console.log(`[TURN] scenario=${state.scenarioId} loc=${state.location} act=${state.act} input="${playerInput.slice(0, 60)}"`);
 
-      const gameData = await getScenarioData(repos, state.scenarioId);
+      const gameData = await getScenarioData(repos, state.scenarioId, { state });
       const { scenario, characters, locations, clues } = gameData;
 
       // -- Defining moment ----------------------------------------------------

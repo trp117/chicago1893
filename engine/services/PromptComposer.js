@@ -1041,6 +1041,30 @@ export function resolveDefiningMomentBlock(state, scenario) {
   return state?.effectiveDefiningMoment ?? scenario?.defining_moment ?? null;
 }
 
+// STORY-BOUND FORKS — THE OPT-IN GATE. A fork that sets at_act (a number) or at_beat (a beat
+// id) is bound to story position instead of the clock; everything Part A adds — loading the
+// story arc into play, the beat roster in the turn prompt, beat tracking on state, the bound
+// due-check — hangs off this one predicate. A block with neither is exactly today's
+// clock-fraction fork, and a session playing one loads no arc, sees no beat prompt, and
+// carries no beat state.
+//
+// fallback_at_elapsed_fraction on its own does NOT opt in: it is the fallback FOR a binding,
+// and without one there is nothing to fall back from.
+//
+// Why this exists: the clock cannot tell the fork where the story is. Joan's relapse fork is
+// written for 28 May, in her cell, and at_elapsed_fraction 0.75 put it to the player while
+// the prose was still in the February public sessions.
+export function isStoryBoundFork(block) {
+  return (typeof block?.at_act === 'number' && Number.isFinite(block.at_act))
+      || (typeof block?.at_beat === 'string' && block.at_beat.trim() !== '');
+}
+
+// The gate as the engine reads it: the flag on AND the playing role's fork story-bound. With
+// the flag off no fork is ever due, so beat tracking would be work with no reader.
+export function storyBoundForkActive(state, scenario) {
+  return DEFINING_MOMENT_ENABLED && isStoryBoundFork(resolveDefiningMomentBlock(state, scenario));
+}
+
 // Pure evaluation of the effective (per-role) closure transition against live state.
 // Returns a serializable closure_state object. Never throws; never mutates.
 // When the flag is off or no closure block is in force, returns

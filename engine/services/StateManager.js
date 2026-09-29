@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -87,6 +87,25 @@ export function resolveAnchoredLocation(role, locations = []) {
     reviewed,
     rationale:    typeof raw.rationale === 'string' ? raw.rationale.trim() : '',
   };
+}
+
+// The scenario's story arc, loaded into PLAY — but only for a session whose fork is
+// story-bound (storyBoundForkActive). Until Part A the arc never reached play at all: the
+// engine ran on a generic clock and the authored acts, beats and dates lived in the admin
+// only. That stays true for every session that does not opt in — this returns null and the
+// caller adds no key, so their game data is exactly what it was.
+//
+// A bound fork whose arc is missing or empty is logged and gets null: its binding can then
+// never be met, and it fires at its fallback fraction instead (definingMomentDue).
+export function loadForkStoryArc(repos, scenario, state) {
+  if (!storyBoundForkActive(state, scenario)) return null;
+  const arcId = scenario?.storyArcIds?.[0];
+  const arc   = arcId && repos?.storyArcs ? repos.storyArcs.findById(arcId) : null;
+  if (!Array.isArray(arc?.acts) || arc.acts.length === 0) {
+    console.warn(`[STORY-BOUND] ${scenario?.id} — the fork is story-bound but story arc "${arcId ?? '(none)'}" has no acts; it will fire at its fallback fraction only.`);
+    return null;
+  }
+  return arc;
 }
 
 export function buildInitialState(scenario, role, locations) {
