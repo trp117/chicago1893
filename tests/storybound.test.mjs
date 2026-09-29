@@ -6,6 +6,8 @@
 //   A1  the scenario's story arc is loaded into play (it never was before)
 //   A2  the beat roster goes into the turn prompt, and the beats the model reports are
 //       recorded on state.reachedBeats (the closure-flag pattern, for story position)
+//   A3  the fork is due when its beat/act is reached — or at its fallback fraction if it
+//       never is — instead of at at_elapsed_fraction
 //
 // THE GATE IS THE POINT. A fork without those fields — every fork stored today — must load no
 // arc and compose exactly the prompt it composed before. Most assertions below are about that
@@ -34,7 +36,8 @@ const { LocationRepository }  = await import(`${ROOT}/engine/repositories/Locati
 const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryArcRepository.js`);
 const { buildInitialState, loadForkStoryArc, recordReachedBeats, mergeState } =
   await import(`${ROOT}/engine/services/StateManager.js`);
-const { isStoryBoundFork, storyBoundForkActive, composeTurnPrompt, arcBeats, storyPosition } =
+const { isStoryBoundFork, storyBoundForkActive, composeTurnPrompt, arcBeats, storyPosition,
+        definingMomentDue, FORK_FALLBACK_FRACTION_DEFAULT } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 
 const store = new JsonFileStore(path.join(REPO_DIR, 'engine/data'));
@@ -209,6 +212,100 @@ const beats  = arcBeats(WG_ARC);
   const gap = stateFor(bound({ at_act: 4 }));
   quiet(() => recordReachedBeats(gap, { stateChanges: { beats_reached: ['the_officers_begin'] } }, WG_ARC));
   check('a skipped-to beat sets position without the earlier ones', storyPosition(gap, WG_ARC)?.actNumber === 3);
+}
+
+head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minute');
+{
+  // The pre-Part-A predicate, restated: due from total * at_elapsed_fraction on.
+  const clockDue = (st, c) => {
+    const b = st.effectiveDefiningMoment;
+    return !!b && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
+      && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * b.at_elapsed_fraction;
+  };
+  let forks = 0, points = 0; const moved = [];
+  for (const c of corpus) {
+    const arc = arcOf(c);
+    for (const role of c.roles.filter(r => r.defining_moment)) {
+      forks++;
+      const total = c.scenario.sessionTargetMinutes || 15;
+      for (let m = 0; m <= total; m += 0.5) {
+        const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
+        st.elapsedMinutes = m; st.remainingMinutes = total - m;
+        const want = clockDue(st, c);
+        if (definingMomentDue(st, c.scenario) !== want || definingMomentDue(st, c.scenario, arc) !== want) moved.push(`${role.id}@${m}`);
+        points++;
+      }
+    }
+  }
+  check(`all ${forks} stored forks: due exactly at at_elapsed_fraction (${points} half-minute points, arc passed or not)`, forks === 15 && moved.length === 0, moved.slice(0, 5).join(', '));
+}
+
+head('A3 WATERGATE — McCord bound at_act:4 fires in Act 4, never in Act 3');
+// A scripted night, two minutes a turn. Each entry: the beats the model reports that turn.
+// The fork is checked at the START of each turn, against the state the previous turns left.
+const NIGHT = [
+  ['wills_completes_his', 'mccord_and_the', 'baldwin_is_at'],   // ends at 2
+  [], ['wills_finds_fresh'], [], ['mccord_registers_a'],        // 4..10   Act 2
+  ['wills_logs_the'], ['three_plainclothes_officers'],          // 12..14  Act 3
+  ['baldwin_transmits_his'], [], ['the_officers_begin'], [],    // 16..22  Act 3, past 0.6 (18 min)
+  ['officers_reach_the'],                                        // 24      Act 4 begins
+];
+const playNight = (role, night, arc = WG_ARC) => {
+  const st = stateFor(role);
+  const total = WG.scenario.sessionTargetMinutes || 15;
+  const log = [];
+  for (const reported of night) {
+    log.push({ elapsed: st.elapsedMinutes, act: storyPosition(st, arc)?.actNumber ?? 0, due: definingMomentDue(st, WG.scenario, arc) });
+    quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: reported } }, arc));
+    st.elapsedMinutes += 2; st.remainingMinutes = total - st.elapsedMinutes;
+  }
+  log.push({ elapsed: st.elapsedMinutes, act: storyPosition(st, arc)?.actNumber ?? 0, due: definingMomentDue(st, WG.scenario, arc) });
+  return { st, log };
+};
+{
+  const total  = WG.scenario.sessionTargetMinutes;
+  const today  = playNight(mccord, NIGHT).log;
+  const firstToday = today.find(t => t.due);
+  check('CONTRAST: unbound (today) McCord fork fires in Act 3, at 0.6', firstToday?.act === 3 && firstToday.elapsed === total * 0.6, JSON.stringify(firstToday));
+
+  const { log } = playNight(bound({ at_act: 4 }), NIGHT);
+  const inAct3 = log.filter(t => t.act === 3);
+  check(`bound: NOT due on any of the ${inAct3.length} Act 3 turns (elapsed ${inAct3.map(t => t.elapsed).join(',')})`, inAct3.length >= 5 && inAct3.every(t => !t.due));
+  check('bound: not due anywhere before Act 4', log.filter(t => t.act < 4).every(t => !t.due));
+  const first = log.find(t => t.due);
+  check('bound: due on the first turn after Act 4 begins, before the fallback', first?.act === 4 && first.elapsed < total * FORK_FALLBACK_FRACTION_DEFAULT, JSON.stringify(first));
+
+  const byBeat = playNight(bound({ at_beat: 'officers_reach_the' }), NIGHT).log.find(t => t.due);
+  check('at_beat officers_reach_the: fires on the same turn', byBeat?.elapsed === first?.elapsed && byBeat?.act === 4);
+  const skip = playNight(bound({ at_beat: 'officers_reach_the' }), [...NIGHT.slice(0, -1), ['mccord_barker_martinez']]).log.find(t => t.due);
+  check('at_beat: a LATER beat reported instead still fires it (the story is past it)', skip?.act === 4 && skip.elapsed === first?.elapsed);
+  const early = playNight(bound({ at_beat: 'the_officers_begin', at_act: 4 }), NIGHT).log.find(t => t.due);
+  check('at_beat wins over at_act when both are set', early?.act === 3);
+
+  // The payload is untouched: the prompt on the due turn carries the same instruction as today.
+  const dueState = playNight(bound({ at_act: 4 }), NIGHT).st;
+  const pDue = promptFor(WG, dueState, WG_ARC);
+  check('the due turn\'s prompt carries the DEFINING MOMENT instruction + authored setup', pDue.includes('⚑ DEFINING MOMENT (THIS TURN)') && pDue.includes(mccord.defining_moment.setup.trim().slice(0, 60)));
+  const act3State = playNight(bound({ at_act: 4 }), NIGHT.slice(0, 9)).st;
+  check('an Act 3 turn past 0.6 carries NO defining-moment instruction', act3State.elapsedMinutes >= total * 0.6 && !promptFor(WG, act3State, WG_ARC).includes('⚑ DEFINING MOMENT'));
+}
+
+head('A3 FALLBACK — a binding never met still gets the fork');
+{
+  const total   = WG.scenario.sessionTargetMinutes;
+  const stalled = [...NIGHT.slice(0, -1), [], [], [], []];           // the story never reaches Act 4
+  const dflt    = playNight(bound({ at_act: 4 }), stalled).log;
+  const f1      = dflt.find(t => t.due);
+  check(`default fallback ${FORK_FALLBACK_FRACTION_DEFAULT}: fires at the first turn ≥ ${total * FORK_FALLBACK_FRACTION_DEFAULT} min, still in Act 3`, f1?.act === 3 && f1.elapsed >= total * FORK_FALLBACK_FRACTION_DEFAULT && !dflt.some(t => t.due && t.elapsed < total * FORK_FALLBACK_FRACTION_DEFAULT), JSON.stringify(f1));
+  const custom = playNight(bound({ at_act: 4, fallback_at_elapsed_fraction: 0.9 }), stalled).log.find(t => t.due);
+  check('authored fallback 0.9: fires at the first turn ≥ 27 min (turns land on even minutes)', custom?.elapsed >= total * 0.9 && custom.elapsed < total * 0.9 + 2, JSON.stringify(custom));
+  const unknownBeat = playNight(bound({ at_beat: 'no_such_beat' }), NIGHT.concat([[], []])).log.find(t => t.due);
+  check('an at_beat naming no beat of the arc waits for the fallback', unknownBeat?.elapsed >= total * FORK_FALLBACK_FRACTION_DEFAULT, JSON.stringify(unknownBeat));
+  const noArc = playNight(bound({ at_act: 4 }), NIGHT.concat([[], []]), null).log.find(t => t.due);
+  check('a bound fork whose arc did not load fires at the fallback only', noArc?.elapsed >= total * FORK_FALLBACK_FRACTION_DEFAULT, JSON.stringify(noArc));
+  const st = stateFor(bound({ at_act: 4 }));
+  st.elapsedMinutes = total; st.definingMomentPresented = true;
+  check('the presented latch still wins — a bound fork is asked once', definingMomentDue(st, WG.scenario, WG_ARC) === false);
 }
 
 console.log(fails ? `\n${fails} assertion(s) FAILED.` : '\nAll story-bound assertions passed.');

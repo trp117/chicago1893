@@ -1091,7 +1091,9 @@ Do not open with the historical context. Open inside the character's body. Let t
       // (b) Whether THIS turn presents the fork. Read from the same state the prompt is
       //     composed from, so the injected instruction and the options handed to the
       //     client can never disagree about whether the moment is happening.
-      const forkDue       = definingMomentDue(state, scenario);
+      // gameData.storyArc is present only for a story-bound fork (A1), and is the same arc the
+      // prompt is composed against, so the instruction and the injected options still agree.
+      const forkDue       = definingMomentDue(state, scenario, gameData.storyArc ?? null);
       const definingBlock = forkDue ? resolveDefiningMomentBlock(state, scenario) : null;
       // DRIFT INSTRUMENTATION — measurement only. Nothing reads these values; forkDue is
       // unchanged. `loc` is where the PREVIOUS turn left the player (reliable since the

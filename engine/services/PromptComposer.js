@@ -1065,6 +1065,28 @@ export function storyBoundForkActive(state, scenario) {
   return DEFINING_MOMENT_ENABLED && isStoryBoundFork(resolveDefiningMomentBlock(state, scenario));
 }
 
+// When a story-bound fork fires if its beat/act is never reached, for a block that does not
+// set fallback_at_elapsed_fraction. 0.85 sits inside 'final' (getArcPosition: final >= 0.80)
+// and leaves a 30-minute session four and a half minutes — two or three turns — to answer
+// the fork and close on it. Later risks the fork arriving on a turn the FINAL-TURN backstop
+// already owns (buildDefiningMomentInstruction yields at remaining <= 0); earlier would cut
+// into the stretch the binding exists to wait through.
+export const FORK_FALLBACK_FRACTION_DEFAULT = 0.85;
+
+// Whether a story-bound fork's binding has been met by the beats reached so far. at_beat
+// wins when both are set. An at_beat that names no beat of the arc, or an arc that was not
+// loaded, can never be met — the fork then waits for its fallback.
+function storyBindingReached(block, state, storyArc) {
+  const pos = storyPosition(state, storyArc);
+  if (!pos) return false;
+  const atBeat = typeof block.at_beat === 'string' ? block.at_beat.trim() : '';
+  if (atBeat) {
+    const target = arcBeats(storyArc).find(b => b.id === atBeat);
+    return !!target && pos.index >= target.index;
+  }
+  return typeof block.at_act === 'number' && pos.actNumber >= block.at_act;
+}
+
 // Pure evaluation of the effective (per-role) closure transition against live state.
 // Returns a serializable closure_state object. Never throws; never mutates.
 // When the flag is off or no closure block is in force, returns
@@ -1231,7 +1253,19 @@ export function closureShouldClose(state, scenario) {
 // Returns false rather than guessing whenever the block is unusable: no
 // at_elapsed_fraction to compare against, or no moment id to record a decision under
 // (a fork whose choice can never be recorded would be due forever).
-export function definingMomentDue(state, scenario) {
+//
+// STORY-BOUND (isStoryBoundFork): the fork waits for story position instead of the clock —
+// due once at_beat has been reached (or any beat after it: the story is past it), or, with
+// no at_beat, once act at_act has begun (a beat of that act or a later one has been
+// reached). The act is the STORY act from reached beats, never state.act: that is the
+// clock's act, capped at 3, and would put a Joan fork back on the clock it is escaping.
+// If the binding is never met, the fork fires anyway at fallback_at_elapsed_fraction
+// (default FORK_FALLBACK_FRACTION_DEFAULT) so no session ends without its defining moment.
+// at_elapsed_fraction is not read for a bound fork. storyArc is the arc loaded for it
+// (loadForkStoryArc); without one the binding cannot be met and only the fallback fires.
+//
+// A fork with neither at_act nor at_beat takes the clock path below, unchanged.
+export function definingMomentDue(state, scenario, storyArc = null) {
   const block = resolveDefiningMomentBlock(state, scenario);
   if (!DEFINING_MOMENT_ENABLED || !block) return false;
   if (state?.definingMomentPresented) return false;
@@ -1239,6 +1273,14 @@ export function definingMomentDue(state, scenario) {
   const momentId = block.principal_transition?.moment;
   if (!momentId) return false;
   if (state?.decisions?.[momentId] != null) return false;
+
+  if (isStoryBoundFork(block)) {
+    if (storyBindingReached(block, state, storyArc)) return true;
+    const fb = typeof block.fallback_at_elapsed_fraction === 'number' && Number.isFinite(block.fallback_at_elapsed_fraction)
+      ? block.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
+    const total = scenario?.sessionTargetMinutes || 15;
+    return (state?.elapsedMinutes ?? 0) >= total * fb;
+  }
 
   const fraction = block.at_elapsed_fraction;
   if (typeof fraction !== 'number') return false;
@@ -1256,7 +1298,7 @@ export function checkEndingReadiness(state, scenario) {
   };
 }
 
-function buildClosingInstruction(state, scenario) {
+function buildClosingInstruction(state, scenario, storyArc = null) {
   const remaining   = state.remainingMinutes ?? 0;
   const turnsAtZero = state.turnsAtZero || 0;
 
@@ -1278,7 +1320,7 @@ function buildClosingInstruction(state, scenario) {
   //       FINAL TURN still always wins, and the fork yields to it rather than holding
   //       a session open past its end. A no-op while DEFINING_MOMENT_ENABLED is off,
   //       since definingMomentDue is false throughout.
-  if (definingMomentDue(state, scenario)) return '';
+  if (definingMomentDue(state, scenario, storyArc)) return '';
 
   // (2) Beat-aware close — the player has reached the arc-resolving transition and
   //     is past the elapsed floor. Ranks ABOVE the soft <=5 land, BELOW the <=0
@@ -1308,9 +1350,9 @@ function buildClosingInstruction(state, scenario) {
 //
 // This sets up the choice ONLY. It renders no options — Step 6 presents them — and it
 // forbids the model from resolving what it has just made unavoidable.
-export function buildDefiningMomentInstruction(state, scenario) {
+export function buildDefiningMomentInstruction(state, scenario, storyArc = null) {
   if ((state?.remainingMinutes ?? 0) <= 0) return '';
-  if (!definingMomentDue(state, scenario)) return '';
+  if (!definingMomentDue(state, scenario, storyArc)) return '';
   const block = resolveDefiningMomentBlock(state, scenario);
   const setup = typeof block?.setup === 'string' ? block.setup.trim() : '';
   return [
@@ -1473,7 +1515,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
       buildAnchoredLocationDirective(state, scenario, locations),
       buildAnchoredOutcomeDirective(state, scenario, characters),
     ].filter(Boolean).join('\n\n'))
-    .replace('{{DEFINING_MOMENT_INSTRUCTION}}', buildDefiningMomentInstruction(state, scenario))
-    .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario))
+    .replace('{{DEFINING_MOMENT_INSTRUCTION}}', buildDefiningMomentInstruction(state, scenario, storyArc))
+    .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario, storyArc))
     .replace('{{PLAYER_INPUT}}',           resolvedInput);
 }
