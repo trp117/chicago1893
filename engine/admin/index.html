@@ -2691,6 +2691,62 @@ function renderDefiningMomentOptionRow(i, j, o) {
   </div>`;
 }
 
+// STORY BINDING — when the fork fires, by story position instead of the clock. Mirrors
+// PromptComposer.isStoryBoundFork / definingMomentDue: set "Fires in act" or "After beat"
+// and the fork waits for the story to get there (at_elapsed_fraction is then ignored);
+// leave both blank and it fires on the clock exactly as before. The fallback is when a bound
+// fork fires anyway if the story never arrives; blank means the engine default (0.85).
+// Blank fields post as null / '' and the server's normalizeForkBinding drops the key, so
+// opening and saving an unbound role writes nothing new to its file.
+//
+// The act and beat lists come from this scenario's story arc. A stored at_beat the arc no
+// longer has is kept as a flagged option rather than silently dropped on the next save.
+function renderForkBindingFields(i, dm, data) {
+  const acts   = Array.isArray(data?.storyArc?.acts) ? data.storyArc.acts : [];
+  const atBeat = typeof dm.at_beat === 'string' ? dm.at_beat.trim() : '';
+  const clip   = (t, n) => { t = String(t || ''); return t.length > n ? `${t.slice(0, n).trimEnd()}…` : t; };
+  const actOpts = acts.map(a => `<option value="${esc(String(a.actNumber))}"${dm.at_act === a.actNumber ? ' selected' : ''}>Act ${esc(String(a.actNumber))} — ${esc(a.title || a.name || '')}</option>`).join('');
+  let beatKnown = false;
+  const beatGroups = acts.map(a => {
+    const beats = (a.beats || []).filter(b => b && typeof b.id === 'string' && b.id.trim());
+    if (!beats.length) return '';
+    return `<optgroup label="Act ${esc(String(a.actNumber))} — ${esc(a.title || a.name || '')}">${beats.map(b => {
+      const sel = b.id === atBeat; if (sel) beatKnown = true;
+      return `<option value="${esc(b.id)}"${sel ? ' selected' : ''}>${esc(b.id)} — ${esc(clip(b.description, 70))}</option>`;
+    }).join('')}</optgroup>`;
+  }).join('');
+  const orphan = atBeat && !beatKnown
+    ? `<option value="${esc(atBeat)}" selected>⚠ ${esc(atBeat)} — not a beat of this arc (fork will fire at its fallback)</option>` : '';
+  const actOrphan = typeof dm.at_act === 'number' && !acts.some(a => a.actNumber === dm.at_act)
+    ? `<option value="${esc(String(dm.at_act))}" selected>⚠ Act ${esc(String(dm.at_act))} — not an act of this arc</option>` : '';
+  const selStyle = 'width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px';
+  const noArc = acts.length ? '' : '<div style="font-size:11px;color:#b45309;margin-top:6px">This scenario has no story arc loaded here, so there are no acts or beats to bind to. A fork bound without one fires at its fallback only.</div>';
+  return `
+      <div style="margin:0 0 12px;padding:10px 12px;border:1px solid var(--border);border-radius:6px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:6px">Story binding <span style="font-weight:400;text-transform:none">(optional — blank = fire on the clock, as now)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 2fr 130px;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Fires in act</div>
+            <select class="dm-at-act-input" data-path="playerRoles.${i}.defining_moment.at_act" data-type="number" style="${selStyle}">
+              <option value="">—</option>${actOrphan}${actOpts}
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">After beat <span style="opacity:.7">(wins over act)</span></div>
+            <select class="dm-at-beat-input" data-path="playerRoles.${i}.defining_moment.at_beat" style="${selStyle}">
+              <option value="">—</option>${orphan}${beatGroups}
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Fallback fraction</div>
+            <input type="text" class="dm-fallback-input" data-path="playerRoles.${i}.defining_moment.fallback_at_elapsed_fraction" data-type="number" value="${typeof dm.fallback_at_elapsed_fraction === 'number' ? dm.fallback_at_elapsed_fraction : ''}" placeholder="0.85" style="${selStyle}">
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-soft);margin-top:6px">Bound: the fork waits until the story reaches that act (any of its beats) or that beat (or a later one), as the narrator reports beats. If it never does, it fires at the fallback fraction of the session. <code>at_elapsed_fraction</code> is ignored while bound.</div>
+        ${noArc}
+      </div>`;
+}
+
 function renderDefiningMomentSection(r, i, data) {
   const dm      = r.defining_moment;
   const state   = definingMomentState(dm);
@@ -2743,6 +2799,7 @@ function renderDefiningMomentSection(r, i, data) {
     </div>`);
   } else {
     const moment    = dm.principal_transition?.moment ?? dm.id;
+    const bindingOn = typeof dm.at_act === 'number' || (typeof dm.at_beat === 'string' && dm.at_beat.trim() !== '');
     const setupW    = dmWords(dm.setup);
     const lift      = entry ? dmLongestLift(entry, dm.setup) : null;
     const optCounts = (dm.options || []).map(o => dmWords(o.text));
@@ -2757,7 +2814,7 @@ function renderDefiningMomentSection(r, i, data) {
     body = `
       ${declineHtml}
       <div style="margin:0 0 14px;padding:10px 12px;background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-soft)">
-        Presented once, partway through the session, at <code>at_elapsed_fraction</code> of the session length. Costs no game time. The chosen option is recorded and reflected back by the closing prose and the epilogue.
+        Presented once, partway through the session — at <code>at_elapsed_fraction</code> of the session length, or, if it is <strong>story-bound</strong> below, once the story reaches its act or beat. Costs no game time. The chosen option is recorded and reflected back by the closing prose and the epilogue.
         <strong style="color:var(--text)">This block is inert unless <code>DEFINING_MOMENT_ENABLED=true</code> on the server.</strong>
       </div>
 
@@ -2780,9 +2837,11 @@ function renderDefiningMomentSection(r, i, data) {
         <div>
           <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">at_elapsed_fraction</div>
           <input type="text" class="dm-fraction-input" data-path="playerRoles.${i}.defining_moment.at_elapsed_fraction" data-type="number" value="${dm.at_elapsed_fraction ?? 0.6}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
-          <div style="font-size:11px;color:var(--text-soft);margin-top:3px">0.6 = 60% in</div>
+          <div style="font-size:11px;color:var(--text-soft);margin-top:3px">0.6 = 60% in${bindingOn ? ' · <strong>ignored — story-bound</strong>' : ''}</div>
         </div>
       </div>
+
+      ${renderForkBindingFields(i, dm, data)}
 
       <div style="margin-bottom:12px">
         <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Setup — the authored prose the player reads at the fork</div>

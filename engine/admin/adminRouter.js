@@ -187,6 +187,35 @@ function hasRealDefiningMoment(block) {
     && Array.isArray(block.options) && block.options.length > 0);
 }
 
+// STORY BINDING on a defining_moment — at_act / at_beat / fallback_at_elapsed_fraction, the
+// opt-in PromptComposer.isStoryBoundFork keys on. The editor posts every field, blank ones as
+// null or '', so this drops a blank key outright: an unbound role saved from the editor must
+// write exactly the file it had, and a stray `at_act: null` would be a new key on every role.
+// Values are coerced to the types the engine reads (the gate is strict: a STRING at_act does
+// not opt in), and an invalid value is dropped with a warning rather than stored inert.
+const FORK_BINDING_KEYS = ['at_act', 'at_beat', 'fallback_at_elapsed_fraction'];
+function normalizeForkBinding(block, roleId = '') {
+  if (!block || typeof block !== 'object') return block;
+  const blank = v => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+  const drop  = (k, why) => {
+    if (!blank(block[k])) console.warn(`[DEFINING-MOMENT] ${roleId} — dropped ${k}=${JSON.stringify(block[k])}: ${why}`);
+    delete block[k];
+  };
+
+  const act = blank(block.at_act) ? NaN : Number(block.at_act);
+  if (Number.isInteger(act) && act >= 1) block.at_act = act;
+  else drop('at_act', 'must be a whole act number >= 1');
+
+  const beat = typeof block.at_beat === 'string' ? block.at_beat.trim() : '';
+  if (beat) block.at_beat = beat;
+  else drop('at_beat', 'must be a beat id');
+
+  const fb = blank(block.fallback_at_elapsed_fraction) ? NaN : Number(block.fallback_at_elapsed_fraction);
+  if (Number.isFinite(fb) && fb > 0 && fb <= 1) block.fallback_at_elapsed_fraction = fb;
+  else drop('fallback_at_elapsed_fraction', 'must be a fraction in (0, 1]');
+  return block;
+}
+
 // Whether REPLACING this stored block destroys work nothing else carries. Server-side twin of
 // definingMomentAtRisk in index.html; both must agree or the editor will offer a button the
 // API then refuses. Hand-authored blocks are answer keys; a REVIEWED generated block is
@@ -493,6 +522,8 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredArchetype(shim, role);
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
+  // After the defining-moment guard, so a block restored from storage is normalized too.
+  if (role.defining_moment) normalizeForkBinding(role.defining_moment, role.id);
   return role;
 }
 
@@ -2585,6 +2616,8 @@ export function createAdminRouter(repos, config = {}) {
       // gameRouter reads to make the fork cost no clock, and at_elapsed_fraction is fixed
       // by the system. Stamps go LAST so a model that emitted generated/reviewed of its own
       // cannot pre-mark its own draft as reviewed.
+      // The STORY BINDING is the author's timing choice, not prose: it is carried over from
+      // the outgoing block, and anything the model emitted for it is discarded.
       const defining_moment = {
         ...result,
         time_advance:        0,
@@ -2592,6 +2625,11 @@ export function createAdminRouter(repos, config = {}) {
         generated: true,
         reviewed:  false,
       };
+      for (const k of FORK_BINDING_KEYS) {
+        delete defining_moment[k];
+        if (role.defining_moment?.[k] !== undefined) defining_moment[k] = role.defining_moment[k];
+      }
+      normalizeForkBinding(defining_moment, role.id);
 
       // BACK UP WHAT THIS WRITE DESTROYS, immediately before destroying it. Placed here and
       // not earlier on purpose: the model may decline, or emit a block that fails validation,
@@ -4907,7 +4945,7 @@ Return only the scene description. No preamble, no closing remarks.`,
 // Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
 export { stripEmptyEndingNotes, preserveStoredEndingNotes };
 // Same, for the defining_moment guard and the three-guard composer the save paths call.
-export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks };
+export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks, normalizeForkBinding };
 // Same, for the archetype guard. The property's own accessors (ROLE_ARCHETYPES,
 // isRoleArchetype, roleArchetype) are exported at their definition — those ARE app code.
 export { preserveStoredArchetype };

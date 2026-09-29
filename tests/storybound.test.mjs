@@ -308,5 +308,73 @@ head('A3 FALLBACK — a binding never met still gets the fork');
   check('the presented latch still wins — a bound fork is asked once', definingMomentDue(st, WG.scenario, WG_ARC) === false);
 }
 
+head('ADMIN — the editor\'s binding fields, and the save guard behind them');
+{
+  // The real admin page script in a VM (the anchor-scope.test harness), the real
+  // collectEdits, and the real adminRouter save guard. Nothing is saved.
+  const { JSDOM } = await import('jsdom');
+  const vm        = await import('vm');
+  const admin     = await import(`${ROOT}/engine/admin/adminRouter.js`);
+  const html   = fs.readFileSync(path.join(REPO_DIR, 'engine/admin/index.html'), 'utf8');
+  const script = /<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/i.exec(html)[1];
+  const noop   = () => {};
+  const stubEl = new Proxy({}, { get: (t, k) => (k === 'value' ? '' : k === 'style' ? {} : k === 'classList' ? { add: noop, remove: noop } : noop) });
+  const ctx = vm.createContext({
+    document: { addEventListener: noop, getElementById: () => stubEl, querySelector: () => stubEl, querySelectorAll: () => [], createElement: () => stubEl, body: stubEl, documentElement: stubEl, head: stubEl },
+    window: {}, localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
+    location: { search: '', href: '', pathname: '/admin/' }, navigator: { clipboard: {} },
+    fetch: async () => ({ ok: true, json: async () => ({}) }), console: { ...console, log: noop, warn: noop }, setTimeout, clearTimeout,
+    alert: noop, confirm: () => false, prompt: () => null, addEventListener: noop, removeEventListener: noop,
+    URLSearchParams, JSON, Math, Date, Object, Array, String, Number, Boolean, Set, Map, RegExp,
+    Error, Promise, parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent,
+  });
+  ctx.window = ctx;
+  try { vm.runInContext(script, ctx, { filename: 'index.html<script>' }); } catch { /* builders may still be defined */ }
+  const { renderDefiningMomentSection, collectEdits } = ctx;
+  check('admin builders reachable', typeof renderDefiningMomentSection === 'function' && typeof collectEdits === 'function');
+
+  // Render McCord's section, let the test drive the controls, collect, then run the guard.
+  const edit = (role, drive = () => {}) => {
+    const data = { scenario: WG.scenario, storyArc: WG_ARC, playerRoles: [structuredClone(role)] };
+    const dom  = new JSDOM(`<div id="c">${renderDefiningMomentSection(data.playerRoles[0], 0, data)}</div>`);
+    const c    = dom.window.document.getElementById('c');
+    drive(c);
+    collectEdits(c, data);
+    return { dom: c, saved: quiet(() => admin.preserveStoredRoleBlocks(repos, data.playerRoles[0])) };
+  };
+
+  const { dom, saved } = edit(mccord);
+  const actSel  = dom.querySelector('.dm-at-act-input');
+  const beatSel = dom.querySelector('.dm-at-beat-input');
+  check('"Fires in act" offers the arc\'s 4 acts plus blank', actSel?.options.length === 5 && actSel.options[4].textContent.includes('Suite 600, 2:10 AM'));
+  check('"After beat" offers all 15 beat ids plus blank', beatSel?.querySelectorAll('option').length === 16);
+  check('unbound role: every binding control renders blank', actSel.value === '' && beatSel.value === '' && dom.querySelector('.dm-fallback-input').value === '');
+  const bindingKeys = Object.keys(saved.defining_moment).filter(k => ['at_act', 'at_beat', 'fallback_at_elapsed_fraction'].includes(k));
+  check('opening and saving an unbound role adds NO binding key to its block', bindingKeys.length === 0, bindingKeys.join(','));
+  check('...and the block is otherwise what was stored', JSON.stringify(saved.defining_moment) === JSON.stringify(mccord.defining_moment));
+
+  const { saved: s2 } = edit(mccord, c => {
+    c.querySelector('.dm-at-act-input').value = '4';
+    c.querySelector('.dm-at-beat-input').value = 'officers_reach_the';
+    c.querySelector('.dm-fallback-input').value = '0.9';
+  });
+  const d2 = s2.defining_moment;
+  check('binding set in the editor saves with engine types', d2.at_act === 4 && d2.at_beat === 'officers_reach_the' && d2.fallback_at_elapsed_fraction === 0.9, JSON.stringify({ a: d2.at_act, b: d2.at_beat, f: d2.fallback_at_elapsed_fraction }));
+  check('...and the saved block opts in to the engine gate', isStoryBoundFork(d2));
+
+  const { dom: d3 } = edit(bound({ at_act: 4, at_beat: 'gone_beat' }));
+  check('a stored at_beat the arc lacks renders as a flagged, selected option', d3.querySelector('.dm-at-beat-input').value === 'gone_beat' && d3.textContent.includes('not a beat of this arc'));
+  check('a bound block shows at_elapsed_fraction as ignored', d3.textContent.includes('ignored — story-bound'));
+
+  const n = b => quiet(() => admin.normalizeForkBinding({ ...b }));
+  check('normalize: "4" → 4, " beat " → "beat", "0.9" → 0.9', JSON.stringify(n({ at_act: '4', at_beat: ' beat ', fallback_at_elapsed_fraction: '0.9' })) === '{"at_act":4,"at_beat":"beat","fallback_at_elapsed_fraction":0.9}');
+  check('normalize: blanks, 0, 3.5, and fallback 1.5 / 0 are all dropped', JSON.stringify(n({ at_act: 3.5, at_beat: '', fallback_at_elapsed_fraction: 1.5 })) === '{}' && JSON.stringify(n({ at_act: 0, fallback_at_elapsed_fraction: 0 })) === '{}' && JSON.stringify(n({ at_act: null, at_beat: null, fallback_at_elapsed_fraction: null })) === '{}');
+  check('normalize: a block with no binding keys is untouched', JSON.stringify(n(mccord.defining_moment)) === JSON.stringify(mccord.defining_moment));
+  const movedBlocks = corpus.flatMap(c => c.roles.filter(r => r.defining_moment))
+    .filter(r => JSON.stringify(quiet(() => admin.preserveStoredRoleBlocks(repos, structuredClone(r))).defining_moment) !== JSON.stringify(r.defining_moment))
+    .map(r => r.id);
+  check('the save guard leaves all 15 stored defining_moment blocks byte-identical', movedBlocks.length === 0, movedBlocks.join(', '));
+}
+
 console.log(fails ? `\n${fails} assertion(s) FAILED.` : '\nAll story-bound assertions passed.');
 process.exit(fails ? 1 : 0);
