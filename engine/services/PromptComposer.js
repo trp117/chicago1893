@@ -1289,6 +1289,41 @@ export function definingMomentDue(state, scenario, storyArc = null) {
   return elapsed >= total * fraction;
 }
 
+// WHY the fork is or is not due — for the transcript diagnostics (ForkDiagnostics.js), never
+// for timing. `due` IS definingMomentDue's verdict on the same inputs; everything else explains
+// it: whether the binding was met, where the fallback sits, how far the story has got, and
+// whether the fork was already put or answered. `via` says which rule made it due: 'binding',
+// 'fallback' (a bound fork whose binding was not met) or 'clock' (an unbound fork).
+export function forkTimingStatus(state, scenario, storyArc = null) {
+  const block    = resolveDefiningMomentBlock(state, scenario);
+  const due      = definingMomentDue(state, scenario, storyArc);
+  const bound    = isStoryBoundFork(block);
+  const total    = scenario?.sessionTargetMinutes || 15;
+  const fbSet    = typeof block?.fallback_at_elapsed_fraction === 'number' && Number.isFinite(block.fallback_at_elapsed_fraction);
+  const fb       = fbSet ? block.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
+  const met      = bound && storyBindingReached(block, state, storyArc);
+  const momentId = block?.principal_transition?.moment ?? null;
+  const decided  = momentId ? state?.decisions?.[momentId] : null;
+  const pos      = storyPosition(state, storyArc);
+  return {
+    due,
+    via:              !due ? null : bound ? (met ? 'binding' : 'fallback') : 'clock',
+    bound,
+    at_act:           bound && typeof block.at_act === 'number' ? block.at_act : null,
+    at_beat:          bound && typeof block.at_beat === 'string' && block.at_beat.trim() ? block.at_beat.trim() : null,
+    bindingMet:       met,
+    fallbackFraction: bound ? fb : null,
+    fallbackDefault:  bound ? !fbSet : null,
+    fallbackMinutes:  bound ? total * fb : null,
+    totalMinutes:     total,
+    elapsed:          state?.elapsedMinutes ?? 0,
+    storyAct:         pos ? pos.actNumber : null,
+    furthestBeat:     pos ? pos.id : null,
+    presented:        !!state?.definingMomentPresented,
+    decision:         decided == null ? null : (typeof decided === 'string' ? decided : (decided.option_id ?? null)),
+  };
+}
+
 export function checkEndingReadiness(state, scenario) {
   const closure = evaluateClosure(state, scenario);
   return {

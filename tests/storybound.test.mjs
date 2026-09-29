@@ -376,5 +376,107 @@ head('ADMIN — the editor\'s binding fields, and the save guard behind them');
   check('the save guard leaves all 15 stored defining_moment blocks byte-identical', movedBlocks.length === 0, movedBlocks.join(', '));
 }
 
+head('TRANSCRIPT DIAGNOSTICS — durable beat/fork evidence, invisible to the closing model');
+{
+  const { forkTimingStatus } = await import(`${ROOT}/engine/services/PromptComposer.js`);
+  const { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, parseForkDiagLines, DIAG_PREFIX } =
+    await import(`${ROOT}/engine/services/ForkDiagnostics.js`);
+
+  // forkTimingStatus explains definingMomentDue; it must never disagree with it.
+  let pts = 0; const disagree = [];
+  for (const c of corpus) {
+    const arc = arcOf(c);
+    for (const role of c.roles.filter(r => r.defining_moment)) {
+      const total = c.scenario.sessionTargetMinutes || 15;
+      for (let m = 0; m <= total; m += 1) {
+        const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
+        st.elapsedMinutes = m;
+        const s = forkTimingStatus(st, c.scenario, arc);
+        if (s.due !== definingMomentDue(st, c.scenario, arc) || (s.due && s.via !== 'clock')) disagree.push(`${role.id}@${m}`);
+        pts++;
+      }
+    }
+  }
+  check(`forkTimingStatus.due === definingMomentDue on ${pts} stored-fork points (all via 'clock')`, disagree.length === 0, disagree.slice(0, 5).join(', '));
+
+  // A transcript written exactly as gameRouter writes one (the /start header's tail, then each
+  // /turn chunk), with or without the diagnostic lines — so the strip can be checked for exact
+  // restoration. The fork is presented the way gameRouter presents it: verdict from the state
+  // the turn starts from, 0 minutes on the fork turn, the latch set, the answer recorded next turn.
+  const simulate = (role, night, { diag, answer = 'close_the_housing', arc = WG_ARC } = {}) => {
+    let st = stateFor(role);
+    const total = WG.scenario.sessionTargetMinutes;
+    const parts = [];
+    const opening = { stateChanges: { beats_reached: night[0] } };
+    const next0 = structuredClone(st);
+    const nb0 = quiet(() => recordReachedBeats(next0, opening, arc));
+    parts.push(['## Session\n\n', 'Opening narrative.', '',
+      ...(diag ? [forkDiagTurnLine({ turn: 0, opening: true, state: st, nextState: next0, scenario: WG.scenario, storyArc: arc, output: opening, newBeats: nb0 }), ''] : []),
+      '---', ''].join('\n'));
+    st = next0;
+    let pendingFork = false;
+    for (let i = 1; i < night.length; i++) {
+      const out = { stateChanges: night[i] === undefined ? {} : { beats_reached: night[i] } };
+      let decided = null;
+      if (pendingFork && answer) { st.decisions = { mccord_defining_choice: { option_id: answer, turn: st.turnCount, elapsed: st.elapsedMinutes } }; decided = answer; pendingFork = false; }
+      const due  = definingMomentDue(st, WG.scenario, arc);
+      const next = structuredClone(st);
+      next.elapsedMinutes += due ? 0 : 2; next.remainingMinutes = total - next.elapsedMinutes; next.turnCount = (st.turnCount || 0) + 1;
+      const nb = quiet(() => recordReachedBeats(next, out, arc));
+      if (due) { next.definingMomentPresented = true; pendingFork = true; }
+      parts.push([`**Player:** input ${i}`, '', `> Act ${next.act} · Suite 600 · ${next.remainingMinutes} min remaining`, '', `Narrative ${i}.`, '',
+        ...(diag ? [forkDiagTurnLine({ turn: next.turnCount, state: st, nextState: next, scenario: WG.scenario, storyArc: arc, output: out, newBeats: nb, decisionRecorded: decided }), ''] : []),
+        '---', ''].join('\n'));
+      st = next;
+    }
+    // /closing-prose: `lines` ends with '' and the summary is pushed onto it before the join.
+    const text    = parts.join('');
+    const closing = ['', '## Closing Prose', '', 'Closing.', '', '---', '', '## Historical Record', '', 'Record.', ''];
+    const summary = diag ? forkDiagSummaryLines({ transcript: text, sessionState: st, scenario: WG.scenario, storyArc: arc }) : [];
+    return { text: text + [...closing, ...(summary.length ? [...summary, ''] : [])].join('\n'), state: st, plain: text + closing.join('\n') };
+  };
+
+  // A McCord-like night: beats through Act 3, never Act 4, one turn with a bad id, one with none.
+  const LIVE = [
+    ['wills_completes_his', 'mccord_and_the'], [], ['baldwin_is_at'], undefined, ['wills_finds_fresh', 'the_arrest'],
+    [], ['mccord_registers_a'], ['wills_logs_the'], [], ['three_plainclothes_officers'], [], ['the_officers_begin'],
+    [], [], [], [],
+  ];
+  const withDiag = simulate(bound({ at_act: 4 }), LIVE, { diag: true });
+  const without  = simulate(bound({ at_act: 4 }), LIVE, { diag: false });
+  check('strip(diagnosed transcript) === the transcript without diagnostics, exactly', stripForkDiagnostics(withDiag.text) === without.plain);
+  check('every diagnostic line carries the DIAG prefix', withDiag.text.split('\n').filter(l => l.includes('⚑ DIAG')).every(l => l.startsWith(DIAG_PREFIX)));
+
+  const lines = withDiag.text.split('\n').filter(l => l.startsWith(DIAG_PREFIX + 'turn'));
+  check(`one diagnostic line per turn (${LIVE.length})`, lines.length === LIVE.length);
+  check('turn 0 states the binding and the loaded arc', lines[0].includes('binding: at_act 4 · fallback 0.85 (default) = 25.5 of 30 min') && lines[0].includes('arc: watergate_1972_part1_breach_main_arc (15 beats)'));
+  check('a turn with no beats_reached key reads "(absent)"', lines[3].includes('beats_reached: (absent)'), lines[3]);
+  check('a turn with an empty list reads "[]"', lines[1].includes('beats_reached: [] · new: []'), lines[1]);
+  check('a bad id is shown as rejected', lines[4].includes('rejected: [the_arrest]') && lines[4].includes('new: [wills_finds_fresh]'), lines[4]);
+  const forkLine = lines.find(l => l.includes('PRESENTED'));
+  check('the fork line says it fired via fallback, and why', /fork: PRESENTED this turn via fallback \(26 ≥ 25\.5 min; binding unmet\)/.test(forkLine || ''), forkLine);
+  check('the answer is recorded on the following turn', lines.some(l => l.includes('fork: answered this turn: close_the_housing')));
+
+  const sum = withDiag.text.split('\n').filter(l => l.startsWith(DIAG_PREFIX) && !l.startsWith(DIAG_PREFIX + 'turn'));
+  check('summary: beats listed with act, turn and clock', sum.some(l => l.startsWith(`${DIAG_PREFIX}beats reached (8): wills_completes_his [Act 1] (turn 0, 0 min)`) && l.includes('the_officers_begin [Act 3]')), sum.find(l => l.includes('beats reached')));
+  check('summary: position at close is Act 3 (never reached Act 4)', sum.some(l => l.includes('position at close: Act 3 (the_officers_begin)')));
+  check('summary: fork presented via fallback', sum.some(l => /fork: presented turn \d+ at 26 min via fallback/.test(l)));
+  check('summary: decision with turn and clock', sum.some(l => /decision: close_the_housing \(turn \d+, 26 min\)/.test(l)));
+
+  const bindingNight = simulate(bound({ at_act: 4 }), [...LIVE.slice(0, 12), ['officers_reach_the'], [], []], { diag: true }).text;
+  check('a night that reaches Act 4 records the fork via binding', /fork: PRESENTED this turn via binding \(at_act 4 met\)/.test(bindingNight));
+  const silent = simulate(bound({ at_act: 4 }), LIVE.map(() => undefined), { diag: true }).text;
+  check('a model that never reports: summary says NONE, every line (absent)', silent.includes('beats reached: NONE') && parseForkDiagLines(silent).beats.length === 0 && !/beats_reached: \[/.test(silent));
+  const gone = forkDiagSummaryLines({ transcript: withDiag.text, sessionState: null, scenario: WG.scenario, storyArc: WG_ARC });
+  check('summary still built with session state gone (from the transcript alone)', gone.some(l => l.includes('beats reached (8)')) && gone.some(l => l.includes('(session state gone')));
+  check('no diagnostic lines → no summary', forkDiagSummaryLines({ transcript: without.plain, sessionState: withDiag.state, scenario: WG.scenario, storyArc: WG_ARC }).length === 0);
+
+  // Every real transcript on disk comes back as the same string.
+  const tdir = path.join(REPO_DIR, 'engine/data/transcripts');
+  const files = fs.existsSync(tdir) ? fs.readdirSync(tdir).filter(f => f.endsWith('.md')) : [];
+  const changed = files.filter(f => { const t = fs.readFileSync(path.join(tdir, f), 'utf8'); return stripForkDiagnostics(t) !== t; });
+  check(`strip is the identity on all ${files.length} stored transcripts`, changed.length === 0, changed.slice(0, 3).join(', '));
+}
+
 console.log(fails ? `\n${fails} assertion(s) FAILED.` : '\nAll story-bound assertions passed.');
 process.exit(fails ? 1 : 0);

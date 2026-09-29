@@ -13,12 +13,14 @@ import {
   evaluateDefiningMoment,
   definingMomentDue,
   resolveDefiningMomentBlock,
+  storyBoundForkActive,
   closureShouldClose,
   prepareForTts,
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadForkStoryArc, recordReachedBeats } from '../services/StateManager.js';
+import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics } from '../services/ForkDiagnostics.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -992,9 +994,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       const nextState = mergeState(seededInitial, output, scenario, clues, '', locations);
       // Story-bound fork only (gameData.storyArc is attached for no other session): the
       // opening can already reach the arc's first beat.
+      let openingBeats = [];
       if (gameData.storyArc) {
-        const beats = recordReachedBeats(nextState, output, gameData.storyArc);
-        if (beats.length) console.log('[STORY-BOUND] beats reached: ' + beats.join(', '));
+        openingBeats = recordReachedBeats(nextState, output, gameData.storyArc);
+        if (openingBeats.length) console.log('[STORY-BOUND] beats reached: ' + openingBeats.join(', '));
       }
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
@@ -1032,6 +1035,11 @@ Do not open with the historical context. Open inside the character's body. Let t
           : `## Session\n\n`,
         output.narrative || '',
         ``,
+        // Story-bound fork only: the turn-0 diagnostic line, which also states the binding.
+        ...(storyBoundForkActive(seededInitial, scenario) ? [forkDiagTurnLine({
+          turn: 0, opening: true, state: seededInitial, nextState, scenario,
+          storyArc: gameData.storyArc ?? null, output, newBeats: openingBeats,
+        }), ``] : []),
         `---`,
         ``,
       ].join('\n');
@@ -1440,9 +1448,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Story-bound fork only: record the beats this turn reached. Read by the NEXT turn's
       // definingMomentDue, so a fork bound to a beat is put to the player on the turn after
       // the story arrives at it — the same one-turn lag the closure flag has.
+      let newBeats = [];
       if (gameData.storyArc) {
-        const beats = recordReachedBeats(nextState, output, gameData.storyArc);
-        if (beats.length) console.log('[STORY-BOUND] beats reached: ' + beats.join(', '));
+        newBeats = recordReachedBeats(nextState, output, gameData.storyArc);
+        if (newBeats.length) console.log('[STORY-BOUND] beats reached: ' + newBeats.join(', '));
       }
 
       if (nextState.act > prevAct) {
@@ -1515,6 +1524,15 @@ Do not open with the historical context. Open inside the character's body. Let t
           output.narrative || '',
           ``,
         ];
+        // Story-bound fork only: one diagnostic line (ForkDiagnostics.js) — beats the model
+        // reported, the story position, and why the fork did or did not fire. Stripped from
+        // the transcript before /closing-prose hands it to a model.
+        if (storyBoundForkActive(state, scenario)) {
+          chunk.push(forkDiagTurnLine({
+            turn: nextState.turnCount, state, nextState, scenario, storyArc: gameData.storyArc ?? null,
+            output, newBeats, decisionRecorded: recordedDecision,
+          }), ``);
+        }
         if (output.endState?.isEnding) {
           const p = output.endState.performance || {};
           chunk.push(`## Session Close`);
@@ -1689,6 +1707,9 @@ Do not open with the historical context. Open inside the character's body. Let t
     } catch {
       return res.status(404).json({ error: 'Transcript not found.' });
     }
+    // The story as the closing-prose model reads it: story-bound fork diagnostic lines removed
+    // (ForkDiagnostics.js). A transcript without any is returned as the same string.
+    const narrativeTranscript = stripForkDiagnostics(transcript);
 
     // Resolve scenario and role for structured endings
     const scenarioMatch = transcript.match(/^##\s+Scenario:\s*(.+)$/m) || transcript.match(/^scenario:\s*(.+)$/m);
@@ -1743,7 +1764,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         `Emotional weight: ${notes.emotional_weight || '—'}`,
         '',
         'SESSION TRANSCRIPT (final 2000 characters):',
-        transcript.slice(-2000),
+        narrativeTranscript.slice(-2000),
         '',
         'Write 2-3 sentences of closing interior prose for this character.',
         'Ground it in the specific ending notes above — what happened, who was there, what it cost.',
@@ -1772,7 +1793,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         '',
         '---',
         '',
-        transcript,
+        narrativeTranscript,
       ].join('\n');
     }
 
@@ -1924,6 +1945,15 @@ Do not open with the historical context. Open inside the character's body. Let t
             lines.push('', '---', '', '## A Note on the Characters', '', `${names} ${compositeDisclosure.length === 1 ? 'is a fictional composite' : 'are fictional composites'} placed within a documented historical context. ${compositeDisclosure.length === 1 ? 'This character is' : 'These characters are'} not based on identified historical individuals.`);
           }
           lines.push('');
+          // Story-bound fork only — i.e. the transcript already carries per-turn diagnostic
+          // lines: the beat/fork summary, built from those lines plus session state if it still
+          // exists. Written last, after every model call above has read the transcript.
+          if (narrativeTranscript !== transcript) {
+            const arcId   = scenarioData?.storyArcIds?.[0];
+            const diagArc = arcId && repos.storyArcs ? repos.storyArcs.findById(arcId) : null;
+            const summary = forkDiagSummaryLines({ transcript, sessionState, scenario: scenarioData, storyArc: diagArc });
+            if (summary.length) lines.push(...summary, '');
+          }
           await appendFile(transcriptPath, lines.join('\n'));
         } catch (e) {
           console.error('[TRANSCRIPT CLOSING]', e.message);
