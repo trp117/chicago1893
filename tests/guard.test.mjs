@@ -67,6 +67,8 @@ function assertIntact(orig, after) {
   const orig   = JSON.parse(before);
   console.log(`\n[2a] /generate/save (bulk editor save) — stale tab on ${ID}`);
   console.log(`     stored: archetype=${orig.archetype}  defining_moment=${orig.defining_moment?.id}  ending_notes=[${Object.keys(orig.ending_notes || {})}]`);
+  check('fixture precondition: stores endings, a fork and an archetype',
+        !!orig.ending_notes && Object.keys(orig.ending_notes).length > 0 && !!orig.defining_moment?.id && !!orig.archetype);
 
   // The exact line from adminRouter.js /generate/save (normalizeBriefing omitted — it only
   // coerces a non-string briefing, and this role's briefing is already a string).
@@ -83,10 +85,18 @@ function assertIntact(orig, after) {
 
 // ── Test 2b — PUT /player-roles/:id composition, stale tab ───────────────────
 {
-  const ID = 'role_princip';
+  // Needs a role that STORES all three ending branches plus a fork and an archetype — what a
+  // stale tab could erase. This was role_princip until its endings were removed (crucible-fixed
+  // roles carry no graded endings under the archetype gate); Trude Harms is now the only role
+  // with all three. The precondition makes a future data change fail as "fixture drifted",
+  // not as a guard regression.
+  const ID = 'role_trude_harms';
   const before = fs.readFileSync(fileOf(ID), 'utf8');
   const orig   = JSON.parse(before);
   console.log(`\n[2b] PUT /player-roles/:id (single-role editor save) — stale tab on ${ID}`);
+  check('fixture precondition: stores success/partial/failure endings, a fork and an archetype',
+        ['success', 'partial', 'failure'].every(b => orig.ending_notes?.[b]) && !!orig.defining_moment?.id && !!orig.archetype,
+        `endings=[${Object.keys(orig.ending_notes || {})}] fork=${orig.defining_moment?.id} archetype=${orig.archetype}`);
 
   // The exact line from adminRouter.js PUT /player-roles/:id.
   repos.scenarios.savePlayerRole(preserveStoredRoleBlocks(repos, { ...staleTabPayload(orig), id: ID }));

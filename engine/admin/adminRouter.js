@@ -244,7 +244,11 @@ function definingMomentAtRisk(block) {
 // regeneration. The reviewer has already typed REPLACE; refusing the write they asked for
 // because a docs file was read-only would be the wrong trade. The log line is the record.
 function backupDefiningMomentBlock(role, block, reason) {
-  const file = join(_dir, '../data/scenarios/player_roles/_defining_moment_blocks.md');
+  // DEFINING_MOMENT_BACKUP_FILE redirects the append — for tests only, so a test that drives
+  // the delete/regenerate routes on a scratch fixture never writes into this TRACKED file.
+  // Read per call (not at module load) so a test can set it after importing the router.
+  const file = process.env.DEFINING_MOMENT_BACKUP_FILE
+    || join(_dir, '../data/scenarios/player_roles/_defining_moment_blocks.md');
   try {
     const state = block.generated !== true ? 'hand-authored'
                 : block.reviewed === true  ? 'generated, reviewed'

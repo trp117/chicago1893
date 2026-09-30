@@ -7,6 +7,7 @@
 
 import 'dotenv/config';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
@@ -58,6 +59,23 @@ const repos = {
 };
 const fileOf   = id => path.join(DATA_DIR, 'scenarios/player_roles', `${id}.json`);
 const readRole = id => JSON.parse(fs.readFileSync(fileOf(id), 'utf8'));
+
+// The six confirmed roles, snapshotted BEFORE this run touches anything. "Untouched" means this
+// run left each file byte-identical and on its confirmed archetype. (It used to mean "updatedAt
+// is still the 2026-08-24 confirmation stamp", which fails the moment a role is legitimately
+// edited later — Lojka and Mila on 2026-08-25, Princip on 2026-09-07 — and says nothing about
+// whether THIS run changed the file.)
+const CONFIRMED = { role_trude_harms: 'crucible-open', role_gatekeeper: 'crucible-fixed', role_princip: 'crucible-fixed',
+                    role_lojka: 'instrument', role_mila: 'witness', role_chronicler: 'witness' };
+const confirmedBefore = Object.fromEntries(Object.keys(CONFIRMED).map(id => [id, fs.readFileSync(fileOf(id), 'utf8')]));
+
+// The delete/regenerate routes append the outgoing block to _defining_moment_blocks.md — a
+// TRACKED file, which every run of this test used to dirty with a scratch-fixture backup.
+// Redirect the append to a per-run temp file (read per call by backupDefiningMomentBlock).
+const TRACKED_BLOCKS = path.join(DATA_DIR, 'scenarios/player_roles/_defining_moment_blocks.md');
+const trackedBefore  = fs.readFileSync(TRACKED_BLOCKS, 'utf8');
+const SCRATCH_BLOCKS = path.join(os.tmpdir(), `defining-moment-blocks-test-${process.pid}.md`);
+process.env.DEFINING_MOMENT_BACKUP_FILE = SCRATCH_BLOCKS;
 const remote   = async id => {
   const { data, error } = await supabase.from('scenario_data').select('data')
     .eq('data_type', 'player_role').eq('id', id).limit(1);
@@ -254,9 +272,14 @@ try {
   try { check('scratch fixture removed from Supabase', (await remote(SCRATCH)) === null); }
   catch (err) { console.log(`  ??  Supabase cleanup unverified — ${err.message}`); }
 
-  for (const id of ['role_trude_harms', 'role_gatekeeper', 'role_princip', 'role_lojka', 'role_mila', 'role_chronicler']) {
-    check(`${id.padEnd(18)} untouched`, readRole(id).updatedAt.startsWith('2026-08-24T22:18:26'), readRole(id).archetype);
+  for (const [id, archetype] of Object.entries(CONFIRMED)) {
+    check(`${id.padEnd(18)} untouched`, fs.readFileSync(fileOf(id), 'utf8') === confirmedBefore[id] && readRole(id).archetype === archetype, readRole(id).archetype);
   }
+
+  const scratchBackups = fs.existsSync(SCRATCH_BLOCKS) ? fs.readFileSync(SCRATCH_BLOCKS, 'utf8') : '';
+  check('route backups were written — to the scratch file', scratchBackups.includes(`\`${SCRATCH}\``), `${(scratchBackups.match(/auto-backup before/g) || []).length} backup(s)`);
+  check('tracked _defining_moment_blocks.md is byte-identical after the run', fs.readFileSync(TRACKED_BLOCKS, 'utf8') === trackedBefore);
+  try { fs.rmSync(SCRATCH_BLOCKS, { force: true }); } catch {}
 }
 
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nAll delete / cleanup / composition tests passed.');

@@ -76,13 +76,28 @@ for (const id of scenarioIds) {
 // WATERGATE is the clean opted-in case: continuous time, a 4-act arc, and McCord's fork, which
 // belongs in Act 4 ("Suite 600, 2:10 AM") and today fires on the clock at 0.6.
 const WG        = corpus.find(c => c.scenario.id === 'watergate_1972_part1_breach');
-const mccord    = WG.roles.find(r => r.id === 'role_mccord');
+// McCord's STORED fork is now live-bound (at_act:4, authored in the admin). The unbound
+// baseline every contrast below needs is the same block with the binding keys removed —
+// exactly the clock-only shape it had before Part A — rebuilt in memory, never written.
+const BINDING_KEYS = ['at_act', 'at_beat', 'fallback_at_elapsed_fraction'];
+const unbind    = role => ({ ...role, defining_moment: Object.fromEntries(Object.entries(role.defining_moment).filter(([k]) => !BINDING_KEYS.includes(k))) });
+const mccordStored = WG.roles.find(r => r.id === 'role_mccord');
+const mccord    = unbind(mccordStored);
 const bound     = (fields) => ({ ...mccord, defining_moment: { ...mccord.defining_moment, ...fields } });
 const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.locations));
+
+// The roles whose STORED fork is story-bound. Explicit, so a new live binding is a deliberate
+// test update rather than something the inertness sweeps silently absorb. Everything else in
+// the corpus must stay byte-identical to pre-Part-A behaviour.
+const EXPECTED_BOUND = ['role_mccord', 'role_wills'];
+const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
 check('no block → not bound',                         isStoryBoundFork(null) === false);
 check('clock-only block (today\'s shape) → not bound', isStoryBoundFork(mccord.defining_moment) === false);
+const boundIds = corpus.flatMap(c => c.roles.filter(isBoundRole).map(r => r.id)).sort();
+check(`stored story-bound roles are exactly ${EXPECTED_BOUND.join(', ')}`, JSON.stringify(boundIds) === JSON.stringify([...EXPECTED_BOUND].sort()), boundIds.join(', ') || 'none');
+check('stored McCord is bound at_act:4 (the live binding this file now models)', mccordStored.defining_moment.at_act === 4 && isStoryBoundFork(mccordStored.defining_moment));
 check('at_act number → bound',                        isStoryBoundFork({ at_act: 4 }) === true);
 check('at_beat id → bound',                           isStoryBoundFork({ at_beat: 'officers_reach_the' }) === true);
 check('at_act as a STRING does not opt in',           isStoryBoundFork({ at_act: '4' }) === false);
@@ -90,16 +105,23 @@ check('blank at_beat does not opt in',                isStoryBoundFork({ at_beat
 check('null at_act / at_beat do not opt in',          isStoryBoundFork({ at_act: null, at_beat: null }) === false);
 check('fallback fraction ALONE does not opt in',      isStoryBoundFork({ fallback_at_elapsed_fraction: 0.85 }) === false);
 
-head('A1 INERTNESS — no stored role opts in, so no session loads an arc');
-let storedForks = 0, loaded = [];
+head('A1 INERTNESS — no UNBOUND stored role loads an arc; each bound one loads its own');
+let storedForks = 0, unboundRoles = 0; const loaded = [], boundMissed = [];
 for (const { scenario, roles, locations } of corpus) {
   for (const role of roles) {
     if (role.defining_moment) storedForks++;
-    const st = quiet(() => buildInitialState(scenario, role, locations));
-    if (storyBoundForkActive(st, scenario) || loadForkStoryArc(repos, scenario, st)) loaded.push(`${scenario.id}/${role.id}`);
+    const st  = quiet(() => buildInitialState(scenario, role, locations));
+    const arc = quiet(() => loadForkStoryArc(repos, scenario, st));
+    if (isBoundRole(role)) {
+      if (!storyBoundForkActive(st, scenario) || arc?.id !== scenario.storyArcIds?.[0]) boundMissed.push(`${scenario.id}/${role.id}`);
+      continue;
+    }
+    unboundRoles++;
+    if (storyBoundForkActive(st, scenario) || arc) loaded.push(`${scenario.id}/${role.id}`);
   }
 }
-check(`all ${corpus.reduce((n, c) => n + c.roles.length, 0)} stored roles (${storedForks} with a fork) load no arc`, loaded.length === 0, loaded.join(', '));
+check(`all ${unboundRoles} unbound stored roles (of ${corpus.reduce((n, c) => n + c.roles.length, 0)}; ${storedForks} with a fork) load no arc`, unboundRoles > 0 && loaded.length === 0, loaded.join(', '));
+check(`each bound stored role (${EXPECTED_BOUND.join(', ')}) loads its scenario's arc`, boundMissed.length === 0, boundMissed.join(', '));
 for (const id of ['greensboro_four_the_color_line', 'dog_green_sector']) {
   const c = corpus.find(x => x.scenario.id === id);
   const any = c.roles.some(r => loadForkStoryArc(repos, c.scenario, quiet(() => buildInitialState(c.scenario, r, c.locations))));
@@ -143,9 +165,11 @@ const arcOf = c => (c.scenario.storyArcIds?.[0] ? repos.storyArcs.findById(c.sce
 
 head('A2 INERTNESS — the gate is the fork fields, not the arc being available');
 {
-  // Hand EVERY stored role its scenario's arc anyway. Not one is story-bound, so not one
+  // Hand EVERY unbound stored role its scenario's arc anyway. None is story-bound, so not one
   // prompt may change: the directive keys on the fork, and an arc in the game data is inert.
-  let compared = 0; const moved = [];
+  // The bound roles are the opposite case — the arc must SHAPE their prompt (a STORY POSITION
+  // block), which is what their binding asks for.
+  let compared = 0; const moved = [], boundFlat = [];
   for (const c of corpus) {
     const arc = arcOf(c);
     if (!arc) continue;
@@ -154,12 +178,17 @@ head('A2 INERTNESS — the gate is the fork fields, not the arc being available'
       for (const f of [0, 0.6, 0.8]) {
         const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
         st.elapsedMinutes = total * f; st.remainingMinutes = total - st.elapsedMinutes;
+        if (isBoundRole(role)) {
+          if (!promptFor(c, st, arc).includes('⚑ STORY POSITION')) boundFlat.push(`${c.scenario.id}/${role.id}@${f}`);
+          continue;
+        }
         if (promptFor(c, st, arc) !== promptFor(c, st, null)) moved.push(`${c.scenario.id}/${role.id}@${f}`);
         compared++;
       }
     }
   }
-  check(`${compared} stored role x elapsed prompts identical with and without the arc`, moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`${compared} UNBOUND stored role x elapsed prompts identical with and without the arc`, compared > 0 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check('every BOUND stored role\'s prompt carries STORY POSITION when its arc is loaded', boundFlat.length === 0, boundFlat.slice(0, 5).join(', '));
 
   const gb  = corpus.find(c => c.scenario.id === 'greensboro_four_the_color_line');
   const gst = quiet(() => buildInitialState(gb.scenario, gb.roles[0], gb.locations));
@@ -222,22 +251,32 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
     return !!b && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
       && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * b.at_elapsed_fraction;
   };
-  let forks = 0, points = 0; const moved = [];
+  // A BOUND fork with no beat reached (a fresh state) is due at its fallback fraction only —
+  // never at at_elapsed_fraction, which the binding ignores. Same minute sweep, its own rule.
+  const fallbackDue = (st, c) => {
+    const b = st.effectiveDefiningMoment;
+    const frac = typeof b?.fallback_at_elapsed_fraction === 'number' ? b.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
+    return !!b && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
+  };
+  let forks = 0, boundForks = 0, points = 0; const moved = [], boundMoved = [];
   for (const c of corpus) {
     const arc = arcOf(c);
     for (const role of c.roles.filter(r => r.defining_moment)) {
       forks++;
+      const isB = isBoundRole(role);
+      if (isB) boundForks++;
       const total = c.scenario.sessionTargetMinutes || 15;
       for (let m = 0; m <= total; m += 0.5) {
         const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
         st.elapsedMinutes = m; st.remainingMinutes = total - m;
-        const want = clockDue(st, c);
-        if (definingMomentDue(st, c.scenario) !== want || definingMomentDue(st, c.scenario, arc) !== want) moved.push(`${role.id}@${m}`);
+        const want = isB ? fallbackDue(st, c) : clockDue(st, c);
+        if (definingMomentDue(st, c.scenario) !== want || definingMomentDue(st, c.scenario, arc) !== want) (isB ? boundMoved : moved).push(`${role.id}@${m}`);
         points++;
       }
     }
   }
-  check(`all ${forks} stored forks: due exactly at at_elapsed_fraction (${points} half-minute points, arc passed or not)`, forks === 15 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 15 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`all ${boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${points} points total)`, boundForks === EXPECTED_BOUND.length && boundMoved.length === 0, boundMoved.slice(0, 5).join(', '));
 }
 
 head('A3 WATERGATE — McCord bound at_act:4 fires in Act 4, never in Act 3');
@@ -392,12 +431,15 @@ head('TRANSCRIPT DIAGNOSTICS — durable beat/fork evidence, invisible to the cl
         const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
         st.elapsedMinutes = m;
         const s = forkTimingStatus(st, c.scenario, arc);
-        if (s.due !== definingMomentDue(st, c.scenario, arc) || (s.due && s.via !== 'clock')) disagree.push(`${role.id}@${m}`);
+        // Fresh state, no beat reached: an unbound fork is due via the clock, a bound one via
+        // its fallback — never 'binding', since no beat has been reported.
+        const wantVia = isBoundRole(role) ? 'fallback' : 'clock';
+        if (s.due !== definingMomentDue(st, c.scenario, arc) || (s.due && s.via !== wantVia)) disagree.push(`${role.id}@${m}`);
         pts++;
       }
     }
   }
-  check(`forkTimingStatus.due === definingMomentDue on ${pts} stored-fork points (all via 'clock')`, disagree.length === 0, disagree.slice(0, 5).join(', '));
+  check(`forkTimingStatus.due === definingMomentDue on ${pts} stored-fork points (unbound via 'clock', bound via 'fallback')`, disagree.length === 0, disagree.slice(0, 5).join(', '));
 
   // A transcript written exactly as gameRouter writes one (the /start header's tail, then each
   // /turn chunk), with or without the diagnostic lines — so the strip can be checked for exact

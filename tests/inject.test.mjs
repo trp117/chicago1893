@@ -47,6 +47,15 @@ const repos = {
 };
 const fileOf   = id => path.join(DATA_DIR, 'scenarios/player_roles', `${id}.json`);
 const readRole = id => JSON.parse(fs.readFileSync(fileOf(id), 'utf8'));
+
+// The six confirmed roles, snapshotted BEFORE this run touches anything. "Untouched" means this
+// run left each file byte-identical and on its confirmed archetype. (It used to mean "updatedAt
+// is still the 2026-08-24 confirmation stamp", which fails the moment a role is legitimately
+// edited later — Lojka and Mila on 2026-08-25, Princip on 2026-09-07 — and says nothing about
+// whether THIS run changed the file.)
+const CONFIRMED = { role_trude_harms: 'crucible-open', role_gatekeeper: 'crucible-fixed', role_princip: 'crucible-fixed',
+                    role_lojka: 'instrument', role_mila: 'witness', role_chronicler: 'witness' };
+const confirmedBefore = Object.fromEntries(Object.keys(CONFIRMED).map(id => [id, fs.readFileSync(fileOf(id), 'utf8')]));
 const rawOf    = id => fs.readFileSync(fileOf(id), 'utf8');
 
 const app = express();
@@ -179,8 +188,8 @@ try {
           fs.readdirSync(versionsDir).every(f => versionsBefore.has(f)));
   }
 
-  for (const id of ['role_trude_harms', 'role_gatekeeper', 'role_princip', 'role_lojka', 'role_mila', 'role_chronicler']) {
-    check(`${id.padEnd(18)} untouched`, readRole(id).updatedAt.startsWith('2026-08-24T22:18:26'), readRole(id).archetype);
+  for (const [id, archetype] of Object.entries(CONFIRMED)) {
+    check(`${id.padEnd(18)} untouched`, fs.readFileSync(fileOf(id), 'utf8') === confirmedBefore[id] && readRole(id).archetype === archetype, readRole(id).archetype);
   }
 }
 
