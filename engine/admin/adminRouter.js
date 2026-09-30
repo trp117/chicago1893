@@ -469,6 +469,87 @@ function preserveStoredAnchoredLocation(repos, role) {
   return role;
 }
 
+// SCENES (Part B, B1) — an act may carry an optional scenes[] array. B1 is STORAGE ONLY:
+// nothing in the engine reads scenes[] yet (arcBeats walks act.beats and nothing else), so an
+// arc with scenes plays exactly as one without. This is the save-side check, and it is the
+// only thing B1 enforces.
+//
+// Scoped like the anchor dropdown (scopeLocationsToItem, c218b44): a location is valid when
+// its scenarioId FIELD equals the arc's scenario — not via findByScenario, whose directory
+// mapping returns [] for chicago_1893_v1 — plus any location posted in the same bundle save
+// (a location added in this edit is saved after the arc, and must still count).
+//
+// Only referential integrity and shape. Scene ends are a beat OR a budget (B3 triggers on
+// either), so at least one must be set; everything else not named here is free text.
+export const SCENE_CHANGE_TYPES = ['time', 'place', 'both'];
+const SCENE_ID_RE = /^[a-z0-9]+(?:_[a-z0-9]+)*$/;
+
+function validateArcScenes(arc, { locationIds, roleIds = null }) {
+  const errors = [];
+  const acts = Array.isArray(arc?.acts) ? arc.acts : [];
+  if (!acts.some(a => a && a.scenes !== undefined)) return errors;   // no scenes anywhere → nothing to check
+
+  const beatIds = new Set();
+  for (const a of acts) for (const b of (Array.isArray(a?.beats) ? a.beats : [])) {
+    if (typeof b?.id === 'string' && b.id.trim()) beatIds.add(b.id.trim());
+  }
+  const seen = new Set();
+  acts.forEach((act, ai) => {
+    if (!act || act.scenes === undefined) return;
+    const actLabel = `Act ${act.actNumber ?? ai + 1}`;
+    if (!Array.isArray(act.scenes)) { errors.push(`${actLabel}: scenes must be a list.`); return; }
+    act.scenes.forEach((s, si) => {
+      const where = `${actLabel} scene ${si + 1}${typeof s?.id === 'string' && s.id ? ` (${s.id})` : ''}`;
+      if (!s || typeof s !== 'object' || Array.isArray(s)) { errors.push(`${where}: not a scene object.`); return; }
+      if (typeof s.id !== 'string' || !SCENE_ID_RE.test(s.id)) errors.push(`${where}: id is required, snake_case.`);
+      else if (seen.has(s.id)) errors.push(`${where}: id "${s.id}" is used by another scene in this arc.`);
+      else seen.add(s.id);
+      if (!SCENE_CHANGE_TYPES.includes(s.change)) errors.push(`${where}: change must be one of ${SCENE_CHANGE_TYPES.join(' / ')}.`);
+      if (typeof s.location_id !== 'string' || !s.location_id) errors.push(`${where}: location is required.`);
+      else if (!locationIds.has(s.location_id)) errors.push(`${where}: location "${s.location_id}" is not a location in this scenario.`);
+      const hasBeat = typeof s.ends_on_beat === 'string' && s.ends_on_beat !== '';
+      if (s.ends_on_beat !== undefined && !hasBeat) errors.push(`${where}: ends_on_beat must be a beat id (or omitted).`);
+      else if (hasBeat && !beatIds.has(s.ends_on_beat)) errors.push(`${where}: ends_on_beat "${s.ends_on_beat}" is not a beat in this arc.`);
+      const hasBudget = s.budget_minutes !== undefined;
+      if (hasBudget && !(typeof s.budget_minutes === 'number' && Number.isFinite(s.budget_minutes) && s.budget_minutes > 0)) {
+        errors.push(`${where}: budget_minutes must be a positive number (or omitted).`);
+      }
+      if (!hasBeat && !hasBudget) errors.push(`${where}: needs an end — ends_on_beat, budget_minutes, or both.`);
+      for (const k of ['date_label', 'time_label', 'bridge']) {
+        if (s[k] !== undefined && typeof s[k] !== 'string') errors.push(`${where}: ${k} must be text.`);
+      }
+      if (s.role_locations !== undefined) {
+        if (!s.role_locations || typeof s.role_locations !== 'object' || Array.isArray(s.role_locations)) {
+          errors.push(`${where}: role_locations must be a { role_id: location_id } map.`);
+        } else {
+          for (const [rid, lid] of Object.entries(s.role_locations)) {
+            if (roleIds && !roleIds.has(rid)) errors.push(`${where}: role_locations names "${rid}", which is not a role in this scenario.`);
+            if (typeof lid !== 'string' || !locationIds.has(lid)) errors.push(`${where}: role_locations.${rid} → "${lid}" is not a location in this scenario.`);
+          }
+        }
+      }
+    });
+  });
+  return errors;
+}
+
+// The scenario-scoped id sets validateArcScenes checks against, from the repositories.
+function sceneRefSets(repos, scenarioId, postedLocations = [], postedRoles = []) {
+  const locationIds = new Set(repos.locations.findAll().filter(l => l && l.scenarioId === scenarioId).map(l => l.id));
+  for (const l of postedLocations) if (l?.id && (!l.scenarioId || l.scenarioId === scenarioId)) locationIds.add(l.id);
+  const roleIds = new Set(repos.scenarios.findPlayerRoles(scenarioId).map(r => r.id));
+  for (const r of postedRoles) if (r?.id) roleIds.add(r.id);
+  return { locationIds, roleIds };
+}
+
+function scenesRejection(errors) {
+  return {
+    error: `Scenes have ${errors.length} invalid reference(s): ${errors.slice(0, 4).join(' ')}${errors.length > 4 ? ' …' : ''}`,
+    code: 'SCENES_INVALID',
+    errors,
+  };
+}
+
 // EDITOR-SAVE GUARD for the choice register — fifth sibling, same hazard, same `undefined`
 // rule as preserveStoredAnchoredLocation. The register is three flat keys, not a block: the
 // text (which shipped first, bare, in 4d4efdb), the reviewed flag the runtime gates on, and
@@ -2922,7 +3003,10 @@ export function createAdminRouter(repos, config = {}) {
     res.status(201).json(repos.storyArcs.save(payload));
   });
   r.put('/story-arcs/:id', (req, res) => {
-    if (!repos.storyArcs.findById(req.params.id)) return notFound(res);
+    const stored = repos.storyArcs.findById(req.params.id);
+    if (!stored) return notFound(res);
+    const sceneErrors = validateArcScenes(req.body, sceneRefSets(repos, req.body.scenarioId || stored.scenarioId));
+    if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
     res.json(repos.storyArcs.save({ ...req.body, id: req.params.id }));
   });
   r.delete('/story-arcs/:id', (req, res) => {
@@ -3846,6 +3930,12 @@ Return ONLY valid JSON in this exact structure:
   r.post('/generate/save', async (req, res) => {
     const { scenario, storyArc, characters = [], locations = [], clues = [], playerRoles = [], baseVersion } = req.body;
     if (!scenario?.id) return badRequest(res, 'Missing scenario.');
+    // Scenes are checked BEFORE anything is written: this route saves the scenario first and
+    // the arc after, so a rejection further down would leave a half-saved bundle.
+    if (storyArc?.id) {
+      const sceneErrors = validateArcScenes(storyArc, sceneRefSets(repos, storyArc.scenarioId || scenario.id, locations, playerRoles));
+      if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
+    }
     try {
       const existing = await repos.scenarios.findById(scenario.id);
       if (!existing) scenario.status = 'draft';
@@ -4954,6 +5044,9 @@ export { preserveStoredArchetype };
 // free) —" option posts) deletes the block, while an ABSENT key (a stale tab) still restores
 // it. Those two cases are one `if` apart and the editor's clear action rides on the first.
 export { preserveStoredAnchoredLocation };
+// Scenes (B1): the save-side reference check and the id sets it runs against, exported so
+// scenes.test.mjs asserts the same function both save routes call.
+export { validateArcScenes, sceneRefSets };
 // Same, for the choice-register guard — choice-register.test.mjs asserts it restores the
 // flags a stale tab omits, and honors a current tab's clear.
 export { preserveStoredChoiceRegister };

@@ -30,6 +30,7 @@ const SUITE = [
   ['choice register: compat + fresh read',  'choice-register.test.mjs'],
   ['story-bound forks: opt-in gate',         'storybound.test.mjs'],
   ['epilogue: no cut-off sentences',         'epilogue.test.mjs'],
+  ['scenes B1: storage only, round trip',    'scenes.test.mjs'],
 ];
 
 const results = [];

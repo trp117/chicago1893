@@ -851,7 +851,10 @@ function extractFormData(cfg, formEl, existingItem) {
   // Acts editor
   const actBlocks = formEl.querySelectorAll('[data-act]');
   if (actBlocks.length) {
+    // Spread the stored act first: this form edits name/minutes/beats only, and a field it
+    // does not render (title, scenes[]) must survive its save rather than be rebuilt away.
     data.acts = [...actBlocks].map((_, i) => ({
+      ...(existingItem?.acts?.[i] || {}),
       actNumber:  i + 1,
       name:       formEl.querySelector(`[name="act-name-${i}"]`)?.value.trim() || '',
       minuteRange:[
@@ -1629,6 +1632,18 @@ function collectEdits(containerEl, data) {
     data.storyArc.acts.forEach((act, i) => { act.beats = beatActMap[i] || []; });
   }
 
+  // Collect scenes, per act, in card (DOM) order — that order IS the scene order. Every other
+  // act field is left as loaded. No cards → the key is removed, not written as [].
+  const sceneListEls = containerEl.querySelectorAll('[data-scene-list]');
+  if (sceneListEls.length > 0 && data.storyArc?.acts) {
+    data.storyArc.acts.forEach((act, i) => {
+      const list = containerEl.querySelector(`[data-scene-list="${i}"]`);
+      if (!list) return;
+      const scenes = [...list.querySelectorAll('.scene-card')].map(collectSceneCard).filter(Boolean);
+      if (scenes.length) act.scenes = scenes; else delete act.scenes;
+    });
+  }
+
   // Collect review checklist
   const checklistWrap = containerEl.querySelector('#review-checklist-container');
   if (checklistWrap) {
@@ -1838,9 +1853,112 @@ function buildBeatRow(beat, actIdx) {
   </div>`;
 }
 
+// ── Scenes (Part B, B1) — STORAGE + AUTHORING ONLY ───────────────────────────────
+// An act may carry an optional scenes[]. Nothing in the engine reads it yet (B2 adds the
+// transitions), so authoring here changes no session. An act with no scene cards saves with
+// NO scenes key at all — removing the last scene returns the act to exactly its old shape.
+//
+// The dropdowns are the anchor pattern: locations scoped to THIS scenario by their scenarioId
+// field (scopeLocationsToItem), and a stored value the options no longer contain is kept as a
+// visible "(missing)" option rather than silently swapped for the first choice — the server
+// save (validateArcScenes) then rejects it by name.
+const SCENE_CHANGE_OPTS = [['time', 'Time'], ['place', 'Place'], ['both', 'Time + place']];
+
+function sceneRefOptions(data) {
+  const scenarioId = data?.scenario?.id || data?.storyArc?.scenarioId || '';
+  return {
+    locations: scopeLocationsToItem(data?.locations || [], { scenarioId }),
+    acts:      Array.isArray(data?.storyArc?.acts) ? data.storyArc.acts : [],
+    roles:     data?.playerRoles || [],
+  };
+}
+
+function sceneOpt(value, label, selected) {
+  return `<option value="${esc(value)}"${value === selected ? ' selected' : ''}>${esc(label)}</option>`;
+}
+function sceneLocationSelect(cls, selected, locations, blankLabel, extraAttrs = '') {
+  const known  = locations.some(l => l.id === selected);
+  const orphan = selected && !known ? sceneOpt(selected, `${selected} (missing — not a location in this scenario)`, selected) : '';
+  return `<select class="${cls}" ${extraAttrs}><option value=""${selected ? '' : ' selected'}>${esc(blankLabel)}</option>${orphan}${
+    locations.map(l => sceneOpt(l.id, l.name || l.title || l.id, selected)).join('')}</select>`;
+}
+
+function buildSceneCard(scene, actIdx, ref) {
+  const s = scene || {};
+  const beatGroups = ref.acts.map(a => {
+    const beats = (a.beats || []).filter(b => b && typeof b.id === 'string' && b.id.trim());
+    if (!beats.length) return '';
+    return `<optgroup label="Act ${esc(String(a.actNumber ?? ''))} — ${esc(a.title || a.name || '')}">${
+      beats.map(b => sceneOpt(b.id, b.id, s.ends_on_beat)).join('')}</optgroup>`;
+  }).join('');
+  const beatKnown  = ref.acts.some(a => (a.beats || []).some(b => b?.id === s.ends_on_beat));
+  const beatOrphan = s.ends_on_beat && !beatKnown ? sceneOpt(s.ends_on_beat, `${s.ends_on_beat} (missing — not a beat in this arc)`, s.ends_on_beat) : '';
+  const rl = (s.role_locations && typeof s.role_locations === 'object') ? s.role_locations : {};
+  const roleRows = ref.roles.length
+    ? ref.roles.map(r => `<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+        <span style="width:160px;flex-shrink:0;font-size:12px">${esc(r.name || r.id)}</span>
+        ${sceneLocationSelect('scene-role-loc', rl[r.id] || '', ref.locations, '— with the scene —', `data-role="${esc(r.id)}"`)}
+      </div>`).join('')
+    : '<p class="help-text" style="font-style:italic">No roles in this scenario.</p>';
+  // A role_locations key for a role no longer in the scenario is carried as-is so the save
+  // does not silently drop it; the server names it on save.
+  const strayRoles = Object.keys(rl).filter(id => !ref.roles.some(r => r.id === id));
+  const strayHtml = strayRoles.map(id => `<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+        <span style="width:160px;flex-shrink:0;font-size:12px;color:var(--danger)">${esc(id)} (missing role)</span>
+        ${sceneLocationSelect('scene-role-loc', rl[id] || '', ref.locations, '— remove —', `data-role="${esc(id)}"`)}
+      </div>`).join('');
+  const small = 'style="font-size:12px"';
+  return `<div class="scene-card" data-scene-act="${actIdx}" style="border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;background:var(--bg)">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input type="text" class="scene-id" placeholder="scene_id" value="${esc(s.id || '')}" style="flex:1;font-family:monospace;font-size:12px">
+      <button type="button" class="btn btn-secondary btn-sm scene-up-btn" title="Move up">↑</button>
+      <button type="button" class="btn btn-secondary btn-sm scene-down-btn" title="Move down">↓</button>
+      <button type="button" class="btn btn-secondary btn-sm remove-scene-btn" title="Remove scene">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
+      <div class="field-group"><label ${small}>Change</label><select class="scene-change">${
+        (SCENE_CHANGE_OPTS.some(([v]) => v === s.change) || !s.change ? '' : sceneOpt(s.change, `${s.change} (invalid)`, s.change)) +
+        SCENE_CHANGE_OPTS.map(([v, l]) => sceneOpt(v, l, s.change || 'both')).join('')}</select></div>
+      <div class="field-group"><label ${small}>Date</label><input type="text" class="scene-date" placeholder="24 May 1431" value="${esc(s.date_label || '')}"></div>
+      <div class="field-group"><label ${small}>Time (optional)</label><input type="text" class="scene-time" placeholder="Morning" value="${esc(s.time_label || '')}"></div>
+      <div class="field-group"><label ${small}>Location</label>${sceneLocationSelect('scene-location', s.location_id || '', ref.locations, 'Choose…')}</div>
+      <div class="field-group"><label ${small}>Ends on beat</label><select class="scene-ends"><option value=""${s.ends_on_beat ? '' : ' selected'}>— budget only —</option>${beatOrphan}${beatGroups}</select></div>
+      <div class="field-group"><label ${small}>Budget (minutes)</label><input type="number" class="scene-budget" min="0" step="0.5" value="${s.budget_minutes ?? ''}"></div>
+    </div>
+    <div class="field-group"><label ${small}>Bridge</label><textarea class="scene-bridge" rows="3" placeholder="Transition prose read as the story moves into this scene.">${esc(s.bridge || '')}</textarea></div>
+    <details><summary style="font-size:12px;cursor:pointer">Role locations${Object.keys(rl).length ? ` (${Object.keys(rl).length})` : ''}</summary>
+      <p class="help-text">Only for roles the record puts somewhere OTHER than the scene's location. Leave "with the scene" for everyone else.</p>
+      ${roleRows}${strayHtml}
+    </details>
+  </div>`;
+}
+
+// The inverse of buildSceneCard. Keys are written only when set, so an untouched optional
+// field does not appear as "" on disk. A card with every field blank (an unused "Add Scene")
+// is dropped; a partly filled one is kept for the server to judge.
+function collectSceneCard(card) {
+  const v = sel => (card.querySelector(sel)?.value ?? '').trim();
+  const scene = { id: v('.scene-id'), change: v('.scene-change') };
+  const date = v('.scene-date'), time = v('.scene-time'), loc = v('.scene-location');
+  const bridge = card.querySelector('.scene-bridge')?.value ?? '';
+  const ends = v('.scene-ends'), budget = v('.scene-budget');
+  scene.date_label = date;
+  if (time) scene.time_label = time;
+  scene.location_id = loc;
+  scene.bridge = bridge.trim();
+  if (ends) scene.ends_on_beat = ends;
+  if (budget !== '') scene.budget_minutes = Number(budget);
+  const rl = {};
+  card.querySelectorAll('.scene-role-loc').forEach(el => { if (el.value) rl[el.dataset.role] = el.value; });
+  if (Object.keys(rl).length) scene.role_locations = rl;
+  const blank = !scene.id && !date && !time && !loc && !scene.bridge && !ends && budget === '' && !scene.role_locations;
+  return blank ? null : scene;
+}
+
 function renderArcSection(data) {
   const arc  = data.storyArc || {};
   const acts = Array.isArray(arc.acts) ? arc.acts : [];
+  const sceneRef = sceneRefOptions(data);
 
   // Migrate legacy string beats to structured objects on load
   const migratedActs = acts.map(act => ({
@@ -1862,6 +1980,12 @@ function renderArcSection(data) {
          <label>Beats</label>
          <div id="beat-rows-act-${i}" data-beat-list="${i}">${beatsHtml}</div>
          <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px" data-add-beat="${i}">＋ Add Beat</button>
+       </div>
+       <div class="field-group">
+         <label>Scenes</label>
+         <p class="help-text">Where and when this act moves. Stored only — scenes do not change play yet. A scene ends on its beat or its time budget. The beat list reflects the last save; save after adding beats to pick them here.</p>
+         <div id="scene-rows-act-${i}" data-scene-list="${i}">${(Array.isArray(act.scenes) ? act.scenes : []).map(sc => buildSceneCard(sc, i, sceneRef)).join('')}</div>
+         <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px" data-add-scene="${i}">＋ Add Scene</button>
        </div>`,
       i === 0
     );
@@ -4540,6 +4664,7 @@ let formDirty = false;
 const PERSISTED_FIELD_SELECTOR = [
   '[data-path]',
   '.beat-desc', '.beat-id',
+  '.scene-card input', '.scene-card select', '.scene-card textarea',
   '.checklist-cb', '.checklist-notes',
   '[class*="tf-fact-"]',
   '[class*="ep-char"]', '[class*="ep-fact"]', '[class*="ep-frame"]',
@@ -5982,6 +6107,30 @@ function renderPreview(data, autoSaved = false) {
     }
     const remBtn = e.target.closest('.remove-beat-btn');
     if (remBtn) { remBtn.closest('.beat-row').remove(); updateBeatCount(); return; }
+    // Scenes: add / remove / reorder within the act. Structural edits fire no input event,
+    // so each marks the form dirty itself.
+    const addScene = e.target.closest('[data-add-scene]');
+    if (addScene) {
+      const actIdx = parseInt(addScene.dataset.addScene, 10);
+      const wrap = formEl.querySelector(`#scene-rows-act-${actIdx}`);
+      if (wrap) {
+        const div = document.createElement('div');
+        div.innerHTML = buildSceneCard({}, actIdx, sceneRefOptions(data));
+        wrap.appendChild(div.firstElementChild);
+        markFormDirty();
+      }
+      return;
+    }
+    const sceneCard = e.target.closest('.scene-card');
+    if (sceneCard) {
+      if (e.target.closest('.remove-scene-btn')) { sceneCard.remove(); markFormDirty(); return; }
+      if (e.target.closest('.scene-up-btn') && sceneCard.previousElementSibling) {
+        sceneCard.parentNode.insertBefore(sceneCard, sceneCard.previousElementSibling); markFormDirty(); return;
+      }
+      if (e.target.closest('.scene-down-btn') && sceneCard.nextElementSibling) {
+        sceneCard.parentNode.insertBefore(sceneCard.nextElementSibling, sceneCard); markFormDirty(); return;
+      }
+    }
     if (e.target.closest('#mark-approved-btn')) {
       updateStatusDisplay('approved');
       handleManualSave(data, formEl);
