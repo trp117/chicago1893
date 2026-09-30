@@ -58,7 +58,12 @@ const quiet = fn => { const w = console.warn; console.warn = () => {}; try { ret
 const clone = o => JSON.parse(JSON.stringify(o));
 
 const JOAN_ID  = 'joan_trial_rouen_1431';
-const JOAN_ARC = repos.storyArcs.findById(`${JOAN_ID}_main_arc`);
+// Joan's STORED arc now carries her 7 real scenes (authored 2026-09-30). The fixture every
+// test below builds on is that arc with its scenes stripped — the no-scenes shape B1 must
+// leave byte-identical — rebuilt in memory, never written. The real scenes are checked on
+// their own in section 0.
+const JOAN_STORED = repos.storyArcs.findById(`${JOAN_ID}_main_arc`);
+const JOAN_ARC    = (() => { const a = JSON.parse(JSON.stringify(JOAN_STORED)); a.acts.forEach(x => { delete x.scenes; }); return a; })();
 const JOAN_LOC = repos.locations.findAll().filter(l => l.scenarioId === JOAN_ID);
 const JOAN_ROLES = repos.scenarios.findPlayerRoles(JOAN_ID);
 
@@ -93,7 +98,13 @@ const withScenes = arc => {
 
 head('0. fixtures');
 check('Joan arc loads with 4 acts', JOAN_ARC?.acts?.length === 4);
-check('stored Joan arc carries NO scenes yet', !JOAN_ARC.acts.some(a => 'scenes' in a));
+check('fixture: Joan arc with scenes stripped carries none', !JOAN_ARC.acts.some(a => 'scenes' in a));
+{
+  // Live data: whatever scenes the stored arc carries must pass the same check the save routes run.
+  const live = JOAN_STORED.acts.flatMap(a => a.scenes || []);
+  const errs = validateArcScenes(JOAN_STORED, sceneRefSets(repos, JOAN_ID));
+  check(`stored Joan scenes (${live.length}) validate clean against Joan's own locations / beats / roles`, errs.length === 0, errs.slice(0, 3).join(' | '));
+}
 check('Joan has 7 scenario-scoped locations', JOAN_LOC.length === 7, JOAN_LOC.map(l => l.id).join(', '));
 check('Joan has roles joan / manchon / massieu', ['role_joan', 'role_manchon', 'role_massieu'].every(id => JOAN_ROLES.some(r => r.id === id)));
 
@@ -358,7 +369,8 @@ head('2c. PUT /story-arcs/:id → disk → GET (real router, scratch store)');
 {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'scenes-test-'));
   fs.mkdirSync(path.join(tmp, 'story_arcs'));
-  fs.copyFileSync(path.join(REPO_DIR, 'engine/data/story_arcs', `${JOAN_ARC.id}.json`), path.join(tmp, 'story_arcs', `${JOAN_ARC.id}.json`));
+  // Seed the scratch store with the scenes-stripped fixture (not the live file, which has scenes).
+  fs.writeFileSync(path.join(tmp, 'story_arcs', `${JOAN_ARC.id}.json`), JSON.stringify(JOAN_ARC, null, 2));
   const scratch = new JsonFileStore(tmp);
   const app = express();
   app.use(express.json({ limit: '5mb' }));
@@ -492,7 +504,7 @@ head('3. validateArcScenes — the check both save routes run');
   check('ref sets are Joan\'s own', refs.locationIds.size === 7 && refs.roleIds.has('role_joan'));
   check('valid Joan scenes → no errors', validateArcScenes(withScenes(JOAN_ARC), refs).length === 0, validateArcScenes(withScenes(JOAN_ARC), refs).join(' | '));
   check('no scenes anywhere → no errors (gated)', validateArcScenes(JOAN_ARC, refs).length === 0);
-  check('every stored arc validates clean (none carries scenes)', repos.storyArcs.findByScenario().every(a => validateArcScenes(a, sceneRefSets(repos, a.scenarioId)).length === 0));
+  check('every stored arc validates clean (scenes included)', repos.storyArcs.findByScenario().every(a => validateArcScenes(a, sceneRefSets(repos, a.scenarioId)).length === 0));
 
   const foreign = repos.locations.findAll().find(l => l.scenarioId !== JOAN_ID).id;
   const cases = [
