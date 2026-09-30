@@ -539,28 +539,47 @@ function validateArcScenes(arc, { locationIds, roleIds = null }) {
 // UI at all — posts acts with the key ABSENT and the whole-object save erases every scene.
 // That is not hypothetical: Joan's arc was saved twice after the B1 deploy with no scenes.
 //
-// KEYED ON `undefined`, like preserveStoredAnchoredLocation. The current editor ALWAYS posts
-// scenes for every act it renders — [] when the act has no cards — so:
-//   absent  → a stale tab: the stored act's scenes are restored
-//   []      → a deliberate clear: the key is deleted, so the file stays key-absent (the husk
-//             is stripped rather than stored, exactly as the anchor guard strips its own)
-//   [...]   → honored as posted
+// KEYED ON `undefined`, like preserveStoredAnchoredLocation:
+//   absent  → a stale / old-page tab: the stored act's scenes are restored
+//   [...]   → honored as posted, EXCEPT that a post can only delete scenes it LOADED
+//
+// A SAVE CANNOT CLEAR SCENES IT NEVER LOADED. An absent key is not the only stale shape: a
+// current-page tab that loaded the arc before scenes were authored posts scenes: [] for every
+// act, which reads exactly like a deliberate clear. So the editor also posts
+// _loaded_scene_ids — per act, the ids it rendered at load — and a stored scene whose id is
+// neither posted nor in that list is one the tab never saw: it is kept, appended after the
+// posted scenes. A post with no list at all (a pre-guard tab, the console/API, the legacy
+// Story Arcs form) therefore adds and edits but never deletes. The list is transport only and
+// is stripped here; it is never stored.
+//
+// What survives empty ([] after the merge) is a real clear: the key is deleted so the file
+// stays key-absent, the husk stripped rather than stored, as the anchor guard strips its own.
 // Acts are matched by actNumber (an act reorder must not move scenes onto the wrong act),
 // falling back to position only for acts that carry no actNumber.
 function preserveStoredScenes(repos, arc) {
   if (!arc?.id || !Array.isArray(arc.acts)) return arc;
   const stored     = repos.storyArcs.findById(arc.id);
   const storedActs = Array.isArray(stored?.acts) ? stored.acts : [];
+  const clone      = v => JSON.parse(JSON.stringify(v));
   arc.acts.forEach((act, i) => {
     if (!act || typeof act !== 'object') return;
+    const loaded = new Set(Array.isArray(act._loaded_scene_ids) ? act._loaded_scene_ids : []);
+    delete act._loaded_scene_ids;
+    const prior = act.actNumber != null
+      ? storedActs.find(s => s && s.actNumber === act.actNumber)
+      : storedActs[i];
+    const priorScenes = Array.isArray(prior?.scenes) ? prior.scenes : null;
     if (act.scenes === undefined) {
-      const prior = act.actNumber != null
-        ? storedActs.find(s => s && s.actNumber === act.actNumber)
-        : storedActs[i];
-      if (prior && prior.scenes !== undefined) act.scenes = JSON.parse(JSON.stringify(prior.scenes));
-    } else if (Array.isArray(act.scenes) && act.scenes.length === 0) {
-      delete act.scenes;
+      if (prior && prior.scenes !== undefined) act.scenes = clone(prior.scenes);
+      return;
     }
+    if (!Array.isArray(act.scenes)) return;   // malformed — validateArcScenes names it
+    if (priorScenes) {
+      const posted = new Set(act.scenes.map(s => s?.id));
+      const unseen = priorScenes.filter(s => s && !posted.has(s.id) && !loaded.has(s.id));
+      if (unseen.length) act.scenes = [...act.scenes, ...clone(unseen)];
+    }
+    if (act.scenes.length === 0) delete act.scenes;
   });
   return arc;
 }

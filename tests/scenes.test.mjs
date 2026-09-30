@@ -283,8 +283,31 @@ const collect = (el, loaded) => { const d = clone(loaded); collectEdits(el, d); 
   b.remove();
   check('remove one: the others keep their fields', JSON.stringify(collect(el, loaded).storyArc.acts[1].scenes) === JSON.stringify([JOAN_SCENES[1][2], JOAN_SCENES[1][0]]));
   el.querySelector('#scene-rows-act-0').querySelectorAll('.scene-card').forEach(n => n.remove());
-  const cleared = collect(el, loaded).storyArc.acts[0].scenes;
-  check('remove all in an act → posts [] (the explicit clear the server guard honors)', Array.isArray(cleared) && cleared.length === 0);
+  const clearedAct = collect(el, loaded).storyArc.acts[0];
+  check('remove all in an act → posts [] (the explicit clear the server guard honors)', Array.isArray(clearedAct.scenes) && clearedAct.scenes.length === 0);
+  check('...together with the ids it LOADED, fixed at render', JSON.stringify(clearedAct._loaded_scene_ids) === JSON.stringify(JOAN_SCENES[0].map(s => s.id)));
+  // Collecting TWICE (the bug a data-derived list would have): the second collect must still
+  // report the render-time ids, or a scene deleted here would read as never-seen and come back.
+  const twice = clone(loaded); collectEdits(el, twice); collectEdits(el, twice);
+  check('a second collect still reports the render-time loaded ids', JSON.stringify(twice.storyArc.acts[0]._loaded_scene_ids) === JSON.stringify(JOAN_SCENES[0].map(s => s.id)));
+  const twiceStored = preserveStoredScenes({ storyArcs: { findById: () => withScenes(JOAN_ARC) } }, twice.storyArc);
+  check('...so the deletion survives the save guard (act 1 key-absent)', !('scenes' in twiceStored.acts[0]));
+  {
+    // Same tab: ADD a scene, save, then DELETE it and save again. After the first save the tab
+    // has "loaded" its own scene (commitLoadedSceneIds), so the second save may delete it.
+    const { commitLoadedSceneIds } = ctx;
+    const d0 = editorData(JOAN_ARC), el2 = mount(d0), w = el2.querySelector('#scene-rows-act-3');
+    w.insertAdjacentHTML('beforeend', buildSceneCard({ id: 'tmp_scene', change: 'both', location_id: 'joan_prison_cell', ends_on_beat: '28_may_1431' }, 3, sceneRefOptions(d0)));
+    const d1 = clone(d0); collectEdits(el2, d1);
+    const saved1 = preserveStoredScenes({ storyArcs: { findById: () => JOAN_ARC } }, clone(d1.storyArc));
+    check('same tab: added scene saved', saved1.acts[3].scenes?.[0]?.id === 'tmp_scene');
+    commitLoadedSceneIds(el2, d1);
+    w.querySelector('.scene-card').remove();
+    const d2 = clone(d1); collectEdits(el2, d2);
+    check('same tab: after a save, the loaded list includes what it saved', JSON.stringify(d2.storyArc.acts[3]._loaded_scene_ids) === '["tmp_scene"]');
+    const saved2 = preserveStoredScenes({ storyArcs: { findById: () => saved1 } }, clone(d2.storyArc));
+    check('same tab: deleting the scene it just added sticks (key-absent)', !('scenes' in saved2.acts[3]));
+  }
   // An added, untouched card is dropped; an added card with content is kept.
   const wrap = el.querySelector('#scene-rows-act-3');
   wrap.insertAdjacentHTML('beforeend', buildSceneCard({}, 3, sceneRefOptions(loaded)));
@@ -377,8 +400,11 @@ head('2c. PUT /story-arcs/:id → disk → GET (real router, scratch store)');
     const afterStale = await (await fetch(base)).json();
     check('stale tab OTHER edits still land (goal saved)', afterStale.goal === 'edited in a stale tab');
     check('...while its absent scenes do not erase the stored ones', sameScenes(afterStale.acts));
-    // A current tab clears one act ([]), leaves one absent, and edits another.
+    // A current tab (loaded WITH the scenes) clears one act ([]), leaves one absent, and edits
+    // another. It posts what it loaded, as the editor does.
     const cur = withScenes(JOAN_ARC);
+    const loadedIds = n => JOAN_SCENES[n].map(s => s.id);
+    cur.acts.forEach((x, n) => { x._loaded_scene_ids = loadedIds(n); });
     cur.acts[0].scenes = [];
     delete cur.acts[1].scenes;
     cur.acts[2].scenes[0].bridge = 'Edited bridge.';
@@ -390,9 +416,58 @@ head('2c. PUT /story-arcs/:id → disk → GET (real router, scratch store)');
     check('absent in the same save: act 2 scenes restored', JSON.stringify(a[1].scenes) === JSON.stringify(JOAN_SCENES[1]));
     check('posted scenes honored: act 3 bridge edited', a[2].scenes?.[0]?.bridge === 'Edited bridge.');
     check('[] on an act that never had scenes: stays key-absent', !('scenes' in a[3]));
+    check('_loaded_scene_ids is transport only — never stored', a.every(x => !('_loaded_scene_ids' in x)));
+
+    head('4b. a save cannot clear scenes it never loaded');
+    await putArc(withScenes(JOAN_ARC));
+    // THE GAP: a current-page tab opened BEFORE the scenes existed. It rendered empty lists, so
+    // it posts scenes: [] on every act with an EMPTY loaded list.
+    const early = clone(JOAN_ARC); early.goal = 'saved from an early tab';
+    early.acts.forEach(x => { x.scenes = []; x._loaded_scene_ids = []; });
+    const er = await putArc(early);
+    const afterEarly = await (await fetch(base)).json();
+    check('early current-page tab ([] + nothing loaded) → 200, its other edits land', er.status === 200 && afterEarly.goal === 'saved from an early tab');
+    check('...and every stored scene is KEPT', sameScenes(afterEarly.acts));
+    // Same tab adds one scene of its own to act 4: it lands, and nobody else's scenes are lost.
+    const early2 = clone(JOAN_ARC);
+    early2.acts.forEach(x => { x.scenes = []; x._loaded_scene_ids = []; });
+    early2.acts[3].scenes = [{ id: 'cell_relapse', change: 'both', date_label: '28 May 1431', location_id: 'joan_prison_cell', bridge: '', ends_on_beat: '28_may_1431' }];
+    await putArc(early2);
+    const e2 = await stored();
+    check('early tab ADDING a scene: its scene lands', e2[3].scenes?.some(s => s.id === 'cell_relapse'));
+    check('...and acts 1–3 keep every stored scene', [0, 1, 2].every(n => JSON.stringify(e2[n].scenes) === JSON.stringify(JOAN_SCENES[n])));
+    // A tab that loaded [A, B, C] deletes B, while someone else added D since it loaded:
+    // B goes (it was loaded), D stays (it was not), appended after the posted scenes.
+    const withD = withScenes(JOAN_ARC);
+    withD.acts[1].scenes.push({ id: 'added_elsewhere', change: 'time', date_label: '1 April 1431', location_id: 'joan_prison_cell', bridge: '', budget_minutes: 2 });
+    await putArc(withD);
+    const partial = withScenes(JOAN_ARC);
+    partial.acts.forEach((x, n) => { x._loaded_scene_ids = loadedIds(n); });
+    partial.acts[1].scenes = partial.acts[1].scenes.filter(s => s.id !== 'cell_church_militant');
+    await putArc(partial);
+    const pAct = (await stored())[1].scenes.map(s => s.id).join(',');
+    check('loaded scene deleted, unseen scene kept & appended', pAct === 'hall_male_dress,tower_torture,added_elsewhere', pAct);
+    // No list at all (the console/API, a pre-guard tab): adds and edits, never deletes.
+    await putArc(withScenes(JOAN_ARC));
+    const noList = withScenes(JOAN_ARC);
+    noList.acts[0].scenes = [];
+    noList.acts[2].scenes[0].bridge = 'API edit.';
+    await putArc(noList);
+    const nl = await stored();
+    check('no loaded list + [] → nothing deleted', JSON.stringify(nl[0].scenes) === JSON.stringify(JOAN_SCENES[0]));
+    check('no loaded list + edit → edit honored', nl[2].scenes?.[0]?.bridge === 'API edit.');
+    // Reset to exactly JOAN_SCENES. Since 4b a post can only delete what it loaded, so the
+    // reset loads first — the 4b tests left extra scenes behind in acts 2 and 4.
+    const resetScenes = async () => {
+      const cur = await stored();
+      const r = withScenes(JOAN_ARC);
+      r.acts.forEach((x, n) => { x._loaded_scene_ids = (cur[n].scenes || []).map(s => s.id); if (!x.scenes) x.scenes = []; });
+      await putArc(r);
+      check('reset to the fixture scenes', sameScenes(await stored()));
+    };
+    await resetScenes();
     // Acts matched by actNumber, not position: a payload with acts in another order must not
     // move act 2's scenes onto whatever sits at index 1.
-    await putArc(withScenes(JOAN_ARC));
     const shuffled = clone(JOAN_ARC); shuffled.acts = [shuffled.acts[2], shuffled.acts[1], shuffled.acts[0], shuffled.acts[3]];
     await putArc(shuffled);
     const byNum = Object.fromEntries((await stored()).map(x => [x.actNumber, x]));

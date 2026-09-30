@@ -1642,6 +1642,12 @@ function collectEdits(containerEl, data) {
       const list = containerEl.querySelector(`[data-scene-list="${i}"]`);
       if (!list) return;
       act.scenes = [...list.querySelectorAll('.scene-card')].map(collectSceneCard).filter(Boolean);
+      // The ids this list RENDERED at load (fixed at render, so a second collect before a save
+      // cannot mistake a scene deleted here for one never seen). The server lets a save delete
+      // only these; a stored scene outside them is one this tab never loaded, and it is kept.
+      let loadedIds = [];
+      try { loadedIds = JSON.parse(list.dataset.loadedSceneIds || '[]'); } catch { /* keep [] */ }
+      act._loaded_scene_ids = Array.isArray(loadedIds) ? loadedIds : [];
     });
   }
 
@@ -1938,6 +1944,18 @@ function buildSceneCard(scene, actIdx, ref) {
 // The inverse of buildSceneCard. Keys are written only when set, so an untouched optional
 // field does not appear as "" on disk. A card with every field blank (an unused "Add Scene")
 // is dropped; a partly filled one is kept for the server to judge.
+// After a SUCCESSFUL save, what this tab just saved is what it has "loaded": without this, a
+// scene added and saved here, then deleted and saved again from the same tab, would read as
+// never-loaded to the server's guard and come back. Scenes the server kept because this tab
+// never saw them stay unknown to it — they are still not this tab's to delete.
+function commitLoadedSceneIds(containerEl, data) {
+  containerEl.querySelectorAll('[data-scene-list]').forEach(list => {
+    const act = data?.storyArc?.acts?.[parseInt(list.dataset.sceneList, 10)];
+    if (!act || !Array.isArray(act.scenes)) return;
+    list.dataset.loadedSceneIds = JSON.stringify(act.scenes.map(s => s?.id).filter(Boolean));
+  });
+}
+
 function collectSceneCard(card) {
   const v = sel => (card.querySelector(sel)?.value ?? '').trim();
   const scene = { id: v('.scene-id'), change: v('.scene-change') };
@@ -1986,7 +2004,7 @@ function renderArcSection(data) {
        <div class="field-group">
          <label>Scenes</label>
          <p class="help-text">Where and when this act moves. Stored only — scenes do not change play yet. A scene ends on its beat or its time budget. The beat list reflects the last save; save after adding beats to pick them here.</p>
-         <div id="scene-rows-act-${i}" data-scene-list="${i}">${(Array.isArray(act.scenes) ? act.scenes : []).map(sc => buildSceneCard(sc, i, sceneRef)).join('')}</div>
+         <div id="scene-rows-act-${i}" data-scene-list="${i}" data-loaded-scene-ids="${esc(JSON.stringify((Array.isArray(act.scenes) ? act.scenes : []).map(sc => sc?.id).filter(Boolean)))}">${(Array.isArray(act.scenes) ? act.scenes : []).map(sc => buildSceneCard(sc, i, sceneRef)).join('')}</div>
          <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px" data-add-scene="${i}">＋ Add Scene</button>
        </div>`,
       i === 0
@@ -4872,6 +4890,7 @@ async function handleManualSave(data, containerEl) {
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
+    if (containerEl) commitLoadedSceneIds(containerEl, data);
     clearFormDirty();   // single choke point — clears badge/Save emphasis for all save paths
     // Repaint the Regenerate buttons: risk state just moved from session-dirty to a stamp.
     if (containerEl) refreshRegenRiskUI(containerEl, data);
