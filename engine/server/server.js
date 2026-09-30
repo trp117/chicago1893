@@ -19,7 +19,8 @@ import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
-import { checkSupabaseConnection, isSupabaseConnected, supabaseAuth } from '../../lib/supabase.js';
+import { checkSupabaseConnection, isSupabaseConnected, supabaseAuth, supabase as supabaseService } from '../../lib/supabase.js';
+import { SupabaseSessionStore } from '../../lib/SupabaseSessionStore.js';
 import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/PromptComposer.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
@@ -48,7 +49,14 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(publicDir, { maxAge: '5m' }));
 
+// Sessions persist in Supabase (public.admin_sessions) so a deploy/restart no longer signs
+// every admin out mid-edit — see lib/SupabaseSessionStore.js. A persistent session is only
+// as stable as the secret that signs its cookie, so warn if production runs on the fallback.
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  console.warn('[SESSION] SESSION_SECRET is not set — cookies are signed with the built-in fallback. Set it in the environment.');
+}
 app.use(session({
+  store: new SupabaseSessionStore({ client: supabaseService }),
   secret: process.env.SESSION_SECRET || 'ledger250-dev-secret',
   resave: false,
   saveUninitialized: false,
@@ -229,16 +237,21 @@ app.post('/admin/auth/login', async (req, res) => {
       return res.json({ success: false, error: 'Invalid email or password.' })
     }
 
-    req.session.adminUser = {
+    // A fresh session id at the moment of login (session-fixation hardening — it matters more
+    // now that sessions persist), then an explicit save BEFORE replying: the client navigates
+    // straight into the admin on success, and a login the store could not persist must fail
+    // here rather than look successful and bounce at the next request.
+    const redirect = req.session.returnTo || '/admin'
+    const adminUser = {
       id: data.user.id,
       email: data.user.email,
       loginAt: new Date().toISOString()
     }
+    await new Promise((resolve, reject) => req.session.regenerate(err => err ? reject(err) : resolve()))
+    req.session.adminUser = adminUser
+    await new Promise((resolve, reject) => req.session.save(err => err ? reject(err) : resolve()))
 
     console.log(`[AUTH] Login: ${data.user.email}`)
-
-    const redirect = req.session.returnTo || '/admin'
-    delete req.session.returnTo
 
     return res.json({ success: true, redirect })
 

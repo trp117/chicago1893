@@ -31,6 +31,7 @@ const SUITE = [
   ['story-bound forks: opt-in gate',         'storybound.test.mjs'],
   ['epilogue: no cut-off sentences',         'epilogue.test.mjs'],
   ['scenes B1: storage only, round trip',    'scenes.test.mjs'],
+  ['admin sessions: persistent store',       'session-store.test.mjs'],
 ];
 
 const results = [];
