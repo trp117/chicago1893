@@ -37,7 +37,7 @@ const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryA
 const { buildInitialState, loadForkStoryArc, recordReachedBeats, mergeState } =
   await import(`${ROOT}/engine/services/StateManager.js`);
 const { isStoryBoundFork, storyBoundForkActive, composeTurnPrompt, arcBeats, storyPosition,
-        definingMomentDue, FORK_FALLBACK_FRACTION_DEFAULT } =
+        definingMomentDue, FORK_FALLBACK_FRACTION_DEFAULT, arcHasScenes, buildStoryPositionDirective } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 
 const store = new JsonFileStore(path.join(REPO_DIR, 'engine/data'));
@@ -169,7 +169,9 @@ head('A2 INERTNESS — the gate is the fork fields, not the arc being available'
   // prompt may change: the directive keys on the fork, and an arc in the game data is inert.
   // The bound roles are the opposite case — the arc must SHAPE their prompt (a STORY POSITION
   // block), which is what their binding asks for.
-  let compared = 0; const moved = [], boundFlat = [];
+  // Scene scenarios (B2a) are a third case: every role gets the roster — exactly the roster,
+  // nothing else — because scenes advance on reported beats. Asserted as such below.
+  let compared = 0, sceneRoles = 0; const moved = [], boundFlat = [], sceneMoved = [];
   for (const c of corpus) {
     const arc = arcOf(c);
     if (!arc) continue;
@@ -182,12 +184,20 @@ head('A2 INERTNESS — the gate is the fork fields, not the arc being available'
           if (!promptFor(c, st, arc).includes('⚑ STORY POSITION')) boundFlat.push(`${c.scenario.id}/${role.id}@${f}`);
           continue;
         }
+        if (arcHasScenes(arc)) {
+          const withArc = promptFor(c, st, arc), d = buildStoryPositionDirective(st, c.scenario, arc);
+          const stripped = withArc.includes('\n\n' + d) ? withArc.replace('\n\n' + d, '') : withArc.replace(d, '');
+          if (!d.includes('⚑ STORY POSITION') || d.includes('⚑ PACING') || stripped !== promptFor(c, st, null)) sceneMoved.push(`${c.scenario.id}/${role.id}@${f}`);
+          sceneRoles++;
+          continue;
+        }
         if (promptFor(c, st, arc) !== promptFor(c, st, null)) moved.push(`${c.scenario.id}/${role.id}@${f}`);
         compared++;
       }
     }
   }
-  check(`${compared} UNBOUND stored role x elapsed prompts identical with and without the arc`, compared > 0 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`${compared} UNBOUND stored role x elapsed prompts (scenarios without scenes) identical with and without the arc`, compared > 0 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`${sceneRoles} scene-scenario role x elapsed prompts: the arc adds the beat roster and NOTHING else (no nudge)`, sceneRoles > 0 && sceneMoved.length === 0, sceneMoved.slice(0, 5).join(', '));
   check('every BOUND stored role\'s prompt carries STORY POSITION when its arc is loaded', boundFlat.length === 0, boundFlat.slice(0, 5).join(', '));
 
   const gb  = corpus.find(c => c.scenario.id === 'greensboro_four_the_color_line');

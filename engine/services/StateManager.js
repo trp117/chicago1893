@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes, storyPosition } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -106,6 +106,66 @@ export function loadForkStoryArc(repos, scenario, state) {
     return null;
   }
   return arc;
+}
+
+// The arc a session plays with: the story-bound-fork arc (Part A, above), or — for any role —
+// the scenario's arc when it carries scenes (B2a: scenes advance on reported beats, so the
+// arc and its beat roster must be loaded). null for everything else, so a scenario with no
+// scenes and no bound fork gets no storyArc key, exactly as before.
+export function loadStoryArc(repos, scenario, state) {
+  const forkArc = loadForkStoryArc(repos, scenario, state);
+  if (forkArc) return forkArc;
+  const arcId = scenario?.storyArcIds?.[0];
+  const arc   = arcId && repos?.storyArcs ? repos.storyArcs.findById(arcId) : null;
+  return arcHasScenes(arc) ? arc : null;
+}
+
+// SCENE TRACKING (B2a) — state only; nothing is shown to the player yet (B2b).
+//
+// initSceneState puts a scene-scenario session in its first scene (story order: Act 1's first
+// scene). It adds currentSceneId and sceneAdvances ONLY when the arc has scenes; every other
+// session's state is untouched. Returns the starting scene id, or null.
+export function initSceneState(state, storyArc) {
+  const scenes = arcScenes(storyArc);
+  if (!scenes.length) return null;
+  state.currentSceneId = scenes[0].id;
+  state.sceneAdvances  = [];
+  return scenes[0].id;
+}
+
+// Advance the current scene past every scene whose ends_on_beat the story has reached. Reads
+// the beats recordReachedBeats just wrote, so call it right after. "Reached" is Part A's story
+// position rule: the beat was reported, OR a later beat was (the story is past it — beats can
+// be skipped or reported late). One turn can therefore cross several scenes; each crossing is
+// logged. A scene with no ends_on_beat (budget-only) holds until B3 adds budgets. The last
+// scene never advances. A session with no currentSceneId (no scenes, or a session started
+// before scenes existed) is left alone. Returns the advances made this call.
+export function advanceScene(state, storyArc, turn = null) {
+  if (typeof state?.currentSceneId !== 'string') return [];
+  const scenes = arcScenes(storyArc);
+  if (!scenes.length) return [];
+  let i = scenes.findIndex(s => s.id === state.currentSceneId);
+  if (i < 0) {
+    console.warn(`[SCENE] current scene "${state.currentSceneId}" is not a scene of ${storyArc?.id} — holding`);
+    return [];
+  }
+  const beatIndex = new Map(arcBeats(storyArc).map(b => [b.id, b.index]));
+  const reached   = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
+  const furthest  = storyPosition(state, storyArc);
+  const ended = s => {
+    const b = typeof s.ends_on_beat === 'string' ? s.ends_on_beat : '';
+    return !!b && beatIndex.has(b) && (reached.has(b) || beatIndex.get(b) <= (furthest ? furthest.index : -1));
+  };
+  const moves = [];
+  while (i < scenes.length - 1 && ended(scenes[i])) {
+    moves.push({ from: scenes[i].id, to: scenes[i + 1].id, beat: scenes[i].ends_on_beat, turn });
+    i++;
+  }
+  if (moves.length) {
+    state.currentSceneId = scenes[i].id;
+    state.sceneAdvances  = [...(Array.isArray(state.sceneAdvances) ? state.sceneAdvances : []), ...moves];
+  }
+  return moves;
 }
 
 export function buildInitialState(scenario, role, locations) {

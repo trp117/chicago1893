@@ -6,15 +6,22 @@
 // was run to show, whether beats were reported at all. Transcripts are on the mounted volume
 // (railway.toml) and survive.
 //
-// Written ONLY for a session whose fork is story-bound (storyBoundForkActive), so every other
-// transcript is byte-for-byte what it was. Every line this module writes starts with DIAG_PREFIX,
+// Written ONLY for a session whose fork is story-bound (storyBoundForkActive) or that tracks
+// scenes (B2a: state.currentSceneId) — forkDiagActive — so every other transcript is
+// byte-for-byte what it was. Every line this module writes starts with DIAG_PREFIX,
 // and stripForkDiagnostics removes exactly those lines: /closing-prose feeds the transcript to
 // the closing-prose model, and a line saying "fork: PRESENTED via fallback" must never become
 // something it writes about. Stripping a transcript with no such line returns it unchanged.
 
-import { forkTimingStatus, storyPosition, storyPacingNudge, arcBeats, resolveDefiningMomentBlock } from './PromptComposer.js';
+import { forkTimingStatus, storyPosition, storyPacingNudge, arcBeats, resolveDefiningMomentBlock, storyBoundForkActive } from './PromptComposer.js';
 
 export const DIAG_PREFIX = '> ⚑ DIAG ';
+
+// Whether a session writes diagnostic lines: a story-bound fork (Part A), or scene tracking
+// (B2a — the session was started in a scene). `state` is the state a turn STARTED from.
+export function forkDiagActive(state, scenario) {
+  return storyBoundForkActive(state, scenario) || typeof state?.currentSceneId === 'string';
+}
 
 // Diagnostics are only ever written as a run of DIAG lines followed by one blank line (a turn's
 // line after its narrative; the summary after the closing sections). Dropping the run AND that
@@ -56,7 +63,16 @@ export function describeBinding(status) {
 // can only count from the next turn. The wording says so, because the position column beside it
 // shows where the turn LEFT the story, and a line reading "binding unmet" next to "Act 4" was
 // read as an ordering bug when it was the honest pre-turn verdict.
-function describeFork(status, decisionRecorded) {
+function describeFork(status, decisionRecorded, block = undefined) {
+  // A scene session's role may have no fork at all, or an unbound (clock) one. Said plainly —
+  // the bound-fork wording below would print "binding unmet … fallback at ? min" for them.
+  if (!status.bound && block !== undefined) {
+    if (!block) return 'none (this role has no fork)';
+    if (!status.due && !decisionRecorded && !status.decision && !status.presented) {
+      const f = block.at_elapsed_fraction;
+      return typeof f === 'number' ? `waiting (clock: ${f} = ${mins(status.totalMinutes * f)} of ${mins(status.totalMinutes)} min)` : 'waiting (clock)';
+    }
+  }
   if (status.due) {
     const why = status.via === 'binding'
       ? `${status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`} met at turn start`
@@ -76,7 +92,20 @@ const describePosition = pos => (pos ? `Act ${pos.actNumber} (${pos.id})` : 'no 
 // One line per turn. `state` is the state the turn STARTED from (the fork verdict and the
 // pacing nudge are both taken against it, exactly as gameRouter takes forkDue and the prompt
 // composes the nudge); `nextState` is where it left the story. Position shows both.
-export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, output, newBeats = [], decisionRecorded = null, opening = false }) {
+// The scene segment (B2a): where the turn left the player, and any scene crossings it made.
+// Omitted for a session that does not track scenes, so a bound-fork-only line is unchanged.
+function describeScene(state, nextState, sceneMoves, opening) {
+  const at = nextState?.currentSceneId ?? state?.currentSceneId;
+  if (typeof at !== 'string') return null;
+  if (sceneMoves.length) {
+    const path = [sceneMoves[0].from, ...sceneMoves.map(m => m.to)].join(' → ');
+    const on   = sceneMoves.map(m => m.beat);
+    return `scene: ${path} (advanced on beat${on.length === 1 ? '' : 's'} ${on.join(', ')})`;
+  }
+  return `scene: ${at} (${opening ? 'opening scene' : 'held'})`;
+}
+
+export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, output, newBeats = [], decisionRecorded = null, opening = false, sceneMoves = [] }) {
   const status   = forkTimingStatus(state, scenario, storyArc);
   const raw      = output?.stateChanges?.beats_reached;
   const known    = new Set(arcBeats(storyArc).map(b => b.id));
@@ -85,6 +114,10 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
   const before   = storyPosition(state, storyArc);
   const after    = storyPosition(nextState, storyArc);
   const nudge    = storyPacingNudge(state, scenario, storyArc);
+  const scene    = describeScene(state, nextState, sceneMoves, opening);
+  // Unbound wording only for scene sessions (their role's fork is usually not bound); a
+  // bound-fork session keeps the exact Part A wording.
+  const block    = scene && !status.bound ? resolveDefiningMomentBlock(state, scenario) : undefined;
   return [
     `${DIAG_PREFIX}turn ${turn}${opening ? ' (opening)' : ''}`,
     `${mins(state?.elapsedMinutes ?? 0)}→${mins(nextState?.elapsedMinutes ?? 0)} min`,
@@ -93,8 +126,9 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
     `new: ${list(newBeats)}`,
     ...(rejected.length ? [`rejected: ${list(rejected)}`] : []),
     `position: ${describePosition(before)} → ${describePosition(after)}`,
+    ...(scene ? [scene] : []),
     ...(nudge ? [`pacing: nudged toward ${nudge.target.id} (~${nudge.turnsLeft} turn${nudge.turnsLeft === 1 ? '' : 's'} left)`] : []),
-    `fork: ${describeFork(status, decisionRecorded)}`,
+    `fork: ${describeFork(status, decisionRecorded, block)}`,
   ].join(' · ');
 }
 
@@ -114,10 +148,30 @@ export function parseForkDiagLines(transcript) {
   return { turns, beats, fork };
 }
 
+// Scene crossings, read back from the turn lines' scene segments (B2a).
+const SCENE_SEG_RE = /^> ⚑ DIAG turn (\d+)[^\n]*? · scene: ([^·\n]*?)(?: · |$)/gm;
+export function parseSceneDiag(transcript) {
+  const moves = []; let last = null; let seen = false;
+  for (const m of String(transcript || '').matchAll(SCENE_SEG_RE)) {
+    seen = true;
+    const [, turn, seg] = m;
+    const adv = /^(.*?) \(advanced on beats? (.*)\)$/.exec(seg);
+    if (adv) {
+      const path = adv[1].split(' → ');
+      moves.push({ turn: Number(turn), path, beats: adv[2] });
+      last = path[path.length - 1];
+    } else {
+      last = seg.replace(/ \((opening scene|held)\)$/, '');
+    }
+  }
+  return { seen, moves, last };
+}
+
 // The footer written at session close. Every line carries DIAG_PREFIX so it strips like the rest.
 export function forkDiagSummaryLines({ transcript, sessionState = null, scenario = null, storyArc = null }) {
   const { turns, beats, fork } = parseForkDiagLines(transcript);
   if (!turns) return [];
+  const scenes = parseSceneDiag(transcript);
   const status   = sessionState ? forkTimingStatus(sessionState, scenario, storyArc) : null;
   const block    = sessionState ? resolveDefiningMomentBlock(sessionState, scenario) : null;
   const momentId = block?.principal_transition?.moment ?? null;
@@ -135,6 +189,13 @@ export function forkDiagSummaryLines({ transcript, sessionState = null, scenario
       ? `${DIAG_PREFIX}fork: presented turn ${fork.turn} at ${fork.elapsed} min via ${fork.via}`
       : `${DIAG_PREFIX}fork: NEVER presented`,
     `${DIAG_PREFIX}decision: ${decision ? `${decision.option_id}${decision.turn != null ? ` (turn ${decision.turn}, ${mins(decision.elapsed)} min)` : ''}` : (sessionState ? 'none recorded' : '(session state gone)')}`,
+    // Scene sessions only (a line carried a scene segment).
+    ...(scenes.seen ? [
+      scenes.moves.length
+        ? `${DIAG_PREFIX}scene advances (${scenes.moves.reduce((n, m) => n + m.path.length - 1, 0)}): ${scenes.moves.map(m => `turn ${m.turn} ${m.path.join(' → ')} (on ${m.beats})`).join('; ')}`
+        : `${DIAG_PREFIX}scene advances: NONE — the session never left its opening scene`,
+      `${DIAG_PREFIX}scene at close: ${sessionState?.currentSceneId ?? `${scenes.last ?? '?'} (last recorded; session state gone)`}`,
+    ] : []),
   ];
   return out;
 }

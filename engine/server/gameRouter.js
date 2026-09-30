@@ -13,14 +13,13 @@ import {
   evaluateDefiningMoment,
   definingMomentDue,
   resolveDefiningMomentBlock,
-  storyBoundForkActive,
   closureShouldClose,
   prepareForTts,
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
-import { mergeState, buildInitialState, recordDefiningDecision, loadForkStoryArc, recordReachedBeats } from '../services/StateManager.js';
-import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics } from '../services/ForkDiagnostics.js';
+import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats } from '../services/StateManager.js';
+import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive } from '../services/ForkDiagnostics.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -72,8 +71,8 @@ const langfuse = (process.env.LANGFUSE_SECRET_KEY && process.env.LANGFUSE_PUBLIC
 // ── Data helpers ───────────────────────────────────────────────────────────────
 
 // `state` is passed only by /turn, where the playing role's fork is known. The story arc is
-// attached ONLY when that fork is story-bound (loadForkStoryArc); every other session gets
-// exactly the five keys it always got. /start attaches it itself, once the role is resolved.
+// attached ONLY when that fork is story-bound or the arc carries scenes (loadStoryArc); every
+// other session gets exactly the five keys it always got. /start attaches it itself, once the role is resolved.
 async function getScenarioData(repos, scenarioId, { state = null } = {}) {
   const scenario = await repos.scenarios.findById(scenarioId);
   if (!scenario) throw new Error(`Scenario "${scenarioId}" not found.`);
@@ -82,7 +81,7 @@ async function getScenarioData(repos, scenarioId, { state = null } = {}) {
   const locations   = repos.locations.findByScenario(scenarioId);
   const clues       = repos.clues.findByScenario(scenarioId);
   const data        = { scenario, playerRoles, characters, locations, clues };
-  const storyArc    = state ? loadForkStoryArc(repos, scenario, state) : null;
+  const storyArc    = state ? loadStoryArc(repos, scenario, state) : null;
   if (storyArc) data.storyArc = storyArc;
   return data;
 }
@@ -786,10 +785,16 @@ export function createGameRouter(repos, config = {}) {
       initialState.narrativeStyle  = narrativeStyle || 'focused';
       initialState.introducedNpcs  = [];
 
-      // Story-bound fork: the arc joins the game data now that the role is known (see
-      // getScenarioData). No key is added for any other session.
-      const startArc = loadForkStoryArc(repos, scenario, initialState);
-      if (startArc) gameData.storyArc = startArc;
+      // Story-bound fork, or a scenario with scenes: the arc joins the game data now that the
+      // role is known (see getScenarioData), and a scene scenario starts the player in its
+      // first scene (B2a — state only; nothing about scenes is shown yet). No key is added for
+      // any other session.
+      const startArc = loadStoryArc(repos, scenario, initialState);
+      if (startArc) {
+        gameData.storyArc = startArc;
+        const firstScene = initSceneState(initialState, startArc);
+        if (firstScene) console.log(`[SCENE] start in ${firstScene}`);
+      }
 
       // Pre-seed verified technical facts
       if (scenario.technical_facts?.reviewed === true) {
@@ -1055,6 +1060,10 @@ Do not open with the historical context. Open inside the character's body. Let t
         openingBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (openingBeats.length) console.log('[STORY-BOUND] beats reached: ' + openingBeats.join(', '));
       }
+      // Scene scenarios only (no currentSceneId on any other state): cross every scene whose
+      // ending beat the opening reached. State only — nothing is shown to the player (B2a).
+      const openingScenes = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, 0) : [];
+      if (openingScenes.length) console.log('[SCENE] ' + openingScenes.map(m => `${m.from} → ${m.to} (on ${m.beat})`).join(', '));
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
@@ -1091,10 +1100,11 @@ Do not open with the historical context. Open inside the character's body. Let t
           : `## Session\n\n`,
         output.narrative || '',
         ``,
-        // Story-bound fork only: the turn-0 diagnostic line, which also states the binding.
-        ...(storyBoundForkActive(seededInitial, scenario) ? [forkDiagTurnLine({
+        // Story-bound fork or scene scenario only: the turn-0 diagnostic line, which also
+        // states the binding (and, for a scene scenario, the opening scene).
+        ...(forkDiagActive(seededInitial, scenario) ? [forkDiagTurnLine({
           turn: 0, opening: true, state: seededInitial, nextState, scenario,
-          storyArc: gameData.storyArc ?? null, output, newBeats: openingBeats,
+          storyArc: gameData.storyArc ?? null, output, newBeats: openingBeats, sceneMoves: openingScenes,
         }), ``] : []),
         `---`,
         ``,
@@ -1509,6 +1519,10 @@ Do not open with the historical context. Open inside the character's body. Let t
         newBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (newBeats.length) console.log('[STORY-BOUND] beats reached: ' + newBeats.join(', '));
       }
+      // Scene scenarios only: advance past every scene whose ending beat the story has now
+      // reached (B2a — state and DIAG only; the player sees no change yet).
+      const sceneMoves = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, nextState.turnCount) : [];
+      if (sceneMoves.length) console.log('[SCENE] ' + sceneMoves.map(m => `${m.from} → ${m.to} (on ${m.beat})`).join(', '));
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
@@ -1580,13 +1594,13 @@ Do not open with the historical context. Open inside the character's body. Let t
           output.narrative || '',
           ``,
         ];
-        // Story-bound fork only: one diagnostic line (ForkDiagnostics.js) — beats the model
-        // reported, the story position, and why the fork did or did not fire. Stripped from
+        // Story-bound fork or scene scenario only: one diagnostic line (ForkDiagnostics.js) —
+        // beats the model reported, the story position, the scene, and why the fork did or did not fire. Stripped from
         // the transcript before /closing-prose hands it to a model.
-        if (storyBoundForkActive(state, scenario)) {
+        if (forkDiagActive(state, scenario)) {
           chunk.push(forkDiagTurnLine({
             turn: nextState.turnCount, state, nextState, scenario, storyArc: gameData.storyArc ?? null,
-            output, newBeats, decisionRecorded: recordedDecision,
+            output, newBeats, decisionRecorded: recordedDecision, sceneMoves,
           }), ``);
         }
         if (output.endState?.isEnding) {

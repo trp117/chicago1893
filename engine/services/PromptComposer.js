@@ -1437,6 +1437,22 @@ export function arcBeats(storyArc) {
   return out;
 }
 
+// SCENES (Part B). An act's optional scenes[] (B1 data), flattened into story order, each
+// carrying its act. B2a tracks which one the player is in (StateManager.advanceScene); nothing
+// renders a scene to the player yet. An arc with no scenes yields [] — the gate every scene
+// behaviour keys on, so a scenario without scenes composes exactly what it composed before.
+export function arcScenes(storyArc) {
+  const out = [];
+  for (const act of (Array.isArray(storyArc?.acts) ? storyArc.acts : [])) {
+    for (const scene of (Array.isArray(act?.scenes) ? act.scenes : [])) {
+      if (!scene || typeof scene.id !== 'string' || !scene.id) continue;
+      out.push({ ...scene, actNumber: act.actNumber, index: out.length });
+    }
+  }
+  return out;
+}
+export function arcHasScenes(storyArc) { return arcScenes(storyArc).length > 0; }
+
 // The furthest point the story has reached: the reached beat latest in arc order, or null.
 // Beats are reported by the model and can arrive out of order or with gaps (a beat that
 // happens off-screen may never be reported), so position is the MAX, not the last reported.
@@ -1526,12 +1542,15 @@ function buildPacingNudgeLine(nudge) {
 // StateManager.recordReachedBeats reads the report back onto state.reachedBeats, the way
 // evaluateClosure reads the flag.
 //
-// Returns '' unless storyBoundForkActive AND an arc with beats was loaded — so every session
-// whose fork is not story-bound composes the prompt it composed before. It is rendered into
-// the CLOSURE_FLAG_DIRECTIVE slot beside the closure line rather than into a new template
-// slot, because an empty new slot would still leave a blank line in every prompt.
+// Returns '' unless an arc with beats was loaded AND the session needs beat reports: its fork
+// is story-bound (Part A), or the arc carries scenes (B2a — scenes advance on reported beats,
+// so a scene scenario needs the roster whatever its roles' forks are). Every other session
+// composes the prompt it composed before. The pacing nudge below stays fork-only
+// (storyPacingNudge requires a bound fork). It is rendered into the CLOSURE_FLAG_DIRECTIVE
+// slot beside the closure line rather than into a new template slot, because an empty new
+// slot would still leave a blank line in every prompt.
 export function buildStoryPositionDirective(state, scenario, storyArc) {
-  if (!storyArc || !storyBoundForkActive(state, scenario)) return '';
+  if (!storyArc || !(storyBoundForkActive(state, scenario) || arcHasScenes(storyArc))) return '';
   const beats = arcBeats(storyArc);
   if (!beats.length) return '';
 
@@ -1588,10 +1607,13 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // turn byte-identical to the one it composed before.
   // reachedBeats (story-bound forks only) goes too: buildStoryPositionDirective already renders
   // it as the ticked roster, and a session without it has no such key to strip.
+  // currentSceneId / sceneAdvances (scene scenarios, B2a) are engine bookkeeping that nothing
+  // shows the model yet — B2b decides what the narrator is told about scenes, and it will not
+  // be a raw id in the state block.
   const {
     remainingMinutes, effectiveClosure, effectiveDefiningMoment,
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
-    reachedBeats,
+    reachedBeats, currentSceneId, sceneAdvances,
     ...stateRest
   } = state;
   const promptState = {

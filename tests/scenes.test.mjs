@@ -1,13 +1,14 @@
 // SCENES (Part B, B1) — data model + admin authoring. STORAGE ONLY.
 //
 // An act may carry an optional scenes[] array. B1 adds the shape, the Story Arc editor's
-// scene cards, and a save-side reference check. It adds NO runtime behaviour: nothing in the
-// engine reads scenes[] until B2. So this file asserts three things:
+// scene cards, and a save-side reference check. Since B2a the engine TRACKS scenes (state +
+// DIAG only — tests/scene-tracking.test.mjs), which puts the beat roster in a scene arc's
+// prompt; nothing else about a scene reaches the model or the player. So this file asserts:
 //
-//   1. INERTNESS  an arc WITH scenes composes byte-identical prompts, beat rosters, story
-//                 positions and fork due-checks to the same arc without them — for every
-//                 stored role, and for the story-bound (arc-loaded) path. Plus a static check
-//                 that no runtime module mentions scenes at all.
+//   1. INERTNESS  an arc WITH scenes adds exactly the Part A beat roster to a prompt and nothing
+//                 else (a bound role's prompt does not move at all); beat rosters, positions and
+//                 fork due-checks are identical. A static check pins which runtime modules read
+//                 scenes, and that none reads a scene's presentation fields (B2b/B3).
 //   2. ROUND TRIP every scene field — dropdowns, role_locations, reorder, removal — survives
 //                 the real editor render → collect, and the real PUT → disk → GET routes.
 //   3. VALIDATION a location from another scenario, an unknown beat, an unknown role, a
@@ -36,7 +37,7 @@ const { LocationRepository } = await import(`${ROOT}/engine/repositories/Locatio
 const { StoryArcRepository } = await import(`${ROOT}/engine/repositories/StoryArcRepository.js`);
 const { buildInitialState, loadForkStoryArc, recordReachedBeats } =
   await import(`${ROOT}/engine/services/StateManager.js`);
-const { composeTurnPrompt, arcBeats, storyPosition, definingMomentDue, forkTimingStatus } =
+const { composeTurnPrompt, arcBeats, storyPosition, definingMomentDue, forkTimingStatus, buildStoryPositionDirective, isStoryBoundFork } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 const admin = await import(`${ROOT}/engine/admin/adminRouter.js`);
 const { validateArcScenes, sceneRefSets, preserveStoredScenes, createAdminRouter } = admin;
@@ -109,20 +110,29 @@ check('Joan has 7 scenario-scoped locations', JOAN_LOC.length === 7, JOAN_LOC.ma
 check('Joan has roles joan / manchon / massieu', ['role_joan', 'role_manchon', 'role_massieu'].every(id => JOAN_ROLES.some(r => r.id === id)));
 
 // ═══ 1. INERTNESS ════════════════════════════════════════════════════════════
-head('1a. static — no runtime module reads scenes');
+head('1a. static — runtime reads scenes only where B2a tracks them, never their presentation fields');
 {
+  // B2a reads scenes to TRACK them (ids, ends_on_beat, currentSceneId) in exactly four modules.
+  // The fields a player would see or that move people and clocks — bridge, date/time labels,
+  // role_locations, budget_minutes — are B2b/B3 and must not be read anywhere yet.
   const runtimeDirs = ['engine/services', 'engine/server', 'engine/game', 'engine/agents'];
-  const hits = [];
+  const hits = [], presentation = [];
   const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
     const p = path.join(d, f.name);
     if (f.isDirectory()) walk(p);
-    else if (/\.(m?js)$/.test(f.name) && /\.scenes\b|\['scenes'\]|\bscenes\s*[:=]|ends_on_beat|role_locations|budget_minutes/.test(fs.readFileSync(p, 'utf8'))) hits.push(path.relative(REPO_DIR, p));
+    else if (/\.(m?js)$/.test(f.name)) {
+      const src = fs.readFileSync(p, 'utf8'), rel = path.relative(REPO_DIR, p).replace(/\\/g, '/');
+      if (/\.scenes\b|\['scenes'\]|\bscenes\s*[:=]|ends_on_beat|currentSceneId/.test(src)) hits.push(rel);
+      if (/\.bridge\b|\['bridge'\]|date_label|time_label|role_locations|budget_minutes/.test(src)) presentation.push(rel);
+    }
   } };
   for (const d of runtimeDirs) if (fs.existsSync(path.join(REPO_DIR, d))) walk(path.join(REPO_DIR, d));
-  check('engine/{services,server,game,agents} never touch scenes / scene fields', hits.length === 0, hits.join(', '));
+  const B2A = ['engine/server/gameRouter.js', 'engine/services/ForkDiagnostics.js', 'engine/services/PromptComposer.js', 'engine/services/StateManager.js'];
+  check('scene-reading runtime modules are exactly the B2a set', JSON.stringify([...hits].sort()) === JSON.stringify(B2A), hits.sort().join(', '));
+  check('no runtime module reads a scene\'s bridge / date / time / role_locations / budget (B2b/B3)', presentation.length === 0, presentation.join(', '));
 }
 
-head('1b. every stored role — prompt identical with a scene-laden arc');
+head('1b. every stored role — a scene-laden arc adds the beat roster and nothing else');
 const SCEN_DIR = path.join(REPO_DIR, 'engine/data/scenarios');
 const scenarioIds = [...new Set([
   ...fs.readdirSync(SCEN_DIR).filter(f => f.endsWith('.json')).map(f => f.replace(/\.json$/, '')),
@@ -150,12 +160,16 @@ const sceneify = (arc, locations) => {
 const promptFor = (c, st, storyArc) =>
   composeTurnPrompt(st, 'I wait and watch.', { scenario: c.scenario, characters: [], locations: c.locations, clues: [], ...(storyArc ? { storyArc } : {}) });
 {
-  // The claim is arc vs arc-with-scenes. (Arc vs NO arc legitimately differs for a role whose
-  // stored fork is story-bound — McCord and Wills are, at_act:4 — which is Part A, not B1.)
+  // B2a: an arc with scenes puts the Part A beat roster in every role's prompt (scenes advance
+  // on reported beats). A bound role already has the roster, so its prompt must not move at
+  // all; for any other role the roster is the ONLY change — strip it and the prompt is the
+  // arc-without-scenes prompt, byte for byte — and no scene id or bridge appears.
   let compared = 0, bound = 0; const moved = [];
   for (const c of corpus) {
     const arcId = c.scenario.storyArcIds?.[0];
-    const arc   = arcId ? repos.storyArcs.findById(arcId) : null;
+    // Baseline = the stored arc with any scenes stripped (Joan's carries real ones now).
+    const stored = arcId ? repos.storyArcs.findById(arcId) : null;
+    const arc    = stored ? (a => { a.acts?.forEach(x => { delete x.scenes; }); return a; })(clone(stored)) : null;
     if (!arc?.acts?.length) continue;
     const sArc  = sceneify(arc, c.locations);
     const total = c.scenario.sessionTargetMinutes || 15;
@@ -163,14 +177,24 @@ const promptFor = (c, st, storyArc) =>
       for (const f of [0, 0.6, 0.8]) {
         const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
         st.elapsedMinutes = total * f; st.remainingMinutes = total - st.elapsedMinutes;
-        const p1 = promptFor(c, st, arc);
+        const p1 = promptFor(c, st, arc), p2 = promptFor(c, st, sArc);
         if (p1 !== promptFor(c, st, null)) bound++;
-        if (p1 !== promptFor(c, st, sArc)) moved.push(`${c.scenario.id}/${role.id}@${f}`);
+        let ok;
+        // A bound role already has the roster; an arc whose beats carry no ids (legacy string
+        // beats — Boston's) has no roster to add. Either way the prompt must not move at all.
+        if (isStoryBoundFork(role.defining_moment) || !arcBeats(sArc).length) ok = p1 === p2;
+        else {
+          const d = buildStoryPositionDirective(st, c.scenario, sArc);
+          const stripped = p2.includes('\n\n' + d) ? p2.replace('\n\n' + d, '') : p2.replace(d, '');
+          ok = d.includes('⚑ STORY POSITION') && !d.includes('⚑ PACING') && stripped === p1;
+        }
+        if (sArc.acts.some(a => a.scenes.some(sc => p2.includes(sc.bridge) || p2.includes(`"${sc.id}"`)))) ok = false;
+        if (!ok) moved.push(`${c.scenario.id}/${role.id}@${f}`);
         compared++;
       }
     }
   }
-  check(`${compared} stored role x elapsed prompts byte-identical with scenes on every act`, compared > 0 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`${compared} stored role x elapsed prompts: scenes add exactly the roster (bound roles: unchanged), no scene data`, compared > 0 && moved.length === 0, moved.slice(0, 5).join(', '));
   check(`...including the ${bound} story-bound ones whose prompt the arc does shape`, bound > 0, 'bound roles present, so the arc-reading path was exercised');
 }
 

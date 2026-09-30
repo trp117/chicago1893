@@ -32,6 +32,7 @@ const SUITE = [
   ['epilogue: no cut-off sentences',         'epilogue.test.mjs'],
   ['scenes B1: storage only, round trip',    'scenes.test.mjs'],
   ['admin sessions: persistent store',       'session-store.test.mjs'],
+  ['scenes B2a: tracking (state + DIAG)',    'scene-tracking.test.mjs'],
 ];
 
 const results = [];
