@@ -63,7 +63,11 @@ const secret = process.env.SESSION_SECRET || 'ledger250-dev-secret';
 const cookie = `connect.sid=${encodeURIComponent('s:' + signature.sign(sid, secret))}`;
 // redirect:'manual' — /admin/auth/me is not under /admin/api, so signed-out is a 302 to the
 // login page, which fetch would otherwise follow into a 200.
-const me     = (withCookie = true) => fetch(`${BASE}/admin/auth/me`, { headers: withCookie ? { cookie } : {}, redirect: 'manual' });
+// A signed-out /admin hit saves returnTo on a fresh anonymous session — a row. Collect those
+// sids from Set-Cookie so the run deletes every row it caused.
+const strays = new Set();
+const noteSetCookie = r => { const m = /connect.sid=([^;]+)/.exec(r.headers.get('set-cookie') || ''); if (m) { const v = decodeURIComponent(m[1]); const sidOnly = v.startsWith('s:') ? v.slice(2, v.lastIndexOf('.')) : v; if (sidOnly !== sid) strays.add(sidOnly); } return r; };
+const me     = (withCookie = true) => fetch(`${BASE}/admin/auth/me`, { headers: withCookie ? { cookie } : {}, redirect: 'manual' }).then(noteSetCookie);
 const signedOut = r => r.status === 302 && (r.headers.get('location') || '').includes('/admin/login');
 const save   = (withCookie = true) => fetch(`${BASE}/admin/api/story-arcs/__e2e_no_such_arc__`, {
   method: 'PUT', headers: { 'content-type': 'application/json', ...(withCookie ? { cookie } : {}) }, body: JSON.stringify({ name: 'e2e' }),
@@ -116,6 +120,9 @@ try {
   await stop();
   store.close();
   await supabase.from('admin_sessions').delete().eq('sid', sid);
+  if (strays.size) await supabase.from('admin_sessions').delete().in('sid', [...strays]);
+  const { data: left } = await supabase.from('admin_sessions').select('sid').in('sid', [sid, ...strays]);
+  check(`every session row this run caused is deleted (${1 + strays.size})`, (left || []).length === 0);
 }
 
 console.log(fails ? `\n${fails} assertion(s) failed.` : '\nSession survives restart — all e2e assertions passed.');
