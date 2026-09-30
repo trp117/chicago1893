@@ -533,6 +533,38 @@ function validateArcScenes(arc, { locationIds, roleIds = null }) {
   return errors;
 }
 
+// EDITOR-SAVE GUARD for scenes — the arc sibling of the role guards above, same hazard: both
+// arc save paths write the arc as a whole object, so a tab that loaded the arc before its
+// scenes were authored — or a tab still running the pre-B1 admin page, which has no Scenes
+// UI at all — posts acts with the key ABSENT and the whole-object save erases every scene.
+// That is not hypothetical: Joan's arc was saved twice after the B1 deploy with no scenes.
+//
+// KEYED ON `undefined`, like preserveStoredAnchoredLocation. The current editor ALWAYS posts
+// scenes for every act it renders — [] when the act has no cards — so:
+//   absent  → a stale tab: the stored act's scenes are restored
+//   []      → a deliberate clear: the key is deleted, so the file stays key-absent (the husk
+//             is stripped rather than stored, exactly as the anchor guard strips its own)
+//   [...]   → honored as posted
+// Acts are matched by actNumber (an act reorder must not move scenes onto the wrong act),
+// falling back to position only for acts that carry no actNumber.
+function preserveStoredScenes(repos, arc) {
+  if (!arc?.id || !Array.isArray(arc.acts)) return arc;
+  const stored     = repos.storyArcs.findById(arc.id);
+  const storedActs = Array.isArray(stored?.acts) ? stored.acts : [];
+  arc.acts.forEach((act, i) => {
+    if (!act || typeof act !== 'object') return;
+    if (act.scenes === undefined) {
+      const prior = act.actNumber != null
+        ? storedActs.find(s => s && s.actNumber === act.actNumber)
+        : storedActs[i];
+      if (prior && prior.scenes !== undefined) act.scenes = JSON.parse(JSON.stringify(prior.scenes));
+    } else if (Array.isArray(act.scenes) && act.scenes.length === 0) {
+      delete act.scenes;
+    }
+  });
+  return arc;
+}
+
 // The scenario-scoped id sets validateArcScenes checks against, from the repositories.
 function sceneRefSets(repos, scenarioId, postedLocations = [], postedRoles = []) {
   const locationIds = new Set(repos.locations.findAll().filter(l => l && l.scenarioId === scenarioId).map(l => l.id));
@@ -3005,9 +3037,11 @@ export function createAdminRouter(repos, config = {}) {
   r.put('/story-arcs/:id', (req, res) => {
     const stored = repos.storyArcs.findById(req.params.id);
     if (!stored) return notFound(res);
-    const sceneErrors = validateArcScenes(req.body, sceneRefSets(repos, req.body.scenarioId || stored.scenarioId));
+    // Guard FIRST, then validate what will actually be written — restored scenes included.
+    const arc = preserveStoredScenes(repos, { ...req.body, id: req.params.id });
+    const sceneErrors = validateArcScenes(arc, sceneRefSets(repos, arc.scenarioId || stored.scenarioId));
     if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
-    res.json(repos.storyArcs.save({ ...req.body, id: req.params.id }));
+    res.json(repos.storyArcs.save(arc));
   });
   r.delete('/story-arcs/:id', (req, res) => {
     return repos.storyArcs.delete(req.params.id) ? res.json({ ok: true }) : notFound(res);
@@ -3933,6 +3967,7 @@ Return ONLY valid JSON in this exact structure:
     // Scenes are checked BEFORE anything is written: this route saves the scenario first and
     // the arc after, so a rejection further down would leave a half-saved bundle.
     if (storyArc?.id) {
+      preserveStoredScenes(repos, storyArc);   // a stale tab's absent scenes are restored, not erased
       const sceneErrors = validateArcScenes(storyArc, sceneRefSets(repos, storyArc.scenarioId || scenario.id, locations, playerRoles));
       if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
     }
@@ -5046,7 +5081,7 @@ export { preserveStoredArchetype };
 export { preserveStoredAnchoredLocation };
 // Scenes (B1): the save-side reference check and the id sets it runs against, exported so
 // scenes.test.mjs asserts the same function both save routes call.
-export { validateArcScenes, sceneRefSets };
+export { validateArcScenes, sceneRefSets, preserveStoredScenes };
 // Same, for the choice-register guard — choice-register.test.mjs asserts it restores the
 // flags a stale tab omits, and honors a current tab's clear.
 export { preserveStoredChoiceRegister };

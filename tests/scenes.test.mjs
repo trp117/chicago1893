@@ -39,7 +39,7 @@ const { buildInitialState, loadForkStoryArc, recordReachedBeats } =
 const { composeTurnPrompt, arcBeats, storyPosition, definingMomentDue, forkTimingStatus } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 const admin = await import(`${ROOT}/engine/admin/adminRouter.js`);
-const { validateArcScenes, sceneRefSets, createAdminRouter } = admin;
+const { validateArcScenes, sceneRefSets, preserveStoredScenes, createAdminRouter } = admin;
 
 const store = new JsonFileStore(path.join(REPO_DIR, 'engine/data'));
 const repos = {
@@ -83,7 +83,7 @@ const JOAN_SCENES = [
       // role_locations keys in the scenario's role order: the editor collects them in the order it
       // renders the roles, so an authored map in another key order comes back reordered (same content).
       role_locations: { role_manchon: 'chapter_room_rouen', role_massieu: 'saint_ouen_cemetery' } } ],
-  [],   // act 4 left WITHOUT scenes: must stay key-absent through every path
+  [],   // act 4 left WITHOUT scenes: posted as [] by the editor, STORED key-absent
 ];
 const withScenes = arc => {
   const a = clone(arc);
@@ -240,7 +240,7 @@ const collect = (el, loaded) => { const d = clone(loaded); collectEdits(el, d); 
     const want = JOAN_SCENES[i];
     if (want.length) check(`act ${i + 1}: every scene field round-trips render → collect`, JSON.stringify(act.scenes) === JSON.stringify(want),
                            JSON.stringify(act.scenes) === JSON.stringify(want) ? `${want.length} scene(s)` : JSON.stringify(act.scenes));
-    else check(`act ${i + 1}: no scenes → NO scenes key after collect`, !('scenes' in act));
+    else check(`act ${i + 1}: no cards → posts an explicit [] (a clear, never an absent key)`, Array.isArray(act.scenes) && act.scenes.length === 0);
   });
   const keep = ['name', 'title', 'actNumber', 'minuteRange', 'beats'];
   check('other act fields untouched by the scene collect', out.storyArc.acts.every((a, i) => keep.every(k => JSON.stringify(a[k]) === JSON.stringify(JOAN_ARC.acts[i][k]))));
@@ -283,11 +283,12 @@ const collect = (el, loaded) => { const d = clone(loaded); collectEdits(el, d); 
   b.remove();
   check('remove one: the others keep their fields', JSON.stringify(collect(el, loaded).storyArc.acts[1].scenes) === JSON.stringify([JOAN_SCENES[1][2], JOAN_SCENES[1][0]]));
   el.querySelector('#scene-rows-act-0').querySelectorAll('.scene-card').forEach(n => n.remove());
-  check('remove all in an act → the scenes key is DELETED, not []', !('scenes' in collect(el, loaded).storyArc.acts[0]));
+  const cleared = collect(el, loaded).storyArc.acts[0].scenes;
+  check('remove all in an act → posts [] (the explicit clear the server guard honors)', Array.isArray(cleared) && cleared.length === 0);
   // An added, untouched card is dropped; an added card with content is kept.
   const wrap = el.querySelector('#scene-rows-act-3');
   wrap.insertAdjacentHTML('beforeend', buildSceneCard({}, 3, sceneRefOptions(loaded)));
-  check('an empty added card is dropped (act 4 stays key-absent)', !('scenes' in collect(el, loaded).storyArc.acts[3]));
+  check('an empty added card is dropped (act 4 posts [])', collect(el, loaded).storyArc.acts[3].scenes?.length === 0);
   wrap.querySelector('.scene-id').value = 'cell_relapse';
   wrap.querySelector('.scene-location').value = 'joan_prison_cell';
   wrap.querySelector('.scene-ends').value = '28_may_1431';
@@ -298,8 +299,10 @@ const collect = (el, loaded) => { const d = clone(loaded); collectEdits(el, d); 
   // An arc with NO scenes: the collect must not add a key to any act.
   const loaded = editorData(JOAN_ARC);
   const out = collect(mount(loaded), loaded);
-  check('no-scenes arc: collect adds no scenes key anywhere', out.storyArc.acts.every(a => !('scenes' in a)));
-  check('no-scenes arc: acts byte-identical after render → collect', JSON.stringify(out.storyArc.acts) === JSON.stringify(JOAN_ARC.acts));
+  check('no-scenes arc: collect posts [] on every act', out.storyArc.acts.every(a => Array.isArray(a.scenes) && a.scenes.length === 0));
+  // ...which the server guard strips: what lands on disk is the arc exactly as it was.
+  const guarded = preserveStoredScenes({ storyArcs: { findById: () => JOAN_ARC } }, out.storyArc);
+  check('no-scenes arc: after the save guard, acts byte-identical to the stored arc', JSON.stringify(guarded.acts) === JSON.stringify(JOAN_ARC.acts));
 }
 {
   // A stored reference that is no longer valid is SHOWN and CARRIED, never silently swapped.
@@ -352,7 +355,8 @@ head('2c. PUT /story-arcs/:id → disk → GET (real router, scratch store)');
     // Reload into the editor from what came back, collect, and compare — the load half.
     const reloaded = editorData(got);
     const again = collect(mount(reloaded), reloaded);
-    check('GET → editor → collect reproduces the saved scenes exactly', JSON.stringify(again.storyArc.acts) === JSON.stringify(got.acts));
+    const againGuarded = preserveStoredScenes({ storyArcs: { findById: () => got } }, again.storyArc);
+    check('GET → editor → collect → guard reproduces the saved scenes exactly', JSON.stringify(againGuarded.acts) === JSON.stringify(got.acts));
 
     const bad = withScenes(JOAN_ARC); bad.acts[1].scenes[0].location_id = 'great_hall_watergate';
     const rej = await fetch(base, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(bad) });
@@ -360,7 +364,46 @@ head('2c. PUT /story-arcs/:id → disk → GET (real router, scratch store)');
     check('PUT with an invalid location → 400 SCENES_INVALID', rej.status === 400 && rejBody.code === 'SCENES_INVALID', rejBody.error);
     check('...and the stored arc is unchanged by the rejected PUT', JSON.stringify((await (await fetch(base)).json()).acts) === JSON.stringify(got.acts));
     const none = await fetch(base, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(JOAN_ARC) });
-    check('PUT the scene-less arc → 200 (the gate: no scenes, no checks)', none.status === 200);
+    check('PUT an arc with NO scenes keys → 200', none.status === 200);
+    const putArc = body => fetch(base, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const stored = async () => (await (await fetch(base)).json()).acts;
+    const sameScenes = acts => acts.every((a, i) => JOAN_SCENES[i].length ? JSON.stringify(a.scenes) === JSON.stringify(JOAN_SCENES[i]) : !('scenes' in a));
+
+    head('4. stale-tab guard — through the real PUT route');
+    // (the PUT just above IS the stale case: an old-page tab posts no scenes keys at all)
+    check('old-page tab (no scenes keys anywhere) → stored scenes KEPT', sameScenes(await stored()));
+    const stale = clone(JOAN_ARC); stale.goal = 'edited in a stale tab';
+    await putArc(stale);
+    const afterStale = await (await fetch(base)).json();
+    check('stale tab OTHER edits still land (goal saved)', afterStale.goal === 'edited in a stale tab');
+    check('...while its absent scenes do not erase the stored ones', sameScenes(afterStale.acts));
+    // A current tab clears one act ([]), leaves one absent, and edits another.
+    const cur = withScenes(JOAN_ARC);
+    cur.acts[0].scenes = [];
+    delete cur.acts[1].scenes;
+    cur.acts[2].scenes[0].bridge = 'Edited bridge.';
+    cur.acts[3].scenes = [];
+    const curRes = await putArc(cur);
+    const a = await stored();
+    check('current-tab save → 200', curRes.status === 200);
+    check('explicit [] clears: act 1 scenes gone, key DELETED (not stored as [])', !('scenes' in a[0]));
+    check('absent in the same save: act 2 scenes restored', JSON.stringify(a[1].scenes) === JSON.stringify(JOAN_SCENES[1]));
+    check('posted scenes honored: act 3 bridge edited', a[2].scenes?.[0]?.bridge === 'Edited bridge.');
+    check('[] on an act that never had scenes: stays key-absent', !('scenes' in a[3]));
+    // Acts matched by actNumber, not position: a payload with acts in another order must not
+    // move act 2's scenes onto whatever sits at index 1.
+    await putArc(withScenes(JOAN_ARC));
+    const shuffled = clone(JOAN_ARC); shuffled.acts = [shuffled.acts[2], shuffled.acts[1], shuffled.acts[0], shuffled.acts[3]];
+    await putArc(shuffled);
+    const byNum = Object.fromEntries((await stored()).map(x => [x.actNumber, x]));
+    check('restored scenes follow actNumber, not array position',
+          [1, 2, 3].every(n => JSON.stringify(byNum[n].scenes) === JSON.stringify(JOAN_SCENES[n - 1])) && !('scenes' in byNum[4]));
+    // Restored scenes are validated too: a stale tab that deleted the beat a stored scene ends
+    // on is refused by name instead of storing a dangling reference.
+    await putArc(withScenes(JOAN_ARC));
+    const staleBeat = clone(JOAN_ARC); staleBeat.acts[0].beats = staleBeat.acts[0].beats.filter(b => b.id !== '24_feb_1431');
+    const sb = await putArc(staleBeat); const sbBody = await sb.json();
+    check('stale tab removing a beat a stored scene needs → 400 naming it', sb.status === 400 && /24_feb_1431/.test(sbBody.error || ''), sbBody.error);
   } finally {
     server.close();
     fs.rmSync(tmp, { recursive: true, force: true });
@@ -402,6 +445,10 @@ head('3. validateArcScenes — the check both save routes run');
   const fresh = withScenes(JOAN_ARC); fresh.acts[0].scenes[0].location_id = 'new_room';
   check('a location posted in the same bundle save is accepted',
         validateArcScenes(fresh, sceneRefSets(repos, JOAN_ID, [{ id: 'new_room', scenarioId: JOAN_ID }])).length === 0);
+  const noneStored = { storyArcs: { findById: () => null } };
+  check('guard: brand-new arc (nothing stored) is left as posted', JSON.stringify(preserveStoredScenes(noneStored, clone(JOAN_ARC)).acts) === JSON.stringify(JOAN_ARC.acts));
+  check('guard: absent key over a stored act with no scenes stays absent',
+        preserveStoredScenes({ storyArcs: { findById: () => JOAN_ARC } }, clone(JOAN_ARC)).acts.every(a => !('scenes' in a)));
 }
 
 console.log(fails ? `\n${fails} assertion(s) failed.` : '\nAll scene assertions passed.');

@@ -1633,14 +1633,15 @@ function collectEdits(containerEl, data) {
   }
 
   // Collect scenes, per act, in card (DOM) order — that order IS the scene order. Every other
-  // act field is left as loaded. No cards → the key is removed, not written as [].
+  // act field is left as loaded. No cards → an explicit [] is POSTED, never an absent key: the
+  // server's preserveStoredScenes reads an absent key as a stale tab (restores the stored
+  // scenes) and [] as a deliberate clear (deletes the key, so the file stays key-absent).
   const sceneListEls = containerEl.querySelectorAll('[data-scene-list]');
   if (sceneListEls.length > 0 && data.storyArc?.acts) {
     data.storyArc.acts.forEach((act, i) => {
       const list = containerEl.querySelector(`[data-scene-list="${i}"]`);
       if (!list) return;
-      const scenes = [...list.querySelectorAll('.scene-card')].map(collectSceneCard).filter(Boolean);
-      if (scenes.length) act.scenes = scenes; else delete act.scenes;
+      act.scenes = [...list.querySelectorAll('.scene-card')].map(collectSceneCard).filter(Boolean);
     });
   }
 
@@ -1855,8 +1856,9 @@ function buildBeatRow(beat, actIdx) {
 
 // ── Scenes (Part B, B1) — STORAGE + AUTHORING ONLY ───────────────────────────────
 // An act may carry an optional scenes[]. Nothing in the engine reads it yet (B2 adds the
-// transitions), so authoring here changes no session. An act with no scene cards saves with
-// NO scenes key at all — removing the last scene returns the act to exactly its old shape.
+// transitions), so authoring here changes no session. An act with no scene cards posts
+// scenes: [] (a deliberate clear) and is STORED with no scenes key at all — removing the last
+// scene returns the act to exactly its old shape (preserveStoredScenes in adminRouter.js).
 //
 // The dropdowns are the anchor pattern: locations scoped to THIS scenario by their scenarioId
 // field (scopeLocationsToItem), and a stored value the options no longer contain is kept as a
