@@ -1564,6 +1564,20 @@ export function sceneFraming(state, scenario, storyArc, locations = []) {
   return { scene, locId, place, date, entered, byFork, forkNow, transition, pace: scenePacingStatus(state, scenario, storyArc) };
 }
 
+// What the PLAYER is shown of the scene (B2b-PLAYER): output.scene, or null for a session that
+// does not track scenes. Computed from the same state the prompt is composed from, so it names
+// the scene the narration plays in — not the one the end-of-turn state may already have moved
+// to. The bridge rides along exactly when the prompt handed it to the model (sceneFraming's
+// transition: a scene's first turn, never the fork turn or a fork jump) and never on the
+// opening, whose prompt carries no scene directive.
+export function scenePresentation(state, scenario, storyArc, locations = [], { opening = false } = {}) {
+  const f = sceneFraming(state, scenario, storyArc, locations);
+  if (!f) return null;
+  const out = { id: f.scene.id, date: f.date, place: f.place, location_id: f.locId };
+  if (!opening && f.transition) out.bridge = f.transition;
+  return out;
+}
+
 // The directive as composed into a turn prompt — '' for a session that does not track scenes.
 export function sceneFramingDirective(state, scenario, storyArc, locations = []) {
   const f = sceneFraming(state, scenario, storyArc, locations);

@@ -17,6 +17,7 @@ import {
   prepareForTts,
   getClueById,
   getArcPosition,
+  scenePresentation,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive } from '../services/ForkDiagnostics.js';
@@ -1071,6 +1072,10 @@ Do not open with the historical context. Open inside the character's body. Let t
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
       appData.saveSession(sessionId, nextState);
+      // Scene sessions only: the scene the opening plays in, for the player's header (B2b-PLAYER).
+      // From the state the opening was composed from; never a bridge on the opening.
+      const openingScene = gameData.storyArc ? scenePresentation(seededInitial, scenario, gameData.storyArc, locations, { opening: true }) : null;
+      if (openingScene) output.scene = openingScene;
 
       // Transcript — fire-and-forget (writeFile creates fresh; no stale append risk)
       // introSections already declared above for worldContextBlock — reuse it
@@ -1209,6 +1214,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const prompt = composeTurnPrompt(state, playerInput, gameData);
+      // Scene sessions only: what the player is shown of the scene this turn plays in — from the
+      // state the prompt was just composed from, bridge included exactly when the prompt had it.
+      const turnScene = gameData.storyArc ? scenePresentation(state, scenario, gameData.storyArc, locations) : null;
+      // Sent ahead of the narration so the client can lead the streaming text with the bridge.
+      if (turnScene) sendSse(res, { type: 'scene', scene: turnScene });
 
       const isEndingTurn  = state.remainingMinutes <= 0;
       const endingSignals = checkEndingReadiness(state, scenario);
@@ -1591,18 +1601,23 @@ Do not open with the historical context. Open inside the character's body. Let t
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
       if (sessionId) appData.saveSession(sessionId, nextState);
+      if (turnScene) output.scene = turnScene;
 
       // Transcript — fire-and-forget on normal turns, awaited on ending turns
       // so the file is on disk before the client immediately calls /closing-prose
       if (sessionId) {
-        // A scene session's place is the one the engine holds (B2b-MODEL), not the model's emit.
-        const locId   = sceneHold ? nextState.location : (output.location || state.location);
+        // A scene session's line names the scene the narration plays in — its date and place —
+        // not the end-of-turn held location, which is already the NEXT scene's on the turn a
+        // scene ends; its bridge, when the player was shown one, is prose above the narration.
+        const locId   = output.location || state.location;
         const locName = locations.find(l => l.id === locId)?.name || locId;
+        const where   = turnScene ? [turnScene.date, turnScene.place].filter(Boolean).join(' · ') : locName;
         const chunk = [
           `**Player:** ${playerInput}`,
           ``,
-          `> Act ${nextState.act || 1} · ${locName} · ${nextState.remainingMinutes} min remaining`,
+          `> Act ${nextState.act || 1} · ${where} · ${nextState.remainingMinutes} min remaining`,
           ``,
+          ...(turnScene?.bridge ? [turnScene.bridge, ``] : []),
           output.narrative || '',
           ``,
         ];
@@ -1718,7 +1733,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
   // ── TTS ────────────────────────────────────────────────────────────────────
   r.post('/tts', async (req, res) => {
-    const { text, sensory_opening, confirmation, trust_level, narrative_speed } = req.body;
+    const { text, sensory_opening, bridge, confirmation, trust_level, narrative_speed } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
     if (!elevenLabsApiKey) return res.status(503).json({ error: 'TTS not configured.' });
 
@@ -1744,9 +1759,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       return { resp, charCount: cleaned.length };
     }
 
-    // Build ordered segment list: confirmation (0.85) → sensory (0.88) → main (trust-mapped)
+    // Build ordered segment list: confirmation (0.85) → bridge (0.88) → sensory (0.88) → main (trust-mapped)
+    // bridge: a scene session's lead paragraph on a scene's first turn (B2b-PLAYER), read as it is shown.
     const segments = [];
     if (confirmation)   segments.push({ raw: confirmation,   speed: 0.85, trust: false });
+    if (bridge)         segments.push({ raw: bridge,         speed: 0.88, trust: false });
     if (sensory_opening) segments.push({ raw: sensory_opening, speed: 0.88, trust: false });
     segments.push({ raw: text, speed: narrative_speed ?? null, trust: true });
 

@@ -35,6 +35,7 @@ const SUITE = [
   ['scenes B2a: tracking (state + DIAG)',    'scene-tracking.test.mjs'],
   ['B3a: timing confirmation (record)',      'timing-confirm.test.mjs'],
   ['B3c: fork at_scene binding',             'scene-binding.test.mjs'],
+  ['B2b-PLAYER: scene header + bridge (jsdom)', 'scene-player.test.mjs'],
 ];
 
 const results = [];

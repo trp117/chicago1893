@@ -34,7 +34,7 @@ const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryA
 const { PlayerRepository }    = await import(`${ROOT}/engine/repositories/PlayerRepository.js`);
 const { SessionRepository }   = await import(`${ROOT}/engine/repositories/SessionRepository.js`);
 const { buildInitialState, initSceneState } = await import(`${ROOT}/engine/services/StateManager.js`);
-const { isStoryBoundFork, definingMomentDue, forkTimingStatus, storyPacingNudge } = await import(`${ROOT}/engine/services/PromptComposer.js`);
+const { isStoryBoundFork, definingMomentDue, forkTimingStatus, storyPacingNudge, arcScenes } = await import(`${ROOT}/engine/services/PromptComposer.js`);
 const { describeBinding, DIAG_PREFIX } = await import(`${ROOT}/engine/services/ForkDiagnostics.js`);
 const admin = await import(`${ROOT}/engine/admin/adminRouter.js`);
 
@@ -209,6 +209,11 @@ try {
     check('A DIAG: PRESENTED via binding (at_scene met at turn start)', line.includes('fork: PRESENTED this turn via binding (at_scene scene_28_may met at turn start)'), line);
     check('A: no fork jump (the scene was reached on budget, not by the fork)', !a.s.sceneAdvances.some(m => m.via === 'fork'));
     check('A: the fork turn costs no clock', a.s.elapsedMinutes === 24, `${a.s.elapsedMinutes}`);
+    // B2b-PLAYER: the fork turn plays in scene_28_may, which it opens — and shows no bridge:
+    // the fork's setup is the transition.
+    const sc28 = arcScenes(JOAN_ARC).find(x => x.id === 'scene_28_may');
+    check('A PLAYER: the fork turn\'s output.scene is scene_28_may (the scene it opens)', a.fork?.scene?.id === 'scene_28_may' && a.fork.scene.date === sc28.date_label, JSON.stringify(a.fork?.scene));
+    check('A PLAYER: ...with NO bridge, though scene_28_may has one', !!sc28.bridge && !('bridge' in (a.fork?.scene || {})));
     check('A: the fork\'s options reach the client', Array.isArray(a.fork?.definingChoices) ? a.fork.definingChoices.length === 3 : JSON.stringify(a.fork || {}).includes(FORK.options[0].id), Object.keys(a.fork || {}).join(','));
   }
 
@@ -223,6 +228,12 @@ try {
     const line = b.diag[b.diag.length - 1] || '';
     check('B DIAG: PRESENTED via fallback, and "jumped by fork"', line.includes('fork: PRESENTED this turn via fallback') && line.includes('scene: scene_23_may → scene_28_may (jumped by fork)'), line);
     check('B: the jump skipped scene_24_may (the fork path is the only one that skips)', !b.s.sceneAdvances.some(m => m.to === 'scene_24_may'));
+    // B2b-PLAYER: the fork turn shows the scene it played in (scene_23_may, opened turns
+    // earlier — no bridge); the turn after the jump plays in scene_28_may, also with no bridge.
+    check('B PLAYER: the fork turn shows scene_23_may, no bridge', b.fork?.scene?.id === 'scene_23_may' && !('bridge' in b.fork.scene), JSON.stringify(b.fork?.scene));
+    nextOutput = out();
+    const after = await sse('turn', { state: b.s, playerInput: 'I keep silent.', sessionId: b.sid });
+    check('B PLAYER: the turn after the fork jump shows scene_28_may with NO bridge (reached by the fork)', after.done?.output?.scene?.id === 'scene_28_may' && !('bridge' in after.done.output.scene), JSON.stringify(after.done?.output?.scene));
   }
 } finally {
   server.close();

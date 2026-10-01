@@ -59,6 +59,9 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 .scene-card .line:last-child { margin-bottom: 0; }
 .scene-card .line.dialogue { margin-top: 0.9em; }
 .sensory-opening { font-style: italic; opacity: 0.85; margin-bottom: 16px; line-height: 1.7; }
+/* Scene sessions: the bridge into a new scene, read as the paragraph before the cut — upright
+   where the narration is italic, a shade quieter, no box of its own (B2b-PLAYER). */
+.scene-bridge { font-style: normal; opacity: 0.8; margin: 0 0 16px; line-height: 1.7; }
 .thinking-dots { display: flex; gap: 5px; padding: 10px 0 4px; }
 .thinking-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: dot-pulse 1.2s ease-in-out infinite; }
 .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -887,6 +890,9 @@ let conversationHistory = [];
 const MAX_HISTORY_TURNS = 4;
 let locationFeed    = [];
 let feedLocationId  = null;
+// Scene sessions only: output.scene of the latest turn — the scene the narration on screen plays
+// in. The header follows it, not gameState.location (B2b-PLAYER). null for every other session.
+let currentScene    = null;
 let pendingEntryEl  = null;
 let locationShowing = false;
 let bootstrapData        = null;
@@ -958,6 +964,7 @@ let lastSpokenMessageId = 0;
 let currentMessageId = 0;
 let lastRenderedSpeakText = '';
 let lastRenderedSensoryOpening = null;
+let lastRenderedBridge = null;
 let pendingTeleprompterEl = null;
 let teleprompterRafId = null;
 
@@ -998,7 +1005,8 @@ function updateSlimLabel() {
   const title = document.getElementById('header-title')?.textContent || '';
   const sub   = document.getElementById('header-subtitle')?.textContent || '';
   const label = document.getElementById('slim-scene-label');
-  if (label) label.textContent = sub ? `${title} · ${sub}` : title;
+  // A scene session's subtitle already names the place — the bar shows it alone.
+  if (label) label.textContent = currentScene ? sub : (sub ? `${title} · ${sub}` : title);
 }
 
 function updateTtsBarUI() {
@@ -1015,13 +1023,14 @@ function ttsSpeakFallback(text) {
   synth.speak(utt);
 }
 
-async function ttsSpeak(text, sensoryOpening, confirmation = null, trustLevel = null) {
+async function ttsSpeak(text, sensoryOpening, confirmation = null, trustLevel = null, bridge = null) {
   if (!ttsEnabled) return;
   ttsStop();
   if (!audioEl) { console.warn('[TTS] audioEl not initialized — audio not yet unlocked, skipping.'); return; }
   try {
     const body = { text };
     if (sensoryOpening)         body.sensory_opening   = sensoryOpening;
+    if (bridge)                 body.bridge            = bridge;
     if (confirmation)           body.confirmation      = confirmation;
     if (trustLevel != null)     body.trust_level       = trustLevel;
     if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
@@ -1083,7 +1092,7 @@ ttsStopBtn.addEventListener('click', () => {
   if (!ttsEnabled) {
     ttsStop();
   } else if (audioUnlocked && lastRenderedSpeakText) {
-    ttsSpeak(lastRenderedSpeakText, lastRenderedSensoryOpening);
+    ttsSpeak(lastRenderedSpeakText, lastRenderedSensoryOpening, null, null, lastRenderedBridge);
   }
   updateTtsBarUI();
   updateTtsToggleUI();
@@ -1268,15 +1277,28 @@ function markupNarrative(text) {
   }).filter(Boolean).join('');
 }
 
+// Scene sessions: a scene's bridge as the lead paragraph of the turn that opens it (B2b-PLAYER).
+function sceneBridgeHtml(bridge) {
+  return bridge
+    ? `<p class="scene-bridge">${bridge.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`
+    : '';
+}
+
 function renderOutput(output, meta = {}) {
+  if (output.scene) currentScene = output.scene;
+  const bridgeHtml    = sceneBridgeHtml(output.scene?.bridge);
   const sensoryHtml   = output.sensory_opening
     ? `<p class="sensory-opening">${output.sensory_opening}</p>`
     : '';
   const narrativeHtml = markupNarrative(output.narrative);
-  const html = markupGlossaryTerms(`${sensoryHtml}<p>${narrativeHtml}</p>`);
+  const html = markupGlossaryTerms(`${bridgeHtml}${sensoryHtml}<p>${narrativeHtml}</p>`);
 
-  const currentLocation  = gameState?.location;
-  const isTransitionTurn = meta.prevLocation != null && meta.prevLocation !== currentLocation;
+  // A scene session's place is the narrated scene's; its scene changes run on in one reading
+  // flow (the bridge is the cut), so only the opening clears the feed, as it does today.
+  const currentLocation  = output.scene ? output.scene.location_id : gameState?.location;
+  const isTransitionTurn = output.scene
+    ? meta.prevLocation != null
+    : meta.prevLocation != null && meta.prevLocation !== currentLocation;
 
   if (currentLocation && currentLocation !== feedLocationId) {
     feedLocationId = currentLocation;
@@ -1288,6 +1310,8 @@ function renderOutput(output, meta = {}) {
       pendingEntryEl = null;
     }
   }
+  // A time-only jump keeps the place but changes the date.
+  if (output.scene) { updateHeaderSubtitle(); updateSlimLabel(); }
 
   locationFeed.push({ playerInput: meta.playerInput || null, html });
 
@@ -1332,6 +1356,7 @@ function renderOutput(output, meta = {}) {
   const messageId = ++currentMessageId;
   lastRenderedSpeakText      = output.narrative;
   lastRenderedSensoryOpening = output.sensory_opening || null;
+  lastRenderedBridge         = output.scene?.bridge || null;
 
   if (!meta.skipTts && ttsEnabled && audioUnlocked) {
     // Build narrator confirmation: "You [player_action]." — freeform input only, not choices
@@ -1347,7 +1372,7 @@ function renderOutput(output, meta = {}) {
     setTimeout(() => {
       if (lastSpokenMessageId < messageId) {
         lastSpokenMessageId = messageId;
-        ttsSpeak(output.narrative, output.sensory_opening, confirmation, trustLevel);
+        ttsSpeak(output.narrative, output.sensory_opening, confirmation, trustLevel, lastRenderedBridge);
       }
     }, 300);
   }
@@ -1363,9 +1388,17 @@ function getLocationDisplayName(locationId) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
+// A scene's place in the subtitle: short_name if authored, else the name up to its " — " gloss.
+function sceneShortPlace(scene) {
+  const loc  = locationsList.find(l => l.id === scene.location_id);
+  const name = loc?.short_name || loc?.name || scene.place || '';
+  return loc?.short_name ? name : name.split(' — ')[0];
+}
+
 function updateHeaderSubtitle() {
   const sub = document.getElementById('header-subtitle');
-  if (sub && gameState) sub.textContent = getLocationDisplayName(gameState.location);
+  if (sub && currentScene) sub.textContent = [currentScene.date, sceneShortPlace(currentScene)].filter(Boolean).join(' · ');
+  else if (sub && gameState) sub.textContent = getLocationDisplayName(gameState.location);
 }
 
 function updateLocationDisplay(locationId) {
@@ -1657,7 +1690,8 @@ let submitting = false;
 let lastPlayerInput      = '';
 
 function buildAssistantHistoryContent(output) {
-  let text = output.sensory_opening ? `${output.sensory_opening}\n\n` : '';
+  let text = output.scene?.bridge ? `${output.scene.bridge}\n\n` : '';
+  text += output.sensory_opening ? `${output.sensory_opening}\n\n` : '';
   text += output.narrative || '';
   for (const m of output.npcMoments || []) text += `\n${prettifyId(m.npc)}: ${m.text}`;
   return text.trim();
@@ -1730,6 +1764,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     // Consume SSE stream
     let streamEl     = null;
     let streamBuffer = '';
+    let streamBridge = '';   // scene sessions: the bridge leads the narration as it streams in
     let output = null, nextState = null;
     const sseReader  = resp.body.getReader();
     const sseDecoder = new TextDecoder();
@@ -1753,7 +1788,9 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
             entryEl.appendChild(streamEl);
           }
           streamBuffer += evt.text;
-          streamEl.innerHTML = '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+          streamEl.innerHTML = streamBridge + '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+        } else if (evt.type === 'scene') {
+          streamBridge = sceneBridgeHtml(evt.scene?.bridge);
         } else if (evt.type === 'done') {
           output    = evt.output;
           nextState = evt.nextState;
@@ -2784,6 +2821,8 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   conversationHistory = [];
   locationFeed   = [];
   feedLocationId = null;
+  currentScene   = null;
+  lastRenderedBridge = null;
   pendingEntryEl = null;
   locationShowing = false;
   lastChoices = [];
@@ -2927,6 +2966,8 @@ function restartGame() {
   conversationHistory = [];
   locationFeed   = [];
   feedLocationId = null;
+  currentScene   = null;
+  lastRenderedBridge = null;
   pendingEntryEl = null;
   pendingTeleprompterEl = null;
   lastChoices = [];
@@ -3010,7 +3051,7 @@ function renderNotes(notes = lastFetchedNotes) {
   }
 
   // WHERE YOU ARE — current location
-  const loc = locationsList.find(l => l.id === gameState?.location);
+  const loc = locationsList.find(l => l.id === (currentScene?.location_id ?? gameState?.location));
   if (loc) {
     const desc = loc.description ? `<p style="font-size:0.85rem;color:var(--muted);margin:4px 0 0;font-style:italic">${loc.description}</p>` : '';
     sections.push(`<section class="notes-section"><h3>Where You Are</h3><p style="font-size:0.9rem;margin:0"><strong>${loc.name}</strong></p>${desc}</section>`);
@@ -3151,7 +3192,7 @@ if (!SpeechRecognition) {
   const VOICE_COMMANDS = {
     'send':          () => { if (finalTranscript.trim()) { const t = finalTranscript.trim(); finalTranscript = ''; inputEl.value = ''; safeSend(t); } },
     'stop reading':  () => { setTtsEnabled(false); ttsStop(); updateTtsBarUI(); updateTtsToggleUI(); },
-    'start reading': () => { setTtsEnabled(true); if (audioUnlocked && lastRenderedSpeakText) ttsSpeak(lastRenderedSpeakText); updateTtsBarUI(); updateTtsToggleUI(); },
+    'start reading': () => { setTtsEnabled(true); if (audioUnlocked && lastRenderedSpeakText) ttsSpeak(lastRenderedSpeakText, null, null, null, lastRenderedBridge); updateTtsBarUI(); updateTtsToggleUI(); },
     'notes':         () => openNotes(),
   };
 

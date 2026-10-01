@@ -132,7 +132,12 @@ head('1a. static — runtime reads scenes only where B2a tracks them, never thei
   check('scene-reading runtime modules are exactly the B2a set', JSON.stringify([...hits].sort()) === JSON.stringify(B2A), hits.sort().join(', '));
   // B2b-MODEL: the scene's bridge / date / time / role_locations are read in ONE place —
   // PromptComposer (sceneFraming, sceneLocationId), which the location hold and the DIAG go through.
-  check('a scene\'s bridge / date / time / role_locations are read by PromptComposer alone (B2b-MODEL)', JSON.stringify(presentation) === JSON.stringify(['engine/services/PromptComposer.js']), presentation.join(', '));
+  // B2b-PLAYER: gameRouter passes PromptComposer's scenePresentation on to the player and the
+  // transcript — its only presentation reads are of that object (turnScene), never of a scene.
+  const routerSrc = fs.readFileSync(path.join(REPO_DIR, 'engine/server/gameRouter.js'), 'utf8');
+  const routerReads = routerSrc.match(/[\w?.]*\.bridge\b|\['bridge'\]|date_label|time_label|role_locations/g) || [];
+  check('a scene\'s bridge / date / time / role_locations are read by PromptComposer alone (B2b-MODEL)', JSON.stringify([...presentation].sort()) === JSON.stringify(['engine/server/gameRouter.js', 'engine/services/PromptComposer.js']), presentation.join(', '));
+  check('...gameRouter reads only the bridge of scenePresentation\'s output (B2b-PLAYER)', routerReads.length > 0 && routerReads.every(m => /^turnScene\??\.bridge$/.test(m)), routerReads.join(', '));
   // B3b: the budget is read in ONE place (scenePacingStatus); the backstop and the DIAG go through it.
   check('budget_minutes is read by PromptComposer alone (B3b scenePacingStatus)', JSON.stringify(budget) === JSON.stringify(['engine/services/PromptComposer.js']), budget.join(', '));
 }

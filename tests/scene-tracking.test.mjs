@@ -42,7 +42,7 @@ const { buildInitialState, loadStoryArc, loadForkStoryArc, initSceneState, advan
   await import(`${ROOT}/engine/services/StateManager.js`);
 const { composeTurnPrompt, arcScenes, arcHasScenes, buildStoryPositionDirective, isStoryBoundFork, scenePacingStatus, storyPacingNudge, sceneFramingDirective, sceneFraming } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
-const { forkDiagTurnLine, forkDiagSummaryLines, forkDiagActive, parseSceneDiag, DIAG_PREFIX } =
+const { forkDiagTurnLine, forkDiagSummaryLines, forkDiagActive, parseSceneDiag, stripForkDiagnostics, DIAG_PREFIX } =
   await import(`${ROOT}/engine/services/ForkDiagnostics.js`);
 
 const store = new JsonFileStore(p('engine/data'));   // never DualWriteStore: no Supabase writes
@@ -478,15 +478,20 @@ try {
   check('/start (Joan, Manchon) completes', !!st.done, st.error ? JSON.stringify(st.error).slice(0, 200) : String(st.status));
   let state = st.done?.nextState; joanSession = st.done?.sessionId;
   check('opening: 21_feb_1431 reported on arrival — recorded, but the opening scene holds (minimum scene time)', state?.currentSceneId === 'scene_21_feb' && state?.reachedBeats?.includes('21_feb_1431') && !state?.sceneAdvances?.length, state?.currentSceneId);
-  const visible = JSON.stringify(st.done?.output || {});
-  check('what the player is sent (output) carries no scene data', !SEQ.some(id => visible.includes(id)));
+  // B2b-PLAYER: the opening's output carries its scene — date and place, never a bridge — and
+  // that is the only scene data the player is sent.
+  const SC1 = arcScenes(JOAN_ARC)[0];
+  const oScene = st.done?.output?.scene;
+  check('opening output.scene: scene_21_feb, its date and the hall, no bridge', oScene?.id === 'scene_21_feb' && oScene.date === SC1.date_label && oScene.location_id === 'great_hall_rouen_castle' && oScene.place === JOAN_LOCS.find(l => l.id === 'great_hall_rouen_castle')?.name && !('bridge' in oScene), JSON.stringify(oScene));
+  const visible = JSON.stringify({ ...(st.done?.output || {}), scene: undefined });
+  check('...and the rest of the output carries no scene data', !SEQ.some(id => visible.includes(id)));
   const perTurn = [];   // B2b-MODEL: what each turn's request told the model, and the state it started from
   for (const [i, t] of TURNS.entries()) {
     nextOutput = out(t.beats);
     const before = sent.length, startState = state;
     const r = await sse('turn', { state, playerInput: `I answer (${i + 1}).`, sessionId: joanSession });
     if (!r.done) { check(`turn ${i + 1} completes`, false, r.error ? JSON.stringify(r.error).slice(0, 200) : String(r.status)); break; }
-    perTurn.push({ start: startState, prompt: sent.slice(before).join('\n') });
+    perTurn.push({ start: startState, prompt: sent.slice(before).join('\n'), scene: r.done.output?.scene, end: r.done.nextState });
     state = r.done.nextState;
     check(`turn ${i + 1}: beats ${JSON.stringify(t.beats)} → currentSceneId ${t.want}`, state.currentSceneId === t.want, state.currentSceneId);
   }
@@ -517,6 +522,31 @@ try {
   const cellTurn = perTurn.findIndex(x => x.start.currentSceneId === 'scene_17_mar');
   check('e2e: in scene_17_mar the session is HELD in the cell though the scripted model keeps saying the hall', cellTurn >= 0 && perTurn[cellTurn].start.location === 'joan_prison_cell', perTurn[cellTurn]?.start.location);
   check('e2e DIAG: the override is logged', diag.some(l => l.includes('location: model said great_hall_rouen_castle, held at joan_prison_cell')));
+
+  // B2b-PLAYER e2e: output.scene names the scene each turn's narration plays in — the scene at
+  // turn START, the one its prompt framed — and carries the bridge exactly on the turns that
+  // open a scene (Manchon never meets Joan's fork, so every opening turn shows its bridge).
+  check('PLAYER e2e: every turn\'s output.scene is the scene it started in, with that scene\'s date and place',
+    perTurn.every(x => { const sc = SCN[x.start.currentSceneId]; return x.scene?.id === sc.id && x.scene.date === sc.date_label && x.scene.location_id === sc.location_id; }),
+    perTurn.map(x => x.scene?.id).join(','));
+  check('PLAYER e2e: the bridge is on exactly the scene-opening turns, verbatim',
+    perTurn.every((x, i) => { const b = SCN[x.start.currentSceneId].bridge; return opens[i] && b ? x.scene.bridge === b : !('bridge' in x.scene); }),
+    perTurn.map((x, i) => `${i + 1}:${'bridge' in (x.scene || {}) ? 'B' : '-'}`).join(' '));
+  check('PLAYER e2e: six scene-opening turns showed a bridge (every scene after the first)', perTurn.filter(x => x.scene?.bridge).length === 6, `${perTurn.filter(x => x.scene?.bridge).length}`);
+  // No turn-early place: on the turn scene_24_feb ends, the state is already held in the cell
+  // for the next turn — but the narration (and what the player is shown) is still in the hall.
+  const t4 = perTurn[3];
+  check('PLAYER e2e: no turn-early place — turn 4 ends scene_24_feb: state held in the cell, output.scene still the hall', t4.end.location === 'joan_prison_cell' && t4.scene.location_id === 'great_hall_rouen_castle', `${t4.end.location} / ${t4.scene.location_id}`);
+  // Transcript: the turn line names the narrated scene's date · place; the bridge is prose above the narration.
+  const turnLines = transcript.split('\n').filter(l => /^> Act \d/.test(l));
+  check('PLAYER e2e transcript: every turn line is "Act N · date · place" of the narrated scene',
+    turnLines.length === TURNS.length && perTurn.every((x, i) => turnLines[i].includes(` · ${x.scene.date} · ${x.scene.place} · `)), turnLines[3]);
+  check('PLAYER e2e transcript: each shown bridge sits above its turn\'s narration, outside the DIAG lines',
+    perTurn.filter(x => x.scene.bridge).every(x => transcript.includes(` min remaining\n\n${x.scene.bridge}\n\nThe assessors murmur; the scribes dip their pens.\n`)));
+  check('PLAYER e2e transcript: no bridge on the turns that do not open a scene (13 turns, 6 bridges)',
+    Object.values(SCN).filter(sc => sc.bridge).every(sc => transcript.split(sc.bridge).length === 2));
+  check('PLAYER e2e transcript: the stripped transcript (what /closing-prose reads) keeps the bridges',
+    perTurn.filter(x => x.scene.bridge).every(x => stripForkDiagnostics(transcript).includes(x.scene.bridge)));
 
   // B3b e2e: a model that NEVER reports a beat. The budgets alone must carry the story through
   // every scene — one scene per spent budget, the nudge on each scene's last turn — and land
@@ -562,6 +592,9 @@ try {
     check('control: /turn adds no scene state', !!ct.done && !('currentSceneId' in ct.done.nextState) && !('reachedBeats' in ct.done.nextState));
     const ctr = fs.readFileSync(p('engine/data/transcripts', `${cs.done.sessionId}.md`), 'utf8');
     check('control: transcript has no DIAG line', !ctr.includes(DIAG_PREFIX));
+    check('control PLAYER: neither /start nor /turn output carries a scene key', !('scene' in (cs.done?.output || {})) && !('scene' in (ct.done?.output || {})));
+    const adm = repos.locations.findById('administration_building');
+    check('control PLAYER: the turn line is today\'s "Act N · location name · N min remaining"', ctr.includes(`> Act ${ct.done.nextState.act || 1} · ${adm?.name || 'administration_building'} · ${ct.done.nextState.remainingMinutes} min remaining\n\nThe assessors murmur`), ctr.split('\n').find(l => l.startsWith('> Act')));
     check('control: no model request carries a beat roster', !sent.some(s => s.includes('STORY POSITION')));
   } else console.log('      (control skipped — daniel_burnham not available)');
 } finally {
