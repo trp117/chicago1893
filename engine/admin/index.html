@@ -2877,11 +2877,33 @@ function renderForkBindingFields(i, dm, data) {
   const actOrphan = typeof dm.at_act === 'number' && !acts.some(a => a.actNumber === dm.at_act)
     ? `<option value="${esc(String(dm.at_act))}" selected>⚠ Act ${esc(String(dm.at_act))} — not an act of this arc</option>` : '';
   const selStyle = 'width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px';
+  // Scenes (B3c) — the arc's scenes in story order, grouped by act. Offered only when the arc
+  // has scenes; a stored at_scene the arc no longer has is kept as a flagged option.
+  const atScene = typeof dm.at_scene === 'string' ? dm.at_scene.trim() : '';
+  let sceneKnown = false;
+  const sceneGroups = acts.map(a => {
+    const scenes = (a.scenes || []).filter(s => s && typeof s.id === 'string' && s.id.trim());
+    if (!scenes.length) return '';
+    return `<optgroup label="Act ${esc(String(a.actNumber))} — ${esc(a.title || a.name || '')}">${scenes.map(s => {
+      const sel = s.id === atScene; if (sel) sceneKnown = true;
+      return `<option value="${esc(s.id)}"${sel ? ' selected' : ''}>${esc(s.id)}${s.date_label ? ` — ${esc(s.date_label)}` : ''}</option>`;
+    }).join('')}</optgroup>`;
+  }).join('');
+  const sceneOrphan = atScene && !sceneKnown
+    ? `<option value="${esc(atScene)}" selected>⚠ ${esc(atScene)} — not a scene of this arc (fork will fire at its fallback)</option>` : '';
+  const sceneField = (sceneGroups || sceneOrphan) ? `
+          <div>
+            <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Fires in scene <span style="opacity:.7">(wins over beat and act)</span></div>
+            <select class="dm-at-scene-input" data-path="playerRoles.${i}.defining_moment.at_scene" style="${selStyle}">
+              <option value="">—</option>${sceneOrphan}${sceneGroups}
+            </select>
+          </div>` : '';
   const noArc = acts.length ? '' : '<div style="font-size:11px;color:#b45309;margin-top:6px">This scenario has no story arc loaded here, so there are no acts or beats to bind to. A fork bound without one fires at its fallback only.</div>';
   return `
       <div style="margin:0 0 12px;padding:10px 12px;border:1px solid var(--border);border-radius:6px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:6px">Story binding <span style="font-weight:400;text-transform:none">(optional — blank = fire on the clock, as now)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 2fr 130px;gap:10px">
+        <div style="display:grid;grid-template-columns:${sceneField ? '1fr 1fr 2fr 130px' : '1fr 2fr 130px'};gap:10px">
+          ${sceneField}
           <div>
             <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Fires in act</div>
             <select class="dm-at-act-input" data-path="playerRoles.${i}.defining_moment.at_act" data-type="number" style="${selStyle}">
@@ -2899,7 +2921,7 @@ function renderForkBindingFields(i, dm, data) {
             <input type="text" class="dm-fallback-input" data-path="playerRoles.${i}.defining_moment.fallback_at_elapsed_fraction" data-type="number" value="${typeof dm.fallback_at_elapsed_fraction === 'number' ? dm.fallback_at_elapsed_fraction : ''}" placeholder="0.85" style="${selStyle}">
           </div>
         </div>
-        <div style="font-size:11px;color:var(--text-soft);margin-top:6px">Bound: the fork waits until the story reaches that act (any of its beats) or that beat (or a later one), as the narrator reports beats. If it never does, it fires at the fallback fraction of the session. <code>at_elapsed_fraction</code> is ignored while bound.</div>
+        <div style="font-size:11px;color:var(--text-soft);margin-top:6px">Bound: the fork waits until the story reaches that act (any of its beats) or that beat (or a later one), as the narrator reports beats${sceneField ? ' — or, bound to a scene, until the session enters that scene (on the scene before it ending, or its budget running out)' : ''}. If it never does, it fires at the fallback fraction of the session${sceneField ? ', and a scene-bound fork then moves the session straight to its scene' : ''}. <code>at_elapsed_fraction</code> is ignored while bound.</div>
         ${noArc}
       </div>`;
 }
@@ -2956,7 +2978,7 @@ function renderDefiningMomentSection(r, i, data) {
     </div>`);
   } else {
     const moment    = dm.principal_transition?.moment ?? dm.id;
-    const bindingOn = typeof dm.at_act === 'number' || (typeof dm.at_beat === 'string' && dm.at_beat.trim() !== '');
+    const bindingOn = typeof dm.at_act === 'number' || ['at_beat', 'at_scene'].some(k => typeof dm[k] === 'string' && dm[k].trim() !== '');
     const timingConfirmed = dmTimingConfirmedCurrent(dm);
     const setupW    = dmWords(dm.setup);
     const lift      = entry ? dmLongestLift(entry, dm.setup) : null;

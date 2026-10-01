@@ -52,9 +52,12 @@ function describeReported(raw) {
   return JSON.stringify(raw);
 }
 
+// The binding a bound fork waits on, in its precedence order: at_scene, at_beat, at_act.
+const describeOn = status => (status.at_scene ? `at_scene ${status.at_scene}` : status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`);
+
 export function describeBinding(status) {
   if (!status?.bound) return 'unbound (clock)';
-  const on = status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`;
+  const on = describeOn(status);
   return `${on} · fallback ${status.fallbackFraction}${status.fallbackDefault ? ' (default)' : ''} = ${mins(status.fallbackMinutes)} of ${mins(status.totalMinutes)} min`;
 }
 
@@ -75,7 +78,7 @@ function describeFork(status, decisionRecorded, block = undefined) {
   }
   if (status.due) {
     const why = status.via === 'binding'
-      ? `${status.at_beat ? `at_beat ${status.at_beat}` : `at_act ${status.at_act}`} met at turn start`
+      ? `${describeOn(status)} met at turn start`
       : status.via === 'fallback'
       ? `${mins(status.elapsed)} ≥ ${mins(status.fallbackMinutes)} min; binding unmet at turn start`
       : 'clock';

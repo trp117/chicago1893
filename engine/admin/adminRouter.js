@@ -187,13 +187,13 @@ function hasRealDefiningMoment(block) {
     && Array.isArray(block.options) && block.options.length > 0);
 }
 
-// STORY BINDING on a defining_moment — at_act / at_beat / fallback_at_elapsed_fraction, the
+// STORY BINDING on a defining_moment — at_act / at_beat / at_scene / fallback_at_elapsed_fraction, the
 // opt-in PromptComposer.isStoryBoundFork keys on. The editor posts every field, blank ones as
 // null or '', so this drops a blank key outright: an unbound role saved from the editor must
 // write exactly the file it had, and a stray `at_act: null` would be a new key on every role.
 // Values are coerced to the types the engine reads (the gate is strict: a STRING at_act does
 // not opt in), and an invalid value is dropped with a warning rather than stored inert.
-const FORK_BINDING_KEYS = ['at_act', 'at_beat', 'fallback_at_elapsed_fraction'];
+const FORK_BINDING_KEYS = ['at_act', 'at_beat', 'at_scene', 'fallback_at_elapsed_fraction'];
 function normalizeForkBinding(block, roleId = '') {
   if (!block || typeof block !== 'object') return block;
   const blank = v => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
@@ -209,6 +209,12 @@ function normalizeForkBinding(block, roleId = '') {
   const beat = typeof block.at_beat === 'string' ? block.at_beat.trim() : '';
   if (beat) block.at_beat = beat;
   else drop('at_beat', 'must be a beat id');
+
+  // at_scene (B3c) — a scene id of the arc. Like at_beat it is not checked against the arc
+  // here: the editor flags one the arc no longer has, and the engine falls back for it.
+  const scene = typeof block.at_scene === 'string' ? block.at_scene.trim() : '';
+  if (scene) block.at_scene = scene;
+  else drop('at_scene', 'must be a scene id');
 
   const fb = blank(block.fallback_at_elapsed_fraction) ? NaN : Number(block.fallback_at_elapsed_fraction);
   if (Number.isFinite(fb) && fb > 0 && fb <= 1) block.fallback_at_elapsed_fraction = fb;

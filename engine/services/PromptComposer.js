@@ -1041,10 +1041,10 @@ export function resolveDefiningMomentBlock(state, scenario) {
   return state?.effectiveDefiningMoment ?? scenario?.defining_moment ?? null;
 }
 
-// STORY-BOUND FORKS — THE OPT-IN GATE. A fork that sets at_act (a number) or at_beat (a beat
-// id) is bound to story position instead of the clock; everything Part A adds — loading the
-// story arc into play, the beat roster in the turn prompt, beat tracking on state, the bound
-// due-check — hangs off this one predicate. A block with neither is exactly today's
+// STORY-BOUND FORKS — THE OPT-IN GATE. A fork that sets at_act (a number), at_beat (a beat
+// id) or at_scene (a scene id, B3c) is bound to story position instead of the clock;
+// everything Part A adds — loading the story arc into play, the beat roster in the turn
+// prompt, beat tracking on state, the bound due-check — hangs off this one predicate. A block with neither is exactly today's
 // clock-fraction fork, and a session playing one loads no arc, sees no beat prompt, and
 // carries no beat state.
 //
@@ -1056,7 +1056,8 @@ export function resolveDefiningMomentBlock(state, scenario) {
 // the prose was still in the February public sessions.
 export function isStoryBoundFork(block) {
   return (typeof block?.at_act === 'number' && Number.isFinite(block.at_act))
-      || (typeof block?.at_beat === 'string' && block.at_beat.trim() !== '');
+      || (typeof block?.at_beat === 'string' && block.at_beat.trim() !== '')
+      || (typeof block?.at_scene === 'string' && block.at_scene.trim() !== '');
 }
 
 // The gate as the engine reads it: the flag on AND the playing role's fork story-bound. With
@@ -1076,7 +1077,21 @@ export const FORK_FALLBACK_FRACTION_DEFAULT = 0.85;
 // Whether a story-bound fork's binding has been met by the beats reached so far. at_beat
 // wins when both are set. An at_beat that names no beat of the arc, or an arc that was not
 // loaded, can never be met — the fork then waits for its fallback.
+//
+// at_scene (B3c) wins over both, and is read from the SCENE the session is in, not from
+// beats: met once state.currentSceneId is that scene or a later one. A scene is entered on
+// its predecessor's beat or on its budget (StateManager.advanceScene), so a story whose
+// model never reports a beat still arrives — that is the point of binding to a scene. A
+// scene the arc does not have, or a session that does not track scenes, never meets it; the
+// fork then fires at its fallback, and on that turn the scene jumps to at_scene.
+function sceneBindingReached(block, state, storyArc) {
+  const scenes = arcScenes(storyArc);
+  const target = scenes.findIndex(s => s.id === block.at_scene.trim());
+  const cur    = typeof state?.currentSceneId === 'string' ? scenes.findIndex(s => s.id === state.currentSceneId) : -1;
+  return target >= 0 && cur >= target;
+}
 function storyBindingReached(block, state, storyArc) {
+  if (typeof block.at_scene === 'string' && block.at_scene.trim()) return sceneBindingReached(block, state, storyArc);
   const pos = storyPosition(state, storyArc);
   if (!pos) return false;
   const atBeat = typeof block.at_beat === 'string' ? block.at_beat.trim() : '';
@@ -1311,6 +1326,7 @@ export function forkTimingStatus(state, scenario, storyArc = null) {
     bound,
     at_act:           bound && typeof block.at_act === 'number' ? block.at_act : null,
     at_beat:          bound && typeof block.at_beat === 'string' && block.at_beat.trim() ? block.at_beat.trim() : null,
+    at_scene:         bound && typeof block.at_scene === 'string' && block.at_scene.trim() ? block.at_scene.trim() : null,
     bindingMet:       met,
     fallbackFraction: bound ? fb : null,
     fallbackDefault:  bound ? !fbSet : null,
@@ -1531,8 +1547,10 @@ const STORY_BEAT_LIST_CHARS = 220;
 export const PACING_NUDGE_TURNS = 3;
 
 // The beat a bound fork is waiting for: its at_beat, or the first beat of its at_act (or of
-// the first act after it, if that act has no beats). null when neither names a beat of the arc.
+// the first act after it, if that act has no beats). null when neither names a beat of the arc
+// — and null for an at_scene fork, which is paced by its scenes' budgets (scenePacingStatus).
 function bindingTargetBeat(block, beats) {
+  if (typeof block?.at_scene === 'string' && block.at_scene.trim()) return null;
   const atBeat = typeof block?.at_beat === 'string' ? block.at_beat.trim() : '';
   if (atBeat) return beats.find(b => b.id === atBeat) || null;
   return typeof block?.at_act === 'number' ? (beats.find(b => b.actNumber >= block.at_act) || null) : null;
