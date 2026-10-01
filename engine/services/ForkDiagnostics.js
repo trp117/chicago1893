@@ -13,7 +13,7 @@
 // the closing-prose model, and a line saying "fork: PRESENTED via fallback" must never become
 // something it writes about. Stripping a transcript with no such line returns it unchanged.
 
-import { forkTimingStatus, storyPosition, storyPacingNudge, scenePacingStatus, arcBeats, arcScenes, resolveDefiningMomentBlock, storyBoundForkActive } from './PromptComposer.js';
+import { forkTimingStatus, storyPosition, storyPacingNudge, scenePacingStatus, sceneFraming, arcBeats, arcScenes, resolveDefiningMomentBlock, storyBoundForkActive } from './PromptComposer.js';
 
 export const DIAG_PREFIX = '> ⚑ DIAG ';
 
@@ -136,6 +136,20 @@ function describeSceneBudget(state, nextState, scenario, storyArc) {
   return segs.join(' · ');
 }
 
+// B2b-MODEL — what this turn's prompt told the model about the scene (read from the state the
+// turn started from, as the prompt was composed): a scene change with the bridge, a scene change
+// carried by the fork, or none.
+function describeFraming(state, scenario, storyArc) {
+  const f = sceneFraming(state, scenario, storyArc);
+  if (!f?.entered) return null;
+  return `framing: scene change${f.byFork ? ' (reached by the fork — no bridge)' : f.transition ? ' + bridge' : f.forkNow ? ' (fork turn — the setup is the transition, no bridge)' : ' (no bridge authored)'}`;
+}
+// Where the engine held the player, and where the model had put them if that differed.
+function describeHold(hold) {
+  if (!hold) return null;
+  return hold.model === hold.held ? `location: ${hold.held}` : `location: model said ${hold.model}, held at ${hold.held}`;
+}
+
 function describeAhead(nextState, storyArc, newBeats, sceneMoves) {
   if (typeof nextState?.currentSceneId !== 'string') return null;
   const ahead = aheadOfSceneBeats(nextState, storyArc, newBeats, sceneMoves);
@@ -144,7 +158,7 @@ function describeAhead(nextState, storyArc, newBeats, sceneMoves) {
   return `ahead: ${list(ahead)} recorded, ended no scene (${scene.id} ends on ${scene.ends_on_beat})`;
 }
 
-export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, output, newBeats = [], decisionRecorded = null, opening = false, sceneMoves = [] }) {
+export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, output, newBeats = [], decisionRecorded = null, opening = false, sceneMoves = [], locationHold = null }) {
   const status   = forkTimingStatus(state, scenario, storyArc);
   const raw      = output?.stateChanges?.beats_reached;
   const known    = new Set(arcBeats(storyArc).map(b => b.id));
@@ -156,6 +170,8 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
   const scene    = describeScene(state, nextState, sceneMoves, opening);
   const ahead    = scene ? describeAhead(nextState, storyArc, newBeats, sceneMoves) : null;
   const budget   = scene && !opening ? describeSceneBudget(state, nextState, scenario, storyArc) : null;
+  const framed   = scene && !opening ? describeFraming(state, scenario, storyArc) : null;
+  const located  = scene ? describeHold(locationHold) : null;
   // Unbound wording only for scene sessions (their role's fork is usually not bound); a
   // bound-fork session keeps the exact Part A wording.
   const block    = scene && !status.bound ? resolveDefiningMomentBlock(state, scenario) : undefined;
@@ -170,6 +186,8 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
     ...(scene ? [scene] : []),
     ...(ahead ? [ahead] : []),
     ...(budget ? [budget] : []),
+    ...(framed ? [framed] : []),
+    ...(located ? [located] : []),
     ...(nudge ? [`pacing: nudged toward ${nudge.target.id} (~${nudge.turnsLeft} turn${nudge.turnsLeft === 1 ? '' : 's'} left)`] : []),
     `fork: ${describeFork(status, decisionRecorded, block)}`,
   ].join(' · ');

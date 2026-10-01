@@ -38,9 +38,9 @@ const { ScenarioRepository }  = await import(`${ROOT}/engine/repositories/Scenar
 const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryArcRepository.js`);
 const { PlayerRepository }    = await import(`${ROOT}/engine/repositories/PlayerRepository.js`);
 const { SessionRepository }   = await import(`${ROOT}/engine/repositories/SessionRepository.js`);
-const { buildInitialState, loadStoryArc, loadForkStoryArc, initSceneState, advanceScene, recordReachedBeats } =
+const { buildInitialState, loadStoryArc, loadForkStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } =
   await import(`${ROOT}/engine/services/StateManager.js`);
-const { composeTurnPrompt, arcScenes, arcHasScenes, buildStoryPositionDirective, isStoryBoundFork, scenePacingStatus, storyPacingNudge } =
+const { composeTurnPrompt, arcScenes, arcHasScenes, buildStoryPositionDirective, isStoryBoundFork, scenePacingStatus, storyPacingNudge, sceneFramingDirective, sceneFraming } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 const { forkDiagTurnLine, forkDiagSummaryLines, forkDiagActive, parseSceneDiag, DIAG_PREFIX } =
   await import(`${ROOT}/engine/services/ForkDiagnostics.js`);
@@ -104,7 +104,11 @@ head('1. the gate — which sessions load an arc');
 
 head('2. init + advance — the rule');
 const startState = () => { const st = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); initSceneState(st, JOAN_ARC); return st; };
-const report = (st, beats, turn) => { quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: beats } }, JOAN_ARC)); return quiet(() => advanceScene(st, JOAN_ARC, turn)); };
+// The minimum scene time (B2b-MODEL): a beat ends its scene only within half a turn of the
+// scene's budget. spend() puts the clock there (budget − 1 min; no scenario → 3-minute turns),
+// so these B3d checks still test WHICH beat ends a scene, not when. Not spent: no budget advance.
+const spend  = st => { const sc = arcScenes(JOAN_ARC).find(x => x.id === st.currentSceneId); if (sc?.budget_minutes) st.elapsedMinutes = (st.sceneEnteredAt ?? 0) + sc.budget_minutes - 1; return st; };
+const report = (st, beats, turn) => { quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: beats } }, JOAN_ARC)); spend(st); return quiet(() => advanceScene(st, JOAN_ARC, turn)); };
 {
   const st = startState();
   check('initSceneState: first scene of Act 1', st.currentSceneId === 'scene_21_feb');
@@ -141,7 +145,7 @@ head('2b. B3d — a scene ends only on its OWN beat, one step a turn');
   const s5 = startState();
   report(s5, ['9_may_1431', '21_feb_1431'], 1);
   check('out-of-order reports in one turn: only the current scene\'s own beat moves it', s5.currentSceneId === 'scene_24_feb');
-  check('every scene move stamps sceneEnteredAt with the clock', (() => { const x = startState(); x.elapsedMinutes = 6; report(x, ['21_feb_1431'], 3); return x.sceneEnteredAt === 6; })());
+  check('every scene move stamps sceneEnteredAt with the clock', (() => { const x = startState(); report(x, ['21_feb_1431'], 3); return x.currentSceneId === 'scene_24_feb' && x.sceneEnteredAt === x.elapsedMinutes && x.elapsedMinutes > 0; })());
   check('initSceneState starts the scene clock at the session clock', startState().sceneEnteredAt === 0);
 }
 
@@ -153,6 +157,7 @@ head('2c. B3d — the fork path: the only one that jumps');
   const back = startState(); report(back, ['21_feb_1431'], 1); report(back, ['24_feb_1431'], 2);
   check('a fork scene BEHIND the current one never moves it back', quiet(() => advanceScene(back, JOAN_ARC, 3, { forkSceneId: 'scene_21_feb' })).length === 0 && back.currentSceneId === 'scene_17_mar');
   const same = startState(); quiet(() => recordReachedBeats(same, { stateChanges: { beats_reached: ['21_feb_1431'] } }, JOAN_ARC));
+  spend(same);
   const ms = quiet(() => advanceScene(same, JOAN_ARC, 1, { forkSceneId: 'scene_21_feb' }));
   check('a fork scene equal to the current one falls through to the beat path', ms.length === 1 && ms[0].via === 'beat' && same.currentSceneId === 'scene_24_feb');
   const bad = startState();
@@ -163,7 +168,7 @@ head('2c. B3d — the fork path: the only one that jumps');
   delete arc.acts[0].scenes[1].ends_on_beat;   // scene_24_feb becomes budget-only
   const st = quiet(() => buildInitialState(joanScenario, JOAN_ROLES[0], JOAN_LOCS)); initSceneState(st, arc);
   quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: ['21_feb_1431', '9_may_1431'] } }, arc));
-  quiet(() => advanceScene(st, arc, 1)); quiet(() => advanceScene(st, arc, 2));
+  st.elapsedMinutes = 2; quiet(() => advanceScene(st, arc, 1)); quiet(() => advanceScene(st, arc, 2));
   check('a budget-only scene (no ends_on_beat) holds — B3b adds budgets', st.currentSceneId === 'scene_24_feb');
   const lost = { ...startState(), currentSceneId: 'scene_deleted' };
   check('a current scene no longer in the arc holds, with a warning', quiet(() => advanceScene(lost, JOAN_ARC, 1)).length === 0 && lost.currentSceneId === 'scene_deleted');
@@ -233,6 +238,80 @@ head('2e. B3b — the hard-advance backstop');
   check('summary: the budget move, and the count by kind', sum.includes(`${DIAG_PREFIX}scene advances by: 0 beat, 1 budget, 0 fork`) && sum.some(l => l.includes('turn 4 scene_24_feb → scene_17_mar (on budget 4/3 min, 24_feb_1431 not reached)')), sum.filter(l => l.includes('scene')).join(' | '));
 }
 
+head('2f. B2b-MODEL — the model is told the scene; the engine holds its place');
+{
+  const L = JOAN_LOCS;
+  const st = (scene, turnCount, extra = {}) => { const s = startState(); Object.assign(s, { currentSceneId: scene, turnCount }, extra); return s; };
+  // An advance at the end of turn 3 stamps sceneEnteredTurn 3 — the count turn 4 starts from.
+  const s = startState(); s.turnCount = 3; s.elapsedMinutes = 6; s.currentSceneId = 'scene_24_feb';
+  quiet(() => recordReachedBeats(s, { stateChanges: { beats_reached: ['24_feb_1431'] } }, JOAN_ARC)); quiet(() => advanceScene(s, JOAN_ARC, 3));
+  check('an advance stamps sceneEnteredTurn with the count the next turn starts from', s.currentSceneId === 'scene_17_mar' && s.sceneEnteredTurn === 3);
+  const first = sceneFramingDirective(s, joanScenario, JOAN_ARC, L);
+  const bridge17 = arcScenes(JOAN_ARC).find(x => x.id === 'scene_17_mar').bridge;
+  check('the new scene\'s FIRST turn: SCENE CHANGE, the date and place, and its bridge', first.startsWith('⚑ SCENE CHANGE: Since the last turn the story has moved on — it is now 17 March 1431 — Joan\'s Cell') && first.includes(bridge17) && first.includes('⚑ SCENE: 17 March 1431'), first.slice(0, 160));
+  const later = sceneFramingDirective({ ...s, turnCount: 4 }, joanScenario, JOAN_ARC, L);
+  check('the scene\'s next turn: framing only — no change line, no bridge', later.startsWith('⚑ SCENE: 17 March 1431') && !later.includes('SCENE CHANGE') && !later.includes(bridge17));
+  check('a time-only change (scene_24_feb, same hall) still announces the new date', sceneFramingDirective(st('scene_24_feb', 2, { sceneEnteredTurn: 2 }), joanScenario, JOAN_ARC, L).includes('it is now 24 February 1431 — Great Hall'));
+  check('no framing names a scene id', !SEQ.some(id => first.includes(id) || later.includes(id)));
+
+  // The fork turn: the setup IS the transition. Joan bound at_scene scene_28_may, entering it on
+  // its predecessor's budget: the fork is due on the scene's first turn — no bridge.
+  const joan = JOAN_ROLES.find(r => r.id === 'role_joan');
+  const bound = { ...clone(joan.defining_moment), at_scene: 'scene_28_may' };
+  const ft = st('scene_28_may', 11, { sceneEnteredTurn: 11, elapsedMinutes: 24, effectiveDefiningMoment: bound, playerRoleId: 'role_joan' });
+  const fFork = sceneFraming(ft, joanScenario, JOAN_ARC, L);
+  const dFork = sceneFramingDirective(ft, joanScenario, JOAN_ARC, L);
+  const bridge28 = arcScenes(JOAN_ARC).find(x => x.id === 'scene_28_may').bridge;
+  check('fork due on the scene\'s first turn: change announced, NO bridge — the setup is the transition', fFork.forkNow && fFork.transition === '' && dFork.includes('SCENE CHANGE') && dFork.includes('The defining moment below is the transition') && !dFork.includes(bridge28.slice(0, 40)));
+  const fj = st('scene_28_may', 9, { sceneEnteredTurn: 9, elapsedMinutes: 16, effectiveDefiningMoment: bound, definingMomentPresented: true,
+    sceneAdvances: [{ from: 'scene_23_may', to: 'scene_28_may', beat: null, turn: 9, via: 'fork' }] });
+  const dJump = sceneFramingDirective(fj, joanScenario, JOAN_ARC, L);
+  check('scene reached by the fork\'s jump: framing only — no change line, no bridge (the fork already moved the story)', dJump.startsWith('⚑ SCENE: 28 May 1431') && !dJump.includes('SCENE CHANGE') && !dJump.includes(bridge28.slice(0, 40)));
+
+  // The location hold.
+  const h = st('scene_17_mar', 4, { location: 'great_hall_rouen_castle' });
+  const hold = holdSceneLocation(h, JOAN_ARC);
+  check('the engine holds the scene\'s place over the model\'s choice', hold.model === 'great_hall_rouen_castle' && hold.held === 'joan_prison_cell' && h.location === 'joan_prison_cell' && h.visitedLocations.includes('joan_prison_cell'));
+  const same = st('scene_17_mar', 4, { location: 'joan_prison_cell' });
+  check('...and leaves it alone when the model already had it', JSON.stringify(holdSceneLocation(same, JOAN_ARC)) === JSON.stringify({ model: 'joan_prison_cell', held: 'joan_prison_cell' }));
+  const arcRL = clone(JOAN_ARC); arcRL.acts[1].scenes[0].role_locations = { role_manchon: 'great_hall_rouen_castle' };
+  const rl = st('scene_17_mar', 4, { location: 'joan_prison_cell' });
+  check('role_locations: a role with its own place for the scene is held there', holdSceneLocation(rl, arcRL).held === 'great_hall_rouen_castle' && rl.location === 'great_hall_rouen_castle');
+  check('...and the framing names that place for that role', sceneFramingDirective(rl, joanScenario, arcRL, L).includes('17 March 1431 — Great Hall'));
+  check('a session without scenes is never held', holdSceneLocation({ location: 'x' }, JOAN_ARC) === null);
+  const arcStart = clone(JOAN_ARC); arcStart.acts[0].scenes[0].location_id = 'joan_prison_cell';
+  const s0 = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); initSceneState(s0, arcStart);
+  check('a session starts at its first scene\'s place', s0.location === 'joan_prison_cell' && JSON.stringify(s0.visitedLocations) === '["joan_prison_cell"]');
+  const s1 = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); const before1 = JSON.stringify(s1.visitedLocations); initSceneState(s1, JOAN_ARC);
+  check('...and a role already starting there keeps its initial location state exactly', s1.location === 'great_hall_rouen_castle' && JSON.stringify(s1.visitedLocations) === before1);
+
+  // DIAG
+  const n = clone(s); n.turnCount = 4; n.elapsedMinutes = 8;
+  const hl = clone(n); hl.location = 'great_hall_rouen_castle'; const hh = holdSceneLocation(hl, JOAN_ARC);
+  const line = forkDiagTurnLine({ turn: 4, state: s, nextState: hl, scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: [], locationHold: hh });
+  check('DIAG: the turn whose prompt opened a scene says so', line.includes('framing: scene change + bridge'), line);
+  check('DIAG: where the model put the player vs where the engine held them', line.includes('location: model said great_hall_rouen_castle, held at joan_prison_cell'), line);
+  const fline = forkDiagTurnLine({ turn: 12, state: ft, nextState: clone(ft), scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: [] });
+  check('DIAG: a fork turn opening a scene — no bridge, and why', fline.includes('framing: scene change (fork turn — the setup is the transition, no bridge)'), fline);
+}
+
+head('2g. B2b-MODEL — minimum scene time: a beat ends its scene only near the budget');
+{
+  // Joan: 2-minute turns, so a beat may end a scene once less than 1 minute of its budget is left.
+  const at = (scene, entered, now, beats) => { const s = startState(); Object.assign(s, { currentSceneId: scene, sceneEnteredAt: entered, elapsedMinutes: now, reachedBeats: beats }); return s; };
+  const adv = s => quiet(() => advanceScene(s, JOAN_ARC, 9, { scenario: joanScenario }));
+  check('beat played on ARRIVAL (4-min scene, 2 in): the scene holds', adv(at('scene_17_mar', 8, 10, ['17_mar_1431'])).length === 0);
+  check('...and ends on that beat after its second turn (4 in, budget spent)', adv(at('scene_17_mar', 8, 12, ['17_mar_1431']))[0]?.via === 'beat');
+  check('3-min scene, beat on arrival (2 in, 1 left — not under half a turn): holds', adv(at('scene_24_feb', 4, 6, ['24_feb_1431'])).length === 0);
+  check('5-min scene: holds at 2 in, still at 4 in (1 left), ends on its beat at 6 in', adv(at('scene_28_may', 20, 22, ['28_may_1431'])).length === 0 && adv(at('scene_28_may', 20, 24, ['28_may_1431'])).length === 0);
+  const p = (scene, entered, now, beats = []) => scenePacingStatus(at(scene, entered, now, beats), joanScenario, JOAN_ARC);
+  check('the scene\'s length in turns and the turn number (4-min scene: 2 turns)', p('scene_17_mar', 8, 8).turns === 2 && p('scene_17_mar', 8, 8).turnNo === 1 && p('scene_17_mar', 8, 10).turnNo === 2);
+  const fr = (scene, entered, now, beats = []) => sceneFramingDirective(at(scene, entered, now, beats), joanScenario, JOAN_ARC, JOAN_LOCS);
+  check('turn 1: the model is told the scene\'s length and to land the beat on its LAST turn', fr('scene_17_mar', 8, 8).includes('This scene runs about 2 turns; this is turn 1. Its ending beat (17_mar_1431) belongs on its LAST turn'));
+  check('the last turn: the beat belongs here', fr('scene_17_mar', 8, 10).includes('This is the scene\'s last turn: its ending beat (17_mar_1431) belongs here.'));
+  check('beat already played: let the scene play out — do not move on', fr('scene_17_mar', 8, 10, ['17_mar_1431']).includes('has happened. Let the scene play out its remaining time in this place'));
+}
+
 head('3. inert without scenes');
 {
   const WG   = await repos.scenarios.findById('watergate_1972_part1_breach');
@@ -251,26 +330,30 @@ head('3. inert without scenes');
   check('an unbound, scene-less session writes no DIAG', forkDiagActive(gst, gb) === false);
 }
 
-head('4. nothing about scenes reaches the model prompt');
+head('4. what reaches the model prompt — the roster and the scene framing (B2b-MODEL), never a scene id');
 {
+  // B2a kept scenes out of the prompt entirely; that is what let the narration lag the scene
+  // position. B2b-MODEL adds exactly one thing for a scene session: the framing directive (date,
+  // place, and on a scene's first turn the move and its bridge). Still no scene id anywhere.
   const promptFor = (st, arc) => composeTurnPrompt(st, 'I wait and watch.', { scenario: joanScenario, characters: [], locations: JOAN_LOCS, clues: [], ...(arc ? { storyArc: arc } : {}) });
   const bare = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS));
   const tracked = clone(bare); initSceneState(tracked, JOAN_ARC);
   quiet(() => recordReachedBeats(tracked, { stateChanges: { beats_reached: ['24_feb_1431'] } }, JOAN_ARC)); quiet(() => advanceScene(tracked, JOAN_ARC, 1));
-  const untracked = clone(tracked); delete untracked.currentSceneId; delete untracked.sceneAdvances; delete untracked.sceneEnteredAt;
-  check('currentSceneId / sceneAdvances / sceneEnteredAt are stripped from STATE_JSON (tracked == untracked prompt)', promptFor(tracked, JOAN_ARC) === promptFor(untracked, JOAN_ARC));
+  const untracked = clone(tracked); for (const k of ['currentSceneId', 'sceneAdvances', 'sceneEnteredAt', 'sceneEnteredTurn']) delete untracked[k];
   const pr = promptFor(tracked, JOAN_ARC);
-  // Scene-only content: ids and bridges. (Date labels are not checked here — Joan's beat
-  // descriptions start with the same dates, so the roster carries them; the exact check below
-  // proves nothing but the roster was added.)
-  const leaks = [...SEQ, ...arcScenes(JOAN_ARC).map(s => s.bridge).filter(Boolean).map(b => b.slice(0, 40))]
-    .filter(x => pr.includes(x));
-  check('no scene id or bridge appears anywhere in the prompt', leaks.length === 0, leaks.slice(0, 3).join(' | '));
+  const fr = sceneFramingDirective(tracked, joanScenario, JOAN_ARC, JOAN_LOCS);
+  check('a scene-session prompt carries the framing: date and place', fr.startsWith('⚑ SCENE: 21 February 1431 — Great Hall, Rouen Castle') && pr.includes(fr), fr.slice(0, 120));
+  const SEP = '\n\n';
+  check('scene bookkeeping is stripped from STATE_JSON (tracked minus framing == untracked prompt)', pr.replace(SEP + fr, '') === promptFor(untracked, JOAN_ARC));
+  check('no scene id appears anywhere in the prompt', !SEQ.some(id => pr.includes(id)));
+  check('no bridge on a turn that does not open a scene', !arcScenes(JOAN_ARC).some(sc => sc.bridge && pr.includes(sc.bridge.slice(0, 40))) && !pr.includes('SCENE CHANGE'));
   check('the Part A beat roster IS in the prompt (the model needs it to report beats)', pr.includes('⚑ STORY POSITION') && pr.includes('] 24_feb_1431 — '));
   check('...with no PACING nudge (that stays fork-bound)', !pr.includes('⚑ PACING'));
   const d = buildStoryPositionDirective(tracked, joanScenario, JOAN_ARC);
-  const withoutRoster = pr.includes('\n\n' + d) ? pr.replace('\n\n' + d, '') : pr.replace(d, '');
-  check('removing the roster leaves exactly the no-arc prompt (scenes add the roster and nothing else)', withoutRoster === promptFor(untracked, null));
+  const noFr = pr.replace(SEP + fr, '');
+  const bareOfBoth = noFr.includes(SEP + d) ? noFr.replace(SEP + d, '') : noFr.replace(d, '');   // the roster may lead its slot
+  check('removing the roster and the framing leaves exactly the no-arc prompt (scenes add those two and nothing else)', bareOfBoth === promptFor(untracked, null));
+  check('a session that does not track scenes gets no framing', sceneFramingDirective(untracked, joanScenario, JOAN_ARC, JOAN_LOCS) === '');
 }
 
 head('5. DIAG — the scene segment and the summary');
@@ -278,6 +361,7 @@ head('5. DIAG — the scene segment and the summary');
   const st0 = startState();
   const n0  = clone(st0);
   quiet(() => recordReachedBeats(n0, { stateChanges: { beats_reached: ['21_feb_1431'] } }, JOAN_ARC));
+  spend(n0);
   const mv0 = quiet(() => advanceScene(n0, JOAN_ARC, 0));
   const line0 = forkDiagTurnLine({ turn: 0, opening: true, state: st0, nextState: n0, scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: { beats_reached: ['21_feb_1431'] } }, newBeats: ['21_feb_1431'], sceneMoves: mv0 });
   check('opening line shows the crossing', line0.includes('scene: scene_21_feb → scene_24_feb (advanced on beat 21_feb_1431)'), line0);
@@ -286,6 +370,7 @@ head('5. DIAG — the scene segment and the summary');
   check('a turn with no crossing says held', held.includes('scene: scene_24_feb (held)'), held);
   const n2 = clone(n0);
   quiet(() => recordReachedBeats(n2, { stateChanges: { beats_reached: ['24_feb_1431', 'the_voices_are', '9_may_1431'] } }, JOAN_ARC));
+  spend(n2);
   const mv2 = quiet(() => advanceScene(n2, JOAN_ARC, 2));
   const multi = forkDiagTurnLine({ turn: 2, state: n0, nextState: n2, scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: { beats_reached: ['24_feb_1431', 'the_voices_are', '9_may_1431'] } }, newBeats: ['24_feb_1431', 'the_voices_are', '9_may_1431'], sceneMoves: mv2 });
   check('a turn with ahead-of-sequence beats: one step on its own beat', multi.includes('scene: scene_24_feb → scene_17_mar (advanced on beat 24_feb_1431)'), multi);
@@ -367,14 +452,22 @@ const out = (beats, loc = 'great_hall_rouen_castle') => ({
   narrative: 'The assessors murmur; the scribes dip their pens.', choices: ['Answer carefully', 'Say nothing', 'Ask for counsel'],
   location: loc, timeAdvance: 2, stateChanges: beats === undefined ? {} : { beats_reached: beats },
 });
+// 2-minute turns. With the minimum scene time (B2b-MODEL) every 3- and 4-minute scene runs two
+// turns whatever the beats do; the beats decide whether it ends 'beat' or 'budget', and which
+// reports are flagged ahead. The opening reports 21_feb_1431 on arrival — it no longer ends the
+// opening scene.
 const TURNS = [
-  { beats: [],                             want: 'scene_24_feb', move: null },
+  { beats: [],                             want: 'scene_21_feb', move: null },
+  { beats: [],                             want: 'scene_24_feb', move: 'scene_21_feb → scene_24_feb (advanced on beat 21_feb_1431)' },
+  { beats: ['the_voices_are'],             want: 'scene_24_feb', move: null },
   { beats: ['24_feb_1431'],                want: 'scene_17_mar', move: 'scene_24_feb → scene_17_mar (advanced on beat 24_feb_1431)' },
-  { beats: ['the_voices_are'],             want: 'scene_17_mar', move: null },
-  { beats: ['17_mar_1431', '9_may_1431'],  want: 'scene_9_may',  move: 'scene_17_mar → scene_9_may (advanced on beat 17_mar_1431)' },
+  { beats: ['17_mar_1431', '9_may_1431'],  want: 'scene_17_mar', move: null },
+  { beats: [],                             want: 'scene_9_may',  move: 'scene_17_mar → scene_9_may (advanced on beat 17_mar_1431)' },
+  { beats: [],                             want: 'scene_9_may',  move: null },
   { beats: [],                             want: 'scene_23_may', move: 'scene_9_may → scene_23_may (advanced on beat 9_may_1431)' },
   { beats: ['24_may_1431'],                want: 'scene_23_may', move: null },
-  { beats: ['23_may_1431'],                want: 'scene_24_may', move: 'scene_23_may → scene_24_may (advanced on beat 23_may_1431)' },
+  { beats: [],                             want: 'scene_24_may', move: 'scene_23_may → scene_24_may (advanced on budget 4/4 min, 23_may_1431 not reached)' },
+  { beats: ['23_may_1431'],                want: 'scene_24_may', move: null },
   { beats: [],                             want: 'scene_28_may', move: 'scene_24_may → scene_28_may (advanced on beat 24_may_1431)' },
   { beats: ['28_may_1431'],                want: 'scene_28_may', move: null },
 ];
@@ -384,29 +477,46 @@ try {
   const st = await sse('start', { scenarioId: JOAN_ID, roleId: 'role_manchon', narrativeStyle: 'focused' });
   check('/start (Joan, Manchon) completes', !!st.done, st.error ? JSON.stringify(st.error).slice(0, 200) : String(st.status));
   let state = st.done?.nextState; joanSession = st.done?.sessionId;
-  check('opening: started in scene_21_feb, crossed to scene_24_feb on 21_feb_1431', state?.currentSceneId === 'scene_24_feb' && state?.sceneAdvances?.[0]?.from === 'scene_21_feb', state?.currentSceneId);
+  check('opening: 21_feb_1431 reported on arrival — recorded, but the opening scene holds (minimum scene time)', state?.currentSceneId === 'scene_21_feb' && state?.reachedBeats?.includes('21_feb_1431') && !state?.sceneAdvances?.length, state?.currentSceneId);
   const visible = JSON.stringify(st.done?.output || {});
   check('what the player is sent (output) carries no scene data', !SEQ.some(id => visible.includes(id)));
+  const perTurn = [];   // B2b-MODEL: what each turn's request told the model, and the state it started from
   for (const [i, t] of TURNS.entries()) {
     nextOutput = out(t.beats);
+    const before = sent.length, startState = state;
     const r = await sse('turn', { state, playerInput: `I answer (${i + 1}).`, sessionId: joanSession });
     if (!r.done) { check(`turn ${i + 1} completes`, false, r.error ? JSON.stringify(r.error).slice(0, 200) : String(r.status)); break; }
+    perTurn.push({ start: startState, prompt: sent.slice(before).join('\n') });
     state = r.done.nextState;
     check(`turn ${i + 1}: beats ${JSON.stringify(t.beats)} → currentSceneId ${t.want}`, state.currentSceneId === t.want, state.currentSceneId);
   }
   const transcript = fs.readFileSync(p('engine/data/transcripts', `${joanSession}.md`), 'utf8');
   const diag = transcript.split('\n').filter(l => l.startsWith(DIAG_PREFIX));
   check(`transcript carries a DIAG line per turn (opening + ${TURNS.length})`, diag.length === TURNS.length + 1, `${diag.length} lines`);
-  check('opening DIAG: the crossing out of the opening scene', diag[0]?.includes('scene: scene_21_feb → scene_24_feb (advanced on beat 21_feb_1431)'), diag[0]);
+  check('opening DIAG: the opening scene, held', diag[0]?.includes('scene: scene_21_feb (opening scene)'), diag[0]);
   TURNS.forEach((t, i) => {
     const l = diag[i + 1] || '';
     check(`turn ${i + 1} DIAG: ${t.move ? 'crossing recorded' : 'held'}`, t.move ? l.includes(`scene: ${t.move}`) : l.includes(`scene: ${t.want} (held)`), l.slice(0, 220));
   });
-  check('e2e: the_voices_are reported late in scene_17_mar: recorded, held, not flagged ahead', (diag[3] || '').includes('new: [the_voices_are]') && (diag[3] || '').includes('scene: scene_17_mar (held) · ') && !(diag[3] || '').includes('ahead:'), diag[3]);
-  check('e2e: 24_may_1431 reported in scene_23_may is logged as ahead, not a skip', (diag[6] || '').includes('scene: scene_23_may (held) · ahead: [24_may_1431]'), diag[6]);
-  const leak = sent.find(s => SEQ.some(id => s.includes(id)) || arcScenes(JOAN_ARC).some(sc => sc.bridge && s.includes(sc.bridge.slice(0, 40))));
-  check(`none of the ${sent.length} model requests carries a scene id or bridge`, sent.length > 0 && !leak);
+  check('e2e: the_voices_are reported in scene_24_feb is logged as ahead, not a skip', (diag[3] || '').includes('scene: scene_24_feb (held) · ahead: [the_voices_are]'), diag[3]);
+  check('e2e: 24_may_1431 reported in scene_23_may is logged as ahead, not a skip', (diag[9] || '').includes('scene: scene_23_may (held) · ahead: [24_may_1431]'), diag[9]);
+  check('e2e: 23_may_1431 reported late in scene_24_may: recorded, held, not flagged ahead', (diag[11] || '').includes('new: [23_may_1431]') && (diag[11] || '').includes('scene: scene_24_may (held) · ') && !(diag[11] || '').includes('ahead:'), diag[11]);
+  check('e2e: a beat played on arrival holds its scene (17_mar_1431 on the first turn of scene_17_mar)', (diag[5] || '').includes('new: [17_mar_1431, 9_may_1431]') && (diag[5] || '').includes('scene: scene_17_mar (held)'), diag[5]);
+  check(`none of the ${sent.length} model requests carries a scene id`, sent.length > 0 && !sent.some(s => SEQ.some(id => s.includes(id))));
   check('...and the requests DO carry the beat roster', sent.some(s => s.includes('STORY POSITION')));
+  // B2b-MODEL e2e: every turn names its scene; a scene's FIRST turn — and only that turn —
+  // carries the change and the scene's bridge.
+  const SCN = Object.fromEntries(arcScenes(JOAN_ARC).map(sc => [sc.id, sc]));
+  const opens = perTurn.map(x => x.start.sceneEnteredTurn === x.start.turnCount);
+  check('e2e: every turn\'s request carries the date of the scene it plays in', perTurn.every(x => x.prompt.includes(`⚑ SCENE: ${SCN[x.start.currentSceneId].date_label}`)), perTurn.map(x => x.start.currentSceneId).join(','));
+  check('e2e: the change + bridge appear exactly on the turns that open a scene', perTurn.every((x, i) => {
+    const b = SCN[x.start.currentSceneId].bridge;
+    return opens[i] ? x.prompt.includes('SCENE CHANGE') && (!b || x.prompt.includes(JSON.stringify(b).slice(1, 41))) : !x.prompt.includes('SCENE CHANGE');
+  }), `opening turns: ${opens.map((o, i) => (o ? i + 1 : null)).filter(Boolean).join(',')}`);
+  check('e2e: turn 3 opens scene_24_feb — the time-only change, with its bridge', opens[2] && perTurn[2].prompt.includes('it is now 24 February 1431') && !opens[0] && !opens[1]);
+  const cellTurn = perTurn.findIndex(x => x.start.currentSceneId === 'scene_17_mar');
+  check('e2e: in scene_17_mar the session is HELD in the cell though the scripted model keeps saying the hall', cellTurn >= 0 && perTurn[cellTurn].start.location === 'joan_prison_cell', perTurn[cellTurn]?.start.location);
+  check('e2e DIAG: the override is logged', diag.some(l => l.includes('location: model said great_hall_rouen_castle, held at joan_prison_cell')));
 
   // B3b e2e: a model that NEVER reports a beat. The budgets alone must carry the story through
   // every scene — one scene per spent budget, the nudge on each scene's last turn — and land

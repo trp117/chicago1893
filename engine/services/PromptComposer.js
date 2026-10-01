@@ -1517,7 +1517,77 @@ export function scenePacingStatus(state, scenario, storyArc) {
     scene, budget, inScene, remaining, turnMin, target, beatDone, nudge, between,
     last: scenes[scenes.length - 1]?.id === scene.id,
     exhausted: budget !== null && inScene >= budget,
+    // MINIMUM SCENE TIME (B2b-MODEL): a reported beat may end the scene only once less than
+    // half a turn of its budget is left — so a scene runs about its budget even when the model
+    // plays its ending beat on the turn it arrives. "One turn early" would not do: Joan's turns
+    // are 2 minutes and her scenes 3–4, so one turn early is the whole scene, and the re-test
+    // showed exactly that — every scene one turn long, the arc spent by 17 minutes, then a loop.
+    beatMayEnd: budget === null || budget - inScene < turnMin / 2,
+    turns:   budget === null ? null : Math.max(1, Math.ceil(budget / turnMin)),
+    turnNo:  budget === null ? null : Math.min(Math.max(1, Math.ceil(budget / turnMin)), Math.floor(inScene / turnMin) + 1),
   };
+}
+
+// SCENE FRAMING (B2b-MODEL). The scene a session is in has to reach the model: with scene state
+// stripped from the prompt (B2a) the bookkeeping moved on while the narration stayed where it
+// was, and a later turn crammed several scenes to catch up. This puts the current scene's date
+// and place into every scene-session prompt, and — on the first turn of a new scene — the move
+// itself and its authored bridge, so the narrative changes scene WITH the bookkeeping.
+//
+// Where a role is during a scene: its role_locations entry, else the scene's location_id. The
+// engine holds the session there for the whole scene (StateManager.holdSceneLocation), so the
+// framing, the location block, the NPC list and the clues all describe the same place.
+export function sceneLocationId(scene, roleId) {
+  const own = roleId && scene?.role_locations && typeof scene.role_locations[roleId] === 'string' ? scene.role_locations[roleId] : '';
+  return own || (typeof scene?.location_id === 'string' && scene.location_id ? scene.location_id : null);
+}
+
+// The framing for THIS turn, or null for a session that does not track scenes. `entered` is the
+// first turn of a scene the session moved into at the end of the previous turn (sceneEnteredTurn,
+// stamped by advanceScene with the turn count the next turn starts from). The bridge is withheld
+// when the fork is put this turn or the scene was reached by the fork's jump: the fork's setup IS
+// the transition then (Joan's relapse setup and the scene_28_may bridge tell the same thing), and
+// giving both would hand the player the transition twice.
+export function sceneFraming(state, scenario, storyArc, locations = []) {
+  if (typeof state?.currentSceneId !== 'string') return null;
+  const scene = arcScenes(storyArc).find(s => s.id === state.currentSceneId);
+  if (!scene) return null;
+  const locId   = sceneLocationId(scene, state.playerRoleId);
+  const loc     = (locations || []).find(l => l.id === locId);
+  const place   = loc?.name || locId || '';
+  const date    = [scene.date_label, scene.time_label].filter(s => typeof s === 'string' && s.trim()).join(', ');
+  const entered = typeof state.sceneEnteredTurn === 'number' && state.sceneEnteredTurn === (state.turnCount ?? 0);
+  const last    = Array.isArray(state.sceneAdvances) ? state.sceneAdvances[state.sceneAdvances.length - 1] : null;
+  const byFork  = entered && last?.to === scene.id && last?.via === 'fork';
+  const forkNow = definingMomentDue(state, scenario, storyArc);
+  const transition = entered && !byFork && !forkNow && typeof scene.bridge === 'string' ? scene.bridge.trim() : '';
+  return { scene, locId, place, date, entered, byFork, forkNow, transition, pace: scenePacingStatus(state, scenario, storyArc) };
+}
+
+// The directive as composed into a turn prompt — '' for a session that does not track scenes.
+export function sceneFramingDirective(state, scenario, storyArc, locations = []) {
+  const f = sceneFraming(state, scenario, storyArc, locations);
+  return f ? buildSceneFramingDirective(f) : '';
+}
+
+function buildSceneFramingDirective(f) {
+  const where = [f.date, f.place].filter(Boolean).join(' — ');
+  const lines = [];
+  if (f.entered && !f.byFork) {
+    lines.push(`⚑ SCENE CHANGE: Since the last turn the story has moved on — it is now ${where}. Open this turn by carrying the player there: the move in time and place comes first, then the turn plays out in the new scene. The player's last action belongs to the scene just left; resolve it in a line at most, or let the move overtake it.`);
+    if (f.transition) lines.push(`The authored transition into this scene — narrate the player into it (you may follow it closely; do not contradict it or add to what it says has happened):\n${f.transition}`);
+    else if (f.forkNow) lines.push('The defining moment below is the transition: let it carry the player into this scene.');
+  }
+  lines.push(`⚑ SCENE: ${where}. This turn takes place here, on this date. Narrate this scene — do not drift back into an earlier one, and do not reach ahead to a later date.`);
+  // The scene's length and where this turn sits in it, so the model FILLS the scene rather than
+  // playing its ending beat on arrival (the minimum scene time, scenePacingStatus.beatMayEnd).
+  const p = f.pace;
+  if (p?.turns && p.target && !f.forkNow) {
+    if (p.beatDone) lines.push(`- This scene's ending beat (${p.target.id}) has happened. Let the scene play out its remaining time in this place — its aftermath, the people in it — and do not move on to the next scene's events.`);
+    else if (p.turnNo >= p.turns) lines.push(`- This is the scene's last turn: its ending beat (${p.target.id}) belongs here.`);
+    else lines.push(`- This scene runs about ${p.turns} turns; this is turn ${p.turnNo}. Its ending beat (${p.target.id}) belongs on its LAST turn, not on the turn the story arrives: fill the turns before it with the scene itself — the people in it, what is asked and answered, the pressure building toward that beat.`);
+  }
+  return lines.join('\n');
 }
 
 function buildScenePacingLine(p) {
@@ -1685,13 +1755,13 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // turn byte-identical to the one it composed before.
   // reachedBeats (story-bound forks only) goes too: buildStoryPositionDirective already renders
   // it as the ticked roster, and a session without it has no such key to strip.
-  // currentSceneId / sceneAdvances / sceneEnteredAt (scene scenarios, B2a/B3) are engine
-  // bookkeeping that nothing shows the model yet — B2b decides what the narrator is told about
-  // scenes, and it will not be a raw id in the state block.
+  // currentSceneId / sceneAdvances / sceneEnteredAt / sceneEnteredTurn (scene scenarios) are
+  // engine bookkeeping: the narrator is told the scene by buildSceneFramingDirective (date,
+  // place, bridge) and never sees a raw scene id in the state block.
   const {
     remainingMinutes, effectiveClosure, effectiveDefiningMoment,
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
-    reachedBeats, currentSceneId, sceneAdvances, sceneEnteredAt,
+    reachedBeats, currentSceneId, sceneAdvances, sceneEnteredAt, sceneEnteredTurn,
     ...stateRest
   } = state;
   const promptState = {
@@ -1719,6 +1789,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{CLOSURE_FLAG_DIRECTIVE}}', [
       buildClosureFlagDirective(state, scenario),
       buildStoryPositionDirective(state, scenario, storyArc),
+      sceneFramingDirective(state, scenario, storyArc, locations),
     ].filter(Boolean).join('\n\n'))
     .replace('{{ANCHORED_OUTCOME_DIRECTIVE}}', [
       buildAnchoredLocationDirective(state, scenario, locations),

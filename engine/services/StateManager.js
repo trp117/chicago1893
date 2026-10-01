@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes, scenePacingStatus } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes, scenePacingStatus, sceneLocationId } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -131,7 +131,32 @@ export function initSceneState(state, storyArc) {
   state.currentSceneId = scenes[0].id;
   state.sceneAdvances  = [];
   state.sceneEnteredAt = state.elapsedMinutes ?? 0;
+  // The session starts where its first scene is (B2b-MODEL). Changed only when it differs from
+  // the role's start, so a role that already starts there keeps its initial state exactly.
+  const loc = sceneLocationId(scenes[0], state.playerRoleId);
+  if (loc && loc !== state.location) { state.location = loc; state.visitedLocations = [loc]; }
   return scenes[0].id;
+}
+
+// HOLD the session at its scene's place (B2b-MODEL). A scene is one place: the engine sets the
+// location — the scene's location_id, or that role's own place for the scene — and the model's own
+// choice of location is overridden for as long as the scene lasts. Without this the framing would
+// say "Joan's cell" while the location block, the NPC list and the clues (all read from
+// state.location) still described the Great Hall. Call after advanceScene, so the hold is the
+// place of the scene the NEXT turn plays in. Returns { model, held } (model: where the model had
+// put the player), or null for a session that does not track scenes.
+export function holdSceneLocation(state, storyArc) {
+  if (typeof state?.currentSceneId !== 'string') return null;
+  const scene = arcScenes(storyArc).find(s => s.id === state.currentSceneId);
+  const held  = sceneLocationId(scene, state.playerRoleId);
+  if (!held) return null;
+  const model = state.location;
+  if (model !== held) {
+    state.location = held;
+    if (!Array.isArray(state.visitedLocations)) state.visitedLocations = [];
+    if (!state.visitedLocations.includes(held)) state.visitedLocations.push(held);
+  }
+  return { model, held };
 }
 
 // Move the current scene on, at most ONE step per call (one call per turn). Reads the beats
@@ -156,7 +181,7 @@ export function initSceneState(state, storyArc) {
 // Every move stamps sceneEnteredAt with the clock it happened at; a session that predates it
 // gets it stamped now, so its current scene starts its budget from here rather than from 0.
 // Returns the moves made (0 or 1).
-export function advanceScene(state, storyArc, turn = null, { forkSceneId = null } = {}) {
+export function advanceScene(state, storyArc, turn = null, { forkSceneId = null, scenario = null } = {}) {
   if (typeof state?.currentSceneId !== 'string') return [];
   const scenes = arcScenes(storyArc);
   if (!scenes.length) return [];
@@ -174,13 +199,16 @@ export function advanceScene(state, storyArc, turn = null, { forkSceneId = null 
   } else if (i < scenes.length - 1) {
     const own     = typeof cur.ends_on_beat === 'string' ? cur.ends_on_beat : '';
     const reached = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
-    const pace    = scenePacingStatus(state, null, storyArc);
-    if (own && reached.has(own)) move = { from: cur.id, to: scenes[i + 1].id, beat: own, turn, via: 'beat' };
+    const pace    = scenePacingStatus(state, scenario, storyArc);
+    if (own && reached.has(own) && pace?.beatMayEnd !== false) move = { from: cur.id, to: scenes[i + 1].id, beat: own, turn, via: 'beat' };
     else if (pace?.exhausted)    move = { from: cur.id, to: scenes[i + 1].id, beat: null, turn, via: 'budget', minutes: pace.inScene, budget: pace.budget, missed: own || null };
   }
   if (!move) return [];
-  state.currentSceneId = move.to;
-  state.sceneEnteredAt = state.elapsedMinutes ?? 0;
+  state.currentSceneId   = move.to;
+  state.sceneEnteredAt   = state.elapsedMinutes ?? 0;
+  // The turn count the NEXT turn starts from: that turn is the new scene's first, the one
+  // PromptComposer.sceneFraming opens with the scene change (B2b-MODEL).
+  state.sceneEnteredTurn = state.turnCount ?? 0;
   state.sceneAdvances  = [...(Array.isArray(state.sceneAdvances) ? state.sceneAdvances : []), move];
   return [move];
 }

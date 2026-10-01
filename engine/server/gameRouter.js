@@ -18,7 +18,7 @@ import {
   getClueById,
   getArcPosition,
 } from '../services/PromptComposer.js';
-import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats } from '../services/StateManager.js';
+import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive } from '../services/ForkDiagnostics.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
@@ -1062,8 +1062,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
       // Scene scenarios only (no currentSceneId on any other state): leave the opening scene
       // if the opening reached its own ending beat. State only — nothing is shown to the player.
-      const openingScenes = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, 0) : [];
+      const openingScenes = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, 0, { scenario }) : [];
       if (openingScenes.length) console.log('[SCENE] ' + openingScenes.map(m => `${m.from} → ${m.to} (on ${m.beat})`).join(', '));
+      // Scene sessions only: the engine holds the player at the scene's place (B2b-MODEL).
+      const openingHold = gameData.storyArc ? holdSceneLocation(nextState, gameData.storyArc) : null;
+      if (openingHold && openingHold.model !== openingHold.held) console.log(`[SCENE] location held at ${openingHold.held} (model said ${openingHold.model})`);
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
       }
@@ -1104,7 +1107,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         // states the binding (and, for a scene scenario, the opening scene).
         ...(forkDiagActive(seededInitial, scenario) ? [forkDiagTurnLine({
           turn: 0, opening: true, state: seededInitial, nextState, scenario,
-          storyArc: gameData.storyArc ?? null, output, newBeats: openingBeats, sceneMoves: openingScenes,
+          storyArc: gameData.storyArc ?? null, output, newBeats: openingBeats, sceneMoves: openingScenes, locationHold: openingHold,
         }), ``] : []),
         `---`,
         ``,
@@ -1523,9 +1526,13 @@ Do not open with the historical context. Open inside the character's body. Let t
       // beat, or straight to the fork's scene on the turn the fork is put (B3d). State and
       // DIAG only; the player sees no change yet.
       const sceneMoves = gameData.storyArc
-        ? advanceScene(nextState, gameData.storyArc, nextState.turnCount, { forkSceneId: forkDue ? definingBlock?.at_scene ?? null : null })
+        ? advanceScene(nextState, gameData.storyArc, nextState.turnCount, { forkSceneId: forkDue ? definingBlock?.at_scene ?? null : null, scenario })
         : [];
       if (sceneMoves.length) console.log('[SCENE] ' + sceneMoves.map(m => `${m.from} → ${m.to} (${m.via === 'beat' ? `on ${m.beat}` : `via ${m.via}`})`).join(', '));
+      // Scene sessions only: the engine, not the model, sets where the player is — the place of
+      // the scene the next turn plays in (B2b-MODEL). Logged when it overrides the model.
+      const sceneHold = gameData.storyArc ? holdSceneLocation(nextState, gameData.storyArc) : null;
+      if (sceneHold && sceneHold.model !== sceneHold.held) console.log(`[SCENE] location held at ${sceneHold.held} (model said ${sceneHold.model})`);
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
@@ -1588,7 +1595,9 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Transcript — fire-and-forget on normal turns, awaited on ending turns
       // so the file is on disk before the client immediately calls /closing-prose
       if (sessionId) {
-        const locName = locations.find(l => l.id === (output.location || state.location))?.name || (output.location || state.location);
+        // A scene session's place is the one the engine holds (B2b-MODEL), not the model's emit.
+        const locId   = sceneHold ? nextState.location : (output.location || state.location);
+        const locName = locations.find(l => l.id === locId)?.name || locId;
         const chunk = [
           `**Player:** ${playerInput}`,
           ``,
@@ -1603,7 +1612,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         if (forkDiagActive(state, scenario)) {
           chunk.push(forkDiagTurnLine({
             turn: nextState.turnCount, state, nextState, scenario, storyArc: gameData.storyArc ?? null,
-            output, newBeats, decisionRecorded: recordedDecision, sceneMoves,
+            output, newBeats, decisionRecorded: recordedDecision, sceneMoves, locationHold: sceneHold,
           }), ``);
         }
         if (output.endState?.isEnding) {
