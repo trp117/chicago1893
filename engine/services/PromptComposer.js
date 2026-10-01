@@ -1607,13 +1607,13 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // turn byte-identical to the one it composed before.
   // reachedBeats (story-bound forks only) goes too: buildStoryPositionDirective already renders
   // it as the ticked roster, and a session without it has no such key to strip.
-  // currentSceneId / sceneAdvances (scene scenarios, B2a) are engine bookkeeping that nothing
-  // shows the model yet — B2b decides what the narrator is told about scenes, and it will not
-  // be a raw id in the state block.
+  // currentSceneId / sceneAdvances / sceneEnteredAt (scene scenarios, B2a/B3) are engine
+  // bookkeeping that nothing shows the model yet — B2b decides what the narrator is told about
+  // scenes, and it will not be a raw id in the state block.
   const {
     remainingMinutes, effectiveClosure, effectiveDefiningMoment,
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
-    reachedBeats, currentSceneId, sceneAdvances,
+    reachedBeats, currentSceneId, sceneAdvances, sceneEnteredAt,
     ...stateRest
   } = state;
   const promptState = {

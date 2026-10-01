@@ -114,27 +114,57 @@ const report = (st, beats, turn) => { quiet(() => recordReachedBeats(st, { state
   const endBeats = ['21_feb_1431', '24_feb_1431', '17_mar_1431', '9_may_1431', '23_may_1431', '24_may_1431'];
   endBeats.forEach((b, i) => { const m = report(st, [b], i + 2); if (m.length) visited.push(st.currentSceneId); });
   check('each scene\'s ends_on_beat advances to the next, in order', JSON.stringify(visited) === JSON.stringify(SEQ), visited.join(' → '));
-  check('the advance log records from / to / beat / turn', st.sceneAdvances.length === 6 && st.sceneAdvances[0].from === 'scene_21_feb' && st.sceneAdvances[0].to === 'scene_24_feb' && st.sceneAdvances[0].beat === '21_feb_1431' && st.sceneAdvances[0].turn === 2);
+  check('the advance log records from / to / beat / turn / via', st.sceneAdvances.length === 6 && st.sceneAdvances[0].from === 'scene_21_feb' && st.sceneAdvances[0].to === 'scene_24_feb' && st.sceneAdvances[0].beat === '21_feb_1431' && st.sceneAdvances[0].turn === 2 && st.sceneAdvances.every(m => m.via === 'beat'));
   check('last scene: its beat reached → stays (no next scene)', report(st, ['28_may_1431'], 9).length === 0 && st.currentSceneId === 'scene_28_may');
-  // Story position, as Part A defines it: the_voices_are sits AFTER both 21_feb_1431 and
-  // 24_feb_1431 in arc order, so reporting it alone means the story is past both scenes' ends.
-  check('a later non-ending beat (the_voices_are) carries the scene past every ending beat before it', (() => { const s = startState(); return report(s, ['the_voices_are'], 1).length === 2 && s.currentSceneId === 'scene_17_mar'; })());
 }
+
+head('2b. B3d — a scene ends only on its OWN beat, one step a turn');
 {
-  const st = startState();
-  const m = report(st, ['17_mar_1431'], 1);   // skip: story reported a later beat first
-  check('skipped beats: a later beat crosses every scene it is past (multi-hop in one turn)', m.map(x => x.to).join(',') === 'scene_24_feb,scene_17_mar,scene_9_may' && st.currentSceneId === 'scene_9_may', m.map(x => `${x.from}→${x.to}`).join(', '));
-  const st2 = startState();
-  const m2 = report(st2, ['9_may_1431', '21_feb_1431'], 1);   // out-of-order report in one turn
-  check('out-of-order reports resolve by story position', st2.currentSceneId === 'scene_23_may' && m2.length === 4);
+  // the_voices_are sits after 24_feb_1431 in arc order. Under the old furthest-reached rule,
+  // reporting it alone carried the scene past both Act 1 scenes and into the cell.
+  const s = startState();
+  check('the_voices_are reported in scene_21_feb: recorded, but no scene is skipped', report(s, ['the_voices_are'], 1).length === 0 && s.currentSceneId === 'scene_21_feb' && s.reachedBeats.includes('the_voices_are'));
+  const s2 = startState(); report(s2, ['21_feb_1431'], 1);
+  check('...and in scene_24_feb: recorded, scene_24_feb holds (it ends on 24_feb_1431)', report(s2, ['the_voices_are'], 2).length === 0 && s2.currentSceneId === 'scene_24_feb');
+  report(s2, ['24_feb_1431'], 3);
+  check('24_feb_1431 then advances to scene_17_mar', s2.currentSceneId === 'scene_17_mar');
+  check('...where a LATER the_voices_are report does not skip further', report(s2, [], 4).length === 0 && s2.currentSceneId === 'scene_17_mar');
+  const s3 = startState();
+  check('a later scene\'s ending beat (17_mar_1431) reported first: recorded, no scene skipped', report(s3, ['17_mar_1431'], 1).length === 0 && s3.currentSceneId === 'scene_21_feb' && s3.reachedBeats.includes('17_mar_1431'));
+  const walk = [];
+  for (const [t, b] of [[2, ['21_feb_1431']], [3, ['24_feb_1431']], [4, []]]) { report(s3, b, t); walk.push(s3.currentSceneId); }
+  check('...the scenes then advance one at a time; the early-reported scene_17_mar advances on its first turn', walk.join(',') === 'scene_24_feb,scene_17_mar,scene_9_may', walk.join(' → '));
+  const s4 = startState(); report(s4, ['21_feb_1431'], 1); report(s4, ['24_feb_1431'], 2);
+  const m = report(s4, ['17_mar_1431', '9_may_1431'], 3);
+  check('two ending beats in one turn: ONE step (scene_17_mar → scene_9_may)', m.length === 1 && s4.currentSceneId === 'scene_9_may');
+  check('...and the next turn takes the second (scene_9_may → scene_23_may)', report(s4, [], 4).length === 1 && s4.currentSceneId === 'scene_23_may');
+  const s5 = startState();
+  report(s5, ['9_may_1431', '21_feb_1431'], 1);
+  check('out-of-order reports in one turn: only the current scene\'s own beat moves it', s5.currentSceneId === 'scene_24_feb');
+  check('every scene move stamps sceneEnteredAt with the clock', (() => { const x = startState(); x.elapsedMinutes = 6; report(x, ['21_feb_1431'], 3); return x.sceneEnteredAt === 6; })());
+  check('initSceneState starts the scene clock at the session clock', startState().sceneEnteredAt === 0);
+}
+
+head('2c. B3d — the fork path: the only one that jumps');
+{
+  const s = startState(); s.elapsedMinutes = 20;
+  const m = quiet(() => advanceScene(s, JOAN_ARC, 9, { forkSceneId: 'scene_28_may' }));
+  check('fork put this turn, bound to scene_28_may, from scene_21_feb: jumps straight there', m.length === 1 && m[0].via === 'fork' && m[0].to === 'scene_28_may' && s.currentSceneId === 'scene_28_may' && s.sceneEnteredAt === 20, JSON.stringify(m));
+  const back = startState(); report(back, ['21_feb_1431'], 1); report(back, ['24_feb_1431'], 2);
+  check('a fork scene BEHIND the current one never moves it back', quiet(() => advanceScene(back, JOAN_ARC, 3, { forkSceneId: 'scene_21_feb' })).length === 0 && back.currentSceneId === 'scene_17_mar');
+  const same = startState(); quiet(() => recordReachedBeats(same, { stateChanges: { beats_reached: ['21_feb_1431'] } }, JOAN_ARC));
+  const ms = quiet(() => advanceScene(same, JOAN_ARC, 1, { forkSceneId: 'scene_21_feb' }));
+  check('a fork scene equal to the current one falls through to the beat path', ms.length === 1 && ms[0].via === 'beat' && same.currentSceneId === 'scene_24_feb');
+  const bad = startState();
+  check('a fork scene the arc does not have is ignored', quiet(() => advanceScene(bad, JOAN_ARC, 1, { forkSceneId: 'scene_nowhere' })).length === 0 && bad.currentSceneId === 'scene_21_feb');
 }
 {
   const arc = clone(JOAN_ARC);
   delete arc.acts[0].scenes[1].ends_on_beat;   // scene_24_feb becomes budget-only
   const st = quiet(() => buildInitialState(joanScenario, JOAN_ROLES[0], JOAN_LOCS)); initSceneState(st, arc);
-  quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: ['9_may_1431'] } }, arc));
-  quiet(() => advanceScene(st, arc, 1));
-  check('a budget-only scene (no ends_on_beat) holds — B3 adds budgets', st.currentSceneId === 'scene_24_feb');
+  quiet(() => recordReachedBeats(st, { stateChanges: { beats_reached: ['21_feb_1431', '9_may_1431'] } }, arc));
+  quiet(() => advanceScene(st, arc, 1)); quiet(() => advanceScene(st, arc, 2));
+  check('a budget-only scene (no ends_on_beat) holds — B3b adds budgets', st.currentSceneId === 'scene_24_feb');
   const lost = { ...startState(), currentSceneId: 'scene_deleted' };
   check('a current scene no longer in the arc holds, with a warning', quiet(() => advanceScene(lost, JOAN_ARC, 1)).length === 0 && lost.currentSceneId === 'scene_deleted');
 }
@@ -163,8 +193,8 @@ head('4. nothing about scenes reaches the model prompt');
   const bare = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS));
   const tracked = clone(bare); initSceneState(tracked, JOAN_ARC);
   quiet(() => recordReachedBeats(tracked, { stateChanges: { beats_reached: ['24_feb_1431'] } }, JOAN_ARC)); quiet(() => advanceScene(tracked, JOAN_ARC, 1));
-  const untracked = clone(tracked); delete untracked.currentSceneId; delete untracked.sceneAdvances;
-  check('currentSceneId / sceneAdvances are stripped from STATE_JSON (tracked == untracked prompt)', promptFor(tracked, JOAN_ARC) === promptFor(untracked, JOAN_ARC));
+  const untracked = clone(tracked); delete untracked.currentSceneId; delete untracked.sceneAdvances; delete untracked.sceneEnteredAt;
+  check('currentSceneId / sceneAdvances / sceneEnteredAt are stripped from STATE_JSON (tracked == untracked prompt)', promptFor(tracked, JOAN_ARC) === promptFor(untracked, JOAN_ARC));
   const pr = promptFor(tracked, JOAN_ARC);
   // Scene-only content: ids and bridges. (Date labels are not checked here — Joan's beat
   // descriptions start with the same dates, so the roster carries them; the exact check below
@@ -191,21 +221,32 @@ head('5. DIAG — the scene segment and the summary');
   const held = forkDiagTurnLine({ turn: 1, state: n0, nextState: clone(n0), scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: {} }, newBeats: [], sceneMoves: [] });
   check('a turn with no crossing says held', held.includes('scene: scene_24_feb (held)'), held);
   const n2 = clone(n0);
-  quiet(() => recordReachedBeats(n2, { stateChanges: { beats_reached: ['17_mar_1431', '9_may_1431'] } }, JOAN_ARC));
+  quiet(() => recordReachedBeats(n2, { stateChanges: { beats_reached: ['24_feb_1431', 'the_voices_are', '9_may_1431'] } }, JOAN_ARC));
   const mv2 = quiet(() => advanceScene(n2, JOAN_ARC, 2));
-  const multi = forkDiagTurnLine({ turn: 2, state: n0, nextState: n2, scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: { beats_reached: ['17_mar_1431', '9_may_1431'] } }, newBeats: ['17_mar_1431', '9_may_1431'], sceneMoves: mv2 });
-  check('a multi-hop turn shows the whole path and its beats', multi.includes('scene: scene_24_feb → scene_17_mar → scene_9_may → scene_23_may (advanced on beats 24_feb_1431, 17_mar_1431, 9_may_1431)'), multi);
+  const multi = forkDiagTurnLine({ turn: 2, state: n0, nextState: n2, scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: { beats_reached: ['24_feb_1431', 'the_voices_are', '9_may_1431'] } }, newBeats: ['24_feb_1431', 'the_voices_are', '9_may_1431'], sceneMoves: mv2 });
+  check('a turn with ahead-of-sequence beats: one step on its own beat', multi.includes('scene: scene_24_feb → scene_17_mar (advanced on beat 24_feb_1431)'), multi);
+  // the_voices_are sits BEFORE 17_mar_1431, so from scene_17_mar it is a late report, not ahead.
+  check('...and the DIAG names the beat AHEAD of the new scene\'s ending (not the late one)', multi.includes('ahead: [9_may_1431] recorded, ended no scene (scene_17_mar ends on 17_mar_1431)'), multi);
+  const heldAhead = forkDiagTurnLine({ turn: 1, state: n0, nextState: (() => { const x = clone(n0); quiet(() => recordReachedBeats(x, { stateChanges: { beats_reached: ['the_voices_are'] } }, JOAN_ARC)); return x; })(), scenario: joanScenario, storyArc: JOAN_ARC, output: { stateChanges: { beats_reached: ['the_voices_are'] } }, newBeats: ['the_voices_are'], sceneMoves: [] });
+  check('an ahead beat on a held turn: "held" plus the ahead segment', heldAhead.includes('scene: scene_24_feb (held) · ahead: [the_voices_are] recorded, ended no scene (scene_24_feb ends on 24_feb_1431)'), heldAhead);
+  check('no ahead segment when the turn recorded nothing ahead', !held.includes('ahead:') && !line0.includes('ahead:'));
+  const nf = clone(n2); nf.elapsedMinutes = 22;
+  const mvf = quiet(() => advanceScene(nf, JOAN_ARC, 3, { forkSceneId: 'scene_28_may' }));
+  const forkLine = forkDiagTurnLine({ turn: 3, state: n2, nextState: nf, scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: mvf });
+  check('a fork jump says so', forkLine.includes('scene: scene_17_mar → scene_28_may (jumped by fork)'), forkLine);
   const joanRole = JOAN_ROLES.find(r => r.id === 'role_joan');
   const js = quiet(() => buildInitialState(joanScenario, joanRole, JOAN_LOCS)); initSceneState(js, JOAN_ARC);
   const jl = forkDiagTurnLine({ turn: 1, state: js, nextState: clone(js), scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [] });
   check('Joan (clock fork 0.75) is described by her clock, not a fallback', /fork: waiting \(clock: 0\.75 = [\d.]+ of [\d.]+ min\)/.test(jl), jl);
 
-  const transcript = ['intro', '', line0, '', 'narrative', '', held, '', multi, '', '---'].join('\n');
+  const transcript = ['intro', '', line0, '', 'narrative', '', held, '', multi, '', forkLine, '', '---'].join('\n');
   const parsed = parseSceneDiag(transcript);
-  check('parseSceneDiag reads crossings back from the lines', parsed.moves.length === 2 && parsed.last === 'scene_23_may');
-  const sum = forkDiagSummaryLines({ transcript, sessionState: n2, scenario: joanScenario, storyArc: JOAN_ARC });
-  check('summary lists every crossing with its turn', sum.some(l => l === `${DIAG_PREFIX}scene advances (4): turn 0 scene_21_feb → scene_24_feb (on 21_feb_1431); turn 2 scene_24_feb → scene_17_mar → scene_9_may → scene_23_may (on 24_feb_1431, 17_mar_1431, 9_may_1431)`), sum.find(l => l.includes('scene advances')));
-  check('summary names the scene at close', sum.includes(`${DIAG_PREFIX}scene at close: scene_23_may`));
+  check('parseSceneDiag reads crossings back from the lines (beat and fork)', parsed.moves.length === 3 && parsed.moves[2].via === 'fork' && parsed.last === 'scene_28_may', JSON.stringify(parsed.moves));
+  const sum = forkDiagSummaryLines({ transcript, sessionState: nf, scenario: joanScenario, storyArc: JOAN_ARC });
+  check('summary lists every crossing with its turn', sum.some(l => l === `${DIAG_PREFIX}scene advances (3): turn 0 scene_21_feb → scene_24_feb (on 21_feb_1431); turn 2 scene_24_feb → scene_17_mar (on 24_feb_1431); turn 3 scene_17_mar → scene_28_may (by fork)`), sum.find(l => l.includes('scene advances')));
+  check('summary names the scene at close', sum.includes(`${DIAG_PREFIX}scene at close: scene_28_may`));
+  const old = '> ⚑ DIAG turn 2 · 0→0 min · beats_reached: [] · new: [] · position: no beat → no beat · scene: scene_24_feb → scene_17_mar → scene_9_may (advanced on beats 24_feb_1431, 17_mar_1431) · fork: none';
+  check('a pre-B3d multi-hop line still parses', parseSceneDiag(old).moves[0]?.path.length === 3);
 
   // A bound-fork session with no scenes: its line is exactly the Part A line.
   const WG  = await repos.scenarios.findById('watergate_1972_part1_breach');
@@ -265,8 +306,12 @@ const out = (beats, loc = 'great_hall_rouen_castle') => ({
 const TURNS = [
   { beats: [],                             want: 'scene_24_feb', move: null },
   { beats: ['24_feb_1431'],                want: 'scene_17_mar', move: 'scene_24_feb → scene_17_mar (advanced on beat 24_feb_1431)' },
-  { beats: ['17_mar_1431', '9_may_1431'],  want: 'scene_23_may', move: 'scene_17_mar → scene_9_may → scene_23_may (advanced on beats 17_mar_1431, 9_may_1431)' },
-  { beats: ['24_may_1431'],                want: 'scene_28_may', move: 'scene_23_may → scene_24_may → scene_28_may (advanced on beats 23_may_1431, 24_may_1431)' },
+  { beats: ['the_voices_are'],             want: 'scene_17_mar', move: null },
+  { beats: ['17_mar_1431', '9_may_1431'],  want: 'scene_9_may',  move: 'scene_17_mar → scene_9_may (advanced on beat 17_mar_1431)' },
+  { beats: [],                             want: 'scene_23_may', move: 'scene_9_may → scene_23_may (advanced on beat 9_may_1431)' },
+  { beats: ['24_may_1431'],                want: 'scene_23_may', move: null },
+  { beats: ['23_may_1431'],                want: 'scene_24_may', move: 'scene_23_may → scene_24_may (advanced on beat 23_may_1431)' },
+  { beats: [],                             want: 'scene_28_may', move: 'scene_24_may → scene_28_may (advanced on beat 24_may_1431)' },
   { beats: ['28_may_1431'],                want: 'scene_28_may', move: null },
 ];
 let joanSession = null;
@@ -293,6 +338,8 @@ try {
     const l = diag[i + 1] || '';
     check(`turn ${i + 1} DIAG: ${t.move ? 'crossing recorded' : 'held'}`, t.move ? l.includes(`scene: ${t.move}`) : l.includes(`scene: ${t.want} (held)`), l.slice(0, 220));
   });
+  check('e2e: the_voices_are reported late in scene_17_mar: recorded, held, not flagged ahead', (diag[3] || '').includes('new: [the_voices_are]') && (diag[3] || '').includes('scene: scene_17_mar (held) · fork:'), diag[3]);
+  check('e2e: 24_may_1431 reported in scene_23_may is logged as ahead, not a skip', (diag[6] || '').includes('scene: scene_23_may (held) · ahead: [24_may_1431]'), diag[6]);
   const leak = sent.find(s => SEQ.some(id => s.includes(id)) || arcScenes(JOAN_ARC).some(sc => sc.bridge && s.includes(sc.bridge.slice(0, 40))));
   check(`none of the ${sent.length} model requests carries a scene id or bridge`, sent.length > 0 && !leak);
   check('...and the requests DO carry the beat roster', sent.some(s => s.includes('STORY POSITION')));

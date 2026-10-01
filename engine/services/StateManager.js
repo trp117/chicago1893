@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes, storyPosition } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -130,42 +130,50 @@ export function initSceneState(state, storyArc) {
   if (!scenes.length) return null;
   state.currentSceneId = scenes[0].id;
   state.sceneAdvances  = [];
+  state.sceneEnteredAt = state.elapsedMinutes ?? 0;
   return scenes[0].id;
 }
 
-// Advance the current scene past every scene whose ends_on_beat the story has reached. Reads
-// the beats recordReachedBeats just wrote, so call it right after. "Reached" is Part A's story
-// position rule: the beat was reported, OR a later beat was (the story is past it — beats can
-// be skipped or reported late). One turn can therefore cross several scenes; each crossing is
-// logged. A scene with no ends_on_beat (budget-only) holds until B3 adds budgets. The last
-// scene never advances. A session with no currentSceneId (no scenes, or a session started
-// before scenes existed) is left alone. Returns the advances made this call.
-export function advanceScene(state, storyArc, turn = null) {
+// Move the current scene on, at most ONE step per call (one call per turn). Reads the beats
+// recordReachedBeats just wrote, so call it right after. Three paths, kept distinct and logged
+// by `via`:
+//   'fork' — the fork was put to the player THIS turn and names a scene (forkSceneId) ahead of
+//            the current one: the scene jumps straight there. The only path that skips scenes,
+//            and it never moves backwards.
+//   'beat' — the current scene's OWN ends_on_beat has been reported. One step. A beat reported
+//            ahead of sequence (a later scene's ending, or a beat no scene ends on) is recorded
+//            in reachedBeats and moves story position, but ends no scene: "furthest reached"
+//            used to carry the scene past every ending before it, so the_voices_are reported in
+//            scene_21_feb skipped scene_24_feb outright. A scene whose beat was reported early
+//            advances on the first turn it is current — one step, so it still gets that turn.
+//   'budget' — B3b.
+// A scene with no ends_on_beat holds. The last scene never advances on its beat. A session with
+// no currentSceneId (no scenes, or started before scenes existed) is left alone. Every move
+// stamps sceneEnteredAt with the clock it happened at. Returns the moves made (0 or 1).
+export function advanceScene(state, storyArc, turn = null, { forkSceneId = null } = {}) {
   if (typeof state?.currentSceneId !== 'string') return [];
   const scenes = arcScenes(storyArc);
   if (!scenes.length) return [];
-  let i = scenes.findIndex(s => s.id === state.currentSceneId);
+  const i = scenes.findIndex(s => s.id === state.currentSceneId);
   if (i < 0) {
     console.warn(`[SCENE] current scene "${state.currentSceneId}" is not a scene of ${storyArc?.id} — holding`);
     return [];
   }
-  const beatIndex = new Map(arcBeats(storyArc).map(b => [b.id, b.index]));
-  const reached   = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
-  const furthest  = storyPosition(state, storyArc);
-  const ended = s => {
-    const b = typeof s.ends_on_beat === 'string' ? s.ends_on_beat : '';
-    return !!b && beatIndex.has(b) && (reached.has(b) || beatIndex.get(b) <= (furthest ? furthest.index : -1));
-  };
-  const moves = [];
-  while (i < scenes.length - 1 && ended(scenes[i])) {
-    moves.push({ from: scenes[i].id, to: scenes[i + 1].id, beat: scenes[i].ends_on_beat, turn });
-    i++;
+  const cur  = scenes[i];
+  const fork = typeof forkSceneId === 'string' && forkSceneId ? scenes.findIndex(s => s.id === forkSceneId) : -1;
+  let move = null;
+  if (fork > i) {
+    move = { from: cur.id, to: scenes[fork].id, beat: null, turn, via: 'fork' };
+  } else if (i < scenes.length - 1) {
+    const own     = typeof cur.ends_on_beat === 'string' ? cur.ends_on_beat : '';
+    const reached = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
+    if (own && reached.has(own)) move = { from: cur.id, to: scenes[i + 1].id, beat: own, turn, via: 'beat' };
   }
-  if (moves.length) {
-    state.currentSceneId = scenes[i].id;
-    state.sceneAdvances  = [...(Array.isArray(state.sceneAdvances) ? state.sceneAdvances : []), ...moves];
-  }
-  return moves;
+  if (!move) return [];
+  state.currentSceneId = move.to;
+  state.sceneEnteredAt = state.elapsedMinutes ?? 0;
+  state.sceneAdvances  = [...(Array.isArray(state.sceneAdvances) ? state.sceneAdvances : []), move];
+  return [move];
 }
 
 export function buildInitialState(scenario, role, locations) {

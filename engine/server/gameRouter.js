@@ -1060,8 +1060,8 @@ Do not open with the historical context. Open inside the character's body. Let t
         openingBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (openingBeats.length) console.log('[STORY-BOUND] beats reached: ' + openingBeats.join(', '));
       }
-      // Scene scenarios only (no currentSceneId on any other state): cross every scene whose
-      // ending beat the opening reached. State only — nothing is shown to the player (B2a).
+      // Scene scenarios only (no currentSceneId on any other state): leave the opening scene
+      // if the opening reached its own ending beat. State only — nothing is shown to the player.
       const openingScenes = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, 0) : [];
       if (openingScenes.length) console.log('[SCENE] ' + openingScenes.map(m => `${m.from} → ${m.to} (on ${m.beat})`).join(', '));
       if (output.npc_updates && nextState.npc_states) {
@@ -1519,10 +1519,13 @@ Do not open with the historical context. Open inside the character's body. Let t
         newBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (newBeats.length) console.log('[STORY-BOUND] beats reached: ' + newBeats.join(', '));
       }
-      // Scene scenarios only: advance past every scene whose ending beat the story has now
-      // reached (B2a — state and DIAG only; the player sees no change yet).
-      const sceneMoves = gameData.storyArc ? advanceScene(nextState, gameData.storyArc, nextState.turnCount) : [];
-      if (sceneMoves.length) console.log('[SCENE] ' + sceneMoves.map(m => `${m.from} → ${m.to} (on ${m.beat})`).join(', '));
+      // Scene scenarios only: move the scene on — one step on the current scene's own ending
+      // beat, or straight to the fork's scene on the turn the fork is put (B3d). State and
+      // DIAG only; the player sees no change yet.
+      const sceneMoves = gameData.storyArc
+        ? advanceScene(nextState, gameData.storyArc, nextState.turnCount, { forkSceneId: forkDue ? definingBlock?.at_scene ?? null : null })
+        : [];
+      if (sceneMoves.length) console.log('[SCENE] ' + sceneMoves.map(m => `${m.from} → ${m.to} (${m.via === 'beat' ? `on ${m.beat}` : `via ${m.via}`})`).join(', '));
 
       if (nextState.act > prevAct) {
         output.actTransition = { from: prevAct, to: nextState.act };
