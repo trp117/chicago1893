@@ -33,6 +33,7 @@ const SUITE = [
   ['scenes B1: storage only, round trip',    'scenes.test.mjs'],
   ['admin sessions: persistent store',       'session-store.test.mjs'],
   ['scenes B2a: tracking (state + DIAG)',    'scene-tracking.test.mjs'],
+  ['B3a: timing confirmation (record)',      'timing-confirm.test.mjs'],
 ];
 
 const results = [];

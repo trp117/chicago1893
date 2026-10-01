@@ -216,6 +216,44 @@ function normalizeForkBinding(block, roleId = '') {
   return block;
 }
 
+// TIMING CONFIRMATION — the anchored-role "timing rule" box (the fork fires BEFORE the
+// documented event). It used to be a one-time gate: never stored, so it rendered unticked on
+// every load, and nothing un-ticked it when the binding moved. It is now stored as a RECORD
+// of the timing it confirmed, and counts only while that record equals the block's current
+// timing — so ANY change to when the fork fires (clock fraction, act, beat, scene, fallback)
+// voids it, on every save path, without having to catch the change as it happens.
+//
+// The editor posts the box as a boolean: true stamps the record of the timing being saved
+// (the editor un-ticks the box whenever a timing field is edited, so a true that arrives with
+// new timing is a re-tick of that timing); false clears it; no key at all (a save path with
+// no box, or a stale tab) keeps the stored record — keyed on `undefined`, like
+// preserveStoredArchetype. A record that no longer matches is dropped either way.
+const FORK_TIMING_KEYS = ['at_elapsed_fraction', 'at_act', 'at_beat', 'at_scene', 'fallback_at_elapsed_fraction'];
+function forkTimingRecord(block) {
+  const out = {};
+  for (const k of FORK_TIMING_KEYS) out[k] = block?.[k] ?? null;
+  return out;
+}
+function timingConfirmedCurrent(block) {
+  const tc = block?.timing_confirmed;
+  if (!tc || typeof tc !== 'object') return false;
+  const now = forkTimingRecord(block);
+  return FORK_TIMING_KEYS.every(k => (tc[k] ?? null) === now[k]);
+}
+function reconcileTimingConfirmed(block, storedBlock, roleId = '') {
+  if (!block || typeof block !== 'object') return block;
+  const sent = block.timing_confirmed;
+  if (sent === true) block.timing_confirmed = forkTimingRecord(block);
+  else if (sent === undefined) {
+    if (storedBlock?.timing_confirmed !== undefined) block.timing_confirmed = storedBlock.timing_confirmed;
+  } else if (!sent || typeof sent !== 'object') delete block.timing_confirmed;
+  if (block.timing_confirmed !== undefined && !timingConfirmedCurrent(block)) {
+    console.log(`[DEFINING-MOMENT] ${roleId} — timing confirmation cleared: the fork's timing changed since it was confirmed`);
+    delete block.timing_confirmed;
+  }
+  return block;
+}
+
 // Whether REPLACING this stored block destroys work nothing else carries. Server-side twin of
 // definingMomentAtRisk in index.html; both must agree or the editor will offer a button the
 // API then refuses. Hand-authored blocks are answer keys; a REVIEWED generated block is
@@ -659,7 +697,12 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
   // After the defining-moment guard, so a block restored from storage is normalized too.
-  if (role.defining_moment) normalizeForkBinding(role.defining_moment, role.id);
+  // The timing confirmation is reconciled AFTER normalizing, against the timing that will
+  // actually be written.
+  if (role.defining_moment) {
+    normalizeForkBinding(role.defining_moment, role.id);
+    reconcileTimingConfirmed(role.defining_moment, shim.scenarios.findPlayerRole()?.defining_moment, role.id);
+  }
   return role;
 }
 
@@ -2766,6 +2809,9 @@ export function createAdminRouter(repos, config = {}) {
         if (role.defining_moment?.[k] !== undefined) defining_moment[k] = role.defining_moment[k];
       }
       normalizeForkBinding(defining_moment, role.id);
+      // The timing rule confirms that no OPTION turns the record into a counterfactual — new
+      // options need a new confirmation, so it is never carried over (nor taken from the model).
+      delete defining_moment.timing_confirmed;
 
       // BACK UP WHAT THIS WRITE DESTROYS, immediately before destroying it. Placed here and
       // not earlier on purpose: the model may decline, or emit a block that fails validation,
@@ -5093,7 +5139,7 @@ Return only the scene description. No preamble, no closing remarks.`,
 // Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
 export { stripEmptyEndingNotes, preserveStoredEndingNotes };
 // Same, for the defining_moment guard and the three-guard composer the save paths call.
-export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks, normalizeForkBinding };
+export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks, normalizeForkBinding, forkTimingRecord, timingConfirmedCurrent, reconcileTimingConfirmed };
 // Same, for the archetype guard. The property's own accessors (ROLE_ARCHETYPES,
 // isRoleArchetype, roleArchetype) are exported at their definition — those ARE app code.
 export { preserveStoredArchetype };

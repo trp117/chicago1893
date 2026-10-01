@@ -2798,6 +2798,19 @@ function roleIsAnchored(r, i, formEl) {
   return ct === 'real' || fm === 'anchored';
 }
 
+// The timing-rule box is stored as a RECORD of the timing it confirmed (adminRouter
+// timingConfirmedCurrent — keep the two in step) and is ticked only while that record still
+// equals the block's timing. Any edit to a timing field un-ticks it live (untickTiming, below).
+const DM_TIMING_KEYS = ['at_elapsed_fraction', 'at_act', 'at_beat', 'at_scene', 'fallback_at_elapsed_fraction'];
+// Blank form values ('' from an empty select) are absent keys once the server normalizes.
+const dmTimingVal = v => (v === undefined || v === null || (typeof v === 'string' && v.trim() === '') ? null : v);
+function dmTimingConfirmedCurrent(dm) {
+  const tc = dm?.timing_confirmed;
+  if (!tc || typeof tc !== 'object') return false;
+  return DM_TIMING_KEYS.every(k => dmTimingVal(tc[k]) === dmTimingVal(dm[k]));
+}
+const DM_TIMING_INPUTS = '.dm-fraction-input, .dm-at-act-input, .dm-at-beat-input, .dm-at-scene-input, .dm-fallback-input';
+
 // Declines are EPHEMERAL by decision: nothing is written to the role, so they live here
 // for the session only. Keyed by role id and deliberately NOT hung off the role object —
 // anything on data.playerRoles[i] is posted to /generate/save and would land in the file.
@@ -2944,6 +2957,7 @@ function renderDefiningMomentSection(r, i, data) {
   } else {
     const moment    = dm.principal_transition?.moment ?? dm.id;
     const bindingOn = typeof dm.at_act === 'number' || (typeof dm.at_beat === 'string' && dm.at_beat.trim() !== '');
+    const timingConfirmed = dmTimingConfirmedCurrent(dm);
     const setupW    = dmWords(dm.setup);
     const lift      = entry ? dmLongestLift(entry, dm.setup) : null;
     const optCounts = (dm.options || []).map(o => dmWords(o.text));
@@ -3003,9 +3017,10 @@ function renderDefiningMomentSection(r, i, data) {
       <div class="dm-options-list">${(dm.options || []).map((o, j) => renderDefiningMomentOptionRow(i, j, o)).join('')}</div>
 
       ${anchored ? `<label style="display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 13px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;cursor:pointer">
-        <input type="checkbox" class="dm-timing-cb" data-role-index="${i}" style="margin-top:2px;flex-shrink:0">
+        <input type="checkbox" class="dm-timing-cb" data-role-index="${i}" data-path="playerRoles.${i}.defining_moment.timing_confirmed"${timingConfirmed ? ' checked' : ''} style="margin-top:2px;flex-shrink:0">
         <span style="font-size:12px;color:#78350f">
-          <strong>Anchored role — timing rule.</strong> I confirm this fork fires <em>before</em> the documented historical event, so no option turns the record into a counterfactual. Required before this block can be marked reviewed.
+          <strong>Anchored role — timing rule.</strong> I confirm this fork fires <em>before</em> the documented historical event, so no option turns the record into a counterfactual. Required before this block can be marked reviewed. Stored with the timing it confirms; changing when the fork fires clears it.
+          ${state === 'reviewed' && !timingConfirmed ? `<span class="dm-timing-unconfirmed" style="display:block;margin-top:5px;font-weight:700;color:#b45309">⚠ Timing not confirmed for the current binding — re-check the rule and tick the box.</span>` : ''}
         </span>
       </label>` : ''}
 
@@ -3169,6 +3184,18 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
       btn.textContent = original;
     }
   });
+
+  // ── Defining Moment: a timing edit voids the timing-rule confirmation ─────
+  // The server drops a stored confirmation whose timing no longer matches anyway; un-ticking
+  // here makes the box say so before the save, and means a box ticked AFTER the edit is a
+  // confirmation of the new timing.
+  const untickTiming = e => {
+    if (!e.target.closest?.(DM_TIMING_INPUTS)) return;
+    const cb = e.target.closest('[id^="dm-section-"]')?.querySelector('.dm-timing-cb');
+    if (cb) cb.checked = false;
+  };
+  formEl.addEventListener('change', untickTiming);
+  formEl.addEventListener('input', untickTiming);
 
   // ── Defining Moment: BLOCKING mark-reviewed gate ──────────────────────────
   // Refuses and names every unmet precondition, the way the epilogue gate does — it does
@@ -4886,6 +4913,15 @@ async function handleManualSave(data, containerEl) {
     if (resp?.corrected_at && data.scenario) {
       if (data.scenario.technical_facts) data.scenario.technical_facts.corrected_at = resp.corrected_at.technical_facts ?? null;
       if (data.scenario.epilogue)        data.scenario.epilogue.corrected_at        = resp.corrected_at.epilogue ?? null;
+    }
+    // Mirror the server's timing-rule stamp (reconcileTimingConfirmed): the box posts a boolean,
+    // the role stores the record of the timing it confirmed. Without this a re-render of the
+    // section before reload would read `true` as no record and show the box unticked.
+    for (const r of data.playerRoles || []) {
+      const dm = r?.defining_moment;
+      if (!dm || typeof dm.timing_confirmed === 'object') continue;
+      if (dm.timing_confirmed === true) dm.timing_confirmed = Object.fromEntries(DM_TIMING_KEYS.map(k => [k, dmTimingVal(dm[k])]));
+      else delete dm.timing_confirmed;
     }
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
