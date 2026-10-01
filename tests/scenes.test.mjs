@@ -116,20 +116,23 @@ head('1a. static — runtime reads scenes only where B2a tracks them, never thei
   // The fields a player would see or that move people and clocks — bridge, date/time labels,
   // role_locations, budget_minutes — are B2b/B3 and must not be read anywhere yet.
   const runtimeDirs = ['engine/services', 'engine/server', 'engine/game', 'engine/agents'];
-  const hits = [], presentation = [];
+  const hits = [], presentation = [], budget = [];
   const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true })) {
     const p = path.join(d, f.name);
     if (f.isDirectory()) walk(p);
     else if (/\.(m?js)$/.test(f.name)) {
       const src = fs.readFileSync(p, 'utf8'), rel = path.relative(REPO_DIR, p).replace(/\\/g, '/');
       if (/\.scenes\b|\['scenes'\]|\bscenes\s*[:=]|ends_on_beat|currentSceneId/.test(src)) hits.push(rel);
-      if (/\.bridge\b|\['bridge'\]|date_label|time_label|role_locations|budget_minutes/.test(src)) presentation.push(rel);
+      if (/\.bridge\b|\['bridge'\]|date_label|time_label|role_locations/.test(src)) presentation.push(rel);
+      if (/budget_minutes/.test(src)) budget.push(rel);
     }
   } };
   for (const d of runtimeDirs) if (fs.existsSync(path.join(REPO_DIR, d))) walk(path.join(REPO_DIR, d));
   const B2A = ['engine/server/gameRouter.js', 'engine/services/ForkDiagnostics.js', 'engine/services/PromptComposer.js', 'engine/services/StateManager.js'];
   check('scene-reading runtime modules are exactly the B2a set', JSON.stringify([...hits].sort()) === JSON.stringify(B2A), hits.sort().join(', '));
-  check('no runtime module reads a scene\'s bridge / date / time / role_locations / budget (B2b/B3)', presentation.length === 0, presentation.join(', '));
+  check('no runtime module reads a scene\'s bridge / date / time / role_locations (B2b)', presentation.length === 0, presentation.join(', '));
+  // B3b: the budget is read in ONE place (scenePacingStatus); the backstop and the DIAG go through it.
+  check('budget_minutes is read by PromptComposer alone (B3b scenePacingStatus)', JSON.stringify(budget) === JSON.stringify(['engine/services/PromptComposer.js']), budget.join(', '));
 }
 
 head('1b. every stored role — a scene-laden arc adds the beat roster and nothing else');

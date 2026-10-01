@@ -13,7 +13,7 @@
 // the closing-prose model, and a line saying "fork: PRESENTED via fallback" must never become
 // something it writes about. Stripping a transcript with no such line returns it unchanged.
 
-import { forkTimingStatus, storyPosition, storyPacingNudge, arcBeats, arcScenes, resolveDefiningMomentBlock, storyBoundForkActive } from './PromptComposer.js';
+import { forkTimingStatus, storyPosition, storyPacingNudge, scenePacingStatus, arcBeats, arcScenes, resolveDefiningMomentBlock, storyBoundForkActive } from './PromptComposer.js';
 
 export const DIAG_PREFIX = '> ⚑ DIAG ';
 
@@ -102,6 +102,7 @@ function describeScene(state, nextState, sceneMoves, opening) {
   if (sceneMoves.length) {
     const path = [sceneMoves[0].from, ...sceneMoves.map(m => m.to)].join(' → ');
     if (sceneMoves.every(m => m.via === 'fork')) return `scene: ${path} (jumped by fork)`;
+    if (sceneMoves.every(m => m.via === 'budget')) { const m = sceneMoves[0]; return `scene: ${path} (advanced on budget ${mins(m.minutes)}/${mins(m.budget)} min${m.missed ? `, ${m.missed} not reached` : ''})`; }
     const on   = sceneMoves.map(m => m.beat);
     return `scene: ${path} (advanced on beat${on.length === 1 ? '' : 's'} ${on.join(', ')})`;
   }
@@ -119,6 +120,19 @@ export function aheadOfSceneBeats(nextState, storyArc, newBeats = [], sceneMoves
   const used  = new Set(sceneMoves.map(m => m.beat).filter(Boolean));
   return newBeats.filter(b => !used.has(b) && index.has(b) && index.get(b) > end);
 }
+// B3b — the budget of the scene the turn was PLAYED in, read at the turn's end, and whether
+// that turn's prompt carried the per-scene nudge (read from the state the turn started from,
+// exactly as the prompt was composed).
+function describeSceneBudget(state, nextState, scenario, storyArc) {
+  const start = scenePacingStatus(state, scenario, storyArc);
+  if (!start) return null;
+  const played = { ...nextState, currentSceneId: state.currentSceneId, sceneEnteredAt: state.sceneEnteredAt };
+  const end    = scenePacingStatus(played, scenario, storyArc);
+  const segs   = [`budget: ${end?.budget === null ? 'none' : `${mins(end.inScene)}/${mins(end.budget)} min`}`];
+  if (start.nudge) segs.push(`scene pacing: nudged toward ${start.target.id}`);
+  return segs.join(' · ');
+}
+
 function describeAhead(nextState, storyArc, newBeats, sceneMoves) {
   if (typeof nextState?.currentSceneId !== 'string') return null;
   const ahead = aheadOfSceneBeats(nextState, storyArc, newBeats, sceneMoves);
@@ -138,6 +152,7 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
   const nudge    = storyPacingNudge(state, scenario, storyArc);
   const scene    = describeScene(state, nextState, sceneMoves, opening);
   const ahead    = scene ? describeAhead(nextState, storyArc, newBeats, sceneMoves) : null;
+  const budget   = scene && !opening ? describeSceneBudget(state, nextState, scenario, storyArc) : null;
   // Unbound wording only for scene sessions (their role's fork is usually not bound); a
   // bound-fork session keeps the exact Part A wording.
   const block    = scene && !status.bound ? resolveDefiningMomentBlock(state, scenario) : undefined;
@@ -151,6 +166,7 @@ export function forkDiagTurnLine({ turn, state, nextState, scenario, storyArc, o
     `position: ${describePosition(before)} → ${describePosition(after)}`,
     ...(scene ? [scene] : []),
     ...(ahead ? [ahead] : []),
+    ...(budget ? [budget] : []),
     ...(nudge ? [`pacing: nudged toward ${nudge.target.id} (~${nudge.turnsLeft} turn${nudge.turnsLeft === 1 ? '' : 's'} left)`] : []),
     `fork: ${describeFork(status, decisionRecorded, block)}`,
   ].join(' · ');
@@ -179,10 +195,11 @@ export function parseSceneDiag(transcript) {
   for (const m of String(transcript || '').matchAll(SCENE_SEG_RE)) {
     seen = true;
     const [, turn, seg] = m;
-    const adv = /^(.*?) \((?:advanced on beats? (.*)|jumped by (fork))\)$/.exec(seg);
+    const adv = /^(.*?) \((?:advanced on beats? (.*)|jumped by (fork)|advanced on (budget) ([^)]*))\)$/.exec(seg);
     if (adv) {
       const path = adv[1].split(' → ');
-      moves.push({ turn: Number(turn), path, beats: adv[2] ?? null, via: adv[3] ? 'fork' : 'beat' });
+      const via  = adv[3] ? 'fork' : adv[4] ? 'budget' : 'beat';
+      moves.push({ turn: Number(turn), path, beats: adv[2] ?? null, via, ...(via === 'budget' ? { budget: adv[5] } : {}) });
       last = path[path.length - 1];
     } else {
       last = seg.replace(/ \((opening scene|held)\)$/, '');
@@ -216,8 +233,11 @@ export function forkDiagSummaryLines({ transcript, sessionState = null, scenario
     // Scene sessions only (a line carried a scene segment).
     ...(scenes.seen ? [
       scenes.moves.length
-        ? `${DIAG_PREFIX}scene advances (${scenes.moves.reduce((n, m) => n + m.path.length - 1, 0)}): ${scenes.moves.map(m => `turn ${m.turn} ${m.path.join(' → ')} (${m.via === 'fork' ? 'by fork' : `on ${m.beats}`})`).join('; ')}`
+        ? `${DIAG_PREFIX}scene advances (${scenes.moves.reduce((n, m) => n + m.path.length - 1, 0)}): ${scenes.moves.map(m => `turn ${m.turn} ${m.path.join(' → ')} (${m.via === 'fork' ? 'by fork' : m.via === 'budget' ? `on budget ${m.budget}` : `on ${m.beats}`})`).join('; ')}`
         : `${DIAG_PREFIX}scene advances: NONE — the session never left its opening scene`,
+      // B3b: how the scenes were left — on their beats (the story got there), on their budgets
+      // (the backstop pushed it), or by the fork.
+      ...(scenes.moves.length ? [`${DIAG_PREFIX}scene advances by: ${['beat', 'budget', 'fork'].map(v => `${scenes.moves.filter(m => m.via === v).length} ${v}`).join(', ')}`] : []),
       `${DIAG_PREFIX}scene at close: ${sessionState?.currentSceneId ?? `${scenes.last ?? '?'} (last recorded; session state gone)`}`,
     ] : []),
   ];

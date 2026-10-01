@@ -1,4 +1,4 @@
-import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes } from './PromptComposer.js';
+import { getClueById, getAvailableCluesAt, closureShouldClose, resolveDefiningMomentBlock, evaluateDefiningMoment, storyBoundForkActive, arcBeats, arcScenes, arcHasScenes, scenePacingStatus } from './PromptComposer.js';
 
 // When an anchor's wall OPENS, as a fraction of the session, for a role that does not say.
 //
@@ -146,10 +146,16 @@ export function initSceneState(state, storyArc) {
 //            used to carry the scene past every ending before it, so the_voices_are reported in
 //            scene_21_feb skipped scene_24_feb outright. A scene whose beat was reported early
 //            advances on the first turn it is current — one step, so it still gets that turn.
-//   'budget' — B3b.
-// A scene with no ends_on_beat holds. The last scene never advances on its beat. A session with
-// no currentSceneId (no scenes, or started before scenes existed) is left alone. Every move
-// stamps sceneEnteredAt with the clock it happened at. Returns the moves made (0 or 1).
+//   'budget' — the HARD-ADVANCE backstop (B3b): the scene has used its whole minute budget
+//            (clock since sceneEnteredAt) without its own beat. One step, so a 3-minute scene
+//            cannot run eleven turns. The missed beat is NOT marked reached — a beat records
+//            that something happened, and it did not. The prompt's per-scene nudge
+//            (PromptComposer.scenePacingStatus) has already pushed toward it on the scene's last turn.
+// A scene with no ends_on_beat advances on its budget only. The last scene never advances. A
+// session with no currentSceneId (no scenes, or started before scenes existed) is left alone.
+// Every move stamps sceneEnteredAt with the clock it happened at; a session that predates it
+// gets it stamped now, so its current scene starts its budget from here rather than from 0.
+// Returns the moves made (0 or 1).
 export function advanceScene(state, storyArc, turn = null, { forkSceneId = null } = {}) {
   if (typeof state?.currentSceneId !== 'string') return [];
   const scenes = arcScenes(storyArc);
@@ -159,6 +165,7 @@ export function advanceScene(state, storyArc, turn = null, { forkSceneId = null 
     console.warn(`[SCENE] current scene "${state.currentSceneId}" is not a scene of ${storyArc?.id} — holding`);
     return [];
   }
+  if (typeof state.sceneEnteredAt !== 'number' || !Number.isFinite(state.sceneEnteredAt)) state.sceneEnteredAt = state.elapsedMinutes ?? 0;
   const cur  = scenes[i];
   const fork = typeof forkSceneId === 'string' && forkSceneId ? scenes.findIndex(s => s.id === forkSceneId) : -1;
   let move = null;
@@ -167,7 +174,9 @@ export function advanceScene(state, storyArc, turn = null, { forkSceneId = null 
   } else if (i < scenes.length - 1) {
     const own     = typeof cur.ends_on_beat === 'string' ? cur.ends_on_beat : '';
     const reached = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
+    const pace    = scenePacingStatus(state, null, storyArc);
     if (own && reached.has(own)) move = { from: cur.id, to: scenes[i + 1].id, beat: own, turn, via: 'beat' };
+    else if (pace?.exhausted)    move = { from: cur.id, to: scenes[i + 1].id, beat: null, turn, via: 'budget', minutes: pace.inScene, budget: pace.budget, missed: own || null };
   }
   if (!move) return [];
   state.currentSceneId = move.to;

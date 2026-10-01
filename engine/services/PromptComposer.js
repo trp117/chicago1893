@@ -1463,6 +1463,58 @@ export function storyPosition(state, storyArc) {
   return furthest;
 }
 
+// SCENE PACING (B3b) — each scene's budget_minutes, measured from sceneEnteredAt. One reading
+// shared by the prompt (the nudge), StateManager.advanceScene (the budget backstop) and the
+// DIAG, so the three can never disagree about where a scene stands. null unless the session
+// tracks scenes (state.currentSceneId) and its current scene is a scene of the arc.
+//
+// The nudge fires on the scene's LAST turn: when what is left of its budget is one turn or
+// less (the scenario's timePerTurnDefault, else mergeState's backstop of 3). Joan's scenes are
+// 3–5 minutes at 2 minutes a turn — two or three turns each — so one turn of warning is the
+// whole margin there is: two turns would nudge every turn of a 3- or 4-minute scene, which is
+// not pacing, it is pushing. Only while the scene's own ending beat is unreported; a scene
+// with no ends_on_beat, or no budget, is never nudged. The last scene is nudged like any other
+// (its beat is where the arc's last scene turns), though it never advances.
+export function scenePacingStatus(state, scenario, storyArc) {
+  if (typeof state?.currentSceneId !== 'string') return null;
+  const scenes = arcScenes(storyArc);
+  const scene  = scenes.find(s => s.id === state.currentSceneId);
+  if (!scene) return null;
+  const budget  = typeof scene.budget_minutes === 'number' && Number.isFinite(scene.budget_minutes) && scene.budget_minutes > 0 ? scene.budget_minutes : null;
+  const tpt     = scenario?.systems?.timePerTurnDefault;
+  const turnMin = typeof tpt === 'number' && Number.isFinite(tpt) && tpt > 0 ? tpt : 3;
+  const now     = state.elapsedMinutes ?? 0;
+  const entered = typeof state.sceneEnteredAt === 'number' && Number.isFinite(state.sceneEnteredAt) ? state.sceneEnteredAt : now;
+  const inScene = Math.max(0, now - entered);
+  const beats   = arcBeats(storyArc);
+  const reached = new Set(Array.isArray(state.reachedBeats) ? state.reachedBeats : []);
+  const target  = typeof scene.ends_on_beat === 'string' ? beats.find(b => b.id === scene.ends_on_beat) || null : null;
+  const beatDone = !!target && reached.has(target.id);
+  const remaining = budget === null ? null : budget - inScene;
+  const nudge   = !!target && !beatDone && remaining !== null && remaining <= turnMin;
+  let between = [];
+  if (nudge) {
+    const furthest = storyPosition(state, storyArc);
+    between = beats.filter(b => b.index > (furthest ? furthest.index : -1) && b.index < target.index && !reached.has(b.id));
+  }
+  return {
+    scene, budget, inScene, remaining, turnMin, target, beatDone, nudge, between,
+    last: scenes[scenes.length - 1]?.id === scene.id,
+    exhausted: budget !== null && inScene >= budget,
+  };
+}
+
+function buildScenePacingLine(p) {
+  const { target, between } = p;
+  const path = between.length
+    ? `Move through ${between.map(b => b.id).join(', ')}, in that order, and reach ${target.id}`
+    : `Bring the story to ${target.id}`;
+  return [
+    `⚑ SCENE PACING: This part of the story has run its length. It should now be reaching ACT ${target.actNumber}${target.actTitle ? ` — ${target.actTitle}` : ''}, beat ${target.id} — move toward it.`,
+    `- ${path} in this turn if it can honestly happen now: escalate what is already in motion so the beat arrives, rather than opening anything new. Do not skip a beat, do not narrate one out of order, and report each as it happens.`,
+  ].join('\n');
+}
+
 const STORY_BEAT_LIST_CHARS = 220;
 
 // PACING — how many turns before a bound fork's fallback the story starts being pushed toward
@@ -1490,7 +1542,11 @@ function bindingTargetBeat(block, beats) {
 // null unless: the fork is story-bound, not yet put or answered, not due this turn, its binding
 // is not yet met, its target is a beat of the arc, and the clock is inside the nudge window.
 // Shared by buildStoryPositionDirective (which renders it) and the transcript diagnostics.
+// A session that tracks scenes is paced by its scenes instead (scenePacingStatus, B3b): its
+// budgets carry the story to the fork's scene, and two nudges would point the model at two
+// different beats.
 export function storyPacingNudge(state, scenario, storyArc) {
+  if (typeof state?.currentSceneId === 'string') return null;
   const block = resolveDefiningMomentBlock(state, scenario);
   if (!storyArc || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
   const momentId = block.principal_transition?.moment;
@@ -1576,9 +1632,13 @@ export function buildStoryPositionDirective(state, scenario, storyArc) {
     '- When a beat HAPPENS — in the scene, or the player learns that it has happened — you MUST emit stateChanges: { beats_reached: ["<beat_id>"] } in that turn\'s response, using the id exactly as listed. Report each beat once. Never report a beat that has not happened.',
   );
   // The pacing nudge (storyPacingNudge) — only inside the window before a bound fork's
-  // fallback, and only while its binding is still unmet.
+  // fallback, and only while its binding is still unmet. A scene session gets the per-scene
+  // nudge instead (never both): beat ids only, no scene id — what the narrator is told about
+  // scenes is B2b's to decide.
   const nudge = storyPacingNudge(state, scenario, storyArc);
   if (nudge) lines.push(buildPacingNudgeLine(nudge));
+  const scenePace = scenePacingStatus(state, scenario, storyArc);
+  if (scenePace?.nudge) lines.push(buildScenePacingLine(scenePace));
   return lines.join('\n');
 }
 

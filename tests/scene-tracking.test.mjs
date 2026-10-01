@@ -40,7 +40,7 @@ const { PlayerRepository }    = await import(`${ROOT}/engine/repositories/Player
 const { SessionRepository }   = await import(`${ROOT}/engine/repositories/SessionRepository.js`);
 const { buildInitialState, loadStoryArc, loadForkStoryArc, initSceneState, advanceScene, recordReachedBeats } =
   await import(`${ROOT}/engine/services/StateManager.js`);
-const { composeTurnPrompt, arcScenes, arcHasScenes, buildStoryPositionDirective, isStoryBoundFork } =
+const { composeTurnPrompt, arcScenes, arcHasScenes, buildStoryPositionDirective, isStoryBoundFork, scenePacingStatus, storyPacingNudge } =
   await import(`${ROOT}/engine/services/PromptComposer.js`);
 const { forkDiagTurnLine, forkDiagSummaryLines, forkDiagActive, parseSceneDiag, DIAG_PREFIX } =
   await import(`${ROOT}/engine/services/ForkDiagnostics.js`);
@@ -167,6 +167,70 @@ head('2c. B3d — the fork path: the only one that jumps');
   check('a budget-only scene (no ends_on_beat) holds — B3b adds budgets', st.currentSceneId === 'scene_24_feb');
   const lost = { ...startState(), currentSceneId: 'scene_deleted' };
   check('a current scene no longer in the arc holds, with a warning', quiet(() => advanceScene(lost, JOAN_ARC, 1)).length === 0 && lost.currentSceneId === 'scene_deleted');
+}
+
+head('2d. B3b — per-scene budget: the nudge threshold');
+{
+  // Joan: 2 minutes a turn. scene_21_feb budget 3, scene_17_mar budget 4, scene_28_may budget 5.
+  check('fixture: Joan plays 2-minute turns', joanScenario.systems?.timePerTurnDefault === 2);
+  const at = (scene, entered, now, beats = []) => { const s = startState(); s.currentSceneId = scene; s.sceneEnteredAt = entered; s.elapsedMinutes = now; s.reachedBeats = beats; return scenePacingStatus(s, joanScenario, JOAN_ARC); };
+  check('3-min scene, first turn (0 in): no nudge', at('scene_21_feb', 0, 0).nudge === false);
+  check('3-min scene, second turn (2 in, 1 left ≤ 1 turn): nudged toward 21_feb_1431', (p => p.nudge && p.target.id === '21_feb_1431')(at('scene_21_feb', 0, 2)));
+  check('4-min scene, first turn: no nudge', at('scene_17_mar', 8, 8).nudge === false);
+  check('4-min scene, second turn (2 left = 1 turn): nudged', at('scene_17_mar', 8, 10).nudge === true);
+  check('5-min scene: not at 2 in (3 left), nudged at 4 in (1 left)', at('scene_28_may', 20, 22).nudge === false && at('scene_28_may', 20, 24).nudge === true);
+  check('own beat already reported → never nudged', at('scene_21_feb', 0, 2, ['21_feb_1431']).nudge === false);
+  check('the nudge lists the unreached beats before the target, in order', JSON.stringify(at('scene_17_mar', 8, 10, ['21_feb_1431', '24_feb_1431']).between.map(b => b.id)) === JSON.stringify(['the_voices_are', '13_mar_1431']));
+  check('a scene session predating sceneEnteredAt reads 0 minutes in (no nudge, no backstop)', (() => { const s = startState(); delete s.sceneEnteredAt; s.elapsedMinutes = 14; const p = scenePacingStatus(s, joanScenario, JOAN_ARC); return p.inScene === 0 && !p.nudge && !p.exhausted; })());
+  check('a session without scenes has no scene pacing', scenePacingStatus({ elapsedMinutes: 20 }, joanScenario, JOAN_ARC) === null);
+
+  const promptAt = (now, beats = []) => { const s = startState(); s.currentSceneId = 'scene_17_mar'; s.sceneEnteredAt = 8; s.elapsedMinutes = now; s.remainingMinutes = 30 - now; s.reachedBeats = beats; return composeTurnPrompt(s, 'I wait.', { scenario: joanScenario, characters: [], locations: JOAN_LOCS, clues: [], storyArc: JOAN_ARC }); };
+  const nudged = promptAt(10, ['21_feb_1431', '24_feb_1431']);
+  check('the nudged turn\'s prompt carries ⚑ SCENE PACING toward the scene\'s own beat', nudged.includes('⚑ SCENE PACING') && nudged.includes('beat 17_mar_1431 — move toward it') && nudged.includes('Move through the_voices_are, 13_mar_1431, in that order, and reach 17_mar_1431'));
+  check('...the un-nudged turn\'s prompt does not', !promptAt(8, ['21_feb_1431', '24_feb_1431']).includes('SCENE PACING'));
+  check('...and the nudge names no scene id or bridge (scenes stay invisible until B2b)', !SEQ.some(id => nudged.includes(id)) && !arcScenes(JOAN_ARC).some(sc => sc.bridge && nudged.includes(sc.bridge.slice(0, 40))));
+  // Part A's fork nudge is suppressed in a scene session: two nudges, two beats.
+  // (A bound fork in a scene session is B3c; the guard is the first line of storyPacingNudge.)
+  const bound = startState(); bound.elapsedMinutes = 24;
+  check('Part A fork nudge is off for a scene session (the scene budgets pace it)', storyPacingNudge(bound, joanScenario, JOAN_ARC) === null);
+}
+
+head('2e. B3b — the hard-advance backstop');
+{
+  const st = (scene, entered, now, beats = []) => { const s = startState(); s.currentSceneId = scene; s.sceneEnteredAt = entered; s.elapsedMinutes = now; s.reachedBeats = beats; return s; };
+  const a = st('scene_24_feb', 4, 6);
+  check('budget not yet spent (2/3 min) → holds', quiet(() => advanceScene(a, JOAN_ARC, 3)).length === 0 && a.currentSceneId === 'scene_24_feb');
+  const b = st('scene_24_feb', 4, 8);
+  const mb = quiet(() => advanceScene(b, JOAN_ARC, 4));
+  check('budget spent (4/3 min), beat unreported → ONE step, via budget', mb.length === 1 && mb[0].via === 'budget' && b.currentSceneId === 'scene_17_mar' && mb[0].minutes === 4 && mb[0].budget === 3 && mb[0].missed === '24_feb_1431', JSON.stringify(mb));
+  check('...the missed beat is NOT marked reached', !(b.reachedBeats || []).includes('24_feb_1431'));
+  check('...and the new scene\'s clock starts now', b.sceneEnteredAt === 8);
+  const c = st('scene_24_feb', 4, 8, ['24_feb_1431']);
+  check('budget spent but the beat WAS reported → via beat (the beat wins)', quiet(() => advanceScene(c, JOAN_ARC, 4))[0]?.via === 'beat');
+  const d = st('scene_28_may', 20, 40);
+  check('the last scene never advances, however long it runs', quiet(() => advanceScene(d, JOAN_ARC, 9)).length === 0 && d.currentSceneId === 'scene_28_may');
+  const e = st('scene_21_feb', 0, 12); delete e.sceneEnteredAt;
+  check('a session predating sceneEnteredAt: stamped now, no instant backstop', quiet(() => advanceScene(e, JOAN_ARC, 5)).length === 0 && e.sceneEnteredAt === 12);
+  const arc = clone(JOAN_ARC); delete arc.acts[0].scenes[1].ends_on_beat;
+  const f = st('scene_24_feb', 4, 8);
+  check('a scene with no ends_on_beat: never nudged, advances on its budget', !scenePacingStatus(f, joanScenario, arc).nudge && quiet(() => advanceScene(f, arc, 4))[0]?.via === 'budget');
+  const g = st('scene_23_may', 16, 30);
+  check('a budget overrun of several turns still moves ONE scene', quiet(() => advanceScene(g, JOAN_ARC, 9)).length === 1 && g.currentSceneId === 'scene_24_may');
+
+  // DIAG
+  const s0 = st('scene_24_feb', 4, 6), n0 = clone(s0); n0.elapsedMinutes = 8;
+  const mv = quiet(() => advanceScene(n0, JOAN_ARC, 4));
+  const line = forkDiagTurnLine({ turn: 4, state: s0, nextState: n0, scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: mv });
+  check('DIAG: a budget advance says so, with the minutes and the missed beat', line.includes('scene: scene_24_feb → scene_17_mar (advanced on budget 4/3 min, 24_feb_1431 not reached)'), line);
+  check('DIAG: the budget of the scene the turn was played in', line.includes('budget: 4/3 min'), line);
+  check('DIAG: the turn\'s prompt was nudged (state at turn start: 2 in, 1 left)', line.includes('scene pacing: nudged toward 24_feb_1431'), line);
+  const s1 = st('scene_24_feb', 4, 4), n1 = clone(s1); n1.elapsedMinutes = 6;
+  const l1 = forkDiagTurnLine({ turn: 3, state: s1, nextState: n1, scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: [] });
+  check('DIAG: an un-nudged held turn shows its budget and no nudge', l1.includes('scene: scene_24_feb (held) · budget: 2/3 min · fork:') && !l1.includes('scene pacing'), l1);
+  const parsed = parseSceneDiag(line);
+  check('parseSceneDiag reads a budget move back', parsed.moves[0]?.via === 'budget' && parsed.moves[0]?.budget === '4/3 min, 24_feb_1431 not reached', JSON.stringify(parsed.moves));
+  const sum = forkDiagSummaryLines({ transcript: `${line}\n`, sessionState: n0, scenario: joanScenario, storyArc: JOAN_ARC });
+  check('summary: the budget move, and the count by kind', sum.includes(`${DIAG_PREFIX}scene advances by: 0 beat, 1 budget, 0 fork`) && sum.some(l => l.includes('turn 4 scene_24_feb → scene_17_mar (on budget 4/3 min, 24_feb_1431 not reached)')), sum.filter(l => l.includes('scene')).join(' | '));
 }
 
 head('3. inert without scenes');
@@ -338,11 +402,42 @@ try {
     const l = diag[i + 1] || '';
     check(`turn ${i + 1} DIAG: ${t.move ? 'crossing recorded' : 'held'}`, t.move ? l.includes(`scene: ${t.move}`) : l.includes(`scene: ${t.want} (held)`), l.slice(0, 220));
   });
-  check('e2e: the_voices_are reported late in scene_17_mar: recorded, held, not flagged ahead', (diag[3] || '').includes('new: [the_voices_are]') && (diag[3] || '').includes('scene: scene_17_mar (held) · fork:'), diag[3]);
+  check('e2e: the_voices_are reported late in scene_17_mar: recorded, held, not flagged ahead', (diag[3] || '').includes('new: [the_voices_are]') && (diag[3] || '').includes('scene: scene_17_mar (held) · ') && !(diag[3] || '').includes('ahead:'), diag[3]);
   check('e2e: 24_may_1431 reported in scene_23_may is logged as ahead, not a skip', (diag[6] || '').includes('scene: scene_23_may (held) · ahead: [24_may_1431]'), diag[6]);
   const leak = sent.find(s => SEQ.some(id => s.includes(id)) || arcScenes(JOAN_ARC).some(sc => sc.bridge && s.includes(sc.bridge.slice(0, 40))));
   check(`none of the ${sent.length} model requests carries a scene id or bridge`, sent.length > 0 && !leak);
   check('...and the requests DO carry the beat roster', sent.some(s => s.includes('STORY POSITION')));
+
+  // B3b e2e: a model that NEVER reports a beat. The budgets alone must carry the story through
+  // every scene — one scene per spent budget, the nudge on each scene's last turn — and land
+  // it in scene_28_may at 24 minutes (each 3- or 4-minute budget takes two 2-minute turns),
+  // before Joan's 0.75 clock fork (22.5 min) would matter for a binding and before the
+  // default fallback (25.5).
+  {
+    nextOutput = out(undefined);
+    const st2 = await sse('start', { scenarioId: JOAN_ID, roleId: 'role_manchon', narrativeStyle: 'focused' });
+    let s = st2.done?.nextState; const sid = st2.done?.sessionId;
+    check('B3b e2e: /start (no beats reported) holds in the opening scene', s?.currentSceneId === 'scene_21_feb' && s?.sceneEnteredAt === 0);
+    const path = [], nudgedTurns = [], plainTurns = [];
+    for (let t = 1; t <= 12 && s; t++) {
+      nextOutput = out(undefined);
+      const before = sent.length;
+      const r = await sse('turn', { state: s, playerInput: `I hold my tongue (${t}).`, sessionId: sid });
+      if (!r.done) { check(`B3b e2e turn ${t} completes`, false, r.error ? JSON.stringify(r.error).slice(0, 200) : ''); break; }
+      const prompt = sent.slice(before).join('\n');
+      (prompt.includes('SCENE PACING') ? nudgedTurns : plainTurns).push(t);
+      if (r.done.nextState.currentSceneId !== s.currentSceneId) path.push(`${r.done.nextState.currentSceneId}@${r.done.nextState.elapsedMinutes}`);
+      s = r.done.nextState;
+    }
+    check('B3b e2e: every scene left on its budget, one per two turns, reaching scene_28_may at 24 min',
+      path.join(',') === 'scene_24_feb@4,scene_17_mar@8,scene_9_may@12,scene_23_may@16,scene_24_may@20,scene_28_may@24', path.join(' → '));
+    check('B3b e2e: all moves via budget, none via beat', (s?.sceneAdvances || []).length === 6 && s.sceneAdvances.every(m => m.via === 'budget'));
+    check('B3b e2e: the nudge was in the prompt on each scene\'s last turn (2,4,6,8,10,12) and no other', nudgedTurns.join(',') === '2,4,6,8,10,12', `nudged: ${nudgedTurns.join(',')}`);
+    check('B3b e2e: no beat was fabricated by the backstop', !(s?.reachedBeats || []).length);
+    const tr = fs.readFileSync(p('engine/data/transcripts', `${sid}.md`), 'utf8');
+    const dl = tr.split('\n').filter(l => l.startsWith(DIAG_PREFIX));
+    check('B3b e2e DIAG: turn 2 is nudged and advances on budget', (dl[2] || '').includes('scene: scene_21_feb → scene_24_feb (advanced on budget 4/3 min, 21_feb_1431 not reached)') && (dl[2] || '').includes('scene pacing: nudged toward 21_feb_1431'), dl[2]);
+  }
 
   // Control: a scenario with no scenes — no scene state, no DIAG, no roster.
   const CH = 'chicago_1893_v1';
