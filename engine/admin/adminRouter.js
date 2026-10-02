@@ -2500,7 +2500,7 @@ export function createAdminRouter(repos, config = {}) {
     res.json({
       ...SENSORY_DEFAULTS,
       ...(scenario.sensory_opening || {}),
-      tts_narration_speed: scenario.tts_narration_speed ?? 1.0,
+      tts_narration_speed: scenario.tts_narration_speed ?? 0.9,   // unset plays at the voice default, 0.9 (/tts)
     });
   });
 
@@ -2515,7 +2515,7 @@ export function createAdminRouter(repos, config = {}) {
     // as the glossary and image routes. Without it this write bumps the scenario version
     // behind the editor's back and its next manual Save 409s with nothing actually wrong.
     const newVersion = await repos.scenarios.save(updated, { savedBy: req.adminUser?.email || 'admin' });
-    res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 1.0, current_version: newVersion });
+    res.json({ ...merged, tts_narration_speed: updated.tts_narration_speed ?? 0.9, current_version: newVersion });
   });
 
   // ── Locations ────────────────────────────────────────────────────────────────

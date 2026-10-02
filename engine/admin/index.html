@@ -1064,7 +1064,7 @@ async function renderDashboard() {
               <label>Narration speed</label>
               <select id="sop-speed-${s.id}" data-field="tts_narration_speed">
                 <option value="0.75">0.75 — slow &amp; deliberate</option>
-                <option value="0.9">0.9 — measured</option>
+                <option value="0.9">0.9 — measured (default)</option>
                 <option value="1.0">1.0 — normal</option>
                 <option value="1.1">1.1 — brisk</option>
                 <option value="1.2">1.2 — urgent</option>
@@ -1121,7 +1121,11 @@ async function renderDashboard() {
           document.getElementById(`sop-enabled-${sid}`).checked    = cfg.enabled !== false;
           document.getElementById(`sop-style-${sid}`).value        = cfg.style || 'cinematic_period';
           document.getElementById(`sop-sentences-${sid}`).value    = String(cfg.target_sentences || 4);
-          document.getElementById(`sop-speed-${sid}`).value        = String(cfg.tts_narration_speed ?? 1.0);
+          // Unset plays at the server's voice default, 0.9. A stored value with no option (e.g. 0)
+          // would leave the select blank and save as Number('') = 0 — show 0.9 instead.
+          const speedSel = document.getElementById(`sop-speed-${sid}`);
+          speedSel.value = String(cfg.tts_narration_speed ?? 0.9);
+          if (!speedSel.value) speedSel.value = '0.9';
           panel.querySelectorAll('[data-element]').forEach(cb => {
             cb.checked = (cfg.elements || []).includes(cb.dataset.element);
           });

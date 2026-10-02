@@ -1736,6 +1736,9 @@ Do not open with the historical context. Open inside the character's body. Let t
     const { text, sensory_opening, bridge, confirmation, trust_level, narrative_speed } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
     if (!elevenLabsApiKey) return res.status(503).json({ error: 'TTS not configured.' });
+    // A narration speed ElevenLabs accepts (0.7–1.2), else null → the voice's default. A bad
+    // stored value (e.g. tts_narration_speed: 0) must not fail the request.
+    const narrSpeed = typeof narrative_speed === 'number' && narrative_speed >= 0.7 && narrative_speed <= 1.2 ? narrative_speed : null;
 
     const voiceId = elevenLabsVoiceId || 'onwK4e9ZLuTAKqWW03F9';
 
@@ -1765,7 +1768,7 @@ Do not open with the historical context. Open inside the character's body. Let t
     if (confirmation)   segments.push({ raw: confirmation,   speed: 0.85, trust: false });
     if (bridge)         segments.push({ raw: bridge,         speed: 0.88, trust: false });
     if (sensory_opening) segments.push({ raw: sensory_opening, speed: 0.88, trust: false });
-    segments.push({ raw: text, speed: narrative_speed ?? null, trust: true });
+    segments.push({ raw: text, speed: narrSpeed, trust: true });
 
     const totalChars = segments.reduce((n, s) => n + prepareForTts(s.raw).length, 0);
     console.log(`[TTS] chars=${totalChars} segments=${segments.length} confirmation=${!!confirmation} sensory=${!!sensory_opening} est=$${((totalChars / 1000) * 0.15).toFixed(4)}`);
@@ -1778,7 +1781,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       if (segments.length === 1) {
         const { Readable } = await import('node:stream');
-        const { resp } = await elevenLabsCall(text, null, true);
+        const { resp } = await elevenLabsCall(text, narrSpeed, true);
         ttsTrace?.update({ output: { segments: 1 } });
         Readable.fromWeb(resp.body).pipe(res);
       } else {

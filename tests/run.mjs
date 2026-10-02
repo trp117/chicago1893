@@ -36,6 +36,7 @@ const SUITE = [
   ['B3a: timing confirmation (record)',      'timing-confirm.test.mjs'],
   ['B3c: fork at_scene binding',             'scene-binding.test.mjs'],
   ['B2b-PLAYER: scene header + bridge (jsdom)', 'scene-player.test.mjs'],
+  ['TTS: narration speed on every request',  'tts-speed.test.mjs'],
 ];
 
 const results = [];

@@ -908,7 +908,7 @@ let currentScene    = null;
 let pendingEntryEl  = null;
 let locationShowing = false;
 let bootstrapData        = null;
-let ttsNarrationSpeed    = 1.0;
+let ttsNarrationSpeed    = null;   // the scenario's set speed; null = unset → the server's voice default (0.9)
 let lastChoices          = [];
 // Single-entry guard for showClosingScreen — a second call blanks the prose and starts
 // a concurrent /closing-prose stream. Reset in the session-reset block.
@@ -1045,7 +1045,7 @@ async function ttsSpeak(text, sensoryOpening, confirmation = null, trustLevel = 
     if (bridge)                 body.bridge            = bridge;
     if (confirmation)           body.confirmation      = confirmation;
     if (trustLevel != null)     body.trust_level       = trustLevel;
-    if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
+    if (ttsNarrationSpeed != null) body.narrative_speed = ttsNarrationSpeed;
     const resp = await fetch(`${API_BASE}/tts`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -1992,7 +1992,7 @@ async function loadGame() {
     }
     bootstrapData      = await resp.json();
     scenario           = bootstrapData.scenario;
-    ttsNarrationSpeed  = scenario.tts_narration_speed ?? 1.0;
+    ttsNarrationSpeed  = scenario.tts_narration_speed ?? null;
     locationsList      = bootstrapData.locations    || [];
     if (USE_SCENARIO_REDESIGN) applyRedesignRoleHero();
 
@@ -2632,7 +2632,7 @@ function _buildIntroScreen({ overlay, titleEl, sectionsEl, skipBtn, titleClass, 
     try {
       ttsStop();
       const body = { text: texts.join('\n\n') };
-      if (ttsNarrationSpeed !== 1.0) body.narrative_speed = ttsNarrationSpeed;
+      if (ttsNarrationSpeed != null) body.narrative_speed = ttsNarrationSpeed;
       const resp = await fetch(`${API_BASE}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

@@ -214,6 +214,14 @@ try {
   s = await turn(b, fork, base(CELL, 6, JOAN_ID));
   check('fork turn: the header moves to 28 May, no lead paragraph, no bridge in /tts', s.sub === `28 May 1431 · ${short(CELL)}` && s.bridges.length === 0 && !('bridge' in (s.tts || {})), s.sub);
 
+  // Narration speed: unset (Joan has none) sends nothing — the server's 0.9 plays. A scenario
+  // set to 1.0 now sends 1.0 (it used to be dropped as "the default" and play at 0.9).
+  check('unset narration speed: /tts carries no narrative_speed', b.io.tts.length > 0 && b.io.tts.every(t => !('narrative_speed' in t)));
+  b.win.eval('ttsNarrationSpeed = 1.0');
+  s = await turn(b, { narrative: NARR(7), choices: CHOICES, scene: scene('scene_28_may') }, base(CELL, 7, JOAN_ID));
+  check('narration speed set to 1.0: /tts carries narrative_speed 1 (1.0 in admin plays 1.0)', s.tts?.narrative_speed === 1, JSON.stringify(s.tts?.narrative_speed));
+  b.win.eval('ttsNarrationSpeed = null');
+
   // Every /turn request the page sent carried the plain state — nothing presentational.
   check('the page never posts its scene back to /turn', b.io.turns.every(t => !JSON.stringify(t.state).includes('"scene"')));
 
