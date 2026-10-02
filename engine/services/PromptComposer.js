@@ -1587,10 +1587,14 @@ export function sceneFramingDirective(state, scenario, storyArc, locations = [])
 function buildSceneFramingDirective(f) {
   const where = [f.date, f.place].filter(Boolean).join(' — ');
   const lines = [];
-  if (f.entered && !f.byFork) {
+  if (f.entered && !f.byFork && f.transition) {
+    // The player sees the bridge as the lead paragraph directly above this turn's narration
+    // (B2b-PLAYER), so the narration continues from it rather than retelling it.
+    lines.push(`⚑ SCENE CHANGE: Since the last turn the story has moved on — it is now ${where}. The player has ALREADY READ the transition below: it is shown to them directly above this turn's narration, and it has told them the time that has passed, the move, and the new place. CONTINUE from where it leaves off. Open on something NEW in this scene — the immediate action, the first exchange or question, a concrete detail of the place in this moment. Do NOT restate, paraphrase or summarise the transition: no recap of the time elapsed, the move, or where the player now is. The player's last action belongs to the scene just left; resolve it in a line at most, or let the move overtake it.`);
+    lines.push(`The transition the player has just read (continue from it; do not repeat it, contradict it, or add to what it says has happened):\n${f.transition}`);
+  } else if (f.entered && !f.byFork) {
     lines.push(`⚑ SCENE CHANGE: Since the last turn the story has moved on — it is now ${where}. Open this turn by carrying the player there: the move in time and place comes first, then the turn plays out in the new scene. The player's last action belongs to the scene just left; resolve it in a line at most, or let the move overtake it.`);
-    if (f.transition) lines.push(`The authored transition into this scene — narrate the player into it (you may follow it closely; do not contradict it or add to what it says has happened):\n${f.transition}`);
-    else if (f.forkNow) lines.push('The defining moment below is the transition: let it carry the player into this scene.');
+    if (f.forkNow) lines.push('The defining moment below is the transition: let it carry the player into this scene.');
   }
   lines.push(`⚑ SCENE: ${where}. This turn takes place here, on this date. Narrate this scene — do not drift back into an earlier one, and do not reach ahead to a later date.`);
   // The scene's length and where this turn sits in it, so the model FILLS the scene rather than

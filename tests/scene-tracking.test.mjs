@@ -249,6 +249,7 @@ head('2f. B2b-MODEL — the model is told the scene; the engine holds its place'
   const first = sceneFramingDirective(s, joanScenario, JOAN_ARC, L);
   const bridge17 = arcScenes(JOAN_ARC).find(x => x.id === 'scene_17_mar').bridge;
   check('the new scene\'s FIRST turn: SCENE CHANGE, the date and place, and its bridge', first.startsWith('⚑ SCENE CHANGE: Since the last turn the story has moved on — it is now 17 March 1431 — Joan\'s Cell') && first.includes(bridge17) && first.includes('⚑ SCENE: 17 March 1431'), first.slice(0, 160));
+  check('a bridge turn: the model is told the player has ALREADY READ the bridge — continue, do not recap it', first.includes('The player has ALREADY READ the transition below') && first.includes('Do NOT restate, paraphrase or summarise the transition') && !first.includes('carrying the player there') && !first.includes('follow it closely'));
   const later = sceneFramingDirective({ ...s, turnCount: 4 }, joanScenario, JOAN_ARC, L);
   check('the scene\'s next turn: framing only — no change line, no bridge', later.startsWith('⚑ SCENE: 17 March 1431') && !later.includes('SCENE CHANGE') && !later.includes(bridge17));
   check('a time-only change (scene_24_feb, same hall) still announces the new date', sceneFramingDirective(st('scene_24_feb', 2, { sceneEnteredTurn: 2 }), joanScenario, JOAN_ARC, L).includes('it is now 24 February 1431 — Great Hall'));
@@ -263,6 +264,11 @@ head('2f. B2b-MODEL — the model is told the scene; the engine holds its place'
   const dFork = sceneFramingDirective(ft, joanScenario, JOAN_ARC, L);
   const bridge28 = arcScenes(JOAN_ARC).find(x => x.id === 'scene_28_may').bridge;
   check('fork due on the scene\'s first turn: change announced, NO bridge — the setup is the transition', fFork.forkNow && fFork.transition === '' && dFork.includes('SCENE CHANGE') && dFork.includes('The defining moment below is the transition') && !dFork.includes(bridge28.slice(0, 40)));
+  check('fork turn (no bridge shown): still told to carry the player into the scene — no "already read" claim', dFork.includes('carrying the player there') && !dFork.includes('ALREADY READ'));
+  const noBridgeArc = clone(JOAN_ARC);
+  for (const act of noBridgeArc.acts || []) for (const sc of act.scenes || []) if (sc.id === 'scene_17_mar') sc.bridge = '';
+  const dNoBridge = sceneFramingDirective(s, joanScenario, noBridgeArc, L);
+  check('a scene change with an EMPTY bridge keeps the "carry the player there" wording', dNoBridge.includes('carrying the player there') && !dNoBridge.includes('ALREADY READ'));
   const fj = st('scene_28_may', 9, { sceneEnteredTurn: 9, elapsedMinutes: 16, effectiveDefiningMoment: bound, definingMomentPresented: true,
     sceneAdvances: [{ from: 'scene_23_may', to: 'scene_28_may', beat: null, turn: 9, via: 'fork' }] });
   const dJump = sceneFramingDirective(fj, joanScenario, JOAN_ARC, L);
