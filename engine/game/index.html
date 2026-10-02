@@ -1758,6 +1758,10 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
   feedAppend(entryEl);
   pendingEntryEl = entryEl;
 
+  // Scene sessions: the header flips on the early scene event. If the turn then fails, the
+  // header goes back to the scene the player is still in.
+  let sceneHeaderRollback = null;
+
   try {
     const resp = await respPromise;
 
@@ -1791,6 +1795,12 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
           streamEl.innerHTML = streamBridge + '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
         } else if (evt.type === 'scene') {
           streamBridge = sceneBridgeHtml(evt.scene?.bridge);
+          // The header leads the prose: it shows the narrated scene before its first words stream in.
+          if (evt.scene) {
+            sceneHeaderRollback = currentScene;
+            currentScene = evt.scene;
+            updateLocationDisplay(evt.scene.location_id);
+          }
         } else if (evt.type === 'done') {
           output    = evt.output;
           nextState = evt.nextState;
@@ -1840,6 +1850,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     renderSidebar();
     updateChaseUI();
     renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
+    sceneHeaderRollback = null;
     updateCandleIndicator(gameState.remainingMinutes, scenario?.sessionTargetMinutes || 15);
 
     streamOptionsDots.classList.add('hidden');
@@ -1891,6 +1902,10 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
       }
     }
   } finally {
+    if (sceneHeaderRollback) {
+      currentScene = sceneHeaderRollback;
+      updateLocationDisplay(sceneHeaderRollback.location_id);
+    }
     submitting = false;
   }
 }

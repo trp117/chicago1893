@@ -182,14 +182,32 @@ try {
   const pending = turn(b, out5, base(CELL, 5, JOAN_ID), { stream: () => new Response(body, { headers: { 'Content-Type': 'text/event-stream' } }) });
   for (let i = 0; i < 40 && !ctl; i++) await sleep(25);
   await sleep(450);   // past submitTurn's fade
-  ctl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'scene', scene: out5.scene })}\n\ndata: ${JSON.stringify({ type: 'chunk', text: 'The cell is' })}\n\n`));
+  const hdr = () => { const d = b.win.document; return { title: d.getElementById('header-title').textContent, sub: d.getElementById('header-subtitle').textContent, bar: d.getElementById('slim-scene-label').textContent }; };
+  const hdr4 = hdr();
+  check('turn 5 WAITING: before the scene event the header still shows the scene in play (the hall)', hdr4.title === name(HALL) && !hdr4.sub.startsWith('17 March'), hdr4.sub);
+  // The scene event arrives on its own, before any prose.
+  ctl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'scene', scene: out5.scene })}\n\n`));
   await sleep(100);
+  const hdrEarly = hdr();
+  const proseYet = [...b.win.document.querySelectorAll('#story .scene-card')].length;
+  check('turn 5 SCENE EVENT: the header flips to the cell and 17 March BEFORE any narration has streamed', proseYet === 0 && hdrEarly.title === name(CELL) && hdrEarly.sub === `17 March 1431 · ${short(CELL)}` && hdrEarly.bar === hdrEarly.sub, `${proseYet} card(s) | ${hdrEarly.title} | ${hdrEarly.sub}`);
+  ctl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'chunk', text: 'The cell is' })}\n\n`));
+  await sleep(100);
+  const hdrStreaming = hdr();
+  check('turn 5 STREAMING: the header stays on the new scene while the narration streams beneath it', JSON.stringify(hdrStreaming) === JSON.stringify(hdrEarly), hdrStreaming.sub);
   const streaming = [...b.win.document.querySelectorAll('#story .scene-card')].pop();
   check('turn 5 STREAMING: the bridge leads the card while the narration streams in under it', streaming?.firstElementChild?.className === 'scene-bridge' && streaming.textContent.startsWith(SC.scene_17_mar.bridge) && streaming.textContent.endsWith('The cell is'), streaming?.textContent?.slice(0, 60));
   ctl.enqueue(enc.encode(`data: ${JSON.stringify({ type: 'done', output: out5, nextState: base(CELL, 5, JOAN_ID) })}\n\n`)); ctl.close();
   s = await pending;
   check('turn 5 opens scene_17_mar: title and subtitle move to the cell and its date', s.title === name(CELL) && s.sub === `17 March 1431 · ${short(CELL)}`, `${s.title} | ${s.sub}`);
   check('turn 5: the final render keeps exactly one lead paragraph', s.first === 'scene-bridge' && s.bridges.length === 1 && s.bridges[0] === SC.scene_17_mar.bridge);
+
+  // A turn whose scene event arrives but which then FAILS: the header goes back to the scene in play.
+  const before = hdr();
+  b.io.queue.push(sse([{ type: 'scene', scene: scene('scene_28_may') }, { type: 'error', error: 'model unavailable' }]));
+  await b.win.eval(`submitTurn('I answer.')`);
+  const after = hdr();
+  check('failed turn: the early header flip is rolled back to the scene still in play (17 March, the cell)', JSON.stringify(after) === JSON.stringify(before) && b.win.eval('currentScene.id') === 'scene_17_mar', `${after.sub} / ${b.win.eval('currentScene.id')}`);
 
   // The fork turn opens scene_28_may with NO bridge (the server omits it; the setup is the transition).
   const fork = { narrative: NARR(6), choices: ['A', 'B', 'C'], definingMoment: { momentId: 'joan_defining_choice', options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }, { id: 'c', text: 'C' }] }, scene: scene('scene_28_may') };
