@@ -413,21 +413,29 @@ li { margin-bottom: 8px; }
     margin: 1.25rem 0 0;
     text-align: center;
   }
+  /* An outlined pill in the accent colour, so it reads as something to tap (it was 12px muted
+     text between two rules, easy to take for a caption). */
   .intro-panel-toggle {
     background: none;
-    border: none;
-    padding: 0;
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 8px 18px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-    transition: color 0.15s ease;
+    justify-content: center;
+    gap: 8px;
+    max-width: 100%;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    transition: background-color 0.15s ease, color 0.15s ease;
     font-family: system-ui, sans-serif;
   }
-  .intro-panel-toggle:hover { color: #C9A84C; }
-  .intro-panel-arrow { font-size: 10px; color: inherit; }
+  .intro-panel-toggle:hover { background: rgba(208,176,106,0.10); color: var(--text); }
+  .intro-panel-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .intro-panel-arrow { font-size: 13px; color: inherit; }
   .intro-panel-content {
     text-align: left;
     padding-top: 1rem;
@@ -568,7 +576,11 @@ li { margin-bottom: 8px; }
   max-width: 680px; width: 100%; box-sizing: border-box;
   padding-left: 1.5rem; padding-right: 1.5rem;
 }
-.redesign .role-overlay-inner > .intro-zone { margin-top: 12px; }
+.redesign .role-overlay-inner > .intro-zone { margin-top: 12px; padding-top: 14px; padding-bottom: 14px; }
+/* The intro toggle takes the role cards' amber, so it reads as part of the same set of actions */
+.redesign .intro-panel-toggle { border-color: #ba7517; color: #ba7517; }
+.redesign .intro-panel-toggle:hover { background: rgba(186,117,23,0.08); color: #f0eadc; }
+.redesign .intro-panel-toggle:focus-visible { outline-color: #ba7517; }
 
 /* ── Role cards: gold border accent ── */
 .redesign .role-card { border: 0.5px solid #2c2c2a; border-radius: 8px; }
