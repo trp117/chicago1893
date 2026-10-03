@@ -61,6 +61,7 @@ const check = (name, cond, detail = '') => {
 const head  = t => console.log(`\n-- ${t} ${'-'.repeat(Math.max(0, 72 - t.length))}`);
 const quiet = fn => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return fn(); } finally { console.warn = w; console.log = l; } };
 const clone = o => JSON.parse(JSON.stringify(o));
+const forkless = role => { const r = clone(role); delete r.defining_moment; return r; };
 
 const JOAN_ID = 'joan_trial_rouen_1431';
 const joanScenario = await repos.scenarios.findById(JOAN_ID);
@@ -103,7 +104,12 @@ head('1. the gate — which sessions load an arc');
 }
 
 head('2. init + advance — the rule');
-const startState = () => { const st = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); initSceneState(st, JOAN_ARC); return st; };
+// The fork-less role these scene checks play: Manchon as stored, minus his witness crucible
+// (bound at_scene scene_28_may since 2026-10-03), rebuilt in memory and never written.
+const MANCHON_STORED = JOAN_ROLES.find(r => r.id === 'role_manchon');
+const MANCHON = forkless(MANCHON_STORED);
+check('stored Manchon: his fork is bound at_scene scene_28_may (the scene checks play him without it)', MANCHON_STORED?.defining_moment?.at_scene === 'scene_28_may' && !MANCHON.defining_moment);
+const startState = () => { const st = quiet(() => buildInitialState(joanScenario, MANCHON, JOAN_LOCS)); initSceneState(st, JOAN_ARC); return st; };
 // The minimum scene time (B2b-MODEL): a beat ends its scene only within half a turn of the
 // scene's budget. spend() puts the clock there (budget − 1 min; no scenario → 3-minute turns),
 // so these B3d checks still test WHICH beat ends a scene, not when. Not spent: no budget advance.
@@ -286,9 +292,9 @@ head('2f. B2b-MODEL — the model is told the scene; the engine holds its place'
   check('...and the framing names that place for that role', sceneFramingDirective(rl, joanScenario, arcRL, L).includes('17 March 1431 — Great Hall'));
   check('a session without scenes is never held', holdSceneLocation({ location: 'x' }, JOAN_ARC) === null);
   const arcStart = clone(JOAN_ARC); arcStart.acts[0].scenes[0].location_id = 'joan_prison_cell';
-  const s0 = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); initSceneState(s0, arcStart);
+  const s0 = quiet(() => buildInitialState(joanScenario, MANCHON, JOAN_LOCS)); initSceneState(s0, arcStart);
   check('a session starts at its first scene\'s place', s0.location === 'joan_prison_cell' && JSON.stringify(s0.visitedLocations) === '["joan_prison_cell"]');
-  const s1 = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS)); const before1 = JSON.stringify(s1.visitedLocations); initSceneState(s1, JOAN_ARC);
+  const s1 = quiet(() => buildInitialState(joanScenario, MANCHON, JOAN_LOCS)); const before1 = JSON.stringify(s1.visitedLocations); initSceneState(s1, JOAN_ARC);
   check('...and a role already starting there keeps its initial location state exactly', s1.location === 'great_hall_rouen_castle' && JSON.stringify(s1.visitedLocations) === before1);
 
   // DIAG
@@ -342,7 +348,7 @@ head('4. what reaches the model prompt — the roster and the scene framing (B2b
   // position. B2b-MODEL adds exactly one thing for a scene session: the framing directive (date,
   // place, and on a scene's first turn the move and its bridge). Still no scene id anywhere.
   const promptFor = (st, arc) => composeTurnPrompt(st, 'I wait and watch.', { scenario: joanScenario, characters: [], locations: JOAN_LOCS, clues: [], ...(arc ? { storyArc: arc } : {}) });
-  const bare = quiet(() => buildInitialState(joanScenario, JOAN_ROLES.find(r => r.id === 'role_manchon'), JOAN_LOCS));
+  const bare = quiet(() => buildInitialState(joanScenario, MANCHON, JOAN_LOCS));
   const tracked = clone(bare); initSceneState(tracked, JOAN_ARC);
   quiet(() => recordReachedBeats(tracked, { stateChanges: { beats_reached: ['24_feb_1431'] } }, JOAN_ARC)); quiet(() => advanceScene(tracked, JOAN_ARC, 1));
   const untracked = clone(tracked); for (const k of ['currentSceneId', 'sceneAdvances', 'sceneEnteredAt', 'sceneEnteredTurn']) delete untracked[k];
@@ -489,6 +495,7 @@ try {
   const st = await sse('start', { scenarioId: JOAN_ID, roleId: 'role_manchon', narrativeStyle: 'focused' });
   check('/start (Joan, Manchon) completes', !!st.done, st.error ? JSON.stringify(st.error).slice(0, 200) : String(st.status));
   let state = st.done?.nextState; joanSession = st.done?.sessionId;
+  if (state) state.effectiveDefiningMoment = null;   // play Manchon fork-less (see MANCHON above)
   check('opening: 21_feb_1431 reported on arrival — recorded, but the opening scene holds (minimum scene time)', state?.currentSceneId === 'scene_21_feb' && state?.reachedBeats?.includes('21_feb_1431') && !state?.sceneAdvances?.length, state?.currentSceneId);
   // B2b-PLAYER: the opening's output carries its scene — date and place, never a bridge — and
   // that is the only scene data the player is sent.
@@ -569,6 +576,7 @@ try {
     nextOutput = out(undefined);
     const st2 = await sse('start', { scenarioId: JOAN_ID, roleId: 'role_manchon', narrativeStyle: 'focused' });
     let s = st2.done?.nextState; const sid = st2.done?.sessionId;
+    if (s) s.effectiveDefiningMoment = null;   // fork-less, as above: this measures the budgets alone
     check('B3b e2e: /start (no beats reported) holds in the opening scene', s?.currentSceneId === 'scene_21_feb' && s?.sceneEnteredAt === 0);
     const path = [], nudgedTurns = [], plainTurns = [];
     for (let t = 1; t <= 12 && s; t++) {

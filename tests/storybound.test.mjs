@@ -90,7 +90,8 @@ const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.
 // test update rather than something the inertness sweeps silently absorb. Everything else in
 // the corpus must stay byte-identical to pre-Part-A behaviour.
 // role_joan: bound at_scene scene_28_may since B3c (her relapse fork, live in prod).
-const EXPECTED_BOUND = ['role_joan', 'role_mccord', 'role_wills'];
+// role_manchon: his witness crucible, bound at_scene scene_28_may (2026-10-03).
+const EXPECTED_BOUND = ['role_joan', 'role_manchon', 'role_mccord', 'role_wills'];
 const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
@@ -286,7 +287,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
       }
     }
   }
-  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 15 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 16 && moved.length === 0, moved.slice(0, 5).join(', '));
   check(`all ${boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${points} points total)`, boundForks === EXPECTED_BOUND.length && boundMoved.length === 0, boundMoved.slice(0, 5).join(', '));
 }
 
