@@ -1433,6 +1433,26 @@ export function buildDefiningMomentInstruction(state, scenario, storyArc = null)
   ].filter(Boolean).join('\n');
 }
 
+// Standing per-turn directive that HOLDS a recorded defining-moment decision. Once the
+// player has answered the fork, every later turn (the answer turn included, and the final
+// turn) carries the chosen option's authored text, so the narration plays the character
+// as having made that choice instead of drifting back to whatever the role guidance leans
+// toward — and the authored debrief, written per option, matches the scene the player read.
+// Returns '' unless a decision is recorded and known (evaluateDefiningMoment met, which is
+// also false while DEFINING_MOMENT_ENABLED is off): a session with no fork, or a fork not
+// yet answered, composes a byte-identical prompt. Mutually exclusive with
+// buildDefiningMomentInstruction — a recorded decision makes the fork no longer due.
+export function buildDecisionHoldDirective(state, scenario) {
+  const dm   = evaluateDefiningMoment(state, scenario);
+  const text = dm.met && typeof dm.decision_text === 'string' ? dm.decision_text.trim() : '';
+  if (!text) return '';
+  return [
+    `⚑ DECISION MADE: The player chose: ${text}`,
+    'Play the character as having chosen this — never narrate them acting against it, and do not offer choices that would undo it.',
+    'This choice overrides the role description: where the role\'s stated duty, disposition or choice guidance assumes a different course, the course the player chose is the one this character now takes, in this turn\'s narration and every turn after.',
+  ].join('\n');
+}
+
 // Standing per-turn directive that DRIVES the closure flag for the PLAYING ROLE.
 // Returns '' unless the effective closure is a flag_set transition and the feature
 // flag is on — a no-op for every other scenario/role and when CLOSURE_BEATS_ENABLED
@@ -1829,7 +1849,10 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
       buildAnchoredLocationDirective(state, scenario, locations),
       buildAnchoredOutcomeDirective(state, scenario, characters),
     ].filter(Boolean).join('\n\n'))
-    .replace('{{DEFINING_MOMENT_INSTRUCTION}}', buildDefiningMomentInstruction(state, scenario, storyArc))
+    .replace('{{DEFINING_MOMENT_INSTRUCTION}}', [
+      buildDefiningMomentInstruction(state, scenario, storyArc),
+      buildDecisionHoldDirective(state, scenario),
+    ].filter(Boolean).join('\n\n'))
     .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario, storyArc))
     .replace('{{PLAYER_INPUT}}',           resolvedInput);
 }

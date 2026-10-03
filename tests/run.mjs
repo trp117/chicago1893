@@ -39,6 +39,7 @@ const SUITE = [
   ['TTS: narration speed on every request',  'tts-speed.test.mjs'],
   ['fork options: authored debrief + label',  'fork-debrief.test.mjs'],
   ['Manchon witness crucible (Stage 2)',     'manchon-crucible.test.mjs'],
+  ['decision hold: a chosen path sticks',     'decision-hold.test.mjs'],
 ];
 
 const results = [];

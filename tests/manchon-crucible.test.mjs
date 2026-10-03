@@ -11,7 +11,9 @@
 //   3. the three witnessing-choices are presented with their SHORT labels (full text kept);
 //   4. "Your Session" is the chosen option's authored debrief, byte for byte, with no
 //      session-block model call — fidelity (1, 3) vs compliance (2) differ;
-//   5. the debrief carries no "could(n't) save her" and the compliance path invents no catastrophe.
+//   5. the debrief carries no "could(n't) save her" and the compliance path invents no catastrophe;
+//   6. the decision HOLDS: every turn prompt from the answer turn on names the chosen option as
+//      the decision made (so the narration plays it and the debrief matches); none before it does.
 //
 // Manchon's stored role is never written. Sessions and transcripts made here are deleted.
 
@@ -77,6 +79,7 @@ check('the compliance debrief keeps the cost uncertain and says the truth surviv
 const ANTHROPIC = 'https://api.anthropic.com/v1/messages';
 const realFetch = globalThis.fetch;
 let nextOutput = null;
+let lastTurnPrompt = null;
 const modelCalls = [];
 function sseStream(text) {
   const events = [`data: ${JSON.stringify({ type: 'content_block_start', index: 0 })}\n\n`];
@@ -93,6 +96,7 @@ globalThis.fetch = async (url, opts) => {
   const sys  = typeof body.system === 'string' ? body.system : JSON.stringify(body.system || '');
   const kind = sys.includes('"Your Session"') ? 'session' : sys.includes('"Historical Record"') ? 'record' : 'other';
   modelCalls.push(kind);
+  if (kind === 'other') { const m = body.messages?.at(-1)?.content; lastTurnPrompt = typeof m === 'string' ? m : JSON.stringify(m); }
   if (kind === 'session') return json('MODEL-WRITTEN SESSION BLOCK.');
   if (kind === 'record')  return json('Guillaume Manchon survived the trial and testified at the nullification in 1456.');
   const text = nextOutput === 'CLOSING' ? 'The ink dries on the parchment. Outside, the bells of Rouen.' : JSON.stringify(nextOutput);
@@ -133,11 +137,13 @@ async function play(option, minutes) {
     const ending    = s.remainingMinutes <= 0;
     nextOutput = out(minutes, ending ? { endState: { isEnding: true, outcome: 'session_complete' } } : {});
     const body = { state: s, sessionId: sid, playerInput: answering ? option.text : `I write what is said (${t}).`, ...(answering ? { definingChoiceId: option.id } : {}) };
+    lastTurnPrompt = null;
     const res = await sse('turn', body);
     if (!res.done) return { ...r, ok: false, error: res.error };
     const o = res.done.output;
     if (o.definingMoment && !r.fork) { r.fork = o; r.forkTurn = t; r.forkAt = s.elapsedMinutes; r.forkScene = s.currentSceneId; }
-    else if (r.fork) r.afterTurns.push({ t, scene: s.currentSceneId, start: s.elapsedMinutes, decided: !!res.done.nextState.decisions?.[DM.id] });
+    else if (r.fork) r.afterTurns.push({ t, scene: s.currentSceneId, start: s.elapsedMinutes, decided: !!res.done.nextState.decisions?.[DM.id], prompt: lastTurnPrompt });
+    if (!r.fork || o.definingMoment) (r.beforeTurns ||= []).push(lastTurnPrompt);
     s = res.done.nextState;
     if (o.endState?.isEnding) { r.end = { t, elapsed: s.elapsedMinutes }; break; }
   }
@@ -171,6 +177,10 @@ try {
       const sb = r.closing?.epilogue?.session_block;
       check('(4) "Your Session" is the authored debrief, byte for byte', sb === option.debrief, (sb || '').slice(0, 80));
       check('(4) ...and no session-block model call was made (record block still written)', !r.calls.includes('session') && r.calls.includes('record') && !!r.closing?.epilogue?.record_block, r.calls.join(','));
+      check('(6) the decision holds: every turn from the answer on carries "The player chose: <this option\'s text>"',
+        r.afterTurns.length >= 1 && r.afterTurns.every(x => x.prompt?.includes(`⚑ DECISION MADE: The player chose: ${option.text}`) && !DM.options.some(o => o !== option && x.prompt.includes(o.text))),
+        r.afterTurns.map(x => `t${x.t}:${x.prompt?.includes('DECISION MADE') ? 'held' : 'MISSING'}`).join(', '));
+      check('(6) ...and no turn up to and including the fork carries it', (r.beforeTurns || []).length >= 1 && r.beforeTurns.every(x => typeof x === 'string' && !x.includes('DECISION MADE')));
       check('(5) no "could(n\'t) save her" in what the player reads', !BANNED.some(rx => rx.test(`${r.closing?.closing_prose || ''}\n${sb || ''}`)));
     }
   }
