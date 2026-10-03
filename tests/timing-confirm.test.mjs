@@ -33,7 +33,11 @@ const quiet = fn => { const l = console.log, w = console.warn; console.log = () 
 
 const ROLES_DIR = path.join(REPO_DIR, 'engine/data/scenarios/player_roles');
 const readRole  = id => JSON.parse(fs.readFileSync(path.join(ROLES_DIR, `${id}.json`), 'utf8'));
-const JOAN = readRole('role_joan');
+const JOAN_STORED = readRole('role_joan');
+// The fixture these checks are written against: Joan's fork on the clock (0.75), unconfirmed —
+// her shape before B3c. Rebuilt in memory from the stored block (never written), so binding her
+// live fork to a scene no longer moves it.
+const JOAN = (() => { const r = clone(JOAN_STORED); delete r.defining_moment.at_scene; delete r.defining_moment.timing_confirmed; return r; })();
 const reposWith = stored => ({ scenarios: { findPlayerRole: () => (stored ? clone(stored) : null) } });
 const save = (posted, stored) => quiet(() => preserveStoredRoleBlocks(reposWith(stored), clone(posted)));
 const withDm = (role, patch) => ({ ...clone(role), defining_moment: { ...clone(role.defining_moment), ...patch } });
@@ -41,7 +45,8 @@ const withDm = (role, patch) => ({ ...clone(role), defining_moment: { ...clone(r
 // ═══ 1. the server rule ═══════════════════════════════════════════════════════
 head('1. reconcile — what is stored');
 {
-  check('fixture: Joan has a fork on the clock (0.75), no confirmation stored', JOAN.defining_moment?.at_elapsed_fraction === 0.75 && !('timing_confirmed' in JOAN.defining_moment));
+  check('fixture: Joan rebuilt on the clock (0.75), no binding, no confirmation', JOAN.defining_moment?.at_elapsed_fraction === 0.75 && !('at_scene' in JOAN.defining_moment) && !('timing_confirmed' in JOAN.defining_moment));
+  check('stored Joan: bound at_scene scene_28_may, with a confirmation that is current for that binding', JOAN_STORED.defining_moment?.at_scene === 'scene_28_may' && timingConfirmedCurrent(JOAN_STORED.defining_moment), JSON.stringify(JOAN_STORED.defining_moment?.timing_confirmed));
   const ticked = save(withDm(JOAN, { timing_confirmed: true }), JOAN).defining_moment;
   check('box ticked (true) → the record of the saved timing is stored', JSON.stringify(ticked.timing_confirmed) === JSON.stringify(forkTimingRecord(ticked)) && ticked.timing_confirmed.at_elapsed_fraction === 0.75, JSON.stringify(ticked.timing_confirmed));
   check('...and it reads as current', timingConfirmedCurrent(ticked));

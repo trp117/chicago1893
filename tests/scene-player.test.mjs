@@ -214,9 +214,15 @@ try {
   s = await turn(b, fork, base(CELL, 6, JOAN_ID));
   check('fork turn: the header moves to 28 May, no lead paragraph, no bridge in /tts', s.sub === `28 May 1431 · ${short(CELL)}` && s.bridges.length === 0 && !('bridge' in (s.tts || {})), s.sub);
 
-  // Narration speed: unset (Joan has none) sends nothing — the server's 0.9 plays. A scenario
-  // set to 1.0 now sends 1.0 (it used to be dropped as "the default" and play at 0.9).
-  check('unset narration speed: /tts carries no narrative_speed', b.io.tts.length > 0 && b.io.tts.every(t => !('narrative_speed' in t)));
+  // Narration speed (6e6f61b): the scenario's set speed rides on every /tts; unset sends nothing,
+  // so the server's 0.9 plays; a speed set to 1.0 sends 1.0 (it used to be dropped as "the
+  // default" and play at 0.9). Joan's own speed is whatever the scenario stores — read, not assumed.
+  const joanSpeed = b.win.eval('scenario.tts_narration_speed ?? null');
+  check(`the scenario's narration speed (${joanSpeed}) is what /tts carries`, b.io.tts.length > 0 && b.io.tts.every(t => joanSpeed == null ? !('narrative_speed' in t) : t.narrative_speed === joanSpeed), JSON.stringify(b.io.tts.map(t => t.narrative_speed)));
+  b.win.eval('ttsNarrationSpeed = null');
+  const ttsBefore = b.io.tts.length;
+  s = await turn(b, { narrative: NARR(8), choices: CHOICES, scene: scene('scene_28_may') }, base(CELL, 7, JOAN_ID));
+  check('unset narration speed: /tts carries no narrative_speed', b.io.tts.length > ttsBefore && b.io.tts.slice(ttsBefore).every(t => !('narrative_speed' in t)));
   b.win.eval('ttsNarrationSpeed = 1.0');
   s = await turn(b, { narrative: NARR(7), choices: CHOICES, scene: scene('scene_28_may') }, base(CELL, 7, JOAN_ID));
   check('narration speed set to 1.0: /tts carries narrative_speed 1 (1.0 in admin plays 1.0)', s.tts?.narrative_speed === 1, JSON.stringify(s.tts?.narrative_speed));

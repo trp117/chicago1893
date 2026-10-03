@@ -390,9 +390,15 @@ head('5. DIAG — the scene segment and the summary');
   const forkLine = forkDiagTurnLine({ turn: 3, state: n2, nextState: nf, scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [], sceneMoves: mvf });
   check('a fork jump says so', forkLine.includes('scene: scene_17_mar → scene_28_may (jumped by fork)'), forkLine);
   const joanRole = JOAN_ROLES.find(r => r.id === 'role_joan');
+  // Joan's stored fork is bound at_scene scene_28_may (B3c), with the default fallback.
   const js = quiet(() => buildInitialState(joanScenario, joanRole, JOAN_LOCS)); initSceneState(js, JOAN_ARC);
   const jl = forkDiagTurnLine({ turn: 1, state: js, nextState: clone(js), scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [] });
-  check('Joan (clock fork 0.75) is described by her clock, not a fallback', /fork: waiting \(clock: 0\.75 = [\d.]+ of [\d.]+ min\)/.test(jl), jl);
+  check('Joan (bound at_scene, default fallback) is described by her binding and the 25.5 fallback', joanRole.defining_moment?.at_scene === 'scene_28_may' && jl.includes('fork: waiting (binding unmet at turn start; fallback at 25.5 min)'), jl);
+  // The clock description, on the same fork with its binding removed (in memory, never written).
+  const joanClock = { ...clone(joanRole), defining_moment: Object.fromEntries(Object.entries(joanRole.defining_moment).filter(([k]) => !['at_scene', 'timing_confirmed'].includes(k))) };
+  const jc = quiet(() => buildInitialState(joanScenario, joanClock, JOAN_LOCS)); initSceneState(jc, JOAN_ARC);
+  const jcl = forkDiagTurnLine({ turn: 1, state: jc, nextState: clone(jc), scenario: joanScenario, storyArc: JOAN_ARC, output: {}, newBeats: [] });
+  check('a clock fork (Joan unbound, 0.75) is described by her clock, not a fallback', /fork: waiting \(clock: 0\.75 = [\d.]+ of [\d.]+ min\)/.test(jcl), jcl);
 
   const transcript = ['intro', '', line0, '', 'narrative', '', held, '', multi, '', forkLine, '', '---'].join('\n');
   const parsed = parseSceneDiag(transcript);

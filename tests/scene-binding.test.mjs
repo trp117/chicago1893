@@ -60,13 +60,19 @@ const joanScenario = await repos.scenarios.findById(JOAN_ID);
 if (!joanScenario) { console.log('SKIP  scene-binding.test — Joan scenario not available (needs Supabase creds).'); process.exit(0); }
 const JOAN_ARC  = repos.storyArcs.findById(`${JOAN_ID}_main_arc`);
 const JOAN_LOCS = repos.locations.findByScenario(JOAN_ID);
-const JOAN_ROLE = repos.scenarios.findPlayerRoles(JOAN_ID).find(r => r.id === 'role_joan');
-const FORK      = JOAN_ROLE.defining_moment;
+const JOAN_STORED_ROLE = repos.scenarios.findPlayerRoles(JOAN_ID).find(r => r.id === 'role_joan');
+const JOAN_STORED_FILE = fs.readFileSync(p('engine/data/scenarios/player_roles/role_joan.json'), 'utf8');
+// The UNBOUND baseline these checks contrast against: Joan's fork on the clock (0.75), as it
+// was before B3c. Rebuilt in memory from the stored block (never written) — her live fork is
+// now bound at_scene scene_28_may, which is exactly BOUND below.
+const FORK      = Object.fromEntries(Object.entries(clone(JOAN_STORED_ROLE.defining_moment)).filter(([k]) => !['at_scene', 'timing_confirmed'].includes(k)));
+const JOAN_ROLE = { ...clone(JOAN_STORED_ROLE), defining_moment: FORK };
 const BOUND     = { ...clone(FORK), at_scene: 'scene_28_may' };
 
 // ═══ PART 1 — pure ═══════════════════════════════════════════════════════════
 head('1. the gate and the due-check');
-check('fixture: Joan\'s stored fork is still on the clock (0.75), unbound', FORK.at_elapsed_fraction === 0.75 && !isStoryBoundFork(FORK));
+check('fixture: Joan\'s fork rebuilt on the clock (0.75), unbound', FORK.at_elapsed_fraction === 0.75 && !isStoryBoundFork(FORK));
+check('stored Joan: bound at_scene scene_28_may (the BOUND shape these tests play)', JOAN_STORED_ROLE.defining_moment?.at_scene === 'scene_28_may' && isStoryBoundFork(JOAN_STORED_ROLE.defining_moment));
 check('at_scene opts a fork in', isStoryBoundFork({ at_scene: 'scene_28_may' }) && !isStoryBoundFork({ at_scene: '  ' }) && !isStoryBoundFork({ at_scene: 3 }));
 
 const sess = (scene, elapsed, block = BOUND, extra = {}) => {
@@ -243,7 +249,7 @@ try {
   }
   const left = [...snapshot('engine/data/sessions')].filter(f => !beforeSessions.has(f)).length + [...snapshot('engine/data/transcripts')].filter(f => !beforeTranscripts.has(f)).length;
   check('sessions and transcripts created by this test are removed', left === 0, `${left} left`);
-  check('Joan\'s stored role is untouched (still clock 0.75, no at_scene)', (() => { const r = JSON.parse(fs.readFileSync(p('engine/data/scenarios/player_roles/role_joan.json'), 'utf8')); return r.defining_moment.at_elapsed_fraction === 0.75 && !('at_scene' in r.defining_moment); })());
+  check('Joan\'s stored role is untouched (byte-identical to the start of the run)', fs.readFileSync(p('engine/data/scenarios/player_roles/role_joan.json'), 'utf8') === JOAN_STORED_FILE);
 }
 
 console.log(fails ? `\n${fails} assertion(s) failed.` : '\nAll scene-binding assertions passed.');

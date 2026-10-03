@@ -89,7 +89,8 @@ const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.
 // The roles whose STORED fork is story-bound. Explicit, so a new live binding is a deliberate
 // test update rather than something the inertness sweeps silently absorb. Everything else in
 // the corpus must stay byte-identical to pre-Part-A behaviour.
-const EXPECTED_BOUND = ['role_mccord', 'role_wills'];
+// role_joan: bound at_scene scene_28_may since B3c (her relapse fork, live in prod).
+const EXPECTED_BOUND = ['role_joan', 'role_mccord', 'role_wills'];
 const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
