@@ -1158,7 +1158,7 @@ function syncArrows() {
   arrowRight.classList.toggle('visible', scrollLeft + clientWidth < scrollWidth - 4);
 }
 
-// definingMoment is the engine-owned fork payload ({ momentId, options:[{id,text}] })
+// definingMoment is the engine-owned fork payload ({ momentId, options:[{id,text,label?}] })
 // attached by the server on the turn that puts the choice. When it is present the
 // buttons are built from those options so the click can carry the option ID; the id is
 // what the server records the decision under, and the text-match fallback it replaces is
@@ -1174,7 +1174,8 @@ function renderChoices(choices = [], definingMoment = null) {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
       btn.type = 'button';
-      btn.textContent = opt.text;
+      // The button shows the short label when the fork authors one; the full text is what is sent.
+      btn.textContent = opt.label || opt.text;
       // Text still goes as playerInput (the narrative needs it); the DECISION rides as the id.
       btn.addEventListener('click', () => submitTurn(opt.text, { isChoice: true, definingChoiceId: opt.id }));
       choicesEl.appendChild(btn);

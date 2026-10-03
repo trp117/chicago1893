@@ -1239,6 +1239,22 @@ export function evaluateDefiningMoment(state, scenario) {
   };
 }
 
+// The AUTHORED DEBRIEF for the option the player chose — the "Your Session" text, verbatim,
+// when the chosen option carries one (options[].debrief, optional). Returns the trimmed text,
+// or null whenever there is nothing authored to use: no decision recorded (met false — which
+// also covers the flag off), an option with no debrief, or an empty one. null means the
+// session block is model-written exactly as before; a block with no debrief on any option
+// (Joan's, every generated fork) therefore never reaches the authored path.
+//
+// Deliberately NOT exposed through evaluateDefiningMoment: that object is JSON'd whole into
+// the epilogue prompts, and the record block must not receive a page of session prose.
+export function authoredForkDebrief(block, definingState) {
+  if (definingState?.met !== true || !Array.isArray(block?.options)) return null;
+  const chosen = block.options.find(o => o?.id === definingState.decision);
+  const text   = typeof chosen?.debrief === 'string' ? chosen.debrief.trim() : '';
+  return text || null;
+}
+
 // Whether a met closure transition should DRIVE/PERMIT the close *right now*:
 // met AND past the elapsed floor. Single source of truth shared by the injection
 // (buildClosingInstruction) and the arc-guard exception (gameRouter), so closure

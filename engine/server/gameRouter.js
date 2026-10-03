@@ -13,6 +13,7 @@ import {
   evaluateDefiningMoment,
   definingMomentDue,
   resolveDefiningMomentBlock,
+  authoredForkDebrief,
   closureShouldClose,
   prepareForTts,
   getClueById,
@@ -487,7 +488,7 @@ export function recordWordBudget(layer1Fates) {
 }
 
 // Exported for tests/epilogue.test.mjs, which drives it against a scripted Anthropic.
-export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null) {
+export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -594,8 +595,13 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     closingProse,
   ].join('\n');
 
+  // AUTHORED DEBRIEF. When the chosen fork option carries its own reviewed debrief
+  // (authoredForkDebrief), that text IS the session block, verbatim, and Call 1 is not made —
+  // a reviewed, source-checked debrief ships exactly as written rather than paraphrased. Every
+  // session without one (no fork, no decision, no debrief on the chosen option) passes null
+  // and makes the same call with the same prompt as before.
   // 60–100 words is ~130 tokens; 200 left almost no headroom. 400, retried at 800, then trimmed.
-  const session_block = await completeEpilogueCall({
+  const session_block = authoredSessionBlock || await completeEpilogueCall({
     apiKey: anthropicApiKey, system: sessionSystemPrompt, content: sessionUserContent,
     maxTokens: 400, retryMaxTokens: 800, label: 'session block',
   });
@@ -694,6 +700,16 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
   )];
 
   return { session_block, record_block, label: 'Historical Record', sources, style_hint: 'historian' };
+}
+
+// The fork's options as handed to the client: ids and text from the block, never the model.
+// `label` (optional) is the short button wording; `text` stays the full authored choice —
+// what is posted back, recorded and paraphrased. An option with no label gets no key, so a
+// block without labels produces exactly the payload it always did.
+export function forkOptionsPayload(block) {
+  return (block?.options || [])
+    .filter(o => o?.id && typeof o.text === 'string')
+    .map(o => ({ id: o.id, text: o.text, ...(typeof o.label === 'string' && o.label.trim() ? { label: o.label.trim() } : {}) }));
 }
 
 // ── Router export ──────────────────────────────────────────────────────────────
@@ -1583,9 +1599,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       // player answers the authored question and nothing else. definingMoment carries the
       // ids alongside so a selection can be mapped back to one.
       if (forkDue) {
-        const options = (definingBlock.options || [])
-          .filter(o => o?.id && typeof o.text === 'string')
-          .map(o => ({ id: o.id, text: o.text }));
+        const options = forkOptionsPayload(definingBlock);
         output.choices        = options.map(o => o.text);
         output.definingMoment = {
           momentId: definingBlock.principal_transition?.moment ?? null,
@@ -1961,17 +1975,23 @@ Do not open with the historical context. Open inside the character's body. Let t
           // the role, not about whether the engine is currently allowed to present it.
           const forkBlock = resolveDefiningMomentBlock(sessionState, scenarioData) || role?.defining_moment || null;
           const proximitySession = !forkBlock;
+          // The chosen option's authored debrief, when it has one — used verbatim as "Your
+          // Session" (null for every fork without one, and for every session with no decision).
+          const authoredDebrief = authoredForkDebrief(forkBlock, summary.closure_state?.defining_moment_state);
           console.log('[EPILOGUE-CLOSE] epilogue arm —',
-            summary.closure_state?.defining_moment_state?.met === true ? 'decision-aware'
+            authoredDebrief ? `decision-aware (authored debrief, option ${summary.closure_state.defining_moment_state.decision})`
+              : summary.closure_state?.defining_moment_state?.met === true ? 'decision-aware'
               : proximitySession ? 'proximity/presence'
               : 'fork-present-not-fired (unchanged)');
 
           epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession,
-            role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null);
+            role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null,
+            authoredDebrief);
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,
-              session_block: fixCharacterIdLeaks(epilogueResult.session_block || '', characters),
+              // An authored debrief is shipped untouched — it was written with names, not ids.
+              session_block: authoredDebrief ? epilogueResult.session_block : fixCharacterIdLeaks(epilogueResult.session_block || '', characters),
               record_block:  fixCharacterIdLeaks(epilogueResult.record_block  || '', characters),
             };
           }

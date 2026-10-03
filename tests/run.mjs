@@ -37,6 +37,7 @@ const SUITE = [
   ['B3c: fork at_scene binding',             'scene-binding.test.mjs'],
   ['B2b-PLAYER: scene header + bridge (jsdom)', 'scene-player.test.mjs'],
   ['TTS: narration speed on every request',  'tts-speed.test.mjs'],
+  ['fork options: authored debrief + label',  'fork-debrief.test.mjs'],
 ];
 
 const results = [];
