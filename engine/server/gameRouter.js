@@ -21,7 +21,8 @@ import {
   scenePresentation,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
-import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive } from '../services/ForkDiagnostics.js';
+import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
+import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -1587,6 +1588,10 @@ Do not open with the historical context. Open inside the character's body. Let t
         output.endState = { isEnding: true, outcome: 'session_complete' };
       }
 
+      // Grace turn (SessionTermination.js): the one turn granted past the target to finish a
+      // crucible always closes. Null — and nothing touched — on every other turn.
+      const graceClosedBy = closeGraceTurn(state, nextState, output);
+
       if (output.endState?.isEnding) {
         output.endState.performance = {
           timeRemaining: nextState.remainingMinutes,
@@ -1610,6 +1615,12 @@ Do not open with the historical context. Open inside the character's body. Let t
         nextState.definingMomentPresented = true;
         console.log("[DEFINING] fork presented - " + options.length + " options, timeAdvance=" + output.timeAdvance);
       }
+
+      // Termination at the target (SessionTermination.js): a turn that reached the target with the
+      // crucible still in progress gets ONE closing turn past it, under the ceiling. Pacing never
+      // sees this — remainingMinutes stays 0; only the close rule (here and in the client) reads
+      // graceActive. Null, and nextState untouched, for every session without a crucible in flight.
+      const graceGrant = grantGrace(nextState, scenario, { decisionRecordedThisTurn: !!recordedDecision, forkPresentedThisTurn: forkDue, isEnding: !!output.endState?.isEnding });
 
       if (output.npc_updates && nextState.npc_states) {
         nextState.npc_states = applyNpcUpdates(nextState.npc_states, output.npc_updates);
@@ -1644,6 +1655,8 @@ Do not open with the historical context. Open inside the character's body. Let t
             output, newBeats, decisionRecorded: recordedDecision, sceneMoves, locationHold: sceneHold,
           }), ``);
         }
+        const graceLine = graceDiagLine(DIAG_PREFIX, { grant: graceGrant, closedBy: graceClosedBy, nextState, scenario });
+        if (graceLine) chunk.push(graceLine, ``);
         if (output.endState?.isEnding) {
           const p = output.endState.performance || {};
           chunk.push(`## Session Close`);
@@ -2069,8 +2082,10 @@ Do not open with the historical context. Open inside the character's body. Let t
           lines.push('');
           // Story-bound fork only — i.e. the transcript already carries per-turn diagnostic
           // lines: the beat/fork summary, built from those lines plus session state if it still
-          // exists. Written last, after every model call above has read the transcript.
-          if (narrativeTranscript !== transcript) {
+          // exists. Written last, after every model call above has read the transcript. Keyed on
+          // the per-turn lines, not on any DIAG line: a grace line (SessionTermination.js) alone
+          // does not make a session story-bound.
+          if (narrativeTranscript !== transcript && transcript.includes(`${DIAG_PREFIX}turn `)) {
             const arcId   = scenarioData?.storyArcIds?.[0];
             const diagArc = arcId && repos.storyArcs ? repos.storyArcs.findById(arcId) : null;
             const summary = forkDiagSummaryLines({ transcript, sessionState, scenario: scenarioData, storyArc: diagArc });

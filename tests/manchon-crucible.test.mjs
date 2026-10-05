@@ -121,7 +121,8 @@ const closing = sessionId => quietly(async () => {
   return events(await resp.text()).find(e => e.type === 'done');
 });
 const snapshot = dir => new Set(fs.existsSync(p(dir)) ? fs.readdirSync(p(dir)) : []);
-const beforeSessions = snapshot('engine/data/sessions'), beforeTranscripts = snapshot('engine/data/transcripts');
+// appData.saveSession writes the session state to the repo-root data/sessions (engine/data.js), not engine/data/sessions.
+const beforeSessions = snapshot('engine/data/sessions'), beforeTranscripts = snapshot('engine/data/transcripts'), beforeState = snapshot('data/sessions');
 
 const out = (minutes, extra = {}) => ({ narrative: 'Cauchon speaks; the quills move.', choices: ['Write it down', 'Look up', 'Wait'], location: 'great_hall_rouen_castle', timeAdvance: minutes, stateChanges: {}, ...extra });
 
@@ -185,13 +186,19 @@ try {
     }
   }
 } finally {
+  // /closing-prose keeps writing the transcript after it sends `done`: a file removed too early is
+  // re-created by that late write. Let the writes land, then sweep twice.
+  await new Promise(res => setTimeout(res, 1500));
   server.close();
   globalThis.fetch = realFetch;
-  for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts]]) {
-    for (const f of snapshot(dir)) if (!before.has(f)) { try { fs.rmSync(p(dir, f), { force: true }); } catch {} }
+  for (let pass = 0; pass < 2; pass++) {
+    for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts], ['data/sessions', beforeState]]) {
+      for (const f of snapshot(dir)) if (!before.has(f)) { try { fs.rmSync(p(dir, f), { force: true }); } catch {} }
+    }
+    if (!pass) await new Promise(res => setTimeout(res, 1000));
   }
   check('sessions and transcripts created by this test are removed',
-    [...snapshot('engine/data/sessions')].every(f => beforeSessions.has(f)) && [...snapshot('engine/data/transcripts')].every(f => beforeTranscripts.has(f)));
+    [...snapshot('engine/data/sessions')].every(f => beforeSessions.has(f)) && [...snapshot('engine/data/transcripts')].every(f => beforeTranscripts.has(f)) && [...snapshot('data/sessions')].every(f => beforeState.has(f)));
   check('Manchon\'s stored role is untouched (byte-identical)', fs.readFileSync(p('engine/data/scenarios/player_roles', `${ROLE_ID}.json`), 'utf8') === ROLE_FILE);
 }
 

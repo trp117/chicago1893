@@ -134,6 +134,8 @@ const BASE = `http://127.0.0.1:${server.address().port}`;
 const snapshot = dir => { try { return new Set(fs.readdirSync(p(dir))); } catch { return new Set(); } };
 const beforeSessions    = snapshot('engine/data/sessions');
 const beforeTranscripts = snapshot('engine/data/transcripts');
+// appData.saveSession writes the session state to the repo-root data/sessions (engine/data.js), not engine/data/sessions.
+const beforeState       = snapshot('data/sessions');
 
 // ── Drivers ──────────────────────────────────────────────────────────────────
 async function runStart() {
@@ -347,11 +349,17 @@ script = [{ text: NO_CHOICES }, { text: GOOD_RETRY }]; calls = [];
 
 // ── Cleanup — leave no session or transcript behind ──────────────────────────
 let removed = 0;
-for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts]]) {
-  for (const name of snapshot(dir)) {
-    if (before.has(name)) continue;
-    try { fs.unlinkSync(p(dir, name)); removed++; } catch {}
+// /closing-prose keeps writing the transcript after it sends `done`: a file removed too early is
+// re-created by that late write. Let the writes land, then sweep twice.
+await new Promise(res => setTimeout(res, 1500));
+for (let sweep = 0; sweep < 2; sweep++) {
+  for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts], ['data/sessions', beforeState]]) {
+    for (const name of snapshot(dir)) {
+      if (before.has(name)) continue;
+      try { fs.unlinkSync(p(dir, name)); removed++; } catch {}
+    }
   }
+  if (!sweep) await new Promise(res => setTimeout(res, 1000));
 }
 server.close();
 globalThis.fetch = realFetch;

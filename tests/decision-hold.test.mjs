@@ -60,11 +60,21 @@ try {
   check('no fork at all → \'\'', PC.buildDecisionHoldDirective({}, SCEN) === '');
   check('option with no text → \'\'', PC.buildDecisionHoldDirective({ effectiveDefiningMoment: { ...BLOCK, options: [{ id: 'a' }] }, decisions: { m: 'a' } }, SCEN) === '');
   const d = PC.buildDecisionHoldDirective(st({ decisions: { m: { option_id: 'a' } } }), SCEN);
-  check('recorded → the chosen text (trimmed) and the hold instruction',
+  const CHOICES_RULE = 'CHOICES: every choice you offer must be a way of carrying out this course or of facing what follows from it. Offer none that takes it back, reverses it, softens it, makes up for it, or does the other thing anyway — not partly, not in secret, not in a note, a draft or a margin, not "just this once", not later.';
+  check('recorded → the chosen text (trimmed), the hold instruction, the choices rule and the course NOT chosen',
     d === '⚑ DECISION MADE: The player chose: Do A.\n'
       + 'Play the character as having chosen this — never narrate them acting against it, and do not offer choices that would undo it.\n'
-      + 'This choice overrides the role description: where the role\'s stated duty, disposition or choice guidance assumes a different course, the course the player chose is the one this character now takes, in this turn\'s narration and every turn after.', JSON.stringify(d));
+      + 'This choice overrides the role description: where the role\'s stated duty, disposition or choice guidance assumes a different course, the course the player chose is the one this character now takes, in this turn\'s narration and every turn after.\n'
+      + CHOICES_RULE + '\n'
+      + 'The courses the player did NOT choose — offer no choice that leads toward any of them:\n'
+      + '- Do B.', JSON.stringify(d));
   check('the string form of a recorded decision is read too', PC.buildDecisionHoldDirective(st({ decisions: { m: 'b' } }), SCEN).includes('The player chose: Do B.'));
+  const LBL = { ...BLOCK, options: [{ id: 'a', label: 'A, short', text: 'Do A.' }, { id: 'b', label: '  B, short ', text: 'Do B.' }, { id: 'c', text: 'Do C.' }] };
+  const dl = PC.buildDecisionHoldDirective({ effectiveDefiningMoment: LBL, decisions: { m: 'a' } }, SCEN);
+  check('a course not chosen is named by its label (trimmed), or by its text when it has none; never the chosen one',
+    dl.endsWith('offer no choice that leads toward any of them:\n- B, short\n- Do C.') && !dl.includes('- A, short') && !dl.includes('Do B.'), JSON.stringify(dl.slice(-120)));
+  const d1 = PC.buildDecisionHoldDirective({ effectiveDefiningMoment: { ...BLOCK, options: [{ id: 'a', text: 'Do A.' }] }, decisions: { m: 'a' } }, SCEN);
+  check('a single-option fork: the choices rule, and no empty NOT-chosen list', d1.endsWith(CHOICES_RULE) && !d1.includes('did NOT choose'));
 
   // ── every stored role, against HEAD ─────────────────────────────────────────
   head('2. every stored role — prompts vs the committed (HEAD) code');
@@ -106,17 +116,24 @@ try {
         decided++;
         const s = { ...clone(late), definingMomentPresented: true, decisions: { [moment]: { option_id: opt.id, turn: 9, elapsed: 20 } } };
         const [now, was] = both(s);
+        // HEAD already carries a (shorter) directive: the prompt must be HEAD with exactly that
+        // directive swapped for the current one, and nothing else moved.
         const directive = PC.buildDecisionHoldDirective(s, scenario);
+        const headDir   = HEAD_PC.buildDecisionHoldDirective(s, scenario);
         const others = block.options.filter(o => o !== opt && typeof o?.text === 'string' && o.text.trim());
+        const outside = now.replace(directive, '');
         const ok = directive.startsWith(`⚑ DECISION MADE: The player chose: ${opt.text.trim()}\n`)
-          && now.split(directive).length === 2 && now.replace(directive, '') === was
-          && !others.some(o => now.includes(o.text.trim()));
+          && now.split(directive).length === 2 && now === (headDir ? was.replace(headDir, directive) : was)
+          && directive.includes('CHOICES: every choice you offer')
+          // the courses not taken appear only in the directive's NOT-chosen list
+          && others.every(o => directive.includes(`\n- ${(typeof o.label === 'string' && o.label.trim()) || o.text.trim()}`))
+          && !others.some(o => outside.includes(o.text.trim()));
         if (!ok) badDecided.push(`${id}/${role.id}:${opt.id}`);
       }
     }
   }
   check(`undecided turns are byte-identical to HEAD and carry no directive (${roles} stored roles × start/late/presented[/unknown])`, roles > 0 && notIdentical.length === 0, notIdentical.slice(0, 8).join(', '));
-  check(`decided turns = HEAD + exactly the directive, naming only the chosen option (${forks} forks, ${decided} options)`, forks > 0 && badDecided.length === 0, badDecided.slice(0, 8).join(', '));
+  check(`decided turns = HEAD with its directive swapped for the current one; the courses not taken appear only in its NOT-chosen list (${forks} forks, ${decided} options)`, forks > 0 && badDecided.length === 0, badDecided.slice(0, 8).join(', '));
 
   // ── Manchon, in his scene ───────────────────────────────────────────────────
   head('3. Manchon, compliance, in scene_28_may');

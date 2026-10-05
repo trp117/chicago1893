@@ -1442,14 +1442,30 @@ export function buildDefiningMomentInstruction(state, scenario, storyArc = null)
 // also false while DEFINING_MOMENT_ENABLED is off): a session with no fork, or a fork not
 // yet answered, composes a byte-identical prompt. Mutually exclusive with
 // buildDefiningMomentInstruction — a recorded decision makes the fork no longer due.
+//
+// CHOICES. The hold alone did not stop the model OFFERING the other course back: in live runs 2
+// of 3 choices after a compliance decision walked it back ("write her words into the draft").
+// So the directive also names the courses NOT taken — each by its short label, or its text when
+// the option has none — and forbids any choice that leads toward them. This is the one place the
+// roads not taken are rendered: as a list of what NOT to offer, on decided turns only.
 export function buildDecisionHoldDirective(state, scenario) {
   const dm   = evaluateDefiningMoment(state, scenario);
   const text = dm.met && typeof dm.decision_text === 'string' ? dm.decision_text.trim() : '';
   if (!text) return '';
+  const block   = resolveDefiningMomentBlock(state, scenario);
+  const notDone = (block?.options || [])
+    .filter(o => o && o.id !== dm.decision)
+    .map(o => (typeof o.label === 'string' && o.label.trim()) || (typeof o.text === 'string' && o.text.trim()) || '')
+    .filter(Boolean);
   return [
     `⚑ DECISION MADE: The player chose: ${text}`,
     'Play the character as having chosen this — never narrate them acting against it, and do not offer choices that would undo it.',
     'This choice overrides the role description: where the role\'s stated duty, disposition or choice guidance assumes a different course, the course the player chose is the one this character now takes, in this turn\'s narration and every turn after.',
+    'CHOICES: every choice you offer must be a way of carrying out this course or of facing what follows from it. Offer none that takes it back, reverses it, softens it, makes up for it, or does the other thing anyway — not partly, not in secret, not in a note, a draft or a margin, not "just this once", not later.',
+    ...(notDone.length ? [
+      'The courses the player did NOT choose — offer no choice that leads toward any of them:',
+      ...notDone.map(t => `- ${t}`),
+    ] : []),
   ].join('\n');
 }
 
@@ -1812,10 +1828,13 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
   // currentSceneId / sceneAdvances / sceneEnteredAt / sceneEnteredTurn (scene scenarios) are
   // engine bookkeeping: the narrator is told the scene by buildSceneFramingDirective (date,
   // place, bridge) and never sees a raw scene id in the state block.
+  // graceActive / graceUsed (SessionTermination.js) are termination bookkeeping: the model paces
+  // to the target and is told to close by FINAL TURN, and must never see that a grace turn exists.
   const {
     remainingMinutes, effectiveClosure, effectiveDefiningMoment,
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
     reachedBeats, currentSceneId, sceneAdvances, sceneEnteredAt, sceneEnteredTurn,
+    graceActive, graceUsed,
     ...stateRest
   } = state;
   const promptState = {

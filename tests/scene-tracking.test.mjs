@@ -458,7 +458,8 @@ const server = app.listen(0);
 await new Promise(r => server.once('listening', r));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 const snapshot = dir => { try { return new Set(fs.readdirSync(p(dir))); } catch { return new Set(); } };
-const beforeSessions = snapshot('engine/data/sessions'), beforeTranscripts = snapshot('engine/data/transcripts');
+// appData.saveSession writes the session state to the repo-root data/sessions (engine/data.js), not engine/data/sessions.
+const beforeSessions = snapshot('engine/data/sessions'), beforeTranscripts = snapshot('engine/data/transcripts'), beforeState = snapshot('data/sessions');
 
 const sse = async (route, body) => {
   const resp = await realFetch(`${BASE}/game/api/${route}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -618,12 +619,18 @@ try {
     check('control: no model request carries a beat roster', !sent.some(s => s.includes('STORY POSITION')));
   } else console.log('      (control skipped — daniel_burnham not available)');
 } finally {
+  // /closing-prose keeps writing the transcript after it sends `done`: a file removed too early is
+  // re-created by that late write. Let the writes land, then sweep twice.
+  await new Promise(res => setTimeout(res, 1500));
   server.close();
   globalThis.fetch = realFetch;
-  for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts]]) {
-    for (const f of snapshot(dir)) if (!before.has(f)) { try { fs.rmSync(p(dir, f), { force: true }); } catch {} }
+  for (let pass = 0; pass < 2; pass++) {
+    for (const [dir, before] of [['engine/data/sessions', beforeSessions], ['engine/data/transcripts', beforeTranscripts], ['data/sessions', beforeState]]) {
+      for (const f of snapshot(dir)) if (!before.has(f)) { try { fs.rmSync(p(dir, f), { force: true }); } catch {} }
+    }
+    if (!pass) await new Promise(res => setTimeout(res, 1000));
   }
-  const left = [...snapshot('engine/data/sessions')].filter(f => !beforeSessions.has(f)).length + [...snapshot('engine/data/transcripts')].filter(f => !beforeTranscripts.has(f)).length;
+  const left = [...snapshot('engine/data/sessions')].filter(f => !beforeSessions.has(f)).length + [...snapshot('engine/data/transcripts')].filter(f => !beforeTranscripts.has(f)).length + [...snapshot('data/sessions')].filter(f => !beforeState.has(f)).length;
   check('sessions and transcripts created by this test are removed', left === 0, `${left} left`);
 }
 

@@ -1728,7 +1728,9 @@ function teardownTurnControls() {
 
 async function submitTurn(playerInput, { isChoice = false, definingChoiceId = null } = {}) {
   if (!playerInput?.trim() || submitting) return;
-  if (gameState?.remainingMinutes <= 0) {
+  // graceActive: the server granted one closing turn past the target to finish a crucible
+  // (SessionTermination.js). Absent in every other session, so this rule is unchanged for them.
+  if (gameState?.remainingMinutes <= 0 && !gameState?.graceActive) {
     showClosingScreen(null, sessionId);
     return;
   }
@@ -1876,7 +1878,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     submitBtn.disabled = false;
     extractAndStoreFacts(output.narrative);
 
-    if (gameState.remainingMinutes <= 0) {
+    if (gameState.remainingMinutes <= 0 && !gameState.graceActive) {
       try {
         // Player-paced close. NOT teardownTurnControls() — that fades .bottom-bar to
         // opacity 0, and #choices lives inside .bottom-bar, so it would hide the pause
