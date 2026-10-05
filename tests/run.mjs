@@ -42,6 +42,7 @@ const SUITE = [
   ['decision hold: a chosen path sticks',     'decision-hold.test.mjs'],
   ['soft target + grace margin',              'grace.test.mjs'],
   ['Massieu witness crucible',                'massieu-crucible.test.mjs'],
+  ['narrative salvage: no JSON on screen',     'narrative-salvage.test.mjs'],
 ];
 
 const results = [];

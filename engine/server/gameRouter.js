@@ -23,6 +23,7 @@ import {
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
 import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
+import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../services/NarrativeSalvage.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -1364,11 +1365,20 @@ Do not open with the historical context. Open inside the character's body. Let t
         // At the time boundary the model naturally writes closing prose rather than
         // structured JSON.  Coerce it into a minimal ending payload so the client
         // receives a `done` event and transitions to /closing-prose normally.
-        if (!output && state.remainingMinutes <= 0 && stopReason === 'end_turn') {
+        // When what it wrote is BROKEN JSON rather than prose (NarrativeSalvage.js, shape A),
+        // the narrative is salvaged out of it — never the raw JSON. Broken JSON with no
+        // narrative to salvage and no prose before it is not coerced: the recovery below
+        // re-asks instead. Prose is coerced exactly as before.
+        const closingText = !output ? (salvageNarrative(text) ?? (looksLikeJsonReply(text) ? prosePart(text) : text)) : null;
+        if (!output && state.remainingMinutes <= 0 && stopReason === 'end_turn' && closingText) {
           traceTags.push('closing-coerce');
           console.log(`[CLOSING COERCE] time boundary — coercing end_turn prose to ending payload`);
+          if (closingText !== text) {
+            traceTags.push('narrative-salvage');
+            console.warn(`[NARRATIVE SALVAGE] closing turn returned broken JSON — narrative salvaged (${closingText.length} of ${text.length} chars), raw JSON kept off screen`);
+          }
           output = {
-            narrative:    text,
+            narrative:    closingText,
             choices:      [],
             npcMoments:   [],
             stateChanges: {},
@@ -1376,7 +1386,7 @@ Do not open with the historical context. Open inside the character's body. Let t
             endState: {
               isEnding: true,
               outcome:  'session_complete',
-              scene:    text,
+              scene:    closingText,
             },
           };
         }
@@ -1398,8 +1408,9 @@ Do not open with the historical context. Open inside the character's body. Let t
             traceTags.push('degraded-json');
             scoreTrace(0, `invalid-json-unrecovered stop_reason=${stopReason}`);
             console.error(`[TURN ERROR] invalid JSON unrecovered after ${MAX_UNUSABLE_RETRIES} retries — degrading to prose-only turn`);
+            // The narrative inside the broken JSON, when there is one, beats the prose before it.
             output = {
-              narrative:    prosePart(text),
+              narrative:    salvageNarrative(text) ?? prosePart(text),
               choices:      [],
               npcMoments:   [],
               stateChanges: {},
@@ -1408,6 +1419,18 @@ Do not open with the historical context. Open inside the character's body. Let t
           }
         }
       }
+
+      // Shape B (NarrativeSalvage.js): a parseable reply whose narrative IS the model's JSON
+      // reply. Unwrapped here, before the choices check, so the real reply's choices count;
+      // and again after the retries below, any of which may bring a nested reply back. Null —
+      // and output untouched — for every narrative that does not open like a JSON reply.
+      const salvageNested = where => {
+        const how = unnestNarrative(output);
+        if (!how) return;
+        traceTags.push('narrative-salvage');
+        console.warn(`[NARRATIVE SALVAGE] narrative held a nested JSON reply (${where}) — unwrapped (${how})`);
+      };
+      salvageNested('parse');
 
       // Retry: silent NPC
       const npcPresent = Array.isArray(output.npcMoments) && output.npcMoments.length > 0;
@@ -1468,6 +1491,8 @@ Do not open with the historical context. Open inside the character's body. Let t
           }
         } catch {}
       }
+
+      salvageNested('after retries');
 
       // Strip any "You:" attribution tags that slipped through generation
       if (output.narrative) {
