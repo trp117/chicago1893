@@ -91,7 +91,8 @@ const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.
 // the corpus must stay byte-identical to pre-Part-A behaviour.
 // role_joan: bound at_scene scene_28_may since B3c (her relapse fork, live in prod).
 // role_manchon: his witness crucible, bound at_scene scene_28_may (2026-10-03).
-const EXPECTED_BOUND = ['role_joan', 'role_manchon', 'role_mccord', 'role_wills'];
+// role_massieu: his witness crucible, bound at_scene scene_28_may (2026-10-05).
+const EXPECTED_BOUND = ['role_joan', 'role_manchon', 'role_massieu', 'role_mccord', 'role_wills'];
 const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
@@ -173,12 +174,17 @@ head('A2 INERTNESS — the gate is the fork fields, not the arc being available'
   // block), which is what their binding asks for.
   // Scene scenarios (B2a) are a third case: every role gets the roster — exactly the roster,
   // nothing else — because scenes advance on reported beats. Asserted as such below.
+  // Every stored role of Joan's scene scenario now carries a bound fork (Massieu, the last
+  // fork-less one, got his witness crucible 2026-10-05), so the fork-less scene case is played
+  // by each such role with its fork removed IN MEMORY (as scene-tracking does) — never written.
   let compared = 0, sceneRoles = 0; const moved = [], boundFlat = [], sceneMoved = [];
+  const forkless = role => { const { defining_moment, ...rest } = role; return { ...rest, id: `${role.id}(fork removed)` }; };
   for (const c of corpus) {
     const arc = arcOf(c);
     if (!arc) continue;
     const total = c.scenario.sessionTargetMinutes || 15;
-    for (const role of c.roles) {
+    const roles = arcHasScenes(arc) ? [...c.roles, ...c.roles.filter(r => r.defining_moment).map(forkless)] : c.roles;
+    for (const role of roles) {
       for (const f of [0, 0.6, 0.8]) {
         const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
         st.elapsedMinutes = total * f; st.remainingMinutes = total - st.elapsedMinutes;
@@ -287,7 +293,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
       }
     }
   }
-  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 16 && moved.length === 0, moved.slice(0, 5).join(', '));
+  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 17 && moved.length === 0, moved.slice(0, 5).join(', '));
   check(`all ${boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${points} points total)`, boundForks === EXPECTED_BOUND.length && boundMoved.length === 0, boundMoved.slice(0, 5).join(', '));
 }
 
