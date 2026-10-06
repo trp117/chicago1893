@@ -2185,6 +2185,25 @@ function definingMomentAtRisk(dm) {
   if (definingMomentState(dm) === 'none') return false;
   return dm.generated !== true || dm.reviewed === true || dm.corrected_at != null;
 }
+// Client twin of isAuthoredCrucible (adminRouter.js): a hand-authored block whose options
+// carry authored debriefs. Replacing or removing one takes a THIRD typed token — the block's
+// own moment id — on top of REPLACE / DELETE. The server enforces it either way.
+function isAuthoredCrucible(dm) {
+  return definingMomentState(dm) !== 'none' && dm.generated !== true
+    && Array.isArray(dm.options) && dm.options.some(o => o && typeof o.debrief === 'string' && o.debrief.trim());
+}
+function confirmCrucibleLoss(role, action) {
+  const dm = role.defining_moment;
+  const debriefs = dm.options.filter(o => o && typeof o.debrief === 'string' && o.debrief.trim()).length;
+  const typed = prompt(
+    `SECOND CONFIRMATION — "${role.name}" carries a HAND-AUTHORED CRUCIBLE.\n\n` +
+    `${action} it discards the authored setup, all ${dm.options.length} options and their labels, ` +
+    `and ${debriefs} authored debriefs (the "Your Session" text each choice ships verbatim)` +
+    `${dm.at_scene ? `, and its binding to ${dm.at_scene}` : ''}.\n\n` +
+    `The only recovery is the copy appended to _defining_moment_blocks.md.\n\n` +
+    `Type the moment id — ${dm.id} — to proceed, or Cancel.`);
+  return typed === dm.id;
+}
 
 // ── Archetype gating table (client copy) ─────────────────────────────────────
 // The SAME table the server enforces (ARCHETYPE_ARTIFACTS / ARCHETYPE_REFUSALS in
@@ -2730,6 +2749,10 @@ function bindArchetypeHandlers(formEl, data, scenarioId) {
         `Type DELETE to proceed, or Cancel.`);
       if (typed !== 'DELETE') { toast('Removal cancelled — hand-authored block kept.', 'success'); return; }
       body.confirm = 'DELETE';
+      if (isAuthoredCrucible(role.defining_moment)) {
+        if (!confirmCrucibleLoss(role, 'Removing')) { toast('Removal cancelled — authored crucible kept.', 'success'); return; }
+        body.confirm_crucible = role.defining_moment.id;
+      }
     } else if (!confirm(`Remove the defining moment "${role.defining_moment.id}" from "${role.name}"?\n\nThis is immediate and server-side — it is not part of Save.`)) {
       return;
     }
@@ -3183,6 +3206,9 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
         `overwrite, so it can be restored by hand from there.\n\n` +
         `Type REPLACE to overwrite permanently, or Cancel.`);
       if (typed !== 'REPLACE') { toast('Regenerate cancelled — existing block kept.', 'success'); return; }
+      if (isAuthoredCrucible(role.defining_moment) && !confirmCrucibleLoss(role, 'Regenerating')) {
+        toast('Regenerate cancelled — authored crucible kept.', 'success'); return;
+      }
     } else if (state === 'pending') {
       if (!confirm('This will replace the existing (unreviewed) defining moment. Continue?')) return;
     } else {
@@ -3198,7 +3224,8 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
         // The server refuses an overwrite without this; the confirms above are what earn it.
         // `confirm` is the second token, required by the server whenever the stored block
         // carries authored or reviewed work — the typed REPLACE above is what earns THAT.
-        { overwrite: state !== 'none', ...(atRisk ? { confirm: 'REPLACE' } : {}) });
+        { overwrite: state !== 'none', ...(atRisk ? { confirm: 'REPLACE' } : {}),
+          ...(isAuthoredCrucible(role?.defining_moment) ? { confirm_crucible: role.defining_moment.id } : {}) });
 
       if (result.declined) {
         // First-class outcome, not an error. Nothing was written server-side and nothing

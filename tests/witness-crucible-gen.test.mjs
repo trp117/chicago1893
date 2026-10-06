@@ -5,10 +5,13 @@
 //   Stage 2  CrucibleLint: the shared rules pass a full generated witness crucible, catch
 //            each violation, leave the old protagonist shape untouched, and pass the two
 //            stored authored crucibles (positive control, skipped without restored data)
+//   Stage 3  the overwrite guard's third tier: a hand-authored crucible needs its own moment
+//            id (confirm_crucible) on top of REPLACE / DELETE, and the 409 names what is lost
 //
 // SYNTHETIC FIXTURES ONLY. Every role, scenario and arc here lives in a temp JsonFileStore
 // made for this run and deleted after it; no real role file, no Supabase, no tracked file is
-// written. api.anthropic.com is never reached in Stage 1.
+// written. api.anthropic.com is scripted: no network call is ever made, and the backup file
+// the destroying routes append to is redirected to a temp file.
 
 import 'dotenv/config';
 import fs from 'fs';
@@ -20,6 +23,26 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 const REPO_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ROOT     = pathToFileURL(REPO_DIR).href;
+
+// ── scripted Anthropic ────────────────────────────────────────────────────────
+// Installed BEFORE the router is imported, so the SDK client it builds sends here. Each test
+// queues the model's reply text; every call is recorded (system + user) for assertions. An
+// unqueued call fails loudly rather than reaching the network.
+const ANTHROPIC = 'https://api.anthropic.com/v1/messages';
+const realFetch = globalThis.fetch;
+const modelQueue = [];
+const modelCalls = [];
+globalThis.fetch = async (url, opts) => {
+  const u = typeof url === 'string' ? url : url?.url;
+  if (!u || !u.startsWith(ANTHROPIC)) return realFetch(url, opts);
+  const body = JSON.parse(opts.body);
+  modelCalls.push({ system: typeof body.system === 'string' ? body.system : JSON.stringify(body.system), user: body.messages?.at(-1)?.content, max_tokens: body.max_tokens });
+  const text = modelQueue.length ? modelQueue.shift() : '__UNQUEUED_MODEL_CALL__';
+  return new Response(JSON.stringify({ id: 'msg_test', type: 'message', role: 'assistant', model: body.model, content: [{ type: 'text', text }], stop_reason: 'end_turn', usage: { input_tokens: 10, output_tokens: 20 } }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } });
+};
+const BACKUP_FILE = path.join(os.tmpdir(), `wc-gen-backup-${process.pid}.md`);
+process.env.DEFINING_MOMENT_BACKUP_FILE = BACKUP_FILE;   // never the tracked _defining_moment_blocks.md
 
 const { JsonFileStore }       = await import(`${ROOT}/engine/repositories/JsonFileStore.js`);
 const { ScenarioRepository }  = await import(`${ROOT}/engine/repositories/ScenarioRepository.js`);
@@ -263,9 +286,83 @@ try {
     check(`${id}: inside the witness budgets (no warnings)`, r.warnings.length === 0, r.warnings.join(' | '));
     check(`${id}: validator (structure) passes`, admin.validateDefiningMomentBlock(dm).length === 0);
   }
+  // ═══ STAGE 3 ═══════════════════════════════════════════════════════════════
+  head('3a. isAuthoredCrucible — the third tier, server and editor agree');
+  const AUTHORED_CRUCIBLE = { ...structuredClone(GOOD_BLOCK), generated: false, reviewed: true, at_scene: 'scene_b' };
+  for (const o of AUTHORED_CRUCIBLE.options) { delete o.outcome_disclaimer; delete o.consequence; }
+  const TRUDE_LIKE = { id: 'trude_like_choice', setup: 's', options: [{ id: 'a', text: 't' }, { id: 'b', text: 't' }, { id: 'c', text: 't' }], principal_transition: { type: 'decision_made', moment: 'trude_like_choice' } };
+  const JOAN_LIKE  = { ...structuredClone(TRUDE_LIKE), id: 'joan_like_choice', generated: true, reviewed: true };
+  const GEN_WITH_DEBRIEFS = { ...structuredClone(GOOD_BLOCK), generated: true, reviewed: true };
+  for (const [label, block, expect] of [
+    ['hand-authored crucible (Manchon/Massieu shape)', AUTHORED_CRUCIBLE, true],
+    ['hand-authored, no debriefs (Trude/Jäger)',       TRUDE_LIKE,        false],
+    ['generated + reviewed, no debriefs (Joan)',       JOAN_LIKE,         false],
+    ['generated + reviewed, with debriefs',            GEN_WITH_DEBRIEFS, false],
+    ['no block',                                       undefined,         false],
+  ]) {
+    check(`${label.padEnd(48)} → ${expect ? 'CRUCIBLE tier' : 'not'}`, admin.isAuthoredCrucible(block) === expect && ctx.isAuthoredCrucible(block) === expect);
+  }
+  for (const id of ['role_manchon', 'role_massieu']) {
+    const f = path.join(REPO_DIR, 'engine/data/scenarios/player_roles', `${id}.json`);
+    if (fs.existsSync(f)) check(`${id}: stored block is on the crucible tier`, admin.isAuthoredCrucible(JSON.parse(fs.readFileSync(f, 'utf8')).defining_moment));
+  }
+
+  head('3b. regenerate — an authored crucible needs the moment id on top of REPLACE');
+  const protag = id => ({ ...baseRole, id, name: id, archetype: 'crucible-fixed' });
+  repos.scenarios.savePlayerRole({ ...protag('role_wc_crucible'), defining_moment: AUTHORED_CRUCIBLE });
+  repos.scenarios.savePlayerRole({ ...protag('role_wc_trude'),    defining_moment: TRUDE_LIKE });
+  repos.scenarios.savePlayerRole({ ...protag('role_wc_joan'),     defining_moment: JOAN_LIKE });
+  const DECLINE = JSON.stringify({ declined: true, reason: 'observer or witness role — scripted decline, nothing is written.' });
+  {
+    const steps = [
+      [{},                                                                   409, b => /already has a defining_moment/.test(b.error)],
+      [{ overwrite: true },                                                  409, b => b.atRisk === true],
+      [{ overwrite: true, confirm: 'REPLACE' },                              409, b => b.crucibleAtRisk === true],
+      [{ overwrite: true, confirm: 'REPLACE', confirm_crucible: 'REPLACE' }, 409, b => b.crucibleAtRisk === true],
+      [{ overwrite: true, confirm_crucible: AUTHORED_CRUCIBLE.id },          409, b => b.atRisk === true],
+    ];
+    for (const [body, status, ok] of steps) {
+      const r = await post(genUrl('role_wc_crucible'), body);
+      check(`regenerate ${JSON.stringify(body).padEnd(78)} → ${status}`, r.status === status && ok(r.body), `${r.status} ${(r.body.error || '').slice(0, 70)}`);
+    }
+    const r = await post(genUrl('role_wc_crucible'), { overwrite: true, confirm: 'REPLACE' });
+    const L = r.body.would_lose || {};
+    check('409 names what would be lost', L.moment_id === AUTHORED_CRUCIBLE.id && L.debriefs === 3 && L.distinct_debriefs === 2 && L.labels === 3 && L.binding?.at_scene === 'scene_b' && L.debrief_words?.length === 3, JSON.stringify(L));
+    check('409 text names the backup file and the token', /_defining_moment_blocks\.md/.test(r.body.error) && r.body.error.includes(`"confirm_crucible": "${AUTHORED_CRUCIBLE.id}"`));
+    check('no model call was made by any refused request', modelCalls.length === 0);
+    modelQueue.push(DECLINE);
+    const ok = await post(genUrl('role_wc_crucible'), { overwrite: true, confirm: 'REPLACE', confirm_crucible: AUTHORED_CRUCIBLE.id });
+    check('all three tokens → passes every guard (reaches the model; scripted decline)', ok.status === 200 && ok.body.declined === true && modelCalls.length === 1, `${ok.status}`);
+    check('authored crucible untouched on disk (a decline writes nothing)', JSON.stringify(repos.scenarios.findPlayerRole('role_wc_crucible').defining_moment) === JSON.stringify(AUTHORED_CRUCIBLE));
+  }
+  for (const id of ['role_wc_trude', 'role_wc_joan']) {
+    modelQueue.push(DECLINE);
+    const r = await post(genUrl(id), { overwrite: true, confirm: 'REPLACE' });
+    check(`${id}: REPLACE tier unchanged — no crucible token asked`, r.status === 200 && r.body.declined === true, `${r.status} ${r.body.error || ''}`);
+  }
+
+  head('3c. delete — same third token, backup written before the removal');
+  {
+    const url = '/player-roles/role_wc_crucible/defining-moment';
+    const patch = async body => {
+      const r = await fetch(base + url, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      return { status: r.status, body: await r.json().catch(() => ({})) };
+    };
+    const a = await patch({ delete: true });
+    check('delete without DELETE → 409 hand-authored', a.status === 409 && a.body.handAuthored === true && !a.body.crucibleAtRisk);
+    const b = await patch({ delete: true, confirm: 'DELETE' });
+    check('delete with DELETE only → 409 crucible tier', b.status === 409 && b.body.crucibleAtRisk === true && b.body.would_lose?.debriefs === 3);
+    check('still on disk after both refusals', !!repos.scenarios.findPlayerRole('role_wc_crucible').defining_moment);
+    const before = fs.existsSync(BACKUP_FILE) ? fs.readFileSync(BACKUP_FILE, 'utf8') : '';
+    const c = await patch({ delete: true, confirm: 'DELETE', confirm_crucible: AUTHORED_CRUCIBLE.id });
+    check('delete with DELETE + moment id → removed', c.status === 200 && !repos.scenarios.findPlayerRole('role_wc_crucible').defining_moment, `${c.status}`);
+    const after = fs.existsSync(BACKUP_FILE) ? fs.readFileSync(BACKUP_FILE, 'utf8') : '';
+    check('the removed crucible was appended to the (redirected) backup first', after.length > before.length && after.includes(AUTHORED_CRUCIBLE.options[0].debrief.slice(0, 60)) && /state when replaced: hand-authored/.test(after));
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });
+  fs.rmSync(BACKUP_FILE, { force: true });
 }
 
 console.log(fails ? `\n${fails} FAILURE(S)` : '\nAll witness-crucible-gen assertions passed.');

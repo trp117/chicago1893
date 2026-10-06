@@ -14,6 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
+import { lintCrucibleBlock, wordCount } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -269,6 +270,46 @@ function reconcileTimingConfirmed(block, storedBlock, roleId = '') {
 function definingMomentAtRisk(block) {
   if (!hasRealDefiningMoment(block)) return false;
   return block.generated !== true || block.reviewed === true || block.corrected_at != null;
+}
+
+// A HAND-AUTHORED CRUCIBLE — the third, highest tier of protection. A hand-written block
+// (generated !== true) whose options carry authored debriefs: Manchon's and Massieu's
+// witness crucibles today. Each is pages of reviewed, source-checked prose — setup, three
+// options, labels, a "Your Session" per choice — so REPLACE alone (one word, typed the same
+// for any reviewed block) is too easy to type through. Replacing or deleting one also needs
+// `confirm_crucible` equal to the block's own moment id, which nobody types by reflex.
+// Trude's and Jäger's (no debriefs) and Joan's (generated, reviewed) stay on the REPLACE tier.
+function isAuthoredCrucible(block) {
+  return hasRealDefiningMoment(block)
+    && block.generated !== true
+    && block.options.some(o => typeof o?.debrief === 'string' && o.debrief.trim());
+}
+
+// What destroying an authored crucible discards, named — the 409 body states it so the
+// reviewer reads the stakes, not a generic warning.
+function crucibleLossSummary(block) {
+  const opts = block.options || [];
+  const debriefs = opts.filter(o => typeof o?.debrief === 'string' && o.debrief.trim());
+  return {
+    moment_id:         block.id,
+    setup_words:       wordCount(block.setup),
+    options:           opts.length,
+    labels:            opts.filter(o => typeof o?.label === 'string' && o.label.trim()).length,
+    debriefs:          debriefs.length,
+    distinct_debriefs: new Set(debriefs.map(o => o.debrief.trim())).size,
+    debrief_words:     debriefs.map(o => wordCount(o.debrief)),
+    binding:           Object.fromEntries(FORK_BINDING_KEYS.filter(k => block[k] != null).map(k => [k, block[k]])),
+    timing_confirmed:  timingConfirmedCurrent(block),
+  };
+}
+function crucibleRefusal(role, action) {
+  const block = role.defining_moment;
+  const loss  = crucibleLossSummary(block);
+  return {
+    error: `"${role.name}" carries a HAND-AUTHORED CRUCIBLE ("${block.id}"): a ${loss.setup_words}-word setup, ${loss.options} options with ${loss.labels} labels, and ${loss.debriefs} authored debriefs (${loss.distinct_debriefs} distinct; ${loss.debrief_words.join(' / ')} words)${Object.keys(loss.binding).length ? `, bound ${Object.entries(loss.binding).map(([k, v]) => `${k}=${v}`).join(', ')}` : ''}${loss.timing_confirmed ? ', timing confirmed' : ''}. ${action === 'delete' ? 'Removing' : 'Regenerating'} it discards all of that. Defining moments have NO version history; the only recovery is the copy appended to _defining_moment_blocks.md. To proceed, also send { "confirm_crucible": "${block.id}" }.`,
+    crucibleAtRisk: true,
+    would_lose: loss,
+  };
 }
 
 // Append a block that is ABOUT TO BE DESTROYED to the recovery file, before the overwrite.
@@ -2828,6 +2869,10 @@ export function createAdminRouter(repos, config = {}) {
         },
       });
     }
+    // HAND-AUTHORED CRUCIBLE — the third token, on top of overwrite + REPLACE.
+    if (isAuthoredCrucible(role.defining_moment) && req.body?.confirm_crucible !== role.defining_moment.id) {
+      return res.status(409).json(crucibleRefusal(role, 'regenerate'));
+    }
 
     // Entry paragraph — the material the setup must harvest. Same accessor the repair route
     // and validateStoredScenario use.
@@ -3275,6 +3320,9 @@ export function createAdminRouter(repos, config = {}) {
         handAuthored: true,
         existing: { id: role.defining_moment.id, reviewed: role.defining_moment.reviewed === true },
       });
+    }
+    if (isAuthoredCrucible(role.defining_moment) && req.body?.confirm_crucible !== role.defining_moment.id) {
+      return res.status(409).json({ ...crucibleRefusal(role, 'delete'), handAuthored: true });
     }
 
     // Same backup the regenerate route takes, for the same reason: this is the other path
@@ -5210,7 +5258,7 @@ Return only the scene description. No preamble, no closing remarks.`,
 // Exported for unit tests only (editor-save ending_notes preservation). Not used by app code.
 export { stripEmptyEndingNotes, preserveStoredEndingNotes };
 // Same, for the defining_moment guard and the three-guard composer the save paths call.
-export { hasRealDefiningMoment, preserveStoredDefiningMoment, preserveStoredRoleBlocks, normalizeForkBinding, forkTimingRecord, timingConfirmedCurrent, reconcileTimingConfirmed };
+export { hasRealDefiningMoment, isAuthoredCrucible, preserveStoredDefiningMoment, preserveStoredRoleBlocks, normalizeForkBinding, forkTimingRecord, timingConfirmedCurrent, reconcileTimingConfirmed };
 // Same, for the archetype guard. The property's own accessors (ROLE_ARCHETYPES,
 // isRoleArchetype, roleArchetype) are exported at their definition — those ARE app code.
 export { preserveStoredArchetype };
