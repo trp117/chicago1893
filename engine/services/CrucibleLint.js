@@ -99,6 +99,12 @@ export function lintCrucibleBlock(block, { path = 'protagonist', generated = tru
   }
 
   // ── generated-only provenance: checkable, not decorative ────────────────────
+  // "Word for word" means the same words in the same order. Case, whitespace, curly vs
+  // straight quotes and a trailing full stop are not words: a claim written as its own
+  // sentence ("The French minute…") is still present when the debrief runs it mid-sentence
+  // ("…opened, the French minute…"). The first real-model runs failed on exactly that.
+  const norm = t => t.toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim().replace(/[.!?;:,]+$/, '');
+  const verbatimIn = (needle, hay) => norm(hay).includes(norm(needle));
   if (generated && witness) {
     const sources = new Set((Array.isArray(lever?.evidence) ? lever.evidence : []).map(e => (e?.source || '').trim()).filter(Boolean));
     const terms   = (Array.isArray(lever?.instrument_terms) ? lever.instrument_terms : []).filter(str).map(t => t.trim().toLowerCase());
@@ -107,11 +113,11 @@ export function lintCrucibleBlock(block, { path = 'protagonist', generated = tru
       const at = `option ${i + 1}${o?.id ? ` (${o.id})` : ''}`;
       const d  = o.debrief;
       if (!str(o.outcome_disclaimer)) errors.push(`${at}: needs an "outcome_disclaimer" (the sentence that says the outcome was never theirs to change).`);
-      else if (!d.includes(o.outcome_disclaimer.trim())) errors.push(`${at}: "outcome_disclaimer" does not appear word for word in the debrief.`);
+      else if (!verbatimIn(o.outcome_disclaimer, d)) errors.push(`${at}: "outcome_disclaimer" does not appear word for word in the debrief.`);
       const c = o.consequence;
       if (!c || !str(c.claim) || !str(c.source)) errors.push(`${at}: needs a "consequence" { claim, source } — the displaced consequence, cited.`);
       else {
-        if (!d.includes(c.claim.trim())) errors.push(`${at}: consequence.claim does not appear word for word in the debrief.`);
+        if (!verbatimIn(c.claim, d)) errors.push(`${at}: consequence.claim does not appear word for word in the debrief.`);
         if (sources.size && !sources.has(c.source.trim())) errors.push(`${at}: consequence.source "${c.source.trim()}" is not one of the confirmed lever's evidence sources.`);
       }
       if (terms.length && !terms.some(t => d.toLowerCase().includes(t))) {

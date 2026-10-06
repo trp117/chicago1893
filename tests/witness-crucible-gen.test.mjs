@@ -276,6 +276,15 @@ try {
     const negated = mutate(b => { b.options[0].debrief += ' No word in a corridor could have stayed the fire.'; });
     check('a NEGATED outcome statement is not an outcome claim', lint.lintCrucibleBlock(negated, { path: 'witness-crucible', generated: true, lever: LEVER }).errors.length === 0);
   }
+  {
+    // "Word for word" ignores case, whitespace, quote style and a trailing stop — the shape of
+    // the first real-model failures (a claim written as its own sentence, run mid-sentence).
+    const run = fn => lint.lintCrucibleBlock(mutate(fn), { path: 'witness-crucible', generated: true, lever: LEVER }).errors;
+    check('claim differing only in case / spacing / final stop → still found', run(b => { b.options[0].consequence.claim = '  in 1456 you  would TESTIFY at the nullification to how she was held'; }).length === 0);
+    check('claim with curly quotes, debrief with straight → still found', run(b => { b.options[0].debrief += ' He said "enough" at the door.'; b.options[0].consequence.claim = 'He said “enough” at the door.'; }).length === 0);
+    check('disclaimer differing only in case → still found', run(b => { b.options[0].outcome_disclaimer = DISCLAIMER.toLowerCase(); }).length === 0);
+    check('claim with DIFFERENT words → still an error', run(b => { b.options[0].consequence.claim = 'In 1456 you testified at the nullification to how she was held.'; }).some(e => /consequence.claim does not appear/.test(e)));
+  }
 
   head('2c. CrucibleLint — protagonist path');
   {
