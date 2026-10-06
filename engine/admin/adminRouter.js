@@ -359,13 +359,15 @@ function preserveStoredDefiningMoment(repos, role) {
 //   crucible-fixed  fork YES  graded endings NO    outcome fixed — there is nothing to grade
 //   instrument      fork NO   graded endings NO    acts, but without the foreknowledge a fork needs
 //   witness         fork NO   graded endings NO    conduct is not a hinge
+//                   (fork YES only when the role is also flagged witness_crucible — below)
 //   unclassified    (not yet set)
 //
 // The open/fixed split keys on FATE_MODE — the character's own outcome — and NOT on
 // character_type: a fictional character welded to a fixed anchor is still crucible-fixed.
 //
-// NOTHING GATES ON THIS YET. Step 1 is the property and its guard only; the classifier,
-// the gating table and the human-confirm UI land in later steps.
+// archetypeAllows below is the gate both generation routes and the editor's buttons read,
+// through ARCHETYPE_ARTIFACTS. The classifier (classifyRoleArchetype) only PROPOSES a value;
+// the gate reads the confirmed one stored on the role.
 export const ROLE_ARCHETYPES = Object.freeze([
   'crucible-open',
   'crucible-fixed',
@@ -379,10 +381,10 @@ export function isRoleArchetype(value) {
 }
 
 // The ONLY way to read a role's archetype. Absent, empty, or unrecognised all read as
-// 'unclassified' — the safe direction once gating exists, because unclassified is the
-// value that will REFUSE artifact generation rather than permit it. Legacy roles need no
-// backfill: 68 of the 74 stored today carry no archetype at all, absent already means
-// unclassified, and writing the string into every file would buy nothing.
+// 'unclassified', which ARCHETYPE_ARTIFACTS below treats as PERMISSIVE: a role nobody has
+// classified behaves exactly as it did before archetypes existed. Only a role a human has
+// LABELLED instrument or witness is refused anything. Legacy roles need no backfill — absent
+// already means unclassified, and writing the string into every file would buy nothing.
 export function roleArchetype(role) {
   return isRoleArchetype(role?.archetype) ? role.archetype : 'unclassified';
 }
@@ -395,8 +397,11 @@ export function roleArchetype(role) {
 //
 // unclassified is PERMISSIVE, and deliberately so. It allows both, exactly as the engine
 // behaved before any of this existed. The safeguard protects roles a human has LABELLED; a
-// role nobody has classified yet is "not yet decided", not "forbidden", so the 68 legacy
-// roles are not frozen out of generation by a gate that has no opinion about them.
+// role nobody has classified yet is "not yet decided", not "forbidden", so legacy roles are
+// not frozen out of generation by a gate that has no opinion about them.
+//
+// The witness row is overridden for ONE artifact by the witness_crucible flag — see
+// isWitnessCrucible below. The table itself stays the default for every unflagged witness.
 export const ARCHETYPE_ARTIFACTS = Object.freeze({
   'crucible-open':  { fork: true,  graded_endings: true  },
   'crucible-fixed': { fork: true,  graded_endings: false },
@@ -418,19 +423,35 @@ export const ARCHETYPE_REFUSALS = Object.freeze({
     graded_endings: 'Instrument role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
   },
   witness: {
-    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue.',
+    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue. (A witness who holds a witnessing-choice — a lever over the record, the testimony or their own presence — is flagged witness_crucible and generated on the witness-crucible path.)',
     graded_endings: 'Witness role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
   },
 });
 
+// WITNESS CRUCIBLE — a witness WITH a witnessing-choice (Manchon's record, Massieu's
+// corridor): the outcome is not theirs to change, but HOW they bear witness is a real
+// decision with a documented consequence downstream. A human decision, stored as the boolean
+// `witness_crucible: true` on the role; the classifier never sets it. It means something
+// only on archetype witness — a pure bystander stays unflagged and refused, and an
+// instrument is refused flagged or not (its fork would grant foreknowledge it never had).
+// Strictly the boolean: a string 'true' does not opt in, the same rule normalizeForkBinding
+// applies to at_act.
+export function isWitnessCrucible(role) {
+  return roleArchetype(role) === 'witness' && role?.witness_crucible === true;
+}
+
 // THE GATE. `artifact` is 'fork' or 'graded_endings'. Reads the CONFIRMED archetype stored
 // on the role — never a classifier proposal, which is why the classifier writes nothing.
+// `path` names the generator an allowed fork is drafted on: 'witness-crucible' for a flagged
+// witness, 'protagonist' for every other allowed role (the generator as it always was).
 export function archetypeAllows(role, artifact) {
   const archetype = roleArchetype(role);
-  const allowed   = ARCHETYPE_ARTIFACTS[archetype]?.[artifact] !== false;
+  const witnessFork = artifact === 'fork' && isWitnessCrucible(role);
+  const allowed   = witnessFork || ARCHETYPE_ARTIFACTS[archetype]?.[artifact] !== false;
   return {
     allowed,
     archetype,
+    ...(artifact === 'fork' && allowed ? { path: witnessFork ? 'witness-crucible' : 'protagonist' } : {}),
     reason: allowed ? null
       : (ARCHETYPE_REFUSALS[archetype]?.[artifact] || `Archetype ${archetype} may not have ${artifact} generated.`),
   };
@@ -679,7 +700,26 @@ function preserveStoredChoiceRegister(repos, role) {
   return role;
 }
 
-// All five editor-save guards over ONE stored read. preserveStoredEndingNotes,
+// EDITOR-SAVE GUARD for the witness_crucible flag — sixth sibling, same hazard, same
+// `undefined` rule as preserveStoredArchetype: a tab with no checkbox for it (every tab
+// today) posts the key ABSENT and the whole-object save would drop it, silently re-closing
+// the gate on a witness crucible. Absent → restored from the stored role. Present → honored,
+// coerced to a real boolean the way the form posts checkboxes ('true'/'false'), so a current
+// tab can clear it on purpose. A cleared flag is stored as no key at all, so an unflagged
+// role writes exactly the file it had.
+function preserveStoredWitnessCrucible(repos, role) {
+  if (role.witness_crucible === undefined) {
+    const stored = repos.scenarios.findPlayerRole(role.id);
+    if (stored && stored.witness_crucible !== undefined) role.witness_crucible = stored.witness_crucible;
+  }
+  if (role.witness_crucible !== undefined) {
+    if (role.witness_crucible === true || role.witness_crucible === 'true') role.witness_crucible = true;
+    else delete role.witness_crucible;
+  }
+  return role;
+}
+
+// All six editor-save guards over ONE stored read. preserveStoredEndingNotes,
 // preserveStoredDefiningMoment, preserveStoredArchetype and preserveStoredAnchoredLocation
 // each look the role up for themselves; running them back to back would read it four
 // times. The shim memoizes the single real lookup and hands the same object to all four,
@@ -702,6 +742,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredArchetype(shim, role);
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
+  preserveStoredWitnessCrucible(shim, role);
   // After the defining-moment guard, so a block restored from storage is normalized too.
   // The timing confirmation is reconciled AFTER normalizing, against the timing that will
   // actually be written.
@@ -2731,6 +2772,23 @@ export function createAdminRouter(repos, config = {}) {
       return res.status(422).json({
         error: forkGate.reason, refused: true, artifact: 'fork', archetype: forkGate.archetype,
       });
+    }
+
+    // WITNESS-CRUCIBLE PRECONDITION. A flagged witness is drafted AXIS-FIRST: its lever (what
+    // this witness's power actually is) and its scene are proposed, then confirmed by a human,
+    // and only then is content generated on them. Without a confirmed lever there is nothing
+    // to generate on, so this refuses before the overwrite conversation — confirming an
+    // overwrite the route cannot then perform would be a question with no answer.
+    if (forkGate.path === 'witness-crucible' && role.witness_lever?.confirmed !== true) {
+      return res.status(422).json({
+        error: `"${role.name}" is a witness crucible: its lever must be proposed and confirmed before a fork can be generated on it.`,
+        refused: true, artifact: 'fork', archetype: forkGate.archetype, path: forkGate.path, code: 'LEVER_UNCONFIRMED',
+      });
+    }
+    if (forkGate.path === 'witness-crucible') {
+      // The witness-crucible prompt lands in a later stage. Until then a flagged witness must
+      // never fall through to the protagonist prompt, whose Step 1 refuses witnesses.
+      return res.status(501).json({ error: 'Witness-crucible generation is not built yet.', path: forkGate.path, code: 'WITNESS_PATH_PENDING' });
     }
 
     // OVERWRITE GUARD. Some blocks are hand-authored answer keys with no role-level version

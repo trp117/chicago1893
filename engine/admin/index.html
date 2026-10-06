@@ -2215,7 +2215,7 @@ const ARCHETYPE_REFUSALS = {
     graded_endings: 'Instrument role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
   },
   witness: {
-    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue.',
+    fork:           'Witness role — no fork. This character\'s conduct is not a hinge, so there is no decision to put to the player. The session resolves via the proximity epilogue. (A witness who holds a witnessing-choice — a lever over the record, the testimony or their own presence — is flagged witness_crucible and generated on the witness-crucible path.)',
     graded_endings: 'Witness role — no graded endings. The session resolves via the proximity epilogue, not a graded outcome.',
   },
 };
@@ -2225,10 +2225,20 @@ function roleArchetypeOf(r) {
   const a = r && r.archetype;
   return Object.prototype.hasOwnProperty.call(ARCHETYPE_ARTIFACTS, a) ? a : 'unclassified';
 }
+// Mirror of isWitnessCrucible() on the server: a witness flagged witness_crucible (the real
+// boolean) may carry a fork, drafted on the witness-crucible path.
+function isWitnessCrucible(r) {
+  return roleArchetypeOf(r) === 'witness' && !!r && r.witness_crucible === true;
+}
 function archetypeAllows(r, artifact) {
   const archetype = roleArchetypeOf(r);
-  const allowed   = ARCHETYPE_ARTIFACTS[archetype][artifact] !== false;
-  return { allowed, archetype, reason: allowed ? null : (ARCHETYPE_REFUSALS[archetype] || {})[artifact] || '' };
+  const witnessFork = artifact === 'fork' && isWitnessCrucible(r);
+  const allowed   = witnessFork || ARCHETYPE_ARTIFACTS[archetype][artifact] !== false;
+  return {
+    allowed, archetype,
+    ...(artifact === 'fork' && allowed ? { path: witnessFork ? 'witness-crucible' : 'protagonist' } : {}),
+    reason: allowed ? null : (ARCHETYPE_REFUSALS[archetype] || {})[artifact] || '',
+  };
 }
 // The badge shown wherever a gate applies, so the reviewer can see the archetype that is
 // doing the blocking without hunting for it.
