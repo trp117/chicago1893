@@ -10,6 +10,9 @@
 //   Stage 4  the lever, axis-first: propose (lever + counter-case + cited evidence + scene,
 //            written confirmed:false), confirm/edit/clear via PATCH (the only writer of
 //            confirmed:true), the editor can never write one, generate stays closed until confirmed
+//   Stage 5  generation: the protagonist prompts pinned byte-identical (debriefs only on
+//            request), the witness path on the confirmed lever (full shape, lint-gated, bound to
+//            the lever's scene), and the embedded exemplars verbatim against their role files
 //
 // SYNTHETIC FIXTURES ONLY. Every role, scenario and arc here lives in a temp JsonFileStore
 // made for this run and deleted after it; no real role file, no Supabase, no tracked file is
@@ -220,8 +223,11 @@ try {
     check('flagged instrument → 422 instrument refusal', r.status === 422 && /^Instrument role/.test(r.body.error || ''));
   }
   {
+    modelQueue.push(JSON.stringify({ declined: true, reason: 'lever does not hold — scripted decline.' }));
     const r = await post(genUrl('role_wc_confirmed'), { overwrite: true });
-    check('flagged witness, confirmed lever → never reaches the protagonist prompt (501 pending)', r.status === 501 && r.body.code === 'WITNESS_PATH_PENDING', `${r.status}`);
+    const sys = modelCalls.at(-1)?.system || '';
+    check('flagged witness, confirmed lever → the WITNESS prompt, never the protagonist one', r.status === 200 && r.body.declined === true && /STEP 1W/.test(sys) && !/WITNESS SCENARIOS MUST DECLINE/.test(sys), `${r.status}`);
+    modelCalls.length = 0;   // later stages count calls from zero
   }
   check('no route call wrote a fixture role', Object.keys(ROLES).every(id => !repos.scenarios.findPlayerRole(id).defining_moment));
   // ═══ STAGE 2 ═══════════════════════════════════════════════════════════════
@@ -476,6 +482,129 @@ try {
     await post(leverUrl('role_wc_usher'), {});
     await patchLever('role_wc_usher', { confirm: true });
     check('re-proposed and confirmed for Stage 5', leverOf('role_wc_usher')?.confirmed === true);
+  }
+  // ═══ STAGE 5 ═══════════════════════════════════════════════════════════════
+  const crypto = await import('crypto');
+  const sha = s => crypto.createHash('sha256').update(s).digest('hex');
+
+  head('5a. the protagonist prompts are byte-identical to before this build');
+  {
+    // Frozen from the generator at 0eb0736 (before any witness-crucible change).
+    const FROZEN = {
+      open:     'c998058d09575a692facf67addd1a0f7ea4e875cec017840b15f06408e1dbda0',
+      anchored: '4f796884cb76308c20d81caedd84402d9aa0e6b8b2400fdca5fbcd1d9d68ba01',
+      user:     '2e389c42ff0a566b85a420c3662892fae75e0bc7c3023a0c2bee5a1462fd0bcd',
+    };
+    check('system prompt, open-outcome: unchanged',  sha(admin.buildDefiningMomentSystemPrompt(undefined, false)) === FROZEN.open);
+    check('system prompt, anchored: unchanged',      sha(admin.buildDefiningMomentSystemPrompt(undefined, true))  === FROZEN.anchored);
+    const role = { id: 'r', name: 'R', character_type: 'real', fate_mode: 'anchored', description: 'd', briefing: 'b' };
+    check('user prompt (no witness): unchanged',     sha(admin.buildDefiningMomentUserPrompt({ scenario: { title: 'T' }, role, entryParagraph: 'E' })) === FROZEN.user);
+    check('Test 3 still refuses witnesses on the protagonist path', /WITNESS SCENARIOS MUST DECLINE/.test(admin.buildDefiningMomentSystemPrompt(undefined, true)));
+  }
+
+  head('5b. protagonist route — old shape unchanged; debriefs only on request');
+  repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_protag', name: 'The Captain', archetype: 'crucible-fixed' });
+  const OLD_REPLY = { id: 'captain_defining_choice', setup: words(120), options: [{ id: 'hold_the_line', text: words(12) }, { id: 'pull_back', text: words(12) }, { id: 'go_alone', text: words(12) }], time_advance: 0, at_elapsed_fraction: 0.6, principal_transition: { type: 'decision_made', moment: 'captain_defining_choice' } };
+  {
+    modelQueue.push(JSON.stringify(OLD_REPLY));
+    const r = await post(genUrl('role_wc_protag'), {});
+    const call = modelCalls.at(-1);
+    check('→ 200', r.status === 200, `${r.status} ${r.body.error || ''}`);
+    check('system prompt is exactly the protagonist prompt (anchored)', call.system === admin.buildDefiningMomentSystemPrompt(admin.DEFINING_MOMENT_EXEMPLAR, true));
+    check('no lever in the user prompt; 8000-token ceiling as before', !/CONFIRMED LEVER/.test(call.user) && call.max_tokens === 8000);
+    const dm = repos.scenarios.findPlayerRole('role_wc_protag').defining_moment;
+    check('stored block: the old keys exactly', JSON.stringify(Object.keys(dm).sort()) === JSON.stringify(['at_elapsed_fraction', 'generated', 'id', 'options', 'principal_transition', 'reviewed', 'setup', 'time_advance']) && dm.at_elapsed_fraction === 0.6, Object.keys(dm).join(','));
+    check('options: id + text only', dm.options.every(o => JSON.stringify(Object.keys(o)) === '["id","text"]'));
+    check('response: the old keys exactly (no lint_warnings, no path)', JSON.stringify(Object.keys(r.body).sort()) === JSON.stringify(['classification', 'defining_moment', 'roleId']), Object.keys(r.body).join(','));
+  }
+  {
+    modelQueue.push(JSON.stringify({ ...OLD_REPLY, options: OLD_REPLY.options.map((o, i) => ({ ...o, label: `Stance ${i + 1}`, debrief: `${words(110)} ${o.id}.` })) }));
+    const r = await post(genUrl('role_wc_protag'), { overwrite: true, with_debriefs: true });
+    const call = modelCalls.at(-1);
+    check('with_debriefs → the protagonist prompt + Step 7, nothing else changed', call.system === admin.buildDefiningMomentSystemPrompt(admin.DEFINING_MOMENT_EXEMPLAR, true) + '\n' + admin.PROTAGONIST_DEBRIEF_STEP);
+    const dm = repos.scenarios.findPlayerRole('role_wc_protag').defining_moment;
+    check('with_debriefs → saved with labels and debriefs, still on the 0.6 clock', r.status === 200 && dm.options.every(o => o.label && o.debrief) && dm.at_elapsed_fraction === 0.6, `${r.status} ${r.body.error || ''}`);
+    modelQueue.push(JSON.stringify(OLD_REPLY));
+    const m = await post(genUrl('role_wc_protag'), { overwrite: true, with_debriefs: true });
+    check('debriefs requested but missing → 500, not saved', m.status === 500 && /debriefs were requested/.test(m.body.error) && repos.scenarios.findPlayerRole('role_wc_protag').defining_moment.options.every(o => o.debrief));
+  }
+
+  head('5c. witness route — the full shape, generated on the confirmed lever');
+  const usher = () => repos.scenarios.findPlayerRole('role_wc_usher');
+  {
+    check('precondition: the usher\'s lever is confirmed, bound to scene_b, and he has no block', usher().witness_lever?.confirmed === true && usher().witness_lever.scene_binding.at_scene === 'scene_b' && !usher().defining_moment);
+    // The model tries to set its own timing and provenance; all of it is discarded.
+    modelQueue.push(JSON.stringify({ ...GOOD_BLOCK, at_elapsed_fraction: 0.6, at_scene: 'scene_zzz', generated: false, reviewed: true, timing_confirmed: true }));
+    const r = await post(genUrl('role_wc_usher'), {});
+    const call = modelCalls.at(-1);
+    check('→ 200 on the witness-crucible path', r.status === 200 && r.body.path === 'witness-crucible', `${r.status} ${r.body.error || ''}`);
+    check('system prompt is the witness prompt (anchored), exemplar Manchon', call.system === admin.buildWitnessCrucibleSystemPrompt(admin.witnessExemplarFor(usher()), true) && call.system.includes('The dress is on her'));
+    check('witness prompt: Steps 1W, 3W, 5W, 6W, 7 and the anchored rules', ['STEP 1W', 'STEP 1B', 'STEP 3W', 'STEP 5W', 'STEP 6W', 'STEP 7'].every(s => call.system.includes(s)));
+    check('witness prompt: NOT Test 3, NOT the 90-140 budget', !/WITNESS SCENARIOS MUST DECLINE|TEST 3 — CHARACTER-REVEALING AGENCY/.test(call.system) && !/90 to 140/.test(call.system));
+    check('witness prompt: the banned phrasings are stated', /could not save her \/ him \/ them/.test(call.system) && /your fault/.test(call.system));
+    check('16000-token ceiling', call.max_tokens === 16000);
+    check('user prompt carries the confirmed lever: counter-case, both sources, terms, bound scene',
+      call.user.includes('CONFIRMED LEVER') && call.user.includes(LEVER.counter_case.assumption) && LEVER.evidence.every(e => call.user.includes(`[source: ${e.source}]`))
+      && call.user.includes('INSTRUMENT TERMS (every debrief uses at least one): corridor, testify') && call.user.includes('BOUND SCENE: scene_b — 28 May. The relapse: the judges come to the cell.') && /Step 1W/.test(call.user));
+    const dm = usher().defining_moment;
+    check('stored: generated:true, reviewed:false (model provenance discarded)', dm.generated === true && dm.reviewed === false);
+    check('stored: bound at_scene scene_b from the confirmed lever; no clock fraction; no timing confirmation', dm.at_scene === 'scene_b' && !('at_elapsed_fraction' in dm) && !('timing_confirmed' in dm) && r.body.binding_source === 'the confirmed lever');
+    check('stored: every option has label, text, debrief, outcome_disclaimer, cited consequence', dm.options.every(o => o.label && o.text && o.debrief && o.outcome_disclaimer && o.consequence?.source));
+    check('stored block passes the crucible lint', lint.lintCrucibleBlock(dm, { path: 'witness-crucible', generated: true, lever: usher().witness_lever }).errors.length === 0);
+    check('stored block passes the validator', admin.validateDefiningMomentBlock(dm).length === 0);
+  }
+
+  head('5d. witness route — a block that breaks a rule is NOT saved');
+  {
+    const saved = JSON.stringify(usher().defining_moment);
+    for (const [label, fn, rx] of [
+      ['"could not save her"',               b => { b.options[0].debrief += ' You could not save her.'; },               /failed-rescue/],
+      ['consequence source not in evidence', b => { b.options[1].consequence.source = 'Chronicle of an unnamed monk'; }, /evidence sources/],
+      ['debriefs identical',                 b => { for (const o of b.options) o.debrief = b.options[0].debrief; },      /do not branch/],
+    ]) {
+      modelQueue.push(JSON.stringify(mutate(fn)));
+      const r = await post(genUrl('role_wc_usher'), { overwrite: true });
+      check(`${label} → 500, errors named, nothing written`, r.status === 500 && r.body.errors?.some(e => rx.test(e)) && JSON.stringify(usher().defining_moment) === saved, `${r.status}`);
+    }
+    modelQueue.push(JSON.stringify({ declined: true, reason: 'lever does not hold — scripted.' }));
+    const d = await post(genUrl('role_wc_usher'), { overwrite: true });
+    check('decline → 200 declined, nothing written', d.status === 200 && d.body.declined === true && JSON.stringify(usher().defining_moment) === saved);
+  }
+
+  head('5e. witness binding — a regenerate keeps the outgoing binding; exemplar swap');
+  {
+    repos.scenarios.savePlayerRole({ ...usher(), defining_moment: { ...usher().defining_moment, at_scene: 'scene_a' } });
+    const before = fs.existsSync(BACKUP_FILE) ? fs.readFileSync(BACKUP_FILE, 'utf8').length : 0;
+    modelQueue.push(JSON.stringify(GOOD_BLOCK));
+    const r = await post(genUrl('role_wc_usher'), { overwrite: true });
+    check('outgoing at_scene scene_a carried over (not the lever\'s scene_b)', r.status === 200 && usher().defining_moment.at_scene === 'scene_a' && r.body.binding_source === 'carried over from the outgoing block');
+    const after = fs.readFileSync(BACKUP_FILE, 'utf8');
+    check('the replaced block was backed up first', after.length > before && /generated, unreviewed/.test(after.slice(before)));
+    check('exemplar for Manchon himself is Massieu\'s', admin.witnessExemplarFor({ id: 'role_manchon' }).role_id === 'role_massieu');
+    check('exemplar for anyone else is Manchon\'s', admin.witnessExemplarFor({ id: 'role_wc_usher' }).role_id === 'role_manchon');
+  }
+
+  head('5f. a hand-authored witness crucible is guarded on the witness path too');
+  {
+    const keep = usher().defining_moment;
+    repos.scenarios.savePlayerRole({ ...usher(), defining_moment: AUTHORED_CRUCIBLE });
+    const calls = modelCalls.length;
+    const r = await post(genUrl('role_wc_usher'), { overwrite: true, confirm: 'REPLACE' });
+    check('REPLACE alone → 409 crucible tier, no model call', r.status === 409 && r.body.crucibleAtRisk === true && modelCalls.length === calls);
+    repos.scenarios.savePlayerRole({ ...usher(), defining_moment: keep });
+  }
+
+  head('5g. exemplars — verbatim from the authored role files, and they meet the generated-block rules');
+  for (const ex of admin.WITNESS_CRUCIBLE_EXEMPLARS) {
+    const r = lint.lintCrucibleBlock(ex.block, { path: 'witness-crucible', generated: true, lever: ex.lever });
+    check(`${ex.role_id}: annotated exemplar passes the GENERATED lint (verbatim disclaimer + cited consequence + lever terms)`, r.errors.length === 0 && r.warnings.length === 0, [...r.errors, ...r.warnings].join(' | '));
+    check(`${ex.role_id}: exemplar lever is a valid lever`, admin.validateWitnessLever({ ...ex.lever, reasoning: 'r', scene_binding: { at_scene: null } }, []).length === 0);
+    const f = path.join(REPO_DIR, 'engine/data/scenarios/player_roles', `${ex.role_id}.json`);
+    if (!fs.existsSync(f)) { console.log(`SKIP  ${ex.role_id} — not restored locally; drift not checked`); continue; }
+    const dm = JSON.parse(fs.readFileSync(f, 'utf8')).defining_moment;
+    check(`${ex.role_id}: setup, ids, labels, texts, debriefs match the role file verbatim`,
+      dm.id === ex.block.id && dm.setup === ex.block.setup && dm.options.length === ex.block.options.length
+      && dm.options.every((o, i) => ['id', 'label', 'text', 'debrief'].every(k => o[k] === ex.block.options[i][k])));
   }
 } finally {
   await new Promise(r => server.close(r));

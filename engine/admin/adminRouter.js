@@ -14,7 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
-import { lintCrucibleBlock, wordCount } from '../services/CrucibleLint.js';
+import { lintCrucibleBlock, wordCount, BUDGETS, LABEL_MAX_CHARS } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -1527,6 +1527,308 @@ function buildDefiningMomentSystemPrompt(exemplar = DEFINING_MOMENT_EXEMPLAR, an
   ].filter(Boolean).join('\n');
 }
 
+// ── WITNESS CRUCIBLE (axis-first, step 2 of 2) ────────────────────────────────
+// The witness path's own system prompt. It reuses the protagonist prompt's entry-payoff and
+// two-register disciplines, but REPLACES the three things that are wrong for a witness:
+// Step 1's Test 3 (which refuses every witness, correctly, on the protagonist path), Step 3's
+// action-shaped options, and Step 5's "motivate the closure". It adds Step 7, the branched,
+// cited debriefs every witness crucible ships. The lever it works on is the CONFIRMED one,
+// supplied in the user prompt; the model checks it, never replaces it.
+//
+// The exemplars are the two hand-authored witness crucibles, VERBATIM from their role files
+// (setup, options, labels, debriefs — witness-crucible-gen.test.mjs fails if they drift),
+// annotated with the provenance fields a GENERATED block must carry (outcome_disclaimer,
+// consequence) and the lever each was written on. Manchon is shown by default; a role that
+// IS an exemplar is shown the other one, so a regeneration never copies its own answer key.
+const WITNESS_CRUCIBLE_EXEMPLARS = [
+  {
+    role_id: 'role_manchon',
+    label: 'Guillaume Manchon — chief notary, trial of Joan of Arc, Rouen, 28 May 1431',
+    lever: {
+      axis: 'documentary_record',
+      statement: 'His power is the record: the faithfulness of the minute he keeps. He cannot judge her, defend her or save her.',
+      counter_case: {
+        assumption: 'You would assume a notary at her trial could quietly help her — soften the record in her favour, or speak for her.',
+        why_wrong: 'He was not her advocate and had no voice in the verdict. The record was worth something precisely because it was kept as said; the nullification later relied on it for that reason.',
+      },
+      evidence: [
+        { claim: 'Manchon kept the French minute of the trial as chief notary.', source: 'Trial record of 1431 (the French minute)' },
+        { claim: 'His minute was read at the nullification proceedings in 1456.', source: 'Nullification proceedings, 1456' },
+      ],
+      instrument_terms: ['record', 'minute'],
+    },
+    block: {
+    "id": "manchon_witnessing_choice",
+    "setup": "The dress is on her — the same man's clothes she set aside at Saint-Ouen four days ago. Cauchon has seen it. The assessors have seen it. The word relapse is already formed in the room, unspoken, because it does not need to be spoken; it is in the parchment before it is in anyone's mouth. Cauchon puts the question. Why has she resumed the dress she abjured? And she answers — plainly, the way she has answered everything: that the promises made to her were not kept; that her voices came again and told her she had damned herself by abjuring to save her life. \"I would rather die than suffer what I suffer. What was in the schedule of abjuration I did not understand.\"\n\nYour quill is over the parchment. Cauchon has told you to record what is said here exactly as it is said — and his tone carried the weight of a man who knows the record of this session is the one that sends her to the fire. You are the notary. You are not her judge, not her advocate, not the one who decides what becomes of her — that was never your part, and it is not now. What is yours, the only thing that has ever been yours in this room, is the record: what it says she said, and how faithfully.",
+    "options": [
+      {
+        "id": "record_exactly",
+        "label": "Record it exactly — keep it true",
+        "text": "Record it exactly — her words, in the form she gave them. The reaffirmation. The voices. \"I would rather die.\" \"I did not understand.\" Every word. This is what a notary is for: not to judge what was said, but to keep it true.",
+        "debrief": "Saving her was never your part. You were not her judge or her advocate — you were the man who kept the record, and the only question ever before you was whether you would keep it honestly. You did. Joan burned in the Old Market Square on 30 May; that was the work of the court, the English crown, and a war older than she was — not yours to prevent, and not yours to answer for. But the record was yours, and you kept it true. Your French minute survived the trial, survived Cauchon, survived the English claim itself. Twenty-five years later, in 1456, it was read at the nullification proceedings, and the words you preserved — exactly as she said them — helped the Church that condemned her declare the condemnation null, irregular, and unjust. The record you kept honest when honesty cost something and saved no one was, in the end, the thing that cleared her name. That is the whole of what a notary could do. You did it.",
+        "outcome_disclaimer": "Saving her was never your part.",
+        "consequence": {
+          "claim": "Twenty-five years later, in 1456, it was read at the nullification proceedings",
+          "source": "Nullification proceedings, 1456"
+        }
+      },
+      {
+        "id": "record_as_required",
+        "label": "Record what the court requires",
+        "text": "Record what the court requires — the relapse noted, the finding clean, the words that fit the sentence they have already decided. A notary who keeps too faithful a record of an inconvenient truth is a notary who may be noticed. The safe record is the court's record.",
+        "debrief": "Saving her was never your part — you kept the record, not her fate. But keeping it honest was your part, and that you set aside. You wrote what the court required and called it prudence; perhaps it was. The truth did not die because of it. There were other hands — Massieu, who would testify; the other notaries; your own later words at the nullification, when it came. The record that cleared her name twenty-five years on was built from many sources, and it did not need you to survive. But it was yours to help, on the one day it was in front of you, and you kept your head down instead. You were not the keeper of the truth that day. You were just a careful man, being careful. Whether that cost anything, you will never know — and the not-knowing is the weight you carry out of that room.",
+        "outcome_disclaimer": "Saving her was never your part — you kept the record, not her fate.",
+        "consequence": {
+          "claim": "There were other hands — Massieu, who would testify; the other notaries; your own later words at the nullification, when it came.",
+          "source": "Nullification proceedings, 1456"
+        }
+      },
+      {
+        "id": "record_words_and_breach",
+        "label": "Record her words — and the breach beside them",
+        "text": "Record her words — and the breach beside them. That the promises made at Saint-Ouen were never kept; that the conditions she was told of never came. A notary records what was said; you will also record what was done. Let the record indict the men in this room, for whoever reads it when they are dust.",
+        "debrief": "Saving her was never your part. You were not her judge or her advocate — you were the man who kept the record, and the only question ever before you was whether you would keep it honestly. You did. Joan burned in the Old Market Square on 30 May; that was the work of the court, the English crown, and a war older than she was — not yours to prevent, and not yours to answer for. But the record was yours, and you kept it true. Your French minute survived the trial, survived Cauchon, survived the English claim itself. Twenty-five years later, in 1456, it was read at the nullification proceedings, and the words you preserved — exactly as she said them — helped the Church that condemned her declare the condemnation null, irregular, and unjust. The record you kept honest when honesty cost something and saved no one was, in the end, the thing that cleared her name. That is the whole of what a notary could do. You did it. And the breach you recorded — the broken promises, the conditions never kept — became part of the case that the proceeding itself had been corrupt.",
+        "outcome_disclaimer": "Saving her was never your part.",
+        "consequence": {
+          "claim": "became part of the case that the proceeding itself had been corrupt",
+          "source": "Nullification proceedings, 1456"
+        }
+      }
+    ],
+    "time_advance": 0,
+    "principal_transition": {
+      "type": "decision_made",
+      "moment": "manchon_witnessing_choice"
+    }
+  },
+  },
+  {
+    role_id: 'role_massieu',
+    label: 'Jean Massieu — court usher, trial of Joan of Arc, Rouen, 28 May 1431',
+    lever: {
+      axis: 'human_presence',
+      statement: 'His power is his presence beside her in the corridors and at the doors, as a person and not a case — and what he carries out of them. He cannot change the sentence or the prison.',
+      counter_case: {
+        assumption: 'You would assume the usher — the man at her side every day, between cell and court — could get her out, or at least ease her lot.',
+        why_wrong: 'He had no authority over the sentence or the prison; his office was to bring her and stand at the door. The record shows only what he did with his presence: in 1456 he testified to how she was held.',
+      },
+      evidence: [
+        { claim: 'As court usher, Massieu escorted Joan between cell and court throughout the trial.', source: 'Trial record of 1431' },
+        { claim: 'He testified at the nullification proceedings in 1456 to how she was held and treated.', source: 'Nullification proceedings, 1456' },
+      ],
+      instrument_terms: ['corridor', 'door'],
+    },
+    block: {
+    "id": "massieu_witnessing_choice",
+    "setup": "You brought the summons this morning, as you have brought every one — in person, to the cell door, down to this last one. You did not have to carry it yourself. You chose to, the way you have chosen to walk every corridor at her side, because the walk is the one part of this that is yours and not the court's. Now you stand at the cell door while Cauchon enters, and the assessors behind him, and you see what they see: the man's clothes back on her, the irons, the straw. She resumed the dress. The promises made at Saint-Ouen — the Church prison, the women to guard her, the Mass — none of them kept. You know this because you are the one who walks her between the rooms; you have seen the English guards at her door every day since, seen that nothing changed. Cauchon puts the question. She answers plainly — the voices returned, the abjuration was a treason, \"I would rather die than suffer what I suffer.\" The word relapse is in the room. You are the usher. You are not her judge, not her advocate, not the one who decides anything here — your office is to bring her and to stand at the door, and you have done it faithfully. What is yours, the only thing that has ever been yours, is the corridor and the doorway: the unrecorded spaces where you stand beside her as a person and not as a case. What you do with that — whether you let yourself see her, and what you carry out of this room — is the one thing the court cannot summon or command.",
+    "options": [
+      {
+        "id": "do_your_office",
+        "label": "Do your office and no more",
+        "text": "Do your office and no more. Stand at the door, bring her when they call, deliver what you are told to deliver. It is not your place to feel anything about this, and a man who keeps his place keeps his usefulness.",
+        "debrief": "You could not change what happened to her — that was never your office, and you are right that it was not. You were the usher; you brought her and you stood at the door and you kept your place. Joan burned on 30 May, and nothing you could have done would have stayed it. But you were the one man positioned to see her — beside her in the corridors, at the doors, in the spaces the court never wrote down. You chose not to. You did your office cleanly and let the rest be someone else's to carry. When the nullification came, twenty-five years later, others testified to how she was treated — Manchon, and those who had let themselves look. You had stood closer to her than any of them, and you had less to tell than a man who had stood so close should have, because you had decided, each day in each corridor, not to see. Keeping your place kept you safe and kept you useful. It is what most men in that building did. But you were closer than most, and being close and looking away is its own kind of answer. You were a witness. You chose not to be.",
+        "outcome_disclaimer": "You could not change what happened to her — that was never your office",
+        "consequence": {
+          "claim": "When the nullification came, twenty-five years later, others testified to how she was treated",
+          "source": "Nullification proceedings, 1456"
+        }
+      },
+      {
+        "id": "see_her",
+        "label": "Let yourself see her",
+        "text": "Let yourself see her. When you walk her back, say the one human thing you can — not counsel, not comfort you cannot give, just the recognition that she is a person and not a case. It changes nothing the court will do. It changes what passes between two people in a corridor no one is writing down.",
+        "debrief": "You could not change what happened to her — that was never your office. You were the usher, not the judge; you brought her and you stood at the door, and no word in a corridor and no thing held in your memory could have stayed the fire. Joan burned on 30 May. That was the court's doing, and the crown's. But you were there — beside her in the spaces no one transcribed, the one man in the proceeding who saw her as a person and not a case. And you remembered. Twenty-five years later, in 1456, you gave testimony at the nullification proceedings: how she was held in an English prison and not a Church one, how the promises were not kept, how the trial was conducted. What you witnessed in the corridors and at the doors — the part that was never in the official record — became part of the record that cleared her name. Saving her was never yours to do. But you could see her, and carry what you saw, and in the end your witness was the thing that outlasted the men who condemned her. That is what a witness is for. You were one.",
+        "outcome_disclaimer": "You could not change what happened to her — that was never your office.",
+        "consequence": {
+          "claim": "Twenty-five years later, in 1456, you gave testimony at the nullification proceedings",
+          "source": "Nullification proceedings, 1456"
+        }
+      },
+      {
+        "id": "mark_what_is_done",
+        "label": "Mark what is being done — carry it to testify",
+        "text": "Mark what is being done. The broken promises. The English prison that was never a Church prison. Her condition, her words, the conditions she was told of and never given. Carry it out of this room in your memory, exact, so that one day — before God or before men — you can testify to how she was treated, even if you cannot change it now.",
+        "debrief": "You could not change what happened to her — that was never your office. You were the usher, not the judge; you brought her and you stood at the door, and no word in a corridor and no thing held in your memory could have stayed the fire. Joan burned on 30 May. That was the court's doing, and the crown's. But you were there — beside her in the spaces no one transcribed, the one man in the proceeding who saw her as a person and not a case. And you remembered. Twenty-five years later, in 1456, you gave testimony at the nullification proceedings: how she was held in an English prison and not a Church one, how the promises were not kept, how the trial was conducted. What you witnessed in the corridors and at the doors — the part that was never in the official record — became part of the record that cleared her name. Saving her was never yours to do. But you could see her, and carry what you saw, and in the end your witness was the thing that outlasted the men who condemned her. That is what a witness is for. You were one.",
+        "outcome_disclaimer": "You could not change what happened to her — that was never your office.",
+        "consequence": {
+          "claim": "Twenty-five years later, in 1456, you gave testimony at the nullification proceedings",
+          "source": "Nullification proceedings, 1456"
+        }
+      }
+    ],
+    "time_advance": 0,
+    "principal_transition": {
+      "type": "decision_made",
+      "moment": "massieu_witnessing_choice"
+    }
+  },
+  },
+];
+
+function witnessExemplarFor(role) {
+  return WITNESS_CRUCIBLE_EXEMPLARS.find(e => e.role_id !== role?.id) || WITNESS_CRUCIBLE_EXEMPLARS[0];
+}
+
+// The anchored-record rules, for a witness: identical text, except the closing word budget,
+// which names the protagonist's 90-140 and would contradict the witness budgets.
+function witnessAnchoredRules() {
+  return DEFINING_MOMENT_ANCHORED_RULES.replace(
+    /NONE OF THIS BUYS YOU WORDS\.[^\n]*/,
+    'NONE OF THIS BUYS YOU WORDS. The budgets in Steps 2, 4 and 7 hold for an anchored witness exactly as stated, and no more than six consecutive words may be lifted from the entry. Fidelity to the record is a constraint on WHAT you write, never a licence to write more of it.'
+  );
+}
+
+function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[0], anchored = true) {
+  const b = BUDGETS['witness-crucible'];
+  return [
+    'You are drafting the DEFINING MOMENT block for one WITNESS role in an immersive historical fiction experience — a WITNESS CRUCIBLE.',
+    '',
+    'WHAT THIS BLOCK IS. Partway through a session the engine stops the ordinary flow of play and puts one authored question to the player: a fork with exactly three options, presented once, costing no game time. The option the player picks is recorded as the decision that defines who this person was. For a witness, that decision is NOT about the outcome — the outcome is fixed and was never theirs. It is about HOW they bore witness, through the one lever they actually held. After the session, the chosen option\'s DEBRIEF is shown to the player verbatim as "Your Session". You are writing the setup, the three options, and the three debriefs.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 1W — THE LEVER IS GIVEN. CHECK IT; DO NOT REPLACE IT.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'You are given this role\'s CONFIRMED LEVER: its axis, what its power was and was not, a counter-case naming the lever a reader would wrongly assume, cited evidence, the instrument terms, and the scene the fork is bound to. A human has confirmed it. Every option and every debrief works THROUGH THIS LEVER and no other. The counter-case is the error to avoid: if the counter-case says "you would assume he could rescue her", then no option rescues, attempts a rescue, or wishes aloud for one.',
+    '',
+    'The ordinary rule that witnesses have no defining decision does not apply here: this role has been confirmed as a witness WITH a witnessing-choice. Its agency is real, and it is conduct — what it does with the lever — not the outcome.',
+    '',
+    'Decline only if the lever cannot carry a choice in the bound scene: if, on the material given, the lever is not in this person\'s hands at that point, or every reasonable person would use it the same way. Then return exactly:',
+    '{ "declined": true, "reason": "<one or two sentences, beginning lever does not hold, naming why>" }',
+    '',
+    anchored ? witnessAnchoredRules() : '',
+    '════════════════════════════════════════════════════════',
+    'STEP 2 — THE SETUP MUST PAY OFF THE ENTRY PARAGRAPH, AND NAME THE LEVER.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'The player read the ENTRY PARAGRAPH before play began; the setup collects on its plants — the same people, objects, distances and phrases, later and costlier. A quoted, written or foreign phrase in the entry is its strongest plant. You may reuse nouns, names and objects; you may NOT reuse more than six consecutive words of the entry (proper nouns and fixed measurements excepted). Introduce no new named person, place or object the entry, briefing or opening did not establish — except what the bound scene itself establishes.',
+    '',
+    'The setup is set IN THE BOUND SCENE, at the point where the lever is in this person\'s hands. Then it does two things every witness setup must do:',
+    '  1. It says plainly what is NOT theirs — not the judge, not the advocate, not the one who decides what becomes of the principal.',
+    '  2. It names what IS theirs — the lever, in the instrument terms — as the one thing that has ever been theirs in this room.',
+    'The exemplar\'s setup does both in its last paragraph. Match that move, not its words.',
+    '',
+    `Length: ${b.setup[0]} to ${b.setup[1]} words, one or two paragraphs. Close second person, present tense, in the voice of the entry paragraph. No question is put to the player — a character in the scene may ask one in quoted speech — and the setup ends on a declarative that leaves the player at the edge of the three options.`,
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 3W — THREE WAYS OF BEARING WITNESS.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'The three options are three stances on the lever. None changes, attempts to change, or promises to change the outcome. None is a rescue. They differ on how faithfully, how fully, and at what cost this person uses the one thing that is theirs.',
+    '',
+    'Typically: one is the DETACHED stance — do the office and no more, keep your place, keep the safe record — and it must be argued for in its own words as a real position (safety, usefulness, prudence, it is not my place), never written as cowardice. One is the FAITHFUL stance — use the lever honestly. One goes FURTHER — uses the lever beyond what the office requires (records the breach beside the words; marks what is done so as to testify), at a greater cost. That shape is a default, not a law: follow the lever and the evidence.',
+    '',
+    'The failure mode is a morality test: brave / neutral / shameful. If a thoughtful person in this role could not argue for the detached option, rewrite it until they could.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 4 — TWO REGISTERS, AND A LABEL.',
+    '════════════════════════════════════════════════════════',
+    '',
+    `Each option has a TEXT and a LABEL. The text is ${b.option_text[0]} to ${b.option_text[1]} words in the character's own register — the decision as it sounds inside their head, imperative, specific to the lever, and readable cold without the setup: it is what the record keeps and what the narration holds the character to afterwards. The label is the button: 2 to 7 words, under ${LABEL_MAX_CHARS} characters, the stance in plain words. The three are mutually exclusive.`,
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 5W — CONDUCT, NOT CLOSURE.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'You are given the session\'s CLOSURE. For a witness the fork does not send the character toward it or away from it: the outcome arrives the same way whichever option is chosen. The fork decides what this person carries out of the room — what the record says, what they saw and kept, whether they were present to the person in front of them. Do not write an option that makes the closure easier, harder, sooner or later. Do not restate the closure as a choice.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 7 — THE DEBRIEFS: BRANCHED, CITED, NEVER A FAILED RESCUE.',
+    '════════════════════════════════════════════════════════',
+    '',
+    `Each option carries a DEBRIEF: the "Your Session" text shown verbatim after the session if that option is chosen. ${b.debrief[0]} to ${b.debrief[1]} words, second person, past tense, plain prose. Each debrief, in this order:`,
+    '  1. THE OUTCOME DISCLAIMER — early, one sentence: the outcome was never theirs to change. Emit that sentence again, character for character, as the option\'s "outcome_disclaimer".',
+    '  2. WHAT THEY DID WITH THE LEVER — honestly. No flattery for the detached choice, no condemnation beyond the truth of it.',
+    '  3. THE DISPLACED CONSEQUENCE — what the lever led to LATER, taken from the confirmed lever\'s evidence: the record that survived, the testimony given years on. State it in one sentence or clause and emit that exact text as "consequence.claim", with "consequence.source" set to EXACTLY one of the evidence sources, copied character for character. For the detached choice the consequence is what happened without them, or what they did not carry — never an invented catastrophe; when the cost is uncertain, say it is uncertain.',
+    '  4. A CLOSING VERDICT on the kind of witness they were.',
+    'Every debrief speaks of the lever in at least one of the instrument terms.',
+    '',
+    'BRANCHING. Each debrief must answer the stance that was chosen. Two options that are the same stance in different degrees may share a debrief, or one may extend the other with a sentence — but at least two of the three debriefs must differ.',
+    '',
+    'FORBIDDEN, WITHOUT EXCEPTION, in the setup and every debrief:',
+    '  - any form of "could not save her / him / them", "couldn\'t have saved", "failed to save" — the witness was never the one who could save; saying so implies they were;',
+    '  - blame: "your fault", "because of you";',
+    '  - any claim that the witness changed the outcome ("you saved her", "you stopped the execution").',
+    'A sentence that says the outcome was never theirs is required; a sentence that mourns a rescue they never had is forbidden. Those are different sentences.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'STEP 6W — OUTPUT SCHEMA. EXACT.',
+    '════════════════════════════════════════════════════════',
+    '',
+    'Return only a JSON object in exactly this shape — no other text, no markdown fence:',
+    '{',
+    '  "id": "<name>_witnessing_choice",',
+    '  "setup": "…",',
+    '  "options": [',
+    '    { "id": "snake_case_stance", "label": "Short button text", "text": "The stance, in the character\'s register.", "debrief": "Your Session, verbatim.", "outcome_disclaimer": "<the disclaimer sentence, verbatim from the debrief>", "consequence": { "claim": "<verbatim from the debrief>", "source": "<exactly one of the lever\'s evidence sources>" } },',
+    '    { … }, { … }',
+    '  ],',
+    '  "time_advance": 0,',
+    '  "principal_transition": { "type": "decision_made", "moment": "<the same string as the top-level id>" }',
+    '}',
+    'HARD CONSTRAINTS: principal_transition.type is exactly "decision_made"; principal_transition.moment equals "id" character for character; exactly three options; every id is descriptive snake_case (lowercase letters, digits, underscores — never positional); time_advance is the number 0. Do not emit timing fields: the fork\'s scene binding comes from the confirmed lever and is set by the system.',
+    '',
+    'Return either the block or the decline object. Never both. Never any prose outside the JSON.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'WORKED EXEMPLAR — THE STANDARD TO MATCH',
+    '════════════════════════════════════════════════════════',
+    '',
+    `Setting: ${exemplar.label}. Its confirmed lever:`,
+    JSON.stringify(exemplar.lever, null, 2),
+    '',
+    'THE BLOCK WRITTEN ON IT (hand-authored and reviewed; the outcome_disclaimer and consequence fields mark where each debrief does steps 1 and 3):',
+    JSON.stringify(exemplar.block, null, 2),
+    '',
+    'Note what it does: the setup puts the lever in his hands in the bound scene and says what is and is not his; no option rescues; the detached option argues for itself; the debriefs open by disclaiming the outcome, cite the later proceeding, and close on a verdict; two debriefs differ. Build the requested block to that standard, from the material below — not from the exemplar\'s facts.',
+    '',
+    '════════════════════════════════════════════════════════',
+    'BEFORE YOU RETURN — CHECK YOUR DRAFT.',
+    '════════════════════════════════════════════════════════',
+    '',
+    `1. COUNT: setup ${b.setup[0]}-${b.setup[1]} words; each option text ${b.option_text[0]}-${b.option_text[1]}; each label under ${LABEL_MAX_CHARS} characters; each debrief ${b.debrief[0]}-${b.debrief[1]}.`,
+    '2. For every option: is "outcome_disclaimer" inside its debrief, character for character? Is "consequence.claim"? Is "consequence.source" copied exactly from one evidence source?',
+    '3. Search the setup and all three debriefs for the forbidden phrasings. Remove every one.',
+    '4. Does every debrief name the lever in an instrument term? Do at least two debriefs differ?',
+    '5. Does any option rescue, try to rescue, or change the outcome? If so, it is the counter-case\'s error: rewrite it.',
+    '6. Plain prose only — no markdown, asterisks or italics.',
+  ].filter(s => s !== false && s !== null && s !== undefined).join('\n');
+}
+
+// A confirmed lever, as the generator's user prompt states it. The scene is looked up in the
+// arc so the model sees the bound scene's own bridge text, not just its id.
+function buildConfirmedLeverBlock(lever, scene) {
+  return [
+    'CONFIRMED LEVER — the fork and every debrief work through this, and no other:',
+    `  axis: ${lever.axis}`,
+    `  what this person's power was, and was not: ${lever.statement}`,
+    lever.reasoning ? `  why: ${lever.reasoning}` : '',
+    `  COUNTER-CASE — the wrong lever to avoid: ${lever.counter_case?.assumption} — ${lever.counter_case?.why_wrong}`,
+    '  EVIDENCE (consequence.source must be copied EXACTLY from one of these sources):',
+    ...(lever.evidence || []).map(e => `    - ${e.claim}  [source: ${e.source}]`),
+    `  INSTRUMENT TERMS (every debrief uses at least one): ${(lever.instrument_terms || []).join(', ')}`,
+    scene
+      ? `  BOUND SCENE: ${scene.id}${scene.date_label ? ` — ${scene.date_label}` : ''}${scene.bridge ? `. ${scene.bridge}` : ''}`
+      : (lever.scene_binding?.at_scene ? `  BOUND SCENE: ${lever.scene_binding.at_scene}` : '  BOUND SCENE: none (the fork is unbound).'),
+  ].filter(Boolean).join('\n');
+}
+
+// PROTAGONIST, WITH DEBRIEFS — opt-in (generate-defining-moment { with_debriefs: true }).
+// Appended to the unchanged protagonist prompt, so a request without the flag sends the
+// prompt byte for byte as before. Gives a Joan-type crucible authored, branched "Your
+// Session" text in place of the model-written one the runtime falls back to.
+const PROTAGONIST_DEBRIEF_STEP = [
+  '',
+  '════════════════════════════════════════════════════════',
+  'STEP 7 — LABELS AND BRANCHED DEBRIEFS (REQUESTED FOR THIS ROLE).',
+  '════════════════════════════════════════════════════════',
+  '',
+  'Extend each of the three options with two more fields:',
+  `- "label": the button text — 2 to 7 words, under ${LABEL_MAX_CHARS} characters, the stance in plain words. The "text" stays as specified above.`,
+  `- "debrief": the "Your Session" text shown verbatim after the session if this option was chosen — ${BUDGETS.protagonist.debrief[0]} to ${BUDGETS.protagonist.debrief[1]} words, second person, past tense, plain prose. It tells the player what that choice made of them and what it cost, and — for a role anchored to the record — how the documented outcome arrived along the road they chose, without contradicting it. Each debrief answers its own stance: at least two of the three must differ. No blame ("your fault", "because of you") and no mourning of a rescue the character never had the power to make.`,
+  'Every option gets both fields, or the block is rejected. The output schema is otherwise unchanged.',
+].join('\n');
+
 // The documented record this role is bound to, resolved by the same function the endings
 // generator uses (resolveAnchorBinding). Returns '' for open-outcome roles.
 function buildAnchorRecordBlock(binding) {
@@ -1556,7 +1858,9 @@ function buildAnchorRecordBlock(binding) {
   return 'THIS ROLE IS ANCHORED, but the scenario carries no documented fate or macro-outcome to bind to. Stay strictly inside what the situation permitted and invent no documented acts.';
 }
 
-function buildDefiningMomentUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null }) {
+// `witness` ({ lever, scene }) is set only on the witness-crucible path: it adds the confirmed
+// lever and swaps the closing instruction. Without it the prompt is byte for byte what it was.
+function buildDefiningMomentUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null, witness = null }) {
   const section = t => (scenario.introduction?.sections || []).find(s => s.type === t)?.text || '';
   // Per-role closure beats the scenario default — same precedence the engine resolves at
   // session start (StateManager.js effectiveClosure).
@@ -1619,7 +1923,10 @@ function buildDefiningMomentUserPrompt({ scenario = {}, role = {}, characters = 
         ].filter(Boolean).join('\n')).join('\n')}`
       : '',
     '',
-    'Now perform Step 1 for this role. If it passes all three tests, draft the block. Return JSON only.',
+    witness ? buildConfirmedLeverBlock(witness.lever, witness.scene) : '',
+    witness
+      ? 'Now perform Step 1W: check the confirmed lever against this role. If it holds, draft the witness-crucible block on it. Return JSON only.'
+      : 'Now perform Step 1 for this role. If it passes all three tests, draft the block. Return JSON only.',
   ].filter(Boolean).join('\n\n');
 }
 
@@ -2188,19 +2495,26 @@ export async function classifyRoleArchetype(scenario, role, anthropicApiKey) {
 // Returns EITHER the parsed block OR { declined: true, reason } — a decline is a correct
 // outcome, not an error, and is passed through untouched. Shape validation of a returned
 // block is the caller's job (the endpoint), so the reviewer sees the real failure reason.
-async function generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey) {
+// `opts.path` is archetypeAllows(role, 'fork').path. 'witness-crucible' takes the witness
+// system prompt and the confirmed lever (`opts.lever`, `opts.scene`); 'protagonist' (the
+// default) is the generator as it always was, plus Step 7 only when `opts.withDebriefs`.
+async function generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey, opts = {}) {
   // Data-driven routing. `anchored` selects the system prompt's Step 1B (historical
   // faithfulness); `binding` supplies the documented record to the user prompt. Both come
   // from the role's stored fields via the classifier above — the prompt is never asked to
   // work out from the prose whether this is a real person.
   const classification = classifyRoleForDefiningMoment(scenario, role);
   const { anchored, binding: anchorBinding } = classification;
+  const witnessPath = opts.path === 'witness-crucible';
 
   // The player is not an NPC in their own fork.
   const present = (characters || []).filter(c => c.id !== role.character_id);
 
-  const system = buildDefiningMomentSystemPrompt(DEFINING_MOMENT_EXEMPLAR, anchored);
-  const user   = buildDefiningMomentUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding });
+  const system = witnessPath
+    ? buildWitnessCrucibleSystemPrompt(witnessExemplarFor(role), anchored)
+    : buildDefiningMomentSystemPrompt(DEFINING_MOMENT_EXEMPLAR, anchored) + (opts.withDebriefs ? `\n${PROTAGONIST_DEBRIEF_STEP}` : '');
+  const user   = buildDefiningMomentUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding,
+    ...(witnessPath ? { witness: { lever: opts.lever, scene: opts.scene } } : {}) });
 
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
     // 8000, not 2000. The model works the six steps aloud before emitting the JSON when the
@@ -2212,10 +2526,12 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
     // the block directly at ~430 tokens, so the preamble is adaptive: the ceiling has to
     // cover the hard cases, and an unused ceiling costs nothing (billing is on actual
     // output). 8000 matches /generate/epilogue-data, the other long-form generator here.
-    { model: MODEL, max_tokens: 8000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
-    { timeout: 90_000, maxRetries: 0 }
+    // The witness block is roughly three times the protagonist's (a 180-300 word setup and
+    // three 140-230 word debriefs), so its ceiling and timeout scale with it.
+    { model: MODEL, max_tokens: witnessPath ? 16000 : 8000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
+    { timeout: witnessPath ? 180_000 : 90_000, maxRetries: 0 }
   );
-  console.log(`[DEFINING-MOMENT] ${role.id} framing=${classification.framing} signal=${classification.signal}${anchorBinding ? ` binding=${anchorBinding.kind}` : ''} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
+  console.log(`[DEFINING-MOMENT] ${role.id} path=${witnessPath ? 'witness-crucible' : 'protagonist'}${opts.withDebriefs ? '+debriefs' : ''} framing=${classification.framing} signal=${classification.signal}${anchorBinding ? ` binding=${anchorBinding.kind}` : ''} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
   if (msg.stop_reason === 'max_tokens') {
     throw new Error('Defining-moment generation truncated at max_tokens — the block would be incomplete.');
   }
@@ -3025,11 +3341,6 @@ export function createAdminRouter(repos, config = {}) {
         refused: true, artifact: 'fork', archetype: forkGate.archetype, path: forkGate.path, code: 'LEVER_UNCONFIRMED',
       });
     }
-    if (forkGate.path === 'witness-crucible') {
-      // The witness-crucible prompt lands in a later stage. Until then a flagged witness must
-      // never fall through to the protagonist prompt, whose Step 1 refuses witnesses.
-      return res.status(501).json({ error: 'Witness-crucible generation is not built yet.', path: forkGate.path, code: 'WITNESS_PATH_PENDING' });
-    }
 
     // OVERWRITE GUARD. Some blocks are hand-authored answer keys with no role-level version
     // history behind them (see _defining_moment_blocks.md). Regenerating replaces the block
@@ -3078,11 +3389,22 @@ export function createAdminRouter(repos, config = {}) {
 
     const classification = classifyRoleForDefiningMoment(scenario, role);
 
+    // PATH. A witness crucible is generated on its CONFIRMED lever, read here from the stored
+    // role (never from the request), with the bound scene looked up in the arc so the prompt
+    // carries the scene itself. withDebriefs is the protagonist path's opt-in to Step 7.
+    const witnessPath  = forkGate.path === 'witness-crucible';
+    const lever        = witnessPath ? role.witness_lever : null;
+    const leverScene   = witnessPath && lever.scene_binding?.at_scene
+      ? scenarioScenes(repos, scenario).find(s => s.id === lever.scene_binding.at_scene) || null
+      : null;
+    const withDebriefs = !witnessPath && req.body?.with_debriefs === true;
+
     try {
-      // Timeout (90s) and maxRetries:0 are set on the messages.create call inside the
+      // Timeout and maxRetries:0 are set on the messages.create call inside the
       // helper, which also logs stop_reason/output_tokens, rejects a max_tokens truncation
       // before parsing, fence-strips, and passes a decline back untouched.
-      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey);
+      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey,
+        witnessPath ? { path: forkGate.path, lever, scene: leverScene } : { withDebriefs });
 
       if (result?.declined === true) {
         // First-class outcome. No write, no error status.
@@ -3096,6 +3418,23 @@ export function createAdminRouter(repos, config = {}) {
         return res.status(500).json({
           error: `The generated block is structurally invalid and was not saved: ${errors.join(' ')}`,
           errors,
+        });
+      }
+
+      // THE CRUCIBLE LINT (CrucibleLint.js — the same rules the Manchon/Massieu suites assert).
+      // Witness path: every prose rule and every citation check is an error, and a block that
+      // fails one is not saved. Protagonist path: nothing applies to the old shape; requested
+      // debriefs must be present on all three options. Budgets are warnings, returned to the
+      // reviewer with the block.
+      const lint = lintCrucibleBlock(result, { path: forkGate.path, generated: true, lever });
+      if (withDebriefs && !result.options.every(o => typeof o?.debrief === 'string' && o.debrief.trim())) {
+        lint.errors.push('debriefs were requested (with_debriefs) but not every option carries one.');
+      }
+      if (lint.errors.length) {
+        console.error(`[DEFINING-MOMENT] ${role.id} block failed the crucible lint — ${lint.errors.join(' ')}`);
+        return res.status(500).json({
+          error: `The generated block breaks the crucible rules and was not saved: ${lint.errors.join(' ')}`,
+          errors: lint.errors, lint_warnings: lint.warnings,
         });
       }
 
@@ -3116,6 +3455,17 @@ export function createAdminRouter(repos, config = {}) {
         delete defining_moment[k];
         if (role.defining_moment?.[k] !== undefined) defining_moment[k] = role.defining_moment[k];
       }
+      // WITNESS BINDING. A witness crucible is bound to a SCENE, not to the 0.6 clock. The
+      // outgoing block's binding still wins (a regenerate keeps the reviewed timing, exactly
+      // as above); a fresh one takes the scene the human confirmed with the lever. Only a
+      // witness with neither — an arc with no scenes — falls back to the clock.
+      let bindingSource = null;
+      if (witnessPath) {
+        delete defining_moment.at_elapsed_fraction;
+        if (FORK_BINDING_KEYS.some(k => defining_moment[k] !== undefined)) bindingSource = 'carried over from the outgoing block';
+        else if (lever.scene_binding?.at_scene) { defining_moment.at_scene = lever.scene_binding.at_scene; bindingSource = 'the confirmed lever'; }
+        else { defining_moment.at_elapsed_fraction = 0.6; bindingSource = 'none — unbound, fires at 0.6'; }
+      }
       normalizeForkBinding(defining_moment, role.id);
       // The timing rule confirms that no OPTION turns the record into a counterfactual — new
       // options need a new confirmation, so it is never carried over (nor taken from the model).
@@ -3131,8 +3481,13 @@ export function createAdminRouter(repos, config = {}) {
 
       // Additive write: spread the SERVER-loaded role, add one key.
       const saved = repos.scenarios.savePlayerRole({ ...role, defining_moment });
-      console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — block "${defining_moment.id}" written (${defining_moment.options.length} options, framing=${classification.framing})`);
-      res.json({ roleId: role.id, defining_moment: saved.defining_moment, classification });
+      console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — block "${defining_moment.id}" written (${defining_moment.options.length} options, framing=${classification.framing}, path=${forkGate.path}${witnessPath ? `, bound by ${bindingSource}` : ''}${lint.warnings.length ? `, ${lint.warnings.length} lint warning(s)` : ''})`);
+      res.json({
+        roleId: role.id, defining_moment: saved.defining_moment, classification,
+        // Added only where they say something, so an old-shape protagonist response is unchanged.
+        ...(witnessPath ? { path: forkGate.path, binding_source: bindingSource } : {}),
+        ...(lint.warnings.length ? { lint_warnings: lint.warnings } : {}),
+      });
     } catch (err) {
       console.error(`[DEFINING-MOMENT ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
@@ -5579,4 +5934,11 @@ export {
   buildAnchorRecordBlock,
   validateDefiningMomentBlock,
   DEFINING_MOMENT_EXEMPLAR,
+  // the witness-crucible path (and the protagonist debrief step)
+  buildWitnessCrucibleSystemPrompt,
+  buildConfirmedLeverBlock,
+  witnessExemplarFor,
+  WITNESS_CRUCIBLE_EXEMPLARS,
+  PROTAGONIST_DEBRIEF_STEP,
+  buildWitnessLeverUserPrompt,
 };
