@@ -1544,6 +1544,14 @@ function buildDefiningMomentSystemPrompt(exemplar = DEFINING_MOMENT_EXEMPLAR, an
 // Manchon's "read at the nullification" (his evidence 2 and his authored debrief) may overstate
 // it — "produced and identified before" is likelier; and Massieu's setup puts him at the cell
 // door on 28 May, which is unverified against the record of that day.
+// WORD TARGETS — the middle of each budget, which the prompts aim at. The budgets themselves
+// (CrucibleLint BUDGETS) stay the lint's soft limits; the model, given only the range, wrote to
+// its top and over it on every first real run (setups ~320, texts ~78, debriefs ~240).
+const WORD_TARGETS = {
+  'witness-crucible': { setup: 230, option_text: 45, debrief: 180 },
+  protagonist:        { debrief: 150 },
+};
+
 const WITNESS_CRUCIBLE_EXEMPLARS = [
   {
     role_id: 'role_manchon',
@@ -1688,6 +1696,7 @@ function witnessAnchoredRules() {
 
 function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[0], anchored = true) {
   const b = BUDGETS['witness-crucible'];
+  const t = WORD_TARGETS['witness-crucible'];
   return [
     'You are drafting the DEFINING MOMENT block for one WITNESS role in an immersive historical fiction experience — a WITNESS CRUCIBLE.',
     '',
@@ -1716,7 +1725,7 @@ function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[
     '  2. It names what IS theirs — the lever, in the instrument terms — as the one thing that has ever been theirs in this room.',
     'The exemplar\'s setup does both in its last paragraph. Match that move, not its words.',
     '',
-    `Length: ${b.setup[0]} to ${b.setup[1]} words, one or two paragraphs. Close second person, present tense, in the voice of the entry paragraph. No question is put to the player — a character in the scene may ask one in quoted speech — and the setup ends on a declarative that leaves the player at the edge of the three options.`,
+    `Length: ${b.setup[0]} to ${b.setup[1]} words — aim for about ${t.setup}; the range is a limit, not a goal — one or two paragraphs. Close second person, present tense, in the voice of the entry paragraph. No question is put to the player — a character in the scene may ask one in quoted speech — and the setup ends on a declarative that leaves the player at the edge of the three options.`,
     '',
     '════════════════════════════════════════════════════════',
     'STEP 3W — THREE WAYS OF BEARING WITNESS.',
@@ -1732,7 +1741,7 @@ function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[
     'STEP 4 — TWO REGISTERS, AND A LABEL.',
     '════════════════════════════════════════════════════════',
     '',
-    `Each option has a TEXT and a LABEL. The text is ${b.option_text[0]} to ${b.option_text[1]} words in the character's own register — the decision as it sounds inside their head, imperative, specific to the lever, and readable cold without the setup: it is what the record keeps and what the narration holds the character to afterwards. The label is the button: 2 to 7 words, under ${LABEL_MAX_CHARS} characters, the stance in plain words. The three are mutually exclusive.`,
+    `Each option has a TEXT and a LABEL. The text is ${b.option_text[0]} to ${b.option_text[1]} words (aim for about ${t.option_text}) in the character's own register — the decision as it sounds inside their head, imperative, specific to the lever, and readable cold without the setup: it is what the record keeps and what the narration holds the character to afterwards. The label is the button: 2 to 7 words, under ${LABEL_MAX_CHARS} characters, the stance in plain words. The three are mutually exclusive.`,
     '',
     '════════════════════════════════════════════════════════',
     'STEP 5W — CONDUCT, NOT CLOSURE.',
@@ -1744,12 +1753,14 @@ function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[
     'STEP 7 — THE DEBRIEFS: BRANCHED, CITED, NEVER A FAILED RESCUE.',
     '════════════════════════════════════════════════════════',
     '',
-    `Each option carries a DEBRIEF: the "Your Session" text shown verbatim after the session if that option is chosen. ${b.debrief[0]} to ${b.debrief[1]} words, second person, past tense, plain prose. Each debrief, in this order:`,
-    '  1. THE OUTCOME DISCLAIMER — early, one sentence: the outcome was never theirs to change. Emit that sentence again, character for character, as the option\'s "outcome_disclaimer".',
+    `Each option carries a DEBRIEF: the "Your Session" text shown verbatim after the session if that option is chosen. ${b.debrief[0]} to ${b.debrief[1]} words (aim for about ${t.debrief}), second person, past tense, plain prose. Each debrief, in this order:`,
+    '  1. THE OUTCOME DISCLAIMER — early, one SHORT sentence (under 20 words): the outcome was never theirs to change. Emit that sentence again, character for character, as the option\'s "outcome_disclaimer".',
     '  2. WHAT THEY DID WITH THE LEVER — honestly. No flattery for the detached choice, no condemnation beyond the truth of it.',
-    '  3. THE DISPLACED CONSEQUENCE — what the lever led to LATER, taken from the confirmed lever\'s evidence: the record that survived, the testimony given years on. State it in one sentence or clause and emit that exact text as "consequence.claim", with "consequence.source" set to EXACTLY one of the evidence sources, copied character for character. For the detached choice the consequence is what happened without them, or what they did not carry — never an invented catastrophe; when the cost is uncertain, say it is uncertain.',
-    '  4. A CLOSING VERDICT on the kind of witness they were.',
+    '  3. THE DISPLACED CONSEQUENCE — what the lever led to LATER, taken from the confirmed lever\'s evidence: the record that survived, the testimony given years on. State it in one sentence or clause of under 30 words, in the second person like the rest of the debrief ("you"; never name the character in the third person, even where the evidence is phrased that way), and claim no more than the evidence does; emit that exact text as "consequence.claim", with "consequence.source" set to EXACTLY one of the evidence sources, copied character for character. For the detached choice the consequence is what happened without them, or what they did not carry — never an invented catastrophe; when the cost is uncertain, say it is uncertain.',
+    '  4. A CLOSING VERDICT on the kind of witness they were — one or two sentences.',
     'Every debrief speaks of the lever in at least one of the instrument terms.',
+    '',
+    `BREVITY. Aim for the MIDDLE of every budget, not the top: setup about ${t.setup} words, each option text about ${t.option_text}, each debrief about ${t.debrief}. Every sentence earns its place; cut repetition, and cut any sentence that re-says the one before it. In a debrief, state the outcome disclaimer ONCE and the displaced consequence ONCE, each in one clean sentence — do not restate, paraphrase or circle back to either, and do not close by summing them up again. A debrief is about 9 to 12 sentences: the disclaimer (1), what they did with the lever (3 to 4), the consequence (1), what it meant (1 to 2), the verdict (1 to 2). Do not add a paragraph after the consequence explaining its significance in other words. The required elements stay exactly as specified (the verbatim outcome_disclaimer, the cited consequence claim, the instrument terms): tighten the prose around them, never drop them. The exemplar below shows the standard of the writing, not its length; where it runs longer than these targets, write shorter.`,
     '',
     'BRANCHING. Each debrief must answer the stance that was chosen. Two options that are the same stance in different degrees may share a debrief, or one may extend the other with a sentence — but at least two of the three debriefs must differ.',
     '',
@@ -1794,7 +1805,7 @@ function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[
     'BEFORE YOU RETURN — CHECK YOUR DRAFT.',
     '════════════════════════════════════════════════════════',
     '',
-    `1. COUNT: setup ${b.setup[0]}-${b.setup[1]} words; each option text ${b.option_text[0]}-${b.option_text[1]}; each label under ${LABEL_MAX_CHARS} characters; each debrief ${b.debrief[0]}-${b.debrief[1]}.`,
+    `1. COUNT: setup ${b.setup[0]}-${b.setup[1]} words; each option text ${b.option_text[0]}-${b.option_text[1]}; each label under ${LABEL_MAX_CHARS} characters; each debrief ${b.debrief[0]}-${b.debrief[1]}. Anything well past the middle (setup ${t.setup}, text ${t.option_text}, debrief ${t.debrief}) — cut it back: drop repetition first, never a required element.`,
     '2. For every option: is "outcome_disclaimer" inside its debrief, character for character? Is "consequence.claim"? Is "consequence.source" copied exactly from one evidence source?',
     '3. Search the setup and all three debriefs for the forbidden phrasings. Remove every one.',
     '4. Does every debrief name the lever in an instrument term? Do at least two debriefs differ?',
@@ -1833,7 +1844,7 @@ const PROTAGONIST_DEBRIEF_STEP = [
   '',
   'Extend each of the three options with two more fields:',
   `- "label": the button text — 2 to 7 words, under ${LABEL_MAX_CHARS} characters, the stance in plain words. The "text" stays as specified above.`,
-  `- "debrief": the "Your Session" text shown verbatim after the session if this option was chosen — ${BUDGETS.protagonist.debrief[0]} to ${BUDGETS.protagonist.debrief[1]} words, second person, past tense, plain prose. It tells the player what that choice made of them and what it cost, and — for a role anchored to the record — how the documented outcome arrived along the road they chose, without contradicting it. Each debrief answers its own stance: at least two of the three must differ. No blame ("your fault", "because of you") and no mourning of a rescue the character never had the power to make.`,
+  `- "debrief": the "Your Session" text shown verbatim after the session if this option was chosen — ${BUDGETS.protagonist.debrief[0]} to ${BUDGETS.protagonist.debrief[1]} words (aim for about ${WORD_TARGETS.protagonist.debrief}; the range is a limit, not a goal; state the cost once and do not restate it), second person, past tense, plain prose. It tells the player what that choice made of them and what it cost, and — for a role anchored to the record — how the documented outcome arrived along the road they chose, without contradicting it. Each debrief answers its own stance: at least two of the three must differ. No blame ("your fault", "because of you") and no mourning of a rescue the character never had the power to make.`,
   'Every option gets both fields, or the block is rejected. The output schema is otherwise unchanged.',
 ].join('\n');
 
