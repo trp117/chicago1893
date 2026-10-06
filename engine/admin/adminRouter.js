@@ -760,7 +760,20 @@ function preserveStoredWitnessCrucible(repos, role) {
   return role;
 }
 
-// All six editor-save guards over ONE stored read. preserveStoredEndingNotes,
+// EDITOR-SAVE GUARD for witness_lever — seventh sibling, and the strictest: the editor
+// never writes this key at all. A lever is written by the proposal route (confirmed:false)
+// and confirmed or edited only through PATCH /player-roles/:id/witness-lever, so whatever an
+// editor save posts — absent (every tab today), stale, or a hand-rolled { confirmed: true } —
+// is replaced by the stored value. That is what makes "a human confirmed this lever" mean
+// the PATCH route ran, not that a form field said so.
+function preserveStoredWitnessLever(repos, role) {
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  if (stored && stored.witness_lever !== undefined) role.witness_lever = stored.witness_lever;
+  else delete role.witness_lever;
+  return role;
+}
+
+// All seven editor-save guards over ONE stored read. preserveStoredEndingNotes,
 // preserveStoredDefiningMoment, preserveStoredArchetype and preserveStoredAnchoredLocation
 // each look the role up for themselves; running them back to back would read it four
 // times. The shim memoizes the single real lookup and hands the same object to all four,
@@ -784,6 +797,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
   preserveStoredWitnessCrucible(shim, role);
+  preserveStoredWitnessLever(shim, role);
   // After the defining-moment guard, so a block restored from storage is normalized too.
   // The timing confirmation is reconciled AFTER normalizing, against the timing that will
   // actually be written.
@@ -2233,6 +2247,184 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
   return parsed;
 }
 
+// ── WITNESS LEVER (axis-first, step 1 of 2) ───────────────────────────────────
+// A witness crucible is generated AXIS-FIRST. Before any prose, the model proposes the
+// witness's LEVER — what this person's power over the event actually was — with a
+// counter-case and cited evidence, plus the scene the witnessing-choice comes to a point in.
+// A human confirms it (PATCH /player-roles/:id/witness-lever); only then may content be
+// generated on it. The wrong lever is the error both authored crucibles had to get right
+// (Manchon's power is the record, not a defence; Massieu's is presence, not rescue) and the
+// one a model is most likely to make, so it is caught here, cheaply, before the prose.
+export const WITNESS_LEVER_AXES = Object.freeze([
+  'documentary_record',
+  'human_presence',
+  'testimony',
+  'could_have_acted_at_cost',
+  'other',
+]);
+
+// The arc's scenes, in story order, from the scenario's own arc — the same arc a session
+// plays (StateManager.loadStoryArc reads scenario.storyArcIds[0]). [] when it has none.
+function scenarioScenes(repos, scenario) {
+  const arcId = scenario?.storyArcIds?.[0];
+  const arc   = arcId && repos?.storyArcs ? repos.storyArcs.findById(arcId) : null;
+  const out = [];
+  for (const act of (Array.isArray(arc?.acts) ? arc.acts : [])) {
+    for (const s of (Array.isArray(act?.scenes) ? act.scenes : [])) {
+      if (s && typeof s.id === 'string' && s.id) out.push({ ...s, act: act.actNumber ?? null });
+    }
+  }
+  return out;
+}
+
+export const WITNESS_LEVER_SYSTEM_PROMPT = [
+  'You are identifying the LEVER of one WITNESS role in an immersive historical fiction experience, before any prose is written for it. You are not writing anything a player will read. Return JSON only.',
+  '',
+  'WHAT A WITNESS CRUCIBLE IS. This person was present at an event whose outcome was fixed and was never theirs to change. They are not its judge, its victim or its rescuer. But HOW they bore witness was a real decision, and it had a documented consequence somewhere downstream — a record that survived, testimony given years later, a person who was not alone in a corridor. The defining moment that will later be written for this role is a choice about that conduct, made through ONE lever. Your job is to find that lever, from the record, and nothing else.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE AXES — pick exactly one',
+  '════════════════════════════════════════════════════════',
+  '',
+  'documentary_record — they wrote, kept, certified or shaped the record of the event. Their choice is how faithfully. (A trial notary: the minute he keeps is the thing that survives him.)',
+  'human_presence — their power is being physically beside the principal as a person, in spaces nobody records. Their choice is whether to let themselves see, and be seen by, the person in front of them. (A court usher walking the prisoner between cell and court.)',
+  'testimony — what they saw is carried out of the room and into a later account or proceeding. Their choice is what they attend to and keep, so that it can be told.',
+  'could_have_acted_at_cost — the record shows a real, documented opening to act (speak, refuse, warn, sign or not sign), at a personal cost — and acting would STILL not have changed the outcome. Their choice is whether to pay that cost anyway.',
+  'other — none of the above fits; name the lever plainly in "statement".',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE COUNTER-CASE — REQUIRED',
+  '════════════════════════════════════════════════════════',
+  '',
+  'State the lever a reader would NATURALLY assume this person had, and why the record says it is wrong. Most often the natural assumption is rescue or intervention: "you would assume the usher, holding the keys, could get her out — but he had no authority over the sentence; his lever is presence, not rescue." If the natural assumption happens to be right, say so and say why the evidence supports it. This field exists to catch the wrong lever before anything is written on it; do not skip it or fill it with a formality.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'EVIDENCE — CITED, FROM THE MATERIAL GIVEN',
+  '════════════════════════════════════════════════════════',
+  '',
+  'At least two items. Each is { "claim", "source" }: a specific documented act or position of THIS person that shows the lever, and where it comes from. At least one item must be the DOWNSTREAM CONSEQUENCE of the lever — what the record, the testimony or the presence led to afterwards — because the debriefs written later must cite it.',
+  'Sources must be things you were given: quote the documented record\'s source citation verbatim when one is supplied; otherwise name the field ("role briefing", "role description", "starting knowledge"). Never invent a source, a document, a date or an act the material does not support. If the material cannot support two items, decline.',
+  '',
+  'INSTRUMENT TERMS: 2 to 5 short lowercase words that name the lever\'s instrument in plain language — the words a debrief must use when it speaks about the lever (for a notary: record, minute; for an usher: corridor, door, testify). Each must be a word that would naturally appear in prose about this person, not a label.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'THE SCENE',
+  '════════════════════════════════════════════════════════',
+  '',
+  'You are given the scenario\'s scenes in story order. Choose the ONE scene in which this witness\'s choice comes to a point — where the lever is in their hands and the pressure is highest. It must come BEFORE the documented outcome, never at or after it. Give its id exactly as listed and say why. If no scenes are listed, return "at_scene": null.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'DECLINE',
+  '════════════════════════════════════════════════════════',
+  '',
+  'If this person had no lever over anything the record kept — a pure bystander, someone who saw and did nothing that touched the record, the principal, or any later account — there is no witness crucible here. Return exactly:',
+  '{ "declined": true, "reason": "<one or two sentences, using the phrase no lever, naming why>" }',
+  'Declining is a correct outcome. A manufactured lever produces a fork that asks a question that does not matter.',
+  '',
+  '════════════════════════════════════════════════════════',
+  'OUTPUT — EXACT',
+  '════════════════════════════════════════════════════════',
+  '',
+  '{',
+  '  "axis": "documentary_record | human_presence | testimony | could_have_acted_at_cost | other",',
+  '  "statement": "One or two sentences: what this person\'s power actually was, and what it was not.",',
+  '  "reasoning": "Why this axis and not the others, from the evidence.",',
+  '  "counter_case": { "assumption": "The lever a reader would naturally assume.", "why_wrong": "Why the record says otherwise (or why it is in fact right)." },',
+  '  "evidence": [ { "claim": "A documented act or position of this person.", "source": "Where it comes from." } ],',
+  '  "instrument_terms": ["word", "word"],',
+  '  "scene_binding": { "at_scene": "scene_id_from_the_list", "reasoning": "Why this scene, and that it precedes the documented outcome." }',
+  '}',
+  '',
+  'Return either that object or the decline object. Never both. Never any prose outside the JSON.',
+].join('\n');
+
+function buildWitnessLeverUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null, scenes = [] }) {
+  const section = t => (scenario.introduction?.sections || []).find(s => s.type === t)?.text || '';
+  const briefingText = getBriefingText(role.briefing);
+  return [
+    `SCENARIO: ${scenario.title || scenario.id || 'untitled'}`,
+    scenario.premise ? `PREMISE:\n${scenario.premise}` : '',
+    section('world')  ? `WORLD:\n${section('world')}`   : '',
+    section('stakes') ? `STAKES:\n${section('stakes')}` : '',
+    '',
+    `ROLE: ${role.name || role.id}`,
+    role.character_type ? `CHARACTER TYPE: ${role.character_type}` : '',
+    role.fate_mode      ? `FATE MODE: ${role.fate_mode}` : '',
+    role.represents     ? `REPRESENTS: ${role.represents}` : '',
+    buildAnchorRecordBlock(anchorBinding),
+    role.description ? `ROLE DESCRIPTION:\n${role.description}` : '',
+    briefingText ? `ROLE BRIEFING:\n${briefingText}` : '',
+    Array.isArray(role.startingKnowledge) && role.startingKnowledge.length
+      ? `STARTING KNOWLEDGE:\n${role.startingKnowledge.map(k => `- ${k}`).join('\n')}` : '',
+    Array.isArray(role.character_hooks) && role.character_hooks.filter(Boolean).length
+      ? `CHARACTER HOOKS:\n${role.character_hooks.filter(Boolean).map(h => `- ${h}`).join('\n')}` : '',
+    entryParagraph ? `ENTRY PARAGRAPH (what the player reads before play):\n${entryParagraph}` : '',
+    characters.length
+      ? `CHARACTERS PRESENT:\n${characters.map(c => `- ${c.id}: ${c.name}${c.role ? ` (${c.role})` : ''}`).join('\n')}` : '',
+    '',
+    scenes.length
+      ? `SCENES, IN STORY ORDER (choose at_scene from these ids):\n${scenes.map(s => `- ${s.id}${s.date_label ? ` — ${s.date_label}` : ''}${s.act != null ? ` (act ${s.act})` : ''}${s.bridge ? `: ${s.bridge}` : ''}`).join('\n')}`
+      : 'SCENES: none — return "at_scene": null.',
+    '',
+    'Identify this witness\'s lever. Return JSON only.',
+  ].filter(Boolean).join('\n\n');
+}
+
+const str = v => typeof v === 'string' && v.trim() !== '';
+// Shape and coherence of a lever proposal (or a reviewer's edit of one). `sceneIds` is the
+// arc's scene ids: when the arc has scenes the binding must name one of them.
+export function validateWitnessLever(p, sceneIds = []) {
+  const errors = [];
+  if (!p || typeof p !== 'object') return ['Lever is not an object.'];
+  if (!WITNESS_LEVER_AXES.includes(p.axis)) errors.push(`"axis" must be one of ${WITNESS_LEVER_AXES.join(', ')} (got ${JSON.stringify(p.axis)}).`);
+  if (!str(p.statement)) errors.push('"statement" is empty.');
+  if (!str(p.reasoning)) errors.push('"reasoning" is empty.');
+  if (!str(p.counter_case?.assumption) || !str(p.counter_case?.why_wrong)) errors.push('"counter_case" needs both "assumption" and "why_wrong".');
+  const ev = Array.isArray(p.evidence) ? p.evidence : [];
+  if (ev.length < 2) errors.push(`"evidence" needs at least 2 cited items (got ${ev.length}).`);
+  ev.forEach((e, i) => { if (!str(e?.claim) || !str(e?.source)) errors.push(`evidence ${i + 1}: needs both "claim" and "source".`); });
+  const terms = Array.isArray(p.instrument_terms) ? p.instrument_terms : [];
+  if (terms.length < 2 || terms.length > 5 || !terms.every(str)) errors.push(`"instrument_terms" must be 2 to 5 words (got ${JSON.stringify(p.instrument_terms)}).`);
+  const at = p.scene_binding?.at_scene ?? null;
+  if (sceneIds.length) {
+    if (!str(at)) errors.push(`"scene_binding.at_scene" must be one of the arc's scenes: ${sceneIds.join(', ')}.`);
+    else if (!sceneIds.includes(at)) errors.push(`"scene_binding.at_scene" "${at}" is not a scene of this arc (${sceneIds.join(', ')}).`);
+    if (!str(p.scene_binding?.reasoning)) errors.push('"scene_binding.reasoning" is empty.');
+  } else if (at != null && !str(at)) {
+    errors.push('"scene_binding.at_scene" must be a scene id or null.');
+  }
+  return errors;
+}
+
+// The fields a lever carries, in order. Everything else a model or a client sends is dropped,
+// so a model cannot pre-confirm its own proposal and an edit cannot smuggle keys in.
+const LEVER_FIELDS = ['axis', 'statement', 'reasoning', 'counter_case', 'evidence', 'instrument_terms', 'scene_binding'];
+function pickLever(p) {
+  const out = {};
+  for (const k of LEVER_FIELDS) if (p[k] !== undefined) out[k] = p[k];
+  if (Array.isArray(out.instrument_terms)) out.instrument_terms = out.instrument_terms.map(t => String(t).trim().toLowerCase());
+  return out;
+}
+
+async function proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey) {
+  const { binding: anchorBinding } = classifyRoleForDefiningMoment(scenario, role);
+  const present = (characters || []).filter(c => c.id !== role.character_id);
+  const msg = await getAnthropicClient(anthropicApiKey).messages.create(
+    // A judgement with cited reasoning, not prose: low temperature, and the reasoning is a
+    // FIELD of the JSON (as in classifyRoleArchetype), so 3000 tokens covers it.
+    { model: MODEL, max_tokens: 3000, temperature: 0.2, system: WITNESS_LEVER_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildWitnessLeverUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding, scenes }) }] },
+    { timeout: 90_000, maxRetries: 0 }
+  );
+  console.log(`[WITNESS-LEVER] ${role.id} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
+  if (msg.stop_reason === 'max_tokens') throw new Error('Witness-lever proposal truncated at max_tokens.');
+  const text = msg.content[0]?.text?.trim();
+  if (!text) throw new Error('No text returned from Anthropic');
+  const parsed = extractJson(text);
+  if (parsed?.declined === true) return { declined: true, reason: String(parsed.reason || '').trim() || 'No reason given.' };
+  return parsed;
+}
+
 async function generatePeriodVocabulary(scenario, characters, anthropicApiKey) {
   const npcList = (characters || [])
     .map(c => `- ${c.name} (${c.role || 'unknown role'})`)
@@ -2947,6 +3139,105 @@ export function createAdminRouter(repos, config = {}) {
     }
   });
 
+  // WITNESS LEVER — step 1 of the witness-crucible flow. Proposes the lever (axis, counter-
+  // case, cited evidence, instrument terms) and the scene binding, and WRITES it onto the
+  // role as witness_lever { …, generated: true, confirmed: false }. Unconfirmed, it gates
+  // nothing open: generate-defining-moment refuses a witness crucible until a human confirms
+  // the lever through the PATCH route below, which is the ONLY writer of confirmed: true.
+  // Stored, not returned-only, so the confirmed lever is durable and the generator reads it
+  // server-side — a client cannot post a lever of its own into the prompt.
+  r.post('/scenarios/:id/roles/:roleId/propose-witness-lever', async (req, res) => {
+    if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+
+    const gate = archetypeAllows(role, 'fork');
+    if (gate.path !== 'witness-crucible') {
+      return res.status(422).json({
+        error: `"${role.name}" is not a witness crucible (archetype ${gate.archetype}${role.witness_crucible === true ? ', flagged' : ''}). A lever is proposed only for a witness flagged witness_crucible.`,
+        refused: true, code: 'NOT_WITNESS_CRUCIBLE', archetype: gate.archetype,
+      });
+    }
+    // A CONFIRMED lever is a human's decision; replacing it with a fresh, unconfirmed proposal
+    // re-closes the generator, so it takes an explicit overwrite. An unconfirmed draft is
+    // redrafted freely.
+    if (role.witness_lever?.confirmed === true && req.body?.overwrite !== true) {
+      return res.status(409).json({
+        error: `"${role.name}" already has a CONFIRMED lever (${role.witness_lever.axis}). Proposing again replaces it with an unconfirmed draft. Send { "overwrite": true } to proceed.`,
+        existing: role.witness_lever,
+      });
+    }
+
+    const scenes = scenarioScenes(repos, scenario);
+    const entryParagraph = scenario.introduction?.sections?.find(s => s.type === 'entry')?.character_entries?.[role.id] || '';
+    const characters = repos.characters.findAll()
+      .filter(c => c.scenarioIds?.includes(scenario.id))
+      .map(c => ({ id: c.id, name: c.name, role: c.role || c.publicFace || '' }));
+
+    try {
+      const result = await proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey);
+      if (result?.declined === true) {
+        console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — declined, role left unchanged`);
+        return res.json({ roleId: role.id, declined: true, reason: result.reason });
+      }
+      const lever  = pickLever(result);
+      const errors = validateWitnessLever(lever, scenes.map(s => s.id));
+      if (errors.length) {
+        console.error(`[WITNESS-LEVER] ${role.id} invalid proposal — ${errors.join(' ')}`);
+        return res.status(500).json({ error: `The lever proposal is invalid and was not saved: ${errors.join(' ')}`, errors });
+      }
+      // Stamps LAST, so a model that emitted confirmed/generated of its own cannot pre-confirm.
+      const witness_lever = { ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString() };
+      const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever });
+      console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}, confirmed:false)`);
+      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act })) });
+    } catch (err) {
+      console.error(`[WITNESS-LEVER ERROR] ${role.name}: ${err.message}`);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Confirm, edit, or clear a role's witness_lever. THE ONLY WRITER OF confirmed: true.
+  //   { confirm: true }                 confirm the stored lever as it stands
+  //   { edits: {...}, confirm: true }   a reviewer's correction, confirmed in the same act
+  //   { edits: {...} }                  a correction saved UNconfirmed (an edit un-confirms)
+  //   { clear: true }                   remove the lever
+  // Every edit is re-validated against the role's arc, so a confirmed lever always names a
+  // real scene and carries cited evidence the generator's lint can check citations against.
+  r.patch('/player-roles/:id/witness-lever', async (req, res) => {
+    const role = repos.scenarios.findPlayerRole(req.params.id);
+    if (!role) return notFound(res);
+    const body = req.body || {};
+    if (body.clear === true) {
+      if (!role.witness_lever) return res.status(404).json({ error: `"${role.name}" has no lever to clear.` });
+      const { witness_lever, ...rest } = role;
+      repos.scenarios.savePlayerRole(rest);
+      console.log(`[WITNESS-LEVER] ${role.id} — cleared`);
+      return res.json({ roleId: role.id, cleared: true });
+    }
+    if (!role.witness_lever) return res.status(404).json({ error: `"${role.name}" has no proposed lever. Propose one first.` });
+    if (!isWitnessCrucible(role)) {
+      return res.status(422).json({ error: `"${role.name}" is not a witness crucible; its lever cannot be confirmed.`, refused: true, code: 'NOT_WITNESS_CRUCIBLE' });
+    }
+    const edits = body.edits && typeof body.edits === 'object' && !Array.isArray(body.edits) ? pickLever(body.edits) : {};
+    const edited = Object.keys(edits).length > 0;
+    if (body.confirm !== true && !edited) {
+      return badRequest(res, 'Send { "confirm": true }, { "edits": { … } } (optionally with confirm), or { "clear": true }.');
+    }
+    const next = { ...role.witness_lever, ...edits };
+    const scenario = await repos.scenarios.findById(role.scenarioId);
+    const errors = validateWitnessLever(next, scenarioScenes(repos, scenario).map(s => s.id));
+    if (errors.length) return res.status(400).json({ error: `The lever is invalid and was not saved: ${errors.join(' ')}`, errors });
+    if (edited) next.edited = true;
+    if (body.confirm === true) { next.confirmed = true; next.confirmed_at = new Date().toISOString(); }
+    else { next.confirmed = false; delete next.confirmed_at; }
+    const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever: next });
+    console.log(`[WITNESS-LEVER] ${role.id} — ${next.confirmed ? 'CONFIRMED' : 'edited (unconfirmed)'} (axis=${next.axis}, at_scene=${next.scene_binding?.at_scene ?? 'none'})`);
+    res.json({ roleId: role.id, witness_lever: saved.witness_lever });
+  });
+
   // Propose an archetype for a single player role. READ-ONLY BY CONSTRUCTION: the scenario
   // and the role are loaded server-side from :id/:roleId, the classifier is called, and the
   // proposal is returned. Nothing is written — not the archetype, not a note, nothing. The
@@ -3244,6 +3535,7 @@ export function createAdminRouter(repos, config = {}) {
     if (repos.scenarios.findPlayerRole(id))
       return res.status(409).json({ error: `ID "${id}" already exists.` });
     const payload = { ...req.body, id, scenarioId: req.body.scenarioId || 'chicago_1893_v1' };
+    delete payload.witness_lever;   // written only by the lever routes, never posted in
     res.status(201).json(repos.scenarios.savePlayerRole(payload));
   });
   r.put('/player-roles/:id', (req, res) => {

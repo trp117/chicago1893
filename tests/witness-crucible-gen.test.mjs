@@ -7,6 +7,9 @@
 //            stored authored crucibles (positive control, skipped without restored data)
 //   Stage 3  the overwrite guard's third tier: a hand-authored crucible needs its own moment
 //            id (confirm_crucible) on top of REPLACE / DELETE, and the 409 names what is lost
+//   Stage 4  the lever, axis-first: propose (lever + counter-case + cited evidence + scene,
+//            written confirmed:false), confirm/edit/clear via PATCH (the only writer of
+//            confirmed:true), the editor can never write one, generate stays closed until confirmed
 //
 // SYNTHETIC FIXTURES ONLY. Every role, scenario and arc here lives in a temp JsonFileStore
 // made for this run and deleted after it; no real role file, no Supabase, no tracked file is
@@ -108,6 +111,7 @@ const SCENARIO_ID = 'wc_fixture_trial';
 const SCENARIO = {
   id: SCENARIO_ID, title: 'The Fixture Trial', premise: 'A court sits on a prisoner whose sentence is already decided.',
   sessionTargetMinutes: 30,
+  storyArcIds: ['wc_fixture_arc'],
   introduction: { sections: [{ type: 'entry', character_entries: {
     role_wc_usher: 'You carry the summons down the corridor, as you have every morning. The prisoner looks up when the door opens.',
   } }] },
@@ -133,6 +137,10 @@ const ROLES = {
                         witness_lever: { axis: 'documentary_record', confirmed: true } },
 };
 for (const r of Object.values(ROLES)) repos.scenarios.savePlayerRole(r);
+repos.storyArcs.save({ id: 'wc_fixture_arc', scenarioId: SCENARIO_ID, acts: [{ actNumber: 1, beats: [], scenes: [
+  { id: 'scene_a', change: 'both', location_id: 'loc_court', budget_minutes: 10, date_label: '21 February', bridge: 'The first public examination.' },
+  { id: 'scene_b', change: 'both', location_id: 'loc_cell',  budget_minutes: 10, date_label: '28 May',      bridge: 'The relapse: the judges come to the cell.' },
+] }] });
 
 const app = express();
 app.use(express.json());
@@ -358,6 +366,116 @@ try {
     check('delete with DELETE + moment id → removed', c.status === 200 && !repos.scenarios.findPlayerRole('role_wc_crucible').defining_moment, `${c.status}`);
     const after = fs.existsSync(BACKUP_FILE) ? fs.readFileSync(BACKUP_FILE, 'utf8') : '';
     check('the removed crucible was appended to the (redirected) backup first', after.length > before.length && after.includes(AUTHORED_CRUCIBLE.options[0].debrief.slice(0, 60)) && /state when replaced: hand-authored/.test(after));
+  }
+  // ═══ STAGE 4 ═══════════════════════════════════════════════════════════════
+  const leverUrl = id => `/scenarios/${SCENARIO_ID}/roles/${id}/propose-witness-lever`;
+  const patchLever = async (id, body) => {
+    const r = await fetch(`${base}/player-roles/${id}/witness-lever`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return { status: r.status, body: await r.json().catch(() => ({})) };
+  };
+  const leverOf = id => repos.scenarios.findPlayerRole(id).witness_lever;
+  const { generated: _g, confirmed: _c, ...PROPOSAL } = LEVER;   // what the model returns
+
+  head('4a. validateWitnessLever');
+  check('the fixture lever is valid against the arc', admin.validateWitnessLever(PROPOSAL, ['scene_a', 'scene_b']).length === 0, admin.validateWitnessLever(PROPOSAL, ['scene_a', 'scene_b']).join(' | '));
+  for (const [label, fn, rx] of [
+    ['unknown axis',             p => { p.axis = 'rescue'; },                                 /"axis" must be one of/],
+    ['no counter-case',          p => { delete p.counter_case; },                             /counter_case/],
+    ['one evidence item',        p => { p.evidence = p.evidence.slice(0, 1); },               /at least 2 cited items/],
+    ['evidence without source',  p => { p.evidence[1].source = ''; },                         /evidence 2: needs both/],
+    ['six instrument terms',     p => { p.instrument_terms = ['a', 'b', 'c', 'd', 'e', 'f']; }, /instrument_terms/],
+    ['scene not in the arc',     p => { p.scene_binding.at_scene = 'scene_zzz'; },            /is not a scene of this arc/],
+    ['scene without reasoning',  p => { p.scene_binding.reasoning = ''; },                    /scene_binding.reasoning/],
+  ]) {
+    const p = structuredClone(PROPOSAL); fn(p);
+    check(`rejects: ${label}`, admin.validateWitnessLever(p, ['scene_a', 'scene_b']).some(e => rx.test(e)));
+  }
+  check('no scenes in the arc → at_scene may be null', admin.validateWitnessLever({ ...structuredClone(PROPOSAL), scene_binding: { at_scene: null } }, []).length === 0);
+
+  head('4b. propose — gate, prompt, and what is written');
+  {
+    const calls = modelCalls.length;
+    const r = await post(leverUrl('role_wc_bystander'), {});
+    check('unflagged witness → 422 NOT_WITNESS_CRUCIBLE, no model call', r.status === 422 && r.body.code === 'NOT_WITNESS_CRUCIBLE' && modelCalls.length === calls);
+    const i = await post(leverUrl('role_wc_instrument'), {});
+    check('flagged instrument → 422 NOT_WITNESS_CRUCIBLE', i.status === 422 && i.body.code === 'NOT_WITNESS_CRUCIBLE');
+  }
+  {
+    // The model tries to pre-confirm its own proposal and smuggle a key in; both are dropped.
+    modelQueue.push('Thinking it over first.\n```json\n' + JSON.stringify({ ...PROPOSAL, confirmed: true, generated: false, sneaky: 1 }) + '\n```');
+    const r = await post(leverUrl('role_wc_usher'), {});
+    const call = modelCalls.at(-1);
+    check('propose → 200 with the lever', r.status === 200 && r.body.witness_lever?.axis === 'human_presence', `${r.status} ${r.body.error || ''}`);
+    check('system prompt is the lever prompt (axes, counter-case, cited evidence, scene, decline)',
+      call.system === admin.WITNESS_LEVER_SYSTEM_PROMPT && /THE COUNTER-CASE — REQUIRED/.test(call.system) && /documentary_record/.test(call.system) && /no lever/.test(call.system));
+    check('user prompt lists the arc\'s scenes in order, and the documented record', /scene_a[\s\S]*scene_b/.test(call.user) && /DOCUMENTED RECORD|ANCHORED/.test(call.user), call.user.slice(0, 80));
+    const L = leverOf('role_wc_usher');
+    check('stored: generated:true, confirmed:false — the model cannot pre-confirm', L.generated === true && L.confirmed === false && !!L.proposed_at);
+    check('stored: only lever fields (no smuggled key)', !('sneaky' in L));
+    check('stored: counter-case, cited evidence, instrument terms, scene', !!L.counter_case?.assumption && L.evidence.length === 2 && L.evidence.every(e => e.source) && L.instrument_terms.length === 2 && L.scene_binding.at_scene === 'scene_b');
+    check('response lists the arc scenes for the reviewer', JSON.stringify(r.body.scenes?.map(s => s.id)) === '["scene_a","scene_b"]');
+  }
+  {
+    const before = JSON.stringify(leverOf('role_wc_usher'));
+    modelQueue.push(JSON.stringify({ ...PROPOSAL, scene_binding: { at_scene: 'scene_zzz', reasoning: 'r' } }));
+    const r = await post(leverUrl('role_wc_usher'), {});
+    check('invalid proposal (scene not in arc) → 500, nothing saved', r.status === 500 && /not a scene of this arc/.test(r.body.error) && JSON.stringify(leverOf('role_wc_usher')) === before);
+    modelQueue.push(JSON.stringify({ declined: true, reason: 'no lever: a bystander in the crowd.' }));
+    const d = await post(leverUrl('role_wc_usher'), {});
+    check('decline → 200 declined, nothing saved', d.status === 200 && d.body.declined === true && JSON.stringify(leverOf('role_wc_usher')) === before);
+  }
+  {
+    const r = await post(genUrl('role_wc_usher'), {});
+    check('generate before confirmation → 422 LEVER_UNCONFIRMED', r.status === 422 && r.body.code === 'LEVER_UNCONFIRMED');
+  }
+
+  head('4c. the editor can never write a lever');
+  {
+    const put = async body => (await fetch(`${base}/player-roles/role_wc_usher`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).status;
+    const role = repos.scenarios.findPlayerRole('role_wc_usher');
+    const { witness_lever, ...stale } = role;
+    await put(stale);
+    check('stale tab (no key) → stored lever kept', JSON.stringify(leverOf('role_wc_usher')) === JSON.stringify(witness_lever));
+    await put({ ...stale, witness_lever: { ...witness_lever, confirmed: true, axis: 'testimony' } });
+    check('a posted { confirmed: true } is ignored → stored lever kept, still unconfirmed', leverOf('role_wc_usher').confirmed === false && leverOf('role_wc_usher').axis === 'human_presence');
+    const c = await fetch(`${base}/player-roles`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'role wc created', scenarioId: SCENARIO_ID, witness_lever: { ...PROPOSAL, confirmed: true } }) });
+    const created = await c.json();
+    check('create route strips a posted lever', c.status === 201 && !('witness_lever' in created) && !('witness_lever' in repos.scenarios.findPlayerRole(created.id)));
+  }
+
+  head('4d. PATCH — the only writer of confirmed:true');
+  {
+    const r0 = await patchLever('role_wc_usher', {});
+    check('{} → 400', r0.status === 400);
+    const r1 = await patchLever('role_wc_usher', { edits: { scene_binding: { at_scene: 'scene_zzz', reasoning: 'x' } }, confirm: true });
+    check('an invalid edit → 400, nothing saved, still unconfirmed', r1.status === 400 && leverOf('role_wc_usher').confirmed === false && leverOf('role_wc_usher').scene_binding.at_scene === 'scene_b');
+    const r2 = await patchLever('role_wc_usher', { confirm: true });
+    check('{ confirm: true } → confirmed, with confirmed_at', r2.status === 200 && leverOf('role_wc_usher').confirmed === true && !!leverOf('role_wc_usher').confirmed_at && leverOf('role_wc_usher').generated === true);
+    const r3 = await patchLever('role_wc_usher', { edits: { statement: 'A corrected statement of his power.' } });
+    check('an edit without confirm UN-confirms, and marks edited', r3.status === 200 && leverOf('role_wc_usher').confirmed === false && leverOf('role_wc_usher').edited === true && !leverOf('role_wc_usher').confirmed_at);
+    const r4 = await patchLever('role_wc_usher', { edits: { scene_binding: { at_scene: 'scene_a', reasoning: 'The first examination, earlier.' }, confirmed: false, generated: false }, confirm: true });
+    check('edit + confirm → confirmed on the edited lever; provenance keys in edits are ignored', r4.status === 200 && leverOf('role_wc_usher').confirmed === true && leverOf('role_wc_usher').scene_binding.at_scene === 'scene_a' && leverOf('role_wc_usher').generated === true);
+    const r5 = await patchLever('role_wc_bystander', { confirm: true });
+    check('no lever on the role → 404', r5.status === 404);
+  }
+
+  head('4e. a confirmed lever is protected; clear removes it');
+  {
+    const calls = modelCalls.length;
+    const r = await post(leverUrl('role_wc_usher'), {});
+    check('propose over a CONFIRMED lever without overwrite → 409, no model call', r.status === 409 && r.body.existing?.confirmed === true && modelCalls.length === calls);
+    modelQueue.push(JSON.stringify(PROPOSAL));
+    const o = await post(leverUrl('role_wc_usher'), { overwrite: true });
+    check('with overwrite → fresh proposal, UNconfirmed (re-closes the generator)', o.status === 200 && leverOf('role_wc_usher').confirmed === false);
+    const g = await post(genUrl('role_wc_usher'), {});
+    check('…so generate is refused again', g.status === 422 && g.body.code === 'LEVER_UNCONFIRMED');
+    await patchLever('role_wc_usher', { confirm: true });
+    const c = await patchLever('role_wc_usher', { clear: true });
+    check('{ clear: true } → lever removed', c.status === 200 && leverOf('role_wc_usher') === undefined);
+    modelQueue.push(JSON.stringify(PROPOSAL));
+    await post(leverUrl('role_wc_usher'), {});
+    await patchLever('role_wc_usher', { confirm: true });
+    check('re-proposed and confirmed for Stage 5', leverOf('role_wc_usher')?.confirmed === true);
   }
 } finally {
   await new Promise(r => server.close(r));
