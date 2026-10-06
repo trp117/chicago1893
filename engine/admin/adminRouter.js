@@ -3322,12 +3322,31 @@ export function createAdminRouter(repos, config = {}) {
     // unchanged and still the thing that protects Trude's and Jäger's answer keys. 422
     // matches the refusal shape /pipeline/regenerate-endings already uses for a missing
     // fate_mode, so the client has one refusal shape to render, not two.
-    const forkGate = archetypeAllows(role, 'fork');
+    // DRY RUN ({ dry_run: true }) — generate, validate and lint exactly as below, and return
+    // the block as it WOULD be saved, writing NOTHING: no role save (so no Supabase dual
+    // write), no backup file. It replaces nothing, so the overwrite tiers do not apply.
+    // A dry run may also carry the lever INLINE ({ lever: {...} }), so a witness can be tried
+    // with no stored flag and no stored lever: the role is evaluated as flagged, the lever is
+    // validated against the arc exactly as the PATCH route validates an edit, and the caller
+    // posting it is the human confirming it. It persists nowhere, so the rule that no SAVED
+    // crucible exists on an unconfirmed lever still holds. Off a dry run, the lever is only
+    // ever read from the stored role.
+    const dryRun      = req.body?.dry_run === true;
+    const inlineLever = dryRun && req.body?.lever && typeof req.body.lever === 'object' && !Array.isArray(req.body.lever)
+      ? pickLever(req.body.lever) : null;
+    const forkGate = archetypeAllows(inlineLever ? { ...role, witness_crucible: true } : role, 'fork');
     if (!forkGate.allowed) {
       console.log(`[ARCHETYPE-GATE] ${req.params.id}/${role.id} — fork refused (archetype=${forkGate.archetype})`);
       return res.status(422).json({
         error: forkGate.reason, refused: true, artifact: 'fork', archetype: forkGate.archetype,
       });
+    }
+    if (inlineLever) {
+      if (forkGate.path !== 'witness-crucible') {
+        return badRequest(res, `An inline lever applies only to a witness (archetype ${forkGate.archetype}).`);
+      }
+      const leverErrors = validateWitnessLever(inlineLever, scenarioScenes(repos, scenario).map(s => s.id));
+      if (leverErrors.length) return res.status(400).json({ error: `The inline lever is invalid: ${leverErrors.join(' ')}`, errors: leverErrors });
     }
 
     // WITNESS-CRUCIBLE PRECONDITION. A flagged witness is drafted AXIS-FIRST: its lever (what
@@ -3335,7 +3354,7 @@ export function createAdminRouter(repos, config = {}) {
     // and only then is content generated on them. Without a confirmed lever there is nothing
     // to generate on, so this refuses before the overwrite conversation — confirming an
     // overwrite the route cannot then perform would be a question with no answer.
-    if (forkGate.path === 'witness-crucible' && role.witness_lever?.confirmed !== true) {
+    if (forkGate.path === 'witness-crucible' && !inlineLever && role.witness_lever?.confirmed !== true) {
       return res.status(422).json({
         error: `"${role.name}" is a witness crucible: its lever must be proposed and confirmed before a fork can be generated on it.`,
         refused: true, artifact: 'fork', archetype: forkGate.archetype, path: forkGate.path, code: 'LEVER_UNCONFIRMED',
@@ -3347,7 +3366,7 @@ export function createAdminRouter(repos, config = {}) {
     // outright and resets reviewed to false, so an existing REAL block is refused at the API
     // unless the caller says so explicitly. The client confirm() is a UI courtesy; this is
     // the actual protection, and it also covers curl and a double-clicked button.
-    if (hasRealDefiningMoment(role.defining_moment) && req.body?.overwrite !== true) {
+    if (!dryRun && hasRealDefiningMoment(role.defining_moment) && req.body?.overwrite !== true) {
       return res.status(409).json({
         error: `"${role.name}" already has a defining_moment ("${role.defining_moment.id}"${role.defining_moment.reviewed ? ', reviewed' : ''}). Regenerating replaces it and resets review state. Send { "overwrite": true } to proceed.`,
         existing: { id: role.defining_moment.id, reviewed: role.defining_moment.reviewed === true },
@@ -3360,7 +3379,7 @@ export function createAdminRouter(repos, config = {}) {
     // the server is where it must be enforced: a stale tab, a curl, or a replayed request
     // never sees the client prompt. The 409 body states the stakes accurately — there is no
     // version history to fall back on — because the reviewer may only ever read this text.
-    if (definingMomentAtRisk(role.defining_moment) && req.body?.confirm !== 'REPLACE') {
+    if (!dryRun && definingMomentAtRisk(role.defining_moment) && req.body?.confirm !== 'REPLACE') {
       const kind = role.defining_moment.generated !== true ? 'HAND-AUTHORED' : 'REVIEWED';
       return res.status(409).json({
         error: `"${role.name}" carries a ${kind} defining_moment ("${role.defining_moment.id}"). Defining moments have NO version-history backup — this cannot be recovered. Send { "overwrite": true, "confirm": "REPLACE" } to proceed.`,
@@ -3373,7 +3392,7 @@ export function createAdminRouter(repos, config = {}) {
       });
     }
     // HAND-AUTHORED CRUCIBLE — the third token, on top of overwrite + REPLACE.
-    if (isAuthoredCrucible(role.defining_moment) && req.body?.confirm_crucible !== role.defining_moment.id) {
+    if (!dryRun && isAuthoredCrucible(role.defining_moment) && req.body?.confirm_crucible !== role.defining_moment.id) {
       return res.status(409).json(crucibleRefusal(role, 'regenerate'));
     }
 
@@ -3393,7 +3412,7 @@ export function createAdminRouter(repos, config = {}) {
     // role (never from the request), with the bound scene looked up in the arc so the prompt
     // carries the scene itself. withDebriefs is the protagonist path's opt-in to Step 7.
     const witnessPath  = forkGate.path === 'witness-crucible';
-    const lever        = witnessPath ? role.witness_lever : null;
+    const lever        = witnessPath ? (inlineLever || role.witness_lever) : null;
     const leverScene   = witnessPath && lever.scene_binding?.at_scene
       ? scenarioScenes(repos, scenario).find(s => s.id === lever.scene_binding.at_scene) || null
       : null;
@@ -3471,6 +3490,19 @@ export function createAdminRouter(repos, config = {}) {
       // options need a new confirmation, so it is never carried over (nor taken from the model).
       delete defining_moment.timing_confirmed;
 
+      // DRY RUN STOPS HERE — before the backup and the save, the only two writes below.
+      if (dryRun) {
+        console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — DRY RUN, block "${defining_moment.id}" returned, NOTHING written (path=${forkGate.path}${inlineLever ? ', inline lever' : ''})`);
+        return res.json({
+          dry_run: true, saved: false,
+          roleId: role.id, defining_moment, classification, path: forkGate.path,
+          ...(witnessPath ? { binding_source: bindingSource, lever_source: inlineLever ? 'inline (dry run)' : 'stored, confirmed', lever } : {}),
+          would_replace: hasRealDefiningMoment(role.defining_moment)
+            ? { id: role.defining_moment.id, authored_crucible: isAuthoredCrucible(role.defining_moment) } : null,
+          lint_warnings: lint.warnings,
+        });
+      }
+
       // BACK UP WHAT THIS WRITE DESTROYS, immediately before destroying it. Placed here and
       // not earlier on purpose: the model may decline, or emit a block that fails validation,
       // and both paths return above without touching the role — backing up before those
@@ -3508,7 +3540,11 @@ export function createAdminRouter(repos, config = {}) {
     const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
     if (!role) return notFound(res);
 
-    const gate = archetypeAllows(role, 'fork');
+    // DRY RUN ({ dry_run: true }) — propose and return the lever, writing NOTHING. The role is
+    // evaluated as flagged (a witness only: an instrument or a protagonist is still refused),
+    // and a confirmed stored lever is not at risk, so its 409 does not apply.
+    const dryRun = req.body?.dry_run === true;
+    const gate = archetypeAllows(dryRun ? { ...role, witness_crucible: true } : role, 'fork');
     if (gate.path !== 'witness-crucible') {
       return res.status(422).json({
         error: `"${role.name}" is not a witness crucible (archetype ${gate.archetype}${role.witness_crucible === true ? ', flagged' : ''}). A lever is proposed only for a witness flagged witness_crucible.`,
@@ -3518,7 +3554,7 @@ export function createAdminRouter(repos, config = {}) {
     // A CONFIRMED lever is a human's decision; replacing it with a fresh, unconfirmed proposal
     // re-closes the generator, so it takes an explicit overwrite. An unconfirmed draft is
     // redrafted freely.
-    if (role.witness_lever?.confirmed === true && req.body?.overwrite !== true) {
+    if (!dryRun && role.witness_lever?.confirmed === true && req.body?.overwrite !== true) {
       return res.status(409).json({
         error: `"${role.name}" already has a CONFIRMED lever (${role.witness_lever.axis}). Proposing again replaces it with an unconfirmed draft. Send { "overwrite": true } to proceed.`,
         existing: role.witness_lever,
@@ -3545,9 +3581,14 @@ export function createAdminRouter(repos, config = {}) {
       }
       // Stamps LAST, so a model that emitted confirmed/generated of its own cannot pre-confirm.
       const witness_lever = { ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString() };
+      const sceneList = scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act }));
+      if (dryRun) {
+        console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — DRY RUN, proposal returned, NOTHING written (axis=${lever.axis})`);
+        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList });
+      }
       const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever });
       console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}, confirmed:false)`);
-      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act })) });
+      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList });
     } catch (err) {
       console.error(`[WITNESS-LEVER ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });

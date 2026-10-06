@@ -606,6 +606,85 @@ try {
       dm.id === ex.block.id && dm.setup === ex.block.setup && dm.options.length === ex.block.options.length
       && dm.options.every((o, i) => ['id', 'label', 'text', 'debrief'].every(k => o[k] === ex.block.options[i][k])));
   }
+
+  // ═══ DRY RUN ═══════════════════════════════════════════════════════════════
+  // The whole first-real-model test must run with NO write: no flag, no lever, no block, no
+  // backup. Proof is three-way: the store directory is byte-identical before and after, the
+  // backup file is unchanged, and savePlayerRole is never called.
+  const snapStore = () => {
+    const out = {};
+    const walk = d => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); e.isDirectory() ? walk(p) : (out[p] = fs.readFileSync(p, 'utf8')); } };
+    walk(TMP);
+    return JSON.stringify(out);
+  };
+  const backupLen = () => (fs.existsSync(BACKUP_FILE) ? fs.readFileSync(BACKUP_FILE, 'utf8').length : 0);
+  let saves = 0;
+  const realSave = repos.scenarios.savePlayerRole.bind(repos.scenarios);
+  const writesNothing = async (fn) => {
+    const s = snapStore(), b = backupLen(), n = saves;
+    const r = await fn();
+    return { r, clean: snapStore() === s && backupLen() === b && saves === n };
+  };
+  // An UNFLAGGED witness carrying an authored crucible and no lever: Manchon as prod has him.
+  repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_notary', name: 'The Notary', archetype: 'witness', defining_moment: AUTHORED_CRUCIBLE });
+  repos.scenarios.savePlayerRole = (role) => { saves++; return realSave(role); };
+  const { generated: _lg, confirmed: _lc, ...INLINE_LEVER } = LEVER;
+  const proposeUrl = id => `/scenarios/${SCENARIO_ID}/roles/${id}/propose-witness-lever`;
+
+  head('5h. dry run — propose and generate on an unflagged witness, writing NOTHING');
+  {
+    modelQueue.push(JSON.stringify({ ...INLINE_LEVER, confirmed: true }));
+    const { r, clean } = await writesNothing(() => post(proposeUrl('role_wc_notary'), { dry_run: true }));
+    check('propose dry_run on an unflagged witness → 200, dry_run, saved:false', r.status === 200 && r.body.dry_run === true && r.body.saved === false, `${r.status} ${r.body.error || ''}`);
+    check('  the proposal is returned unconfirmed (the model cannot confirm it)', r.body.witness_lever?.axis === LEVER.axis && r.body.witness_lever.confirmed === false);
+    check('  NOTHING written (store bytes, backup, savePlayerRole)', clean);
+    check('  without dry_run the unflagged witness is still refused', (await post(proposeUrl('role_wc_notary'), {})).body.code === 'NOT_WITNESS_CRUCIBLE');
+  }
+  {
+    const calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(GOOD_BLOCK));
+    const { r, clean } = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
+    const call = modelCalls.at(-1);
+    check('generate dry_run + inline lever, over an AUTHORED crucible, no tokens → 200', r.status === 200 && r.body.dry_run === true && r.body.saved === false && modelCalls.length === calls + 1, `${r.status} ${r.body.error || ''}`);
+    check('  ran on the witness prompt with the inline lever in the user prompt', call.system.includes('STEP 5W') && call.user.includes('CONFIRMED LEVER') && call.user.includes(LEVER.counter_case.assumption));
+    check('  returns the block as it would be saved (stamped, linted, bound)', r.body.defining_moment?.generated === true && r.body.defining_moment.reviewed === false && r.body.defining_moment.options.every(o => o.label && o.debrief) && Array.isArray(r.body.lint_warnings) && r.body.lever_source === 'inline (dry run)' && typeof r.body.binding_source === 'string');
+    check('  names what a real run would replace', r.body.would_replace?.id === AUTHORED_CRUCIBLE.id && r.body.would_replace.authored_crucible === true);
+    check('  NOTHING written: the authored block is untouched, no backup, no save', clean && JSON.stringify(repos.scenarios.findPlayerRole('role_wc_notary').defining_moment) === JSON.stringify(AUTHORED_CRUCIBLE));
+  }
+  {
+    modelQueue.push(JSON.stringify(mutate(b => { b.options[0].debrief += ' You could not save her.'; })));
+    const { r, clean } = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
+    check('dry run, lint failure → 500 with the errors, nothing written', r.status === 500 && r.body.errors?.some(e => /failed-rescue/.test(e)) && clean);
+    modelQueue.push(JSON.stringify({ declined: true, reason: 'scripted' }));
+    const d = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
+    check('dry run, decline → 200 declined, nothing written', d.r.status === 200 && d.r.body.declined === true && d.clean);
+  }
+  {
+    const calls = modelCalls.length;
+    const bad = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: { ...INLINE_LEVER, scene_binding: { at_scene: 'scene_zzz', reasoning: 'r' } } }));
+    check('inline lever naming a scene not in the arc → 400, no model call, nothing written', bad.r.status === 400 && /not a scene of this arc/.test(bad.r.body.error) && modelCalls.length === calls && bad.clean);
+    const thin = await post(genUrl('role_wc_notary'), { dry_run: true, lever: { ...INLINE_LEVER, evidence: [LEVER.evidence[0]] } });
+    check('inline lever with one evidence item → 400', thin.status === 400 && /at least 2 cited/.test(thin.body.error));
+    const inst = await post(genUrl('role_wc_instrument'), { dry_run: true, lever: INLINE_LEVER });
+    check('inline lever on an INSTRUMENT → 422 refused, no model call', inst.status === 422 && inst.body.refused === true && modelCalls.length === calls);
+    const prot = await post(genUrl('role_wc_protag'), { dry_run: true, lever: INLINE_LEVER });
+    check('inline lever on a protagonist → 400, no model call', prot.status === 400 && /only to a witness/.test(prot.body.error) && modelCalls.length === calls);
+    const live = await writesNothing(() => post(genUrl('role_wc_notary'), { lever: INLINE_LEVER, overwrite: true, confirm: 'REPLACE', confirm_crucible: AUTHORED_CRUCIBLE.id }));
+    check('WITHOUT dry_run an inline lever is ignored: the unflagged witness is refused, nothing written', live.r.status === 422 && live.r.body.refused === true && modelCalls.length === calls && live.clean);
+  }
+  {
+    // A stored, confirmed lever also works under dry run, and an authored block is not touched.
+    const keep = usher().defining_moment;
+    realSave({ ...usher(), defining_moment: AUTHORED_CRUCIBLE });
+    modelQueue.push(JSON.stringify(GOOD_BLOCK));
+    const { r, clean } = await writesNothing(() => post(genUrl('role_wc_usher'), { dry_run: true }));
+    check('flagged witness, stored confirmed lever, dry_run → 200, lever_source stored, nothing written', r.status === 200 && r.body.lever_source === 'stored, confirmed' && clean, `${r.status} ${r.body.error || ''}`);
+    realSave({ ...usher(), defining_moment: keep });
+    modelQueue.push(JSON.stringify(OLD_REPLY));
+    const p = await writesNothing(() => post(genUrl('role_wc_protag'), { dry_run: true }));
+    check('protagonist dry_run over an existing block, no overwrite → 200, nothing written', p.r.status === 200 && p.r.body.dry_run === true && p.r.body.path === 'protagonist' && p.clean, `${p.r.status} ${p.r.body.error || ''}`);
+  }
+  repos.scenarios.savePlayerRole = realSave;
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });
