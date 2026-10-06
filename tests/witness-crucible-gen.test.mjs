@@ -685,6 +685,37 @@ try {
     check('protagonist dry_run over an existing block, no overwrite → 200, nothing written', p.r.status === 200 && p.r.body.dry_run === true && p.r.body.path === 'protagonist' && p.clean, `${p.r.status} ${p.r.body.error || ''}`);
   }
   repos.scenarios.savePlayerRole = realSave;
+
+  head('5i. scene binding — the witness binds to the PROTAGONIST\'s defining-moment scene');
+  {
+    // The protagonist's fork binds to scene_b; a sibling witness is bound to the EARLIER
+    // scene_a — the shape of the Manchon miss (an early instance of the lever, not the climax).
+    const bound = (id, at_scene) => ({ ...structuredClone(GOOD_BLOCK), id, at_scene, principal_transition: { type: 'decision_made', moment: id } });
+    realSave({ ...baseRole, id: 'role_wc_principal', name: 'The Prisoner', archetype: 'crucible-fixed', defining_moment: bound('prisoner_choice', 'scene_b') });
+    realSave({ ...baseRole, id: 'role_wc_guard', name: 'The Guard', archetype: 'witness', defining_moment: bound('guard_choice', 'scene_a') });
+    check('system prompt: binds to the defining moment, not the earliest lever',
+      /fires at the scenario's DEFINING MOMENT/.test(admin.WITNESS_LEVER_SYSTEM_PROMPT) && /bind to that scene/.test(admin.WITNESS_LEVER_SYSTEM_PROMPT)
+      && /Do NOT choose the earliest scene in which the lever appears/.test(admin.WITNESS_LEVER_SYSTEM_PROMPT)
+      && !/the pressure is highest/.test(admin.WITNESS_LEVER_SYSTEM_PROMPT));
+
+    modelQueue.push(JSON.stringify({ ...INLINE_LEVER, scene_binding: { at_scene: 'scene_a', reasoning: 'earliest instance of the lever' } }));
+    const off = await writesNothing(() => post(proposeUrl('role_wc_notary'), { dry_run: true }));
+    const user = modelCalls.at(-1).user;
+    const listing = user.slice(user.indexOf('DEFINING MOMENTS ALREADY BOUND'));
+    check('user prompt lists the bound defining moments, the protagonist\'s first',
+      /scene_b: The Prisoner's defining moment \(PROTAGONIST\)/.test(listing) && /scene_a: The Guard's defining moment \(a witness\)/.test(listing)
+      && listing.indexOf('The Prisoner') < listing.indexOf('The Guard'));
+    check('  the role\'s OWN bound block is not listed (it must not read its own answer back)', !/The Notary's defining moment/.test(user));
+    check('proposal off the protagonist\'s scene → returned with scene_warning, nothing written',
+      off.r.status === 200 && /not the protagonist's defining-moment scene "scene_b"/.test(off.r.body.scene_warning || '') && off.clean, `${off.r.status} ${off.r.body.error || ''}`);
+
+    modelQueue.push(JSON.stringify({ ...INLINE_LEVER, scene_binding: { at_scene: 'scene_b', reasoning: 'the prisoner\'s defining moment' } }));
+    const on = await post(proposeUrl('role_wc_notary'), { dry_run: true });
+    check('proposal on the protagonist\'s scene → no scene_warning', on.status === 200 && on.body.witness_lever.scene_binding.at_scene === 'scene_b' && !('scene_warning' in on.body));
+
+    const noBound = admin.buildWitnessLeverUserPrompt({ scenario: { title: 'T' }, role: { name: 'R' }, scenes: [{ id: 's1' }] });
+    check('no bound forks → no listing (falls back to the climactic scene by rule)', !/DEFINING MOMENTS ALREADY BOUND/.test(noBound));
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });

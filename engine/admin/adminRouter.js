@@ -2635,7 +2635,11 @@ export const WITNESS_LEVER_SYSTEM_PROMPT = [
   'THE SCENE',
   '════════════════════════════════════════════════════════',
   '',
-  'You are given the scenario\'s scenes in story order. Choose the ONE scene in which this witness\'s choice comes to a point — where the lever is in their hands and the pressure is highest. It must come BEFORE the documented outcome, never at or after it. Give its id exactly as listed and say why. If no scenes are listed, return "at_scene": null.',
+  'You are given the scenario\'s scenes in story order. A witness crucible fires at the scenario\'s DEFINING MOMENT: the climax the witness is there to witness, the scene where the protagonist\'s own fork fires. The witness\'s choice matters because of what is being decided in front of them, so it is bound where that is decided.',
+  '- If the material lists the scene a PROTAGONIST\'s defining moment is bound to, bind to that scene.',
+  '- Otherwise, if it lists scenes other WITNESSES are bound to, bind with them.',
+  '- Otherwise choose the climactic scene: the one the scenario turns on, normally the last scene before the documented outcome.',
+  'Do NOT choose the earliest scene in which the lever appears, or the one where it is most often used. The lever runs through the whole story; the crucible is the moment the outcome is decided in front of the witness. The scene must still come BEFORE the documented outcome, never at or after it. Give its id exactly as listed and say why, naming the defining moment it shares. If no scenes are listed, return "at_scene": null.',
   '',
   '════════════════════════════════════════════════════════',
   'DECLINE',
@@ -2656,13 +2660,24 @@ export const WITNESS_LEVER_SYSTEM_PROMPT = [
   '  "counter_case": { "assumption": "The lever a reader would naturally assume.", "why_wrong": "Why the record says otherwise (or why it is in fact right)." },',
   '  "evidence": [ { "claim": "A documented act or position of this person.", "source": "Where it comes from." } ],',
   '  "instrument_terms": ["word", "word"],',
-  '  "scene_binding": { "at_scene": "scene_id_from_the_list", "reasoning": "Why this scene, and that it precedes the documented outcome." }',
+  '  "scene_binding": { "at_scene": "scene_id_from_the_list", "reasoning": "The defining moment this scene is (whose fork binds there, or why it is the climax), and that it precedes the documented outcome." }',
   '}',
   '',
   'Return either that object or the decline object. Never both. Never any prose outside the JSON.',
 ].join('\n');
 
-function buildWitnessLeverUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null, scenes = [] }) {
+// The scenes the scenario's OTHER defining moments are bound to — what the proposer binds a
+// witness crucible to. The role's own block is excluded (a re-proposal must not read its own
+// answer back). Protagonist forks first: a witness binds to the protagonist's scene by rule.
+function boundForkScenes(repos, scenarioId, excludeRoleId) {
+  return repos.scenarios.findPlayerRoles(scenarioId)
+    .filter(r => r.id !== excludeRoleId && hasRealDefiningMoment(r.defining_moment)
+      && typeof r.defining_moment.at_scene === 'string' && r.defining_moment.at_scene.trim())
+    .map(r => ({ role: r.name || r.id, at_scene: r.defining_moment.at_scene.trim(), witness: roleArchetype(r) === 'witness' }))
+    .sort((a, b) => Number(a.witness) - Number(b.witness));
+}
+
+function buildWitnessLeverUserPrompt({ scenario = {}, role = {}, characters = [], entryParagraph = '', anchorBinding = null, scenes = [], boundForks = [] }) {
   const section = t => (scenario.introduction?.sections || []).find(s => s.type === t)?.text || '';
   const briefingText = getBriefingText(role.briefing);
   return [
@@ -2689,6 +2704,9 @@ function buildWitnessLeverUserPrompt({ scenario = {}, role = {}, characters = []
     scenes.length
       ? `SCENES, IN STORY ORDER (choose at_scene from these ids):\n${scenes.map(s => `- ${s.id}${s.date_label ? ` — ${s.date_label}` : ''}${s.act != null ? ` (act ${s.act})` : ''}${s.bridge ? `: ${s.bridge}` : ''}`).join('\n')}`
       : 'SCENES: none — return "at_scene": null.',
+    scenes.length && boundForks.length
+      ? `DEFINING MOMENTS ALREADY BOUND IN THIS SCENARIO (bind the witness to the protagonist's scene):\n${boundForks.map(f => `- ${f.at_scene}: ${f.role}'s defining moment (${f.witness ? 'a witness' : 'PROTAGONIST'})`).join('\n')}`
+      : '',
     '',
     'Identify this witness\'s lever. Return JSON only.',
   ].filter(Boolean).join('\n\n');
@@ -2730,14 +2748,14 @@ function pickLever(p) {
   return out;
 }
 
-async function proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey) {
+async function proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey, boundForks = []) {
   const { binding: anchorBinding } = classifyRoleForDefiningMoment(scenario, role);
   const present = (characters || []).filter(c => c.id !== role.character_id);
   const msg = await getAnthropicClient(anthropicApiKey).messages.create(
     // A judgement with cited reasoning, not prose: low temperature, and the reasoning is a
     // FIELD of the JSON (as in classifyRoleArchetype), so 3000 tokens covers it.
     { model: MODEL, max_tokens: 3000, temperature: 0.2, system: WITNESS_LEVER_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: buildWitnessLeverUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding, scenes }) }] },
+      messages: [{ role: 'user', content: buildWitnessLeverUserPrompt({ scenario, role, characters: present, entryParagraph, anchorBinding, scenes, boundForks }) }] },
     { timeout: 90_000, maxRetries: 0 }
   );
   console.log(`[WITNESS-LEVER] ${role.id} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
@@ -3576,7 +3594,8 @@ export function createAdminRouter(repos, config = {}) {
       .map(c => ({ id: c.id, name: c.name, role: c.role || c.publicFace || '' }));
 
     try {
-      const result = await proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey);
+      const boundForks = boundForkScenes(repos, scenario.id, role.id);
+      const result = await proposeWitnessLever(scenario, role, characters, entryParagraph, scenes, anthropicApiKey, boundForks);
       if (result?.declined === true) {
         console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — declined, role left unchanged`);
         return res.json({ roleId: role.id, declined: true, reason: result.reason });
@@ -3590,13 +3609,18 @@ export function createAdminRouter(repos, config = {}) {
       // Stamps LAST, so a model that emitted confirmed/generated of its own cannot pre-confirm.
       const witness_lever = { ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString() };
       const sceneList = scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act }));
+      // A proposal off the protagonist's bound scene is returned for the reviewer to see, not
+      // refused: the human confirming the lever decides. Absent when it matches or none is bound.
+      const protagonistScene = boundForks.find(f => !f.witness)?.at_scene;
+      const sceneWarning = protagonistScene && lever.scene_binding?.at_scene !== protagonistScene
+        ? { scene_warning: `Proposed at_scene "${lever.scene_binding?.at_scene}" is not the protagonist's defining-moment scene "${protagonistScene}".` } : {};
       if (dryRun) {
         console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — DRY RUN, proposal returned, NOTHING written (axis=${lever.axis})`);
-        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList });
+        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning });
       }
       const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever });
       console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}, confirmed:false)`);
-      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList });
+      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList, ...sceneWarning });
     } catch (err) {
       console.error(`[WITNESS-LEVER ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
