@@ -1591,6 +1591,13 @@ function validateDefiningMomentBlock(block) {
         errors.push(`option ${i + 1}: "id" must be snake_case (got ${JSON.stringify(o?.id)}).`);
       }
       if (!o || typeof o.text !== 'string' || !o.text.trim()) errors.push(`option ${i + 1}: "text" is empty.`);
+      // Optional per-option fields the runtime reads (gameRouter sends label as the button
+      // text; authoredForkDebrief ships debrief verbatim). Absent is the old shape and fine;
+      // present must be text. Whether they are REQUIRED, and the prose rules on them, is
+      // lintCrucibleBlock's job (CrucibleLint.js), per path.
+      for (const k of ['label', 'debrief']) {
+        if (o && o[k] !== undefined && typeof o[k] !== 'string') errors.push(`option ${i + 1}: "${k}" must be text.`);
+      }
     });
     const ids = block.options.map(o => o?.id);
     if (new Set(ids).size !== ids.length) errors.push('option ids must be unique.');

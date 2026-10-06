@@ -2,6 +2,9 @@
 //
 //   Stage 1  the witness_crucible flag: gate (server + editor mirror), save guard, and the
 //            route precondition (no confirmed lever → refused before any model call)
+//   Stage 2  CrucibleLint: the shared rules pass a full generated witness crucible, catch
+//            each violation, leave the old protagonist shape untouched, and pass the two
+//            stored authored crucibles (positive control, skipped without restored data)
 //
 // SYNTHETIC FIXTURES ONLY. Every role, scenario and arc here lives in a temp JsonFileStore
 // made for this run and deleted after it; no real role file, no Supabase, no tracked file is
@@ -27,6 +30,7 @@ const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryA
 const { PlayerRepository }    = await import(`${ROOT}/engine/repositories/PlayerRepository.js`);
 const { SessionRepository }   = await import(`${ROOT}/engine/repositories/SessionRepository.js`);
 const admin = await import(`${ROOT}/engine/admin/adminRouter.js`);
+const lint  = await import(`${ROOT}/engine/services/CrucibleLint.js`);
 
 let fails = 0;
 const check = (name, cond, detail = '') => {
@@ -34,6 +38,45 @@ const check = (name, cond, detail = '') => {
   if (!cond) fails++;
 };
 const head = t => console.log(`\n-- ${t} ${'-'.repeat(Math.max(0, 72 - t.length))}`);
+
+// A confirmed lever and a full generated witness crucible built on it — the shape the
+// witness path must produce. Reused as scripted model output in later stages.
+const LEVER = {
+  axis: 'human_presence',
+  statement: 'The usher cannot change the sentence; his power is his presence beside her in the corridors, and what he carries out of them to testify.',
+  reasoning: 'He escorts her daily between cell and court, unrecorded, and he testified to her treatment twenty-five years later.',
+  counter_case: { assumption: 'You would assume the usher, holding the keys and the corridor, could get her out.', why_wrong: 'He has no authority over the sentence and no means of escape; his office is to bring her, and the record shows only his later testimony.' },
+  evidence: [
+    { claim: 'He escorted the prisoner between cell and court every day of the trial.', source: 'Trial record, sessions of February-May 1431' },
+    { claim: 'He testified at the nullification to how she was held.',               source: 'Nullification testimony, 1456' },
+  ],
+  instrument_terms: ['corridor', 'testify'],
+  scene_binding: { at_scene: 'scene_b', reasoning: 'The relapse visit is the last morning he walks her before the sentence; it precedes the documented execution.' },
+  generated: true,
+  confirmed: true,
+};
+const words = n => Array.from({ length: n }, (_, i) => ['the', 'corridor', 'stone', 'door', 'light', 'morning', 'step', 'quiet'][i % 8]).join(' ');
+const DISCLAIMER = 'Changing her sentence was never your office.';
+const CLAIM      = 'In 1456 you would testify at the nullification to how she was held.';
+const debrief = (stance, extra = 110) => `${DISCLAIMER} You were the usher; you brought her and you stood at the door. ${stance} ${CLAIM} ${words(extra)}.`;
+const GOOD_BLOCK = {
+  id: 'usher_witnessing_choice',
+  setup: `You carried the summons again this morning. ${words(200)}. The word relapse is in the room, and the corridor is yours.`,
+  options: [
+    { id: 'keep_your_place', label: 'Keep your place',      text: `Do your office and no more. ${words(30)}.`,
+      debrief: debrief('You kept your place in every corridor and let yourself see nothing there.'),
+      outcome_disclaimer: DISCLAIMER, consequence: { claim: CLAIM, source: 'Nullification testimony, 1456' } },
+    { id: 'see_her',         label: 'Let yourself see her', text: `Let yourself see her in the corridor. ${words(30)}.`,
+      debrief: debrief('You saw her, in the corridor no one wrote down, and carried it with you.'),
+      outcome_disclaimer: DISCLAIMER, consequence: { claim: CLAIM, source: 'Nullification testimony, 1456' } },
+    { id: 'mark_it',         label: 'Mark it to testify',   text: `Mark what is done, to testify one day. ${words(30)}.`,
+      debrief: debrief('You saw her, in the corridor no one wrote down, and carried it with you.'),
+      outcome_disclaimer: DISCLAIMER, consequence: { claim: CLAIM, source: 'Trial record, sessions of February-May 1431' } },
+  ],
+  time_advance: 0,
+  principal_transition: { type: 'decision_made', moment: 'usher_witnessing_choice' },
+};
+const mutate = (fn) => { const b = structuredClone(GOOD_BLOCK); fn(b); return b; };
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'wc-gen-'));
@@ -150,6 +193,76 @@ try {
     check('flagged witness, confirmed lever → never reaches the protagonist prompt (501 pending)', r.status === 501 && r.body.code === 'WITNESS_PATH_PENDING', `${r.status}`);
   }
   check('no route call wrote a fixture role', Object.keys(ROLES).every(id => !repos.scenarios.findPlayerRole(id).defining_moment));
+  // ═══ STAGE 2 ═══════════════════════════════════════════════════════════════
+  head('2a. CrucibleLint — a full generated witness crucible passes');
+  {
+    const r = lint.lintCrucibleBlock(GOOD_BLOCK, { path: 'witness-crucible', generated: true, lever: LEVER });
+    check('no errors', r.errors.length === 0, r.errors.join(' | '));
+    check('no budget warnings', r.warnings.length === 0, r.warnings.join(' | '));
+    check('validator (structure) passes too', admin.validateDefiningMomentBlock(GOOD_BLOCK).length === 0);
+  }
+
+  head('2b. CrucibleLint — each violation is caught (witness path → ERROR)');
+  const VIOLATIONS = [
+    ['"could not save her" in a debrief',       b => { b.options[0].debrief += ' You could not save her.'; },                /failed-rescue/],
+    ['"couldn\'t have saved him" in the setup', b => { b.setup += " You couldn't have saved him."; },                     /setup: failed-rescue/],
+    ['blame: "because of you"',                 b => { b.options[1].debrief += ' She burned because of you.'; },             /blame/],
+    ['outcome claim: "you saved her"',          b => { b.options[2].debrief += ' In the end you saved her.'; },              /claims the outcome/],
+    ['debriefs do not branch',                  b => { for (const o of b.options) o.debrief = b.options[0].debrief; },       /do not branch/],
+    ['missing debrief',                         b => { delete b.options[1].debrief; },                                        /needs a "debrief"/],
+    ['missing label',                           b => { delete b.options[0].label; },                                          /needs a short "label"/],
+    ['label too long',                          b => { b.options[0].label = 'x'.repeat(50); },                                /under 50 characters/],
+    ['disclaimer not in the debrief',           b => { b.options[0].outcome_disclaimer = 'It was never yours.'; },           /outcome_disclaimer" does not appear/],
+    ['no disclaimer field',                     b => { delete b.options[0].outcome_disclaimer; },                            /needs an "outcome_disclaimer"/],
+    ['consequence claim not in the debrief',    b => { b.options[0].consequence.claim = 'Something else happened later.'; }, /consequence.claim does not appear/],
+    ['consequence source not lever evidence',   b => { b.options[0].consequence.source = 'A source the lever never cited'; }, /not one of the confirmed lever's evidence sources/],
+    ['no consequence',                          b => { delete b.options[2].consequence; },                                    /needs a "consequence"/],
+    ['debrief never names the lever',           b => { b.options[0].debrief = b.options[0].debrief.replace(/corridors?/g, 'hall').replace(/testify/g, 'speak'); }, /never names the lever/],
+  ];
+  for (const [label, fn, rx] of VIOLATIONS) {
+    const r = lint.lintCrucibleBlock(mutate(fn), { path: 'witness-crucible', generated: true, lever: LEVER });
+    check(`caught: ${label}`, r.errors.some(e => rx.test(e)), r.errors.join(' | ').slice(0, 160));
+  }
+  {
+    const r = lint.lintCrucibleBlock(GOOD_BLOCK, { path: 'witness-crucible', generated: true, lever: { ...LEVER, evidence: [] } });
+    check('caught: a lever with no evidence cannot vouch for any citation', r.errors.some(e => /no evidence sources/.test(e)));
+  }
+  {
+    const r = lint.lintCrucibleBlock(mutate(b => { b.setup = 'Too short.'; b.options[0].debrief = `${DISCLAIMER} ${CLAIM} corridor.`; }), { path: 'witness-crucible', generated: true, lever: LEVER });
+    check('budgets are WARNINGS, not errors', r.errors.length === 0 && r.warnings.some(w => /^setup: \d+ words/.test(w)) && r.warnings.some(w => /debrief: \d+ words/.test(w)), `${r.errors.join(' | ')}`);
+  }
+  {
+    const r = lint.lintCrucibleBlock(mutate(b => { for (const o of b.options) { delete o.outcome_disclaimer; delete o.consequence; } }), { path: 'witness-crucible', generated: false });
+    check('authored (generated:false): provenance fields not required, prose rules still apply', r.errors.length === 0);
+  }
+  {
+    const negated = mutate(b => { b.options[0].debrief += ' No word in a corridor could have stayed the fire.'; });
+    check('a NEGATED outcome statement is not an outcome claim', lint.lintCrucibleBlock(negated, { path: 'witness-crucible', generated: true, lever: LEVER }).errors.length === 0);
+  }
+
+  head('2c. CrucibleLint — protagonist path');
+  {
+    const OLD = { id: 'x_defining_choice', setup: words(120), options: [{ id: 'a', text: words(12) }, { id: 'b', text: words(12) }, { id: 'c', text: words(12) }], time_advance: 0, at_elapsed_fraction: 0.6, principal_transition: { type: 'decision_made', moment: 'x_defining_choice' } };
+    const r = lint.lintCrucibleBlock(OLD, { path: 'protagonist', generated: true });
+    check('the old shape (no label, no debrief): nothing applies', r.errors.length === 0 && r.warnings.length === 0);
+    const partial = structuredClone(OLD); partial.options[0].debrief = words(120);
+    check('debriefs are all-or-none (partial → error)', lint.lintCrucibleBlock(partial, { path: 'protagonist' }).errors.some(e => /all-or-none/.test(e)));
+    const banned = structuredClone(OLD); for (const o of banned.options) { o.debrief = `${words(110)} ${o.id}. It was your fault.`; o.label = o.id; }
+    const rb = lint.lintCrucibleBlock(banned, { path: 'protagonist' });
+    check('prose rules are WARNINGS on the protagonist path', rb.errors.length === 0 && rb.warnings.some(w => /blame/.test(w)), rb.errors.join(' | '));
+    check('protagonist: provenance fields never required', !rb.errors.some(e => /outcome_disclaimer|consequence/.test(e)));
+  }
+
+  head('2d. positive control — the stored authored crucibles pass');
+  for (const id of ['role_manchon', 'role_massieu']) {
+    const f = path.join(REPO_DIR, 'engine/data/scenarios/player_roles', `${id}.json`);
+    if (!fs.existsSync(f)) { console.log(`SKIP  ${id} — not restored locally`); continue; }
+    const dm = JSON.parse(fs.readFileSync(f, 'utf8')).defining_moment;
+    const r = lint.lintCrucibleBlock(dm, { path: 'witness-crucible', generated: false });
+    check(`${id}: no lint errors`, r.errors.length === 0, r.errors.join(' | '));
+    check(`${id}: inside the witness budgets (no warnings)`, r.warnings.length === 0, r.warnings.join(' | '));
+    check(`${id}: validator (structure) passes`, admin.validateDefiningMomentBlock(dm).length === 0);
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });

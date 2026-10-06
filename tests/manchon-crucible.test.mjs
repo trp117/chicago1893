@@ -70,8 +70,13 @@ check('three options, each with a short label, full text and a debrief',
 const [FID, COMP, BREACH] = DM.options;
 check('fidelity-plus debrief = the fidelity debrief + the breach sentence', BREACH.debrief.startsWith(FID.debrief) && BREACH.debrief.length > FID.debrief.length);
 check('compliance debrief differs from fidelity', COMP.debrief !== FID.debrief && !FID.debrief.includes(COMP.debrief.slice(0, 80)));
-const BANNED = [/could\s*n[o']t (have )?save(d)? her/i, /could not (have )?save(d)? her/i, /failed to save her/i, /your fault/i, /because of you/i];
+// The rules live in CrucibleLint (shared with the generator's validator), not here.
+const { BANNED_DEBRIEF_PATTERNS: BANNED, lintCrucibleBlock } = await import(`${ROOT}/engine/services/CrucibleLint.js`);
 check('no debrief says "could(n\'t) save her" / blames him', DM.options.every(o => !BANNED.some(rx => rx.test(o.debrief))));
+{
+  const lint = lintCrucibleBlock(DM, { path: 'witness-crucible', generated: false });
+  check('the stored block passes the crucible lint (witness path, authored)', lint.errors.length === 0, lint.errors.join(' | '));
+}
 check('the compliance debrief keeps the cost uncertain and says the truth survived without him',
   /you will never know/.test(COMP.debrief) && /did not die because of it/.test(COMP.debrief) && /did not need you to survive/.test(COMP.debrief));
 

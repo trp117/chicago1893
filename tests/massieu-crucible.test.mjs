@@ -67,9 +67,14 @@ check('options in order: do_your_office, see_her, mark_what_is_done', DM.options
 const WITNESS = OPT.see_her?.debrief, DETACHED = OPT.do_your_office?.debrief;
 check('see_her and mark_what_is_done share the witness debrief; do_your_office has the detached one',
   !!WITNESS && OPT.mark_what_is_done.debrief === WITNESS && DETACHED !== WITNESS);
-const BANNED = [/could\s*n[o']t (have )?save(d)? her/i, /could not (have )?save(d)? her/i, /failed to save her/i, /your fault/i, /because of you/i];
+// The rules live in CrucibleLint (shared with the generator's validator), not here.
+const { BANNED_DEBRIEF_PATTERNS: BANNED, lintCrucibleBlock } = await import(`${ROOT}/engine/services/CrucibleLint.js`);
 check('STRICT: no debrief and no setup says "could(n\'t) save her" or blames him — no exceptions',
   [DM.setup, ...DM.options.map(o => o.debrief)].every(t => !BANNED.some(rx => rx.test(t))));
+{
+  const lint = lintCrucibleBlock(DM, { path: 'witness-crucible', generated: false });
+  check('the stored block passes the crucible lint (witness path, authored)', lint.errors.length === 0, lint.errors.join(' | '));
+}
 check('witness debrief: "Saving her was never yours to do" … "You were one."', WITNESS.includes('Saving her was never yours to do. But you could see her') && WITNESS.endsWith('That is what a witness is for. You were one.'));
 check('detached debrief: "less to tell than a man who had stood so close should have" … "You chose not to be."',
   DETACHED.includes('you had less to tell than a man who had stood so close should have, because you had decided') && DETACHED.endsWith('You chose not to be.') && !/least to say/.test(DETACHED));
