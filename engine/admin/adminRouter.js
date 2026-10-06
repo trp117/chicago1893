@@ -1540,6 +1540,10 @@ function buildDefiningMomentSystemPrompt(exemplar = DEFINING_MOMENT_EXEMPLAR, an
 // annotated with the provenance fields a GENERATED block must carry (outcome_disclaimer,
 // consequence) and the lever each was written on. Manchon is shown by default; a role that
 // IS an exemplar is shown the other one, so a regeneration never copies its own answer key.
+// PENDING SOURCE REVIEW (held for a content edit, since both touch the authored crucibles):
+// Manchon's "read at the nullification" (his evidence 2 and his authored debrief) may overstate
+// it — "produced and identified before" is likelier; and Massieu's setup puts him at the cell
+// door on 28 May, which is unverified against the record of that day.
 const WITNESS_CRUCIBLE_EXEMPLARS = [
   {
     role_id: 'role_manchon',
@@ -1549,11 +1553,12 @@ const WITNESS_CRUCIBLE_EXEMPLARS = [
       statement: 'His power is the record: the faithfulness of the minute he keeps. He cannot judge her, defend her or save her.',
       counter_case: {
         assumption: 'You would assume a notary at her trial could quietly help her — soften the record in her favour, or speak for her.',
-        why_wrong: 'He was not her advocate and had no voice in the verdict. The record was worth something precisely because it was kept as said; the nullification later relied on it for that reason.',
+        why_wrong: 'He was not her advocate and had no voice in the verdict. What he held was the record, and its worth lay in being kept as said. It was not what cleared her: the nullification rested on many witnesses and on the trial\'s procedural defects, and his minute became one piece of the evidence there.',
       },
       evidence: [
         { claim: 'Manchon kept the French minute of the trial as chief notary.', source: 'Trial record of 1431 (the French minute)' },
         { claim: 'His minute was read at the nullification proceedings in 1456.', source: 'Nullification proceedings, 1456' },
+        { claim: 'He testified that he was pressed to set her answers down to her harm, and refused: he kept to what she said, though clerks placed out of sight took down versions that differed from his.', source: 'Manchon\'s testimony, nullification inquiries (1450-1456)' },
       ],
       instrument_terms: ['record', 'minute'],
     },
@@ -1610,10 +1615,13 @@ const WITNESS_CRUCIBLE_EXEMPLARS = [
       statement: 'His power is his presence beside her in the corridors and at the doors, as a person and not a case — and what he carries out of them. He cannot change the sentence or the prison.',
       counter_case: {
         assumption: 'You would assume the usher — the man at her side every day, between cell and court — could get her out, or at least ease her lot.',
-        why_wrong: 'He had no authority over the sentence or the prison; his office was to bring her and stand at the door. The record shows only what he did with his presence: in 1456 he testified to how she was held.',
+        why_wrong: 'He had no authority over the sentence or the prison; his office was to bring her and stand at the door. What the record shows is what he did with that presence, and that it could cost him: a halt at a chapel door that drew a threat, and years later his testimony to how she was held.',
       },
       evidence: [
-        { claim: 'As court usher, Massieu escorted Joan between cell and court throughout the trial.', source: 'Trial record of 1431' },
+        { claim: 'As the court\'s usher, Massieu served its summonses on her.', source: 'Trial record of 1431' },
+        { claim: 'By his own account, he brought her between prison and court during the trial.', source: 'Massieu\'s testimony, nullification inquiries (1450-1456)' },
+        { claim: 'On the way to court he let her stop to pray before a chapel; the promoter, Jean d\'Estivet, rebuked and threatened him for it.', source: 'Massieu\'s testimony, nullification inquiries (1450-1456)' },
+        { claim: 'His testimony is a principal account of how she came to be in men\'s clothes on the morning of the relapse.', source: 'Massieu\'s testimony, nullification inquiries (1450-1456)' },
         { claim: 'He testified at the nullification proceedings in 1456 to how she was held and treated.', source: 'Nullification proceedings, 1456' },
       ],
       instrument_terms: ['corridor', 'door'],
