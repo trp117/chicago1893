@@ -14,7 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
-import { lintCrucibleBlock, wordCount, BUDGETS, LABEL_MAX_CHARS } from '../services/CrucibleLint.js';
+import { lintCrucibleBlock, wordCount, BUDGETS, LABEL_MAX_CHARS, AUTHORING_TERM_PATTERNS } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -1767,7 +1767,8 @@ function buildWitnessCrucibleSystemPrompt(exemplar = WITNESS_CRUCIBLE_EXEMPLARS[
     'FORBIDDEN, WITHOUT EXCEPTION, in the setup and every debrief:',
     '  - any form of "could not save her / him / them", "couldn\'t have saved", "failed to save" — the witness was never the one who could save; saying so implies they were;',
     '  - blame: "your fault", "because of you";',
-    '  - any claim that the witness changed the outcome ("you saved her", "you stopped the execution").',
+    '  - any claim that the witness changed the outcome ("you saved her", "you stopped the execution");',
+    '  - the vocabulary of THIS brief, in the setup, any option or any debrief: "lever", "axis", "downstream" or "displaced consequence", "counter-case", "instrument terms", "outcome disclaimer", any snake_case name — and source-hedging such as "according to legend" or "the record hedges". These are authoring words, not narrative: say what the record, the minute, the testimony or the vow DID, in the words of the scene itself; where the record is uncertain, say plainly that it is uncertain.',
     'A sentence that says the outcome was never theirs is required; a sentence that mourns a rescue they never had is forbidden. Those are different sentences.',
     '',
     '════════════════════════════════════════════════════════',
@@ -2546,7 +2547,7 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
     // cover the hard cases, and an unused ceiling costs nothing (billing is on actual
     // output). 8000 matches /generate/epilogue-data, the other long-form generator here.
     // The witness block is roughly three times the protagonist's (a 180-300 word setup and
-    // three 140-230 word debriefs), so its ceiling and timeout scale with it.
+    // three 140-250 word debriefs), so its ceiling and timeout scale with it.
     { model: MODEL, max_tokens: witnessPath ? 16000 : 8000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
     { timeout: witnessPath ? 180_000 : 90_000, maxRetries: 0 }
   );
@@ -2615,7 +2616,7 @@ function scenarioScenes(repos, scenario) {
 export const WITNESS_LEVER_SYSTEM_PROMPT = [
   'You are identifying the LEVER of one WITNESS role in an immersive historical fiction experience, before any prose is written for it. You are not writing anything a player will read. Return JSON only.',
   '',
-  'WHAT A WITNESS CRUCIBLE IS. This person was present at an event whose outcome was fixed and was never theirs to change. They are not its judge, its victim or its rescuer. But HOW they bore witness was a real decision, and it had a documented consequence somewhere downstream — a record that survived, testimony given years later, a person who was not alone in a corridor. The defining moment that will later be written for this role is a choice about that conduct, made through ONE lever. Your job is to find that lever, from the record, and nothing else.',
+  'WHAT A WITNESS CRUCIBLE IS. This person was present at an event whose outcome was fixed and was never theirs to change. They are not its judge, its victim or its rescuer. But HOW they bore witness was a real decision, and it had a documented consequence later on — a record that survived, testimony given years later, a person who was not alone in a corridor. The defining moment that will later be written for this role is a choice about that conduct, made through ONE lever. Your job is to find that lever, from the record, and nothing else.',
   '',
   '════════════════════════════════════════════════════════',
   'THE AXES — pick exactly one',
@@ -2637,7 +2638,8 @@ export const WITNESS_LEVER_SYSTEM_PROMPT = [
   'EVIDENCE — CITED, FROM THE MATERIAL GIVEN',
   '════════════════════════════════════════════════════════',
   '',
-  'At least two items. Each is { "claim", "source" }: a specific documented act or position of THIS person that shows the lever, and where it comes from. At least one item must be the DOWNSTREAM CONSEQUENCE of the lever — what the record, the testimony or the presence led to afterwards — because the debriefs written later must cite it.',
+  'At least two items. Each is { "claim", "source" }: a specific documented act or position of THIS person that shows the lever, and where it comes from. At least one item must be what the conduct of this person LED TO AFTERWARDS — what the record, the testimony or the presence came to — because the debriefs written later must cite it.',
+  'Each "claim" is QUOTED TO THE PLAYER later, word for word, so write it as one plain statement of historical fact in ordinary prose: what happened, not what it demonstrates. Never use the vocabulary of this brief in a claim — "lever", "axis", "downstream" or "displaced consequence", "counter-case", any snake_case name — and never hedge with "according to legend". Where the source itself is uncertain — it calls the event a legend or a tradition — state that as a plain fact about the source ("The parish history records the vow as a tradition."), so the uncertainty stays honest without the hedge.',
   'Sources must be things you were given: quote the documented record\'s source citation verbatim when one is supplied; otherwise name the field ("role briefing", "role description", "starting knowledge"). Never invent a source, a document, a date or an act the material does not support. If the material cannot support two items, decline.',
   '',
   'INSTRUMENT TERMS: 2 to 5 short lowercase words that name the lever\'s instrument in plain language — the words a debrief must use when it speaks about the lever (for a notary: record, minute; for an usher: corridor, door, testify). Each must be a word that would naturally appear in prose about this person, not a label.',
@@ -2736,6 +2738,14 @@ export function validateWitnessLever(p, sceneIds = []) {
   const ev = Array.isArray(p.evidence) ? p.evidence : [];
   if (ev.length < 2) errors.push(`"evidence" needs at least 2 cited items (got ${ev.length}).`);
   ev.forEach((e, i) => { if (!str(e?.claim) || !str(e?.source)) errors.push(`evidence ${i + 1}: needs both "claim" and "source".`); });
+  // A claim is quoted to the player word for word (it becomes a debrief's consequence.claim),
+  // so the authoring-vocabulary rule the crucible lint applies to prose applies to it here, at
+  // the source: the first real runs carried "the downstream consequence of the vow" from a
+  // proposed claim straight into a debrief.
+  ev.forEach((e, i) => {
+    const found = str(e?.claim) ? AUTHORING_TERM_PATTERNS.map(rx => e.claim.match(rx)?.[0]).filter(Boolean) : [];
+    if (found.length) errors.push(`evidence ${i + 1}: the claim is quoted to the player, and carries authoring vocabulary (${found.map(t => `"${t}"`).join(', ')}).`);
+  });
   const terms = Array.isArray(p.instrument_terms) ? p.instrument_terms : [];
   if (terms.length < 2 || terms.length > 5 || !terms.every(str)) errors.push(`"instrument_terms" must be 2 to 5 words (got ${JSON.stringify(p.instrument_terms)}).`);
   const at = p.scene_binding?.at_scene ?? null;

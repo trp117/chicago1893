@@ -255,6 +255,12 @@ try {
     ['consequence source not lever evidence',   b => { b.options[0].consequence.source = 'A source the lever never cited'; }, /not one of the confirmed lever's evidence sources/],
     ['no consequence',                          b => { delete b.options[2].consequence; },                                    /needs a "consequence"/],
     ['debrief never names the lever',           b => { b.options[0].debrief = b.options[0].debrief.replace(/corridors?/g, 'hall').replace(/testify/g, 'speak'); }, /never names the lever/],
+    ['authoring term "lever" in a debrief',     b => { b.options[0].debrief += ' Your lever was the corridor.'; },          /debrief: authoring vocabulary .*"lever"/],
+    ['"the downstream consequence" in a debrief', b => { b.options[1].debrief += ' It was the downstream consequence of that morning.'; }, /authoring vocabulary .*"downstream consequence"/],
+    ['snake_case identifier in the setup',      b => { b.setup += ' This is could_have_acted_at_cost.'; },                  /setup: authoring vocabulary .*"could_have_acted_at_cost"/],
+    ['"according to legend" in an option text', b => { b.options[2].text += ' According to legend, it mattered.'; },       /text: authoring vocabulary .*"According to legend"/],
+    ['"the record hedges" in a debrief',        b => { b.options[0].debrief += ' The record hedges on this.'; },             /authoring vocabulary .*"The record hedges"/],
+    ['"axis" in a label',                       b => { b.options[0].label = 'Choose the axis'; },                            /label: authoring vocabulary .*"axis"/],
   ];
   for (const [label, fn, rx] of VIOLATIONS) {
     const r = lint.lintCrucibleBlock(mutate(fn), { path: 'witness-crucible', generated: true, lever: LEVER });
@@ -283,6 +289,13 @@ try {
     check('claim differing only in case / spacing / final stop → still found', run(b => { b.options[0].consequence.claim = '  in 1456 you  would TESTIFY at the nullification to how she was held'; }).length === 0);
     check('claim with curly quotes, debrief with straight → still found', run(b => { b.options[0].debrief += ' He said "enough" at the door.'; b.options[0].consequence.claim = 'He said “enough” at the door.'; }).length === 0);
     check('disclaimer differing only in case → still found', run(b => { b.options[0].outcome_disclaimer = DISCLAIMER.toLowerCase(); }).length === 0);
+    check('narrative "the Axis" (capitalised) is not authoring vocabulary', run(b => { b.setup += ' The Axis held the coast.'; }).length === 0);
+    const prot = lint.lintCrucibleBlock(mutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; }), { path: 'protagonist', generated: true });
+    check('protagonist with debriefs: authoring vocabulary is a WARNING', prot.errors.length === 0 && prot.warnings.some(w => /authoring vocabulary/.test(w)), prot.errors.join(' | '));
+    const leaky = { ...LEVER, evidence: [LEVER.evidence[0], { claim: 'The lights burn today, the downstream consequence of the vow.', source: 'Parish history' }] };
+    check('a lever whose evidence CLAIM carries authoring vocabulary is invalid (it is quoted to the player)',
+      admin.validateWitnessLever(leaky, ['scene_a', 'scene_b']).some(e => /evidence 2: .*authoring vocabulary .*"downstream consequence"/.test(e)));
+    check('debrief budget widened to 140-250', JSON.stringify(lint.BUDGETS['witness-crucible'].debrief) === '[140,250]');
     check('claim with DIFFERENT words → still an error', run(b => { b.options[0].consequence.claim = 'In 1456 you testified at the nullification to how she was held.'; }).some(e => /consequence.claim does not appear/.test(e)));
   }
 
