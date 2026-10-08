@@ -14,7 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
-import { lintCrucibleBlock, lintWitnessLever, lintResult, finding, wordCount, BUDGETS, LABEL_MAX_CHARS, WITNESS_LEVER_AXES } from '../services/CrucibleLint.js';
+import { lintCrucibleBlock, lintWitnessLever, lintResult, finding, formatFindings, optionLocator, wordCount, BUDGETS, LABEL_MAX_CHARS, WITNESS_LEVER_AXES } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -1956,45 +1956,51 @@ function buildDefiningMomentUserPrompt({ scenario = {}, role = {}, characters = 
 // gameRouter.js:1112-1123), so it is rejected here rather than persisted for a reviewer to
 // discover. Prose quality (setup length, contiguous lifts) is NOT checked here: those are
 // reviewer judgements, surfaced in the review gate, not grounds for refusing the draft.
-// Returns a list of human-readable errors; empty means valid.
+// Returns FINDINGS (rule 'structure', all errors), located like the crucible lint's so the
+// review UI can flag the field; validateDefiningMomentBlock below is their text rendering.
 const SNAKE_CASE = /^[a-z0-9_]+$/;
-function validateDefiningMomentBlock(block) {
-  const errors = [];
-  if (!block || typeof block !== 'object') return ['Response was not a JSON object.'];
+function definingMomentStructureFindings(block) {
+  const out = [];
+  const add = (location, message) => out.push(finding('error', 'structure', location, message));
+  if (!block || typeof block !== 'object' || Array.isArray(block)) { add('block', 'Response was not a JSON object.'); return out; }
   if (typeof block.id !== 'string' || !SNAKE_CASE.test(block.id)) {
-    errors.push(`"id" must be snake_case (got ${JSON.stringify(block.id)}).`);
+    add('block.id', `"id" must be snake_case (got ${JSON.stringify(block.id)}).`);
   }
-  if (typeof block.setup !== 'string' || !block.setup.trim()) errors.push('"setup" is empty.');
+  if (typeof block.setup !== 'string' || !block.setup.trim()) add('setup', '"setup" is empty.');
   if (!Array.isArray(block.options) || block.options.length !== 3) {
-    errors.push(`"options" must contain exactly 3 entries (got ${Array.isArray(block.options) ? block.options.length : 'none'}).`);
+    add('options', `"options" must contain exactly 3 entries (got ${Array.isArray(block.options) ? block.options.length : 'none'}).`);
   } else {
+    const loc = optionLocator(block.options);
     block.options.forEach((o, i) => {
       if (!o || typeof o.id !== 'string' || !SNAKE_CASE.test(o.id)) {
-        errors.push(`option ${i + 1}: "id" must be snake_case (got ${JSON.stringify(o?.id)}).`);
+        add(`option.#${i}.id`, `option ${i + 1}: "id" must be snake_case (got ${JSON.stringify(o?.id)}).`);
       }
-      if (!o || typeof o.text !== 'string' || !o.text.trim()) errors.push(`option ${i + 1}: "text" is empty.`);
+      if (!o || typeof o.text !== 'string' || !o.text.trim()) add(loc(i, 'text'), `option ${i + 1}: "text" is empty.`);
       // Optional per-option fields the runtime reads (gameRouter sends label as the button
       // text; authoredForkDebrief ships debrief verbatim). Absent is the old shape and fine;
       // present must be text. Whether they are REQUIRED, and the prose rules on them, is
       // lintCrucibleBlock's job (CrucibleLint.js), per path.
       for (const k of ['label', 'debrief']) {
-        if (o && o[k] !== undefined && typeof o[k] !== 'string') errors.push(`option ${i + 1}: "${k}" must be text.`);
+        if (o && o[k] !== undefined && typeof o[k] !== 'string') add(loc(i, k), `option ${i + 1}: "${k}" must be text.`);
       }
     });
     const ids = block.options.map(o => o?.id);
-    if (new Set(ids).size !== ids.length) errors.push('option ids must be unique.');
+    if (new Set(ids).size !== ids.length) add('options', 'option ids must be unique.');
   }
   const pt = block.principal_transition;
   if (!pt || pt.type !== 'decision_made') {
-    errors.push(`"principal_transition.type" must be "decision_made" (got ${JSON.stringify(pt?.type)}).`);
+    add('block.principal_transition', `"principal_transition.type" must be "decision_made" (got ${JSON.stringify(pt?.type)}).`);
   }
   if (!pt || pt.moment !== block.id) {
-    errors.push(`"principal_transition.moment" must equal "id" (${JSON.stringify(pt?.moment)} vs ${JSON.stringify(block.id)}) — the decision is recorded under this key and would never be found.`);
+    add('block.principal_transition', `"principal_transition.moment" must equal "id" (${JSON.stringify(pt?.moment)} vs ${JSON.stringify(block.id)}) — the decision is recorded under this key and would never be found.`);
   }
   if (block.at_elapsed_fraction != null && typeof block.at_elapsed_fraction !== 'number') {
-    errors.push(`"at_elapsed_fraction" must be a number (got ${JSON.stringify(block.at_elapsed_fraction)}).`);
+    add('block.at_elapsed_fraction', `"at_elapsed_fraction" must be a number (got ${JSON.stringify(block.at_elapsed_fraction)}).`);
   }
-  return errors;
+  return out;
+}
+function validateDefiningMomentBlock(block) {
+  return formatFindings(definingMomentStructureFindings(block));
 }
 
 // CLASSIFICATION — which framing this role's fork is generated under. Pure, no I/O, no
@@ -3433,51 +3439,23 @@ export function createAdminRouter(repos, config = {}) {
       : null;
     const withDebriefs = !witnessPath && req.body?.with_debriefs === true;
 
-    try {
-      // Timeout and maxRetries:0 are set on the messages.create call inside the
-      // helper, which also logs stop_reason/output_tokens, rejects a max_tokens truncation
-      // before parsing, fence-strips, and passes a decline back untouched.
-      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey,
-        witnessPath ? { path: forkGate.path, lever, scene: leverScene } : { withDebriefs });
-
-      if (result?.declined === true) {
-        // First-class outcome. No write, no error status.
-        console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — declined, role left unchanged`);
-        return res.json({ roleId: role.id, declined: true, reason: result.reason, classification });
+    // One draft, checked: structure + the crucible lint, as located findings.
+    const checkDraft = result => {
+      const findings = [...definingMomentStructureFindings(result), ...lintCrucibleBlock(result, { path: forkGate.path, generated: true, lever }).findings];
+      if (withDebriefs && !(Array.isArray(result?.options) && result.options.every(o => typeof o?.debrief === 'string' && o.debrief.trim()))) {
+        findings.push(finding('error', 'debrief_missing', 'options', 'debriefs were requested (with_debriefs) but not every option carries one.'));
       }
-
-      const errors = validateDefiningMomentBlock(result);
-      if (errors.length) {
-        console.error(`[DEFINING-MOMENT] ${role.id} invalid block — ${errors.join(' ')}`);
-        return res.status(500).json({
-          error: `The generated block is structurally invalid and was not saved: ${errors.join(' ')}`,
-          errors,
-        });
-      }
-
-      // THE CRUCIBLE LINT (CrucibleLint.js — the same rules the Manchon/Massieu suites assert).
-      // Witness path: every prose rule and every citation check is an error, and a block that
-      // fails one is not saved. Protagonist path: nothing applies to the old shape; requested
-      // debriefs must be present on all three options. Budgets are warnings, returned to the
-      // reviewer with the block.
-      let lint = lintCrucibleBlock(result, { path: forkGate.path, generated: true, lever });
-      if (withDebriefs && !result.options.every(o => typeof o?.debrief === 'string' && o.debrief.trim())) {
-        lint = lintResult([...lint.findings, finding('error', 'debrief_missing', 'options', 'debriefs were requested (with_debriefs) but not every option carries one.')]);
-      }
-      if (lint.errors.length) {
-        console.error(`[DEFINING-MOMENT] ${role.id} block failed the crucible lint — ${lint.errors.join(' ')}`);
-        return res.status(500).json({
-          error: `The generated block breaks the crucible rules and was not saved: ${lint.errors.join(' ')}`,
-          errors: lint.errors, lint_warnings: lint.warnings,
-        });
-      }
-
-      // Engine-owned fields are stamped, not trusted from the model: time_advance is what
-      // gameRouter reads to make the fork cost no clock, and at_elapsed_fraction is fixed
-      // by the system. Stamps go LAST so a model that emitted generated/reviewed of its own
-      // cannot pre-mark its own draft as reviewed.
-      // The STORY BINDING is the author's timing choice, not prose: it is carried over from
-      // the outgoing block, and anything the model emitted for it is discarded.
+      return lintResult(findings);
+    };
+    // Stamped exactly as it would be saved — shared by the save and the return-editable path,
+    // so the reviewer edits the same object a save would have written.
+    // Engine-owned fields are stamped, not trusted from the model: time_advance is what
+    // gameRouter reads to make the fork cost no clock, and at_elapsed_fraction is fixed
+    // by the system. Stamps go LAST so a model that emitted generated/reviewed of its own
+    // cannot pre-mark its own draft as reviewed.
+    // The STORY BINDING is the author's timing choice, not prose: it is carried over from
+    // the outgoing block, and anything the model emitted for it is discarded.
+    const stampDraft = result => {
       const defining_moment = {
         ...result,
         time_advance:        0,
@@ -3504,7 +3482,49 @@ export function createAdminRouter(repos, config = {}) {
       // The timing rule confirms that no OPTION turns the record into a counterfactual — new
       // options need a new confirmation, so it is never carried over (nor taken from the model).
       delete defining_moment.timing_confirmed;
+      return { defining_moment, bindingSource };
+    };
 
+    try {
+      // Timeout and maxRetries:0 are set on the messages.create call inside the
+      // helper, which also logs stop_reason/output_tokens, rejects a max_tokens truncation
+      // before parsing, fence-strips, and passes a decline back untouched.
+      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey,
+        witnessPath ? { path: forkGate.path, lever, scene: leverScene } : { withDebriefs });
+
+      if (result?.declined === true) {
+        // First-class outcome. No write, no error status.
+        console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — declined, role left unchanged`);
+        return res.json({ roleId: role.id, declined: true, reason: result.reason, classification });
+      }
+
+      // THE CHECK — structure (the engine's literal requirements) and THE CRUCIBLE LINT
+      // (CrucibleLint.js — the same rules the Manchon/Massieu suites assert), as one list of
+      // located findings. Witness path: every prose rule and every citation check is an error.
+      // Protagonist path: nothing applies to the old shape; requested debriefs must be present
+      // on all three options. Budgets and source hedges are warnings.
+      const check = checkDraft(result);
+      if (check.findings.some(f => f.location === 'block' && f.rule === 'structure')) {
+        // Not an object at all: there is nothing a reviewer could edit.
+        console.error(`[DEFINING-MOMENT] ${role.id} invalid block — ${check.errors.join(' ')}`);
+        return res.status(500).json({ error: `The generated block is structurally invalid and was not saved: ${check.errors.join(' ')}`, errors: check.errors, findings: check.findings });
+      }
+      const { defining_moment, bindingSource } = stampDraft(result);
+
+      // RETURN-EDITABLE. A draft that fails a check is NOT saved — and NOT discarded either: it
+      // comes back, stamped exactly as it would have been saved, with its findings located on
+      // the elements they concern, so a reviewer can fix it in place and save it through the
+      // role's defining-moment route (which re-runs every check). 200, because the request did
+      // what it was asked: it drafted, checked, and refused to store what failed.
+      if (check.errors.length) {
+        console.error(`[DEFINING-MOMENT] ${role.id} block failed the checks, returned unsaved for editing — ${check.errors.join(' ')}`);
+        return res.json({
+          saved: false, lint_failed: true, ...(dryRun ? { dry_run: true } : {}),
+          roleId: role.id, defining_moment, classification, path: forkGate.path,
+          ...(witnessPath ? { binding_source: bindingSource, lever } : {}),
+          findings: check.findings, errors: check.errors,
+        });
+      }
       // DRY RUN STOPS HERE — before the backup and the save, the only two writes below.
       if (dryRun) {
         console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — DRY RUN, block "${defining_moment.id}" returned, NOTHING written (path=${forkGate.path}${inlineLever ? ', inline lever' : ''})`);
@@ -3514,7 +3534,7 @@ export function createAdminRouter(repos, config = {}) {
           ...(witnessPath ? { binding_source: bindingSource, lever_source: inlineLever ? 'inline (dry run)' : 'stored, confirmed', lever } : {}),
           would_replace: hasRealDefiningMoment(role.defining_moment)
             ? { id: role.defining_moment.id, authored_crucible: isAuthoredCrucible(role.defining_moment) } : null,
-          lint_warnings: lint.warnings,
+          lint_warnings: check.warnings, findings: check.findings,
         });
       }
 
@@ -3528,12 +3548,12 @@ export function createAdminRouter(repos, config = {}) {
 
       // Additive write: spread the SERVER-loaded role, add one key.
       const saved = repos.scenarios.savePlayerRole({ ...role, defining_moment });
-      console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — block "${defining_moment.id}" written (${defining_moment.options.length} options, framing=${classification.framing}, path=${forkGate.path}${witnessPath ? `, bound by ${bindingSource}` : ''}${lint.warnings.length ? `, ${lint.warnings.length} lint warning(s)` : ''})`);
+      console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — block "${defining_moment.id}" written (${defining_moment.options.length} options, framing=${classification.framing}, path=${forkGate.path}${witnessPath ? `, bound by ${bindingSource}` : ''}${check.warnings.length ? `, ${check.warnings.length} lint warning(s)` : ''})`);
       res.json({
         roleId: role.id, defining_moment: saved.defining_moment, classification,
         // Added only where they say something, so an old-shape protagonist response is unchanged.
         ...(witnessPath ? { path: forkGate.path, binding_source: bindingSource } : {}),
-        ...(lint.warnings.length ? { lint_warnings: lint.warnings } : {}),
+        ...(check.warnings.length ? { lint_warnings: check.warnings, findings: check.findings } : {}),
       });
     } catch (err) {
       console.error(`[DEFINING-MOMENT ERROR] ${role.name}: ${err.message}`);
@@ -3589,12 +3609,8 @@ export function createAdminRouter(repos, config = {}) {
         console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — declined, role left unchanged`);
         return res.json({ roleId: role.id, declined: true, reason: result.reason });
       }
-      const lever  = pickLever(result);
-      const errors = validateWitnessLever(lever, scenes.map(s => s.id));
-      if (errors.length) {
-        console.error(`[WITNESS-LEVER] ${role.id} invalid proposal — ${errors.join(' ')}`);
-        return res.status(500).json({ error: `The lever proposal is invalid and was not saved: ${errors.join(' ')}`, errors });
-      }
+      const lever = pickLever(result || {});
+      const lint  = lintWitnessLever(lever, scenes.map(s => s.id));
       // Stamps LAST, so a model that emitted confirmed/generated of its own cannot pre-confirm.
       const witness_lever = { ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString() };
       const sceneList = scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act }));
@@ -3603,13 +3619,25 @@ export function createAdminRouter(repos, config = {}) {
       const protagonistScene = boundForks.find(f => !f.witness)?.at_scene;
       const sceneWarning = protagonistScene && lever.scene_binding?.at_scene !== protagonistScene
         ? { scene_warning: `Proposed at_scene "${lever.scene_binding?.at_scene}" is not the protagonist's defining-moment scene "${protagonistScene}".` } : {};
+      // RETURN-EDITABLE. A proposal that fails the lint is NOT saved, and NOT discarded: it comes
+      // back with its located findings for the reviewer to correct and submit whole through the
+      // PATCH route below (which re-runs the lint). No retry here — a lever is cheap to re-propose
+      // and a human reads every one before it is confirmed.
+      if (lint.errors.length) {
+        console.error(`[WITNESS-LEVER] ${role.id} proposal failed the lint, returned unsaved for editing — ${lint.errors.join(' ')}`);
+        return res.json({
+          saved: false, lint_failed: true, ...(dryRun ? { dry_run: true } : {}),
+          roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning,
+          findings: lint.findings, errors: lint.errors,
+        });
+      }
       if (dryRun) {
         console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — DRY RUN, proposal returned, NOTHING written (axis=${lever.axis})`);
-        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning });
+        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning, findings: lint.findings });
       }
       const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever });
       console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}, confirmed:false)`);
-      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList, ...sceneWarning });
+      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList, ...sceneWarning, findings: lint.findings });
     } catch (err) {
       console.error(`[WITNESS-LEVER ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });

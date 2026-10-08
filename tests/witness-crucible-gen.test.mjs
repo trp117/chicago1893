@@ -490,7 +490,9 @@ try {
     const before = JSON.stringify(leverOf('role_wc_usher'));
     modelQueue.push(JSON.stringify({ ...PROPOSAL, scene_binding: { at_scene: 'scene_zzz', reasoning: 'r' } }));
     const r = await post(leverUrl('role_wc_usher'), {});
-    check('invalid proposal (scene not in arc) → 500, nothing saved', r.status === 500 && /not a scene of this arc/.test(r.body.error) && JSON.stringify(leverOf('role_wc_usher')) === before);
+    check('invalid proposal (scene not in arc) → 200 lint_failed, returned UNSAVED with located findings', r.status === 200 && r.body.saved === false && r.body.lint_failed === true
+      && r.body.findings?.some(f => f.severity === 'error' && f.location === 'lever.scene_binding' && /not a scene of this arc/.test(f.message))
+      && r.body.witness_lever?.scene_binding?.at_scene === 'scene_zzz' && r.body.witness_lever.confirmed === false && JSON.stringify(leverOf('role_wc_usher')) === before, `${r.status}`);
     modelQueue.push(JSON.stringify({ declined: true, reason: 'no lever: a bystander in the crowd.' }));
     const d = await post(leverUrl('role_wc_usher'), {});
     check('decline → 200 declined, nothing saved', d.status === 200 && d.body.declined === true && JSON.stringify(leverOf('role_wc_usher')) === before);
@@ -599,7 +601,7 @@ try {
     check('with_debriefs → saved with labels and debriefs, still on the 0.6 clock', r.status === 200 && dm.options.every(o => o.label && o.debrief) && dm.at_elapsed_fraction === 0.6, `${r.status} ${r.body.error || ''}`);
     modelQueue.push(JSON.stringify(OLD_REPLY));
     const m = await post(genUrl('role_wc_protag'), { overwrite: true, with_debriefs: true });
-    check('debriefs requested but missing → 500, not saved', m.status === 500 && /debriefs were requested/.test(m.body.error) && repos.scenarios.findPlayerRole('role_wc_protag').defining_moment.options.every(o => o.debrief));
+    check('debriefs requested but missing → 200 lint_failed, not saved', m.status === 200 && m.body.lint_failed === true && m.body.errors?.some(e => /debriefs were requested/.test(e)) && repos.scenarios.findPlayerRole('role_wc_protag').defining_moment.options.every(o => o.debrief));
   }
 
   head('5c. witness route — the full shape, generated on the confirmed lever');
@@ -637,7 +639,19 @@ try {
     ]) {
       modelQueue.push(JSON.stringify(mutate(fn)));
       const r = await post(genUrl('role_wc_usher'), { overwrite: true });
-      check(`${label} → 500, errors named, nothing written`, r.status === 500 && r.body.errors?.some(e => rx.test(e)) && JSON.stringify(usher().defining_moment) === saved, `${r.status}`);
+      check(`${label} → 200 lint_failed, the draft returned UNSAVED with its findings, nothing written`, r.status === 200 && r.body.saved === false && r.body.lint_failed === true
+        && r.body.errors?.some(e => rx.test(e)) && r.body.findings?.some(f => f.severity === 'error' && rx.test(f.message))
+        && r.body.defining_moment?.generated === true && r.body.defining_moment.reviewed === false && r.body.defining_moment.at_scene === usher().defining_moment.at_scene
+        && JSON.stringify(usher().defining_moment) === saved, `${r.status}`);
+    }
+    {
+      // Structurally broken but still an object: editable. Not an object at all: nothing to edit → 500.
+      modelQueue.push(JSON.stringify(mutate(b => { b.options = b.options.slice(0, 2); })));
+      const two = await post(genUrl('role_wc_usher'), { overwrite: true });
+      check('two options → 200 lint_failed with a structure finding on "options"', two.status === 200 && two.body.findings?.some(f => f.rule === 'structure' && f.location === 'options'), `${two.status}`);
+      modelQueue.push('[1, 2, 3]');
+      const arr = await post(genUrl('role_wc_usher'), { overwrite: true });
+      check('not an object → 500 (nothing a reviewer could edit), nothing written', arr.status === 500 && JSON.stringify(usher().defining_moment) === saved, `${arr.status}`);
     }
     modelQueue.push(JSON.stringify({ declined: true, reason: 'lever does not hold — scripted.' }));
     const d = await post(genUrl('role_wc_usher'), { overwrite: true });
@@ -727,7 +741,7 @@ try {
   {
     modelQueue.push(JSON.stringify(mutate(b => { b.options[0].debrief += ' You could not save her.'; })));
     const { r, clean } = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
-    check('dry run, lint failure → 500 with the errors, nothing written', r.status === 500 && r.body.errors?.some(e => /failed-rescue/.test(e)) && clean);
+    check('dry run, lint failure → 200 lint_failed + dry_run, draft and findings returned, nothing written', r.status === 200 && r.body.dry_run === true && r.body.lint_failed === true && r.body.errors?.some(e => /failed-rescue/.test(e)) && !!r.body.defining_moment && clean);
     modelQueue.push(JSON.stringify({ declined: true, reason: 'scripted' }));
     const d = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
     check('dry run, decline → 200 declined, nothing written', d.r.status === 200 && d.r.body.declined === true && d.clean);
