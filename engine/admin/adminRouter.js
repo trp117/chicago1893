@@ -2577,6 +2577,20 @@ export async function classifyRoleArchetype(scenario, role, anthropicApiKey) {
 // `opts.path` is archetypeAllows(role, 'fork').path. 'witness-crucible' takes the witness
 // system prompt and the confirmed lever (`opts.lever`, `opts.scene`); 'protagonist' (the
 // default) is the generator as it always was, plus Step 7 only when `opts.withDebriefs`.
+// The retry turn: the ERRORS the draft broke, each with where it is and what to do, and the
+// instruction to return the whole corrected block. Warnings are not sent — they never block,
+// and a model told about them rewrites prose that was fine.
+export function buildRetryFeedback(findings) {
+  const errors = (findings || []).filter(f => f.severity === 'error');
+  return [
+    'That draft was checked and NOT saved. It breaks these rules:',
+    '',
+    ...errors.map(f => `- ${f.location} [${f.rule}]: ${f.message}${f.hint ? ` — ${f.hint}` : ''}`),
+    '',
+    'Return the corrected block as JSON only, in exactly the same shape, every field present. Fix each error above; change nothing that is not needed for the fix. Where a field must appear word for word in a debrief, make the two match exactly.',
+  ].join('\n');
+}
+
 async function generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey, opts = {}) {
   // Data-driven routing. `anchored` selects the system prompt's Step 1B (historical
   // faithfulness); `binding` supplies the documented record to the user prompt. Both come
@@ -2607,7 +2621,14 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
     // output). 8000 matches /generate/epilogue-data, the other long-form generator here.
     // The witness block is roughly three times the protagonist's (a 180-300 word setup and
     // three 140-250 word debriefs), so its ceiling and timeout scale with it.
-    { model: MODEL, max_tokens: witnessPath ? 16000 : 8000, temperature: 0.8, system, messages: [{ role: 'user', content: user }] },
+    // THE RETRY (opts.retry = { draft, findings }) is the same conversation one turn on: the
+    // first prompt byte-for-byte, the draft as the model's own turn, then the errors it broke.
+    // The first call is unchanged, so the hash-pinned protagonist prompts still hold.
+    { model: MODEL, max_tokens: witnessPath ? 16000 : 8000, temperature: 0.8, system,
+      messages: [{ role: 'user', content: user }, ...(opts.retry ? [
+        { role: 'assistant', content: JSON.stringify(opts.retry.draft, null, 2) },
+        { role: 'user', content: buildRetryFeedback(opts.retry.findings) },
+      ] : [])] },
     { timeout: witnessPath ? 180_000 : 90_000, maxRetries: 0 }
   );
   console.log(`[DEFINING-MOMENT] ${role.id} path=${witnessPath ? 'witness-crucible' : 'protagonist'}${opts.withDebriefs ? '+debriefs' : ''} framing=${classification.framing} signal=${classification.signal}${anchorBinding ? ` binding=${anchorBinding.kind}` : ''} stop_reason:`, msg.stop_reason, 'output_tokens:', msg.usage?.output_tokens);
@@ -3542,8 +3563,8 @@ export function createAdminRouter(repos, config = {}) {
       // Timeout and maxRetries:0 are set on the messages.create call inside the
       // helper, which also logs stop_reason/output_tokens, rejects a max_tokens truncation
       // before parsing, fence-strips, and passes a decline back untouched.
-      const result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey,
-        witnessPath ? { path: forkGate.path, lever, scene: leverScene } : { withDebriefs });
+      const genOpts = witnessPath ? { path: forkGate.path, lever, scene: leverScene } : { withDebriefs };
+      let result = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey, genOpts);
 
       if (result?.declined === true) {
         // First-class outcome. No write, no error status.
@@ -3556,8 +3577,34 @@ export function createAdminRouter(repos, config = {}) {
       // located findings. Witness path: every prose rule and every citation check is an error.
       // Protagonist path: nothing applies to the old shape; requested debriefs must be present
       // on all three options. Budgets and source hedges are warnings.
-      const check = checkDraft(result);
-      if (check.findings.some(f => f.location === 'block' && f.rule === 'structure')) {
+      let check = checkDraft(result);
+      const notAnObject = c => c.findings.some(f => f.location === 'block' && f.rule === 'structure');
+
+      // ONE AUTOMATIC RETRY. A draft that breaks a rule goes back to the model ONCE with its
+      // errors (buildRetryFeedback), and the retry faces exactly the same check — it cannot
+      // bypass anything. Capped at one: a second failure is returned editable, never looped.
+      // The cost is one extra call, and only on a failure. If the retry declines, cannot be
+      // parsed, or is not an object, the FIRST draft is what comes back, with its findings.
+      let retry = null;
+      if (check.errors.length && !notAnObject(check)) {
+        const firstFindings = check.findings;
+        try {
+          const second = await generateDefiningMoment(scenario, role, characters, entryParagraph, anthropicApiKey,
+            { ...genOpts, retry: { draft: result, findings: firstFindings } });
+          const secondCheck = second?.declined === true ? null : checkDraft(second);
+          if (!secondCheck || notAnObject(secondCheck)) {
+            retry = { attempts: 2, retry_outcome: second?.declined === true ? 'declined — the first draft is returned' : 'not an object — the first draft is returned' };
+          } else {
+            result = second; check = secondCheck;
+            retry = { attempts: 2, retry_outcome: secondCheck.errors.length ? 'still failing' : 'fixed', first_attempt_findings: firstFindings };
+          }
+        } catch (err) {
+          retry = { attempts: 2, retry_outcome: `failed (${err.message}) — the first draft is returned` };
+        }
+        console.log(`[DEFINING-MOMENT] ${role.id} — retried once after ${firstFindings.filter(f => f.severity === 'error').length} error(s): ${retry.retry_outcome}`);
+      }
+
+      if (notAnObject(check)) {
         // Not an object at all: there is nothing a reviewer could edit.
         console.error(`[DEFINING-MOMENT] ${role.id} invalid block — ${check.errors.join(' ')}`);
         return res.status(500).json({ error: `The generated block is structurally invalid and was not saved: ${check.errors.join(' ')}`, errors: check.errors, findings: check.findings });
@@ -3575,7 +3622,7 @@ export function createAdminRouter(repos, config = {}) {
           saved: false, lint_failed: true, ...(dryRun ? { dry_run: true } : {}),
           roleId: role.id, defining_moment, classification, path: forkGate.path,
           ...(witnessPath ? { binding_source: bindingSource, lever } : {}),
-          findings: check.findings, errors: check.errors,
+          findings: check.findings, errors: check.errors, ...(retry || {}),
         });
       }
       // DRY RUN STOPS HERE — before the backup and the save, the only two writes below.
@@ -3587,7 +3634,7 @@ export function createAdminRouter(repos, config = {}) {
           ...(witnessPath ? { binding_source: bindingSource, lever_source: inlineLever ? 'inline (dry run)' : 'stored, confirmed', lever } : {}),
           would_replace: hasRealDefiningMoment(role.defining_moment)
             ? { id: role.defining_moment.id, authored_crucible: isAuthoredCrucible(role.defining_moment) } : null,
-          lint_warnings: check.warnings, findings: check.findings,
+          lint_warnings: check.warnings, findings: check.findings, ...(retry || {}),
         });
       }
 
@@ -3607,6 +3654,7 @@ export function createAdminRouter(repos, config = {}) {
         // Added only where they say something, so an old-shape protagonist response is unchanged.
         ...(witnessPath ? { path: forkGate.path, binding_source: bindingSource } : {}),
         ...(check.warnings.length ? { lint_warnings: check.warnings, findings: check.findings } : {}),
+        ...(retry || {}),
       });
     } catch (err) {
       console.error(`[DEFINING-MOMENT ERROR] ${role.name}: ${err.message}`);

@@ -42,7 +42,7 @@ globalThis.fetch = async (url, opts) => {
   const u = typeof url === 'string' ? url : url?.url;
   if (!u || !u.startsWith(ANTHROPIC)) return realFetch(url, opts);
   const body = JSON.parse(opts.body);
-  modelCalls.push({ system: typeof body.system === 'string' ? body.system : JSON.stringify(body.system), user: body.messages?.at(-1)?.content, max_tokens: body.max_tokens });
+  modelCalls.push({ system: typeof body.system === 'string' ? body.system : JSON.stringify(body.system), user: body.messages?.at(-1)?.content, messages: body.messages, max_tokens: body.max_tokens });
   const text = modelQueue.length ? modelQueue.shift() : '__UNQUEUED_MODEL_CALL__';
   return new Response(JSON.stringify({ id: 'msg_test', type: 'message', role: 'assistant', model: body.model, content: [{ type: 'text', text }], stop_reason: 'end_turn', usage: { input_tokens: 10, output_tokens: 20 } }),
     { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -599,7 +599,7 @@ try {
     check('with_debriefs → the protagonist prompt + Step 7, nothing else changed', call.system === admin.buildDefiningMomentSystemPrompt(admin.DEFINING_MOMENT_EXEMPLAR, true) + '\n' + admin.PROTAGONIST_DEBRIEF_STEP);
     const dm = repos.scenarios.findPlayerRole('role_wc_protag').defining_moment;
     check('with_debriefs → saved with labels and debriefs, still on the 0.6 clock', r.status === 200 && dm.options.every(o => o.label && o.debrief) && dm.at_elapsed_fraction === 0.6, `${r.status} ${r.body.error || ''}`);
-    modelQueue.push(JSON.stringify(OLD_REPLY));
+    modelQueue.push(JSON.stringify(OLD_REPLY), JSON.stringify(OLD_REPLY));   // the retry fails too
     const m = await post(genUrl('role_wc_protag'), { overwrite: true, with_debriefs: true });
     check('debriefs requested but missing → 200 lint_failed, not saved', m.status === 200 && m.body.lint_failed === true && m.body.errors?.some(e => /debriefs were requested/.test(e)) && repos.scenarios.findPlayerRole('role_wc_protag').defining_moment.options.every(o => o.debrief));
   }
@@ -637,7 +637,7 @@ try {
       ['consequence source not in evidence', b => { b.options[1].consequence.source = 'Chronicle of an unnamed monk'; }, /evidence sources/],
       ['debriefs identical',                 b => { for (const o of b.options) o.debrief = b.options[0].debrief; },      /do not branch/],
     ]) {
-      modelQueue.push(JSON.stringify(mutate(fn)));
+      modelQueue.push(JSON.stringify(mutate(fn)), JSON.stringify(mutate(fn)));   // the retry fails too
       const r = await post(genUrl('role_wc_usher'), { overwrite: true });
       check(`${label} → 200 lint_failed, the draft returned UNSAVED with its findings, nothing written`, r.status === 200 && r.body.saved === false && r.body.lint_failed === true
         && r.body.errors?.some(e => rx.test(e)) && r.body.findings?.some(f => f.severity === 'error' && rx.test(f.message))
@@ -646,7 +646,7 @@ try {
     }
     {
       // Structurally broken but still an object: editable. Not an object at all: nothing to edit → 500.
-      modelQueue.push(JSON.stringify(mutate(b => { b.options = b.options.slice(0, 2); })));
+      modelQueue.push(JSON.stringify(mutate(b => { b.options = b.options.slice(0, 2); })), JSON.stringify(mutate(b => { b.options = b.options.slice(0, 2); })));
       const two = await post(genUrl('role_wc_usher'), { overwrite: true });
       check('two options → 200 lint_failed with a structure finding on "options"', two.status === 200 && two.body.findings?.some(f => f.rule === 'structure' && f.location === 'options'), `${two.status}`);
       modelQueue.push('[1, 2, 3]');
@@ -739,7 +739,7 @@ try {
     check('  NOTHING written: the authored block is untouched, no backup, no save', clean && JSON.stringify(repos.scenarios.findPlayerRole('role_wc_notary').defining_moment) === JSON.stringify(AUTHORED_CRUCIBLE));
   }
   {
-    modelQueue.push(JSON.stringify(mutate(b => { b.options[0].debrief += ' You could not save her.'; })));
+    modelQueue.push(JSON.stringify(mutate(b => { b.options[0].debrief += ' You could not save her.'; })), JSON.stringify(mutate(b => { b.options[0].debrief += ' You could not save her.'; })));
     const { r, clean } = await writesNothing(() => post(genUrl('role_wc_notary'), { dry_run: true, lever: INLINE_LEVER }));
     check('dry run, lint failure → 200 lint_failed + dry_run, draft and findings returned, nothing written', r.status === 200 && r.body.dry_run === true && r.body.lint_failed === true && r.body.errors?.some(e => /failed-rescue/.test(e)) && !!r.body.defining_moment && clean);
     modelQueue.push(JSON.stringify({ declined: true, reason: 'scripted' }));
@@ -893,6 +893,61 @@ try {
     const before = JSON.stringify(roleOf('role_wc_saver'));
     const g = await post('/generate/save', { scenario: { ...SCENARIO, title: 'Changed title' }, playerRoles: [bundleRole] });
     check('/generate/save: an edited block with an error → 422 CRUCIBLE_LINT, the role untouched', g.status === 422 && g.body.findings_by_role?.role_wc_saver?.length > 0 && JSON.stringify(roleOf('role_wc_saver')) === before, `${g.status}`);
+  }
+  head('6d. ONE automatic retry — failure only, same checks, capped at one');
+  {
+    const gen = id => post(genUrl(id), { dry_run: true, lever: LEVER });
+    const leaky = genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; });
+    const errorCount = lint.lintCrucibleBlock(leaky, { path: 'witness-crucible', generated: true, lever: LEVER }).errors.length;
+
+    // A clean first draft: one call, no retry keys.
+    let calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(GOOD_BLOCK));
+    const clean = await gen('role_wc_saver');
+    check('a clean draft → ONE model call, no retry fields', clean.status === 200 && modelCalls.length === calls + 1 && !('attempts' in clean.body) && !clean.body.lint_failed, `${clean.status}`);
+
+    // Fails once, then passes.
+    calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(leaky), JSON.stringify(GOOD_BLOCK));
+    const fixed = await gen('role_wc_saver');
+    const [first, second] = modelCalls.slice(calls);
+    check('fail → retry → pass: exactly TWO calls, the fixed draft returned, not lint_failed',
+      modelCalls.length === calls + 2 && fixed.status === 200 && !fixed.body.lint_failed && fixed.body.attempts === 2 && fixed.body.retry_outcome === 'fixed'
+      && fixed.body.first_attempt_findings?.some(f => f.rule === 'authoring_term' && f.location === `option.${O0}.debrief`), `${fixed.status} ${fixed.body.retry_outcome}`);
+    check('  the retry is the SAME conversation one turn on: same system, first prompt unchanged, the draft as the model\'s turn',
+      second.system === first.system && second.messages.length === 3 && first.messages.length === 1
+      && second.messages[0].content === first.messages[0].content && second.messages[1].role === 'assistant' && JSON.parse(second.messages[1].content).id === leaky.id);
+    check('  the feedback turn names each error by location, rule and hint', /option\.[a-z_]+\.debrief \[authoring_term\]: authoring vocabulary/.test(second.user) && /Say it in the scene's words/.test(second.user) && /JSON only/.test(second.user));
+
+    // Fails twice: returned editable, never looped.
+    calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(leaky), JSON.stringify(leaky), JSON.stringify(GOOD_BLOCK));
+    const twice = await gen('role_wc_saver');
+    check('fail → retry → fail: capped at TWO calls, returned editable with the retry\'s findings',
+      modelCalls.length === calls + 2 && twice.body.lint_failed === true && twice.body.saved === false && twice.body.attempts === 2 && twice.body.retry_outcome === 'still failing'
+      && twice.body.errors.length === errorCount && !!twice.body.defining_moment, `${modelCalls.length - calls} calls, ${twice.body.retry_outcome}`);
+    modelQueue.length = 0;   // the unused third reply
+
+    // A retry that declines, or returns nothing usable: the FIRST draft comes back.
+    calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(leaky), JSON.stringify({ declined: true, reason: 'scripted' }));
+    const dec = await gen('role_wc_saver');
+    check('retry declines → the first draft returned editable, with its findings', dec.body.lint_failed === true && /declined/.test(dec.body.retry_outcome) && dec.body.defining_moment?.options?.[0]?.debrief?.includes('Your lever') && modelCalls.length === calls + 2);
+    modelQueue.push(JSON.stringify(leaky), 'not json at all');
+    const junk = await gen('role_wc_saver');
+    check('retry unparseable → the first draft returned editable', junk.body.lint_failed === true && /failed/.test(junk.body.retry_outcome) && junk.body.defining_moment?.options?.length === 3);
+
+    // Warnings never trigger a retry.
+    calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(mutate(b => { b.options[1].debrief += ' According to legend, the door stayed open.'; })));
+    const warn = await gen('role_wc_saver');
+    check('warnings only → no retry (one call), returned with its warnings', modelCalls.length === calls + 1 && !('attempts' in warn.body) && warn.body.findings?.some(f => f.rule === 'source_hedge'));
+
+    check('buildRetryFeedback sends errors, never warnings', (() => {
+      const t = admin.buildRetryFeedback([{ severity: 'error', rule: 'blame', location: 'setup', message: 'm1', hint: 'h1' }, { severity: 'warning', rule: 'budget', location: 'setup', message: 'm2', hint: 'h2' }]);
+      return /setup \[blame\]: m1 — h1/.test(t) && !/m2/.test(t);
+    })());
+    check('nothing written by any retry run', !roleOf('role_wc_saver').defining_moment || roleOf('role_wc_saver').defining_moment.id === GEN.id);
   }
 } finally {
   await new Promise(r => server.close(r));
