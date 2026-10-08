@@ -258,8 +258,6 @@ try {
     ['authoring term "lever" in a debrief',     b => { b.options[0].debrief += ' Your lever was the corridor.'; },          /debrief: authoring vocabulary .*"lever"/],
     ['"the downstream consequence" in a debrief', b => { b.options[1].debrief += ' It was the downstream consequence of that morning.'; }, /authoring vocabulary .*"downstream consequence"/],
     ['snake_case identifier in the setup',      b => { b.setup += ' This is could_have_acted_at_cost.'; },                  /setup: authoring vocabulary .*"could_have_acted_at_cost"/],
-    ['"according to legend" in an option text', b => { b.options[2].text += ' According to legend, it mattered.'; },       /text: authoring vocabulary .*"According to legend"/],
-    ['"the record hedges" in a debrief',        b => { b.options[0].debrief += ' The record hedges on this.'; },             /authoring vocabulary .*"The record hedges"/],
     ['"axis" in a label',                       b => { b.options[0].label = 'Choose the axis'; },                            /label: authoring vocabulary .*"axis"/],
   ];
   for (const [label, fn, rx] of VIOLATIONS) {
@@ -297,6 +295,40 @@ try {
       admin.validateWitnessLever(leaky, ['scene_a', 'scene_b']).some(e => /evidence 2: .*authoring vocabulary .*"downstream consequence"/.test(e)));
     check('debrief budget widened to 140-250', JSON.stringify(lint.BUDGETS['witness-crucible'].debrief) === '[140,250]');
     check('claim with DIFFERENT words → still an error', run(b => { b.options[0].consequence.claim = 'In 1456 you testified at the nullification to how she was held.'; }).some(e => /consequence.claim does not appear/.test(e)));
+  }
+
+  head('2b2. CrucibleLint — source hedges are WARNINGS (adjudicated, never blocking)');
+  for (const [label, fn, rx] of [
+    ['"according to legend" in an option text', b => { b.options[2].text += ' According to legend, it mattered.'; }, /text: possible authoring language .*"According to legend"/],
+    ['"the record hedges" in a debrief',        b => { b.options[0].debrief += ' The record hedges on this.'; },     /debrief: possible authoring language .*"The record hedges"/],
+  ]) {
+    const r = lint.lintCrucibleBlock(mutate(fn), { path: 'witness-crucible', generated: true, lever: LEVER });
+    const f = r.findings.find(x => x.rule === 'source_hedge');
+    check(`${label}: a WARNING, not an error`, r.errors.length === 0 && r.warnings.some(w => rx.test(w)), [...r.errors, ...r.warnings].join(' | ').slice(0, 200));
+    check(`${label}: carries the adjudication hint`, f?.severity === 'warning' && /may be a legitimate source-hedge — reword into the narrative or accept/.test(f.hint));
+  }
+
+  head('2b3. CrucibleLint — structured findings, located on their element');
+  {
+    const r = lint.lintCrucibleBlock(mutate(b => {
+      b.options[0].debrief += ' Your lever was the corridor.';
+      b.options[1].label = 'x'.repeat(60);
+      b.options[2].consequence.source = 'Nowhere';
+      b.setup += ' You could not save her.';
+    }), { path: 'witness-crucible', generated: true, lever: LEVER });
+    const [o0, o1, o2] = GOOD_BLOCK.options.map(o => o.id);
+    const has = (severity, rule, location) => r.findings.some(f => f.severity === severity && f.rule === rule && f.location === location);
+    check('every finding has { severity, rule, location, message, hint }', r.findings.length > 0 && r.findings.every(f =>
+      ['error', 'warning'].includes(f.severity) && [f.rule, f.location, f.message, f.hint].every(v => typeof v === 'string' && v)), JSON.stringify(r.findings[0]));
+    check('authoring term → error on option.<id>.debrief', has('error', 'authoring_term', `option.${o0}.debrief`));
+    check('long label → error on option.<id>.label',       has('error', 'label_too_long', `option.${o1}.label`));
+    check('bad citation → error on option.<id>.consequence', has('error', 'source_not_in_lever', `option.${o2}.consequence`));
+    check('failed rescue in setup → error on setup',        has('error', 'failed_rescue', 'setup'));
+    check('text rendering is "<location>: <message>"', r.errors.includes(`setup: ${r.findings.find(f => f.location === 'setup').message}`));
+    const dup = lint.lintCrucibleBlock(mutate(b => { b.options[1].id = b.options[0].id; b.options[1].label = 'x'.repeat(60); }), { path: 'witness-crucible', generated: true, lever: LEVER });
+    check('a duplicated option id is located by index (option.#<i>)', dup.findings.some(f => f.rule === 'label_too_long' && f.location === 'option.#1.label'));
+    const bud = lint.lintCrucibleBlock(mutate(b => { b.setup = 'Too short.'; }), { path: 'witness-crucible', generated: true, lever: LEVER });
+    check('budget → warning on setup, with a hint', bud.findings.some(f => f.severity === 'warning' && f.rule === 'budget' && f.location === 'setup' && f.hint));
   }
 
   head('2c. CrucibleLint — protagonist path');

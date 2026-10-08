@@ -14,7 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
-import { lintCrucibleBlock, wordCount, BUDGETS, LABEL_MAX_CHARS, AUTHORING_TERM_PATTERNS } from '../services/CrucibleLint.js';
+import { lintCrucibleBlock, lintResult, finding, wordCount, BUDGETS, LABEL_MAX_CHARS, AUTHORING_TERM_PATTERNS } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -3492,9 +3492,9 @@ export function createAdminRouter(repos, config = {}) {
       // fails one is not saved. Protagonist path: nothing applies to the old shape; requested
       // debriefs must be present on all three options. Budgets are warnings, returned to the
       // reviewer with the block.
-      const lint = lintCrucibleBlock(result, { path: forkGate.path, generated: true, lever });
+      let lint = lintCrucibleBlock(result, { path: forkGate.path, generated: true, lever });
       if (withDebriefs && !result.options.every(o => typeof o?.debrief === 'string' && o.debrief.trim())) {
-        lint.errors.push('debriefs were requested (with_debriefs) but not every option carries one.');
+        lint = lintResult([...lint.findings, finding('error', 'debrief_missing', 'options', 'debriefs were requested (with_debriefs) but not every option carries one.')]);
       }
       if (lint.errors.length) {
         console.error(`[DEFINING-MOMENT] ${role.id} block failed the crucible lint — ${lint.errors.join(' ')}`);
