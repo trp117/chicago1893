@@ -808,6 +808,59 @@ function preserveStoredRoleBlocks(repos, role) {
   return role;
 }
 
+// ── THE CRUCIBLE CHECK, everywhere a defining_moment is written ───────────────
+// One check — the structure the engine reads literally, plus the crucible lint — run by the
+// generator, by the validate route (no model, no write), and on every SAVE path, so an edit
+// cannot store what a generation could not. Findings are located on their element.
+//
+// The lint path follows the role's ARCHETYPE, not its flag: a witness's fork, wherever it came
+// from, is held to the witness rules (Manchon and Massieu pass them as authored); every other
+// role's to the protagonist's. Provenance rules (verbatim disclaimer, cited consequence) apply
+// to a GENERATED block, checked against the lever passed in — the stored one by default.
+function crucibleLintPath(role) {
+  return roleArchetype(role) === 'witness' ? 'witness-crucible' : 'protagonist';
+}
+export function checkDefiningMoment(role, block, { lever = role?.witness_lever ?? null, path = crucibleLintPath(role) } = {}) {
+  return lintResult([
+    ...definingMomentStructureFindings(block),
+    ...lintCrucibleBlock(block, { path, generated: block?.generated === true, lever }).findings,
+  ]);
+}
+
+// SAVE-LINT scope: only a block the save TOUCHES is checked — a new block, one whose checked
+// content changed, or one being marked reviewed (approval is a decision point, as publishing is
+// for the glossary gate). A stored block that predates a tightened rule is grandfathered until
+// someone touches it, so tightening a rule never freezes an unrelated save.
+const DM_CHECKED_KEYS = ['id', 'setup', 'options', 'principal_transition'];
+function definingMomentTouched(next, stored) {
+  if (!hasRealDefiningMoment(stored)) return true;
+  const pick = b => JSON.stringify(DM_CHECKED_KEYS.map(k => b?.[k] ?? null));
+  return pick(next) !== pick(stored) || (next.reviewed === true && stored.reviewed !== true);
+}
+// Run over roles ALREADY through preserveStoredRoleBlocks (what will actually be written),
+// BEFORE any write. Returns { blocked, warned }, each { [roleId]: findings } — a role with any
+// error finding is blocked; warnings ride back with a successful save.
+function saveLintRoles(repos, roles) {
+  const blocked = {}, warned = {};
+  for (const role of roles) {
+    if (!hasRealDefiningMoment(role?.defining_moment)) continue;
+    const stored = repos.scenarios.findPlayerRole(role.id);
+    if (!definingMomentTouched(role.defining_moment, stored?.defining_moment)) continue;
+    const check = checkDefiningMoment(role, role.defining_moment, { lever: stored?.witness_lever ?? null });
+    if (check.errors.length) blocked[role.id] = check.findings;
+    else if (check.findings.length) warned[role.id] = check.findings;
+  }
+  return { blocked, warned };
+}
+function saveLintRejection(repos, blocked) {
+  const names = Object.keys(blocked).map(id => repos.scenarios.findPlayerRole(id)?.name || id);
+  const n = Object.values(blocked).reduce((k, fs) => k + fs.filter(f => f.severity === 'error').length, 0);
+  return {
+    error: `Not saved: the defining moment for ${names.join(', ')} breaks ${n} crucible rule${n === 1 ? '' : 's'}. Fix the flagged fields and save again — warnings do not block, errors do.`,
+    code: 'CRUCIBLE_LINT', findings_by_role: blocked,
+  };
+}
+
 // Persist a set of ending-notes (and the other role fields they may carry) onto the
 // scenario's player-role files. This is a MERGE: only roles named in `notes` are written
 // (one file each via savePlayerRole); roles absent from `notes` are never loaded or
@@ -3688,6 +3741,106 @@ export function createAdminRouter(repos, config = {}) {
     res.json({ roleId: role.id, witness_lever: saved.witness_lever, findings: lint.findings });
   });
 
+  // VALIDATE — the crucible check on an edited lever and/or block, with NO model call and NO
+  // write. The review UI's edit → revalidate → flag-clears loop. Checked against the stored
+  // role: its archetype picks the lint path (as_witness: true evaluates an unflagged role as a
+  // witness, as a dry run does) and its arc's scenes bind the lever. A block's provenance is
+  // checked against the lever sent with it, else the stored one.
+  //   { witness_lever?, defining_moment?, as_witness? } → { ok, findings, errors, warnings }
+  r.post('/scenarios/:id/roles/:roleId/validate-crucible', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+    const body = req.body || {};
+    const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+    if (!isObj(body.witness_lever) && !isObj(body.defining_moment)) {
+      return badRequest(res, 'Send { "witness_lever": { … } } and/or { "defining_moment": { … } }.');
+    }
+    const findings = [];
+    const lever = isObj(body.witness_lever) ? pickLever(body.witness_lever) : null;
+    if (lever) findings.push(...lintWitnessLever(lever, scenarioScenes(repos, scenario).map(sc => sc.id)).findings);
+    if (isObj(body.defining_moment)) {
+      const evalRole = body.as_witness === true ? { ...role, archetype: 'witness', witness_crucible: true } : role;
+      findings.push(...checkDefiningMoment(evalRole, body.defining_moment, { lever: lever ?? role.witness_lever ?? null }).findings);
+    }
+    const result = lintResult(findings);
+    res.json({ ok: result.errors.length === 0, ...result });
+  });
+
+  // SAVE A DRAFTED BLOCK — the save half of return-editable: the reviewer fixes a draft the
+  // generator returned unsaved (lint_failed) and saves it here. Role-scoped and read-modify-
+  // write from the STORED role, like the generator. Everything the generator's own save is
+  // held to applies, so this route is never a way round it:
+  //   the archetype gate; a witness crucible's CONFIRMED lever (a draft made on a dry run's
+  //   inline lever cannot be stored on an unconfirmed one); the overwrite tiers (overwrite /
+  //   REPLACE / confirm_crucible) and the backup when it replaces a real block; the engine-
+  //   owned stamps; and THE CHECK — errors refuse the save (422, the block echoed back with
+  //   its findings), warnings ride back with it.
+  // Editing a stored block in place stays the editor's job (its saves are save-linted too).
+  //   { defining_moment, overwrite?, confirm?, confirm_crucible? }
+  r.put('/scenarios/:id/roles/:roleId/defining-moment', async (req, res) => {
+    const scenario = await repos.scenarios.findById(req.params.id);
+    if (!scenario) return notFound(res);
+    const role = repos.scenarios.findPlayerRoles(req.params.id).find(pr => pr.id === req.params.roleId);
+    if (!role) return notFound(res);
+    const posted = req.body?.defining_moment;
+    if (!posted || typeof posted !== 'object' || Array.isArray(posted)) return badRequest(res, 'Send { "defining_moment": { … } }.');
+
+    const forkGate = archetypeAllows(role, 'fork');
+    if (!forkGate.allowed) {
+      return res.status(422).json({ error: forkGate.reason, refused: true, artifact: 'fork', archetype: forkGate.archetype });
+    }
+    const witnessPath = forkGate.path === 'witness-crucible';
+    // A stored generated block stays generated: an edit cannot launder it into "hand-authored"
+    // and so out of the provenance checks.
+    const generated = posted.generated === true || role.defining_moment?.generated === true;
+    if (witnessPath && generated && role.witness_lever?.confirmed !== true) {
+      return res.status(422).json({
+        error: `"${role.name}" is a witness crucible: a generated block is saved only on a CONFIRMED lever. Confirm the lever first.`,
+        refused: true, code: 'LEVER_UNCONFIRMED',
+      });
+    }
+    const stored = role.defining_moment;
+    if (hasRealDefiningMoment(stored)) {
+      if (req.body?.overwrite !== true) {
+        return res.status(409).json({
+          error: `"${role.name}" already has a defining_moment ("${stored.id}"${stored.reviewed ? ', reviewed' : ''}). Saving this block replaces it and resets review state. Send { "overwrite": true } to proceed.`,
+          existing: { id: stored.id, reviewed: stored.reviewed === true },
+        });
+      }
+      if (definingMomentAtRisk(stored) && req.body?.confirm !== 'REPLACE') {
+        const kind = stored.generated !== true ? 'HAND-AUTHORED' : 'REVIEWED';
+        return res.status(409).json({
+          error: `"${role.name}" carries a ${kind} defining_moment ("${stored.id}"). Defining moments have NO version-history backup — this cannot be recovered. Send { "overwrite": true, "confirm": "REPLACE" } to proceed.`,
+          atRisk: true, existing: { id: stored.id, reviewed: stored.reviewed === true, generated: stored.generated === true },
+        });
+      }
+      if (isAuthoredCrucible(stored) && req.body?.confirm_crucible !== stored.id) {
+        return res.status(409).json(crucibleRefusal(role, 'regenerate'));
+      }
+    }
+
+    // Engine-owned stamps, as the generator applies them. reviewed is the editor's to set, after.
+    const defining_moment = { ...posted, time_advance: 0, generated, reviewed: false };
+    if (!witnessPath && typeof defining_moment.at_elapsed_fraction !== 'number') defining_moment.at_elapsed_fraction = 0.6;
+    normalizeForkBinding(defining_moment, role.id);
+    delete defining_moment.timing_confirmed;   // new options need a new timing confirmation
+
+    const check = checkDefiningMoment(role, defining_moment, { path: forkGate.path });
+    if (check.errors.length) {
+      console.error(`[DEFINING-MOMENT] ${role.id} save refused by the crucible check — ${check.errors.join(' ')}`);
+      return res.status(422).json({
+        error: `Not saved: the block breaks ${check.errors.length} crucible rule${check.errors.length === 1 ? '' : 's'}. Fix the flagged fields and save again.`,
+        code: 'CRUCIBLE_LINT', saved: false, defining_moment, findings: check.findings, errors: check.errors,
+      });
+    }
+    if (hasRealDefiningMoment(stored)) backupDefiningMomentBlock(role, stored, 'save-drafted-block');
+    const saved = repos.scenarios.savePlayerRole({ ...role, defining_moment });
+    console.log(`[DEFINING-MOMENT] ${req.params.id}/${role.id} — drafted block "${defining_moment.id}" saved after review edits (path=${forkGate.path}${check.warnings.length ? `, ${check.warnings.length} warning(s)` : ''})`);
+    res.json({ roleId: role.id, saved: true, defining_moment: saved.defining_moment, path: forkGate.path, findings: check.findings });
+  });
+
   // Propose an archetype for a single player role. READ-ONLY BY CONSTRUCTION: the scenario
   // and the role are loaded server-side from :id/:roleId, the classifier is called, and the
   // proposal is returned. Nothing is written — not the archetype, not a note, nothing. The
@@ -3993,7 +4146,12 @@ export function createAdminRouter(repos, config = {}) {
     // Same editor-save guard as /generate/save: a whole-object PUT that omits ending_notes
     // or defining_moment would clobber approved endings / an authored fork. Preserve the
     // stored blocks when the client sends none.
-    res.json(repos.scenarios.savePlayerRole(preserveStoredRoleBlocks(repos, { ...req.body, id: req.params.id })));
+    const role = preserveStoredRoleBlocks(repos, { ...req.body, id: req.params.id });
+    // SAVE-LINT: a touched defining_moment must pass the crucible check (saveLintRoles).
+    const { blocked, warned } = saveLintRoles(repos, [role]);
+    if (Object.keys(blocked).length) return res.status(422).json(saveLintRejection(repos, blocked));
+    const saved = repos.scenarios.savePlayerRole(role);
+    res.json(warned[role.id] ? { ...saved, crucible_warnings: warned[role.id] } : saved);
   });
   r.patch('/player-roles/:id/ending-notes', (req, res) => {
     const role = repos.scenarios.findPlayerRole(req.params.id);
@@ -4902,6 +5060,16 @@ Return ONLY valid JSON in this exact structure:
       if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
     }
     try {
+      // preserveStoredRoleBlocks FIRST: a stale editor tab posts empty endings and no
+      // defining_moment; without this, stripEmptyEndingNotes + whole-object save would
+      // erase approved endings, and the whole-object save would erase the authored fork.
+      // Done here, before ANY write, so the save-lint below checks exactly what will be stored.
+      const preparedRoles = playerRoles.map(r => normalizeBriefing(stripEmptyEndingNotes(preserveStoredRoleBlocks(repos, r))));
+      // SAVE-LINT: every defining_moment this save touches must pass the crucible check. Checked
+      // before anything is written — this route saves the scenario first and the roles last, so a
+      // rejection after the first write would leave a half-saved bundle.
+      const { blocked, warned } = saveLintRoles(repos, preparedRoles);
+      if (Object.keys(blocked).length) return res.status(422).json(saveLintRejection(repos, blocked));
       const existing = await repos.scenarios.findById(scenario.id);
       if (!existing) scenario.status = 'draft';
 
@@ -4943,10 +5111,7 @@ Return ONLY valid JSON in this exact structure:
       characters.forEach(c  => repos.characters.save(c));
       locations.forEach(l   => repos.locations.save(l));
       clues.forEach(cl      => repos.clues.save(cl));
-      // preserveStoredRoleBlocks FIRST: a stale editor tab posts empty endings and no
-      // defining_moment; without this, stripEmptyEndingNotes + whole-object save would
-      // erase approved endings, and the whole-object save would erase the authored fork.
-      playerRoles.forEach(r => repos.scenarios.savePlayerRole(normalizeBriefing(stripEmptyEndingNotes(preserveStoredRoleBlocks(repos, r)))));
+      preparedRoles.forEach(r => repos.scenarios.savePlayerRole(r));
       // current_version is returned so the open editor can advance its cached baseVersion —
       // without it the next manual save from this tab would post a stale base and 409.
       // corrected_at is returned for the same reason: the stamp was decided here, and the open
@@ -4960,6 +5125,7 @@ Return ONLY valid JSON in this exact structure:
           technical_facts: scenario.technical_facts?.corrected_at ?? null,
           epilogue:        scenario.epilogue?.corrected_at ?? null,
         },
+        ...(Object.keys(warned).length ? { crucible_warnings: warned } : {}),
       });
     } catch (err) {
       if (err.code === 'VERSION_CONFLICT') {

@@ -803,6 +803,97 @@ try {
     const noBound = admin.buildWitnessLeverUserPrompt({ scenario: { title: 'T' }, role: { name: 'R' }, scenes: [{ id: 's1' }] });
     check('no bound forks → no listing (falls back to the climactic scene by rule)', !/DEFINING MOMENTS ALREADY BOUND/.test(noBound));
   }
+  // ═══ STAGE 6 (backend 4) ═══════════════════════════════════════════════════
+  const call = async (method, url, body) => {
+    const r = await fetch(base + url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
+    return { status: r.status, body: await r.json().catch(() => ({})) };
+  };
+  const roleOf = id => repos.scenarios.findPlayerRole(id);
+  const GEN = { ...structuredClone(GOOD_BLOCK), generated: true };
+  const genMutate = fn => { const b = structuredClone(GEN); fn(b); return b; };
+  const [O0, O1] = GOOD_BLOCK.options.map(o => o.id);
+  repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_saver',   name: 'The Saver',   archetype: 'witness', witness_crucible: true, witness_lever: structuredClone(LEVER) });
+  repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_draftee', name: 'The Draftee', archetype: 'witness', witness_crucible: true, witness_lever: { ...structuredClone(LEVER), confirmed: false } });
+  repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_captain', name: 'The Second Captain', archetype: 'crucible-fixed' });
+  const validateUrl = id => `/scenarios/${SCENARIO_ID}/roles/${id}/validate-crucible`;
+  const saveDmUrl   = id => `/scenarios/${SCENARIO_ID}/roles/${id}/defining-moment`;
+
+  head('6a. validate — the check on an edited block / lever, no model, no write');
+  {
+    const calls = modelCalls.length, before = JSON.stringify(roleOf('role_wc_saver'));
+    const ok = await post(validateUrl('role_wc_saver'), { defining_moment: GEN });
+    check('a clean generated witness block → ok, no findings', ok.status === 200 && ok.body.ok === true && ok.body.findings.length === 0, JSON.stringify(ok.body).slice(0, 200));
+    const bad = await post(validateUrl('role_wc_saver'), { defining_moment: genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; }) });
+    check('a leaked term → not ok, error located on option.<id>.debrief', bad.body.ok === false && bad.body.findings.some(f => f.severity === 'error' && f.rule === 'authoring_term' && f.location === `option.${O0}.debrief`));
+    const fixedAgain = await post(validateUrl('role_wc_saver'), { defining_moment: GEN });
+    check('…and the fixed block revalidates clean (the flag clears)', fixedAgain.body.ok === true);
+    const hedge = await post(validateUrl('role_wc_saver'), { defining_moment: genMutate(b => { b.options[1].debrief += ' According to legend, the door stayed open.'; }) });
+    check('a source hedge → ok (warnings do not block), warning on option.<id>.debrief', hedge.body.ok === true && hedge.body.findings.some(f => f.severity === 'warning' && f.rule === 'source_hedge' && f.location === `option.${O1}.debrief`));
+    const lev = await post(validateUrl('role_wc_saver'), { witness_lever: { ...LEVER, axis: 'rescue' } });
+    check('a lever → lever findings (bad axis on lever.axis)', lev.body.ok === false && lev.body.findings.some(f => f.location === 'lever.axis'));
+    const withLever = await post(validateUrl('role_wc_saver'), { defining_moment: GEN, witness_lever: { ...LEVER, evidence: [LEVER.evidence[0], { claim: 'Something else.', source: 'Another source' }] } });
+    check('a block is checked against the lever SENT with it (a citation the edited lever dropped fails)', withLever.body.ok === false && withLever.body.findings.some(f => f.rule === 'source_not_in_lever'));
+    const prot = await post(validateUrl('role_wc_captain'), { defining_moment: genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; }) });
+    const asW  = await post(validateUrl('role_wc_captain'), { defining_moment: genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; }), as_witness: true });
+    check('protagonist role → the term is a warning; as_witness → an error', prot.body.ok === true && prot.body.findings.some(f => f.rule === 'authoring_term' && f.severity === 'warning') && asW.body.ok === false);
+    const empty = await post(validateUrl('role_wc_saver'), {});
+    check('nothing to validate → 400', empty.status === 400);
+    check('no model call, nothing written', modelCalls.length === calls && JSON.stringify(roleOf('role_wc_saver')) === before);
+  }
+
+  head('6b. save a drafted block — every guard the generator has, and the check');
+  {
+    const bad = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; }) });
+    check('a block with an error → 422 CRUCIBLE_LINT, the block echoed back with findings, nothing written',
+      bad.status === 422 && bad.body.code === 'CRUCIBLE_LINT' && bad.body.saved === false && bad.body.defining_moment?.options?.length === 3
+      && bad.body.findings.some(f => f.location === `option.${O0}.debrief`) && !roleOf('role_wc_saver').defining_moment, `${bad.status}`);
+    const good = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: { ...GEN, reviewed: true, generated: true, time_advance: 5, timing_confirmed: true } });
+    const dm = roleOf('role_wc_saver').defining_moment;
+    check('the fixed block → saved, stamped (time_advance 0, reviewed false, generated, no timing confirmation)',
+      good.status === 200 && good.body.saved === true && dm?.id === GEN.id && dm.time_advance === 0 && dm.reviewed === false && dm.generated === true && dm.timing_confirmed === undefined, `${good.status} ${good.body.error || ''}`);
+    const again = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: GEN });
+    check('replacing a stored block without overwrite → 409', again.status === 409);
+    const launder = await call('PUT', saveDmUrl('role_wc_saver'), { overwrite: true, defining_moment: genMutate(b => { b.generated = false; b.options[0].consequence.source = 'Nowhere'; }) });
+    check('a stored GENERATED block cannot be laundered to hand-authored (provenance still checked)', launder.status === 422 && launder.body.findings.some(f => f.rule === 'source_not_in_lever'));
+    const unconfirmed = await call('PUT', saveDmUrl('role_wc_draftee'), { defining_moment: GEN });
+    check('a witness with an UNCONFIRMED lever → 422 LEVER_UNCONFIRMED (a dry-run draft cannot be stored)', unconfirmed.status === 422 && unconfirmed.body.code === 'LEVER_UNCONFIRMED' && !roleOf('role_wc_draftee').defining_moment);
+    const gated = await call('PUT', saveDmUrl('role_wc_bystander'), { defining_moment: GEN });
+    check('an unflagged witness → 422 (the archetype gate)', gated.status === 422 && gated.body.refused === true && !roleOf('role_wc_bystander').defining_moment);
+  }
+
+  head('6c. save-lint on the editor\'s saves — touched blocks only');
+  {
+    const stored = JSON.stringify(roleOf('role_wc_saver').defining_moment);
+    const edit = structuredClone(roleOf('role_wc_saver'));
+    edit.defining_moment.options[0].debrief += ' Your lever was the corridor.';
+    const r = await call('PUT', '/player-roles/role_wc_saver', edit);
+    check('PUT /player-roles: an edited block with an error → 422, findings by role, nothing written',
+      r.status === 422 && r.body.code === 'CRUCIBLE_LINT' && r.body.findings_by_role?.role_wc_saver?.some(f => f.location === `option.${O0}.debrief`) && JSON.stringify(roleOf('role_wc_saver').defining_moment) === stored, `${r.status}`);
+    const other = { ...structuredClone(roleOf('role_wc_saver')), description: 'an unrelated edit' };
+    const o = await call('PUT', '/player-roles/role_wc_saver', other);
+    check('an unrelated edit with the block untouched → saved', o.status === 200 && roleOf('role_wc_saver').description === 'an unrelated edit');
+    const hedged = structuredClone(roleOf('role_wc_saver'));
+    hedged.defining_moment.options[1].debrief += ' According to legend, the door stayed open.';
+    const h = await call('PUT', '/player-roles/role_wc_saver', hedged);
+    check('a warning only → saved, warnings returned', h.status === 200 && h.body.crucible_warnings?.some(f => f.rule === 'source_hedge'), `${h.status}`);
+
+    // GRANDFATHERED: a block stored before a rule tightened (written straight to the store).
+    const legacy = genMutate(b => { b.options[0].debrief += ' Your lever was the corridor.'; });
+    repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_legacy', name: 'The Legacy', archetype: 'witness', witness_crucible: true, witness_lever: structuredClone(LEVER), defining_moment: legacy });
+    const lg = { ...structuredClone(roleOf('role_wc_legacy')), description: 'unrelated' };
+    const l1 = await call('PUT', '/player-roles/role_wc_legacy', lg);
+    check('an OLD violating block, untouched → the unrelated save goes through (grandfathered)', l1.status === 200 && roleOf('role_wc_legacy').description === 'unrelated', `${l1.status}`);
+    const rev = structuredClone(roleOf('role_wc_legacy')); rev.defining_moment.reviewed = true;
+    const l2 = await call('PUT', '/player-roles/role_wc_legacy', rev);
+    check('…but marking it REVIEWED touches it → 422', l2.status === 422 && roleOf('role_wc_legacy').defining_moment.reviewed !== true, `${l2.status}`);
+
+    // /generate/save — the whole-bundle path; refused before ANY write.
+    const bundleRole = structuredClone(roleOf('role_wc_saver'));
+    bundleRole.defining_moment.options[0].debrief += ' Your lever was the corridor.';
+    const before = JSON.stringify(roleOf('role_wc_saver'));
+    const g = await post('/generate/save', { scenario: { ...SCENARIO, title: 'Changed title' }, playerRoles: [bundleRole] });
+    check('/generate/save: an edited block with an error → 422 CRUCIBLE_LINT, the role untouched', g.status === 422 && g.body.findings_by_role?.role_wc_saver?.length > 0 && JSON.stringify(roleOf('role_wc_saver')) === before, `${g.status}`);
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });
