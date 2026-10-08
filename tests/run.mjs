@@ -44,6 +44,7 @@ const SUITE = [
   ['Massieu witness crucible',                'massieu-crucible.test.mjs'],
   ['narrative salvage: no JSON on screen',     'narrative-salvage.test.mjs'],
   ['witness-crucible generator',              'witness-crucible-gen.test.mjs'],
+  ['witness-crucible editor (jsdom)',        'witness-crucible-ui.test.mjs'],
 ];
 
 const results = [];

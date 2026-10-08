@@ -254,6 +254,21 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .btn-img-replace { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text); transition: background .15s; }
 .btn-img-replace:hover { background: var(--bg); }
 .img-artwork-status { font-size: 12px; min-height: 18px; line-height: 1.5; margin-top: 8px; }
+/* Witness crucible — crucible-check findings, inline on the element they concern. Red errors
+   block approval and saving; amber warnings are judgement calls carrying their hint. */
+.cf-err  > input, .cf-err  > textarea, .cf-err  > select, .cf-err  .cf-input  { border-color: #dc2626 !important; box-shadow: 0 0 0 1px #dc2626; }
+.cf-warn > input, .cf-warn > textarea, .cf-warn > select, .cf-warn .cf-input { border-color: #d97706 !important; box-shadow: 0 0 0 1px #d97706; }
+.cf-flag { font-size: 11.5px; line-height: 1.45; margin-top: 4px; padding: 5px 8px; border-radius: 4px; }
+.cf-flag-err  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.cf-flag-warn { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+.cf-flag .cf-hint { display: block; margin-top: 2px; opacity: .85; font-style: italic; }
+.cf-summary { font-size: 12px; font-weight: 600; padding: 7px 10px; border-radius: 5px; margin-bottom: 10px; }
+.cf-summary-err  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.cf-summary-warn { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+.cf-summary-ok   { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.cf-label { font-size: 11px; color: var(--text-soft); margin-bottom: 3px; }
+.cf-in { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+textarea.cf-in { resize: vertical; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -2426,6 +2441,10 @@ function renderArchetypeSection(r, i) {
         <select class="archetype-select" data-path="playerRoles.${i}.archetype" data-role-id="${r.id}" data-role-index="${i}" style="flex:1;min-width:340px">${options}</select>
         <button type="button" class="btn btn-secondary btn-sm propose-archetype-btn" data-role-id="${r.id}" data-role-index="${i}" style="white-space:nowrap;flex-shrink:0">✦ Propose archetype</button>
       </div>
+      ${current === 'witness' ? `<label style="display:flex;gap:9px;align-items:flex-start;margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer">
+        <input type="checkbox" class="wc-flag-cb" data-path="playerRoles.${i}.witness_crucible" data-role-index="${i}"${r.witness_crucible === true ? ' checked' : ''} style="margin-top:2px;flex-shrink:0">
+        <span style="font-size:12px;line-height:1.5"><strong>Witness crucible</strong> — this witness holds a witnessing-choice (a lever over the record, the testimony or their own presence), so it may carry a fork, drafted lever-first on the witness-crucible path. <span style="color:var(--text-soft)">Save after ticking: proposing a lever and generating read the <em>stored</em> flag.</span></span>
+      </label>` : ''}
       <div class="archetype-proposal" style="margin-top:10px">${renderArchetypeProposalPanel(r, i)}</div>
       ${renderArchetypeCleanupPanel(r, i)}`,
       'What KIND of role this is, and therefore which artifacts may be generated for it. This value is the one the generators are gated on — set by you, never by the classifier. Legacy roles read as unclassified, which allows both artifacts exactly as before.')}
@@ -2718,6 +2737,8 @@ function bindArchetypeHandlers(formEl, data, scenarioId) {
     if (endingsPanel && !endingsPanel.querySelector('.regen-endings-btn[disabled]') !== endingsAllowed) {
       replaceEditorSection(formEl, `#endings-gate-${idx}`, `<div id="endings-gate-${idx}">${renderEndingsGatePanel(role, idx)}</div>`);
     }
+    // The lever card exists only for a flagged witness; leaving 'witness' hides it.
+    replaceEditorSection(formEl, `#lever-section-${idx}`, renderWitnessLeverSection(role, idx, data));
     // The proposal panel restates "matches / differs from the value set above", so it has to
     // follow the select. Re-rendering the archetype section preserves the select's value
     // because it is read back off the role we just updated.
@@ -2853,6 +2874,17 @@ const DM_TIMING_INPUTS = '.dm-fraction-input, .dm-at-act-input, .dm-at-beat-inpu
 // anything on data.playerRoles[i] is posted to /generate/save and would land in the file.
 const _dmDeclines = new Map();
 
+// WITNESS CRUCIBLE — session state, keyed by role id and, like _dmDeclines, never hung off
+// data.playerRoles (anything there is posted by the main Save and would land in the file).
+//   _dmDrafts          { block, tokens, retry } — a generated block the server returned UNSAVED
+//                      (lint_failed); rendered in place of the stored block until saved/discarded
+//   _leverState        { lever, draft, scene_warning } — the lever card's working copy; draft =
+//                      a proposal returned unsaved (lint_failed), saved whole through the PATCH
+//   _crucibleFindings  { block: [...], lever: [...] } — the latest findings, painted inline
+const _dmDrafts = new Map();
+const _leverState = new Map();
+const _crucibleFindings = new Map();
+
 const dmWords = s => String(s || '').trim().split(/\s+/).filter(Boolean).length;
 
 // Longest contiguous word run shared by the entry paragraph and the setup. The prompt caps
@@ -2870,19 +2902,69 @@ function dmLongestLift(entry, setup) {
   return best;
 }
 
-function renderDefiningMomentOptionRow(i, j, o) {
-  return `<div class="dm-option-row" style="border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:6px">
+// ctx (crucibleOptionCtx): which per-option crucible fields this block carries.
+//   prose — label + debrief (every witness crucible; a protagonist block only if it has them)
+//   prov  — outcome_disclaimer + consequence { claim, source } (a GENERATED witness crucible)
+//   sources — the lever's evidence sources, for the consequence.source dropdown
+// A field is rendered only when the block is meant to carry it: an input posts its value on
+// Save, so rendering an empty debrief box on an old-shape block would ADD the key and turn it
+// into a block the lint holds to the all-or-none debrief rule.
+function renderDefiningMomentOptionRow(i, j, o, ctx = {}) {
+  const p = k => `playerRoles.${i}.defining_moment.options.${j}.${k}`;
+  const textBudget = ctx.witness ? '25–70 words' : '8–18 words; read cold by the epilogue';
+  const prose = ctx.prose ? `
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:8px;margin-top:8px">
+      <div data-cf="label">
+        <div class="cf-label">Label <span style="opacity:.7">(button text, under 50 chars)</span> — <span class="dm-opt-label-count">${String(o?.label || '').trim().length}c</span></div>
+        <input type="text" class="cf-in dm-option-label" data-path="${p('label')}" value="${esc(o?.label || '')}" placeholder="Short stance">
+        <div class="cf-flags"></div>
+      </div>
+      <div data-cf="debrief">
+        <div class="cf-label">Debrief — the "Your Session" text this choice ships verbatim — <span class="dm-opt-debrief-count">${dmWords(o?.debrief)}w</span>${ctx.witness ? ' <span style="opacity:.7">(140–250)</span>' : ''}</div>
+        <textarea class="cf-in dm-option-debrief" data-path="${p('debrief')}" rows="6">${esc(o?.debrief || '')}</textarea>
+        <div class="cf-flags"></div>
+      </div>
+    </div>` : '';
+  const src = o?.consequence?.source || '';
+  const prov = ctx.prov ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div data-cf="outcome_disclaimer">
+        <div class="cf-label">Outcome disclaimer <span style="opacity:.7">(must appear word for word in the debrief)</span></div>
+        <textarea class="cf-in dm-option-disclaimer" data-path="${p('outcome_disclaimer')}" rows="2">${esc(o?.outcome_disclaimer || '')}</textarea>
+        <div class="cf-flags"></div>
+      </div>
+      <div data-cf="consequence">
+        <div class="cf-label">Consequence — claim <span style="opacity:.7">(word for word in the debrief)</span> and its source <span style="opacity:.7">(one of the lever's evidence sources)</span></div>
+        <textarea class="cf-in cf-input dm-option-claim" data-path="${p('consequence.claim')}" rows="2">${esc(o?.consequence?.claim || '')}</textarea>
+        <select class="cf-in cf-input dm-cons-source" data-path="${p('consequence.source')}" style="margin-top:4px">${consequenceSourceOptions(ctx.sources || [], src)}</select>
+        <div class="cf-flags"></div>
+      </div>
+    </div>` : '';
+  return `<div class="dm-option-row" data-opt-index="${j}" style="border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:6px">
     <div style="display:grid;grid-template-columns:220px 1fr;gap:8px">
-      <div>
+      <div data-cf="id">
         <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Option ${j + 1} id <span style="opacity:.7">(snake_case)</span></div>
-        <input type="text" class="dm-option-id" data-path="playerRoles.${i}.defining_moment.options.${j}.id" value="${esc(o?.id || '')}" placeholder="stance_in_snake_case" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:monospace">
+        <input type="text" class="dm-option-id" data-path="${p('id')}" value="${esc(o?.id || '')}" placeholder="stance_in_snake_case" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:monospace">
+        <div class="cf-flags"></div>
       </div>
-      <div>
-        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Text <span style="opacity:.7">(8–18 words; read cold by the epilogue)</span> — <span class="dm-opt-count">${dmWords(o?.text)}w</span></div>
-        <textarea class="dm-option-text" data-path="playerRoles.${i}.defining_moment.options.${j}.text" rows="2" placeholder="One sentence in the character's own register." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(o?.text || '')}</textarea>
+      <div data-cf="text">
+        <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Text <span style="opacity:.7">(${textBudget})</span> — <span class="dm-opt-count">${dmWords(o?.text)}w</span></div>
+        <textarea class="dm-option-text" data-path="${p('text')}" rows="${ctx.witness ? 3 : 2}" placeholder="One sentence in the character's own register." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px">${esc(o?.text || '')}</textarea>
+        <div class="cf-flags"></div>
       </div>
-    </div>
+    </div>${prose}${prov}
   </div>`;
+}
+
+// The consequence.source dropdown: the lever's evidence sources. A stored value the lever no
+// longer cites stays SELECTED and flagged, never silently swapped — the lint names it too.
+function consequenceSourceOptions(sources, current) {
+  const uniq = [...new Set(sources.filter(s => typeof s === 'string' && s.trim()).map(s => s.trim()))];
+  const cur = typeof current === 'string' ? current.trim() : '';
+  const orphan = cur && !uniq.includes(cur)
+    ? `<option value="${esc(cur)}" selected>⚠ ${esc(cur)} — not one of the lever's sources</option>` : '';
+  return `<option value=""${cur ? '' : ' selected'}>— choose the lever source this rests on —</option>${orphan}`
+    + uniq.map(s => `<option value="${esc(s)}"${s === cur ? ' selected' : ''}>${esc(s)}</option>`).join('');
 }
 
 // STORY BINDING — when the fork fires, by story position instead of the clock. Mirrors
@@ -2963,9 +3045,20 @@ function renderForkBindingFields(i, dm, data) {
       </div>`;
 }
 
-function renderDefiningMomentSection(r, i, data) {
+function renderDefiningMomentSection(r, i, data, opts = {}) {
+  // AN UNSAVED DRAFT (the generator returned it because it failed the crucible check) is
+  // rendered in place of the stored block — but with data-dpath, not data-path, so the main
+  // Save's collectEdits never sees it: the role keeps its stored block until the reviewer
+  // saves the draft through its own route (which re-runs the check and every overwrite guard).
+  const draft = !opts.asDraft && _dmDrafts.get(r.id);
+  if (draft) {
+    return renderDefiningMomentSection({ ...r, defining_moment: draft.block }, i, data, { asDraft: true })
+      .replace(/ data-path="/g, ' data-dpath="');
+  }
   const dm      = r.defining_moment;
   const state   = definingMomentState(dm);
+  const crux    = crucibleOptionCtx(r, dm);
+  const leverGate = crux.witnessPath && r.witness_lever?.confirmed !== true;
   const anchored = roleIsAnchored(r);
   // ARCHETYPE GATE — fork. Read from the STORED archetype (the confirmed value), never
   // from a form field: the gate must not move while a reviewer is mid-edit.
@@ -2979,7 +3072,9 @@ function renderDefiningMomentSection(r, i, data) {
     pending:  ['Pending Review', '#fef3c7', '#92400e'],
     reviewed: ['Reviewed',       '#f0fdf4', '#166534'],
   }[state];
-  const badge = `<span class="dm-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${BADGE[1]};color:${BADGE[2]}">${BADGE[0]}</span>`;
+  const badge = opts.asDraft
+    ? `<span class="dm-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:#fef2f2;color:#991b1b">Unsaved draft</span>`
+    : `<span class="dm-status-badge" style="padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;background:${BADGE[1]};color:${BADGE[2]}">${BADGE[0]}</span>`;
 
   // Generate button copy and colour escalate with what is at risk, so the danger is visible
   // before the click and not only in the confirmation. A REVIEWED block escalates exactly as
@@ -3028,8 +3123,17 @@ function renderDefiningMomentSection(r, i, data) {
     const hiddenBool = (key) => dm[key] === undefined ? ''
       : `<input type="hidden" class="dm-${key}-input" data-path="playerRoles.${i}.defining_moment.${key}" value="${dm[key] === true}">`;
 
+    const draftInfo = opts.asDraft ? _dmDrafts.get(r.id) : null;
     body = `
       ${declineHtml}
+      ${opts.asDraft ? `<div class="dm-draft-banner" style="margin:0 0 14px;padding:12px 14px;background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:6px;font-size:12px;line-height:1.55;color:#7f1d1d">
+        <strong>Unsaved draft — the generator did not store it</strong>, because it breaks the crucible rules flagged below${draftInfo?.retry ? ` (${esc(draftInfo.retry)})` : ''}. Fix each red field — flags clear as you edit — then <strong>Save draft</strong>. Until then the role keeps ${hasDmBlock(data.playerRoles[i]?.defining_moment) ? `its stored block <code>${esc(data.playerRoles[i].defining_moment.id)}</code>` : 'no defining moment'}; the main Save does not touch this draft.
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button type="button" class="btn btn-primary btn-sm dm-save-draft-btn" data-role-id="${r.id}" data-role-index="${i}">💾 Save draft</button>
+          <button type="button" class="btn btn-secondary btn-sm dm-discard-draft-btn" data-role-id="${r.id}" data-role-index="${i}">Discard draft</button>
+        </div>
+      </div>` : ''}
+      ${crux.check ? `<div class="cf-summary-slot" data-cf="block"><div class="cf-flags"></div></div>` : ''}
       <div style="margin:0 0 14px;padding:10px 12px;background:var(--panel-light,#1a2233);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text-soft)">
         Presented once, partway through the session — at <code>at_elapsed_fraction</code> of the session length, or, if it is <strong>story-bound</strong> below, once the story reaches its act or beat. Costs no game time. The chosen option is recorded and reflected back by the closing prose and the epilogue.
         <strong style="color:var(--text)">This block is inert unless <code>DEFINING_MOMENT_ENABLED=true</code> on the server.</strong>
@@ -3046,10 +3150,11 @@ function renderDefiningMomentSection(r, i, data) {
       <input type="hidden" class="dm-moment-input" data-path="playerRoles.${i}.defining_moment.principal_transition.moment" value="${esc(moment)}">
 
       <div style="display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:12px">
-        <div>
+        <div data-cf="block.id">
           <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Moment id <span style="opacity:.7">(snake_case — the key the decision is recorded under)</span></div>
           <input type="text" class="dm-id-input" data-path="playerRoles.${i}.defining_moment.id" data-role-index="${i}" value="${esc(dm.id || '')}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:monospace">
           <div style="font-size:11px;color:var(--text-soft);margin-top:3px">principal_transition.moment tracks this automatically → <code class="dm-moment-mirror">${esc(moment)}</code></div>
+          <div class="cf-flags"></div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">at_elapsed_fraction</div>
@@ -3060,12 +3165,17 @@ function renderDefiningMomentSection(r, i, data) {
 
       ${renderForkBindingFields(i, dm, data)}
 
-      <div style="margin-bottom:12px">
+      <div style="margin-bottom:12px" data-cf="setup">
         <div style="font-size:11px;color:var(--text-soft);margin-bottom:3px">Setup — the authored prose the player reads at the fork</div>
-        <textarea class="dm-setup-input" data-path="playerRoles.${i}.defining_moment.setup" rows="7" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;line-height:1.55">${esc(dm.setup || '')}</textarea>
+        <textarea class="dm-setup-input" data-path="playerRoles.${i}.defining_moment.setup" rows="${crux.witness ? 10 : 7}" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;resize:vertical;font-size:13px;line-height:1.55">${esc(dm.setup || '')}</textarea>
+        <div class="cf-flags"></div>
         <div style="font-size:11px;margin-top:5px;display:flex;gap:14px;flex-wrap:wrap">
-          ${flag(setupW >= 90 && setupW <= 140, `setup ${setupW} words (90–140)`)}
-          ${flag(optCounts.every(w => w >= 8 && w <= 18), `options ${optCounts.join('/')} words (8–18)`)}
+          ${crux.witness
+            ? flag(setupW >= 180 && setupW <= 300, `setup ${setupW} words (180–300)`)
+            : flag(setupW >= 90 && setupW <= 140, `setup ${setupW} words (90–140)`)}
+          ${crux.witness
+            ? flag(optCounts.every(w => w >= 25 && w <= 70), `options ${optCounts.join('/')} words (25–70)`)
+            : flag(optCounts.every(w => w >= 8 && w <= 18), `options ${optCounts.join('/')} words (8–18)`)}
           ${lift ? flag(lift.n <= 6, `longest lift from the entry: ${lift.n} words${lift.n > 6 ? ` — "${esc(lift.text)}"` : ''}`) : ''}
           ${flag(!(dm.setup || '').includes('?'), (dm.setup || '').includes('?') ? 'setup contains a question mark' : 'no question mark')}
         </div>
@@ -3073,7 +3183,9 @@ function renderDefiningMomentSection(r, i, data) {
       </div>
 
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);margin-bottom:8px">Options <span style="font-weight:400;text-transform:none">(exactly 3, mutually exclusive)</span></div>
-      <div class="dm-options-list">${(dm.options || []).map((o, j) => renderDefiningMomentOptionRow(i, j, o)).join('')}</div>
+      <div data-cf="options"><div class="cf-flags"></div></div>
+      ${crux.prov && crux.sourcesNote ? `<div style="font-size:11px;color:var(--text-soft);margin-bottom:8px">${crux.sourcesNote}</div>` : ''}
+      <div class="dm-options-list">${(dm.options || []).map((o, j) => renderDefiningMomentOptionRow(i, j, o, crux)).join('')}</div>
 
       ${anchored ? `<label style="display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 13px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;cursor:pointer">
         <input type="checkbox" class="dm-timing-cb" data-role-index="${i}" data-path="playerRoles.${i}.defining_moment.timing_confirmed"${timingConfirmed ? ' checked' : ''} style="margin-top:2px;flex-shrink:0">
@@ -3083,7 +3195,7 @@ function renderDefiningMomentSection(r, i, data) {
         </span>
       </label>` : ''}
 
-      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      ${opts.asDraft ? '' : `<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         ${state === 'authored'
           ? `<span style="font-size:12px;color:#1d4ed8;font-weight:600">✍ Hand-authored — trusted, no review needed.</span>`
           : `<button type="button" class="btn btn-primary mark-dm-reviewed-btn" data-role-index="${i}" data-role-id="${r.id}" ${state === 'reviewed' ? 'disabled' : ''}>
@@ -3091,7 +3203,7 @@ function renderDefiningMomentSection(r, i, data) {
              </button>
              ${state !== 'reviewed' ? '<span style="font-size:12px;color:var(--text-soft)">Read the setup and all three options against the entry paragraph before marking reviewed.</span>' : ''}`}
         <button type="button" class="btn btn-danger btn-sm remove-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}" style="margin-left:auto">Remove defining moment</button>
-      </div>`;
+      </div>`}`;
   }
 
   const pendingReview = state === 'pending';
@@ -3111,9 +3223,12 @@ function renderDefiningMomentSection(r, i, data) {
           ${anchored ? '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f5f3ff;color:#6d28d9;font-weight:600">anchored — historical faithfulness enforced</span>' : '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f1f5f9;color:var(--text-soft);font-weight:600">open outcome</span>'}
           ${archetypeBadge(forkGate.archetype)}
           ${forkGate.allowed
-            ? `<button type="button" class="btn ${genClass} btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}">${genLabel}</button>`
+            ? `<button type="button" class="btn ${genClass} btn-sm gen-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}"${leverGate ? ' disabled title="Confirm the lever first — a witness crucible is generated on its confirmed lever."' : ''}>${genLabel}</button>`
             : `<button type="button" class="btn btn-secondary btn-sm" disabled title="Blocked by archetype — see the reason below." style="opacity:.5;cursor:not-allowed">✦ Generate Defining Moment</button>`}
         </div>
+        ${forkGate.allowed && crux.witnessPath ? `<div class="dm-lever-gate-note" style="font-size:12px;margin:-6px 0 12px;color:${leverGate ? '#b45309' : 'var(--text-soft)'}">${leverGate
+          ? '⚠ Witness crucible: generation opens once the lever above is <strong>confirmed</strong>.'
+          : 'Witness crucible: generated on the confirmed lever above.'}</div>` : ''}
         ${forkGate.allowed ? '' : `<div style="display:flex;margin-bottom:14px">${archetypeBlockedNotice(forkGate.reason)}</div>`}
         ${body}
       </div>
@@ -3158,6 +3273,7 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     const tmp = document.createElement('div');
     tmp.innerHTML = renderDefiningMomentSection(data.playerRoles[i], i, data);
     el.replaceWith(tmp.firstElementChild);
+    paintCrucibleFlags(formEl, i, data);
   };
 
   // ── Defining Moment: accept a decline (dismiss the panel) ─────────────────
@@ -3185,6 +3301,12 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     // reviewer reads the reason instead of a raw error.
     const forkGate = archetypeAllows(role, 'fork');
     if (!forkGate.allowed) { toast(forkGate.reason, 'error'); return; }
+    // A witness crucible is generated on its CONFIRMED lever (the server refuses with 422
+    // LEVER_UNCONFIRMED otherwise); the button is disabled until then, this is the backstop.
+    if (forkGate.path === 'witness-crucible' && role.witness_lever?.confirmed !== true) {
+      toast('Confirm the lever first — a witness crucible is generated on its confirmed lever.', 'error'); return;
+    }
+    if (_dmDrafts.has(roleId) && !confirm('An unsaved draft is open for this role. Generating again discards it. Continue?')) return;
 
     // Escalating confirmation. Any block carrying authored or reviewed work is destroyed
     // outright by regeneration, so it takes the typed token — hand-authored and reviewed
@@ -3219,13 +3341,15 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     btn.disabled = true;
     btn.textContent = 'Generating…';
     try {
+      // The server refuses an overwrite without this; the confirms above are what earn it.
+      // `confirm` is the second token, required by the server whenever the stored block
+      // carries authored or reviewed work — the typed REPLACE above is what earns THAT.
+      // Kept: an unsaved draft is saved later under the same tokens.
+      const tokens = { overwrite: state !== 'none', ...(atRisk ? { confirm: 'REPLACE' } : {}),
+        ...(isAuthoredCrucible(role?.defining_moment) ? { confirm_crucible: role.defining_moment.id } : {}) };
       const result = await apiPost(
-        `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/generate-defining-moment`,
-        // The server refuses an overwrite without this; the confirms above are what earn it.
-        // `confirm` is the second token, required by the server whenever the stored block
-        // carries authored or reviewed work — the typed REPLACE above is what earns THAT.
-        { overwrite: state !== 'none', ...(atRisk ? { confirm: 'REPLACE' } : {}),
-          ...(isAuthoredCrucible(role?.defining_moment) ? { confirm_crucible: role.defining_moment.id } : {}) });
+        `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/generate-defining-moment`, tokens);
+      const retryNote = result.attempts === 2 ? `retried once automatically: ${result.retry_outcome}` : '';
 
       if (result.declined) {
         // First-class outcome, not an error. Nothing was written server-side and nothing
@@ -3236,11 +3360,23 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
         return;
       }
 
+      if (result.lint_failed) {
+        // RETURN-EDITABLE: not saved, not discarded. Held as a draft (never on data.playerRoles,
+        // so the main Save cannot post it) and rendered with its findings on the fields.
+        _dmDrafts.set(roleId, { block: result.defining_moment, tokens, retry: retryNote });
+        setCrucibleFindings(roleId, { block: result.findings || [] });
+        _dmDeclines.delete(roleId);
+        rerenderDm(idx);
+        toast(`Draft NOT saved — it breaks ${(result.errors || []).length} crucible rule(s)${retryNote ? ` (${retryNote})` : ''}. Fix the flagged fields, then Save draft.`, 'error');
+        return;
+      }
       data.playerRoles[idx].defining_moment = result.defining_moment;
+      _dmDrafts.delete(roleId);
+      setCrucibleFindings(roleId, { block: result.findings || [] });
       _dmDeclines.delete(roleId);
       rerenderDm(idx);
       markFormDirty();
-      toast('Defining moment generated — review the setup and all three options before marking reviewed.', 'warn');
+      toast(`Defining moment generated${retryNote ? ` (${retryNote})` : ''} — review the setup and all three options before marking reviewed.`, 'warn');
     } catch (err) {
       toast(`Defining moment generation failed: ${err.message}`, 'error');
       btn.disabled = false;
@@ -3307,6 +3443,13 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
       if (!cb?.checked) unmet.push('Anchored role: confirm the timing rule — the fork must fire BEFORE the documented historical event.');
     }
 
+    // The crucible check (server-side, painted inline). The cached findings are the latest
+    // validate-crucible answer; the server re-checks on the save this triggers regardless —
+    // marking reviewed TOUCHES the block, so save-lint refuses it if an error remains.
+    const cErrs = blockFindingErrors(role?.id);
+    if (cErrs.length) unmet.push(`${cErrs.length} crucible error(s) flagged in red — fix them first.`);
+    if (_dmDrafts.has(role?.id)) unmet.push('An unsaved draft is open — save or discard it first.');
+
     if (unmet.length) {
       toast(`Cannot mark as reviewed — ${unmet.length} unmet precondition${unmet.length === 1 ? '' : 's'}:\n\n${unmet.join('\n')}`, 'error');
       return;
@@ -3322,12 +3465,583 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     data.playerRoles[idx].defining_moment.reviewed = true;
     handleManualSave(data, formEl);
   });
+
+  bindWitnessCrucibleHandlers(formEl, data, scenarioId);
 }
 
 // Test seam: jsdom cannot reach top-level const bindings in a classic script, and the
 // review gate is worth testing against a real DOM rather than a string.
 window.__bindDefiningMomentHandlers = bindDefiningMomentHandlers;
 window.__dmDeclines = _dmDeclines;
+window.__dmDrafts = _dmDrafts;
+window.__leverState = _leverState;
+window.__crucibleFindings = _crucibleFindings;
+
+// ═══════════════════════════════════════════════════════════════
+// WITNESS CRUCIBLE — lever card, per-option crucible fields, inline findings
+// ═══════════════════════════════════════════════════════════════
+// The server is the authority on every rule (CrucibleLint.js via validate-crucible, the save
+// routes and the generator). Nothing here re-implements a rule: the editor sends what is on
+// screen to validate-crucible and paints the findings that come back onto the elements they
+// name. Red errors block Mark Reviewed and every save; amber warnings carry their hint.
+
+// Client copy of WITNESS_LEVER_AXES (CrucibleLint.js) — the select's choices only; the server
+// rejects any other value.
+const WITNESS_LEVER_AXES = ['documentary_record', 'human_presence', 'testimony', 'could_have_acted_at_cost', 'other'];
+
+const hasDmBlock = dm => definingMomentState(dm) !== 'none';
+const leverForRole = r => _leverState.get(r?.id)?.lever ?? r?.witness_lever ?? null;
+
+// Which crucible fields a block carries — see renderDefiningMomentOptionRow. `witness` is the
+// server's lint path (crucibleLintPath: the archetype, flagged or not); `witnessPath` is the
+// generator's (a FLAGGED witness).
+function crucibleOptionCtx(r, dm) {
+  const witness = roleArchetypeOf(r) === 'witness';
+  const options = Array.isArray(dm?.options) ? dm.options : [];
+  const prose = witness || options.some(o => o && (o.label !== undefined || o.debrief !== undefined));
+  const prov  = witness && (dm?.generated === true || options.some(o => o && (o.outcome_disclaimer !== undefined || o.consequence !== undefined)));
+  const sources = (leverForRole(r)?.evidence || []).map(e => e?.source).filter(Boolean);
+  return {
+    witness, witnessPath: isWitnessCrucible(r), prose, prov, sources, check: witness || prose,
+    sourcesNote: 'Consequence sources follow the lever card above as you edit it. A save checks the citations against the SAVED lever, so save or confirm lever edits first.',
+  };
+}
+
+// One input's value, exactly as collectEdits reads it (undefined = skip).
+function crucibleFieldValue(el) {
+  const dtype = el.dataset.type, raw = el.value;
+  if (el.type === 'checkbox') return el.checked;
+  if (dtype === 'array')  return raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (dtype === 'csv')    return raw.split(',').map(s => s.trim()).filter(Boolean);
+  if (dtype === 'json')   { try { return JSON.parse(raw); } catch { return undefined; } }
+  if (dtype === 'number') return raw === '' ? null : Number(raw);
+  if (raw === 'true')  return true;
+  if (raw === 'false') return false;
+  return raw;
+}
+// The block as it stands on screen — the draft (data-dpath) or the stored block's inputs
+// (data-path) laid over the block they render, so keys with no input ride along unchanged.
+function collectBlockFromSection(section, i, data) {
+  const role = data.playerRoles[i];
+  const base = _dmDrafts.get(role?.id)?.block ?? role?.defining_moment ?? {};
+  const tmp = { playerRoles: [] };
+  tmp.playerRoles[i] = { defining_moment: JSON.parse(JSON.stringify(base)) };
+  const prefix = `playerRoles.${i}.defining_moment.`;
+  section.querySelectorAll('[data-path], [data-dpath]').forEach(el => {
+    const p = el.dataset.path || el.dataset.dpath;
+    if (!p || !p.startsWith(prefix)) return;
+    const v = crucibleFieldValue(el);
+    if (v !== undefined) setDeep(tmp, p, v);
+  });
+  return tmp.playerRoles[i].defining_moment;
+}
+
+// The lever's fields, in one shape, from any source — so "has the reviewer changed it" is a
+// plain comparison, and what is sent is exactly what the card shows.
+function leverShape(l) {
+  return {
+    axis: l?.axis ?? '',
+    statement: l?.statement ?? '',
+    reasoning: l?.reasoning ?? '',
+    counter_case: { assumption: l?.counter_case?.assumption ?? '', why_wrong: l?.counter_case?.why_wrong ?? '' },
+    evidence: (Array.isArray(l?.evidence) ? l.evidence : []).map(e => ({ claim: e?.claim ?? '', source: e?.source ?? '' })),
+    instrument_terms: (Array.isArray(l?.instrument_terms) ? l.instrument_terms : []).map(t => String(t).trim()).filter(Boolean),
+    scene_binding: { at_scene: l?.scene_binding?.at_scene ?? null, reasoning: l?.scene_binding?.reasoning ?? '' },
+  };
+}
+function collectLeverFromCard(card) {
+  const v = k => card.querySelector(`[data-lv="${k}"]`)?.value ?? '';
+  return leverShape({
+    axis: v('axis'), statement: v('statement'), reasoning: v('reasoning'),
+    counter_case: { assumption: v('counter_case.assumption'), why_wrong: v('counter_case.why_wrong') },
+    evidence: [...card.querySelectorAll('.lv-ev-row')].map(row => ({
+      claim:  row.querySelector('[data-lv-ev="claim"]')?.value ?? '',
+      source: row.querySelector('[data-lv-ev="source"]')?.value ?? '',
+    })),
+    instrument_terms: v('instrument_terms').split(','),
+    scene_binding: { at_scene: v('scene_binding.at_scene') || null, reasoning: v('scene_binding.reasoning') },
+  });
+}
+const leverEdited = (r, lever) => JSON.stringify(leverShape(lever)) !== JSON.stringify(leverShape(r?.witness_lever));
+
+// ── The lever card ─────────────────────────────────────────────────────────
+// Step 1 of the witness-crucible flow: what this witness's power actually was (axis), the
+// assumption it corrects (counter-case), the cited evidence, the words it is named in, and the
+// scene it binds to. Proposed by the model, edited and CONFIRMED by a human; only a confirmed
+// lever opens generation. Rendered for a flagged witness only.
+function renderWitnessLeverSection(r, i, data) {
+  if (!isWitnessCrucible(r)) return `<div id="lever-section-${i}"></div>`;
+  const st     = _leverState.get(r.id);
+  const lever  = st?.lever ?? r.witness_lever ?? null;
+  const draft  = !!st?.draft;
+  const stored = r.witness_lever;
+  const dirty  = !draft && !!lever && leverEdited(r, lever);
+  const L = leverShape(lever);
+
+  const badge = !lever ? ['No lever', '#f1f5f9', 'var(--text-soft)']
+    : draft ? ['Unsaved proposal', '#fef2f2', '#991b1b']
+    : stored?.confirmed === true ? [`Confirmed${stored.edited ? ' (edited)' : ''}`, '#f0fdf4', '#166534']
+    : ['Proposed — needs confirmation', '#fef3c7', '#92400e'];
+  const fieldBox = (loc, label, input) => `<div data-cf="${loc}" style="margin-bottom:10px"><div class="cf-label">${label}</div>${input}<div class="cf-flags"></div></div>`;
+  const ta = (k, val, rows) => `<textarea class="cf-in lv-in" data-lv="${k}" rows="${rows}">${esc(val)}</textarea>`;
+
+  const acts = Array.isArray(data?.storyArc?.acts) ? data.storyArc.acts : [];
+  const at = L.scene_binding.at_scene || '';
+  let known = false;
+  const sceneOpts = acts.map(a => {
+    const scenes = (a.scenes || []).filter(s => s && typeof s.id === 'string' && s.id.trim());
+    if (!scenes.length) return '';
+    return `<optgroup label="Act ${esc(String(a.actNumber))} — ${esc(a.title || a.name || '')}">${scenes.map(s => {
+      const sel = s.id === at; if (sel) known = true;
+      return `<option value="${esc(s.id)}"${sel ? ' selected' : ''}>${esc(s.id)}${s.date_label ? ` — ${esc(s.date_label)}` : ''}</option>`;
+    }).join('')}</optgroup>`;
+  }).join('');
+  const sceneOrphan = at && !known ? `<option value="${esc(at)}" selected>⚠ ${esc(at)} — not a scene of this arc</option>` : '';
+
+  const evidence = L.evidence.map((e, n) => `
+    <div class="lv-ev-row" data-ev-index="${n}" style="display:grid;grid-template-columns:1fr 260px 28px;gap:8px;margin-bottom:6px;align-items:start">
+      <div data-cf="lever.evidence.${n}.claim"><textarea class="cf-in lv-in" data-lv-ev="claim" rows="2" placeholder="The documented fact — it may be quoted to the player word for word">${esc(e.claim)}</textarea><div class="cf-flags"></div></div>
+      <div data-cf="lever.evidence.${n}.source"><input type="text" class="cf-in lv-in" data-lv-ev="source" value="${esc(e.source)}" placeholder="Source"><div class="cf-flags"></div></div>
+      <button type="button" class="btn btn-secondary btn-sm lv-del-ev" data-role-index="${i}" data-ev-index="${n}" title="Remove this evidence item" style="padding:4px 6px">✕</button>
+    </div>`).join('');
+
+  const fields = lever ? `
+    <div class="lv-fields">
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:10px">
+        ${fieldBox('lever.axis', 'Axis — what kind of power', `<select class="cf-in lv-in" data-lv="axis"><option value=""${L.axis ? '' : ' selected'}>—</option>${WITNESS_LEVER_AXES.map(a => `<option value="${a}"${a === L.axis ? ' selected' : ''}>${a}</option>`).join('')}${L.axis && !WITNESS_LEVER_AXES.includes(L.axis) ? `<option value="${esc(L.axis)}" selected>⚠ ${esc(L.axis)}</option>` : ''}</select>`)}
+        ${fieldBox('lever.statement', 'Statement — the lever, in one or two sentences', ta('statement', L.statement, 2))}
+      </div>
+      ${fieldBox('lever.reasoning', 'Reasoning', ta('reasoning', L.reasoning, 3))}
+      <div data-cf="lever.counter_case" style="margin-bottom:10px">
+        <div class="cf-label">Counter-case — the assumption a player would bring, and why the record says otherwise</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <textarea class="cf-in cf-input lv-in" data-lv="counter_case.assumption" rows="3" placeholder="You would assume…">${esc(L.counter_case.assumption)}</textarea>
+          <textarea class="cf-in cf-input lv-in" data-lv="counter_case.why_wrong" rows="3" placeholder="Why it is wrong…">${esc(L.counter_case.why_wrong)}</textarea>
+        </div>
+        <div class="cf-flags"></div>
+      </div>
+      <div data-cf="lever.evidence" style="margin-bottom:10px">
+        <div class="cf-label">Cited evidence <span style="opacity:.7">(at least 2 — a debrief's consequence must cite one of these sources; editing a source here updates the option dropdowns below)</span></div>
+        <div class="lv-ev-list">${evidence}</div>
+        <button type="button" class="btn btn-secondary btn-sm lv-add-ev" data-role-index="${i}">+ Add evidence</button>
+        <div class="cf-flags"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${fieldBox('lever.instrument_terms', 'Instrument terms <span style="opacity:.7">(2–5 words, comma-separated — every debrief names one)</span>', `<input type="text" class="cf-in lv-in" data-lv="instrument_terms" value="${esc(L.instrument_terms.join(', '))}">`)}
+        <div data-cf="lever.scene_binding" style="margin-bottom:10px">
+          <div class="cf-label">Scene — where the witnessing-choice comes to a point</div>
+          <select class="cf-in cf-input lv-in" data-lv="scene_binding.at_scene"><option value="">—</option>${sceneOrphan}${sceneOpts}</select>
+          <textarea class="cf-in cf-input lv-in" data-lv="scene_binding.reasoning" rows="2" placeholder="Why this scene" style="margin-top:4px">${esc(L.scene_binding.reasoning)}</textarea>
+          <div class="cf-flags"></div>
+        </div>
+      </div>
+    </div>` : `<div style="padding:16px;text-align:center;font-size:13px;color:var(--text-soft);border:1px dashed var(--border);border-radius:6px;margin-bottom:10px">
+      No lever yet. <strong>Propose lever</strong> asks the model what this witness's power over the event actually was — with a counter-case and cited evidence — and which scene it binds to. You review, edit and confirm it before any prose is generated.
+    </div>`;
+
+  const confirmed = stored?.confirmed === true;
+  const actions = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px;padding-top:10px;border-top:1px solid var(--border)">
+      <button type="button" class="btn btn-secondary btn-sm lv-propose-btn" data-role-id="${r.id}" data-role-index="${i}">${lever ? '↻ Re-propose lever' : '✦ Propose lever'}</button>
+      ${lever ? `
+        <button type="button" class="btn btn-secondary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="0">${draft ? 'Save proposal (unconfirmed)' : 'Save edits (unconfirms)'}</button>
+        <button type="button" class="btn btn-primary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="1">${confirmed && !dirty ? '✓ Confirmed' : (draft || dirty) ? 'Save & confirm lever' : 'Confirm lever'}</button>` : ''}
+      ${stored ? `<button type="button" class="btn btn-danger btn-sm lv-clear-btn" data-role-id="${r.id}" data-role-index="${i}" style="margin-left:auto">Clear lever</button>` : ''}
+    </div>
+    <div class="lv-dirty-note" style="font-size:11px;margin-top:6px;color:#b45309;${dirty ? '' : 'display:none'}">Unsaved lever edits — saving them un-confirms the lever until you confirm again. Lever edits are not part of the main Save.</div>`;
+
+  return `<div id="lever-section-${i}" style="margin:10px 0">
+    <details ${!confirmed || draft ? 'open' : ''}>
+      <summary style="padding:11px 16px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid ${confirmed && !draft ? 'var(--border)' : '#d97706'};border-radius:8px">
+        <span style="display:flex;align-items:center;gap:10px">Witness Lever
+          <span class="lv-status-badge" style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;background:${badge[1]};color:${badge[2]}">${badge[0]}</span>
+        </span>
+        <span style="font-weight:400;font-size:10px">▸ expand</span>
+      </summary>
+      <div class="lv-card" data-role-index="${i}" style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:16px">
+        <div style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.55">A witness crucible is drafted <strong>lever-first</strong>: this card says what the witness could actually do. The defining moment below is generated on it only once it is <strong>confirmed</strong>, and every debrief's cited consequence must rest on one of its evidence sources.</div>
+        ${draft ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:12px;color:#7f1d1d"><strong>Not saved.</strong> The proposal failed the lever checks flagged below. Fix them, then save or confirm — the server re-checks it either way.</div>` : ''}
+        ${st?.scene_warning ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px;color:#92400e">⚠ ${esc(st.scene_warning)} The witness usually binds to the scene the protagonist's choice is made in — check the scene before confirming.</div>` : ''}
+        ${st?.declined ? `<div style="margin-bottom:10px;padding:9px 12px;border:1px solid var(--border);border-left:4px solid #94a3b8;border-radius:6px;font-size:12px"><strong>The model found no lever:</strong> ${esc(st.declined)}</div>` : ''}
+        <div data-cf="lever"><div class="cf-flags"></div></div>
+        ${fields}
+        ${actions}
+      </div>
+    </details>
+  </div>`;
+}
+
+// ── Inline findings ────────────────────────────────────────────────────────
+// Where a finding goes: the element whose data-cf names its location. Option locations name
+// the option by id (or #index when its id was missing/duplicated), so they are resolved
+// against the ids on screen NOW — an id edited since validation still lands on its row.
+function resolveFindingEl(root, loc, kind) {
+  const q = sel => root.querySelector(sel);
+  if (kind === 'lever') {
+    for (let parts = loc.split('.'); parts.length; parts.pop()) {
+      const el = q(`[data-cf="${parts.join('.')}"]`);
+      if (el) return el;
+    }
+    return q('[data-cf="lever"]');
+  }
+  const m = /^option\.(#?)([^.]+)\.?(.*)$/.exec(loc);
+  if (m) {
+    const rows = [...root.querySelectorAll('.dm-option-row')];
+    const row = m[1] ? rows[Number(m[2])] : rows.find(r => r.querySelector('.dm-option-id')?.value.trim() === m[2]);
+    if (row) return row.querySelector(`[data-cf="${m[3] || 'text'}"]`) || row.querySelector('[data-cf="text"]');
+    return q('[data-cf="options"]') || q('[data-cf="block"]');
+  }
+  if (loc === 'setup' || loc === 'options' || loc === 'block.id') return q(`[data-cf="${loc}"]`) || q('[data-cf="block"]');
+  return q('[data-cf="block"]');
+}
+function paintFindingsInto(root, findings, kind) {
+  if (!root) return;
+  root.querySelectorAll('[data-cf]').forEach(el => el.classList.remove('cf-err', 'cf-warn'));
+  root.querySelectorAll('.cf-flags').forEach(el => { el.innerHTML = ''; });
+  const top = root.querySelector(`[data-cf="${kind}"] > .cf-flags`);
+  for (const f of findings) {
+    const el = resolveFindingEl(root, f.location, kind);
+    const slot = el?.querySelector(':scope > .cf-flags') || el?.querySelector('.cf-flags') || top;
+    if (!slot) continue;
+    const err = f.severity === 'error';
+    const where = slot === top && f.location !== kind ? `<code>${esc(f.location)}</code> ` : '';
+    slot.insertAdjacentHTML('beforeend', `<div class="cf-flag ${err ? 'cf-flag-err' : 'cf-flag-warn'}" data-rule="${esc(f.rule)}" data-severity="${f.severity}">${err ? '✖' : '⚠'} ${where}${esc(f.message)}${f.hint ? `<span class="cf-hint">${esc(f.hint)}${err ? '' : ' — a judgement call; it does not block.'}</span>` : ''}</div>`);
+    // An element with both keeps the red: an error outranks a warning on the same field.
+    if (el && err) { el.classList.remove('cf-warn'); el.classList.add('cf-err'); }
+    else if (el && !el.classList.contains('cf-err')) el.classList.add('cf-warn');
+  }
+  if (top) {
+    const e = findings.filter(f => f.severity === 'error').length, w = findings.length - e;
+    const cls = e ? 'cf-summary-err' : w ? 'cf-summary-warn' : 'cf-summary-ok';
+    const txt = e ? `✖ ${e} error${e === 1 ? '' : 's'} — fix ${e === 1 ? 'it' : 'them'} before ${kind === 'lever' ? 'confirming' : 'saving or marking reviewed'}${w ? ` · ⚠ ${w} warning${w === 1 ? '' : 's'} (judgement calls)` : ''}`
+      : w ? `⚠ ${w} warning${w === 1 ? '' : 's'} — judgement calls, not blocking` : '✓ Crucible checks pass';
+    top.insertAdjacentHTML('afterbegin', `<div class="cf-summary ${cls}">${txt}</div>`);
+  }
+}
+function paintCrucibleFlags(formEl, i, data) {
+  const role = data.playerRoles[i];
+  const st = _crucibleFindings.get(role?.id);
+  if (!st) return;
+  paintFindingsInto(formEl.querySelector(`#dm-section-${i}`), st.block || [], 'block');
+  paintFindingsInto(formEl.querySelector(`#lever-section-${i}`), st.lever || [], 'lever');
+}
+function setCrucibleFindings(roleId, patch) {
+  _crucibleFindings.set(roleId, { block: [], lever: [], ...(_crucibleFindings.get(roleId) || {}), ...patch });
+}
+const blockFindingErrors = roleId => (_crucibleFindings.get(roleId)?.block || []).filter(f => f.severity === 'error');
+
+// Findings a SAVE answered with (422 CRUCIBLE_LINT findings_by_role, or crucible_warnings on a
+// save that went through): painted onto each role's section, which is opened so they are seen.
+function applySaveLintFindings(rootEl, data, byRole) {
+  for (const [roleId, findings] of Object.entries(byRole || {})) {
+    const i = (data.playerRoles || []).findIndex(r => r?.id === roleId);
+    if (i < 0) continue;
+    setCrucibleFindings(roleId, { block: findings });
+    paintCrucibleFlags(rootEl, i, data);
+    const d = rootEl.querySelector(`#dm-section-${i} details`);
+    if (d) d.open = true;
+  }
+}
+
+// The consequence.source dropdowns follow the lever: what the card shows (live, unsaved edits
+// included), else the stored lever. A source RENAMED in the card carries the options that
+// cited it along (`renamed` old → new); a source REMOVED leaves them flagged, never re-pointed.
+function syncConsequenceSources(formEl, i, data, renamed = null) {
+  const section = formEl.querySelector(`#dm-section-${i}`);
+  if (!section) return;
+  const card = formEl.querySelector(`#lever-section-${i} .lv-fields`);
+  const sources = card
+    ? [...card.querySelectorAll('[data-lv-ev="source"]')].map(el => el.value)
+    : (leverForRole(data.playerRoles[i])?.evidence || []).map(e => e?.source);
+  section.querySelectorAll('.dm-cons-source').forEach(sel => {
+    let cur = sel.value;
+    if (renamed && cur && cur === renamed.from.trim()) cur = renamed.to.trim();
+    sel.innerHTML = consequenceSourceOptions(sources, cur);
+  });
+}
+
+function updateLeverGate(formEl, i, data) {
+  const role = data.playerRoles[i];
+  const section = formEl.querySelector(`#dm-section-${i}`);
+  const btn = section?.querySelector('.gen-dm-btn');
+  if (!btn || !isWitnessCrucible(role)) return;
+  const gate = role.witness_lever?.confirmed !== true;
+  btn.disabled = gate;
+  btn.title = gate ? 'Confirm the lever first — a witness crucible is generated on its confirmed lever.' : '';
+  const note = section.querySelector('.dm-lever-gate-note');
+  if (note) {
+    note.style.color = gate ? '#b45309' : 'var(--text-soft)';
+    note.innerHTML = gate ? '⚠ Witness crucible: generation opens once the lever above is <strong>confirmed</strong>.' : 'Witness crucible: generated on the confirmed lever above.';
+  }
+}
+
+// ── Revalidate: what is on screen → validate-crucible → flags ──────────────
+const _crucibleTimers = new Map();
+const _crucibleSeq = new Map();
+function scheduleCrucibleRevalidate(formEl, data, scenarioId, i, delay = 600) {
+  const id = data.playerRoles[i]?.id;
+  if (!id) return;
+  clearTimeout(_crucibleTimers.get(id));
+  _crucibleTimers.set(id, setTimeout(() => { revalidateCrucible(formEl, data, scenarioId, i); }, delay));
+}
+async function revalidateCrucible(formEl, data, scenarioId, i) {
+  const role = data.playerRoles[i];
+  if (!role || !scenarioId) return null;
+  const section = formEl.querySelector(`#dm-section-${i}`);
+  const card    = formEl.querySelector(`#lever-section-${i} .lv-fields`);
+  const body = {};
+  if (card) body.witness_lever = collectLeverFromCard(formEl.querySelector(`#lever-section-${i}`));
+  const block = section?.querySelector('.dm-option-row') ? collectBlockFromSection(section, i, data) : null;
+  if (block && crucibleOptionCtx(role, block).check) body.defining_moment = block;
+  if (!body.witness_lever && !body.defining_moment) return null;
+  const seq = (_crucibleSeq.get(role.id) || 0) + 1;
+  _crucibleSeq.set(role.id, seq);
+  try {
+    const res = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(role.id)}/validate-crucible`, body);
+    if (_crucibleSeq.get(role.id) !== seq) return null;   // a newer check is on its way
+    const fromLever = f => f.location.startsWith('lever') && f.rule !== 'lever_no_sources';
+    const patch = {};
+    if (body.witness_lever)   patch.lever = res.findings.filter(fromLever);
+    if (body.defining_moment) patch.block = res.findings.filter(f => !fromLever(f));
+    setCrucibleFindings(role.id, patch);
+    paintCrucibleFlags(formEl, i, data);
+    return res;
+  } catch (err) {
+    console.warn('[crucible] validate failed:', err.message);
+    return null;
+  }
+}
+
+function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
+  const idxOf = el => Number(el.closest('[id^="dm-section-"], [id^="lever-section-"]')?.id.replace(/^(dm|lever)-section-/, ''));
+  const rerenderLever = i => {
+    replaceEditorSection(formEl, `#lever-section-${i}`, renderWitnessLeverSection(data.playerRoles[i], i, data));
+    paintCrucibleFlags(formEl, i, data);
+    syncConsequenceSources(formEl, i, data);
+    updateLeverGate(formEl, i, data);
+  };
+  const rerenderDmSection = i => {
+    replaceEditorSection(formEl, `#dm-section-${i}`, renderDefiningMomentSection(data.playerRoles[i], i, data));
+    paintCrucibleFlags(formEl, i, data);
+  };
+
+  // ── The witness_crucible flag ─────────────────────────────────────────────
+  formEl.addEventListener('change', e => {
+    const cb = e.target.closest?.('.wc-flag-cb');
+    if (!cb) return;
+    const i = Number(cb.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    if (!role) return;
+    const before = archetypeAllows(role, 'fork').allowed;
+    role.witness_crucible = cb.checked;
+    markFormDirty();
+    rerenderLever(i);
+    if (archetypeAllows(role, 'fork').allowed !== before) rerenderDmSection(i);
+    else updateLeverGate(formEl, i, data);
+  });
+
+  // ── Lever card: live edits ────────────────────────────────────────────────
+  const onLeverEdit = e => {
+    const input = e.target.closest?.('.lv-in');
+    if (!input) return;
+    const i = idxOf(input);
+    const role = data.playerRoles[i];
+    const sectionEl = formEl.querySelector(`#lever-section-${i}`);
+    if (!role || !sectionEl) return;
+    const st = _leverState.get(role.id) || {};
+    _leverState.set(role.id, { ...st, lever: collectLeverFromCard(sectionEl) });
+    let renamed = null;
+    if (input.dataset.lvEv === 'source') {
+      const from = input.dataset.prev ?? input.defaultValue ?? '';
+      if (from !== input.value) renamed = { from, to: input.value };
+      input.dataset.prev = input.value;
+    }
+    syncConsequenceSources(formEl, i, data, renamed);
+    const note = sectionEl.querySelector('.lv-dirty-note');
+    if (note) note.style.display = !st.draft && leverEdited(role, _leverState.get(role.id).lever) ? '' : 'none';
+    scheduleCrucibleRevalidate(formEl, data, scenarioId, i);
+  };
+  formEl.addEventListener('input', onLeverEdit);
+  formEl.addEventListener('change', onLeverEdit);
+
+  // ── Lever card: add / remove evidence ─────────────────────────────────────
+  formEl.addEventListener('click', e => {
+    const add = e.target.closest('.lv-add-ev'), del = e.target.closest('.lv-del-ev');
+    if (!add && !del) return;
+    const i = Number((add || del).dataset.roleIndex);
+    const role = data.playerRoles[i];
+    const lever = collectLeverFromCard(formEl.querySelector(`#lever-section-${i}`));
+    if (add) lever.evidence.push({ claim: '', source: '' });
+    else lever.evidence.splice(Number(del.dataset.evIndex), 1);
+    _leverState.set(role.id, { ...(_leverState.get(role.id) || {}), lever });
+    rerenderLever(i);
+    scheduleCrucibleRevalidate(formEl, data, scenarioId, i, 0);
+  });
+
+  // ── Lever card: propose ───────────────────────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.lv-propose-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    const st = _leverState.get(role.id);
+    const body = {};
+    if (role.witness_lever?.confirmed === true) {
+      if (!confirm(`"${role.name}" has a CONFIRMED lever. Proposing again replaces it with a fresh, UNCONFIRMED proposal — generation closes until you confirm again. Continue?`)) return;
+      body.overwrite = true;
+    } else if ((st?.draft || (st?.lever && leverEdited(role, st.lever))) && !confirm('Discard the unsaved lever edits and ask for a fresh proposal?')) {
+      return;
+    }
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Proposing…';
+    try {
+      const res = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(role.id)}/propose-witness-lever`, body);
+      if (res.declined) {
+        _leverState.set(role.id, { declined: res.reason });
+        toast('The model found no lever for this witness — see the reason in the card.', 'warn');
+      } else if (res.lint_failed) {
+        _leverState.set(role.id, { lever: res.witness_lever, draft: true, scene_warning: res.scene_warning });
+        setCrucibleFindings(role.id, { lever: res.findings || [] });
+        toast(`Lever proposed but NOT saved — it fails ${(res.errors || []).length} check(s). Fix the flagged fields, then save or confirm.`, 'error');
+      } else {
+        role.witness_lever = res.witness_lever;
+        _leverState.set(role.id, { scene_warning: res.scene_warning });
+        setCrucibleFindings(role.id, { lever: res.findings || [] });
+        toast('Lever proposed and saved, unconfirmed. Review the axis, counter-case, evidence and scene, then confirm.', 'warn');
+      }
+      rerenderLever(i);
+    } catch (err) {
+      const hint = err.body?.code === 'NOT_WITNESS_CRUCIBLE' ? ' Tick "Witness crucible" in the archetype section and Save first — the server reads the stored flag.' : '';
+      toast(`Lever proposal failed: ${err.message}${hint}`, 'error');
+      btn.disabled = false; btn.textContent = original;
+    }
+  });
+
+  // ── Lever card: save edits / confirm ──────────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.lv-save-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    const confirmIt = btn.dataset.confirm === '1';
+    const st = _leverState.get(role.id) || {};
+    const lever = collectLeverFromCard(formEl.querySelector(`#lever-section-${i}`));
+    const edited = st.draft || leverEdited(role, lever);
+    if (!edited && !confirmIt) { toast('No lever edits to save.', 'info'); return; }
+    if (!edited && role.witness_lever?.confirmed === true) { toast('The lever is already confirmed.', 'info'); return; }
+    const body = edited ? { edits: lever, ...(st.draft ? { from_proposal: true } : {}), ...(confirmIt ? { confirm: true } : {}) } : { confirm: true };
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      const res = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(role.id)}/witness-lever`, body);
+      role.witness_lever = res.witness_lever;
+      _leverState.set(role.id, { scene_warning: st.scene_warning });
+      setCrucibleFindings(role.id, { lever: res.findings || [] });
+      rerenderLever(i);
+      scheduleCrucibleRevalidate(formEl, data, scenarioId, i, 0);   // the block's citations against the saved lever
+      toast(res.witness_lever.confirmed ? 'Lever confirmed — generation is open.' : 'Lever saved, unconfirmed.', 'success');
+    } catch (err) {
+      if (err.body?.findings) {
+        setCrucibleFindings(role.id, { lever: err.body.findings });
+        paintCrucibleFlags(formEl, i, data);
+        toast('Lever not saved — fix the flagged fields.', 'error');
+      } else {
+        toast(`Lever save failed: ${err.message}`, 'error');
+      }
+      btn.disabled = false; btn.textContent = original;
+    }
+  });
+
+  // ── Lever card: clear ─────────────────────────────────────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.lv-clear-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    if (!confirm(`Remove "${role.name}"'s lever? Generation closes until a new lever is proposed and confirmed. This is immediate and server-side — not part of Save.`)) return;
+    try {
+      await apiFetch('PATCH', `/player-roles/${encodeURIComponent(role.id)}/witness-lever`, { clear: true });
+      delete role.witness_lever;
+      _leverState.delete(role.id);
+      setCrucibleFindings(role.id, { lever: [] });
+      rerenderLever(i);
+      toast('Lever cleared.', 'success');
+    } catch (err) {
+      toast(`Clear failed: ${err.message}`, 'error');
+    }
+  });
+
+  // ── Defining moment: crucible fields — live counts and revalidation ───────
+  formEl.addEventListener('input', e => {
+    const el = e.target.closest?.('[id^="dm-section-"] [data-path], [id^="dm-section-"] [data-dpath]');
+    if (!el) return;
+    const row = el.closest('.dm-option-row');
+    if (el.classList.contains('dm-option-label')) { const c = row?.querySelector('.dm-opt-label-count'); if (c) c.textContent = `${el.value.trim().length}c`; }
+    if (el.classList.contains('dm-option-debrief')) { const c = row?.querySelector('.dm-opt-debrief-count'); if (c) c.textContent = `${dmWords(el.value)}w`; }
+    const i = idxOf(el);
+    const role = data.playerRoles[i];
+    if (role && (crucibleOptionCtx(role, _dmDrafts.get(role.id)?.block ?? role.defining_moment).check)) scheduleCrucibleRevalidate(formEl, data, scenarioId, i);
+  });
+  formEl.addEventListener('change', e => {
+    const el = e.target.closest?.('[id^="dm-section-"] .dm-cons-source');
+    if (el) scheduleCrucibleRevalidate(formEl, data, scenarioId, idxOf(el), 0);
+  });
+  // First look: validate a crucible the moment its section is opened, so a stored block's
+  // flags are on screen before anyone edits it. `toggle` does not bubble — capture it.
+  formEl.addEventListener('toggle', e => {
+    const d = e.target;
+    if (!(d instanceof HTMLElement) || d.tagName !== 'DETAILS' || !d.open) return;
+    const host = d.closest('[id^="dm-section-"], [id^="lever-section-"]');
+    if (!host) return;
+    const i = idxOf(host);
+    const role = data.playerRoles[i];
+    if (!role || _crucibleFindings.has(role.id)) return;
+    const dm = _dmDrafts.get(role.id)?.block ?? role.defining_moment;
+    if (crucibleOptionCtx(role, dm).check || isWitnessCrucible(role)) revalidateCrucible(formEl, data, scenarioId, i);
+  }, true);
+
+  // ── Defining moment: save / discard an unsaved draft ──────────────────────
+  formEl.addEventListener('click', async e => {
+    const btn = e.target.closest('.dm-save-draft-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    const draft = _dmDrafts.get(role.id);
+    if (!draft) return;
+    const block = collectBlockFromSection(formEl.querySelector(`#dm-section-${i}`), i, data);
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      const res = await apiPut(`/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(role.id)}/defining-moment`, { defining_moment: block, ...draft.tokens });
+      data.playerRoles[i].defining_moment = res.defining_moment;
+      _dmDrafts.delete(role.id);
+      setCrucibleFindings(role.id, { block: res.findings || [] });
+      rerenderDmSection(i);
+      toast('Draft saved to the role — now review it and mark it reviewed.', 'success');
+    } catch (err) {
+      if (err.body?.findings) {
+        draft.block = err.body.defining_moment || block;
+        setCrucibleFindings(role.id, { block: err.body.findings });
+        paintCrucibleFlags(formEl, i, data);
+        toast(`Draft not saved — ${err.body.errors?.length || 'some'} crucible error(s) still flagged.`, 'error');
+      } else {
+        draft.block = block;
+        toast(`Draft save failed: ${err.message}`, 'error');
+      }
+      btn.disabled = false; btn.textContent = original;
+    }
+  });
+  formEl.addEventListener('click', e => {
+    const btn = e.target.closest('.dm-discard-draft-btn');
+    if (!btn) return;
+    const i = Number(btn.dataset.roleIndex);
+    const role = data.playerRoles[i];
+    if (!confirm('Discard this unsaved draft? The role keeps what it had. Nothing is written.')) return;
+    _dmDrafts.delete(role.id);
+    setCrucibleFindings(role.id, { block: [] });
+    rerenderDmSection(i);
+  });
+}
 
 function renderPlayerRolesSection(data) {
   const roles = data.playerRoles || [];
@@ -3393,6 +4107,7 @@ function renderPlayerRolesSection(data) {
           ${edField('Closing Line Override', edTextarea(`playerRoles.${i}.ending_notes.failure.closing_line_override`, r.ending_notes?.failure?.closing_line_override, 2), 'Replaces "You were there." — one strong sentence. Leave blank to keep the default.')}
         </div>
       `)}
+      ${renderWitnessLeverSection(r, i, data)}
       ${renderDefiningMomentSection(r, i, data)}
     `, i === 0);
   }).join('');
@@ -4986,6 +5701,15 @@ async function handleManualSave(data, containerEl) {
       if (dm.timing_confirmed === true) dm.timing_confirmed = Object.fromEntries(DM_TIMING_KEYS.map(k => [k, dmTimingVal(dm[k])]));
       else delete dm.timing_confirmed;
     }
+    // Flags on screen may predate the save: re-check every role showing any. (Not simply
+    // cleared — an untouched, grandfathered block was saved past, and still carries its errors.)
+    if (containerEl) {
+      if (resp?.crucible_warnings) applySaveLintFindings(containerEl, data, resp.crucible_warnings);
+      for (const roleId of _crucibleFindings.keys()) {
+        const i = (data.playerRoles || []).findIndex(r => r?.id === roleId);
+        if (i >= 0) revalidateCrucible(containerEl, data, data.scenario?.id, i);
+      }
+    }
     toast(`"${data.scenario?.title}" saved.`, 'success');
     const pill = document.getElementById('save-status-pill');
     if (pill) { pill.className = 'saved-pill ok'; pill.textContent = '✓ Saved'; }
@@ -4997,6 +5721,11 @@ async function handleManualSave(data, containerEl) {
   } catch (err) {
     // 409 = version conflict. Non-destructive: keep the user's edits, tell them to reload.
     if (err.status === 409) {
+      toast(err.message, 'error');
+    } else if (err.body?.code === 'CRUCIBLE_LINT') {
+      // Save-lint refused a defining moment this save touched. Nothing was written; the
+      // findings go onto the fields they name, so the fix is made where the problem is.
+      if (containerEl) applySaveLintFindings(containerEl, data, err.body.findings_by_role);
       toast(err.message, 'error');
     } else {
       toast(`Save failed: ${err.message}`, 'error');
