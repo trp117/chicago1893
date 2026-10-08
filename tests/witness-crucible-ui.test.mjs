@@ -379,6 +379,49 @@ try {
     const deb2 = $('.dm-option-row[data-opt-index="0"] .dm-option-debrief');
     check('…and the post-save refresh sizes it again', !!deb2.style.height && deb2.style.height !== 'auto', deb2.style.height);
   }
+  head('10. the ARCHETYPE proposal persists, and the decision on it is shown');
+  {
+    const REPLY = { family: 'witness', hinge: { passed: false, moment: '', why: 'His conduct changes nothing that follows.' },
+      foreknowledge: { verdict: 'not_applicable', why: 'No hinge to know about.', evidence: ['He carries the summons; the court decides.'] },
+      counter_case: 'One might call him an instrument.', confidence: 'high', reasoning: 'A witness: present at every session, deciding nothing.' };
+    repos.scenarios.savePlayerRole({ id: 'role_ui_clerk', scenarioId: SCENARIO_ID, name: 'The Clerk', character_type: 'fictional', description: 'fixture' });
+    const clerk = () => repos.scenarios.findPlayerRole('role_ui_clerk');
+    formEl.remove();
+    const mountClerk = () => {
+      const d = { scenario: structuredClone(SCENARIO), playerRoles: [structuredClone(clerk())], storyArc: structuredClone(ARC) };
+      const f = doc.createElement('form');
+      f.innerHTML = win.renderArchetypeSection(d.playerRoles[0], 0) + win.renderWitnessLeverSection(d.playerRoles[0], 0, d) + win.renderDefiningMomentSection(d.playerRoles[0], 0, d) + `<div id="endings-gate-0">${win.renderEndingsGatePanel(d.playerRoles[0], 0)}</div>`;
+      doc.body.appendChild(f);
+      win.__bindArchetypeHandlers(f, d, SCENARIO_ID);
+      win.bindDefiningMomentHandlers(f, d, SCENARIO_ID);
+      return { f, d };
+    };
+    const panel = f => f.querySelector('.archetype-proposal')?.textContent.replace(/\s+/g, ' ') || '';
+    let { f, d } = mountClerk();
+    modelQueue.push(JSON.stringify(REPLY));
+    f.querySelector('.propose-archetype-btn').click();
+    await settle(300);
+    check('propose → the panel shows the proposal and its reasoning, stored', /Classifier proposes/.test(panel(f)) && /deciding nothing/.test(panel(f)) && /Stored on the role/.test(panel(f)) && clerk().archetype_proposal?.archetype === 'witness');
+    check('…no decision yet, and the archetype is untouched', /No decision recorded yet/.test(panel(f)) && clerk().archetype === undefined);
+    f.remove();
+
+    ({ f, d } = mountClerk());   // a REFRESH: rendered from the stored role, session map not consulted
+    win.__archetypeProposals.clear();
+    f.querySelector('#archetype-section-0').outerHTML = win.renderArchetypeSection(d.playerRoles[0], 0);
+    check('AFTER A REFRESH: the proposal, both tests, evidence, counter-case and reasoning are on screen',
+      /Classifier proposes/.test(panel(f)) && /Test 1 — hinge/.test(panel(f)) && /Test 2 — foreknowledge/.test(panel(f)) && /summons/.test(panel(f)) && /instrument/.test(panel(f)) && /deciding nothing/.test(panel(f)));
+    f.querySelector('.archetype-apply-btn').click();
+    const ok1 = await win.handleManualSave(d, f);
+    await settle(200);
+    check('"Use this value" + Save → recorded and SHOWN as adopted, without a reload', ok1 === true && clerk().archetype === 'witness' && !!clerk().archetype_proposal.adopted_at && /Adopted — set to witness/.test(panel(f)), panel(f).slice(-200));
+    const sel = f.querySelector('.archetype-select');
+    sel.value = 'instrument'; sel.dispatchEvent(new win.Event('change', { bubbles: true }));
+    const ok2 = await win.handleManualSave(d, f);
+    await settle(200);
+    check('a different value + Save → "Overridden — proposed witness, set instrument", shown at once', ok2 === true && clerk().archetype_proposal.decision?.matched === false && /Overridden — proposed witness, set instrument/.test(panel(f)), panel(f).slice(-200));
+    f.remove();
+    doc.body.appendChild(formEl);
+  }
 } finally {
   win.close();
   await new Promise(r => server.close(r));

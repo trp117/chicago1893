@@ -963,6 +963,56 @@ try {
     })());
     check('nothing written by any retry run', !roleOf('role_wc_saver').defining_moment || roleOf('role_wc_saver').defining_moment.id === GEN.id);
   }
+  head('7. proposals persist — the ARCHETYPE proposal and its reasoning');
+  {
+    const classifyUrl = id => `/scenarios/${SCENARIO_ID}/roles/${id}/classify-archetype`;
+    const WITNESS_REPLY = { family: 'witness', hinge: { passed: false, moment: '', why: 'His conduct changes nothing that follows.' },
+      foreknowledge: { verdict: 'not_applicable', why: 'No hinge to know about.', evidence: ['He carries the summons; the court decides.'] },
+      counter_case: 'One might call him an instrument — but he performs no pivotal act.', confidence: 'high', reasoning: 'A witness: present at every session, deciding nothing.' };
+    const CRUCIBLE_REPLY = { family: 'crucible', hinge: { passed: true, moment: 'the relapse visit', why: 'He could carry word.' },
+      foreknowledge: { verdict: 'had_information', why: 'He knew of the trap.', evidence: ['He saw the clothes left in the cell.'] },
+      counter_case: 'One might call him a witness.', confidence: 'medium', reasoning: 'A crucible, if the clothes episode is his.' };
+    repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_classify', name: 'The Classified' });
+    const calls = modelCalls.length;
+    modelQueue.push(JSON.stringify(WITNESS_REPLY));
+    const r = await post(classifyUrl('role_wc_classify'), {});
+    const P = roleOf('role_wc_classify').archetype_proposal;
+    check('classify → the proposal is STORED with its reasoning (both tests, evidence, counter-case, confidence, date)',
+      r.status === 200 && modelCalls.length === calls + 1 && P?.archetype === 'witness' && P.reasoning === WITNESS_REPLY.reasoning && P.hinge?.passed === false
+      && P.foreknowledge?.evidence?.length === 1 && /instrument/.test(P.counter_case) && P.confidence === 'high' && !!P.proposed_at && P.proposed_over === 'unclassified', `${r.status} ${r.body.error || ''}`);
+    check('…and NOT active: the role\'s archetype is untouched, the gate reads the confirmed value only',
+      roleOf('role_wc_classify').archetype === undefined && admin.archetypeAllows(roleOf('role_wc_classify'), 'fork').archetype === 'unclassified' && !P.decision);
+
+    const role = structuredClone(roleOf('role_wc_classify'));
+    const forged = await call('PUT', '/player-roles/role_wc_classify', { ...role, description: 'edit', archetype_proposal: { archetype: 'instrument', reasoning: 'forged' } });
+    check('an editor save cannot WRITE the proposal (a posted one is replaced by the stored one)', forged.status === 200 && roleOf('role_wc_classify').archetype_proposal.reasoning === WITNESS_REPLY.reasoning);
+    const { archetype_proposal: _drop, ...noKey } = role;
+    await call('PUT', '/player-roles/role_wc_classify', { ...noKey, description: 'edit 2' });
+    check('…nor ERASE it (a save without the key keeps it)', roleOf('role_wc_classify').archetype_proposal?.reasoning === WITNESS_REPLY.reasoning && !roleOf('role_wc_classify').archetype_proposal.decision);
+
+    await call('PUT', '/player-roles/role_wc_classify', { ...structuredClone(roleOf('role_wc_classify')), archetype: 'witness' });
+    const A = roleOf('role_wc_classify').archetype_proposal;
+    check('setting the PROPOSED value → recorded as adopted (adopted_at, decision matched)', roleOf('role_wc_classify').archetype === 'witness' && A.decision?.set === 'witness' && A.decision.matched === true && !!A.adopted_at);
+
+    modelQueue.push(JSON.stringify(CRUCIBLE_REPLY));
+    await post(classifyUrl('role_wc_classify'), {});
+    const B = roleOf('role_wc_classify').archetype_proposal;
+    check('re-proposing replaces ONLY the proposal — the confirmed archetype stays', roleOf('role_wc_classify').archetype === 'witness' && B.reasoning === CRUCIBLE_REPLY.reasoning && B.proposed_over === 'witness' && !B.decision && !B.adopted_at);
+    await call('PUT', '/player-roles/role_wc_classify', { ...structuredClone(roleOf('role_wc_classify')), archetype: 'instrument' });
+    const C = roleOf('role_wc_classify').archetype_proposal;
+    check('setting a DIFFERENT value → recorded as overridden: "proposed X, set Y" (no adopted_at)', C.archetype === B.archetype && C.decision?.set === 'instrument' && C.decision.matched === false && !C.adopted_at);
+    await call('PUT', '/player-roles/role_wc_classify', { ...structuredClone(roleOf('role_wc_classify')), description: 'unrelated' });
+    check('an unrelated save leaves the recorded decision alone', JSON.stringify(roleOf('role_wc_classify').archetype_proposal.decision) === JSON.stringify(C.decision));
+
+    modelQueue.push(JSON.stringify(WITNESS_REPLY));
+    repos.scenarios.savePlayerRole({ ...roleOf('role_wc_classify'), archetype: 'witness' });
+    await post(classifyUrl('role_wc_classify'), {});
+    const D = roleOf('role_wc_classify').archetype_proposal;
+    check('a proposal agreeing with the value ALREADY set is recorded as such at once', D.decision?.matched === true && D.decision.already_set === true && !!D.adopted_at);
+    const created = await post('/player-roles', { name: 'Fresh Role', scenarioId: SCENARIO_ID, archetype_proposal: { archetype: 'instrument' } });
+    check('creating a role cannot smuggle a proposal in', created.status === 201 && created.body.archetype_proposal === undefined);
+    repos.scenarios.deletePlayerRole?.(created.body.id);
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });

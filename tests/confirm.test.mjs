@@ -2,8 +2,9 @@
 // Drives the REAL engine/admin/index.html in jsdom against a REAL admin router: the select,
 // the Propose button, the proposal panel, live re-gating, the override, and the demote.
 //
-// Makes real classifier calls (needs ANTHROPIC_API_KEY) and writes to one scratch role,
-// which it restores byte-for-byte.
+// Makes real classifier calls (needs ANTHROPIC_API_KEY). Writes to one scratch role, and —
+// since a proposal is now STORED on the role as archetype_proposal — to Lojka's file during
+// [2]; both are restored byte-for-byte.
 
 import 'dotenv/config';
 import fs from 'fs';
@@ -148,6 +149,8 @@ console.log('\n[2] Lojka — Propose calls the (previously orphaned) endpoint\n'
   const role = readRole('role_lojka');
   const { formEl } = mountRole(role);
   const PROPOSE_FOR = 'role_lojka';
+  const roleBefore = JSON.parse(JSON.stringify(role));   // the editor adds the stored proposal to `role` itself
+  try {
   formEl.querySelector('.propose-archetype-btn').click();
   await waitForProposal(PROPOSE_FOR);
 
@@ -162,10 +165,20 @@ console.log('\n[2] Lojka — Propose calls the (previously orphaned) endpoint\n'
   check('panel shows the reasoning',       /Reasoning/.test(t) && t.length > 600);
   check('panel shows the counter-case',    /Counter-case/.test(t));
   check('panel says it matches the set value', /matches the value set above/.test(t));
-  check('nothing written to the role file', readRole('role_lojka').archetype === 'instrument'
-        && JSON.stringify(readRole('role_lojka')) === JSON.stringify(role));
+  const after = readRole('role_lojka');
+  // The store stamps updatedAt on every save; everything else must be exactly as it was.
+  const { archetype_proposal: storedProposal, updatedAt: _u1, ...rest } = after;
+  const { updatedAt: _u0, ...was } = roleBefore;
+  check('the archetype is NOT written — only the proposal is stored, with its reasoning', after.archetype === 'instrument'
+        && JSON.stringify(rest) === JSON.stringify(was) && storedProposal?.archetype === p?.archetype && storedProposal.reasoning === p?.reasoning && !!storedProposal.proposed_at,
+        JSON.stringify(Object.keys(after).filter(k => JSON.stringify(after[k]) !== JSON.stringify(roleBefore[k]))));
+  check('a proposal matching the value already set is recorded as agreed', storedProposal?.decision?.matched === (p?.archetype === 'instrument') && (p?.archetype !== 'instrument' || storedProposal.decision.already_set === true));
   console.log(`\n      panel excerpt: ${t.slice(0, 300)}…\n`);
   formEl.remove();
+  } finally {
+    fs.writeFileSync(fileOf('role_lojka'), confirmedBefore.role_lojka, 'utf8');
+    store._cache.clear();
+  }
 }
 
 // ═══ 3–6. An unclassified legacy role: propose, confirm, override, demote ════
@@ -201,6 +214,11 @@ try {
     check('persisted through the guarded save path', readRole(TARGET).archetype === p.archetype, readRole(TARGET).archetype);
     check('gating now applies to the stored value',
           admin.archetypeAllows(readRole(TARGET), 'fork').archetype === p.archetype);
+    // A decision is recorded when a save CHANGES the archetype. A role with no fate_mode can be
+    // proposed "unclassified" — applying that changes nothing, so there is nothing to record.
+    const P = readRole(TARGET).archetype_proposal;
+    check(p.archetype === 'unclassified' ? 'proposal "unclassified" applied → no change, so no decision recorded' : 'the stored proposal records the decision: ADOPTED',
+      p.archetype === 'unclassified' ? !!P && !P.decision : (P?.decision?.set === p.archetype && P.decision.matched === true && !!P.adopted_at), `proposed ${p.archetype}; ${JSON.stringify(P?.decision)}`);
     formEl.remove();
   }
 
@@ -214,6 +232,8 @@ try {
     const posted = saveThroughGuardedPath(formEl, data);
     check(`human value "${override}" beats proposal "${p.archetype}" on the posted role`, posted.archetype === override, posted.archetype);
     check('human value persisted', readRole(TARGET).archetype === override, readRole(TARGET).archetype);
+    const P = readRole(TARGET).archetype_proposal;
+    check(`the stored proposal records the OVERRIDE: proposed "${p.archetype}", set "${override}"`, P?.archetype === p.archetype && P.decision?.set === override && P.decision.matched === false && !P.adopted_at, JSON.stringify(P?.decision));
     const stored = readRole(TARGET);
     const expect = { 'crucible-open': [true, true], 'crucible-fixed': [true, false], instrument: [false, false], witness: [false, false] }[override];
     check(`gating follows the HUMAN value (fork ${expect[0]}, endings ${expect[1]})`,

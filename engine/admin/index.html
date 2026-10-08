@@ -2299,12 +2299,14 @@ function archetypeBlockedNotice(reason) {
 // The classifier PROPOSES; the human CONFIRMS; the gate enforces what the human confirmed.
 // This is that middle step, and it is the only place an archetype is ever set.
 //
-// Proposals are EPHEMERAL, for exactly the reason declines are (see _dmDeclines below):
-// the classifier writes nothing server-side, and anything hung off data.playerRoles[i] is
-// posted to /generate/save and would land in the role file. A proposal therefore lives in
-// this Map for the session, keyed by role id, and disappears on reload. The ONLY thing that
-// persists is the value of the <select>, and only when the reviewer saves.
+// Proposals PERSIST: classify-archetype stores the proposal and its reasoning on the role as
+// archetype_proposal, so the panel below renders it after a reload, with the decision made on
+// it (adopted, or "proposed X, set Y" — stamped server-side when a save changes the archetype).
+// It is ADVISORY: no gate reads it, and an editor save can neither write nor erase it (the
+// server restores the stored copy). The value of the <select> is still the only thing that
+// sets the archetype. This Map mirrors the latest proposal of the session (a test seam).
 const _archetypeProposals = new Map();
+const archetypeProposalOf = r => r?.archetype_proposal ?? _archetypeProposals.get(r?.id) ?? null;
 
 // The select's options. Each carries what the archetype COSTS you, because that is what a
 // reviewer is actually choosing between — an archetype is only ever visible in the editor
@@ -2333,10 +2335,10 @@ function replaceEditorSection(formEl, selector, html) {
 // and the counter-case it argued against itself — because a proposal a reviewer cannot check
 // is worth no more than a guess.
 function renderArchetypeProposalPanel(r, i) {
-  const p = _archetypeProposals.get(r.id);
+  const p = archetypeProposalOf(r);
   if (!p) {
     return `<div style="font-size:12px;color:var(--text-soft);padding:10px 12px;border:1px dashed var(--border);border-radius:6px">
-      No proposal yet. <strong>Propose archetype</strong> runs the classifier against this role's declared fields — its starting knowledge, initial-state flags, hooks and briefing — and reports what it would set and why. It writes nothing: you set the value above.
+      No proposal yet. <strong>Propose archetype</strong> runs the classifier against this role's declared fields — its starting knowledge, initial-state flags, hooks and briefing — and reports what it would set and why. The proposal and its reasoning are kept on the role as a record; you set the value above.
     </div>`;
   }
   const stored  = roleArchetypeOf(r);
@@ -2363,10 +2365,21 @@ function renderArchetypeProposalPanel(r, i) {
     ${evidence ? row('Evidence cited', `<ul style="margin:0;padding-left:16px;color:var(--text-soft)">${evidence}</ul>`) : ''}
     ${row('Reasoning', esc(p.reasoning || ''))}
     ${row('Counter-case', `<span style="color:var(--text-soft)">${esc(p.counter_case || '—')}</span>`)}
+    ${archetypeDecisionLine(p)}
     <div style="font-size:11px;color:var(--text-soft);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-      Advisory only — nothing was written. This note is not stored and clears on reload. The value in the select above is what persists and what the generators are gated on.
+      Stored on the role as a proposal${p.proposed_at ? ` (proposed ${esc(fmtWhen(p.proposed_at))}${p.proposed_over ? `, when the role was <code>${esc(p.proposed_over)}</code>` : ''})` : ''} — advisory: it gates nothing and survives a reload. The value in the select above is what persists and what the generators are gated on.
     </div>
   </div>`;
+}
+const fmtWhen = t => { const d = t ? new Date(t) : null; return d && !isNaN(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''; };
+// The human's decision on the proposal, as recorded by the server: the audit line.
+function archetypeDecisionLine(p) {
+  const d = p?.decision;
+  if (!d) return `<div class="archetype-decision" style="font-size:12px;margin-top:6px;color:var(--text-soft)">No decision recorded yet — it is recorded when a save sets the archetype.</div>`;
+  const when = esc(fmtWhen(d.at));
+  return d.matched
+    ? `<div class="archetype-decision" style="font-size:12px;margin-top:6px;color:#166534;font-weight:600">✓ ${d.already_set ? `Agreed with the value already set (<code>${esc(d.set)}</code>)` : `Adopted — set to <code>${esc(d.set)}</code>`} · ${when}</div>`
+    : `<div class="archetype-decision" style="font-size:12px;margin-top:6px;color:#92400e;font-weight:700">Overridden — proposed <code>${esc(p.archetype)}</code>, set <code>${esc(d.set)}</code> · ${when}</div>`;
 }
 
 // Does this role carry ending_notes with any real content? Mirrors the server's
@@ -2690,8 +2703,10 @@ function bindArchetypeHandlers(formEl, data, scenarioId) {
       const proposal = await apiPost(
         `/scenarios/${encodeURIComponent(scenarioId)}/roles/${encodeURIComponent(roleId)}/classify-archetype`, {});
       _archetypeProposals.set(roleId, proposal);
+      // Stored server-side; mirrored onto the role so the panel renders the stored record.
+      if (data.playerRoles[idx] && proposal.archetype_proposal) data.playerRoles[idx].archetype_proposal = proposal.archetype_proposal;
       replaceEditorSection(formEl, `#archetype-section-${idx}`, renderArchetypeSection(data.playerRoles[idx], idx));
-      toast(`Classifier proposes: ${proposal.archetype} (${proposal.confidence}). Read the reasoning, then set the value yourself.`, 'warn');
+      toast(`Classifier proposes: ${proposal.archetype} (${proposal.confidence}) — stored with its reasoning. Read it, then set the value yourself.`, 'warn');
     } catch (err) {
       toast(`Archetype classification failed: ${err.message}`, 'error');
       btn.disabled = false;
@@ -2706,7 +2721,7 @@ function bindArchetypeHandlers(formEl, data, scenarioId) {
     const btn = e.target.closest('.archetype-apply-btn');
     if (!btn) return;
     const idx = Number(btn.dataset.roleIndex);
-    const p   = _archetypeProposals.get(btn.dataset.roleId);
+    const p   = archetypeProposalOf(data.playerRoles[idx]);
     const sel = formEl.querySelector(`#archetype-section-${idx} .archetype-select`);
     if (!p || !sel) return;
     sel.value = p.archetype;
@@ -3583,16 +3598,15 @@ function renderWitnessLeverSection(r, i, data) {
   // flagged proposal flagged (painted after render by paintCrucibleFlags).
   if (stored?.findings && !_crucibleFindings.get(r.id)?.leverChecked) setCrucibleFindings(r.id, { lever: stored.findings });
   const storedErrors = (stored?.findings || []).filter(f => f.severity === 'error').length;
-  const when = t => { const d = t ? new Date(t) : null; return d && !isNaN(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''; };
 
   const badge = !lever ? ['No lever', '#f1f5f9', 'var(--text-soft)']
     : stored?.confirmed === true ? [`Confirmed${stored.edited ? ' (edited)' : ''}`, '#f0fdf4', '#166534']
     : storedErrors ? [`Proposed — fails ${storedErrors} check${storedErrors === 1 ? '' : 's'}`, '#fef2f2', '#991b1b']
     : ['Proposed — needs confirmation', '#fef3c7', '#92400e'];
   const provenance = stored ? `<div style="font-size:11px;color:var(--text-soft);margin-bottom:10px">${[
-    stored.proposed_at ? `Proposed ${esc(when(stored.proposed_at))}` : (stored.generated ? 'Proposed by the model' : 'Written by hand'),
+    stored.proposed_at ? `Proposed ${esc(fmtWhen(stored.proposed_at))}` : (stored.generated ? 'Proposed by the model' : 'Written by hand'),
     stored.edited ? 'edited by a reviewer' : '',
-    stored.confirmed === true && stored.confirmed_at ? `confirmed ${esc(when(stored.confirmed_at))}` : 'not confirmed — inert until it is',
+    stored.confirmed === true && stored.confirmed_at ? `confirmed ${esc(fmtWhen(stored.confirmed_at))}` : 'not confirmed — inert until it is',
   ].filter(Boolean).join(' · ')}</div>` : '';
   const fieldBox = (loc, label, input) => `<div data-cf="${loc}" style="margin-bottom:10px"><div class="cf-label">${label}</div>${input}<div class="cf-flags"></div></div>`;
   const ta = (k, val, rows) => `<textarea class="cf-in lv-in cf-autosize" data-lv="${k}" rows="${rows}">${esc(val)}</textarea>`;
@@ -5777,6 +5791,10 @@ async function handleManualSave(data, containerEl) {
     // Flags on screen may predate the save: re-check every role showing any. (Not simply
     // cleared — an untouched, grandfathered block was saved past, and still carries its errors.)
     if (containerEl) {
+      // SERVER-OWNED role keys — written only by their own routes, restored by every editor save,
+      // and stamped by the save itself (an archetype decision) — are read back, so the
+      // re-render below shows what is stored. Fail-soft: without it, the next reload shows it.
+      await syncServerOwnedRoleKeys(data);
       // Re-derive everything computed from archetype / flag / block against what was just saved
       // (the server normalizes a cleared flag away; mirror that first) — no page reload needed.
       (data.playerRoles || []).forEach((r, i) => {
@@ -5812,6 +5830,23 @@ async function handleManualSave(data, containerEl) {
     return false;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
+  }
+}
+
+const SERVER_OWNED_ROLE_KEYS = ['archetype_proposal', 'witness_lever', 'choice_register_proposal'];
+async function syncServerOwnedRoleKeys(data) {
+  const sid = data?.scenario?.id;
+  if (!sid || !Array.isArray(data.playerRoles) || !data.playerRoles.length) return;
+  try {
+    const roles = await apiGet(`/player-roles?scenarioId=${encodeURIComponent(sid)}`);
+    const byId = new Map((Array.isArray(roles) ? roles : []).map(r => [r.id, r]));
+    for (const r of data.playerRoles) {
+      const s = r && byId.get(r.id);
+      if (!s) continue;
+      for (const k of SERVER_OWNED_ROLE_KEYS) { if (s[k] !== undefined) r[k] = s[k]; else delete r[k]; }
+    }
+  } catch (err) {
+    console.warn('[save] could not re-read stored proposals:', err.message);
   }
 }
 

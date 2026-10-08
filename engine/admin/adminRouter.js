@@ -517,6 +517,30 @@ function preserveStoredArchetype(repos, role) {
   return role;
 }
 
+// EDITOR-SAVE GUARD for archetype_proposal — the classifier's stored proposal and reasoning.
+// The editor never writes it (classify-archetype does): whatever a save posts is replaced by
+// the stored value, exactly as witness_lever is. It is ADVISORY — no gate reads it; the gate
+// reads `archetype`, the value the human sets.
+//
+// THE DECISION, recorded here. When a save CHANGES the role's archetype and a proposal is on
+// file, the proposal is stamped with what the human did with it: set to what was proposed
+// (adopted_at), or overridden ("proposed X, set Y"). That is the audit trail of the human
+// judgement, deviations included. Runs after preserveStoredArchetype, on what will be written.
+function preserveStoredArchetypeProposal(repos, role) {
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  const proposal = stored?.archetype_proposal;
+  if (!proposal) { delete role.archetype_proposal; return role; }
+  const before = roleArchetype(stored), after = roleArchetype(role);
+  role.archetype_proposal = after !== before ? archetypeDecision(proposal, after) : proposal;
+  return role;
+}
+function archetypeDecision(proposal, set, extra = {}) {
+  const at = new Date().toISOString();
+  const matched = set === proposal.archetype;
+  const { adopted_at, ...rest } = proposal;
+  return { ...rest, decision: { set, matched, at, ...extra }, ...(matched ? { adopted_at: at } : {}) };
+}
+
 // EDITOR-SAVE GUARD for anchored_location — fourth sibling of the three above, same hazard:
 // both editor save paths rebuild the role as a whole object from the form, so a tab loaded
 // before this field existed posts a role with the key ABSENT and the whole-object
@@ -794,6 +818,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredEndingNotes(shim, role);
   preserveStoredDefiningMoment(shim, role);
   preserveStoredArchetype(shim, role);
+  preserveStoredArchetypeProposal(shim, role);
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
   preserveStoredWitnessCrucible(shim, role);
@@ -2526,9 +2551,10 @@ function validateArchetypeProposal(p) {
   return errors;
 }
 
-// Propose an archetype for one role. PURE PROPOSAL: it writes nothing, anywhere. The
-// returned object carries the reasoning and the evidence as first-class fields because
-// step 4's confirm UI has to show a reviewer WHY, not just what.
+// Propose an archetype for one role. This function writes nothing; the classify-archetype
+// route stores what it returns as the role's advisory archetype_proposal. The returned object
+// carries the reasoning and the evidence as first-class fields because step 4's confirm UI
+// has to show a reviewer WHY, not just what — and, stored, why it was set.
 export async function classifyRoleArchetype(scenario, role, anthropicApiKey) {
   const { axis, fate_mode } = resolveCrucibleAxis(role);
 
@@ -3903,12 +3929,12 @@ export function createAdminRouter(repos, config = {}) {
     res.json({ roleId: role.id, saved: true, defining_moment: saved.defining_moment, path: forkGate.path, findings: check.findings });
   });
 
-  // Propose an archetype for a single player role. READ-ONLY BY CONSTRUCTION: the scenario
-  // and the role are loaded server-side from :id/:roleId, the classifier is called, and the
-  // proposal is returned. Nothing is written — not the archetype, not a note, nothing. The
-  // reviewer confirms the value in the editor (step 4) and the gating enforces the CONFIRMED
-  // value (step 3), never this one. There is deliberately no overwrite guard here for the
-  // same reason: with no write there is nothing to overwrite.
+  // Propose an archetype for a single player role. The scenario and the role are loaded
+  // server-side from :id/:roleId, the classifier is called, and the proposal is returned AND
+  // stored as the role's archetype_proposal — its ONLY write, one additive key. The archetype
+  // itself is never written here: the reviewer confirms the value in the editor (step 4) and
+  // the gating enforces the CONFIRMED value (step 3), never the proposal. No overwrite guard:
+  // a fresh proposal replaces only the previous proposal, never a confirmed archetype.
   r.post('/scenarios/:id/roles/:roleId/classify-archetype', async (req, res) => {
     if (!anthropicApiKey) return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
     const scenario = await repos.scenarios.findById(req.params.id);
@@ -3919,7 +3945,20 @@ export function createAdminRouter(repos, config = {}) {
 
     try {
       const proposal = await classifyRoleArchetype(scenario, role, anthropicApiKey);
-      res.json(proposal);
+      // THE PROPOSAL PERSISTS — the verdict and its reasoning (both tests, the evidence, the
+      // counter-case) are stored on the role as archetype_proposal, so a refresh still shows
+      // why, and the decision made on it is recorded against it (preserveStoredArchetypeProposal).
+      // ADVISORY: no gate reads it. The archetype itself is never written here — the human sets
+      // it. A fresh proposal replaces the old one; if the role already carries the proposed
+      // archetype, that agreement is recorded at once.
+      const { roleId, roleName, stored: _current, ...fields } = proposal;
+      let archetype_proposal = { ...fields, proposed_at: new Date().toISOString(), proposed_over: roleArchetype(role) };
+      if (role.archetype !== undefined && roleArchetype(role) !== 'unclassified' && roleArchetype(role) === proposal.archetype) {
+        archetype_proposal = archetypeDecision(archetype_proposal, proposal.archetype, { already_set: true });
+      }
+      const saved = repos.scenarios.savePlayerRole({ ...role, archetype_proposal });
+      console.log(`[ARCHETYPE] ${req.params.id}/${role.id} — proposal stored (${proposal.archetype}; the role's archetype is unchanged: ${roleArchetype(role)})`);
+      res.json({ ...proposal, archetype_proposal: saved.archetype_proposal });
     } catch (err) {
       console.error(`[ARCHETYPE ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
@@ -4200,7 +4239,8 @@ export function createAdminRouter(repos, config = {}) {
     if (repos.scenarios.findPlayerRole(id))
       return res.status(409).json({ error: `ID "${id}" already exists.` });
     const payload = { ...req.body, id, scenarioId: req.body.scenarioId || 'chicago_1893_v1' };
-    delete payload.witness_lever;   // written only by the lever routes, never posted in
+    delete payload.witness_lever;        // written only by the lever routes, never posted in
+    delete payload.archetype_proposal;   // written only by classify-archetype
     res.status(201).json(repos.scenarios.savePlayerRole(payload));
   });
   r.put('/player-roles/:id', (req, res) => {
