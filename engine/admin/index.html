@@ -6092,6 +6092,94 @@ function buildRolesSection(data) {
   return out;
 }
 
+// ── Defining Moments & Crucibles ─────────────────────────────────────────────────
+// The generators' output, for fact review: each role's defining moment (setup, options, the
+// debrief each choice ships and the consequence it cites), the CONFIRMED witness lever it was
+// drafted on, the choice register, and the archetype reasoning. Every correctable field prints
+// its full FIELD locator beside its label — role-scoped, options by id, never by position — so
+// a reviewer copies it rather than composing one. Only setup and an option's text and label are
+// auto-applied; the linked fields (debrief, disclaimer, consequence, lever) and the register
+// are flagged for the editor (resolveCrucibleCorrection). Lines marked "context only" are
+// not correctable fields at all. An unconfirmed lever is a draft and drives nothing: not shown.
+function buildCruciblesSection(data) {
+  const { playerRoles = [] } = data;
+  const hasBlock = r => Array.isArray(r?.defining_moment?.options) && r.defining_moment.options.length > 0;
+  const leverOf  = r => (r?.witness_lever?.confirmed === true ? r.witness_lever : null);
+  const regOf    = r => (typeof r?.choice_register === 'string' ? r.choice_register.trim() : '');
+  const roles = playerRoles.filter(r => r && (hasBlock(r) || leverOf(r) || regOf(r) || r.archetype_proposal
+    || (r.archetype && r.archetype !== 'unclassified')));
+  const out = [];
+  if (!roles.length) return out;
+  out.push(sec(`Defining Moments & Crucibles (${roles.length} role${roles.length === 1 ? '' : 's'})`));
+  const field = (label, locator, text) => {
+    if (typeof text !== 'string' || !text.trim()) return;
+    out.push(`${label} (${locator}):`); out.push(indent(text)); out.push('');
+  };
+  for (const r of roles) {
+    const id = r.id;
+    out.push(sub(`${r.name || id} (${id}) — archetype ${r.archetype || 'unclassified'}${r.witness_crucible === true ? ' · witness crucible' : ''}`));
+
+    const ap = r.archetype_proposal;
+    if (ap) {
+      out.push('ARCHETYPE REASONING (context only — not a correctable field):');
+      out.push(indent(`Classifier proposed: ${ap.archetype || '—'}${ap.confidence ? ` (confidence ${ap.confidence})` : ''}`));
+      if (ap.hinge)         out.push(indent(`Test 1 — hinge: ${ap.hinge.passed ? 'passed' : 'failed'}${ap.hinge.moment ? ` — ${ap.hinge.moment}` : ''}${ap.hinge.why ? `. ${ap.hinge.why}` : ''}`));
+      if (ap.foreknowledge) out.push(indent(`Test 2 — foreknowledge: ${ap.foreknowledge.verdict || '—'}${ap.foreknowledge.why ? `. ${ap.foreknowledge.why}` : ''}`));
+      (ap.foreknowledge?.evidence || []).forEach(e => out.push(`    • ${e}`));
+      if (ap.reasoning)     out.push(indent(`Reasoning: ${ap.reasoning}`));
+      if (ap.counter_case)  out.push(indent(`Counter-case: ${ap.counter_case}`));
+      out.push('');
+    }
+
+    const lv = leverOf(r);
+    if (lv) {
+      out.push(`WITNESS LEVER — confirmed${lv.confirmed_at ? ` ${String(lv.confirmed_at).slice(0, 10)}` : ''} · axis ${lv.axis || '—'} (the axis line is context only)`);
+      out.push('');
+      const L = `${id}.witness_lever`;
+      field('STATEMENT', `${L}.statement`, lv.statement);
+      field('REASONING', `${L}.reasoning`, lv.reasoning);
+      field('COUNTER-CASE — ASSUMPTION', `${L}.counter_case.assumption`, lv.counter_case?.assumption);
+      field('COUNTER-CASE — WHY WRONG',  `${L}.counter_case.why_wrong`,  lv.counter_case?.why_wrong);
+      (lv.evidence || []).forEach((e, n) => {
+        field(`EVIDENCE ${n} — CLAIM`,  `${L}.evidence.${n}.claim`,  e?.claim);
+        field(`EVIDENCE ${n} — SOURCE`, `${L}.evidence.${n}.source`, e?.source);
+      });
+      if (lv.instrument_terms?.length) { out.push(`Instrument terms (context only): ${lv.instrument_terms.join(', ')}`); out.push(''); }
+    }
+
+    if (hasBlock(r)) {
+      const dm = r.defining_moment;
+      const D = `${id}.defining_moment`;
+      out.push(`DEFINING MOMENT ${dm.id || '(no id)'} — ${dm.reviewed === true ? 'reviewed' : 'not yet reviewed'} · ${dm.generated === true ? 'generated' : 'hand-authored'}`);
+      out.push('');
+      field('SETUP', `${D}.setup`, dm.setup);
+      dm.options.forEach((o, j) => {
+        if (!o || typeof o !== 'object') return;
+        if (!o.id) {
+          out.push(`OPTION #${j + 1} — has no id, so it cannot be addressed here (context only; correct it in the editor):`);
+          out.push(indent(o.text || ''));
+          out.push('');
+          return;
+        }
+        const O = `${D}.options.${o.id}`;
+        out.push(`OPTION ${o.id}`);
+        out.push('');
+        field('LABEL', `${O}.label`, o.label);
+        field('TEXT',  `${O}.text`,  o.text);
+        field('DEBRIEF ("Your Session")', `${O}.debrief`, o.debrief);
+        field('OUTCOME DISCLAIMER — appears word for word in the debrief', `${O}.outcome_disclaimer`, o.outcome_disclaimer);
+        field('CONSEQUENCE CLAIM — appears word for word in the debrief', `${O}.consequence.claim`, o.consequence?.claim);
+        field("CONSEQUENCE SOURCE — one of the lever's evidence sources", `${O}.consequence.source`, o.consequence?.source);
+      });
+    }
+
+    const reg = regOf(r);
+    if (reg) field(`CHOICE REGISTER — ${r.choice_register_reviewed === true ? 'approved' : 'draft, not approved'}`, `${id}.choice_register`, reg);
+    out.push(hr);
+  }
+  return out;
+}
+
 function buildCharactersSection(data) {
   const { characters = [] } = data;
   const out = [];
@@ -6349,6 +6437,7 @@ function buildScenarioDocText(data, promptPrefix = '') {
   out.push(...buildGameplaySection(data));
   out.push(...buildStoryArcSection(data));
   out.push(...buildRolesSection(data));
+  out.push(...buildCruciblesSection(data));
   out.push(...buildCharactersSection(data));
   out.push(...buildLocationsSection(data));
   out.push(...buildCluesSection(data));
@@ -7880,6 +7969,7 @@ FIELD locator conventions:
 - Locations / Clues: <id>.<field>
 - win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
+- Defining Moments: the locator printed beside each label — <role_id>.defining_moment.setup, <role_id>.defining_moment.options.<option_id>.<field>, <role_id>.witness_lever.<field>, <role_id>.choice_register (options by id, never position; lines marked "context only" are not correctable)
 - Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or the exact fact text. Historical Frame: the exact entry text.
 
 Rules:
@@ -8337,7 +8427,47 @@ Rules:
 DATA TO REVIEW:
 [PASTE GLOSSARY DATA HERE]`,
 
-  allstory: `Review this COMPLETE interactive historical fiction scenario for historical accuracy and internal consistency. Check every section against primary sources: Opening Scene, Player Roles, Win/Fail Conditions and Pressure Events, Story Arc, Characters, Locations, Clues, Period Vocabulary, Technical Facts, and the Epilogue (Character Fates, Immediate Outcome, Historical Frame, Open Threads, Choice Echoes — each checked separately).
+  crucibles: `Review the DEFINING MOMENTS AND CRUCIBLES of this interactive historical fiction scenario — each role's decision point (the setup, the options, and the "Your Session" debrief each choice ships), the witness lever a witness's decision point is drafted on, and the choice register that steers the role's play. This is the highest-stakes text in the scenario: after the session a debrief tells the player what their choice carried in history, and it CITES a documented consequence.
+
+Check, above all:
+- Every CONSEQUENCE CLAIM against its CONSEQUENCE SOURCE. Does the source document that consequence, as stated? Flag an overclaim (the source documents less than the claim says), a misattribution (a real fact, the wrong source), and a consequence that does not follow from the choice it is attached to.
+- Documented vs dramatized, in every setup and debrief: flag any place where invented in-scenario detail — what the character felt, said or did in the moment — is narrated in the same confident voice as documented fact, and any place where tradition or legend is told as record.
+- Each witness lever's EVIDENCE claims against their sources. The debriefs are drafted on the lever, so an error there carries into every option.
+- Dates, places, names, numbers, whereabouts, and the fixed historical outcome — against primary sources and against the rest of the scenario.
+- Anachronism in the setup and the option text.
+
+FIELD locator for this section — copy it exactly from the label in the data: <role_id>.defining_moment.setup; <role_id>.defining_moment.options.<option_id>.label | .text | .debrief | .outcome_disclaimer | .consequence.claim | .consequence.source; <role_id>.witness_lever.statement | .reasoning | .counter_case.assumption | .counter_case.why_wrong | .evidence.<n>.claim | .evidence.<n>.source; <role_id>.choice_register. Options are addressed by their id, never by position.
+
+Linked fields: a consequence claim and an outcome disclaimer each appear WORD FOR WORD inside their option's debrief, and a consequence source is one of the lever's evidence sources. Report a correction to any of them exactly like any other — complete CURRENT, complete REPLACE WITH — and when correcting one changes its partner (a claim and the debrief that quotes it), give one correction for each field.
+
+For every correction, use EXACTLY this format — no prose between corrections:
+
+---CORRECTION---
+SECTION: Defining Moments
+FIELD: [the locator per above]
+CURRENT: [the stored text, copied verbatim — exact quote, exact punctuation, exact bytes — not a paraphrase]
+REPLACE WITH: [complete replacement text]
+REASON: [one sentence]
+SOURCE: [primary source citation]
+---END---
+
+If the section is fully accurate: ---CONFIRMED: Defining Moments---
+If you cannot verify a claim: ---UNVERIFIED: [field]---
+
+Rules:
+- Do not invent corrections.
+- Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
+- Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
+- Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
+- Correct only text printed under a label that carries a FIELD locator. Headings and status lines (OPTION <id>, DEFINING MOMENT … — reviewed · generated, WITNESS LEVER — confirmed, the CHOICE REGISTER status) are not fields.
+- Lines marked "context only" are not correctable fields — never give a correction for them. If the context is wrong, say so in the REASON of a related correction, or as ---UNVERIFIED: [what]---.
+- A cited consequence must be documented, not inferred: prefer cutting or hedging an unsupported consequence to inventing a citation for it.
+- Real figures are bound by the record — rank, role, whereabouts and fate must match history.
+
+DATA TO REVIEW:
+[PASTE DEFINING MOMENTS DATA HERE]`,
+
+  allstory: `Review this COMPLETE interactive historical fiction scenario for historical accuracy and internal consistency. Check every section against primary sources: Opening Scene, Player Roles, Defining Moments & Crucibles, Win/Fail Conditions and Pressure Events, Story Arc, Characters, Locations, Clues, Period Vocabulary, Technical Facts, and the Epilogue (Character Fates, Immediate Outcome, Historical Frame, Open Threads, Choice Echoes — each checked separately).
 
 Apply, for each section, the checks appropriate to it:
 - factual claims (dates, units, figures, equipment, geography) verified against primary sources;
@@ -8371,6 +8501,7 @@ FIELD locator conventions by section:
 - Locations / Clues: <id>.<field>
 - win conditions: <arrayName>[<index>] — e.g. winConditions[0], failConditions[2], partialSuccessExamples[0], pressureEvents[1]
 - Period Vocabulary: category name + the exact term
+- Defining Moments (SECTION: Defining Moments): the locator printed beside each label — <role_id>.defining_moment.setup, <role_id>.defining_moment.options.<option_id>.<field>, <role_id>.witness_lever.<field>, <role_id>.choice_register (options by id, never position; lines marked "context only" are not correctable). A consequence claim must be documented by its cited source — check it as the highest-stakes claim in the scenario.
 - Epilogue — Character Fates, Open Threads, Choice Echoes: leave FIELD blank. Do NOT use the character id or the thread/echo slug — fate ids are shared with the character records and thread/echo slugs are shared with the story-arc beat ids, so a FIELD id resolves to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text. Immediate Outcome: immediate_outcome.summary or fact text. Historical Frame: the exact entry text.
 
 If a section is fully accurate: ---CONFIRMED: [section name]---
@@ -8408,6 +8539,7 @@ function selectReviewPrompt(sel) {
 const PICKER_SECTION_DATA = {
   opening:    { marker: '[PASTE OPENING SCENE DATA HERE]',                          build: d => buildOpeningSection(d) },
   roles:      { marker: '[PASTE PLAYER ROLES DATA HERE]',                           build: d => buildRolesSection(d) },
+  crucibles:  { marker: '[PASTE DEFINING MOMENTS DATA HERE]',                       build: d => buildCruciblesSection(d) },
   gameplay:   { marker: '[PASTE WIN/FAIL CONDITIONS AND PRESSURE EVENTS DATA HERE]', build: d => buildGameplaySection(d) },
   storyarc:   { marker: '[PASTE STORY ARC DATA HERE]',                              build: d => buildStoryArcSection(d) },
   characters: { marker: '[PASTE CHARACTERS DATA HERE]',                            build: d => buildCharactersSection(d) },
@@ -8465,6 +8597,7 @@ function buildAIPanel(scenarioId) {
       <option value='generic' selected>Generic (any section)</option>
       <option value='opening'>Opening Scene</option>
       <option value='roles'>Player Roles</option>
+      <option value='crucibles'>Defining Moments &amp; Crucibles</option>
       <option value='gameplay'>Win/Fail &amp; Gameplay</option>
       <option value='storyarc'>Story Arc</option>
       <option value='characters'>Characters</option>
