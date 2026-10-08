@@ -2922,7 +2922,7 @@ function renderDefiningMomentOptionRow(i, j, o, ctx = {}) {
       </div>
       <div data-cf="debrief">
         <div class="cf-label">Debrief — the "Your Session" text this choice ships verbatim — <span class="dm-opt-debrief-count">${dmWords(o?.debrief)}w</span>${ctx.witness ? ' <span style="opacity:.7">(140–250)</span>' : ''}</div>
-        <textarea class="cf-in dm-option-debrief" data-path="${p('debrief')}" rows="6">${esc(o?.debrief || '')}</textarea>
+        <textarea class="cf-in cf-autosize dm-option-debrief" data-path="${p('debrief')}" rows="8">${esc(o?.debrief || '')}</textarea>
         <div class="cf-flags"></div>
       </div>
     </div>` : '';
@@ -3275,6 +3275,7 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     tmp.innerHTML = renderDefiningMomentSection(data.playerRoles[i], i, data);
     el.replaceWith(tmp.firstElementChild);
     paintCrucibleFlags(formEl, i, data);
+    autosizeIn(formEl.querySelector(`#dm-section-${i}`));
   };
 
   // ── Defining Moment: accept a decline (dismiss the panel) ─────────────────
@@ -3801,10 +3802,12 @@ function refreshRoleDerivedSections(rootEl, data, i) {
   syncConsequenceSources(rootEl, i, data);
   updateLeverGate(rootEl, i, data);
   autosizeIn(rootEl.querySelector(`#lever-section-${i}`));
+  autosizeIn(rootEl.querySelector(`#dm-section-${i}`));
 }
 
-// LEVER FIELDS GROW TO FIT. The card exists to be READ — the full reasoning, counter-case and
-// every claim — so its text boxes size to their content rather than scroll inside a few rows.
+// TEXT BOXES THAT GROW TO FIT — the lever card's fields and every option's debrief (the longest
+// text in a crucible, 140-250 words). They exist to be READ in full, so they size to their
+// content rather than scroll inside a few rows.
 // Sized on render, on every edit, and when a folded card is opened (a hidden box has no
 // height to measure). Still plain textareas: editable, and resizable by hand as well.
 function autosizeTextarea(el) {
@@ -3865,6 +3868,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
   const rerenderDmSection = i => {
     replaceEditorSection(formEl, `#dm-section-${i}`, renderDefiningMomentSection(data.playerRoles[i], i, data));
     paintCrucibleFlags(formEl, i, data);
+    autosizeIn(formEl.querySelector(`#dm-section-${i}`));
   };
 
   // ── The witness_crucible flag ─────────────────────────────────────────────
@@ -4025,7 +4029,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     if (!el) return;
     const row = el.closest('.dm-option-row');
     if (el.classList.contains('dm-option-label')) { const c = row?.querySelector('.dm-opt-label-count'); if (c) c.textContent = `${el.value.trim().length}c`; }
-    if (el.classList.contains('dm-option-debrief')) { const c = row?.querySelector('.dm-opt-debrief-count'); if (c) c.textContent = `${dmWords(el.value)}w`; }
+    if (el.classList.contains('dm-option-debrief')) { const c = row?.querySelector('.dm-opt-debrief-count'); if (c) c.textContent = `${dmWords(el.value)}w`; autosizeTextarea(el); }
     const i = idxOf(el);
     const role = data.playerRoles[i];
     if (role && (crucibleOptionCtx(role, _dmDrafts.get(role.id)?.block ?? role.defining_moment).check)) scheduleCrucibleRevalidate(formEl, data, scenarioId, i);

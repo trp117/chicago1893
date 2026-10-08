@@ -348,6 +348,13 @@ try {
     const why2 = $('#lever-section-0 [data-lv="counter_case.why_wrong"]');
     check('…and a re-render sizes it again', !!why2.style.height && why2.style.height !== 'auto', why2.style.height);
     check('still editable', !why2.readOnly && !why2.disabled);
+    const deb = $('.dm-option-row[data-opt-index="0"] .dm-option-debrief');
+    check('the option debriefs auto-size too', $$('.dm-option-debrief').length === 3 && $$('.dm-option-debrief').every(t => t.classList.contains('cf-autosize')));
+    type(deb, deb.value + ' More.');
+    check('…typing in a debrief grows it to its content', deb.style.height === `${18 * Math.ceil(deb.value.length / 60) + 2}px`, deb.style.height);
+    win.refreshRoleDerivedSections(formEl, data, 0);
+    const deb2 = $('.dm-option-row[data-opt-index="0"] .dm-option-debrief');
+    check('…and the post-save refresh sizes it again', !!deb2.style.height && deb2.style.height !== 'auto', deb2.style.height);
   }
 } finally {
   win.close();
