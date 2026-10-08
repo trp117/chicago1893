@@ -14,7 +14,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 // proposal and the engine that will one day enforce it cannot drift apart.
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
-import { lintCrucibleBlock, lintResult, finding, wordCount, BUDGETS, LABEL_MAX_CHARS, AUTHORING_TERM_PATTERNS } from '../services/CrucibleLint.js';
+import { lintCrucibleBlock, lintWitnessLever, lintResult, finding, wordCount, BUDGETS, LABEL_MAX_CHARS, WITNESS_LEVER_AXES } from '../services/CrucibleLint.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -2591,13 +2591,8 @@ async function generateDefiningMoment(scenario, role, characters, entryParagraph
 // generated on it. The wrong lever is the error both authored crucibles had to get right
 // (Manchon's power is the record, not a defence; Massieu's is presence, not rescue) and the
 // one a model is most likely to make, so it is caught here, cheaply, before the prose.
-export const WITNESS_LEVER_AXES = Object.freeze([
-  'documentary_record',
-  'human_presence',
-  'testimony',
-  'could_have_acted_at_cost',
-  'other',
-]);
+// The axes and the lever's rules live in CrucibleLint.js (lintWitnessLever), beside the block's.
+export { WITNESS_LEVER_AXES };
 
 // The arc's scenes, in story order, from the scenario's own arc — the same arc a session
 // plays (StateManager.loadStoryArc reads scenario.storyArcIds[0]). [] when it has none.
@@ -2725,38 +2720,11 @@ function buildWitnessLeverUserPrompt({ scenario = {}, role = {}, characters = []
   ].filter(Boolean).join('\n\n');
 }
 
-const str = v => typeof v === 'string' && v.trim() !== '';
-// Shape and coherence of a lever proposal (or a reviewer's edit of one). `sceneIds` is the
-// arc's scene ids: when the arc has scenes the binding must name one of them.
+// Shape and coherence of a lever proposal (or a reviewer's edit of one) — the ERROR
+// renderings of lintWitnessLever (CrucibleLint.js), for the callers that only need yes/no
+// and a sentence. Callers that answer a reviewer use lintWitnessLever's findings directly.
 export function validateWitnessLever(p, sceneIds = []) {
-  const errors = [];
-  if (!p || typeof p !== 'object') return ['Lever is not an object.'];
-  if (!WITNESS_LEVER_AXES.includes(p.axis)) errors.push(`"axis" must be one of ${WITNESS_LEVER_AXES.join(', ')} (got ${JSON.stringify(p.axis)}).`);
-  if (!str(p.statement)) errors.push('"statement" is empty.');
-  if (!str(p.reasoning)) errors.push('"reasoning" is empty.');
-  if (!str(p.counter_case?.assumption) || !str(p.counter_case?.why_wrong)) errors.push('"counter_case" needs both "assumption" and "why_wrong".');
-  const ev = Array.isArray(p.evidence) ? p.evidence : [];
-  if (ev.length < 2) errors.push(`"evidence" needs at least 2 cited items (got ${ev.length}).`);
-  ev.forEach((e, i) => { if (!str(e?.claim) || !str(e?.source)) errors.push(`evidence ${i + 1}: needs both "claim" and "source".`); });
-  // A claim is quoted to the player word for word (it becomes a debrief's consequence.claim),
-  // so the authoring-vocabulary rule the crucible lint applies to prose applies to it here, at
-  // the source: the first real runs carried "the downstream consequence of the vow" from a
-  // proposed claim straight into a debrief.
-  ev.forEach((e, i) => {
-    const found = str(e?.claim) ? AUTHORING_TERM_PATTERNS.map(rx => e.claim.match(rx)?.[0]).filter(Boolean) : [];
-    if (found.length) errors.push(`evidence ${i + 1}: the claim is quoted to the player, and carries authoring vocabulary (${found.map(t => `"${t}"`).join(', ')}).`);
-  });
-  const terms = Array.isArray(p.instrument_terms) ? p.instrument_terms : [];
-  if (terms.length < 2 || terms.length > 5 || !terms.every(str)) errors.push(`"instrument_terms" must be 2 to 5 words (got ${JSON.stringify(p.instrument_terms)}).`);
-  const at = p.scene_binding?.at_scene ?? null;
-  if (sceneIds.length) {
-    if (!str(at)) errors.push(`"scene_binding.at_scene" must be one of the arc's scenes: ${sceneIds.join(', ')}.`);
-    else if (!sceneIds.includes(at)) errors.push(`"scene_binding.at_scene" "${at}" is not a scene of this arc (${sceneIds.join(', ')}).`);
-    if (!str(p.scene_binding?.reasoning)) errors.push('"scene_binding.reasoning" is empty.');
-  } else if (at != null && !str(at)) {
-    errors.push('"scene_binding.at_scene" must be a scene id or null.');
-  }
-  return errors;
+  return lintWitnessLever(p, sceneIds).errors;
 }
 
 // The fields a lever carries, in order. Everything else a model or a client sends is dropped,
@@ -3666,25 +3634,30 @@ export function createAdminRouter(repos, config = {}) {
       console.log(`[WITNESS-LEVER] ${role.id} — cleared`);
       return res.json({ roleId: role.id, cleared: true });
     }
-    if (!role.witness_lever) return res.status(404).json({ error: `"${role.name}" has no proposed lever. Propose one first.` });
+    const edits = body.edits && typeof body.edits === 'object' && !Array.isArray(body.edits) ? pickLever(body.edits) : {};
+    const edited = Object.keys(edits).length > 0;
+    // No stored lever: a proposal that failed the lint came back UNSAVED for the reviewer to
+    // edit, so its corrected text arrives here as a whole lever in `edits` (from_proposal:
+    // true marks it as the model's, edited). Only confirming nothing is still a 404.
+    if (!role.witness_lever && !edited) return res.status(404).json({ error: `"${role.name}" has no proposed lever. Propose one first, or send the whole lever as { "edits": { … } }.` });
     if (!isWitnessCrucible(role)) {
       return res.status(422).json({ error: `"${role.name}" is not a witness crucible; its lever cannot be confirmed.`, refused: true, code: 'NOT_WITNESS_CRUCIBLE' });
     }
-    const edits = body.edits && typeof body.edits === 'object' && !Array.isArray(body.edits) ? pickLever(body.edits) : {};
-    const edited = Object.keys(edits).length > 0;
     if (body.confirm !== true && !edited) {
       return badRequest(res, 'Send { "confirm": true }, { "edits": { … } } (optionally with confirm), or { "clear": true }.');
     }
-    const next = { ...role.witness_lever, ...edits };
+    const next = { ...(role.witness_lever || { generated: body.from_proposal === true }), ...edits };
     const scenario = await repos.scenarios.findById(role.scenarioId);
-    const errors = validateWitnessLever(next, scenarioScenes(repos, scenario).map(s => s.id));
-    if (errors.length) return res.status(400).json({ error: `The lever is invalid and was not saved: ${errors.join(' ')}`, errors });
+    const lint = lintWitnessLever(next, scenarioScenes(repos, scenario).map(s => s.id));
+    if (lint.errors.length) {
+      return res.status(400).json({ error: `The lever is invalid and was not saved: ${lint.errors.join(' ')}`, errors: lint.errors, findings: lint.findings, witness_lever: next });
+    }
     if (edited) next.edited = true;
     if (body.confirm === true) { next.confirmed = true; next.confirmed_at = new Date().toISOString(); }
     else { next.confirmed = false; delete next.confirmed_at; }
     const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever: next });
     console.log(`[WITNESS-LEVER] ${role.id} — ${next.confirmed ? 'CONFIRMED' : 'edited (unconfirmed)'} (axis=${next.axis}, at_scene=${next.scene_binding?.at_scene ?? 'none'})`);
-    res.json({ roleId: role.id, witness_lever: saved.witness_lever });
+    res.json({ roleId: role.id, witness_lever: saved.witness_lever, findings: lint.findings });
   });
 
   // Propose an archetype for a single player role. READ-ONLY BY CONSTRUCTION: the scenario

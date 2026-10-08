@@ -451,6 +451,17 @@ try {
     check(`rejects: ${label}`, admin.validateWitnessLever(p, ['scene_a', 'scene_b']).some(e => rx.test(e)));
   }
   check('no scenes in the arc → at_scene may be null', admin.validateWitnessLever({ ...structuredClone(PROPOSAL), scene_binding: { at_scene: null } }, []).length === 0);
+  {
+    const p = structuredClone(PROPOSAL);
+    p.axis = 'rescue'; p.evidence[1].source = ''; p.evidence[0].claim += ' According to legend, it held.';
+    const r = lint.lintWitnessLever(p, ['scene_a', 'scene_b']);
+    const at = (rule, location, severity = 'error') => r.findings.some(f => f.rule === rule && f.location === location && f.severity === severity && f.hint);
+    check('lever findings are located: bad axis → lever.axis', at('lever_shape', 'lever.axis'));
+    check('lever findings are located: missing source → lever.evidence.1.source (0-based)', at('lever_shape', 'lever.evidence.1.source'));
+    check('a source hedge in a claim → WARNING on lever.evidence.0.claim', at('source_hedge', 'lever.evidence.0.claim', 'warning'));
+    check('validateWitnessLever = the error renderings only (the hedge is not among them)', admin.validateWitnessLever(p, ['scene_a', 'scene_b']).length === r.errors.length && !r.errors.some(e => /legend/.test(e)));
+    check('the axes live in CrucibleLint and are re-exported unchanged', admin.WITNESS_LEVER_AXES === lint.WITNESS_LEVER_AXES);
+  }
 
   head('4b. propose — gate, prompt, and what is written');
   {
@@ -532,6 +543,14 @@ try {
     await patchLever('role_wc_usher', { confirm: true });
     const c = await patchLever('role_wc_usher', { clear: true });
     check('{ clear: true } → lever removed', c.status === 200 && leverOf('role_wc_usher') === undefined);
+    // A proposal that failed the lint comes back unsaved; the reviewer's corrected copy is
+    // PATCHed in whole, with no stored lever behind it.
+    const part = await patchLever('role_wc_usher', { edits: { statement: 'Only a statement.' }, confirm: true });
+    check('no stored lever + a PARTIAL lever → 400 with located findings and the lever echoed back, nothing saved',
+      part.status === 400 && part.body.findings?.some(f => f.location === 'lever.axis') && part.body.witness_lever?.statement === 'Only a statement.' && leverOf('role_wc_usher') === undefined);
+    const whole = await patchLever('role_wc_usher', { edits: PROPOSAL, from_proposal: true, confirm: true });
+    check('no stored lever + the WHOLE lever (from_proposal) → saved, confirmed, generated + edited', whole.status === 200 && leverOf('role_wc_usher')?.confirmed === true && leverOf('role_wc_usher').generated === true && leverOf('role_wc_usher').edited === true && Array.isArray(whole.body.findings), `${whole.status} ${whole.body.error || ''}`);
+    await patchLever('role_wc_usher', { clear: true });
     modelQueue.push(JSON.stringify(PROPOSAL));
     await post(leverUrl('role_wc_usher'), {});
     await patchLever('role_wc_usher', { confirm: true });

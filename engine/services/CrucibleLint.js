@@ -236,3 +236,58 @@ export function lintCrucibleBlock(block, { path = 'protagonist', generated = tru
   });
   return lintResult(findings);
 }
+
+// ── THE LEVER ──────────────────────────────────────────────────────────────────
+// What a witness's power over the event actually was. Proposed by the model, confirmed by
+// a human; generation reads only a confirmed one.
+export const WITNESS_LEVER_AXES = Object.freeze([
+  'documentary_record',
+  'human_presence',
+  'testimony',
+  'could_have_acted_at_cost',
+  'other',
+]);
+
+// Shape and coherence of a lever proposal (or a reviewer's edit of one), as findings located
+// at 'lever.<field>' / 'lever.evidence.<n>.<claim|source>'. `sceneIds` is the arc's scene
+// ids: when the arc has scenes the binding must name one of them. Every shape problem is an
+// error (a lever is confirmed whole or not at all); a source hedge in a claim is a warning,
+// as it is in the block.
+export function lintWitnessLever(p, sceneIds = []) {
+  const findings = [];
+  const add = (severity, rule, location, message) => findings.push(finding(severity, rule, location, message));
+  if (!p || typeof p !== 'object') { add('error', 'lever_shape', 'lever', 'Lever is not an object.'); return lintResult(findings); }
+  if (!WITNESS_LEVER_AXES.includes(p.axis)) add('error', 'lever_shape', 'lever.axis', `"axis" must be one of ${WITNESS_LEVER_AXES.join(', ')} (got ${JSON.stringify(p.axis)}).`);
+  if (!str(p.statement)) add('error', 'lever_shape', 'lever.statement', '"statement" is empty.');
+  if (!str(p.reasoning)) add('error', 'lever_shape', 'lever.reasoning', '"reasoning" is empty.');
+  if (!str(p.counter_case?.assumption) || !str(p.counter_case?.why_wrong)) add('error', 'lever_shape', 'lever.counter_case', '"counter_case" needs both "assumption" and "why_wrong".');
+  const ev = Array.isArray(p.evidence) ? p.evidence : [];
+  if (ev.length < 2) add('error', 'lever_shape', 'lever.evidence', `"evidence" needs at least 2 cited items (got ${ev.length}).`);
+  ev.forEach((e, i) => {
+    if (!str(e?.claim)) add('error', 'lever_shape', `lever.evidence.${i}.claim`, `evidence ${i + 1}: needs both "claim" and "source".`);
+    if (!str(e?.source)) add('error', 'lever_shape', `lever.evidence.${i}.source`, `evidence ${i + 1}: needs both "claim" and "source".`);
+  });
+  // A claim is quoted to the player word for word (it becomes a debrief's consequence.claim),
+  // so the authoring-vocabulary rule the crucible lint applies to prose applies to it here, at
+  // the source: the first real runs carried "the downstream consequence of the vow" from a
+  // proposed claim straight into a debrief.
+  ev.forEach((e, i) => {
+    if (!str(e?.claim)) return;
+    const quoted = found => found.map(t => `"${t}"`).join(', ');
+    const terms  = AUTHORING_TERM_PATTERNS.map(rx => e.claim.match(rx)?.[0]).filter(Boolean);
+    if (terms.length) add('error', 'authoring_term', `lever.evidence.${i}.claim`, `evidence ${i + 1}: the claim is quoted to the player, and carries authoring vocabulary (${quoted(terms)}).`);
+    const hedges = SOURCE_HEDGE_PATTERNS.map(rx => e.claim.match(rx)?.[0]).filter(Boolean);
+    if (hedges.length) add('warning', 'source_hedge', `lever.evidence.${i}.claim`, `evidence ${i + 1}: the claim is quoted to the player, and may carry authoring language (${quoted(hedges)}).`);
+  });
+  const terms = Array.isArray(p.instrument_terms) ? p.instrument_terms : [];
+  if (terms.length < 2 || terms.length > 5 || !terms.every(str)) add('error', 'lever_shape', 'lever.instrument_terms', `"instrument_terms" must be 2 to 5 words (got ${JSON.stringify(p.instrument_terms)}).`);
+  const at = p.scene_binding?.at_scene ?? null;
+  if (sceneIds.length) {
+    if (!str(at)) add('error', 'lever_shape', 'lever.scene_binding', `"scene_binding.at_scene" must name one of the arc's scenes (${sceneIds.join(', ')}).`);
+    else if (!sceneIds.includes(at)) add('error', 'lever_shape', 'lever.scene_binding', `"scene_binding.at_scene" "${at}" is not a scene of this arc (${sceneIds.join(', ')}).`);
+    if (!str(p.scene_binding?.reasoning)) add('error', 'lever_shape', 'lever.scene_binding', '"scene_binding.reasoning" is empty.');
+  } else if (at != null && !str(at)) {
+    add('error', 'lever_shape', 'lever.scene_binding', '"scene_binding.at_scene" must be a scene id or null.');
+  }
+  return lintResult(findings);
+}
