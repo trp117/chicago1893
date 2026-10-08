@@ -2757,6 +2757,15 @@ export const WITNESS_LEVER_SYSTEM_PROMPT = [
 // The scenes the scenario's OTHER defining moments are bound to — what the proposer binds a
 // witness crucible to. The role's own block is excluded (a re-proposal must not read its own
 // answer back). Protagonist forks first: a witness binds to the protagonist's scene by rule.
+// A lever bound off the protagonist's defining-moment scene — returned for the reviewer to
+// see and STORED with the lever, not refused: the human confirming the lever decides. null
+// when it matches or no protagonist fork is bound.
+function leverSceneWarning(repos, scenarioId, roleId, lever) {
+  const protagonistScene = boundForkScenes(repos, scenarioId, roleId).find(f => !f.witness)?.at_scene;
+  return protagonistScene && lever?.scene_binding?.at_scene !== protagonistScene
+    ? `Proposed at_scene "${lever?.scene_binding?.at_scene}" is not the protagonist's defining-moment scene "${protagonistScene}".` : null;
+}
+
 function boundForkScenes(repos, scenarioId, excludeRoleId) {
   return repos.scenarios.findPlayerRoles(scenarioId)
     .filter(r => r.id !== excludeRoleId && hasRealDefiningMoment(r.defining_moment)
@@ -3712,33 +3721,27 @@ export function createAdminRouter(repos, config = {}) {
       }
       const lever = pickLever(result || {});
       const lint  = lintWitnessLever(lever, scenes.map(s => s.id));
+      const scene_warning = leverSceneWarning(repos, scenario.id, role.id, lever);
+      // THE PROPOSAL PERSISTS — passing the lint or not. It is stored UNCONFIRMED, with its
+      // findings and any scene warning, so a refresh shows what was proposed and why it was
+      // flagged, and a half-reviewed proposal is picked up again without another model call.
+      // Unconfirmed, it opens nothing: generation reads only a CONFIRMED lever, and confirming
+      // (the PATCH below) re-runs the lint and refuses one with errors. No retry here — a lever
+      // is cheap to re-propose and a human reads every one before it is confirmed.
       // Stamps LAST, so a model that emitted confirmed/generated of its own cannot pre-confirm.
-      const witness_lever = { ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString() };
+      const witness_lever = {
+        ...lever, generated: true, confirmed: false, proposed_at: new Date().toISOString(),
+        findings: lint.findings, ...(scene_warning ? { scene_warning } : {}),
+      };
       const sceneList = scenes.map(s => ({ id: s.id, date_label: s.date_label ?? null, act: s.act }));
-      // A proposal off the protagonist's bound scene is returned for the reviewer to see, not
-      // refused: the human confirming the lever decides. Absent when it matches or none is bound.
-      const protagonistScene = boundForks.find(f => !f.witness)?.at_scene;
-      const sceneWarning = protagonistScene && lever.scene_binding?.at_scene !== protagonistScene
-        ? { scene_warning: `Proposed at_scene "${lever.scene_binding?.at_scene}" is not the protagonist's defining-moment scene "${protagonistScene}".` } : {};
-      // RETURN-EDITABLE. A proposal that fails the lint is NOT saved, and NOT discarded: it comes
-      // back with its located findings for the reviewer to correct and submit whole through the
-      // PATCH route below (which re-runs the lint). No retry here — a lever is cheap to re-propose
-      // and a human reads every one before it is confirmed.
-      if (lint.errors.length) {
-        console.error(`[WITNESS-LEVER] ${role.id} proposal failed the lint, returned unsaved for editing — ${lint.errors.join(' ')}`);
-        return res.json({
-          saved: false, lint_failed: true, ...(dryRun ? { dry_run: true } : {}),
-          roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning,
-          findings: lint.findings, errors: lint.errors,
-        });
-      }
+      const extra = { ...(scene_warning ? { scene_warning } : {}), findings: lint.findings, ...(lint.errors.length ? { lint_failed: true, errors: lint.errors } : {}) };
       if (dryRun) {
-        console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — DRY RUN, proposal returned, NOTHING written (axis=${lever.axis})`);
-        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList, ...sceneWarning, findings: lint.findings });
+        console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — DRY RUN, proposal returned, NOTHING written (axis=${lever.axis}${lint.errors.length ? `, ${lint.errors.length} lint error(s)` : ''})`);
+        return res.json({ dry_run: true, saved: false, roleId: role.id, witness_lever, scenes: sceneList, ...extra });
       }
       const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever });
-      console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}, confirmed:false)`);
-      res.json({ roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList, ...sceneWarning, findings: lint.findings });
+      console.log(`[WITNESS-LEVER] ${req.params.id}/${role.id} — proposal written UNCONFIRMED (axis=${lever.axis}, at_scene=${lever.scene_binding?.at_scene ?? 'none'}${lint.errors.length ? `, ${lint.errors.length} lint error(s) to fix before it can be confirmed` : ''})`);
+      res.json({ saved: true, roleId: role.id, witness_lever: saved.witness_lever, scenes: sceneList, ...extra });
     } catch (err) {
       console.error(`[WITNESS-LEVER ERROR] ${role.name}: ${err.message}`);
       res.status(500).json({ error: err.message });
@@ -3778,15 +3781,26 @@ export function createAdminRouter(repos, config = {}) {
     const next = { ...(role.witness_lever || { generated: body.from_proposal === true }), ...edits };
     const scenario = await repos.scenarios.findById(role.scenarioId);
     const lint = lintWitnessLever(next, scenarioScenes(repos, scenario).map(s => s.id));
-    if (lint.errors.length) {
-      return res.status(400).json({ error: `The lever is invalid and was not saved: ${lint.errors.join(' ')}`, errors: lint.errors, findings: lint.findings, witness_lever: next });
+    // CONFIRMING needs a clean lever — a confirmed lever always names a real scene and carries
+    // cited evidence the generator's lint can check citations against. An UNCONFIRMED save of a
+    // stored lever may still carry errors (the proposal it edits was stored with them): it is
+    // kept, with its findings, because it opens nothing until it is confirmed.
+    if (lint.errors.length && (body.confirm === true || !role.witness_lever)) {
+      return res.status(400).json({
+        error: `The lever has errors and was not ${body.confirm === true ? 'confirmed' : 'saved'}: ${lint.errors.join(' ')}`,
+        errors: lint.errors, findings: lint.findings, witness_lever: next,
+      });
     }
+    // Findings and the scene warning describe what is stored — recomputed, never carried stale.
+    next.findings = lint.findings;
+    const scene_warning = leverSceneWarning(repos, role.scenarioId, role.id, next);
+    if (scene_warning) next.scene_warning = scene_warning; else delete next.scene_warning;
     if (edited) next.edited = true;
     if (body.confirm === true) { next.confirmed = true; next.confirmed_at = new Date().toISOString(); }
     else { next.confirmed = false; delete next.confirmed_at; }
     const saved = repos.scenarios.savePlayerRole({ ...role, witness_lever: next });
     console.log(`[WITNESS-LEVER] ${role.id} — ${next.confirmed ? 'CONFIRMED' : 'edited (unconfirmed)'} (axis=${next.axis}, at_scene=${next.scene_binding?.at_scene ?? 'none'})`);
-    res.json({ roleId: role.id, witness_lever: saved.witness_lever, findings: lint.findings });
+    res.json({ roleId: role.id, witness_lever: saved.witness_lever, findings: lint.findings, ...(lint.errors.length ? { lint_failed: true, errors: lint.errors } : {}) });
   });
 
   // VALIDATE — the crucible check on an edited lever and/or block, with NO model call and NO

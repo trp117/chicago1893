@@ -487,15 +487,29 @@ try {
     check('response lists the arc scenes for the reviewer', JSON.stringify(r.body.scenes?.map(s => s.id)) === '["scene_a","scene_b"]');
   }
   {
-    const before = JSON.stringify(leverOf('role_wc_usher'));
+    // A proposal that FAILS the lint PERSISTS, unconfirmed, with its findings — a refresh shows
+    // it flagged, and nothing can be generated on it until it is fixed and confirmed.
     modelQueue.push(JSON.stringify({ ...PROPOSAL, scene_binding: { at_scene: 'scene_zzz', reasoning: 'r' } }));
     const r = await post(leverUrl('role_wc_usher'), {});
-    check('invalid proposal (scene not in arc) → 200 lint_failed, returned UNSAVED with located findings', r.status === 200 && r.body.saved === false && r.body.lint_failed === true
-      && r.body.findings?.some(f => f.severity === 'error' && f.location === 'lever.scene_binding' && /not a scene of this arc/.test(f.message))
-      && r.body.witness_lever?.scene_binding?.at_scene === 'scene_zzz' && r.body.witness_lever.confirmed === false && JSON.stringify(leverOf('role_wc_usher')) === before, `${r.status}`);
+    const L = leverOf('role_wc_usher');
+    check('invalid proposal (scene not in arc) → 200, STORED unconfirmed with its located findings', r.status === 200 && r.body.saved === true && r.body.lint_failed === true
+      && L.confirmed === false && L.scene_binding.at_scene === 'scene_zzz' && !!L.proposed_at
+      && L.findings?.some(f => f.severity === 'error' && f.location === 'lever.scene_binding' && /not a scene of this arc/.test(f.message)), `${r.status}`);
+    const g = await post(genUrl('role_wc_usher'), {});
+    check('…it opens nothing: generate → 422 LEVER_UNCONFIRMED', g.status === 422 && g.body.code === 'LEVER_UNCONFIRMED');
+    const c = await patchLever('role_wc_usher', { confirm: true });
+    check('…and it cannot be confirmed while it has errors (400, still unconfirmed)', c.status === 400 && c.body.findings?.some(f => f.location === 'lever.scene_binding') && leverOf('role_wc_usher').confirmed === false);
+    const e = await patchLever('role_wc_usher', { edits: { statement: 'Edited, still bound to a scene that does not exist.' } });
+    check('an UNCONFIRMED edit of a failing lever is kept, its findings recomputed', e.status === 200 && e.body.lint_failed === true && leverOf('role_wc_usher').statement.startsWith('Edited') && leverOf('role_wc_usher').findings.some(f => f.location === 'lever.scene_binding'));
+    const fx = await patchLever('role_wc_usher', { edits: { scene_binding: { at_scene: 'scene_b', reasoning: 'The relapse visit.' } } });
+    check('fixing it clears the stored findings', fx.status === 200 && !fx.body.lint_failed && !leverOf('role_wc_usher').findings.some(f => f.severity === 'error'));
+    const before = JSON.stringify(leverOf('role_wc_usher'));
     modelQueue.push(JSON.stringify({ declined: true, reason: 'no lever: a bystander in the crowd.' }));
     const d = await post(leverUrl('role_wc_usher'), {});
-    check('decline → 200 declined, nothing saved', d.status === 200 && d.body.declined === true && JSON.stringify(leverOf('role_wc_usher')) === before);
+    check('decline → 200 declined, the stored proposal untouched', d.status === 200 && d.body.declined === true && JSON.stringify(leverOf('role_wc_usher')) === before);
+    modelQueue.push(JSON.stringify(PROPOSAL));
+    await post(leverUrl('role_wc_usher'), {});
+    check('re-proposing an UNCONFIRMED lever replaces the proposal (fresh, unedited)', leverOf('role_wc_usher').confirmed === false && !leverOf('role_wc_usher').edited && leverOf('role_wc_usher').statement === PROPOSAL.statement);
   }
   {
     const r = await post(genUrl('role_wc_usher'), {});

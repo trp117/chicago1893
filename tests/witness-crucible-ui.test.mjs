@@ -159,6 +159,19 @@ const settle = async (ms = 700) => {
   await sleep(30);
 };
 const flagsOn = sel => [...(formEl.querySelector(sel)?.querySelectorAll('.cf-flag') || [])];
+// A PAGE REFRESH, as far as these sections go: session state gone, the role as the server
+// stored it, a fresh editor bound (its first paint runs). Returns the new mount; detach after.
+async function freshMount() {
+  win.__crucibleFindings.clear(); win.__leverState.clear(); win.__dmDrafts.clear();
+  const d = { scenario: structuredClone(SCENARIO), playerRoles: [structuredClone(stored())], storyArc: structuredClone(ARC) };
+  formEl.remove();   // one mount in the document at a time: ids are per-page, and jsdom resolves #id document-first
+  const f = doc.createElement('form');
+  f.innerHTML = win.renderArchetypeSection(d.playerRoles[0], 0) + win.renderWitnessLeverSection(d.playerRoles[0], 0, d) + win.renderDefiningMomentSection(d.playerRoles[0], 0, d);
+  doc.body.appendChild(f);
+  win.bindDefiningMomentHandlers(f, d, SCENARIO_ID);
+  await sleep(30);
+  return f;
+}
 
 try {
   head('1. the witness_crucible flag');
@@ -175,13 +188,22 @@ try {
     check('the flag saves (the server reads the stored flag)', r.status === 200 && stored().witness_crucible === true, `${r.status}`);
   }
 
-  head('2. propose — a proposal that fails the lint comes back UNSAVED and flagged');
+  head('2. propose — a proposal that fails the lint is STORED unconfirmed, and flagged');
   {
     modelQueue.push(JSON.stringify(PROPOSAL));
     click($('.lv-propose-btn'));
     await settle(400);
-    check('the card shows the unsaved proposal', /Unsaved proposal/.test($('#lever-section-0 .lv-status-badge')?.textContent || ''), toasts());
-    check('nothing was stored', stored().witness_lever === undefined);
+    check('the card shows the proposal as failing its checks', /Proposed — fails 1 check/.test($('#lever-section-0 .lv-status-badge')?.textContent || ''), toasts());
+    check('it was STORED, unconfirmed, with its findings', stored().witness_lever?.confirmed === false && stored().witness_lever.findings?.some(f => f.location === 'lever.evidence.1.claim' && f.severity === 'error'));
+    {
+      const f = await freshMount();
+      const card = f.querySelector('#lever-section-0');
+      check('AFTER A REFRESH: the proposal is on screen — axis, counter-case, evidence, scene, proposed date',
+        card.querySelector('[data-lv="axis"]').value === 'human_presence' && /could get her out/.test(card.querySelector('[data-lv="counter_case.assumption"]').value)
+        && card.querySelectorAll('.lv-ev-row').length === 2 && card.querySelector('[data-lv="scene_binding.at_scene"]').value === 'scene_b' && /Proposed /.test(card.textContent) && /not confirmed/.test(card.textContent));
+      check('AFTER A REFRESH: its stored finding is painted RED on evidence 2\'s claim', [...card.querySelectorAll('[data-cf="lever.evidence.1.claim"] .cf-flag')].some(x => x.dataset.severity === 'error'));
+      f.remove(); doc.body.appendChild(formEl);
+    }
     const claimFlags = flagsOn('[data-cf="lever.evidence.1.claim"]');
     check('the leaked term is flagged RED on evidence 2\'s claim, with its hint', claimFlags.some(f => f.dataset.severity === 'error' && /downstream consequence/.test(f.textContent) && f.querySelector('.cf-hint'))
       && $('[data-cf="lever.evidence.1.claim"]').classList.contains('cf-err'));
@@ -192,7 +214,8 @@ try {
       && /pass/.test($('#lever-section-0 [data-cf="lever"] .cf-summary')?.textContent || ''));
     click($$('.lv-save-btn').find(b => b.dataset.confirm === '1'));
     await settle(400);
-    check('Save & confirm → stored, confirmed, from the proposal', stored().witness_lever?.confirmed === true && stored().witness_lever.generated === true && /testified at the nullification/.test(stored().witness_lever.evidence[1].claim), lastToast());
+    check('Save & confirm → stored, confirmed, still the model\'s proposal (edited)', stored().witness_lever?.confirmed === true && stored().witness_lever.generated === true && stored().witness_lever.edited === true && /testified at the nullification/.test(stored().witness_lever.evidence[1].claim)
+      && !stored().witness_lever.findings.some(f => f.severity === 'error'), lastToast());
     check('…the card says Confirmed, and Generate opens', /Confirmed/.test($('#lever-section-0 .lv-status-badge')?.textContent || '') && $('#dm-section-0 .gen-dm-btn')?.disabled === false);
   }
 

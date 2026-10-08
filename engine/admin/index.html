@@ -2879,8 +2879,9 @@ const _dmDeclines = new Map();
 // data.playerRoles (anything there is posted by the main Save and would land in the file).
 //   _dmDrafts          { block, tokens, retry } — a generated block the server returned UNSAVED
 //                      (lint_failed); rendered in place of the stored block until saved/discarded
-//   _leverState        { lever, draft, scene_warning } — the lever card's working copy; draft =
-//                      a proposal returned unsaved (lint_failed), saved whole through the PATCH
+//   _leverState        { lever, declined } — the lever card's working copy (unsaved edits) and a
+//                      decline's reason. Every PROPOSAL is stored on the role (witness_lever,
+//                      unconfirmed, with its findings), so a refresh shows it
 //   _crucibleFindings  { block: [...], lever: [...] } — the latest findings, painted inline
 const _dmDrafts = new Map();
 const _leverState = new Map();
@@ -3575,15 +3576,24 @@ function renderWitnessLeverSection(r, i, data) {
   if (!isWitnessCrucible(r)) return `<div id="lever-section-${i}"></div>`;
   const st     = _leverState.get(r.id);
   const lever  = st?.lever ?? r.witness_lever ?? null;
-  const draft  = !!st?.draft;
   const stored = r.witness_lever;
-  const dirty  = !draft && !!lever && leverEdited(r, lever);
+  const dirty  = !!lever && leverEdited(r, lever);
   const L = leverShape(lever);
+  // The STORED proposal's findings, until a live check replaces them — so a refresh shows a
+  // flagged proposal flagged (painted after render by paintCrucibleFlags).
+  if (stored?.findings && !_crucibleFindings.get(r.id)?.leverChecked) setCrucibleFindings(r.id, { lever: stored.findings });
+  const storedErrors = (stored?.findings || []).filter(f => f.severity === 'error').length;
+  const when = t => { const d = t ? new Date(t) : null; return d && !isNaN(d) ? d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''; };
 
   const badge = !lever ? ['No lever', '#f1f5f9', 'var(--text-soft)']
-    : draft ? ['Unsaved proposal', '#fef2f2', '#991b1b']
     : stored?.confirmed === true ? [`Confirmed${stored.edited ? ' (edited)' : ''}`, '#f0fdf4', '#166534']
+    : storedErrors ? [`Proposed — fails ${storedErrors} check${storedErrors === 1 ? '' : 's'}`, '#fef2f2', '#991b1b']
     : ['Proposed — needs confirmation', '#fef3c7', '#92400e'];
+  const provenance = stored ? `<div style="font-size:11px;color:var(--text-soft);margin-bottom:10px">${[
+    stored.proposed_at ? `Proposed ${esc(when(stored.proposed_at))}` : (stored.generated ? 'Proposed by the model' : 'Written by hand'),
+    stored.edited ? 'edited by a reviewer' : '',
+    stored.confirmed === true && stored.confirmed_at ? `confirmed ${esc(when(stored.confirmed_at))}` : 'not confirmed — inert until it is',
+  ].filter(Boolean).join(' · ')}</div>` : '';
   const fieldBox = (loc, label, input) => `<div data-cf="${loc}" style="margin-bottom:10px"><div class="cf-label">${label}</div>${input}<div class="cf-flags"></div></div>`;
   const ta = (k, val, rows) => `<textarea class="cf-in lv-in cf-autosize" data-lv="${k}" rows="${rows}">${esc(val)}</textarea>`;
 
@@ -3646,15 +3656,15 @@ function renderWitnessLeverSection(r, i, data) {
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px;padding-top:10px;border-top:1px solid var(--border)">
       <button type="button" class="btn btn-secondary btn-sm lv-propose-btn" data-role-id="${r.id}" data-role-index="${i}">${lever ? '↻ Re-propose lever' : '✦ Propose lever'}</button>
       ${lever ? `
-        <button type="button" class="btn btn-secondary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="0">${draft ? 'Save proposal (unconfirmed)' : 'Save edits (unconfirms)'}</button>
-        <button type="button" class="btn btn-primary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="1">${confirmed && !dirty ? '✓ Confirmed' : (draft || dirty) ? 'Save & confirm lever' : 'Confirm lever'}</button>` : ''}
+        <button type="button" class="btn btn-secondary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="0">${confirmed ? 'Save edits (unconfirms)' : 'Save edits'}</button>
+        <button type="button" class="btn btn-primary btn-sm lv-save-btn" data-role-id="${r.id}" data-role-index="${i}" data-confirm="1">${confirmed && !dirty ? '✓ Confirmed' : dirty ? 'Save & confirm lever' : 'Confirm lever'}</button>` : ''}
       ${stored ? `<button type="button" class="btn btn-danger btn-sm lv-clear-btn" data-role-id="${r.id}" data-role-index="${i}" style="margin-left:auto">Clear lever</button>` : ''}
     </div>
     <div class="lv-dirty-note" style="font-size:11px;margin-top:6px;color:#b45309;${dirty ? '' : 'display:none'}">Unsaved lever edits — saving them un-confirms the lever until you confirm again. Lever edits are not part of the main Save.</div>`;
 
   return `<div id="lever-section-${i}" style="margin:10px 0">
-    <details ${!confirmed || draft ? 'open' : ''}>
-      <summary style="padding:11px 16px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid ${confirmed && !draft ? 'var(--border)' : '#d97706'};border-radius:8px">
+    <details ${!confirmed ? 'open' : ''}>
+      <summary style="padding:11px 16px;cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-soft);display:flex;align-items:center;justify-content:space-between;list-style:none;user-select:none;background:var(--card);border:1px solid ${confirmed ? 'var(--border)' : '#d97706'};border-radius:8px">
         <span style="display:flex;align-items:center;gap:10px">Witness Lever
           <span class="lv-status-badge" style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;text-transform:none;letter-spacing:0;background:${badge[1]};color:${badge[2]}">${badge[0]}</span>
         </span>
@@ -3662,8 +3672,9 @@ function renderWitnessLeverSection(r, i, data) {
       </summary>
       <div class="lv-card" data-role-index="${i}" style="background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:16px">
         <div style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.55">A witness crucible is drafted <strong>lever-first</strong>: this card says what the witness could actually do. The defining moment below is generated on it only once it is <strong>confirmed</strong>, and every debrief's cited consequence must rest on one of its evidence sources.</div>
-        ${draft ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:12px;color:#7f1d1d"><strong>Not saved.</strong> The proposal failed the lever checks flagged below. Fix them, then save or confirm — the server re-checks it either way.</div>` : ''}
-        ${st?.scene_warning ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px;color:#92400e">⚠ ${esc(st.scene_warning)} The witness usually binds to the scene the protagonist's choice is made in — check the scene before confirming.</div>` : ''}
+        ${provenance}
+        ${storedErrors && stored?.confirmed !== true ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:12px;color:#7f1d1d"><strong>This proposal fails the lever checks flagged below.</strong> It is stored, so it survives a refresh, but it cannot be confirmed — and nothing can be generated on it — until they are fixed. Edit in place and save, or confirm once clean.</div>` : ''}
+        ${stored?.scene_warning ? `<div style="margin-bottom:10px;padding:9px 12px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;font-size:12px;color:#92400e">⚠ ${esc(stored.scene_warning)} The witness usually binds to the scene the protagonist's choice is made in — check the scene before confirming.</div>` : ''}
         ${st?.declined ? `<div style="margin-bottom:10px;padding:9px 12px;border:1px solid var(--border);border-left:4px solid #94a3b8;border-radius:6px;font-size:12px"><strong>The model found no lever:</strong> ${esc(st.declined)}</div>` : ''}
         <div data-cf="lever"><div class="cf-flags"></div></div>
         ${fields}
@@ -3845,8 +3856,8 @@ async function revalidateCrucible(formEl, data, scenarioId, i) {
     if (_crucibleSeq.get(role.id) !== seq) return null;   // a newer check is on its way
     const fromLever = f => f.location.startsWith('lever') && f.rule !== 'lever_no_sources';
     const patch = {};
-    if (body.witness_lever)   patch.lever = res.findings.filter(fromLever);
-    if (body.defining_moment) patch.block = res.findings.filter(f => !fromLever(f));
+    if (body.witness_lever)   { patch.lever = res.findings.filter(fromLever); patch.leverChecked = true; }
+    if (body.defining_moment) { patch.block = res.findings.filter(f => !fromLever(f)); patch.blockChecked = true; }
     setCrucibleFindings(role.id, patch);
     paintCrucibleFlags(formEl, i, data);
     return res;
@@ -3910,7 +3921,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     }
     syncConsequenceSources(formEl, i, data, renamed);
     const note = sectionEl.querySelector('.lv-dirty-note');
-    if (note) note.style.display = !st.draft && leverEdited(role, _leverState.get(role.id).lever) ? '' : 'none';
+    if (note) note.style.display = leverEdited(role, _leverState.get(role.id).lever) ? '' : 'none';
     scheduleCrucibleRevalidate(formEl, data, scenarioId, i);
   };
   formEl.addEventListener('input', onLeverEdit);
@@ -3941,7 +3952,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     if (role.witness_lever?.confirmed === true) {
       if (!confirm(`"${role.name}" has a CONFIRMED lever. Proposing again replaces it with a fresh, UNCONFIRMED proposal — generation closes until you confirm again. Continue?`)) return;
       body.overwrite = true;
-    } else if ((st?.draft || (st?.lever && leverEdited(role, st.lever))) && !confirm('Discard the unsaved lever edits and ask for a fresh proposal?')) {
+    } else if (st?.lever && leverEdited(role, st.lever) && !confirm('Discard the unsaved lever edits and ask for a fresh proposal?')) {
       return;
     }
     const original = btn.textContent;
@@ -3951,15 +3962,14 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
       if (res.declined) {
         _leverState.set(role.id, { declined: res.reason });
         toast('The model found no lever for this witness — see the reason in the card.', 'warn');
-      } else if (res.lint_failed) {
-        _leverState.set(role.id, { lever: res.witness_lever, draft: true, scene_warning: res.scene_warning });
-        setCrucibleFindings(role.id, { lever: res.findings || [] });
-        toast(`Lever proposed but NOT saved — it fails ${(res.errors || []).length} check(s). Fix the flagged fields, then save or confirm.`, 'error');
       } else {
+        // Stored either way (unconfirmed, with its findings) — it survives a refresh.
         role.witness_lever = res.witness_lever;
-        _leverState.set(role.id, { scene_warning: res.scene_warning });
-        setCrucibleFindings(role.id, { lever: res.findings || [] });
-        toast('Lever proposed and saved, unconfirmed. Review the axis, counter-case, evidence and scene, then confirm.', 'warn');
+        _leverState.delete(role.id);
+        setCrucibleFindings(role.id, { lever: res.findings || [], leverChecked: true });
+        toast(res.lint_failed
+          ? `Lever proposed and stored, unconfirmed — but it fails ${(res.errors || []).length} check(s). Fix the flagged fields before confirming.`
+          : 'Lever proposed and stored, unconfirmed. Review the axis, counter-case, evidence and scene, then confirm.', res.lint_failed ? 'error' : 'warn');
       }
       rerenderLever(i);
     } catch (err) {
@@ -3978,20 +3988,22 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     const confirmIt = btn.dataset.confirm === '1';
     const st = _leverState.get(role.id) || {};
     const lever = collectLeverFromCard(formEl.querySelector(`#lever-section-${i}`));
-    const edited = st.draft || leverEdited(role, lever);
+    const edited = leverEdited(role, lever);
     if (!edited && !confirmIt) { toast('No lever edits to save.', 'info'); return; }
     if (!edited && role.witness_lever?.confirmed === true) { toast('The lever is already confirmed.', 'info'); return; }
-    const body = edited ? { edits: lever, ...(st.draft ? { from_proposal: true } : {}), ...(confirmIt ? { confirm: true } : {}) } : { confirm: true };
+    const body = edited ? { edits: lever, ...(confirmIt ? { confirm: true } : {}) } : { confirm: true };
     const original = btn.textContent;
     btn.disabled = true; btn.textContent = 'Saving…';
     try {
       const res = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(role.id)}/witness-lever`, body);
       role.witness_lever = res.witness_lever;
-      _leverState.set(role.id, { scene_warning: st.scene_warning });
-      setCrucibleFindings(role.id, { lever: res.findings || [] });
+      _leverState.delete(role.id);
+      setCrucibleFindings(role.id, { lever: res.findings || [], leverChecked: true });
       rerenderLever(i);
       scheduleCrucibleRevalidate(formEl, data, scenarioId, i, 0);   // the block's citations against the saved lever
-      toast(res.witness_lever.confirmed ? 'Lever confirmed — generation is open.' : 'Lever saved, unconfirmed.', 'success');
+      toast(res.witness_lever.confirmed ? 'Lever confirmed — generation is open.'
+        : res.lint_failed ? `Lever saved, unconfirmed — ${(res.errors || []).length} check(s) still fail; fix them to confirm.` : 'Lever saved, unconfirmed.',
+        res.lint_failed ? 'warn' : 'success');
     } catch (err) {
       if (err.body?.findings) {
         setCrucibleFindings(role.id, { lever: err.body.findings });
@@ -4048,7 +4060,8 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     autosizeIn(host);
     const i = idxOf(host);
     const role = data.playerRoles[i];
-    if (!role || _crucibleFindings.has(role.id)) return;
+    const seen = _crucibleFindings.get(role?.id);
+    if (!role || (seen?.blockChecked && (seen.leverChecked || !isWitnessCrucible(role)))) return;
     const dm = _dmDrafts.get(role.id)?.block ?? role.defining_moment;
     if (crucibleOptionCtx(role, dm).check || isWitnessCrucible(role)) revalidateCrucible(formEl, data, scenarioId, i);
   }, true);
@@ -4095,8 +4108,12 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     rerenderDmSection(i);
   });
 
-  // First paint: size the lever boxes already open on screen (after layout).
-  setTimeout(() => autosizeIn(formEl), 0);
+  // First paint: size the boxes already open on screen (after layout), and paint the findings
+  // stored with each proposal, so a refresh shows a flagged proposal flagged.
+  setTimeout(() => {
+    autosizeIn(formEl);
+    (data.playerRoles || []).forEach((r, i) => paintCrucibleFlags(formEl, i, data));
+  }, 0);
 }
 
 function renderPlayerRolesSection(data) {
