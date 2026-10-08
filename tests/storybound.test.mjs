@@ -293,7 +293,9 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
       }
     }
   }
-  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 17 && moved.length === 0, moved.slice(0, 5).join(', '));
+  // 18 stored forks: the 17 this was written against, plus Damen (seven_lights_1871), authored
+  // through the witness-crucible editor 2026-10-08 — an unbound fork on the clock.
+  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 18 && moved.length === 0, moved.slice(0, 5).join(', '));
   check(`all ${boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${points} points total)`, boundForks === EXPECTED_BOUND.length && boundMoved.length === 0, boundMoved.slice(0, 5).join(', '));
 }
 
