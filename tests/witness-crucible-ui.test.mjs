@@ -307,6 +307,48 @@ try {
     win.collectEdits(f2, d2);
     check('collectEdits adds no crucible keys to its options', d2.playerRoles[0].defining_moment.options.every(o => JSON.stringify(Object.keys(o).sort()) === '["id","text"]'));
   }
+  head('8. derived state follows the flag and the save — no reload');
+  {
+    // A witness carrying a block: unflagged it may not hold a fork, so the cleanup panel shows.
+    const r0 = data.playerRoles[0];
+    r0.defining_moment = structuredClone(stored().defining_moment);   // step 6 collected its refused edit into data
+    r0.witness_crucible = false;
+    mountRole();
+    check('unflagged witness with a block → "Disallowed artifact still present"', /Disallowed artifact still present/.test($('#archetype-section-0').textContent));
+    const cb = $('.wc-flag-cb');
+    cb.checked = true; cb.dispatchEvent(new win.Event('change', { bubbles: true }));
+    check('ticking the flag clears the panel at once (no save, no reload)', !/Disallowed artifact still present/.test($('#archetype-section-0').textContent) && $('.wc-flag-cb').checked === true);
+    $('.wc-flag-cb').checked = false; $('.wc-flag-cb').dispatchEvent(new win.Event('change', { bubbles: true }));
+    check('unticking brings it back', /Disallowed artifact still present/.test($('#archetype-section-0').textContent));
+
+    // A display left stale (the state moved without a re-render), then a successful Save.
+    $('.wc-flag-cb').checked = true;                   // ticked, but no change event: the panel is stale
+    $('#dm-section-0 details').open = true;
+    check('precondition: the panel is stale on screen', /Disallowed artifact still present/.test($('#archetype-section-0').textContent));
+    const ok = await win.handleManualSave(data, formEl);
+    await settle(300);
+    check('a successful Save re-derives every section from the saved state: the panel is gone', ok === true && stored().witness_crucible === true
+      && !/Disallowed artifact still present/.test($('#archetype-section-0').textContent), lastToast());
+    check('…the lever card and Generate gate are back for the flagged role, and the open section stayed open', !!$('#lever-section-0 .lv-card') && $('#dm-section-0 .gen-dm-btn')?.disabled === false && $('#dm-section-0 details').open === true);
+    check('…and the crucible summary is painted again', /pass|warning/.test($('#dm-section-0 [data-cf="block"] .cf-summary')?.textContent || ''));
+  }
+
+  head('9. lever text boxes grow to fit their text');
+  {
+    const lever = $('#lever-section-0');
+    const boxes = [...lever.querySelectorAll('textarea.lv-in')];
+    check('every lever text box auto-sizes (statement, reasoning, counter-case, claims, scene reasoning)',
+      boxes.length >= 6 && boxes.every(t => t.classList.contains('cf-autosize')) && Number(lever.querySelector('[data-lv="reasoning"]').rows) >= 5 && Number(lever.querySelector('[data-lv="counter_case.why_wrong"]').rows) >= 5);
+    // jsdom does no layout: give textareas a content height so the sizing can be observed.
+    Object.defineProperty(win.HTMLTextAreaElement.prototype, 'scrollHeight', { configurable: true, get() { return 18 * Math.max(1, Math.ceil(this.value.length / 60)); } });
+    const why = lever.querySelector('[data-lv="counter_case.why_wrong"]');
+    type(why, 'A long correction. '.repeat(40));
+    check('typing grows the box to its content (no inner scroll)', why.style.height === `${18 * Math.ceil(why.value.length / 60) + 2}px`, why.style.height);
+    win.refreshRoleDerivedSections(formEl, data, 0);
+    const why2 = $('#lever-section-0 [data-lv="counter_case.why_wrong"]');
+    check('…and a re-render sizes it again', !!why2.style.height && why2.style.height !== 'auto', why2.style.height);
+    check('still editable', !why2.readOnly && !why2.disabled);
+  }
 } finally {
   win.close();
   await new Promise(r => server.close(r));

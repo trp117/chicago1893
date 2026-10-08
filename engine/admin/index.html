@@ -269,6 +269,7 @@ details[open] > .entity-details-summary::before { transform: rotate(90deg); }
 .cf-label { font-size: 11px; color: var(--text-soft); margin-bottom: 3px; }
 .cf-in { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
 textarea.cf-in { resize: vertical; line-height: 1.5; }
+textarea.cf-autosize { overflow-y: hidden; min-height: 3.6em; }
 </style>
 </head>
 <body>
@@ -3583,7 +3584,7 @@ function renderWitnessLeverSection(r, i, data) {
     : stored?.confirmed === true ? [`Confirmed${stored.edited ? ' (edited)' : ''}`, '#f0fdf4', '#166534']
     : ['Proposed — needs confirmation', '#fef3c7', '#92400e'];
   const fieldBox = (loc, label, input) => `<div data-cf="${loc}" style="margin-bottom:10px"><div class="cf-label">${label}</div>${input}<div class="cf-flags"></div></div>`;
-  const ta = (k, val, rows) => `<textarea class="cf-in lv-in" data-lv="${k}" rows="${rows}">${esc(val)}</textarea>`;
+  const ta = (k, val, rows) => `<textarea class="cf-in lv-in cf-autosize" data-lv="${k}" rows="${rows}">${esc(val)}</textarea>`;
 
   const acts = Array.isArray(data?.storyArc?.acts) ? data.storyArc.acts : [];
   const at = L.scene_binding.at_scene || '';
@@ -3600,7 +3601,7 @@ function renderWitnessLeverSection(r, i, data) {
 
   const evidence = L.evidence.map((e, n) => `
     <div class="lv-ev-row" data-ev-index="${n}" style="display:grid;grid-template-columns:1fr 260px 28px;gap:8px;margin-bottom:6px;align-items:start">
-      <div data-cf="lever.evidence.${n}.claim"><textarea class="cf-in lv-in" data-lv-ev="claim" rows="2" placeholder="The documented fact — it may be quoted to the player word for word">${esc(e.claim)}</textarea><div class="cf-flags"></div></div>
+      <div data-cf="lever.evidence.${n}.claim"><textarea class="cf-in lv-in cf-autosize" data-lv-ev="claim" rows="3" placeholder="The documented fact — it may be quoted to the player word for word">${esc(e.claim)}</textarea><div class="cf-flags"></div></div>
       <div data-cf="lever.evidence.${n}.source"><input type="text" class="cf-in lv-in" data-lv-ev="source" value="${esc(e.source)}" placeholder="Source"><div class="cf-flags"></div></div>
       <button type="button" class="btn btn-secondary btn-sm lv-del-ev" data-role-index="${i}" data-ev-index="${n}" title="Remove this evidence item" style="padding:4px 6px">✕</button>
     </div>`).join('');
@@ -3609,14 +3610,14 @@ function renderWitnessLeverSection(r, i, data) {
     <div class="lv-fields">
       <div style="display:grid;grid-template-columns:240px 1fr;gap:10px">
         ${fieldBox('lever.axis', 'Axis — what kind of power', `<select class="cf-in lv-in" data-lv="axis"><option value=""${L.axis ? '' : ' selected'}>—</option>${WITNESS_LEVER_AXES.map(a => `<option value="${a}"${a === L.axis ? ' selected' : ''}>${a}</option>`).join('')}${L.axis && !WITNESS_LEVER_AXES.includes(L.axis) ? `<option value="${esc(L.axis)}" selected>⚠ ${esc(L.axis)}</option>` : ''}</select>`)}
-        ${fieldBox('lever.statement', 'Statement — the lever, in one or two sentences', ta('statement', L.statement, 2))}
+        ${fieldBox('lever.statement', 'Statement — the lever, in one or two sentences', ta('statement', L.statement, 3))}
       </div>
-      ${fieldBox('lever.reasoning', 'Reasoning', ta('reasoning', L.reasoning, 3))}
+      ${fieldBox('lever.reasoning', 'Reasoning', ta('reasoning', L.reasoning, 5))}
       <div data-cf="lever.counter_case" style="margin-bottom:10px">
         <div class="cf-label">Counter-case — the assumption a player would bring, and why the record says otherwise</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <textarea class="cf-in cf-input lv-in" data-lv="counter_case.assumption" rows="3" placeholder="You would assume…">${esc(L.counter_case.assumption)}</textarea>
-          <textarea class="cf-in cf-input lv-in" data-lv="counter_case.why_wrong" rows="3" placeholder="Why it is wrong…">${esc(L.counter_case.why_wrong)}</textarea>
+          <textarea class="cf-in cf-input lv-in cf-autosize" data-lv="counter_case.assumption" rows="5" placeholder="You would assume…">${esc(L.counter_case.assumption)}</textarea>
+          <textarea class="cf-in cf-input lv-in cf-autosize" data-lv="counter_case.why_wrong" rows="5" placeholder="Why it is wrong…">${esc(L.counter_case.why_wrong)}</textarea>
         </div>
         <div class="cf-flags"></div>
       </div>
@@ -3631,7 +3632,7 @@ function renderWitnessLeverSection(r, i, data) {
         <div data-cf="lever.scene_binding" style="margin-bottom:10px">
           <div class="cf-label">Scene — where the witnessing-choice comes to a point</div>
           <select class="cf-in cf-input lv-in" data-lv="scene_binding.at_scene"><option value="">—</option>${sceneOrphan}${sceneOpts}</select>
-          <textarea class="cf-in cf-input lv-in" data-lv="scene_binding.reasoning" rows="2" placeholder="Why this scene" style="margin-top:4px">${esc(L.scene_binding.reasoning)}</textarea>
+          <textarea class="cf-in cf-input lv-in cf-autosize" data-lv="scene_binding.reasoning" rows="3" placeholder="Why this scene" style="margin-top:4px">${esc(L.scene_binding.reasoning)}</textarea>
           <div class="cf-flags"></div>
         </div>
       </div>
@@ -3775,6 +3776,46 @@ function updateLeverGate(formEl, i, data) {
   }
 }
 
+// DERIVED-STATE REFRESH. Everything computed from the archetype, the witness_crucible flag
+// or the block — the "Disallowed artifact still present" panel, the endings gate, the lever
+// card, the defining-moment section and its Generate gate, the crucible summary — re-rendered
+// for one role from the state it now has. Called after a successful save (the state just
+// written) and on a flag change, so none of it waits for a page reload. Open/closed state of
+// each <details> is carried over, so a refresh does not fold a section the reviewer opened.
+// Unsaved drafts and lever edits live in _dmDrafts / _leverState and re-render as they were.
+function refreshRoleDerivedSections(rootEl, data, i) {
+  const role = data.playerRoles?.[i];
+  if (!rootEl || !role) return;
+  const keepOpen = (sel, html) => {
+    const el = rootEl.querySelector(sel);
+    if (!el) return;
+    const open = [...el.querySelectorAll('details')].map(d => d.open);
+    replaceEditorSection(rootEl, sel, html);
+    rootEl.querySelector(sel)?.querySelectorAll('details').forEach((d, k) => { if (open[k] !== undefined) d.open = open[k]; });
+  };
+  keepOpen(`#archetype-section-${i}`, renderArchetypeSection(role, i));
+  keepOpen(`#endings-gate-${i}`, `<div id="endings-gate-${i}">${renderEndingsGatePanel(role, i)}</div>`);
+  keepOpen(`#lever-section-${i}`, renderWitnessLeverSection(role, i, data));
+  keepOpen(`#dm-section-${i}`, renderDefiningMomentSection(role, i, data));
+  paintCrucibleFlags(rootEl, i, data);
+  syncConsequenceSources(rootEl, i, data);
+  updateLeverGate(rootEl, i, data);
+  autosizeIn(rootEl.querySelector(`#lever-section-${i}`));
+}
+
+// LEVER FIELDS GROW TO FIT. The card exists to be READ — the full reasoning, counter-case and
+// every claim — so its text boxes size to their content rather than scroll inside a few rows.
+// Sized on render, on every edit, and when a folded card is opened (a hidden box has no
+// height to measure). Still plain textareas: editable, and resizable by hand as well.
+function autosizeTextarea(el) {
+  if (!el || !el.scrollHeight) return;   // hidden (folded <details>, or no layout): next time
+  el.style.height = 'auto';
+  el.style.height = `${el.scrollHeight + 2}px`;
+}
+function autosizeIn(root) {
+  root?.querySelectorAll('textarea.cf-autosize').forEach(autosizeTextarea);
+}
+
 // ── Revalidate: what is on screen → validate-crucible → flags ──────────────
 const _crucibleTimers = new Map();
 const _crucibleSeq = new Map();
@@ -3819,6 +3860,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     paintCrucibleFlags(formEl, i, data);
     syncConsequenceSources(formEl, i, data);
     updateLeverGate(formEl, i, data);
+    autosizeIn(formEl.querySelector(`#lever-section-${i}`));
   };
   const rerenderDmSection = i => {
     replaceEditorSection(formEl, `#dm-section-${i}`, renderDefiningMomentSection(data.playerRoles[i], i, data));
@@ -3835,6 +3877,11 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     const before = archetypeAllows(role, 'fork').allowed;
     role.witness_crucible = cb.checked;
     markFormDirty();
+    // The flag decides whether this role may carry a fork, so everything derived from that —
+    // the archetype section's "Disallowed artifact still present" panel included — follows it
+    // now. The defining-moment section is re-rendered only when the fork's allowed-ness moved:
+    // it holds editable prose a gratuitous re-render would throw away.
+    replaceEditorSection(formEl, `#archetype-section-${i}`, renderArchetypeSection(role, i));
     rerenderLever(i);
     if (archetypeAllows(role, 'fork').allowed !== before) rerenderDmSection(i);
     else updateLeverGate(formEl, i, data);
@@ -3844,6 +3891,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
   const onLeverEdit = e => {
     const input = e.target.closest?.('.lv-in');
     if (!input) return;
+    if (input.classList.contains('cf-autosize')) autosizeTextarea(input);
     const i = idxOf(input);
     const role = data.playerRoles[i];
     const sectionEl = formEl.querySelector(`#lever-section-${i}`);
@@ -3993,6 +4041,7 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     if (!(d instanceof HTMLElement) || d.tagName !== 'DETAILS' || !d.open) return;
     const host = d.closest('[id^="dm-section-"], [id^="lever-section-"]');
     if (!host) return;
+    autosizeIn(host);
     const i = idxOf(host);
     const role = data.playerRoles[i];
     if (!role || _crucibleFindings.has(role.id)) return;
@@ -4041,6 +4090,9 @@ function bindWitnessCrucibleHandlers(formEl, data, scenarioId) {
     setCrucibleFindings(role.id, { block: [] });
     rerenderDmSection(i);
   });
+
+  // First paint: size the lever boxes already open on screen (after layout).
+  setTimeout(() => autosizeIn(formEl), 0);
 }
 
 function renderPlayerRolesSection(data) {
@@ -5704,6 +5756,12 @@ async function handleManualSave(data, containerEl) {
     // Flags on screen may predate the save: re-check every role showing any. (Not simply
     // cleared — an untouched, grandfathered block was saved past, and still carries its errors.)
     if (containerEl) {
+      // Re-derive everything computed from archetype / flag / block against what was just saved
+      // (the server normalizes a cleared flag away; mirror that first) — no page reload needed.
+      (data.playerRoles || []).forEach((r, i) => {
+        if (r && r.witness_crucible !== true) delete r.witness_crucible;
+        refreshRoleDerivedSections(containerEl, data, i);
+      });
       if (resp?.crucible_warnings) applySaveLintFindings(containerEl, data, resp.crucible_warnings);
       for (const roleId of _crucibleFindings.keys()) {
         const i = (data.playerRoles || []).findIndex(r => r?.id === roleId);
