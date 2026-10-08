@@ -2471,11 +2471,22 @@ function renderArchetypeSection(r, i) {
 // the domain expert and the reasoning is what they are really approving. The human APPROVES;
 // the runtime steers only on choice_register_reviewed === true.
 //
-// Proposals are EPHEMERAL, like _archetypeProposals: held here for the session, keyed by
-// role id, never hung off data.playerRoles (the main Save would post them into the role
-// file). The only writes are Approve (the choice-register route, which also syncs this page)
-// and the ordinary Save of the text box and Reviewed checkbox below.
+// Proposals PERSIST: the propose route stores each one on its role as choice_register_proposal
+// (with its reasoning), and Approve / Save as draft / Discard record their decision on it — so
+// a reload shows the proposal, or the record of what was done with it. It steers nothing; the
+// main Save cannot write or erase it (the server restores the stored copy). This Map holds only
+// a failed attempt's error for the session.
 const _choiceRegisterProposals = new Map();
+
+// A proposal stored server-side by the batch panel, shown on the role's own card at once.
+function showStoredRegisterProposal(roleId, proposal) {
+  const roles = window._aiPanelData?.playerRoles || [];
+  const i = roles.findIndex(r => r && r.id === roleId);
+  if (i < 0 || !proposal) return;
+  roles[i].choice_register_proposal = proposal;
+  _choiceRegisterProposals.delete(roleId);
+  replaceEditorSection(document, `#creg-proposal-${i}`, renderChoiceRegisterProposalPanel(roles[i], i));
+}
 
 // Where a role stands, from the stored (or on-screen) register and flag.
 function choiceRegisterStatusBadge(r, i) {
@@ -2523,11 +2534,40 @@ function choiceRegisterPostureHeader(p) {
     <span style="font-size:11px;font-weight:700;color:${confColor}">confidence ${esc(p.confidence || 'unstated')}</span>`;
 }
 
+// What the role carries now, for comparison beside a proposal (a stored proposal does not
+// carry it — it describes the proposal, not the role at render time).
+function choiceRegisterExisting(r) {
+  const text = typeof r?.choice_register === 'string' ? r.choice_register.trim() : '';
+  return text ? { choice_register: text, reviewed: r.choice_register_reviewed === true, generated: r.choice_register_generated === true } : null;
+}
+// The decision recorded on a stored proposal (approved / saved as draft / discarded).
+function choiceRegisterDecisionLine(d) {
+  if (!d) return '';
+  const when = esc(fmtWhen(d.at));
+  const [color, text] = d.action === 'approved' ? ['#166534', `✓ Approved${d.edited ? ' — edited before approving' : ' as proposed'}`]
+    : d.action === 'saved_as_draft' ? ['#92400e', `Saved as a draft${d.edited ? ' (edited)' : ''} — not steering until approved`]
+    : ['var(--text-soft)', 'Discarded'];
+  return `<div class="creg-decision" style="font-size:12px;font-weight:700;color:${color}">${text} · ${when}</div>`;
+}
+
 function renderChoiceRegisterProposalPanel(r, i) {
-  const p = _choiceRegisterProposals.get(r.id);
+  // An error from this session's attempt wins; otherwise the proposal STORED on the role, so a
+  // reload shows it with its reasoning — and, once acted on, the record of what was decided.
+  const p = _choiceRegisterProposals.get(r.id)?.error ? _choiceRegisterProposals.get(r.id) : (r.choice_register_proposal || null);
   if (!p) {
     return `<div id="creg-proposal-${i}" style="margin-top:10px;font-size:12px;color:var(--text-soft);padding:10px 12px;border:1px dashed var(--border);border-radius:6px">
-      No proposal yet. <strong>Propose register</strong> reads this role in this scenario and proposes a posture and a register, with its reasoning, the counter-case it ruled out, and the evidence it used. Nothing is written until you Approve.
+      No proposal yet. <strong>Propose register</strong> reads this role in this scenario and proposes a posture and a register, with its reasoning, the counter-case it ruled out, and the evidence it used. The proposal is kept on the role; nothing steers until you Approve.
+    </div>`;
+  }
+  if (p.decision) {
+    return `<div id="creg-proposal-${i}" style="margin-top:10px;border:1px solid var(--border);border-radius:6px;padding:10px 14px;background:var(--card)">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">${choiceRegisterPostureHeader(p)}<span style="font-size:11px;color:var(--text-soft)">proposed ${esc(fmtWhen(p.proposed_at))}</span></div>
+      ${choiceRegisterDecisionLine(p.decision)}
+      <details style="margin-top:8px"><summary style="font-size:12px;cursor:pointer;color:var(--text-soft)">The proposal and its reasoning</summary>
+        <div style="margin-top:8px;font-size:12px;white-space:pre-wrap;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">${esc(p.choice_register || '')}</div>
+        ${choiceRegisterReasoningRows(p)}
+      </details>
+      <div style="margin-top:8px"><button type="button" class="btn btn-secondary btn-sm propose-creg-btn" data-role-id="${r.id}" data-role-index="${i}">✦ Propose again</button></div>
     </div>`;
   }
   if (p.error) {
@@ -2536,7 +2576,7 @@ function renderChoiceRegisterProposalPanel(r, i) {
       <div style="margin-top:6px"><button type="button" class="btn btn-secondary btn-sm propose-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Try again</button></div>
     </div>`;
   }
-  const ex = p.existing;
+  const ex = choiceRegisterExisting(r);
   const border = { high: '#22c55e', medium: '#d97706', low: '#dc2626' }[p.confidence] || 'var(--border)';
   return `<div id="creg-proposal-${i}" style="margin-top:10px;border:1px solid var(--border);border-left:4px solid ${border};border-radius:6px;padding:12px 14px;background:var(--card)">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${choiceRegisterPostureHeader(p)}</div>
@@ -2552,7 +2592,7 @@ function renderChoiceRegisterProposalPanel(r, i) {
       <button type="button" class="btn btn-secondary btn-sm discard-creg-btn" data-role-id="${r.id}" data-role-index="${i}">Discard</button>
     </div>
     <div style="font-size:11px;color:var(--text-soft);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-      Nothing has been written. <strong>Approve</strong> saves the text above to this role and marks it reviewed — it steers from the next turn. Generating never approves.
+      Stored on the role as a proposal${p.proposed_at ? ` (proposed ${esc(fmtWhen(p.proposed_at))})` : ''} — it survives a reload, and it steers nothing. <strong>Approve</strong> saves the text above as this role's register and marks it reviewed — it steers from the next turn. Generating never approves.
     </div>
   </div>`;
 }
@@ -2576,7 +2616,12 @@ function bindChoiceRegisterHandlers(formEl, data, scenarioId) {
         // advisory, nothing is written; `existing` comes back for comparison.
         const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/propose-choice-registers`, { roleId });
         const p = (resp.proposals || [])[0];
-        _choiceRegisterProposals.set(roleId, p || { error: (resp.failed || [])[0]?.error || 'No proposal returned.' });
+        if (p?.choice_register_proposal) {
+          data.playerRoles[i].choice_register_proposal = p.choice_register_proposal;   // stored server-side
+          _choiceRegisterProposals.delete(roleId);
+        } else {
+          _choiceRegisterProposals.set(roleId, { error: (resp.failed || [])[0]?.error || 'No proposal returned.' });
+        }
       } catch (err) {
         _choiceRegisterProposals.set(roleId, { error: err.message });
       }
@@ -2587,8 +2632,15 @@ function bindChoiceRegisterHandlers(formEl, data, scenarioId) {
     // ── Discard ─────────────────────────────────────────────────────────────
     const discardBtn = e.target.closest('.discard-creg-btn');
     if (discardBtn) {
+      const i = Number(discardBtn.dataset.roleIndex);
+      try {
+        const resp = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(discardBtn.dataset.roleId)}/choice-register-proposal`, { discard: true });
+        data.playerRoles[i].choice_register_proposal = resp.choice_register_proposal;   // kept, as a record
+      } catch (err) {
+        toast(`Discard failed: ${err.message}`, 'error');
+      }
       _choiceRegisterProposals.delete(discardBtn.dataset.roleId);
-      rerenderProposal(Number(discardBtn.dataset.roleIndex));
+      rerenderProposal(i);
       return;
     }
 
@@ -2597,12 +2649,12 @@ function bindChoiceRegisterHandlers(formEl, data, scenarioId) {
     if (!approveBtn) return;
     const roleId = approveBtn.dataset.roleId;
     const i      = Number(approveBtn.dataset.roleIndex);
-    const p      = _choiceRegisterProposals.get(roleId);
+    const p      = data.playerRoles[i]?.choice_register_proposal;
     const text   = formEl.querySelector(`#creg-proposal-${i} .creg-proposal-text`)?.value?.trim() || '';
     if (!p || !text) { toast('The proposed register is empty', 'error'); return; }
     // Approved or hand-authored text is protected server-side. Replacing it is allowed only
     // as a deliberate act — the reviewer has it on screen beside the proposal; confirm it.
-    const ex = p.existing;
+    const ex = choiceRegisterExisting(data.playerRoles[i]);
     const protectedText = !!ex && (ex.reviewed || !ex.generated);
     if (protectedText && ex.choice_register !== text
         && !confirm(`${data.playerRoles[i]?.name || roleId} already has a ${ex.reviewed ? 'reviewed' : 'hand-authored'} register. Replace it with this one and mark it reviewed?`)) return;
@@ -4751,6 +4803,7 @@ async function runChoiceRegisterPropose(scenarioId) {
     const proposals = resp.proposals || [];
     const skipped   = resp.skipped   || [];
     const failed    = resp.failed    || [];
+    for (const pr of proposals) showStoredRegisterProposal(pr.role_id, pr.choice_register_proposal);
 
     const badge = document.getElementById('creg-count-badge');
     if (badge) badge.textContent = `${proposals.length} proposal${proposals.length === 1 ? '' : 's'}`;
@@ -4760,7 +4813,7 @@ async function runChoiceRegisterPropose(scenarioId) {
       : `<div style="padding:14px;border:1px dashed var(--border);border-radius:6px;margin-bottom:12px">No new proposals — every role already carries an approved or hand-authored register.</div>`;
 
     area.innerHTML = `
-      ${proposals.length ? `<div class="suggestions-header"><span class="suggestions-header-text">${proposals.length} proposal${proposals.length === 1 ? '' : 's'} — nothing is written until you Save or Approve, and nothing steers until approved.</span></div>` : ''}
+      ${proposals.length ? `<div class="suggestions-header"><span class="suggestions-header-text">${proposals.length} proposal${proposals.length === 1 ? '' : 's'} — each is kept on its role (it survives a reload, on the role's card), and nothing steers until approved.</span></div>` : ''}
       ${cards}
       ${buildChoiceRegisterFailedList(failed, scenarioId, proposals.length)}
       ${buildChoiceRegisterSkippedList(skipped)}`;
@@ -4788,7 +4841,7 @@ function buildChoiceRegisterCard(p, i, scenarioId) {
       <button type="button" class="btn btn-success btn-sm" onclick="writeChoiceRegister('${id}','${esc(scenarioId)}',true)">Approve</button>
       <button type="button" class="btn btn-primary btn-sm" onclick="writeChoiceRegister('${id}','${esc(scenarioId)}',false)">Save as draft</button>
       <button type="button" class="btn btn-secondary btn-sm" onclick="regenerateChoiceRegister('${id}','${esc(scenarioId)}')">Regenerate</button>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('${id}').remove()">Discard</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="discardChoiceRegisterCard('${id}', ${p.error ? 'false' : 'true'})">Discard</button>
     </div>
   </div>`;
 }
@@ -4838,6 +4891,10 @@ function syncRoleRegisterInPage(roleId, stored) {
     choice_register_reviewed:  stored.choice_register_reviewed,
     choice_register_generated: stored.choice_register_generated,
   });
+  if (stored.choice_register_proposal) {
+    roles[i].choice_register_proposal = stored.choice_register_proposal;
+    replaceEditorSection(document, `#creg-proposal-${i}`, renderChoiceRegisterProposalPanel(roles[i], i));
+  }
   const ta = document.querySelector(`[data-path="playerRoles.${i}.choice_register"]`);
   const cb = document.querySelector(`[data-path="playerRoles.${i}.choice_register_reviewed"]`);
   if (ta) ta.value   = stored.choice_register || '';
@@ -4877,6 +4934,26 @@ async function writeChoiceRegister(cardId, scenarioId, approve) {
   }
 }
 
+// Discard from the batch panel: recorded on the role's stored proposal (kept as a record).
+async function discardChoiceRegisterCard(cardId, record = true) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  // A FAILED card proposed nothing: removing it must not mark an older stored proposal discarded.
+  if (!record) { card.remove(); return; }
+  try {
+    const resp = await apiFetch('PATCH', `/player-roles/${encodeURIComponent(card.dataset.roleId)}/choice-register-proposal`, { discard: true });
+    const roles = window._aiPanelData?.playerRoles || [];
+    const i = roles.findIndex(r => r && r.id === card.dataset.roleId);
+    if (i >= 0) {
+      roles[i].choice_register_proposal = resp.choice_register_proposal;
+      replaceEditorSection(document, `#creg-proposal-${i}`, renderChoiceRegisterProposalPanel(roles[i], i));
+    }
+  } catch (err) {
+    toast(`Discard failed: ${err.message}`, 'error');
+  }
+  card.remove();
+}
+
 async function regenerateChoiceRegister(cardId, scenarioId) {
   const card = document.getElementById(cardId);
   if (!card) return;
@@ -4889,6 +4966,7 @@ async function regenerateChoiceRegister(cardId, scenarioId) {
     const resp = await apiPost(`/scenarios/${encodeURIComponent(scenarioId)}/propose-choice-registers`, { roleId });
     const p = (resp.proposals || [])[0];
     if (p) {
+      showStoredRegisterProposal(roleId, p.choice_register_proposal);
       if (ta)     ta.value = p.choice_register || '';
       if (why)    why.innerHTML = choiceRegisterReasoningRows(p);
       if (headEl) headEl.innerHTML = choiceRegisterPostureHeader(p);

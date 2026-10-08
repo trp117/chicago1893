@@ -1013,6 +1013,58 @@ try {
     check('creating a role cannot smuggle a proposal in', created.status === 201 && created.body.archetype_proposal === undefined);
     repos.scenarios.deletePlayerRole?.(created.body.id);
   }
+  head('8. proposals persist — the CHOICE REGISTER proposal and its reasoning');
+  {
+    const proposeUrl2 = `/scenarios/${SCENARIO_ID}/propose-choice-registers`;
+    const writeUrl = id => `/scenarios/${SCENARIO_ID}/roles/${id}/choice-register`;
+    const TEXT = 'Offer choices about what he carries out of the corridor: what he sees, what he keeps, what he says later and to whom. Avoid rescue.';
+    const REPLY = { posture: 'witnessing', confidence: 'high', choice_register: TEXT, rationale: 'He decides nothing; he carries.', counter_case: 'Escalation would make him a rescuer.', evidence: ['He escorts her daily.'] };
+    repos.scenarios.savePlayerRole({ ...baseRole, id: 'role_wc_register', name: 'The Registrar', archetype: 'witness' });
+    const reg = () => roleOf('role_wc_register');
+    modelQueue.push(JSON.stringify(REPLY));
+    const r = await post(proposeUrl2, { roleId: 'role_wc_register' });
+    const P = reg().choice_register_proposal;
+    check('propose → STORED with its reasoning (posture, confidence, text, rationale, counter-case, evidence, date)',
+      r.status === 200 && r.body.persisted === true && P?.posture === 'witnessing' && P.confidence === 'high' && P.choice_register === TEXT
+      && P.rationale === REPLY.rationale && P.counter_case === REPLY.counter_case && P.evidence.length === 1 && !!P.proposed_at && !P.decision, `${r.status} ${r.body.error || JSON.stringify(r.body.failed || '')}`);
+    check('…and NOT active: no register written, nothing steers', reg().choice_register === undefined && reg().choice_register_reviewed === undefined);
+
+    const forged = await call('PUT', '/player-roles/role_wc_register', { ...structuredClone(reg()), choice_register_proposal: { posture: 'forged' } });
+    const { choice_register_proposal: _x, ...noKey } = structuredClone(reg());
+    await call('PUT', '/player-roles/role_wc_register', { ...noKey, description: 'edit' });
+    check('editor saves can neither WRITE nor ERASE the proposal', forged.status === 200 && reg().choice_register_proposal?.posture === 'witnessing' && reg().choice_register_proposal.rationale === REPLY.rationale);
+
+    const w = await post(writeUrl('role_wc_register'), { choice_register: `${TEXT} Keep it quiet.`, approve: false });
+    check('Save as draft → the register is written unreviewed, and the decision recorded on the proposal (edited)',
+      w.status === 200 && reg().choice_register_reviewed === false && reg().choice_register_proposal.decision?.action === 'saved_as_draft' && reg().choice_register_proposal.decision.edited === true && !!w.body.choice_register_proposal);
+    const a = await post(writeUrl('role_wc_register'), { choice_register: TEXT, approve: true });
+    check('Approve → steering, and the proposal records "approved", unedited — its reasoning kept as the record',
+      a.status === 200 && reg().choice_register_reviewed === true && reg().choice_register_proposal.decision?.action === 'approved' && reg().choice_register_proposal.decision.edited === false && reg().choice_register_proposal.rationale === REPLY.rationale);
+
+    modelQueue.push(JSON.stringify({ ...REPLY, posture: 'testimony', choice_register: `${TEXT} A second reading.` }));
+    await post(proposeUrl2, { roleId: 'role_wc_register' });
+    check('re-proposing replaces ONLY the proposal — the approved register keeps steering', reg().choice_register === TEXT && reg().choice_register_reviewed === true && reg().choice_register_proposal.posture === 'testimony' && !reg().choice_register_proposal.decision);
+    const d = await call('PATCH', '/player-roles/role_wc_register/choice-register-proposal', { discard: true });
+    check('Discard → recorded as discarded (kept as a record), the register untouched', d.status === 200 && reg().choice_register_proposal.decision?.action === 'discarded' && reg().choice_register_proposal.posture === 'testimony' && reg().choice_register === TEXT);
+    const created = await post('/player-roles', { name: 'Fresh Registrar', scenarioId: SCENARIO_ID, choice_register_proposal: { posture: 'x' } });
+    check('creating a role cannot smuggle a proposal in', created.status === 201 && created.body.choice_register_proposal === undefined);
+    repos.scenarios.deletePlayerRole?.(created.body.id);
+  }
+
+  head('9. play and the gates never read a proposal');
+  {
+    const runtimeDirs = ['engine/services', 'engine/server', 'engine/game', 'engine/agents'];
+    const hits = [];
+    const walk = d => { if (!fs.existsSync(d)) return; for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, f.name);
+      if (f.isDirectory()) walk(full);
+      else if (/\.(m?js)$/.test(f.name) && /archetype_proposal|choice_register_proposal/.test(fs.readFileSync(full, 'utf8'))) hits.push(path.relative(REPO_DIR, full));
+    } };
+    runtimeDirs.forEach(d => walk(path.join(REPO_DIR, d)));
+    check('no runtime module mentions archetype_proposal or choice_register_proposal', hits.length === 0, hits.join(', '));
+    const gateSrc = admin.archetypeAllows.toString() + admin.roleArchetype.toString() + admin.isWitnessCrucible.toString();
+    check('the archetype gate reads the confirmed archetype, never the proposal', !/proposal/.test(gateSrc));
+  }
 } finally {
   await new Promise(r => server.close(r));
   fs.rmSync(TMP, { recursive: true, force: true });

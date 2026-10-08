@@ -422,6 +422,50 @@ try {
     f.remove();
     doc.body.appendChild(formEl);
   }
+  head('11. the CHOICE REGISTER proposal persists, and its decision is the record');
+  {
+    const TEXT = 'Offer choices about what he carries out of the corridor: what he sees, what he keeps, what he says later and to whom. Avoid rescue.';
+    const REPLY = { posture: 'witnessing', confidence: 'high', choice_register: TEXT, rationale: 'He decides nothing; he carries.', counter_case: 'Escalation would make him a rescuer.', evidence: ['He escorts her daily.'] };
+    repos.scenarios.savePlayerRole({ id: 'role_ui_reg', scenarioId: SCENARIO_ID, name: 'The Registrar', archetype: 'witness', description: 'fixture' });
+    const reg = () => repos.scenarios.findPlayerRole('role_ui_reg');
+    formEl.remove();
+    const mountReg = () => {
+      const d = { scenario: structuredClone(SCENARIO), playerRoles: [structuredClone(reg())], storyArc: structuredClone(ARC) };
+      win._aiPanelData = d;
+      const f = doc.createElement('form');
+      f.innerHTML = win.renderChoiceRegisterSection(d.playerRoles[0], 0);
+      doc.body.appendChild(f);
+      win.bindChoiceRegisterHandlers(f, d, SCENARIO_ID);
+      return { f, d };
+    };
+    const panel = f => f.querySelector('#creg-proposal-0')?.textContent.replace(/\s+/g, ' ') || '';
+    let { f } = mountReg();
+    modelQueue.push(JSON.stringify(REPLY));
+    f.querySelector('.propose-creg-btn').click();
+    await settle(300);
+    check('propose → the card shows posture, text and reasoning; it is stored', /posture: witnessing/.test(panel(f)) && f.querySelector('.creg-proposal-text')?.value === TEXT && /He decides nothing/.test(panel(f)) && /Stored on the role/.test(panel(f)) && reg().choice_register_proposal?.posture === 'witnessing');
+    f.remove();
+
+    ({ f } = mountReg());   // REFRESH
+    check('AFTER A REFRESH: the proposal is still on the card — posture, confidence, text, rationale, counter-case, evidence',
+      /posture: witnessing/.test(panel(f)) && /confidence high/.test(panel(f)) && f.querySelector('.creg-proposal-text')?.value === TEXT && /He decides nothing/.test(panel(f)) && /rescuer/.test(panel(f)) && /escorts her daily/.test(panel(f)));
+    check('…and it steers nothing yet', reg().choice_register === undefined);
+    f.querySelector('.creg-proposal-text').value = `${TEXT} Keep it quiet.`;
+    f.querySelector('.approve-creg-btn').click();
+    await settle(300);
+    check('Approve (edited) → steering; the card becomes the record: "Approved — edited before approving"', reg().choice_register_reviewed === true && reg().choice_register.endsWith('Keep it quiet.') && /Approved — edited before approving/.test(panel(f)), panel(f).slice(0, 200));
+    f.remove();
+    ({ f } = mountReg());   // REFRESH
+    check('AFTER A REFRESH: the record (decision + the proposal and its reasoning) is still there', /Approved — edited before approving/.test(panel(f)) && /He decides nothing/.test(panel(f)));
+    modelQueue.push(JSON.stringify({ ...REPLY, posture: 'testimony' }));
+    f.querySelector('.propose-creg-btn').click();
+    await settle(300);
+    f.querySelector('.discard-creg-btn').click();
+    await settle(300);
+    check('a fresh proposal, discarded → recorded as "Discarded", the approved register untouched', /Discarded/.test(panel(f)) && /posture: testimony/.test(panel(f)) && reg().choice_register_proposal.decision?.action === 'discarded' && reg().choice_register.endsWith('Keep it quiet.'));
+    f.remove();
+    doc.body.appendChild(formEl);
+  }
 } finally {
   win.close();
   await new Promise(r => server.close(r));

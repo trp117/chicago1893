@@ -747,6 +747,18 @@ function scenesRejection(errors) {
 // and generated flags beside it describe nothing and are stripped with it rather than left
 // as a husk every reader has to special-case.
 const CHOICE_REGISTER_KEYS = ['choice_register', 'choice_register_reviewed', 'choice_register_generated'];
+// EDITOR-SAVE GUARD for choice_register_proposal — the model's stored register proposal and
+// its reasoning (posture, confidence, rationale, counter-case, evidence). Written only by the
+// propose route and stamped only by the register write and discard routes; whatever an editor
+// save posts is replaced by the stored value. ADVISORY: play reads choice_register, and only
+// when choice_register_reviewed is true — never this.
+function preserveStoredChoiceRegisterProposal(repos, role) {
+  const stored = repos.scenarios.findPlayerRole(role.id);
+  if (stored?.choice_register_proposal !== undefined) role.choice_register_proposal = stored.choice_register_proposal;
+  else delete role.choice_register_proposal;
+  return role;
+}
+
 function preserveStoredChoiceRegister(repos, role) {
   if (CHOICE_REGISTER_KEYS.some(k => role[k] === undefined)) {
     const stored = repos.scenarios.findPlayerRole(role.id);
@@ -821,6 +833,7 @@ function preserveStoredRoleBlocks(repos, role) {
   preserveStoredArchetypeProposal(shim, role);
   preserveStoredAnchoredLocation(shim, role);
   preserveStoredChoiceRegister(shim, role);
+  preserveStoredChoiceRegisterProposal(shim, role);
   preserveStoredWitnessCrucible(shim, role);
   preserveStoredWitnessLever(shim, role);
   // After the defining-moment guard, so a block restored from storage is normalized too.
@@ -4058,8 +4071,9 @@ export function createAdminRouter(repos, config = {}) {
   });
 
   // Propose a CHOICE REGISTER for every role in a scenario — or for one, when the body names
-  // a roleId (the panel's per-card Regenerate). READ-ONLY, like propose-anchored-locations:
-  // model calls, no writes. On demand, run per scenario like technical facts; not a pipeline
+  // a roleId (the panel's per-card Regenerate). Each proposal is STORED on its role as
+  // choice_register_proposal (advisory, with its reasoning); the register itself is never
+  // written here — that is the write route's, below. On demand, run per scenario like technical facts; not a pipeline
   // step. Returns every role: proposals, the skipped (approved or hand-authored registers,
   // with their text, so the reviewer sees what is protected), and any per-role failures —
   // one role's malformed proposal never costs the others theirs.
@@ -4095,7 +4109,14 @@ export function createAdminRouter(repos, config = {}) {
         const role = todo[i];
         try {
           const character = role.character_id ? repos.characters.findById(role.character_id) : null;
-          results[i] = await proposeChoiceRegister(scenario, role, character, anthropicApiKey);
+          const proposal = await proposeChoiceRegister(scenario, role, character, anthropicApiKey);
+          // THE PROPOSAL PERSISTS on the role it was made for, with its reasoning, so a reload
+          // still shows it and why. ADVISORY: play reads only an approved choice_register; this
+          // writes nothing else (a re-proposal replaces only the previous proposal).
+          const fresh = repos.scenarios.findPlayerRole(role.id) || role;
+          const { role_id, role_name, proposed, existing, ...fields } = proposal;
+          const saved = repos.scenarios.savePlayerRole({ ...fresh, choice_register_proposal: { ...fields, proposed_at: new Date().toISOString() } });
+          results[i] = { ...proposal, choice_register_proposal: saved.choice_register_proposal };
         } catch (err) {
           console.error(`[REGISTER-PROPOSE ERROR] ${req.params.id}/${role.id}: ${err.message}`);
           results[i] = { role_id: role.id, role_name: role.name || role.id, proposed: false, error: err.message };
@@ -4105,8 +4126,8 @@ export function createAdminRouter(repos, config = {}) {
 
     const proposals = results.filter(p => p.proposed);
     const failed    = results.filter(p => !p.proposed);
-    console.log(`[REGISTER-PROPOSE] ${req.params.id} — ${proposals.length} proposal(s), ${skipped.length} skipped, ${failed.length} failed, from ${targets.length} role(s); nothing written`);
-    res.json({ scenarioId: req.params.id, persisted: false, proposals, skipped, failed });
+    console.log(`[REGISTER-PROPOSE] ${req.params.id} — ${proposals.length} proposal(s) stored as choice_register_proposal, ${skipped.length} skipped, ${failed.length} failed, from ${targets.length} role(s); no register written`);
+    res.json({ scenarioId: req.params.id, persisted: true, proposals, skipped, failed });
   });
 
   // Write ONE register to ONE role, from a proposal card: as a draft (reviewed:false), or —
@@ -4138,11 +4159,18 @@ export function createAdminRouter(repos, config = {}) {
     if (!text) return badRequest(res, '"choice_register" is required.');
     const approve = req.body?.approve === true;
 
+    // THE DECISION, recorded on the stored proposal it came from (the audit trail): approved or
+    // saved as a draft, and whether the reviewer edited the text first.
+    const proposal = role.choice_register_proposal;
     const saved = repos.scenarios.savePlayerRole({
       ...role,
       choice_register:           text,
       choice_register_generated: true,
       choice_register_reviewed:  approve,
+      ...(proposal ? { choice_register_proposal: { ...proposal, decision: {
+        action: approve ? 'approved' : 'saved_as_draft', at: new Date().toISOString(),
+        edited: text !== String(proposal.choice_register || '').trim(),
+      } } } : {}),
     });
     console.log(`[REGISTER-PROPOSE] ${req.params.id}/${role.id} — register written (${approve ? 'reviewed:true, steering' : 'reviewed:false, not steering'})`);
     res.json({
@@ -4150,7 +4178,21 @@ export function createAdminRouter(repos, config = {}) {
       choice_register:           saved.choice_register,
       choice_register_reviewed:  saved.choice_register_reviewed,
       choice_register_generated: saved.choice_register_generated,
+      ...(saved.choice_register_proposal ? { choice_register_proposal: saved.choice_register_proposal } : {}),
     });
+  });
+
+  // DISCARD a stored register proposal — recorded, not erased: the proposal stays on the role
+  // as the record of what was proposed and that it was turned down. Writes nothing else.
+  r.patch('/player-roles/:id/choice-register-proposal', (req, res) => {
+    const role = repos.scenarios.findPlayerRole(req.params.id);
+    if (!role) return notFound(res);
+    if (req.body?.discard !== true) return badRequest(res, 'Send { "discard": true }.');
+    if (!role.choice_register_proposal) return res.status(404).json({ error: `"${role.name}" has no register proposal.` });
+    const saved = repos.scenarios.savePlayerRole({ ...role, choice_register_proposal: {
+      ...role.choice_register_proposal, decision: { action: 'discarded', at: new Date().toISOString() } } });
+    console.log(`[REGISTER-PROPOSE] ${role.id} — proposal discarded (kept as a record)`);
+    res.json({ roleId: role.id, choice_register_proposal: saved.choice_register_proposal });
   });
 
   r.get('/locations',      (req, res) => res.json(
@@ -4241,6 +4283,7 @@ export function createAdminRouter(repos, config = {}) {
     const payload = { ...req.body, id, scenarioId: req.body.scenarioId || 'chicago_1893_v1' };
     delete payload.witness_lever;        // written only by the lever routes, never posted in
     delete payload.archetype_proposal;   // written only by classify-archetype
+    delete payload.choice_register_proposal;   // written only by propose-choice-registers
     res.status(201).json(repos.scenarios.savePlayerRole(payload));
   });
   r.put('/player-roles/:id', (req, res) => {
