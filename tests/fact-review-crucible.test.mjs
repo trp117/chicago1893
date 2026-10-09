@@ -97,7 +97,7 @@ head('1. EXPORT — the Defining Moments & Crucibles section');
   check('options are addressed by ID — no positional locator anywhere', !/\.options\.\d/.test(text));
   check('the linked fields say what they are linked to', /CONSEQUENCE CLAIM — appears word for word in the debrief/.test(text) && /CONSEQUENCE SOURCE — one of the lever's evidence sources/.test(text));
   check('a CONFIRMED lever is exported; an unconfirmed one is not', text.includes('WITNESS LEVER — confirmed') && !text.includes('UNCONFIRMED LEVER STATEMENT') && !text.includes('role_fr_draft.witness_lever'));
-  check('registers are labelled approved / draft', text.includes('CHOICE REGISTER — approved (damen_role.choice_register)') && text.includes('CHOICE REGISTER — draft, not approved (role_fr_draft.choice_register)'));
+  check('registers are labelled approved / draft, and context only', text.includes('CHOICE REGISTER — approved (context only — not a correctable field) (damen_role.choice_register)') && text.includes('CHOICE REGISTER — draft, not approved (context only — not a correctable field) (role_fr_draft.choice_register)'));
   check('the archetype reasoning is CONTEXT ONLY — printed, with no locator', /ARCHETYPE REASONING \(context only — not a correctable field\):/.test(text) && text.includes('She watches.') && !/archetype_proposal/.test(text));
   check('an option without an id is shown as context, never with a locator', text.includes('AN OPTION WITHOUT AN ID.') && /OPTION #2 — has no id/.test(text));
   check('a role with none of it is left out', !text.includes('The Plain Role'));
@@ -121,7 +121,10 @@ head('2. EXPORT — the picker, its prompt, and All-Story');
   check('Copy = the crucibles prompt with the section spliced in at its marker',
     !!copied && copied.startsWith('Review the DEFINING MOMENTS AND CRUCIBLES') && copied.includes(`(damen_role.defining_moment.options.${OPT0.id}.consequence.claim):`) && !copied.includes('[PASTE DEFINING MOMENTS DATA HERE]'));
   check('the prompt centres the high-stakes check and says linked fields are reported like any other',
-    /Every CONSEQUENCE CLAIM against its CONSEQUENCE SOURCE/.test(copied) && /Documented vs dramatized/.test(copied) && /SECTION: Defining Moments/.test(copied) && /give one correction for each field/.test(copied));
+    /Every CONSEQUENCE CLAIM against its CONSEQUENCE SOURCE — the highest-stakes target/.test(copied) && /SECTION: Defining Moments/.test(copied) && /give one correction for each field/.test(copied));
+  check('the prompt frames setup + option text as authored fiction, and drops the register from the locator list',
+    /The SETUP and each option's TEXT are authored FICTION/.test(copied) && /Do NOT "correct" dramatization/.test(copied)
+    && !/<role_id>.choice_register/.test(copied) && /neither is the CHOICE REGISTER — it is marked context only/.test(copied));
   sel.value = 'allstory'; win.selectReviewPrompt(sel);
   copied = null; win.copyCorrectionPrompt(win.document.createElement('button'));
   await sleep(20);

@@ -6174,7 +6174,7 @@ function buildCruciblesSection(data) {
     }
 
     const reg = regOf(r);
-    if (reg) field(`CHOICE REGISTER — ${r.choice_register_reviewed === true ? 'approved' : 'draft, not approved'}`, `${id}.choice_register`, reg);
+    if (reg) field(`CHOICE REGISTER — ${r.choice_register_reviewed === true ? 'approved' : 'draft, not approved'} (context only — not a correctable field)`, `${id}.choice_register`, reg);
     out.push(hr);
   }
   return out;
@@ -8427,16 +8427,16 @@ Rules:
 DATA TO REVIEW:
 [PASTE GLOSSARY DATA HERE]`,
 
-  crucibles: `Review the DEFINING MOMENTS AND CRUCIBLES of this interactive historical fiction scenario — each role's decision point (the setup, the options, and the "Your Session" debrief each choice ships), the witness lever a witness's decision point is drafted on, and the choice register that steers the role's play. This is the highest-stakes text in the scenario: after the session a debrief tells the player what their choice carried in history, and it CITES a documented consequence.
+  crucibles: `Review the DEFINING MOMENTS AND CRUCIBLES of this interactive historical fiction scenario — each role's decision point (the setup, the options, and the "Your Session" debrief each choice ships), and the witness lever a witness's decision point is drafted on. This is the highest-stakes text in the scenario: after the session a debrief tells the player what their choice carried in history, and it CITES a documented consequence. Each role's choice register is printed too, as CONTEXT ONLY — it is a design note that steers play, not a historical claim, and is never corrected here.
 
-Check, above all:
-- Every CONSEQUENCE CLAIM against its CONSEQUENCE SOURCE. Does the source document that consequence, as stated? Flag an overclaim (the source documents less than the claim says), a misattribution (a real fact, the wrong source), and a consequence that does not follow from the choice it is attached to.
-- Documented vs dramatized, in every setup and debrief: flag any place where invented in-scenario detail — what the character felt, said or did in the moment — is narrated in the same confident voice as documented fact, and any place where tradition or legend is told as record.
-- Each witness lever's EVIDENCE claims against their sources. The debriefs are drafted on the lever, so an error there carries into every option.
-- Dates, places, names, numbers, whereabouts, and the fixed historical outcome — against primary sources and against the rest of the scenario.
-- Anachronism in the setup and the option text.
+Fact-check only what is verifiable. In priority order:
+1. Every CONSEQUENCE CLAIM against its CONSEQUENCE SOURCE — the highest-stakes target. Does the source document that consequence, as stated? Flag an overclaim (the source documents less than the claim says), a misattribution (a real fact, the wrong source), and a consequence that does not follow from the choice it is attached to. In the DEBRIEF, flag invented in-scenario detail or tradition/legend told as documented record.
+2. Each witness lever's EVIDENCE claims against their sources. The debriefs are drafted on the lever, so an error there carries into every option.
+3. Hard facts — dates, places, names, numbers, whereabouts, and the fixed historical outcome — against primary sources and against the rest of the scenario.
 
-FIELD locator for this section — copy it exactly from the label in the data: <role_id>.defining_moment.setup; <role_id>.defining_moment.options.<option_id>.label | .text | .debrief | .outcome_disclaimer | .consequence.claim | .consequence.source; <role_id>.witness_lever.statement | .reasoning | .counter_case.assumption | .counter_case.why_wrong | .evidence.<n>.claim | .evidence.<n>.source; <role_id>.choice_register. Options are addressed by their id, never by position.
+The SETUP and each option's TEXT are authored FICTION: the dramatized scene, and the in-character framing of each choice. In those fields flag ONLY a falsifiable fact stated as documented — a wrong date, name or place, or an anachronism. Do NOT "correct" dramatization, invented scene detail, a character's interior state (what they feel, fear, or think), voice, or characterization — those are intentional authorial choices, not errors.
+
+FIELD locator for this section — copy it exactly from the label in the data: <role_id>.defining_moment.setup; <role_id>.defining_moment.options.<option_id>.label | .text | .debrief | .outcome_disclaimer | .consequence.claim | .consequence.source; <role_id>.witness_lever.statement | .reasoning | .counter_case.assumption | .counter_case.why_wrong | .evidence.<n>.claim | .evidence.<n>.source. Options are addressed by their id, never by position.
 
 Linked fields: a consequence claim and an outcome disclaimer each appear WORD FOR WORD inside their option's debrief, and a consequence source is one of the lever's evidence sources. Report a correction to any of them exactly like any other — complete CURRENT, complete REPLACE WITH — and when correcting one changes its partner (a claim and the debrief that quotes it), give one correction for each field.
 
@@ -8459,7 +8459,7 @@ Rules:
 - Quote CURRENT verbatim — exact bytes, not a paraphrase — or the correction cannot be located and applied.
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
-- Correct only text printed under a label that carries a FIELD locator. Headings and status lines (OPTION <id>, DEFINING MOMENT … — reviewed · generated, WITNESS LEVER — confirmed, the CHOICE REGISTER status) are not fields.
+- Correct only text printed under a label that carries a FIELD locator. Headings and status lines (OPTION <id>, DEFINING MOMENT … — reviewed · generated, WITNESS LEVER — confirmed) are not fields, and neither is the CHOICE REGISTER — it is marked context only.
 - Lines marked "context only" are not correctable fields — never give a correction for them. If the context is wrong, say so in the REASON of a related correction, or as ---UNVERIFIED: [what]---.
 - A cited consequence must be documented, not inferred: prefer cutting or hedging an unsupported consequence to inventing a citation for it.
 - Real figures are bound by the record — rank, role, whereabouts and fate must match history.
