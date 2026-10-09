@@ -28,3 +28,6 @@ engine/data/scenarios/player_roles/*.json
 # real lineage in scenario_versions, with base_version. Directory exclude: the
 # dirs are created on demand per scenario, so a glob would miss new ones.
 engine/data/scenarios/versions/
+
+# Scenario rollback points written by scripts/scenario-snapshot.mjs — data, not code.
+snapshots/

@@ -6,7 +6,9 @@
     "start": "node engine/server/server.js",
     "engine": "node engine/server/server.js",
     "review": "node engine/agents/transcriptReviewer.js",
-    "test": "node tests/run.mjs"
+    "test": "node tests/run.mjs",
+    "snapshot": "node scripts/scenario-snapshot.mjs snapshot",
+    "restore": "node scripts/scenario-snapshot.mjs restore"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.1",
