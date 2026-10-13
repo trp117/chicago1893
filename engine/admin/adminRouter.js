@@ -2957,26 +2957,30 @@ function generationMaxTokens(minutes) {
 function buildGenerationPrompt({ description, playTimeMinutes }) {
   const s = scalingGuide(playTimeMinutes);
 
-  return `You are a professional story designer for an AI-powered interactive mystery game engine.
+  return `You are a professional story designer for an AI-powered interactive historical fiction engine.
 Read the creator's description and generate a complete, immediately playable story package.
 
 GAME ENGINE:
-Players inhabit a historical moment, interact with the people in it, and make decisions under the constraints that actually existed. The scenario ends when time runs out or the historical moment resolves.
-- Players travel between locations; clues are location-specific
-- NPCs respond based on professional role, chain of command, and the pressure of the situation
-- The game ends when time runs out or the player triggers the historical moment's resolution
+Players inhabit a real historical moment in the first person, interact with the people in it, and make decisions under the constraints that actually existed. Every scenario turns on a single human decision under pressure — sometimes an investigation against the clock, sometimes a choice of conscience with no mystery to solve at all. The scenario ends when time runs out or the historical moment resolves.
+- The player moves through the setting and encounters what is there. In an investigation this means traveling between locations for location-specific clues; in an intimate or interior story it may mean one or two charged settings and almost no "clues" in the detective sense.
+- NPCs respond based on their role, their knowledge, the chain of command where one exists, and the pressure of the situation.
+- The game ends when time runs out or the player reaches the moment the story turns on.
 
 CREATOR'S DESCRIPTION:
 ${description}
+
+THE DECISION THIS STORY TURNS ON:
+First, name for yourself the single decision or moment of conscience at the heart of the creator's description, and what it costs the person who faces it. Build everything to deliver the player to that moment: the arc rises toward it, the locations and clues exist to inform it, the NPCs embody the pressures on it. Decide which kind of story this is — an investigation (what happened, who did it, can it be stopped in time) or a reckoning (what will I do, what will I record, who will I become when it costs me) — and shape the scale accordingly. Do NOT force an investigation structure onto a story that is really a choice of conscience.
 
 PLAY TIME: ${playTimeMinutes} minutes
 TIME PER TURN: ${s.tpt} minutes
 
 REQUIRED SCALE:
+SCALE — adapt to the story's spine. The figures below are an upper bound for a story that genuinely spans a place. For an intimate, interior, or single-room story (a convalescence, a trial, a vigil), use far fewer locations — only the charged settings the story actually inhabits — and treat the scale as a ceiling, never a quota. Never invent locations to walk between or clues to find where the story does not call for them.
 - Acts: exactly ${s.acts}
 - NPCs: ${s.chars} — characters representing the documented roles present at this moment: the chain of command, the specialists, the witnesses, the people whose work intersected the crisis. No invented villains.
-- Locations: ${s.locs} — 2–3 NPCs per location
-- Clues: ${s.clues} — exactly 2 with isKeyEvidence: true
+- Locations: up to ${s.locs} for a story that spans a place; as few as one or two for an interior story. Aim for 2–3 NPCs per location you create.
+- Clues: up to ${s.clues}, exactly 2 marked isKeyEvidence. In an investigation these are evidence to discover; in a reckoning they are what the character comes to notice, learn, or realize — and the two isKeyEvidence clues are the two realizations the whole story turns on. Do not pad.
 - Player Roles: ${s.roles}
 
 OUTPUT RULES:
@@ -2995,6 +2999,7 @@ OUTPUT RULES:
 13. Use period-appropriate, unit-appropriate names drawn from documented rosters or period census data for the relevant nationality, service branch, and era. Do not reuse character names across scenarios. Avoid stock generic names unless documented. Do NOT use thematic, symbolic, or punning names that describe a character's function (e.g., "Pulling" for an oarsman, "Burns" for a firefighter, "Bridge" for an engineer). Names must be plausible census-derived surnames, not literary inventions.
 14. Generate a composite_disclosure array on the scenario object listing the names of all fictional composite characters. Format: ["Name One", "Name Two"]. Include ONLY fictional/composite characters — do NOT include real historical figures (Washington, Glover, Tallmadge, and anyone else with a documented individual historical record). If all characters are real historical figures, set composite_disclosure to an empty array [].
 15. Set character_type on every character. Use "real" for documented historical individuals whose names, roles, and fates are in the historical record. Use "fictional" for all other characters — composites, representatives of documented roles, or invented individuals. Never leave character_type empty.
+16. Win, fail, and partial-success conditions must fit the story's spine. In an investigation they describe solving, preventing, or surviving. In a reckoning they describe fidelity to conscience and its cost — what it means to hold or to yield. For a story built on a real person whose fate is documented, success is NEVER changing that fate; it is who the player becomes and what they carry, within what truly happened.
 
 INTRODUCTION RULES (required on scenario):
 Write a 4-section pre-game reading experience in the style of a serious narrative historian — specific, cinematic, grounded in concrete detail. No genre clichés.

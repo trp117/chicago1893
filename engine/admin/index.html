@@ -1435,20 +1435,20 @@ function renderGenerator() {
         <h3>Describe Your Story</h3>
         <div class="field-group">
           <label for="gen-description">Scenario Description <span class="required">*</span></label>
-          <textarea id="gen-description" style="min-height:200px" placeholder="Describe the scenario you have in mind. Include the setting, the central mystery or conflict, the key characters, and the stakes. One paragraph or more — Claude generates everything else.
+          <textarea id="gen-description" style="min-height:200px" placeholder="Describe the story you have in mind — the setting, the people at its heart, and the decision or moment of conscience it turns on, and what it costs. One paragraph or more; Claude builds the rest.
 
 Examples:
-  • A locked-room murder at a Victorian séance. The medium is the obvious suspect, but four guests each had reason to want the victim dead.
-  • 1920s Prohibition Chicago. A speakeasy owner is found dead the night before he was to testify against the mob boss who owns the city.
-  • A Martian colony, 2147. The water recycler has been sabotaged and someone on the twelve-person crew did it."></textarea>
+  • Rouen, 1431. A notary records Joan of Arc's trial. He can't save her — but line by line, he decides how truthfully the record will stand.
+  • Loyola, 1521. A wounded soldier has nothing to read but lives of the saints, and slowly notices which daydreams leave him hollow and which leave him at peace.
+  • Berlin, 1961. A young conscript mans the wall going up overnight through his own neighborhood — and a neighbor breaks for the West."></textarea>
           <p class="help-text" id="gen-word-count">0 words</p>
         </div>
         <div class="field-group">
           <label for="gen-playtime">Session Length</label>
           <select id="gen-playtime" style="width:auto">
             <option value="10">10 minutes</option>
-            <option value="15" selected>15 minutes</option>
-            <option value="30">30 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30" selected>30 minutes (recommended)</option>
             <option value="60">60 minutes</option>
           </select>
         </div>
@@ -1470,7 +1470,7 @@ Examples:
 
 async function handleGenerate() {
   const description     = document.getElementById('gen-description')?.value.trim() || '';
-  const playTimeMinutes = Number(document.getElementById('gen-playtime')?.value || 15);
+  const playTimeMinutes = Number(document.getElementById('gen-playtime')?.value || 30);
 
   if (!description) { toast('Please describe your scenario.', 'error'); return; }
 
