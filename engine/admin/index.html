@@ -9061,8 +9061,9 @@ async function applyCorrections(scenarioId) {
 // NFC is CANONICAL composition only, so it closes exactly that gap and no other: "Inigo"
 // remains a different string from "Íñigo", so a reviewer who DE-ACCENTS the text still
 // yields current-mismatch — that is a real alteration and must stay caught. Verified: NFD
-// quotes go 2/20 → 20/20 applied, while de-accented / ñ→n / curly-quote / dash-swap /
-// quoted / truncated / paraphrased all still mismatch at their prior rates.
+// quotes go 2/20 → 20/20 applied, while de-accented / ñ→n / quoted / truncated /
+// paraphrased all still mismatch at their prior rates. (Curly-vs-straight quotes and
+// en/em-dash-vs-hyphen are tolerated when LOCATING — see _normPunct.)
 //
 // NEVER NFKC. That is COMPATIBILITY folding — ﬁ→fi, ²→2, №→No — which would silently
 // coerce genuine differences into matches and defeat the point of verifying CURRENT.
@@ -9070,12 +9071,25 @@ function _nfc(s) { return String(s == null ? '' : s).normalize('NFC'); }
 
 function _normWs(s) { return _nfc(s).replace(/\s+/g, ' ').trim(); }
 
-// Whitespace-tolerant literal pattern. Quotes/dashes must match literally — a
-// smart-quote / em-dash / paraphrase variant deliberately yields current-mismatch
-// (surfaced) rather than being silently coerced. Unicode composition form is normalised
-// (see _nfc) because that is not a difference in the text.
+// Punctuation ENCODING, for locating CURRENT only. A reviewer's copy (or the model's
+// output) routinely turns ' into ’ and - into —, or the reverse, and a verbatim match then
+// blocks a correct quote. Both sides — the submitted CURRENT and every stored candidate —
+// are folded to the ASCII form before comparison, and uniqueness ("exactly one leaf") is
+// counted on the folded text, so it still holds. Only these three families are folded;
+// anything else that differs still mismatches. Nothing folded is ever written: the span is
+// located in the stored text as-is (_flexPattern) and REPLACE WITH goes in exactly as given.
+const _PUNCT_FOLD = [[/[‘’ʼ]/g, "'"], [/[“”„]/g, '"'], [/[–—]/g, '-']];
+function _normPunct(s) { return _PUNCT_FOLD.reduce((t, [re, to]) => t.replace(re, to), String(s)); }
+// The locate-side comparison form: NFC, whitespace collapsed, punctuation encoding folded.
+function _normMatch(s) { return _normPunct(_normWs(s)); }
+
+// Whitespace-tolerant literal pattern. A quote or dash matches any of its encodings (see
+// _normPunct); a paraphrase variant still yields current-mismatch (surfaced) rather than
+// being silently coerced. Unicode composition form is normalised (see _nfc) because that
+// is not a difference in the text.
 function _flexPattern(s) {
-  return _nfc(s).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return _normPunct(_nfc(s).trim()).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')
+    .replace(/'/g, "['‘’ʼ]").replace(/"/g, '["“”„]').replace(/-/g, '[-–—]');
 }
 // All three sides go through _nfc: the pattern (via _flexPattern), the stored string it
 // runs against, and REPLACE WITH before write-back. Normalising only the locate step in
@@ -9265,7 +9279,7 @@ function resolveAndApply(data, corr) {
     repRaw = _stripVocabTermPrefix(corr.replacewith, terms);
   }
 
-  const cur = _normWs(curRaw);
+  const cur = _normMatch(curRaw);
   if (!cur) return { outcome: 'current-mismatch', detail: 'empty CURRENT text' };
 
   let explicitSlots = null, scopeNode = null, label = null;
@@ -9300,7 +9314,7 @@ function resolveAndApply(data, corr) {
   // Locate + verify CURRENT within the resolved scope.
   let slots = explicitSlots;
   if (!slots) { slots = []; _collectSlots(scopeNode, slots); }
-  const matches = slots.filter(s => _normWs(s.container[s.key]).includes(cur));
+  const matches = slots.filter(s => _normMatch(s.container[s.key]).includes(cur));
 
   // A mismatch ECHOES the stored value. The comparison above already had it in hand, and
   // without it the reviewer re-quotes blind: a smart quote, a trailing period, a dropped
@@ -9485,8 +9499,8 @@ function _crucibleSlot(data, slot) {
 // replacement spliced in is computed on a copy — nothing is written.
 function _crucibleFlag(role, path, kind, slot, current, replacewith) {
   const stored = slot ? slot.container[slot.key] : null;
-  const cur = _normWs(current);
-  const currentFound = typeof stored === 'string' && !!cur && _normWs(stored).includes(cur);
+  const cur = _normMatch(current);
+  const currentFound = typeof stored === 'string' && !!cur && _normMatch(stored).includes(cur);
   let suggestedField = null;
   if (currentFound) {
     const r = _replaceOnce(stored, current, replacewith);
@@ -9534,9 +9548,9 @@ function resolveCrucibleCorrection(data, corr) {
   if (kind !== 'simple') return _crucibleFlag(role, path, kind, slot, corr.current, corr.replacewith);
 
   // SIMPLE: one string, located and verified exactly as resolveAndApply's single-field path.
-  const cur = _normWs(corr.current);
+  const cur = _normMatch(corr.current);
   if (!cur) return { outcome: 'current-mismatch', detail: 'empty CURRENT text' };
-  if (!_normWs(slot.container[slot.key]).includes(cur)) {
+  if (!_normMatch(slot.container[slot.key]).includes(cur)) {
     return { outcome: 'current-mismatch', echoed: true,
              detail: _mismatchDetail(`CURRENT not found in ${field}`, corr.current, slot.container[slot.key]) };
   }

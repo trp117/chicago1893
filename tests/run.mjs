@@ -46,6 +46,7 @@ const SUITE = [
   ['witness-crucible generator',              'witness-crucible-gen.test.mjs'],
   ['witness-crucible editor (jsdom)',        'witness-crucible-ui.test.mjs'],
   ['fact review: crucible export + injector', 'fact-review-crucible.test.mjs'],
+  ['injector: CURRENT punctuation encoding', 'punct-match.test.mjs'],
 ];
 
 const results = [];
