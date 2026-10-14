@@ -1543,6 +1543,26 @@ function showClosingScreen(endState, sessionId) {
   const aftermath = scenario?.historical_aftermath || '';
   aftermathEl.textContent = aftermath;
 
+  // DOCUMENTED-OUTCOME FLOOR. The Historical Record is written by a model call that can fail,
+  // time out, or never run (epilogue guard false, stream aborted). When no generated record
+  // arrives, show the scenario's immediate_outcome verbatim in its place so the documented
+  // outcome is never lost. Same reviewed gate as the server (gameRouter.js:1982): unreviewed
+  // epilogue data is never shown. A generated record, when present, suppresses the floor.
+  // Returns true when it filled the record block.
+  function fillDocumentedOutcomeFloor() {
+    const io = scenario?.epilogue?.reviewed === true ? scenario.epilogue.immediate_outcome : null;
+    const facts = (io?.key_facts || [])
+      .map(k => (typeof k === 'string' ? k : k?.text || '').trim())
+      .filter(Boolean);
+    const text = [(io?.summary || '').trim(), ...facts].filter(Boolean).join('\n\n');
+    if (!text || !epRecordEl || !epRecordTextEl) return false;
+    epRecordTextEl.textContent = text;
+    epRecordTextEl.style.whiteSpace = 'pre-line';
+    epRecordEl.classList.add('visible');
+    console.log(`[CLOSING] documented-outcome floor shown (${facts.length} key facts)`);
+    return true;
+  }
+
   overlay.classList.remove('hidden');
   proseEl.textContent = '';
   syncClosingNarrationBtn();
@@ -1642,6 +1662,7 @@ function showClosingScreen(endState, sessionId) {
                 epRecordEl.classList.add('visible');
               }
             }
+            if (!recordText && fillDocumentedOutcomeFloor()) hasEpilogue = true;
             if (evt.bibliography?.length && bibEl && bibListEl) {
               hasBibliography = true;
               const escH = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -1681,7 +1702,7 @@ function showClosingScreen(endState, sessionId) {
             dotsEl.classList.add('hidden');
             waitEl?.classList.add('hidden');
             epLoadingEl?.classList.remove('visible');
-            triggerClosingSequence(false, false, false);
+            triggerClosingSequence(fillDocumentedOutcomeFloor(), false, false);
           }
         }
       }
@@ -1692,7 +1713,7 @@ function showClosingScreen(endState, sessionId) {
       dotsEl.classList.add('hidden');
       waitEl?.classList.add('hidden');
       epLoadingEl?.classList.remove('visible');
-      triggerClosingSequence(false, false, false);
+      triggerClosingSequence(fillDocumentedOutcomeFloor(), false, false);
     });
 }
 
