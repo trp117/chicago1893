@@ -587,9 +587,13 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
       sessionNpcList.map(c => `- ${c.name}${c.role ? ` (${c.role})` : ''}`).join('\n')
     : 'CHARACTERS PRESENT THIS SESSION: none recorded.';
 
+  // interacted_characters holds character IDs; they exist for the record call's fate filtering.
+  // The session block names people only from CHARACTERS PRESENT, so it gets no IDs at all:
+  // handed one, the model read "pedro_de_loyola" as "Pedro de Loyola" (16 Oct prod playtest).
+  const { interacted_characters: _ids, ...sessionSummaryForBlock } = sessionSummary;
   const sessionUserContent = [
     'SESSION SUMMARY:',
-    JSON.stringify(sessionSummary, null, 2),
+    JSON.stringify(sessionSummaryForBlock, null, 2),
     '',
     npcListSection,
     '',
