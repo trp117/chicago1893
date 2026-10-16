@@ -656,6 +656,7 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     '- Include open_threads entries only when the matching thread_id appears in SESSION SCOPING resolved_threads.',
     '- Include choice_echoes entries only when the matching beat_id appears in SESSION SCOPING completed_beats.',
     '- Do not invent, extrapolate, or editorialize. Every fact from epilogue data only.',
+    '- Keep every attribution qualifier. Where the data says a fact rests on "the biographical tradition", or that a source "does not name" someone, keep that wording; never restate it as plain fact. If two entries state the same fact with different certainty, use the more qualified one.',
     '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
     '- Last sentence: a verified historical fact. Not a meaning-statement.',
     compositeRule,

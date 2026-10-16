@@ -562,6 +562,7 @@ export function buildApprovedCharactersBlock(characters = []) {
     '## Approved Characters (only these people may be named, speak, or act in your narrative)',
     lines.join('\n'),
     '',
+    'Each line is `id: name`. The id is a system key for npc_updates and npcMoments only — it is never a name, and no name may be read out of it. Refer to each person exactly as written after the colon. Where that is a role rather than a personal name ("Household servant", "Night clerk"), the person has no name: write them as "the household servant", "the night clerk", and never give them a personal name, whether invented or taken from the id. That holds in their own dialogue too: asked their name, they give none — they deflect or answer with their place in the household.',
     'No other person may be given a name, a line of dialogue, or an action. Unnamed functionaries are permitted ("the duty officer", "a clerk", "the switchboard operator", "a marine at the desk") and must stay unnamed — they may move through the scene and speak as texture, but they never acquire a name, a history, or a part in the story.',
     'The player character is never an "other person" — they are the point of view, and the player-identity rules govern how they are written. This list closes who else may exist, not who the player is.',
   ].join('\n');
