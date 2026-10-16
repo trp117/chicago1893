@@ -430,7 +430,8 @@ const ENTITIES = {
         { key: 'character_type', label: 'Character Type', type: 'select', options: [
           { value: '',           label: '— not declared (legacy only) —' },
           { value: 'real',       label: 'real — documented historical individual' },
-          { value: 'fictional',  label: 'fictional — not a documented individual (composite, representative, or invented)' },
+          { value: 'composite',  label: 'composite — stands for an undocumented role; never given an individual fate' },
+          { value: 'fictional',  label: 'fictional — not a documented individual (representative or invented)' },
         ], help: 'Required for Historical Record generation.' },
         { key: 'represents', label: 'Represents', type: 'textarea', help: 'Required for fictional/composite. What category of real person this character represents — used in the Historical Record.' },
         { key: 'fact_checked', label: 'Fact Checked', type: 'select', bool: true, options: [
@@ -1725,8 +1726,15 @@ function collectEdits(containerEl, data) {
       const urlVal            = row.querySelector('.ep-char-url')?.value.trim()          || '';
       const noteVal           = row.querySelector('.ep-char-access-note')?.value.trim()  || '';
       const primary_source    = citVal ? { citation: citVal, url: urlVal || null, access_note: noteVal || null } : null;
+      // classification and verified have no input on the row, so they ride on data attributes
+      // and are written back as they were. Rebuilding the fate from the inputs alone stripped
+      // classification on every save, which silently turned off the composite no-invented-fate
+      // rule in the Historical Record (gameRouter.js compositeRule keys on it).
+      const classification    = row.dataset.classification || '';
+      const verified          = row.dataset.verified === 'true';
       if (character_id || name || historical_record) {
-        fates.push({ character_id, name, outcome, historical_record, primary_source });
+        fates.push({ character_id, name, outcome, historical_record, primary_source,
+          ...(classification ? { classification } : {}), ...(verified ? { verified } : {}) });
       }
     });
 
@@ -2129,7 +2137,7 @@ function renderCharactersSection(data) {
       ${edField('Trust Logic',        edTextarea(`characters.${i}.trustLogic`,     c.trustLogic,   2))}
       ${edField('Secrets',            edTextarea(`characters.${i}.secrets`,        secretsVal,     3, 'data-type="array"'), 'One per line')}
       ${edField('Aggression Profile', edTextarea(`characters.${i}.aggressionProfile`, aggrVal,    2, 'data-type="json"'))}
-      ${edField('Character Type', `<select data-path="characters.${i}.character_type"><option value=""${!c.character_type ? ' selected' : ''}>— not declared (legacy only) —</option><option value="real"${c.character_type === 'real' ? ' selected' : ''}>real — documented historical individual</option><option value="fictional"${c.character_type === 'fictional' || c.character_type === 'composite' ? ' selected' : ''}>fictional — not a documented individual (composite, representative, or invented)</option></select>`, 'Required for Historical Record generation.')}
+      ${edField('Character Type', `<select data-path="characters.${i}.character_type"><option value=""${!c.character_type ? ' selected' : ''}>— not declared (legacy only) —</option><option value="real"${c.character_type === 'real' ? ' selected' : ''}>real — documented historical individual</option><option value="composite"${c.character_type === 'composite' ? ' selected' : ''}>composite — stands for an undocumented role; never given an individual fate</option><option value="fictional"${c.character_type === 'fictional' ? ' selected' : ''}>fictional — not a documented individual (representative or invented)</option></select>`, 'Required for Historical Record generation.')}
       ${edField('Represents',         edTextarea(`characters.${i}.represents`, c.represents, 2), 'Required for fictional/composite — what category of real person this character represents')}
       ${edField('Fact Checked', `<select data-path="characters.${i}.fact_checked"><option value="false"${c.fact_checked !== true ? ' selected' : ''}>No — needs review</option><option value="true"${c.fact_checked === true ? ' selected' : ''}>Yes — verified</option></select>`, 'Has the real vs fictional declaration been verified?')}
     `, i === 0);
@@ -4265,7 +4273,7 @@ function normSourceClient(val) {
 
 function renderEpilogueCharFateRow(f) {
   const src = normSourceClient(f.primary_source);
-  return `<div class="ep-fate-row" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative">
+  return `<div class="ep-fate-row" data-classification="${esc(f.classification || '')}" data-verified="${f.verified === true ? 'true' : ''}" style="border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;position:relative">
     <button type="button" class="remove-ep-fate-btn" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:18px;line-height:1;padding:0">×</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
       <input type="text" class="ep-char-id"   placeholder="character_id" value="${esc(f.character_id || '')}" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:13px">
