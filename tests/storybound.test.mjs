@@ -276,27 +276,65 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
     const frac = typeof b?.fallback_at_elapsed_fraction === 'number' ? b.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
     return !!b && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
   };
-  let forks = 0, boundForks = 0, points = 0; const moved = [], boundMoved = [];
-  for (const c of corpus) {
-    const arc = arcOf(c);
-    for (const role of c.roles.filter(r => r.defining_moment)) {
-      forks++;
-      const isB = isBoundRole(role);
-      if (isB) boundForks++;
-      const total = c.scenario.sessionTargetMinutes || 15;
-      for (let m = 0; m <= total; m += 0.5) {
-        const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
-        st.elapsedMinutes = m; st.remainingMinutes = total - m;
-        const want = isB ? fallbackDue(st, c) : clockDue(st, c);
-        if (definingMomentDue(st, c.scenario) !== want || definingMomentDue(st, c.scenario, arc) !== want) (isB ? boundMoved : moved).push(`${role.id}@${m}`);
-        points++;
+  // One sweep, run twice: over the REAL stored forks, and over a FROZEN synthetic corpus whose
+  // shape never changes. The real sweep's invariant (nothing moved) holds for any data, so it
+  // pins no count; the exact counts live on the frozen corpus, which no content edit can touch.
+  // (The real-count pin re-rotted with every new crucible: 17 → 18 Damen → 19 role_inigo + role_magdalena.)
+  const sweep = (cor, arcFor) => {
+    let forks = 0, boundForks = 0, points = 0; const moved = [], boundMoved = [];
+    for (const c of cor) {
+      const arc = arcFor(c);
+      for (const role of c.roles.filter(r => r.defining_moment)) {
+        forks++;
+        const isB = isBoundRole(role);
+        if (isB) boundForks++;
+        const total = c.scenario.sessionTargetMinutes || 15;
+        for (let m = 0; m <= total; m += 0.5) {
+          const st = quiet(() => buildInitialState(c.scenario, role, c.locations));
+          st.elapsedMinutes = m; st.remainingMinutes = total - m;
+          const want = isB ? fallbackDue(st, c) : clockDue(st, c);
+          if (definingMomentDue(st, c.scenario) !== want || definingMomentDue(st, c.scenario, arc) !== want) (isB ? boundMoved : moved).push(`${role.id}@${m}`);
+          points++;
+        }
       }
     }
-  }
-  // 18 stored forks: the 17 this was written against, plus Damen (seven_lights_1871), authored
-  // through the witness-crucible editor 2026-10-08 — an unbound fork on the clock.
-  check(`all ${forks - boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, forks === 17 && moved.length === 0, moved.slice(0, 5).join(', '));
-  check(`all ${boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${points} points total)`, boundForks === EXPECTED_BOUND.length && boundMoved.length === 0, boundMoved.slice(0, 5).join(', '));
+    return { forks, boundForks, points, moved, boundMoved };
+  };
+
+  const real = sweep(corpus, arcOf);
+  check(`all ${real.forks - real.boundForks} UNBOUND stored forks: due exactly at at_elapsed_fraction (half-minute sweep, arc passed or not)`, real.forks - real.boundForks > 0 && real.moved.length === 0, real.moved.slice(0, 5).join(', '));
+  check(`all ${real.boundForks} BOUND stored forks: with no beat reached, due only at the fallback fraction (${real.points} points total)`, real.boundForks === EXPECTED_BOUND.length && real.boundMoved.length === 0, real.boundMoved.slice(0, 5).join(', '));
+
+  // FROZEN: three unbound forks at three fractions, two bound ones (at_act with an authored
+  // fallback, at_beat on the default), and a role with no fork — on a 30-minute session.
+  const fork = (moment, extra) => ({ id: moment, setup: 'Frozen.', principal_transition: { type: 'decision_made', moment }, options: [{ id: 'a', text: 'A.' }, { id: 'b', text: 'B.' }], ...extra });
+  const FROZEN_ARC = { id: 'syn_frozen_arc', acts: [{ act_number: 1, title: 'One', beats: [{ id: 'syn_b1' }] }, { act_number: 2, title: 'Two', beats: [{ id: 'syn_b2' }] }] };
+  const FZ = {
+    scenario: { id: 'syn_frozen_forks', sessionTargetMinutes: 30, storyArcIds: [FROZEN_ARC.id] },
+    locations: [{ id: 'syn_room', name: 'Room' }],
+    roles: [
+      { id: 'syn_u50',    name: 'U50',   defining_moment: fork('m_u50',    { at_elapsed_fraction: 0.5 }) },
+      { id: 'syn_u60',    name: 'U60',   defining_moment: fork('m_u60',    { at_elapsed_fraction: 0.6 }) },
+      { id: 'syn_u75',    name: 'U75',   defining_moment: fork('m_u75',    { at_elapsed_fraction: 0.75 }) },
+      { id: 'syn_b_act',  name: 'BAct',  defining_moment: fork('m_b_act',  { at_elapsed_fraction: 0.6, at_act: 2, fallback_at_elapsed_fraction: 0.9 }) },
+      { id: 'syn_b_beat', name: 'BBeat', defining_moment: fork('m_b_beat', { at_elapsed_fraction: 0.6, at_beat: 'syn_b2' }) },
+      { id: 'syn_none',   name: 'None' },
+    ],
+  };
+  const frozen = sweep([FZ], () => FROZEN_ARC);
+  check('FROZEN corpus: exactly 3 unbound + 2 bound forks swept, 305 points (5 forks x 61 half-minutes)', frozen.forks === 5 && frozen.boundForks === 2 && frozen.points === 305, JSON.stringify({ f: frozen.forks, b: frozen.boundForks, p: frozen.points }));
+  check('FROZEN corpus: every unbound fork due exactly at its fraction, every bound one only at its fallback', frozen.moved.length === 0 && frozen.boundMoved.length === 0, [...frozen.moved, ...frozen.boundMoved].slice(0, 5).join(', '));
+  // ...and the sweep is not vacuous: each frozen fork first comes due at a known minute.
+  const firstDue = role => {
+    for (let m = 0; m <= 30; m += 0.5) {
+      const st = quiet(() => buildInitialState(FZ.scenario, role, FZ.locations));
+      st.elapsedMinutes = m; st.remainingMinutes = 30 - m;
+      if (definingMomentDue(st, FZ.scenario, FROZEN_ARC)) return m;
+    }
+    return null;
+  };
+  const firsts = FZ.roles.filter(r => r.defining_moment).map(firstDue).join(' / ');
+  check('FROZEN corpus: first due at 15 / 18 / 22.5 (clock) and 27 / 25.5 (fallback 0.9 / default)', firsts === `15 / 18 / 22.5 / 27 / ${30 * FORK_FALLBACK_FRACTION_DEFAULT}`, firsts);
 }
 
 head('A3 WATERGATE — McCord bound at_act:4 fires in Act 4, never in Act 3');

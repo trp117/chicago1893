@@ -144,7 +144,11 @@ const fixtureData = () => ({
   characters: [{ id: 'damen_role', name: 'Damen the character', description: 'A character record with the role\'s id.' }],
   playerRoles: [structuredClone(APPROVED_REG), structuredClone(PLAIN)],
 });
-const crucibleJson = r => JSON.stringify(['defining_moment', 'witness_lever', 'choice_register', 'choice_register_reviewed', 'archetype', 'archetype_proposal'].map(k => r?.[k] ?? null));
+// The crucible keys, taken from the injector itself (CRUCIBLE_ROLE_KEYS) rather than restated:
+// a hand-kept copy here once left out choice_register_proposal, so section 7 could not see the
+// old resolver writing into one, and failed the day real roles first carried a proposal.
+const CRUCIBLE_KEYS = [...win.eval('CRUCIBLE_ROLE_KEYS')];
+const crucibleJson = r => JSON.stringify([...CRUCIBLE_KEYS, 'choice_register_reviewed'].map(k => r?.[k] ?? null));
 const sentenceOf = (s, n = 0) => s.split(/(?<=[.!?])\s+/)[n];
 const D = 'damen_role.defining_moment';
 
@@ -288,7 +292,29 @@ head('7. UNCHANGED — the injector before this change and after, side by side o
     };
     // A CURRENT the way a reviewer quotes one: a sentence of the value, or all of a short one.
     const quoteOf = v => { const s = v.split(/(?<=[.!?])\s+/).find(x => x.trim().length >= 12) || v; return s.length > 220 ? s.slice(0, 220).replace(/\s+\S*$/, '') : s; };
-    const CRU = new Set(['defining_moment', 'witness_lever', 'choice_register', 'archetype', 'archetype_proposal', 'choice_register_proposal']);
+    const CRU = new Set(CRUCIBLE_KEYS);
+    check('the crucible keys are the six the injector guards (a new one is a deliberate test update)',
+      JSON.stringify([...CRU].sort()) === JSON.stringify(['archetype', 'archetype_proposal', 'choice_register', 'choice_register_proposal', 'defining_moment', 'witness_lever']), [...CRU].join(', '));
+
+    // A FROZEN fixture scenario rides in the corpus beside the real data: one role carrying every
+    // crucible key, a stored register proposal among them. The real data decides what else is
+    // covered; this guarantees the proposal path is exercised whatever the real roles hold today.
+    const FROZEN_SC = { id: 'fr_frozen_fixture', title: 'Frozen fixture', storyArcIds: [] };
+    const FROZEN_ROLE = {
+      ...structuredClone(UNCONFIRMED), id: 'role_fr_frozen', scenarioId: FROZEN_SC.id,
+      briefing: 'The frozen fixture briefing is a plain field the injector may write.',
+      choice_register_proposal: {
+        register: 'A proposed register sentence, stored but never steering.',
+        rationale: 'The rationale for the proposed register, long enough to quote.',
+        counter_case: 'The counter case against the proposed register, also quotable.',
+        evidence: ['First evidence line for the register proposal.', 'Second evidence line for the register proposal.'],
+        decision: { at: '2026-10-15T00:00:00.000Z', by: 'fixture' },
+        proposed_at: '2026-10-15T00:00:00.000Z',
+      },
+    };
+    scenarios.push(FROZEN_SC);
+    allRoles.push(FROZEN_ROLE);
+    let frozenProposal = 0, frozenProposalRefused = 0;
 
     let n = 0, same = 0, crucibleOnly = 0, linkedWrites = 0;
     const unexpected = [];
@@ -345,6 +371,10 @@ head('7. UNCHANGED — the injector before this change and after, side by side o
         const ra = oldWin.resolveAndApply(a, { ...corr });
         const rb = resolve(win, b, { ...corr });
         const sa = JSON.stringify(a), sb = JSON.stringify(b);
+        if (sc.id === FROZEN_SC.id) {
+          const prop = x => JSON.stringify(x.playerRoles[0]?.choice_register_proposal ?? null);
+          if (prop(a) !== prop(composite)) { frozenProposal++; if (prop(b) === prop(composite)) frozenProposalRefused++; }
+        }
         if (JSON.stringify(ra) === JSON.stringify(rb) && sa === sb) { same++; continue; }
         // A difference is allowed ONLY for a correction that reaches a role's crucible keys:
         // a crucible FIELD, or one the OLD resolver wrote into a crucible field.
@@ -374,6 +404,8 @@ head('7. UNCHANGED — the injector before this change and after, side by side o
     check(`every non-crucible correction resolves IDENTICALLY — same outcome object, same resulting data (${same} of ${n})`, unexpected.length === 0 && same + crucibleOnly === n, unexpected.slice(0, 4).join(' | '));
     check(`the only differences are corrections that reach a crucible field (${crucibleOnly})`, crucibleOnly > 0);
     check('across the whole corpus the new injector never wrote a linked crucible field', linkedWrites === 0, `${linkedWrites} role(s)`);
+    check(`frozen fixture: corrections the OLD resolver wrote into a register proposal (${frozenProposal}) are all refused by the new one, and counted as crucible-only`,
+      frozenProposal > 0 && frozenProposalRefused === frozenProposal && !unexpected.some(u => u.startsWith(`${FROZEN_SC.id}:`)), `${frozenProposalRefused} of ${frozenProposal}`);
   }
 }
 
