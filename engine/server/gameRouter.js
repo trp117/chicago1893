@@ -364,6 +364,23 @@ function buildEpilogueSummary(state, endResult, scenario) {
   };
 }
 
+// What the player actually did, turn by turn: their own inputs, read back from the transcript's
+// "**Player:**" lines. The summary above carries only ids, closure state and the crucible choice,
+// so without these the session block wrote a whole session from its last decision alone (a player
+// who confronted Martín all session, then held at the crucible, read as "you kept it from him").
+// Player inputs only — the narration is the model's, and can carry what the player never did.
+// Capped so a very long session cannot swamp the prompt; the most recent turns are kept.
+const SESSION_ACTIONS_MAX = 40;
+const SESSION_ACTION_CHARS = 400;
+export function extractPlayerActions(transcript) {
+  if (typeof transcript !== 'string') return [];
+  const lines = [...transcript.matchAll(/^\*\*Player:\*\*[ \t]*(.+)$/gm)]
+    .map(m => m[1].trim())
+    .filter(Boolean)
+    .map(t => t.length > SESSION_ACTION_CHARS ? t.slice(0, SESSION_ACTION_CHARS).trimEnd() + '…' : t);
+  return lines.slice(-SESSION_ACTIONS_MAX);
+}
+
 // Matches "turn 29", "Turn 3", "turn N" etc — must not appear in record-voice prose.
 const TURN_META_RE = /\bturn\s+\d+\b/gi;
 function scrubTurnMeta(text) {
@@ -490,7 +507,7 @@ export function recordWordBudget(layer1Fates) {
 }
 
 // Exported for tests/epilogue.test.mjs, which drives it against a scripted Anthropic.
-export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null) {
+export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null, playerActions = []) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -536,6 +553,11 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
   // Presence is reserved for a role that never had a fork to answer.
   const proximity = !decisionMade && proximitySession === true;
 
+  // The player's own inputs this session (extractPlayerActions). Empty — every caller that
+  // passes none — leaves the prompt byte-identical to what it was before they existed.
+  const actions    = Array.isArray(playerActions) ? playerActions.filter(a => typeof a === 'string' && a.trim()) : [];
+  const hasActions = actions.length > 0;
+
   const sessionSystemPrompt = [
     'You are writing the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
@@ -549,8 +571,16 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     'Voice: reported past tense or second person. Not documentary. Not historian\'s record.',
     '',
     'Rules:',
-    '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
+    hasActions
+      ? '- Draw ONLY from the SESSION SUMMARY, WHAT THE PLAYER DID, and the CLOSING PROSE provided. No other knowledge, no external sources.'
+      : '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
     '- Name characters ONLY from the CHARACTERS PRESENT THIS SESSION list. Never invent a name or substitute a name not on that list.',
+    ...(hasActions ? [
+      '- FOLLOW WHAT THE PLAYER ACTUALLY DID. WHAT THE PLAYER DID lists their own inputs this session, in order. The block must reflect that arc — whom they sought out, what they said, what they pressed on and what they let lie. Weigh it by how much of the session it took: a thread they returned to again and again is the spine of the session; a line they said once is not. Take it only from that list: where they engaged someone little or not at all, do not invent a confrontation, a conversation, or a feeling they did not show. An input records what they tried or said, not what it achieved: pressing someone for an answer is not getting one. Report what they did and said, never an outcome the CLOSING PROSE does not show. Compress: the whole arc still fits the length above.',
+      ...(decisionMade ? [
+        '- THE CHOICE CLOSES THE SESSION; IT DOES NOT REWRITE IT. decision_text is what they chose at one moment, the last one. It does not describe the session before it. Hold both, in order: what they did across the session, then what they chose when it came to the point. If earlier inputs already said or did what the choice holds back, never write as if they had not — write the choice as what it withheld at that moment, after everything before it.',
+      ] : []),
+    ] : []),
     ...(decisionMade ? [
       '- THE DECISION IS THE RESOLUTION. A defining decision was recorded this session (closure_state.defining_moment_state). The choice in decision_text is how this session resolved — it is the crystallizing moment, not a step toward one. Write who this person was in it and what it asked of them. Never say the session ended without resolution.',
       '- THE DECISION OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Never frame the session as unresolved, incomplete, cut short, or as a shortfall for not reaching somewhere. Reaching a location was never the objective; the human experience was.',
@@ -597,6 +627,11 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     '',
     npcListSection,
     '',
+    ...(hasActions ? [
+      'WHAT THE PLAYER DID (their own inputs, in order — the record of this session):',
+      ...actions.map((a, i) => `${i + 1}. ${a}`),
+      '',
+    ] : []),
     'CLOSING PROSE (draw physical particulars from this — do not copy its phrasing or continue its scene):',
     closingProse,
   ].join('\n');
@@ -2029,7 +2064,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
           epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession,
             role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null,
-            authoredDebrief);
+            authoredDebrief, extractPlayerActions(narrativeTranscript));
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,

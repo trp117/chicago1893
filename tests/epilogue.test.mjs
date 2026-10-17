@@ -22,7 +22,7 @@ const check = (name, cond, detail = '') => {
 };
 const head = t => console.log(`\n-- ${t} ${'-'.repeat(Math.max(0, 72 - t.length))}`);
 
-const { generateEpilogueText, trimToLastSentence, recordWordBudget } = await import(`${ROOT}/engine/server/gameRouter.js`);
+const { generateEpilogueText, trimToLastSentence, recordWordBudget, extractPlayerActions } = await import(`${ROOT}/engine/server/gameRouter.js`);
 
 head('trimToLastSentence');
 check('the McCord cut: back to the last complete sentence', trimToLastSentence('James McCord was arrested inside the DNC offices. The officers entered Suite 600 at approximately 1') === 'James McCord was arrested inside the DNC offices.');
@@ -47,7 +47,7 @@ globalThis.fetch = async (url, opts) => {
   if (!String(url).includes('api.anthropic.com')) return realFetch(url, opts);
   const body  = JSON.parse(opts.body);
   const block = body.system.includes('"Historical Record"') ? 'record' : body.system.includes('"Your Session"') ? 'session' : 'other';
-  calls.push({ block, max_tokens: body.max_tokens, system: body.system });
+  calls.push({ block, max_tokens: body.max_tokens, system: body.system, content: body.messages?.[0]?.content });
   const next = (script[block] || []).shift() || { text: 'Fallback text.', stop: 'end_turn' };
   return { ok: true, status: 200, json: async () => ({ content: [{ type: 'text', text: next.text }], stop_reason: next.stop }) };
 };
@@ -106,6 +106,35 @@ script = {};
   check('10 fates: capped, with one-sentence-each guidance', p10.system.includes('Length: 280–330 words. That is tight for this many figures: give each Layer 1 figure one short sentence, and cover every one.'));
   check('max_tokens follows the budget (330 words → 825)', p10.max_tokens === 825);
   check('"cover every one. Do not omit any" is still in the prompt', p10.system.includes('Cover every one. Do not omit any.'));
+}
+
+head('session block — what the player did (flaw C: the crucible label wrote the whole session)');
+{
+  const T = '## Session\n\n**Player:** I call Martín up.\n\n> Act 1 · x\n\nHe comes.\n\n**Player:**   I tell him about the limp.  \n\nNarration **Player:** not a line.\n\n**Player:** \n';
+  check('extractPlayerActions: the player lines, in order, trimmed; nothing else', JSON.stringify(extractPlayerActions(T)) === JSON.stringify(['I call Martín up.', 'I tell him about the limp.']));
+  check('extractPlayerActions: no transcript → []', extractPlayerActions(undefined).length === 0);
+  const many = Array.from({ length: 50 }, (_, i) => `**Player:** act ${i} ${'x'.repeat(i === 49 ? 500 : 0)}`).join('\n');
+  const got  = extractPlayerActions(many);
+  check('capped at the 40 most recent, long inputs cut', got.length === 40 && got[0] === 'act 10' && got[39].length === 401 && got[39].endsWith('…'));
+
+  const DM = { closure_state: { defining_moment_state: { met: true, decision: 'hold', decision_text: 'Say nothing yet.' } } };
+  const sess = async (s, actions) => {
+    calls.length = 0; script = {};
+    const l = console.log, w = console.warn; console.log = console.warn = () => {};
+    try { await generateEpilogueText(epilogue(1), { ...summary(1), ...s }, 'Closing prose.', 'test-key', null, [], false, played, null, actions); }
+    finally { console.log = l; console.warn = w; }
+    return calls.find(c => c.block === 'session');
+  };
+  const none = await sess(DM), empty = await sess(DM, []);
+  check('no actions → session prompt and content unchanged (no WHAT THE PLAYER DID)', none.system === empty.system && none.content === empty.content
+    && !none.system.includes('WHAT THE PLAYER DID') && !none.content.includes('WHAT THE PLAYER DID') && none.system.includes('- Draw ONLY from the SESSION SUMMARY provided.'));
+  const withA = await sess(DM, ['I call Martín up.', 'I tell him about the limp.']);
+  check('actions → listed, in order, in the session content', withA.content.includes('WHAT THE PLAYER DID') && withA.content.includes('1. I call Martín up.\n2. I tell him about the limp.'));
+  check('decision + actions → the choice-closes-not-rewrites rule', withA.system.includes('THE CHOICE CLOSES THE SESSION; IT DOES NOT REWRITE IT.') && withA.system.includes('FOLLOW WHAT THE PLAYER ACTUALLY DID.'));
+  check('the session block still gets no character ids', !withA.content.includes('"interacted_characters"') && !withA.content.includes('"c0"'));
+  const noDm = await sess({}, ['I read.']);
+  check('no decision + actions → follow rule, but no choice rule', noDm.system.includes('FOLLOW WHAT THE PLAYER ACTUALLY DID.') && !noDm.system.includes('THE CHOICE CLOSES'));
+  check('the record call never receives the actions', !calls.find(c => c.block === 'record').content.includes('I read.'));
 }
 
 globalThis.fetch = realFetch;
