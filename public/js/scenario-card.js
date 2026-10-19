@@ -1,4 +1,5 @@
 const CAT_COLORS = {
+  faith:          '#8f2d3e',
   space:          '#6a9fd8',
   military:       '#c0524a',
   'civil-rights': '#5a8a5a',

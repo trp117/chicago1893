@@ -101,6 +101,7 @@ const CATEGORY_MAP = {
   bornholmer_strasse_first_breach:  'space',
 };
 const CATEGORIES = {
+  'faith':        { displayName: 'Faith',            order: 0, blurb: 'Belief meeting consequence, and a life turning on it. The ledger measures what conviction cost the ones who could not unsee what they had seen.' },
   'space':        { displayName: 'Space & Cold War', order: 1, blurb: 'The margin between mission success and catastrophe is measured in fractions. Every decision is made with the whole world watching — and the outcome already written.' },
   'military':     { displayName: 'Military',         order: 2, blurb: 'From the beaches of Normandy to the trenches of the Argonne. The cost was always paid by someone specific, in a moment that history recorded as a number.' },
   'civil-rights': { displayName: 'Civil Rights',     order: 3, blurb: 'Discipline in the face of violence is the hardest decision of all. The ledger measures what it cost to hold the line — physically, psychologically, and politically.' },
@@ -203,7 +204,7 @@ app.get('/game', (_, res) => res.sendFile(path.join(gameDir,  'index.html'),   H
 
 app.get('/categories',  (_, res) => res.sendFile(path.join(publicDir, 'categories/index.html'),  HTML_HEADERS));
 app.get('/categories/', (_, res) => res.sendFile(path.join(publicDir, 'categories/index.html'),  HTML_HEADERS));
-['space','military','civil-rights','underground','maritime','industrial'].forEach(slug => {
+['faith','space','military','civil-rights','underground','maritime','industrial'].forEach(slug => {
   app.get(`/categories/${slug}`,  (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
   app.get(`/categories/${slug}/`, (_, res) => res.sendFile(path.join(publicDir, `categories/${slug}/index.html`), HTML_HEADERS));
 });
