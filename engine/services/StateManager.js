@@ -448,6 +448,25 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
     }
   }
 
+  // ── Presence ───────────────────────────────────────────────────────────────
+  // Who is physically with the player NOW. Nothing else in state says it: linkedCharacterIds is
+  // where an NPC belongs, introducedNpcs is who has ever been met, targetNpc is the last speaker.
+  // So a character who came to the player (Martín up to the sickroom) read, by the next turn, as
+  // wherever his locations put him — "Martín is not in the sickroom" mid-confrontation.
+  // The model reports the list when it changes (stateChanges.npcs_present); the engine holds it
+  // until the narrative changes it again, and a move to another location clears it unless that
+  // turn reports who came along. The key is written only once it has been used, so a session
+  // that never reports presence carries exactly the state it carried before.
+  {
+    const moved   = next.location !== currentState.location;
+    let present   = moved ? [] : [...(currentState.presentNpcs || [])];
+    if (Array.isArray(delta.npcs_present)) {
+      present = [...new Set(delta.npcs_present.filter(id => typeof id === 'string' && id && id !== next.playerCharacterId))];
+    }
+    if (typeof modelOutput.npcFled === 'string') present = present.filter(id => id !== modelOutput.npcFled);
+    if (present.length || 'presentNpcs' in currentState) next.presentNpcs = present;
+  }
+
   // ── Chase resolution ───────────────────────────────────────────────────────
   if (modelOutput.chaseResolved?.npcId) {
     const { npcId, result, clueGained } = modelOutput.chaseResolved;

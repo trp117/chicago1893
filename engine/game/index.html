@@ -1723,11 +1723,16 @@ let submitting = false;
 // The input behind the turn currently in flight, so a failed turn can offer to re-send it.
 let lastPlayerInput      = '';
 
+// Label for a speaker with no resolved name. Same value as engine/services/SpeakerNames.js.
+const UNKNOWN_SPEAKER = 'someone';
+
 function buildAssistantHistoryContent(output) {
   let text = output.scene?.bridge ? `${output.scene.bridge}\n\n` : '';
   text += output.sensory_opening ? `${output.sensory_opening}\n\n` : '';
   text += output.narrative || '';
-  for (const m of output.npcMoments || []) text += `\n${prettifyId(m.npc)}: ${m.text}`;
+  // The speaker is the roster name the server resolved (SpeakerNames.attachSpeakerNames), never
+  // the id: a prettified id put an anonymized servant's name back into the model's history.
+  for (const m of output.npcMoments || []) text += `\n${m.speaker || UNKNOWN_SPEAKER}: ${m.text}`;
   return text.trim();
 }
 

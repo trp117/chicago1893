@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as data from './data.js';
 import { buildNarrativeStyleRules, buildApprovedCharactersBlock } from './services/PromptComposer.js';
+import { characterLabel, knownAsLines } from './services/SpeakerNames.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -165,7 +166,7 @@ export function buildSystemPrompt(sessionId) {
   if (session) {
     const ctxLines = [
       '## CHARACTER CONTEXT',
-      `Role: ${session.playerRoleName || 'Unknown'} (id: ${session.playerRoleId || 'unknown'})`,
+      `Role: ${session.playerRoleName || 'Unknown'}`,
       `Access Level: ${session.playerAccessLevel || 'staff'}`,
       `Perspective: ${session.playerPerspective || ''}`,
       `Starting Knowledge: ${(session.playerStartingKnowledge || []).join('; ') || 'none'}`,
@@ -174,10 +175,7 @@ export function buildSystemPrompt(sessionId) {
       const realName   = session.playerRealName;
       const coverName  = session.playerCoverName;
       const firstName  = realName.split(' ')[0];
-      const knownAsMap = session.playerKnownAs || {};
-      const knownAsLines = Object.entries(knownAsMap)
-        .map(([who, name]) => `- ${who.replace(/_/g, ' ')}: ${name}`)
-        .join('\n');
+      const knownAsText = knownAsLines(session.playerKnownAs, data.getNPCs()).join('\n');
 
       const identityBlock = [
         'IDENTITY RULE — ABSOLUTE AND NON-NEGOTIABLE:',
@@ -191,7 +189,7 @@ export function buildSystemPrompt(sessionId) {
         `- Refer to ${realName} in the third person as someone other than the player`,
         '',
         'When other characters refer to the player they use whatever name they know her by:',
-        knownAsLines || `- Other characters use "${coverName}" or do not address the player by name`,
+        knownAsText || `- Other characters use "${coverName}" or do not address the player by name`,
         '',
         `If you are about to write the name "${firstName}" or "${realName}" as anyone other than the player character — stop. That is the player. Rewrite the sentence from the player's perspective instead.`,
         '',
@@ -214,21 +212,14 @@ export function buildSystemPrompt(sessionId) {
     const authorityTrust = session.authorityTrust ?? 0;
 
     const suspicionLines = Object.entries(session.suspicion || {})
-      .map(([id, score]) => {
-        const npc = data.getNPC(id);
-        return `- ${npc?.name ?? id}: ${score}`;
-      }).join('\n') || '- (none elevated)';
+      .map(([id, score]) => `- ${characterLabel(id, [data.getNPC(id)])}: ${score}`).join('\n') || '- (none elevated)';
 
     const introducedLines = (session.introducedNpcs || [])
-      .map(id => {
-        const npc = data.getNPC(id);
-        return `- ${npc?.name ?? id}`;
-      }).join('\n') || '- (none yet)';
+      .map(id => `- ${characterLabel(id, [data.getNPC(id)])}`).join('\n') || '- (none yet)';
 
     const npcStateBlocks = session.npc_states
       ? Object.entries(session.npc_states).map(([id, s]) => {
-          const npc = data.getNPC(id);
-          const name = npc?.name ?? id;
+          const name = characterLabel(id, [data.getNPC(id)]);
           return [
             `${name} — current session state:`,
             `Trust in player: ${s.trust_level}/10`,

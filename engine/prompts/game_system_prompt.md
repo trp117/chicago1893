@@ -89,7 +89,8 @@ Return JSON only. No markdown fences. Fields:
     ],
     "resolved_threads": [
       { "thread_id": "unique_snake_case_id", "summary": "one sentence — what was confirmed or closed" }
-    ]
+    ],
+    "npcs_present": ["character_id"]
   },
   "npcMoments": [{ "npc": "character_id", "text": "spoken dialogue only — no italics, no stage directions" }],
   "npc_updates": {
@@ -119,6 +120,7 @@ Return JSON only. No markdown fences. Fields:
 
 - `sensory_opening`: Optional. Populate only when the player enters a new location or the scene context shifts significantly. 1–2 sentences max, no characters, no plot. Omit entirely when continuing within the same scene or responding to a chosen action — carry all environmental texture inside `narrative` instead.
 - `stateChanges`: omit any sub-field that did not change this turn.
+- `stateChanges.npcs_present`: the full list of character ids physically with the player at the end of this turn — in the room, or at its doorway or threshold. Return it on any turn someone arrives or leaves (`[]` once the player is alone); omit it when nobody came or went. A character only heard from elsewhere — a voice below, a step on the stair — is not present.
 - `npcMoments`: omit or use `[]` if no NPC speaks.
 - `npc_updates`: REQUIRED on every turn where an NPC appears. For each NPC who appeared, return their id as a key. `trust_delta` is an integer (+1, -1, +2, etc.) reflecting whether the player's action built or damaged trust. `knows_add` is an array of strings for new things the NPC learned about the player this turn (omit or use [] if nothing new). `aggression_mode` is "neutral", "mild", or "heavy" based on current tension. `last_interaction` is a one-sentence summary of this scene from this NPC's perspective — used in future turns.
 - `chaseInitiated`: include only when an NPC begins fleeing this turn. Omit otherwise.

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { knownAsLines } from './SpeakerNames.js';
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 const promptsDir = path.resolve(__dirname, '../prompts');
@@ -476,7 +477,8 @@ function getCharacterLocations(charId, locations) {
 }
 
 function getRelevantCharacters(state, location, characters, locations) {
-  const ids = new Set(location?.linkedCharacterIds || location?.linkedNPCs || []);
+  // Whoever is present with the player is relevant wherever they usually live (buildPresenceBlock).
+  const ids = new Set([...(location?.linkedCharacterIds || location?.linkedNPCs || []), ...(state.presentNpcs || [])]);
   const currentLocId = location?.id;
   const playerCharId = state.playerCharacterId || null;
 
@@ -631,7 +633,7 @@ function buildReferenceContext(input, state, locations) {
   return parts.length ? `[Reference context: ${parts.join(', ')}]` : null;
 }
 
-function buildAliasProtectionBlock(state) {
+function buildAliasProtectionBlock(state, characters = []) {
   if (!Array.isArray(state.playerAliases) || state.playerAliases.length === 0) return '';
 
   const allNames = [
@@ -640,10 +642,8 @@ function buildAliasProtectionBlock(state) {
     ...state.playerAliases.map(a => a.name),
   ].filter((n, i, arr) => n && arr.indexOf(n) === i);
 
-  const knownAsMap   = state.playerKnownAs || {};
-  const knownAsLines = Object.entries(knownAsMap)
-    .map(([who, name]) => `- ${who.replace(/_/g, ' ')}: ${name}`)
-    .join('\n');
+  // Labelled from the roster (SpeakerNames.knownAsLines), never from the key — the keys are ids.
+  const knownAsText = knownAsLines(state.playerKnownAs, characters).join('\n');
 
   return [
     'IDENTITY PROTECTION — ALL OF THE FOLLOWING REFER TO THE SAME PERSON (THE PLAYER):',
@@ -652,7 +652,7 @@ function buildAliasProtectionBlock(state) {
     'This character operates under multiple names. These are not different people. There is one person and they are the player.',
     '',
     'Never write any of these names as an NPC, bystander, or third party in any scene. If any of these names appears in your output as anyone other than the player, rewrite it.',
-    ...(knownAsLines ? ['', 'How other characters address the player:', knownAsLines] : []),
+    ...(knownAsText ? ['', 'How other characters address the player:', knownAsText] : []),
   ].join('\n');
 }
 
@@ -671,14 +671,13 @@ function buildAliasProtectionBlock(state) {
 // so a session already in flight picks the bounds up on its very next turn and no stored
 // session needs migrating.
 function buildPlayerRoleSection(state, characters = [], playerRoles = []) {
-  const roleId      = state.playerRoleId    || 'unknown';
   const roleName    = state.playerRoleName  || 'Investigator';
   const perspective = state.playerPerspective || 'The player is an investigator.';
   const accessLevel = state.playerAccessLevel || 'staff';
   const knowledge   = (state.playerStartingKnowledge || []).join('; ');
 
   const lines = [
-    `Role: ${roleName} (id: ${roleId}) | Access: ${accessLevel}`,
+    `Role: ${roleName} | Access: ${accessLevel}`,
     `Perspective: ${perspective}`,
     `Starting knowledge: ${knowledge || 'none'}`,
     `HARD RULE: The player is ${roleName}. Never address them as a different character. Never have ${roleName} appear as an NPC speaking to the player.`,
@@ -714,7 +713,7 @@ function buildPlayerRoleSection(state, characters = [], playerRoles = []) {
     ? role.choice_register.trim() : '';
   if (register) lines.push('', `CHOICE REGISTER: ${register}`);
 
-  const aliasBlock = buildAliasProtectionBlock(state);
+  const aliasBlock = buildAliasProtectionBlock(state, characters);
   if (aliasBlock) lines.push('', aliasBlock);
 
   return lines.join('\n');
@@ -857,6 +856,22 @@ function buildNpcIntroInstruction(state, location, characters, playerInput = '')
   return `⚠️ FIRST ENCOUNTER — the following NPCs appear for the first time this session. Before any dialogue, weave their anchor description naturally into the narrative (do not quote it verbatim — integrate it into the prose):\n${introLines}\n\nIf any generated choice references an NPC not yet in the state's introducedNpcs list, append their role in parentheses after the name.`;
 }
 
+
+// WHO IS HERE NOW — state.presentNpcs (mergeState), rendered by name. '' when nobody has been
+// reported present, so a session that never reports presence composes the prompt it did before.
+// Unknown ids are dropped rather than printed: an id is never a name.
+export function buildPresenceBlock(state, characters = []) {
+  const present = (state.presentNpcs || [])
+    .map(id => (characters || []).find(c => c?.id === id))
+    .filter(Boolean);
+  if (present.length === 0) return '';
+  return [
+    `PRESENT IN THIS SCENE (authoritative — engine state): these people are here with the player in ${state.location} right now. Someone at the doorway or threshold counts as here.`,
+    ...present.map(c => `- ${c.id}: ${c.name}`),
+    'As in Approved Characters, the id is a system key, never a name: write each person exactly as written after the colon, and a role ("Household servant") stays a role.',
+    'They stay present until the narrative shows them leave. While listed, never write any of them as absent, elsewhere, or not in the room — where the NPC locations table puts them somewhere else, this list wins. Anyone not listed is not in the room unless this turn\'s narrative brings them in. When anyone arrives or leaves this turn, return stateChanges.npcs_present with the full updated list ([] once the player is alone).',
+  ].join('\n');
+}
 
 function buildObjectStateBlock(state) {
   const inventory = state.inventory || [];
@@ -1836,6 +1851,8 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     effectiveAnchoredLocation, effectiveAnchoredLocationSource,
     reachedBeats, currentSceneId, sceneAdvances, sceneEnteredAt, sceneEnteredTurn,
     graceActive, graceUsed,
+    // presentNpcs is rendered by name in buildPresenceBlock; raw ids in the state block add nothing.
+    presentNpcs,
     ...stateRest
   } = state;
   const promptState = {
@@ -1855,6 +1872,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{OBJECT_STATE}}',           buildObjectStateBlock(state))
     .replace('{{RESOLVED_THREADS}}',       buildResolvedThreadsBlock(state))
     .replace('{{NPC_INTRO_INSTRUCTION}}',  [
+      buildPresenceBlock(state, characters),
       buildNpcIntroInstruction(state, location, characters, playerInput),
       buildPossessionNote(state, characters, playerInput),
     ].filter(Boolean).join('\n\n'))

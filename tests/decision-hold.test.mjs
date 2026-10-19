@@ -29,6 +29,7 @@ const { ScenarioRepository }  = await import(`${ROOT}/engine/repositories/Scenar
 const { StoryArcRepository }  = await import(`${ROOT}/engine/repositories/StoryArcRepository.js`);
 const { buildInitialState, loadStoryArc, initSceneState } = await import(`${ROOT}/engine/services/StateManager.js`);
 const PC = await import(`${ROOT}/engine/services/PromptComposer.js`);
+const { knownAsLines } = await import(`${ROOT}/engine/services/SpeakerNames.js`);
 
 const store = new JsonFileStore(p('engine/data'));
 const repos = {
@@ -95,7 +96,21 @@ try {
       const storyArc = quiet(() => loadStoryArc(repos, scenario, base));
       if (storyArc) quiet(() => initSceneState(base, storyArc));
       const gd = { scenario, characters, locations, clues, playerRoles, storyArc: storyArc ?? null };
-      const both = state => [quiet(() => PC.composeTurnPrompt(clone(state), 'I look around.', gd)), quiet(() => HEAD_PC.composeTurnPrompt(clone(state), 'I look around.', gd))];
+      // Speaker-names pass: HEAD printed the role id on the role line ("Role: X (id: role_x) |
+      // Access:") and labelled known_as lines from their keys ("- to thomas wren: …"); the current
+      // composer shows the role name only and labels known_as from the roster. Those two moved
+      // spans are normalised to the current form; everything else must still match HEAD exactly.
+      const dropRoleId = (txt, state) => {
+        let out = txt.replace(` (id: ${state.playerRoleId || 'unknown'}) | Access: `, ' | Access: ');
+        const headKa = Object.entries(state.playerKnownAs || {}).map(([w, n]) => `- ${w.replace(/_/g, ' ')}: ${n}`).join('\n');
+        if (headKa) {
+          const nowKa = knownAsLines(state.playerKnownAs, characters).join('\n');
+          const hdr   = '\n\nHow other characters address the player:\n';
+          out = out.replace(hdr + headKa, nowKa ? hdr + nowKa : '');
+        }
+        return out;
+      };
+      const both = state => [quiet(() => PC.composeTurnPrompt(clone(state), 'I look around.', gd)), dropRoleId(quiet(() => HEAD_PC.composeTurnPrompt(clone(state), 'I look around.', gd)), state)];
 
       // Undecided states: start; late (a clock fork is due); fork presented, unanswered.
       const late = { ...clone(base), elapsedMinutes: Math.round((scenario.sessionTargetMinutes || 30) * 0.9), remainingMinutes: Math.max(1, Math.round((scenario.sessionTargetMinutes || 30) * 0.1)) };

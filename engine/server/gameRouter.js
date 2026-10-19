@@ -24,6 +24,7 @@ import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, in
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
 import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
 import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../services/NarrativeSalvage.js';
+import { characterLabel, attachSpeakerNames, relabelHistory } from '../services/SpeakerNames.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
 import * as appData from '../data.js';
@@ -1181,7 +1182,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       await writeFile(transcriptPath, transcriptHeader)
         .catch(e => console.error('[TRANSCRIPT-START ERROR]', e.message));
 
-      sendSse(res, { type: 'done', output, nextState, sessionId });
+      sendSse(res, { type: 'done', output: attachSpeakerNames(output, characters), nextState, sessionId });
       res.end();
       return;
     } catch (error) {
@@ -1311,7 +1312,8 @@ Do not open with the historical context. Open inside the character's body. Let t
         return { data, text };
       };
 
-      const baseMessages = [...history.slice(-MAX_HISTORY_MSGS), { role: 'user', content: prompt }];
+      // Relabelled from the roster: an older client wrote prettified ids into history (SpeakerNames.js).
+      const baseMessages = [...relabelHistory(history.slice(-MAX_HISTORY_MSGS), characters), { role: 'user', content: prompt }];
 
       const streamSignal = AbortSignal.timeout(55000);
       const streamResp   = await fetch(ANTHROPIC_URL, {
@@ -1476,9 +1478,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       const npcPresent = Array.isArray(output.npcMoments) && output.npcMoments.length > 0;
       if (npcPresent && !hasSpeech(output.narrative)) {
         traceTags.push('has-retry', 'silent-npc');
-        const firstNpcId = output.npcMoments[0]?.npc;
-        const firstNpcChar = firstNpcId ? characters.find(c => c.id === firstNpcId) : null;
-        const npcName = firstNpcChar?.name || firstNpcId?.replace(/_/g, ' ') || 'the NPC';
+        const npcName = characterLabel(output.npcMoments[0]?.npc, characters);
         console.log(`[RETRY] silent-npc — ${npcName}`);
         const retryMessages = [
           ...baseMessages,
@@ -1764,7 +1764,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 
-      sendSse(res, { type: 'done', output, nextState, mockMode: false });
+      sendSse(res, { type: 'done', output: attachSpeakerNames(output, characters), nextState, mockMode: false });
       res.end();
       return;
     } catch (error) {
@@ -1795,9 +1795,8 @@ Do not open with the historical context. Open inside the character's body. Let t
       const suspicions = Object.entries(state.suspicion || {})
         .filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1])
         .map(([id, score]) => {
-          const char = characters.find(c => c.id === id);
           return {
-            name:      char?.name || id,
+            name:      characterLabel(id, characters),
             level:     score >= 3 ? 'high' : score >= 2 ? 'medium' : 'low',
             reasoning: score >= 3 ? 'Several pieces of evidence point in their direction.' : 'Something about their behavior has not sat right.'
           };
