@@ -1853,12 +1853,13 @@ Do not open with the historical context. Open inside the character's body. Let t
       return { resp, charCount: cleaned.length };
     }
 
-    // Build ordered segment list: confirmation (0.85) → bridge (0.88) → sensory (0.88) → main (trust-mapped)
+    // Build ordered segment list: confirmation → bridge → sensory → main (trust-mapped). Every
+    // segment plays at the scenario's narration speed (narrSpeed; null → the 0.9 voice default).
     // bridge: a scene session's lead paragraph on a scene's first turn (B2b-PLAYER), read as it is shown.
     const segments = [];
-    if (confirmation)   segments.push({ raw: confirmation,   speed: 0.85, trust: false });
-    if (bridge)         segments.push({ raw: bridge,         speed: 0.88, trust: false });
-    if (sensory_opening) segments.push({ raw: sensory_opening, speed: 0.88, trust: false });
+    if (confirmation)   segments.push({ raw: confirmation,   speed: narrSpeed, trust: false });
+    if (bridge)         segments.push({ raw: bridge,         speed: narrSpeed, trust: false });
+    if (sensory_opening) segments.push({ raw: sensory_opening, speed: narrSpeed, trust: false });
     segments.push({ raw: text, speed: narrSpeed, trust: true });
 
     const totalChars = segments.reduce((n, s) => n + prepareForTts(s.raw).length, 0);

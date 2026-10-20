@@ -1445,9 +1445,11 @@ function ttsClosingSpeak(text) {
     };
     closingNarrResolve = done;
     try {
+      const body = { text: cleaned };
+      if (ttsNarrationSpeed != null) body.narrative_speed = ttsNarrationSpeed;
       const resp = await fetch(`${API_BASE}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleaned, narrative_speed: 0.85 })
+        body: JSON.stringify(body)
       });
       if (!resp.ok) { done(); return; }
       const blob = await resp.blob();

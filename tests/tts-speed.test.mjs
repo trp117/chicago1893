@@ -52,11 +52,11 @@ try {
   check('single segment, out-of-range speed 0: default 0.9, request does not fail', r.status === 200 && r.speeds.join() === '0.9', `${r.status} ${r.speeds.join()}`);
 
   r = await tts({ text: 'Narration.', confirmation: 'You wait.', bridge: 'Weeks pass.', sensory_opening: 'Cold stone.', narrative_speed: 1.1 });
-  check('multi segment: confirmation 0.85, bridge 0.88, sensory 0.88, narration the scenario speed', r.status === 200 && r.speeds.join() === '0.85,0.88,0.88,1.1', r.speeds.join());
+  check('multi segment: confirmation, bridge, sensory and narration all at the scenario speed', r.status === 200 && r.speeds.join() === '1.1,1.1,1.1,1.1', r.speeds.join());
   r = await tts({ text: 'Narration.', sensory_opening: 'Cold stone.' });
-  check('multi segment, no speed sent: sensory 0.88, narration default 0.9', r.status === 200 && r.speeds.join() === '0.88,0.9', r.speeds.join());
+  check('multi segment, no speed sent: sensory and narration the default 0.9', r.status === 200 && r.speeds.join() === '0.9,0.9', r.speeds.join());
   r = await tts({ text: 'Narration.', sensory_opening: 'Cold stone.', narrative_speed: 0 });
-  check('multi segment, out-of-range speed 0: narration default 0.9, never speed 0', r.status === 200 && r.speeds.join() === '0.88,0.9', `${r.status} ${r.speeds.join()}`);
+  check('multi segment, out-of-range speed 0: sensory and narration default 0.9, never speed 0', r.status === 200 && r.speeds.join() === '0.9,0.9', `${r.status} ${r.speeds.join()}`);
   for (const bad of [0.5, 1.5, '1.0', null]) {
     r = await tts({ text: 'Narration only.', narrative_speed: bad });
     check(`invalid speed ${JSON.stringify(bad)}: ignored → default 0.9`, r.status === 200 && r.speeds.join() === '0.9', r.speeds.join());
