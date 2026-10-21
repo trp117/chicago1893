@@ -1,11 +1,11 @@
 const CAT_COLORS = {
-  faith:          '#8f2d3e',
-  space:          '#6a9fd8',
-  military:       '#c0524a',
-  'civil-rights': '#5a8a5a',
-  underground:    '#b8832a',
-  maritime:       '#6a9fd8',
-  industrial:     '#8a6040',
+  faith:          '#8E1E2F',
+  space:          '#4A5A82',
+  military:       '#7E6B34',
+  'civil-rights': '#4A6E52',
+  underground:    '#566070',
+  maritime:       '#3E6E78',
+  industrial:     '#7E5436',
 };
 
 const LOCAL_IMAGES = {
@@ -31,15 +31,15 @@ export function renderScenarioCard(scenario, { baseUrl = '' } = {}) {
     ? `background-image:url('${imgSrc}');background-size:cover;background-position:${imgPos}`
     : `background:var(--card-img-gradient,linear-gradient(to bottom,#1e1a16 0%,#0d0b09 100%))`;
   const aiAttr = localImg
-    ? `<span style="font-size:10px;color:rgba(255,255,255,0.45);position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic">AI-generated illustration</span>`
+    ? `<span style="font-size:10px;color:var(--card-caption, rgba(255,255,255,0.45));position:absolute;bottom:6px;left:8px;letter-spacing:0.03em;pointer-events:none;font-style:italic">AI-generated illustration</span>`
     : '';
   const roles    = (scenario.roles || []).map(r => `<span class="meta-pill">${r}</span>`).join('');
   const costLine = scenario.cost_tracked
     ? `<p class="story-cost">Cost tracked: ${scenario.cost_tracked}</p>`
     : '';
-  const arrow = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="rgba(245,240,232,0.5)" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg>`;
+  const arrow = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="stroke:var(--card-arrow, rgba(245,240,232,0.5))" stroke-width="1.5"><path d="M1 5h8M5 1l4 4-4 4"/></svg>`;
   return `<div class="story-card" onclick="location.href='${baseUrl}/game?scenarioId=${scenario.id}'">
-  <div class="story-card-img" style="${imgStyle};border-left:3px solid ${color};position:relative">${aiAttr}</div>
+  <div class="story-card-img" style="${imgStyle};border-left:3px solid var(--cat-accent, ${color});position:relative">${aiAttr}</div>
   <div class="story-card-body">
     <p class="story-era">${scenario.era || ''}</p>
     <h3 class="story-title">${scenario.title}</h3>

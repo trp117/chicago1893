@@ -11,15 +11,19 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#0d0b08;--parchment:#f5f0e8;--wire:#2a2520;
-  --gold:#c49a3c;--gold-light:#e8c46a;
+  --ground:#17100F;--ground-2:#1E1512;--card:#241916;--card-2:#2B1D19;
+  --oxblood:#6E1423;--oxblood-2:#8E1E2F;--gold:#CBA24C;--gold-dim:#9C7E39;--gold-light:#E8C46A;
+  --ivory:#ECE3D2;--muted:#A2917C;
+  --hairline:rgba(203,162,76,.22);--hairline-soft:rgba(236,227,210,.10);
+  --ink:var(--ground);--parchment:var(--ivory);--wire:var(--ground-2);
   --red-cost:#c0524a;--amber-cost:#b8832a;--green-cost:#5a8a4a;
   --pad-x:clamp(16px,5vw,64px);--pad-y:clamp(48px,8vw,96px);--gap:2px;
-  --cat-accent:#8f2d3e;
-  --card-img-gradient:linear-gradient(to bottom,#200a10 0%,#0c0406 100%);
+  --cat-accent:#8E1E2F;
+  --card-img-gradient:linear-gradient(to bottom,color-mix(in srgb,var(--cat-accent) 12%,var(--card-2)) 0%,var(--ground) 100%);
+  --card-caption:var(--muted);--card-arrow:var(--gold-dim);
 }
-body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background:#0a0a08}
+body{background-color:var(--ground);background-image:radial-gradient(70vw 70vw at 0 0,rgba(110,20,35,.18),transparent 70%),radial-gradient(60vw 60vw at 100% 50%,rgba(110,20,35,.18),transparent 70%);background-repeat:no-repeat;color:var(--parchment);font-family:'Barlow',sans-serif;font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:16px var(--pad-x);display:flex;align-items:center;justify-content:space-between;background:var(--ground)}
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,22px);font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;white-space:nowrap;text-decoration:none}
 .nav-links{display:flex;gap:clamp(14px,2.5vw,32px);list-style:none;align-items:center}
 .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;letter-spacing:.20em;text-transform:uppercase;color:var(--parchment);opacity:.95;text-decoration:none;transition:opacity .2s}
@@ -38,8 +42,8 @@ body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-seri
 .stories-grid{display:grid;gap:var(--gap);grid-template-columns:1fr}
 @media(min-width:520px){.stories-grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:900px){.stories-grid{grid-template-columns:repeat(3,1fr)}}
-.story-card{background:#181512;cursor:pointer;display:flex;flex-direction:column;border-left:2px solid transparent;transition:background .22s,border-color .22s;overflow:hidden}
-.story-card:hover{background:#221e1a;border-left-color:var(--gold)}
+.story-card{background:var(--card);cursor:pointer;display:flex;flex-direction:column;border-left:2px solid transparent;transition:background .22s,border-color .22s;overflow:hidden}
+.story-card:hover{background:var(--card-2);border-left-color:var(--gold)}
 .story-card-img{width:100%;height:220px;background-size:cover;background-position:center;transition:filter .3s,transform .5s;flex-shrink:0}
 .story-card:hover .story-card-img{transform:scale(1.03)}
 .story-card-body{padding:clamp(16px,2.2vw,22px);display:flex;flex-direction:column;flex:1}
@@ -47,13 +51,13 @@ body{background:var(--ink);color:var(--parchment);font-family:'Barlow',sans-seri
 .story-title{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.2vw,21px);font-weight:400;line-height:1.22;color:var(--parchment);margin-bottom:9px}
 .story-hook{font-size:13px;line-height:1.58;color:var(--parchment);opacity:.95;margin-bottom:10px;flex:1}
 .story-cost{font-size:13px;font-style:italic;color:var(--gold);opacity:.92;margin-bottom:10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.08em}
-.story-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;margin-top:auto;border-top:1px solid rgba(245,240,232,.06)}
+.story-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;margin-top:auto;border-top:1px solid var(--hairline-soft)}
 .story-pills{display:flex;gap:6px;flex-wrap:wrap}
-.meta-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid rgba(196,154,60,.4);color:var(--gold-light);opacity:1}
-.story-arrow{width:26px;height:26px;border:1px solid rgba(245,240,232,.13);display:flex;align-items:center;justify-content:center;opacity:0;flex-shrink:0;transition:opacity .2s}
+.meta-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--gold-dim);color:var(--gold-light);opacity:1}
+.story-arrow{width:26px;height:26px;border:1px solid var(--hairline-soft);display:flex;align-items:center;justify-content:center;opacity:0;flex-shrink:0;transition:opacity .2s}
 .story-card:hover .story-arrow{opacity:1}
 .empty-state{padding:clamp(32px,5vw,64px);text-align:center;color:var(--parchment);opacity:.5;font-family:'Barlow Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;font-size:13px}
-footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid rgba(245,240,232,.06)}
+footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--hairline)}
 .footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;letter-spacing:.14em;color:var(--gold-light);text-transform:uppercase;opacity:.8}
 .footer-note{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--parchment);opacity:.82}
 </style>
@@ -73,7 +77,7 @@ footer{background:var(--wire);padding:clamp(24px,3.5vw,40px) var(--pad-x);displa
   <div class="cat-rule"></div>
   <p class="section-label">Category</p>
   <h1 class="page-title">Faith</h1>
-  <p class="page-desc">On the water, the margin for error is measured in minutes. Ships and submarines, the cold calculus of survival at sea, and the decisions made when the ocean leaves no room for error.</p>
+  <p class="page-desc">Belief meeting consequence, and a life turning on it. The ledger measures what conviction cost the ones who could not unsee what they had seen.</p>
 </div>
 <div class="page-body">
   <div class="stories-grid" id="stories-grid">
