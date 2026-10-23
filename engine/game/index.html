@@ -1565,13 +1565,19 @@ function showClosingScreen(endState, sessionId) {
   const aftermath = scenario?.historical_aftermath || '';
   aftermathEl.textContent = aftermath;
 
-  // CLOSING REFLECTION. Authored and optional (scenario.closing_reflection: { title, questions }).
+  // CLOSING REFLECTION. Authored and optional, in one of two shapes:
+  //   role-keyed  closing_reflection[<roleId>] = { title, questions }  — the active role's entry
+  //   flat        closing_reflection = { title, questions }            — every role
+  // The active role's entry wins when it has questions; otherwise the flat form; otherwise nothing.
   // No model call behind it, so it is filled here, up front, and reaches the screen on the
   // stream-failure / documented-outcome paths too. Stays hidden without questions. Not narrated.
-  const reflection     = scenario?.closing_reflection;
-  const reflQuestions  = (Array.isArray(reflection?.questions) ? reflection.questions : [])
+  const reflQs = entry => (Array.isArray(entry?.questions) ? entry.questions : [])
     .map(q => (typeof q === 'string' ? q.trim() : ''))
     .filter(Boolean);
+  const reflField      = scenario?.closing_reflection;
+  const reflRoleEntry  = currentRoleId ? reflField?.[currentRoleId] : null;
+  const reflection     = reflQs(reflRoleEntry).length ? reflRoleEntry : reflField;
+  const reflQuestions  = reflQs(reflection);
   const reflectionReady = !!(reflEl && reflListEl && reflQuestions.length);
   if (reflectionReady) {
     const title = typeof reflection.title === 'string' ? reflection.title.trim() : '';

@@ -2129,9 +2129,13 @@ Do not open with the historical context. Open inside the character's body. Let t
           if (epilogueResult?.record_block) {
             lines.push('', '---', '', '## Historical Record', '', epilogueResult.record_block);
           }
-          const reflQuestions = (Array.isArray(scenarioData?.closing_reflection?.questions) ? scenarioData.closing_reflection.questions : [])
+          // Same pick as the closing screen: the played role's entry, else the flat form.
+          const reflQs = entry => (Array.isArray(entry?.questions) ? entry.questions : [])
             .map(q => (typeof q === 'string' ? q.trim() : ''))
             .filter(Boolean);
+          const reflField     = scenarioData?.closing_reflection;
+          const reflRoleEntry = roleId ? reflField?.[roleId] : null;
+          const reflQuestions = reflQs(reflQs(reflRoleEntry).length ? reflRoleEntry : reflField);
           if (reflQuestions.length) {
             lines.push('', '---', '', '## For Reflection', '', ...reflQuestions.map((q, i) => `${i + 1}. ${q}`));
           }
