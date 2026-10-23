@@ -48,6 +48,7 @@ const SUITE = [
   ['fact review: crucible export + injector', 'fact-review-crucible.test.mjs'],
   ['injector: CURRENT punctuation encoding', 'punct-match.test.mjs'],
   ['closing: documented-outcome floor (jsdom)', 'outcome-floor.test.mjs'],
+  ['closing: reflection block (jsdom)',      'closing-reflection.test.mjs'],
   ['presence: who is in the scene now',      'presence.test.mjs'],
   ['speaker names: never an id as a name',   'speaker-names.test.mjs'],
 ];

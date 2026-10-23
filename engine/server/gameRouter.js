@@ -2129,6 +2129,12 @@ Do not open with the historical context. Open inside the character's body. Let t
           if (epilogueResult?.record_block) {
             lines.push('', '---', '', '## Historical Record', '', epilogueResult.record_block);
           }
+          const reflQuestions = (Array.isArray(scenarioData?.closing_reflection?.questions) ? scenarioData.closing_reflection.questions : [])
+            .map(q => (typeof q === 'string' ? q.trim() : ''))
+            .filter(Boolean);
+          if (reflQuestions.length) {
+            lines.push('', '---', '', '## For Reflection', '', ...reflQuestions.map((q, i) => `${i + 1}. ${q}`));
+          }
           if (bibliography?.length) {
             lines.push('', '---', '', '## Primary Sources', '');
             for (const src of bibliography) {
