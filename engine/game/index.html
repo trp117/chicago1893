@@ -155,11 +155,11 @@ li { margin-bottom: 8px; }
 .closing-epilogue-block.visible + .closing-epilogue-block.visible { margin-top: 1.4em; }
 .closing-epilogue-loading { display: none; text-align: center; margin-top: 2.4em; }
 .closing-epilogue-loading.visible { display: flex; align-items: center; justify-content: center; gap: 0.5em; }
-.closing-epilogue-loading-label { font-size: 0.72rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #d0b06a; }
-.closing-epilogue-loading-dots span { font-size: 1.2rem; color: #d0b06a; opacity: 0.35; display: inline-block; animation: epilogue-dot-breathe 2.4s ease-in-out infinite; }
+.closing-epilogue-loading-label { font-size: 0.72rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #e8c46a; }
+.closing-epilogue-loading-dots span { font-size: 1.6rem; color: #e8c46a; opacity: 0.5; display: inline-block; animation: epilogue-dot-breathe 2.4s ease-in-out infinite; }
 .closing-epilogue-loading-dots span:nth-child(2) { animation-delay: 0.8s; }
 .closing-epilogue-loading-dots span:nth-child(3) { animation-delay: 1.6s; }
-@keyframes epilogue-dot-breathe { 0%,100% { opacity:0.35; } 50% { opacity:1; } }
+@keyframes epilogue-dot-breathe { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
 /* Closing reflection — authored, optional (scenario.closing_reflection). Matches the Primary
    Sources <details> below it; question text in the epilogue-body tone. */
 .closing-reflection { opacity: 0; transition: opacity 1.4s ease; margin-bottom: 3.5em; border-top: 1px solid #2e2a24; padding-top: 2.2em; }
@@ -853,7 +853,7 @@ li { margin-bottom: 8px; }
     <div id="closing-prose" class="closing-prose"></div>
     <div id="closing-aftermath" class="closing-aftermath"></div>
     <div id="closing-epilogue-loading" class="closing-epilogue-loading" aria-live="polite">
-      <span class="closing-epilogue-loading-label">Composing the epilogue</span>
+      <span class="closing-epilogue-loading-label">Composing your session…</span>
       <span class="closing-epilogue-loading-dots" aria-hidden="true"><span>·</span><span>·</span><span>·</span></span>
     </div>
     <div id="closing-epilogue" class="closing-epilogue">
@@ -1609,6 +1609,14 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
   syncClosingNarrationBtn();
 
+  // The epilogue fades in well after `done` removes the loader (5.5s later, or once the prose and
+  // aftermath have been narrated), by which time the player may have scrolled. 'nearest' scrolls
+  // only when the block is off-screen, so a reader already looking at it is not moved.
+  function revealEpilogue() {
+    epilogueEl.classList.add('visible');
+    epilogueEl.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+  }
+
   async function triggerClosingSequence(hasEpilogue, hasReflection, hasBibliography, hasCompositeNote) {
     if (ttsEnabled) {
       await speakAtLeast(proseEl.textContent);
@@ -1616,7 +1624,7 @@ function showClosingScreen(endState, sessionId) {
       if (aftermath) await speakAtLeast(aftermathEl.textContent);
       await new Promise(r => setTimeout(r, 1500));
       if (hasEpilogue) {
-        epilogueEl.classList.add('visible');
+        revealEpilogue();
         if (epSessionTextEl?.textContent) await speakAtLeast(epSessionTextEl.textContent);
         if (epRecordTextEl?.textContent)  await speakAtLeast(epRecordTextEl.textContent);
       }
@@ -1636,7 +1644,7 @@ function showClosingScreen(endState, sessionId) {
       returnEl.classList.add('visible');
     } else {
       setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-      setTimeout(() => { if (hasEpilogue) epilogueEl.classList.add('visible'); }, 5500);
+      setTimeout(() => { if (hasEpilogue) revealEpilogue(); }, 5500);
       const reflDelay = hasEpilogue ? 10000 : 8000;
       setTimeout(() => { if (hasReflection && reflEl) reflEl.classList.add('visible'); }, reflDelay);
       const bibDelay = reflDelay + (hasReflection ? 2000 : 0);
@@ -1734,6 +1742,9 @@ function showClosingScreen(endState, sessionId) {
             triggerClosingSequence(hasEpilogue, reflectionReady, hasBibliography, hasCompositeNote);
           } else if (evt.type === 'epilogue_pending') {
             epLoadingEl?.classList.add('visible');
+            // The overlay does not follow the prose, so on a long close the loader sits below the
+            // fold and the screen reads as finished. Bring it into view.
+            epLoadingEl?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
             // The server has just announced it is starting the two epilogue calls. Rearm
             // the abort against THAT budget instead of the prose budget it was armed for.
             // This is the whole point of the epilogue_pending signal.
