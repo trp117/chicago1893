@@ -154,7 +154,9 @@ li { margin-bottom: 8px; }
 .closing-epilogue-block.visible { display: block; }
 .closing-epilogue-block.visible + .closing-epilogue-block.visible { margin-top: 1.4em; }
 .closing-epilogue-loading { display: none; text-align: center; margin-top: 2.4em; }
-.closing-epilogue-loading.visible { display: flex; align-items: center; justify-content: center; gap: 0.5em; }
+.closing-epilogue-loading.visible { display: flex; align-items: center; justify-content: center; gap: 0.5em; overflow: hidden; transition: opacity 0.6s ease, height 0.4s ease 0.6s, margin-top 0.4s ease 0.6s; }
+/* Cross-fade out as the epilogue fades in, then collapse so the epilogue slides into its place. */
+.closing-epilogue-loading.visible.leaving { opacity: 0; margin-top: 0; }
 .closing-epilogue-loading-label { font-size: 0.72rem; font-family: 'Letter Gothic Std', 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.2em; color: #e8c46a; }
 .closing-epilogue-loading-dots span { font-size: 1.6rem; color: #e8c46a; opacity: 0.5; display: inline-block; animation: epilogue-dot-breathe 2.4s ease-in-out infinite; }
 .closing-epilogue-loading-dots span:nth-child(2) { animation-delay: 0.8s; }
@@ -599,7 +601,7 @@ li { margin-bottom: 8px; }
 .redesign .role-card { border: 0.5px solid #2c2c2a; border-radius: 8px; }
 .redesign .role-card:hover { border-color: #ba7517; }
 .redesign .role-card.selected { border-color: #ba7517; background: rgba(186,117,23,0.06); }
-.redesign .role-card-name { color: #ba7517; }
+.redesign .role-card-name { color: #e8c46a; }
 .redesign .role-card-desc { color: #e8e4da; }
 
 /* ── In-game: typography ── */
@@ -1615,12 +1617,35 @@ function showClosingScreen(endState, sessionId) {
   proseEl.textContent = '';
   syncClosingNarrationBtn();
 
-  // The epilogue fades in well after `done` removes the loader (5.5s later, or once the prose and
-  // aftermath have been narrated), by which time the player may have scrolled. 'nearest' scrolls
-  // only when the block is off-screen, so a reader already looking at it is not moved.
+  // The loader is NOT removed on `done`: removing it there left the screen black until the
+  // epilogue's delayed fade-in (5.5s on the timer path, the whole narration on the TTS path).
+  // It stays up until the first section after it is actually appearing, then fades out while
+  // that section fades in, and collapses so the section slides into its place. Idempotent; a
+  // no-op when the loader was never shown (failure before epilogue_pending).
+  function dismissEpLoading() {
+    if (!epLoadingEl?.classList.contains('visible') || epLoadingEl.classList.contains('leaving')) return;
+    epLoadingEl.style.height = `${epLoadingEl.offsetHeight}px`;
+    void epLoadingEl.offsetHeight;
+    epLoadingEl.classList.add('leaving');
+    epLoadingEl.style.height = '0px';
+    setTimeout(() => {
+      epLoadingEl.classList.remove('visible', 'leaving');
+      epLoadingEl.style.height = '';
+    }, 1000);
+  }
+
+  // By the time the epilogue fades in the player may have scrolled. 'nearest' scrolls only when
+  // the block is off-screen, so a reader already looking at it is not moved.
   function revealEpilogue() {
+    dismissEpLoading();
     epilogueEl.classList.add('visible');
     epilogueEl.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Every later section takes the loader's place when there is no epilogue to do it.
+  function revealAfterEpilogue(el) {
+    dismissEpLoading();
+    el.classList.add('visible');
   }
 
   async function triggerClosingSequence(hasEpilogue, hasReflection, hasBibliography, hasCompositeNote) {
@@ -1628,7 +1653,7 @@ function showClosingScreen(endState, sessionId) {
       await speakAtLeast(proseEl.textContent);
       aftermathEl.classList.add('visible');
       if (aftermath) await speakAtLeast(aftermathEl.textContent);
-      await new Promise(r => setTimeout(r, 1500));
+      await new Promise(r => setTimeout(r, 500));
       if (hasEpilogue) {
         revealEpilogue();
         if (epSessionTextEl?.textContent) await speakAtLeast(epSessionTextEl.textContent);
@@ -1636,29 +1661,34 @@ function showClosingScreen(endState, sessionId) {
       }
       if (hasReflection && reflEl) {
         await new Promise(r => setTimeout(r, 500));
-        reflEl.classList.add('visible');
+        revealAfterEpilogue(reflEl);
       }
       if (hasBibliography && bibEl) {
         await new Promise(r => setTimeout(r, 500));
-        bibEl.classList.add('visible');
+        revealAfterEpilogue(bibEl);
       }
       if (hasCompositeNote && compNoteEl) {
         await new Promise(r => setTimeout(r, 500));
-        compNoteEl.classList.add('visible');
+        revealAfterEpilogue(compNoteEl);
       }
       await new Promise(r => setTimeout(r, 500));
-      returnEl.classList.add('visible');
+      revealAfterEpilogue(returnEl);
     } else {
-      setTimeout(() => aftermathEl.classList.add('visible'), 2500);
-      setTimeout(() => { if (hasEpilogue) revealEpilogue(); }, 5500);
-      const reflDelay = hasEpilogue ? 10000 : 8000;
-      setTimeout(() => { if (hasReflection && reflEl) reflEl.classList.add('visible'); }, reflDelay);
+      // The prose finished streaming long before `done` (the epilogue calls ran in between), so
+      // nothing here waits on it. The aftermath, when there is one, sits ABOVE the loader and
+      // gets a reading beat before the epilogue; without one the epilogue cross-fades in now.
+      const aftermathDelay = 300;
+      const epDelay = aftermath ? aftermathDelay + 2700 : aftermathDelay;
+      setTimeout(() => aftermathEl.classList.add('visible'), aftermathDelay);
+      setTimeout(() => { if (hasEpilogue) revealEpilogue(); }, epDelay);
+      const reflDelay = hasEpilogue ? epDelay + 4500 : epDelay;
+      setTimeout(() => { if (hasReflection && reflEl) revealAfterEpilogue(reflEl); }, reflDelay);
       const bibDelay = reflDelay + (hasReflection ? 2000 : 0);
-      setTimeout(() => { if (hasBibliography && bibEl) bibEl.classList.add('visible'); }, bibDelay);
+      setTimeout(() => { if (hasBibliography && bibEl) revealAfterEpilogue(bibEl); }, bibDelay);
       const noteDelay = bibDelay + (hasBibliography ? 2000 : 0);
-      setTimeout(() => { if (hasCompositeNote && compNoteEl) compNoteEl.classList.add('visible'); }, noteDelay);
+      setTimeout(() => { if (hasCompositeNote && compNoteEl) revealAfterEpilogue(compNoteEl); }, noteDelay);
       const returnDelay = noteDelay + (hasCompositeNote ? 2000 : (hasBibliography ? 2000 : (hasEpilogue ? 500 : 0)));
-      setTimeout(() => returnEl.classList.add('visible'), returnDelay);
+      setTimeout(() => revealAfterEpilogue(returnEl), returnDelay);
     }
   }
 
@@ -1744,7 +1774,7 @@ function showClosingScreen(endState, sessionId) {
                 : names[0];
               compNoteTexEl.textContent = `${nameList} ${plural ? 'are fictional composites' : 'is a fictional composite'} placed within a documented historical context. ${plural ? 'These characters are' : 'This character is'} not based on identified historical individuals.`;
             }
-            epLoadingEl?.classList.remove('visible');
+            // The loader stays up: triggerClosingSequence cross-fades it out as the epilogue appears.
             triggerClosingSequence(hasEpilogue, reflectionReady, hasBibliography, hasCompositeNote);
           } else if (evt.type === 'epilogue_pending') {
             epLoadingEl?.classList.add('visible');
@@ -1756,17 +1786,16 @@ function showClosingScreen(endState, sessionId) {
             // This is the whole point of the epilogue_pending signal.
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => controller.abort(), EPILOGUE_ABORT_MS);
-            // Backstop only: primary dismiss is the `done` event above. Held to the same
+            // Backstop only: primary dismiss is the first reveal after `done` (dismissEpLoading). Held to the same
             // deadline as the abort so the indicator cannot vanish while we are still
             // legitimately waiting — at the old 30s it would have gone dark mid-wait.
             clearTimeout(epLoadingSafetyId);
-            epLoadingSafetyId = setTimeout(() => epLoadingEl?.classList.remove('visible'), EPILOGUE_ABORT_MS);
+            epLoadingSafetyId = setTimeout(dismissEpLoading, EPILOGUE_ABORT_MS);
           } else if (evt.type === 'error') {
             clearTimeout(timeoutId);
             clearTimeout(epLoadingSafetyId);
             dotsEl.classList.add('hidden');
             waitEl?.classList.add('hidden');
-            epLoadingEl?.classList.remove('visible');
             triggerClosingSequence(fillDocumentedOutcomeFloor(), reflectionReady, false, false);
           }
         }
@@ -1777,7 +1806,6 @@ function showClosingScreen(endState, sessionId) {
       clearTimeout(epLoadingSafetyId);
       dotsEl.classList.add('hidden');
       waitEl?.classList.add('hidden');
-      epLoadingEl?.classList.remove('visible');
       triggerClosingSequence(fillDocumentedOutcomeFloor(), reflectionReady, false, false);
     });
 }
