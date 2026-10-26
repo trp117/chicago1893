@@ -52,6 +52,7 @@ const SUITE = [
   ['closing: loader → epilogue handoff (jsdom)', 'closing-loader-handoff.test.mjs'],
   ['presence: who is in the scene now',      'presence.test.mjs'],
   ['speaker names: never an id as a name',   'speaker-names.test.mjs'],
+  ['turn finish: streamed card reused (jsdom)', 'stream-finish.test.mjs'],
 ];
 
 const results = [];

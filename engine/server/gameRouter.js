@@ -202,9 +202,53 @@ function sendSse(res, obj) {
   if (typeof res.flush === 'function') res.flush();
 }
 
+// Pulls one top-level string field ("narrative", "sensory_opening") out of a JSON reply while it
+// is still arriving. Each call reads what has accumulated since the last; onChunk gets the newly
+// decoded text, onEnd fires once when the field's closing quote arrives. An escape split across
+// two reads is left for the next one rather than decoded half-arrived.
+function streamedStringField(name, onChunk, onEnd) {
+  const key = new RegExp(`"${name}"\\s*:\\s*"`);
+  let cursor = -1;   // -1 = field not yet found
+  let done   = false;
+  return accumulated => {
+    if (done) return;
+    if (cursor === -1) {
+      const m = key.exec(accumulated);
+      if (!m) return;
+      cursor = m.index + m[0].length;
+    }
+    let chunk = '';
+    let i = cursor;
+    while (i < accumulated.length) {
+      const ch = accumulated[i];
+      if (ch === '\\') {
+        if (i + 1 >= accumulated.length) break;
+        const esc = accumulated[i + 1];
+        if (esc === 'u') {
+          if (i + 6 > accumulated.length) break;
+          chunk += String.fromCharCode(parseInt(accumulated.slice(i + 2, i + 6), 16));
+          i += 6;
+          continue;
+        }
+        chunk += esc === 'n' ? '\n' : esc === 't' ? '\t' : esc === 'r' ? '\r' : esc;
+        i += 2;
+        continue;
+      }
+      if (ch === '"') { done = true; i++; break; }
+      chunk += ch;
+      i++;
+    }
+    cursor = i;
+    if (chunk) onChunk(chunk);
+    if (done) onEnd?.();
+  };
+}
+
 // Consume an Anthropic streaming response. Calls onChunk(text) for each
 // narrative text fragment as it arrives. Returns { text, stopReason, usage }.
-async function collectAnthropicStream(fetchResponse, onChunk) {
+// Optional: onSensoryChunk streams the sensory_opening field the same way, and onNarrativeEnd
+// fires when the narrative's closing quote arrives (the client can then format its last line).
+export async function collectAnthropicStream(fetchResponse, onChunk, { onSensoryChunk, onNarrativeEnd } = {}) {
   const reader  = fetchResponse.body.getReader();
   const decoder = new TextDecoder();
   let lineBuffer = '';
@@ -212,51 +256,9 @@ async function collectAnthropicStream(fetchResponse, onChunk) {
   let stopReason  = null;
   let usage       = null;
 
-  // Narrative extraction state — persists across partial reads
-  let narCursor  = -1;    // -1 = "narrative" field not yet found
-  let narEscaped = false;
-  let narDone    = false;
-
-  function flushNarrative() {
-    if (narDone) return;
-    if (narCursor === -1) {
-      const m = /"narrative"\s*:\s*"/.exec(accumulated);
-      if (!m) return;
-      narCursor = m.index + m[0].length;
-    }
-    let chunk = '';
-    let i = narCursor;
-    while (i < accumulated.length) {
-      const ch = accumulated[i];
-      if (narEscaped) {
-        switch (ch) {
-          case 'n':  chunk += '\n'; break;
-          case 't':  chunk += '\t'; break;
-          case 'r':  chunk += '\r'; break;
-          case '"':  chunk += '"';  break;
-          case '\\': chunk += '\\'; break;
-          case 'u': {
-            const hex = accumulated.slice(i + 1, i + 5);
-            if (hex.length === 4) { chunk += String.fromCharCode(parseInt(hex, 16)); i += 4; }
-            break;
-          }
-          default: chunk += ch;
-        }
-        narEscaped = false;
-      } else if (ch === '\\') {
-        narEscaped = true;
-      } else if (ch === '"') {
-        narDone = true;
-        i++;
-        break;
-      } else {
-        chunk += ch;
-      }
-      i++;
-    }
-    narCursor = i;
-    if (chunk) onChunk(chunk);
-  }
+  const fields = [streamedStringField('narrative', onChunk, onNarrativeEnd)];
+  if (onSensoryChunk) fields.push(streamedStringField('sensory_opening', onSensoryChunk));
+  const flushNarrative = () => fields.forEach(f => f(accumulated));
 
   while (true) {
     const { done, value } = await reader.read();
@@ -1328,6 +1330,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       let { text, stopReason: streamStopReason } = await collectAnthropicStream(
         streamResp,
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
+        {
+          onSensoryChunk: chunk => sendSse(res, { type: 'chunk', field: 'sensory_opening', text: chunk }),
+          onNarrativeEnd: () => sendSse(res, { type: 'narrative_end' }),
+        },
       );
 
       if (!text) {

@@ -1316,14 +1316,28 @@ function sceneBridgeHtml(bridge) {
     : '';
 }
 
+// A turn's scene card. The ONE builder for both the streaming card and the final render, so a
+// turn that streamed cleanly finishes with the same HTML it already shows.
+function sceneCardHtml(bridge, sensoryOpening, narrativeHtml) {
+  const sensoryHtml = sensoryOpening ? `<p class="sensory-opening">${sensoryOpening}</p>` : '';
+  return markupGlossaryTerms(`${sceneBridgeHtml(bridge)}${sensoryHtml}<p>${narrativeHtml}</p>`);
+}
+
+// The card while it streams. Only COMPLETE lines go through markupNarrative — a half-arrived
+// line can't yet be told apart as dialogue, so it shows as plain text until its newline (or the
+// narrative's end) arrives.
+function streamingCardHtml(bridge, sensoryOpening, buffer, complete) {
+  const cut  = complete ? buffer.length : buffer.lastIndexOf('\n') + 1;
+  const tail = buffer.slice(cut);
+  return sceneCardHtml(bridge, sensoryOpening,
+    markupNarrative(buffer.slice(0, cut)) + (tail.trim() ? `<span class="line">${tail}</span>` : ''));
+}
+
 function renderOutput(output, meta = {}) {
   if (output.scene) currentScene = output.scene;
-  const bridgeHtml    = sceneBridgeHtml(output.scene?.bridge);
-  const sensoryHtml   = output.sensory_opening
-    ? `<p class="sensory-opening">${output.sensory_opening}</p>`
-    : '';
-  const narrativeHtml = markupNarrative(output.narrative);
-  const html = markupGlossaryTerms(`${bridgeHtml}${sensoryHtml}<p>${narrativeHtml}</p>`);
+  const html = sceneCardHtml(output.scene?.bridge, output.sensory_opening, markupNarrative(output.narrative));
+  // The card the player watched stream in, when there is one: it becomes this turn's card.
+  const reuseEl = meta.reuseEl?.isConnected ? meta.reuseEl : null;
 
   // A scene session's place is the narrated scene's; its scene changes run on in one reading
   // flow (the bridge is the cut), so only the opening clears the feed, as it does today.
@@ -1335,7 +1349,8 @@ function renderOutput(output, meta = {}) {
   if (currentLocation && currentLocation !== feedLocationId) {
     feedLocationId = currentLocation;
     updateLocationDisplay(currentLocation);
-    if (!isTransitionTurn) {
+    // Never under a streamed card: clearing would take it, the player's line and their place with it.
+    if (!isTransitionTurn && !reuseEl) {
       locationFeed = [];
       storyEl.innerHTML = '';
       storyEl.appendChild(scrollHintEl);
@@ -1347,23 +1362,31 @@ function renderOutput(output, meta = {}) {
 
   locationFeed.push({ playerInput: meta.playerInput || null, html });
 
-  const sceneEl = document.createElement('div');
-  sceneEl.className = 'scene-card';
-  sceneEl.innerHTML = html;
-
-  if (pendingEntryEl) {
-    pendingEntryEl.querySelector('.thinking-dots')?.remove();
-    pendingEntryEl.appendChild(sceneEl);
+  const sceneEl = reuseEl || document.createElement('div');
+  if (reuseEl) {
+    // Already in the feed, under the player's line. Rewritten only when the final turn differs
+    // from what streamed (a server text fix, a glossary term, a retry) — a clean turn finishes
+    // with no DOM change at all.
+    if (meta.reuseHtml !== html) sceneEl.innerHTML = html;
     pendingEntryEl = null;
   } else {
-    const entryEl = document.createElement('div');
-    entryEl.className = 'feed-entry';
-    entryEl.appendChild(sceneEl);
-    feedAppend(entryEl);
+    sceneEl.className = 'scene-card';
+    sceneEl.innerHTML = html;
+    if (pendingEntryEl) {
+      pendingEntryEl.querySelector('.thinking-dots')?.remove();
+      pendingEntryEl.appendChild(sceneEl);
+      pendingEntryEl = null;
+    } else {
+      const entryEl = document.createElement('div');
+      entryEl.className = 'feed-entry';
+      entryEl.appendChild(sceneEl);
+      feedAppend(entryEl);
+    }
   }
 
   pendingTeleprompterEl = sceneEl;
-  requestAnimationFrame(() => {
+  // A streamed card is already where the player is reading — no jump.
+  if (!reuseEl) requestAnimationFrame(() => {
     const newScrollTop = sceneEl.getBoundingClientRect().top
       - storyEl.getBoundingClientRect().top
       + storyEl.scrollTop - 8;
@@ -1900,10 +1923,24 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     const resp = await respPromise;
 
     // Consume SSE stream
-    let streamEl     = null;
-    let streamBuffer = '';
-    let streamBridge = '';   // scene sessions: the bridge leads the narration as it streams in
+    let streamEl       = null;
+    let streamBuffer   = '';
+    let streamSensory  = '';
+    let streamBridge   = null;    // scene sessions: the bridge leads the narration as it streams in
+    let streamComplete = false;   // the narrative's closing quote has arrived: every line is whole
+    let streamHtml     = null;    // what the streamed card shows — renderOutput rewrites it only if the final differs
     let output = null, nextState = null;
+    const paintStream = () => {
+      if (!streamEl) {
+        dotsEl.remove();
+        streamEl = document.createElement('div');
+        streamEl.className = 'scene-card';
+        entryEl.appendChild(streamEl);
+      }
+      streamHtml = streamingCardHtml(streamBridge, streamSensory, streamBuffer, streamComplete);
+      streamEl.innerHTML = streamHtml;
+      if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(streamEl);
+    };
     const sseReader  = resp.body.getReader();
     const sseDecoder = new TextDecoder();
     let sseBuffer = '';
@@ -1919,16 +1956,14 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
         let evt;
         try { evt = JSON.parse(line.slice(6)); } catch { continue; }
         if (evt.type === 'chunk') {
-          if (!streamEl) {
-            dotsEl.remove();
-            streamEl = document.createElement('div');
-            streamEl.className = 'scene-card';
-            entryEl.appendChild(streamEl);
-          }
-          streamBuffer += evt.text;
-          streamEl.innerHTML = streamBridge + '<p>' + streamBuffer.replace(/\*([^*]+)\*/g, '<em>$1</em>').replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+          if (evt.field === 'sensory_opening') streamSensory += evt.text;
+          else streamBuffer += evt.text;
+          paintStream();
+        } else if (evt.type === 'narrative_end') {
+          streamComplete = true;
+          if (streamEl) paintStream();
         } else if (evt.type === 'scene') {
-          streamBridge = sceneBridgeHtml(evt.scene?.bridge);
+          streamBridge = evt.scene?.bridge || null;
           // The header leads the prose: it shows the narrated scene before its first words stream in.
           if (evt.scene) {
             sceneHeaderRollback = currentScene;
@@ -1962,8 +1997,6 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
       return;
     }
 
-    if (streamEl) streamEl.remove();
-
     const prevLocation = gameState?.location;
     const preservedFacts   = gameState.discoveredFacts;
     const preservedGlossary = gameState.glossary;
@@ -1983,7 +2016,7 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
 
     renderSidebar();
     updateChaseUI();
-    renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput });
+    renderOutput(output, { playerInput, prevLocation, player_action: isChoice ? null : playerInput, reuseEl: streamEl, reuseHtml: streamHtml });
     sceneHeaderRollback = null;
     updateCandleIndicator(gameState.remainingMinutes, scenario?.sessionTargetMinutes || 15);
 
