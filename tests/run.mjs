@@ -53,6 +53,7 @@ const SUITE = [
   ['presence: who is in the scene now',      'presence.test.mjs'],
   ['speaker names: never an id as a name',   'speaker-names.test.mjs'],
   ['turn finish: streamed card reused (jsdom)', 'stream-finish.test.mjs'],
+  ['silent-npc: dialogue in any quote style', 'silent-npc-quotes.test.mjs'],
 ];
 
 const results = [];

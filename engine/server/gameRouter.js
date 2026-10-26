@@ -184,8 +184,11 @@ function fixCharacterIdLeaks(text, characters) {
 
 // ── Retry signal detectors ─────────────────────────────────────────────────────
 
-function hasSpeech(narrative) {
-  return narrative && /[""][^""]{4}|:\s*["']/.test(narrative);
+// Dialogue in any quote style: straight "…", typographic “…” and ‘…’, or a "Name: " line.
+// A straight-only check reads typographic dialogue as silence, and the silent-npc retry then
+// fires on every turn with an NPC present. ’ alone is not an opener — it is the apostrophe.
+export function hasSpeech(narrative) {
+  return !!narrative && /["“”][^"“”]{4}|‘[^‘’]{4}|:\s*["'“”‘]/.test(narrative);
 }
 
 function endsOnNpcQuestion(narrative, npcMoments) {
