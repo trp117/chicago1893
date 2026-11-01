@@ -1076,10 +1076,25 @@ export function isStoryBoundFork(block) {
       || (typeof block?.at_scene === 'string' && block.at_scene.trim() !== '');
 }
 
-// The gate as the engine reads it: the flag on AND the playing role's fork story-bound. With
-// the flag off no fork is ever due, so beat tracking would be work with no reader.
+// REVIEWED GATE — a fork is put to a player only when a human has approved its block:
+// reviewed === true, strictly. Fails CLOSED: a missing, undefined or non-boolean reviewed
+// counts as not reviewed, so a hand-authored block that predates the review flag does not
+// fire until someone ticks it. Read off the RESOLVED block (role's, else scenario-level), so
+// one check covers both levels; the block is copied whole onto state at session start
+// (StateManager effectiveDefiningMoment), so reviewed is there at runtime. Checked here and
+// not by nulling effectiveDefiningMoment at session start: a null there falls through
+// resolveDefiningMomentBlock to scenario.defining_moment, which would quietly swap an
+// unreviewed role fork for a scenario-level one.
+export function definingMomentReviewed(block) {
+  return block?.reviewed === true;
+}
+
+// The gate as the engine reads it: the flag on AND the playing role's fork reviewed and
+// story-bound. With the flag off no fork is ever due, so beat tracking would be work with no
+// reader; the same holds for an unreviewed fork, which is never due.
 export function storyBoundForkActive(state, scenario) {
-  return DEFINING_MOMENT_ENABLED && isStoryBoundFork(resolveDefiningMomentBlock(state, scenario));
+  const block = resolveDefiningMomentBlock(state, scenario);
+  return DEFINING_MOMENT_ENABLED && definingMomentReviewed(block) && isStoryBoundFork(block);
 }
 
 // When a story-bound fork fires if its beat/act is never reached, for a block that does not
@@ -1315,6 +1330,7 @@ export function closureShouldClose(state, scenario) {
 export function definingMomentDue(state, scenario, storyArc = null) {
   const block = resolveDefiningMomentBlock(state, scenario);
   if (!DEFINING_MOMENT_ENABLED || !block) return false;
+  if (!definingMomentReviewed(block)) return false;   // REVIEWED GATE — fail closed
   if (state?.definingMomentPresented) return false;
 
   const momentId = block.principal_transition?.moment;
@@ -1722,7 +1738,7 @@ function bindingTargetBeat(block, beats) {
 export function storyPacingNudge(state, scenario, storyArc) {
   if (typeof state?.currentSceneId === 'string') return null;
   const block = resolveDefiningMomentBlock(state, scenario);
-  if (!storyArc || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
+  if (!storyArc || !definingMomentReviewed(block) || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
   const momentId = block.principal_transition?.moment;
   if (!momentId || state?.decisions?.[momentId] != null) return null;
   if (definingMomentDue(state, scenario, storyArc) || storyBindingReached(block, state, storyArc)) return null;

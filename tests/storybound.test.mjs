@@ -263,10 +263,11 @@ const beats  = arcBeats(WG_ARC);
 
 head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minute');
 {
-  // The pre-Part-A predicate, restated: due from total * at_elapsed_fraction on.
+  // The pre-Part-A predicate, restated: due from total * at_elapsed_fraction on — and, since
+  // the REVIEWED GATE, only for a block with reviewed === true (fail closed: absent = never).
   const clockDue = (st, c) => {
     const b = st.effectiveDefiningMoment;
-    return !!b && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
+    return !!b && b.reviewed === true && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
       && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * b.at_elapsed_fraction;
   };
   // A BOUND fork with no beat reached (a fresh state) is due at its fallback fraction only —
@@ -274,7 +275,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
   const fallbackDue = (st, c) => {
     const b = st.effectiveDefiningMoment;
     const frac = typeof b?.fallback_at_elapsed_fraction === 'number' ? b.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
-    return !!b && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
+    return !!b && b.reviewed === true && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
   };
   // One sweep, run twice: over the REAL stored forks, and over a FROZEN synthetic corpus whose
   // shape never changes. The real sweep's invariant (nothing moved) holds for any data, so it
@@ -307,7 +308,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
 
   // FROZEN: three unbound forks at three fractions, two bound ones (at_act with an authored
   // fallback, at_beat on the default), and a role with no fork — on a 30-minute session.
-  const fork = (moment, extra) => ({ id: moment, setup: 'Frozen.', principal_transition: { type: 'decision_made', moment }, options: [{ id: 'a', text: 'A.' }, { id: 'b', text: 'B.' }], ...extra });
+  const fork = (moment, extra) => ({ id: moment, setup: 'Frozen.', principal_transition: { type: 'decision_made', moment }, options: [{ id: 'a', text: 'A.' }, { id: 'b', text: 'B.' }], reviewed: true, ...extra });
   const FROZEN_ARC = { id: 'syn_frozen_arc', acts: [{ act_number: 1, title: 'One', beats: [{ id: 'syn_b1' }] }, { act_number: 2, title: 'Two', beats: [{ id: 'syn_b2' }] }] };
   const FZ = {
     scenario: { id: 'syn_frozen_forks', sessionTargetMinutes: 30, storyArcIds: [FROZEN_ARC.id] },
@@ -335,6 +336,33 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
   };
   const firsts = FZ.roles.filter(r => r.defining_moment).map(firstDue).join(' / ');
   check('FROZEN corpus: first due at 15 / 18 / 22.5 (clock) and 27 / 25.5 (fallback 0.9 / default)', firsts === `15 / 18 / 22.5 / 27 / ${30 * FORK_FALLBACK_FRACTION_DEFAULT}`, firsts);
+
+  // REVIEWED GATE — fail closed. The same five frozen forks with reviewed absent, false, the
+  // string 'true', or 1 are never due at any minute, bound or not, beat reached or not, and an
+  // unreviewed bound fork does not switch on story tracking. A scenario-level block (no role
+  // fork) is gated the same way.
+  const unreviewedVariants = [undefined, false, 'true', 1];
+  const neverDue = [];
+  for (const v of unreviewedVariants) {
+    for (const role of FZ.roles.filter(r => r.defining_moment)) {
+      const r2 = { ...role, defining_moment: { ...role.defining_moment } };
+      if (v === undefined) delete r2.defining_moment.reviewed; else r2.defining_moment.reviewed = v;
+      for (let m = 0; m <= 30; m += 0.5) {
+        const st = quiet(() => buildInitialState(FZ.scenario, r2, FZ.locations));
+        st.elapsedMinutes = m; st.remainingMinutes = 30 - m; st.reachedBeats = ['syn_b1', 'syn_b2'];
+        if (definingMomentDue(st, FZ.scenario, FROZEN_ARC) || storyBoundForkActive(st, FZ.scenario)) neverDue.push(`${role.id}[${String(v)}]@${m}`);
+      }
+    }
+  }
+  check('REVIEWED GATE: unreviewed forks (reviewed absent / false / "true" / 1) are never due and never story-bound-active', neverDue.length === 0, neverDue.slice(0, 5).join(', '));
+  const scenLevel = { ...FZ.scenario, defining_moment: fork('m_scen', { at_elapsed_fraction: 0.5 }) };
+  const scenDue = reviewed => {
+    const sc = { ...scenLevel, defining_moment: { ...scenLevel.defining_moment, reviewed } };
+    const st = quiet(() => buildInitialState(sc, { id: 'syn_none', name: 'None' }, FZ.locations));
+    st.elapsedMinutes = 29; st.remainingMinutes = 1;
+    return definingMomentDue(st, sc, FROZEN_ARC);
+  };
+  check('REVIEWED GATE: a scenario-level fallback block fires only when reviewed === true', scenDue(true) === true && scenDue(undefined) === false && scenDue(false) === false);
 }
 
 head('A3 WATERGATE — McCord bound at_act:4 fires in Act 4, never in Act 3');

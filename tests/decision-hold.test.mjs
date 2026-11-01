@@ -82,7 +82,7 @@ try {
   const roleFiles = fs.readdirSync(p('engine/data/scenarios/player_roles')).filter(f => f.endsWith('.json'));
   const ids = [...new Set(roleFiles.map(f => { try { return JSON.parse(fs.readFileSync(p('engine/data/scenarios/player_roles', f), 'utf8')).scenarioId; } catch { return null; } }).filter(Boolean))].sort();
   let roles = 0, forks = 0, decided = 0;
-  const notIdentical = [], badDecided = [];
+  const notIdentical = [], badDecided = [], unreviewedFired = []; let unreviewedChecked = 0;
   for (const id of ids) {
     const scenario = await repos.scenarios.findById(id);
     if (!scenario) continue;
@@ -120,6 +120,13 @@ try {
       if (moment) states.push(['unknown option', { ...clone(late), definingMomentPresented: true, decisions: { [moment]: { option_id: '__not_an_option__' } } }]);
       for (const [label, s] of states) {
         const [now, was] = both(s);
+        // REVIEWED GATE: HEAD puts an UNREVIEWED fork to the player once it is due; the gate
+        // does not. Those turns are checked for the gate instead of for HEAD identity.
+        if (block && block.reviewed !== true && was.includes('⚑ DEFINING MOMENT')) {
+          unreviewedChecked++;
+          if (now.includes('⚑ DEFINING MOMENT') || now.includes('DECISION MADE')) unreviewedFired.push(`${id}/${role.id} (${label})`);
+          continue;
+        }
         if (now !== was || now.includes('DECISION MADE')) notIdentical.push(`${id}/${role.id} (${label})`);
       }
 
@@ -147,6 +154,7 @@ try {
       }
     }
   }
+  check(`REVIEWED GATE: ${unreviewedChecked} turn(s) where HEAD put an unreviewed fork carry no fork now`, unreviewedFired.length === 0, unreviewedFired.join(', '));
   check(`undecided turns are byte-identical to HEAD and carry no directive (${roles} stored roles × start/late/presented[/unknown])`, roles > 0 && notIdentical.length === 0, notIdentical.slice(0, 8).join(', '));
   check(`decided turns = HEAD with its directive swapped for the current one; the courses not taken appear only in its NOT-chosen list (${forks} forks, ${decided} options)`, forks > 0 && badDecided.length === 0, badDecided.slice(0, 8).join(', '));
 
