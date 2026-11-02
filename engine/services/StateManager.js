@@ -567,6 +567,22 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
     }
   }
 
+  // ── Carried objects ────────────────────────────────────────────────────────
+  // An item authored follows_player:true goes with the player when they leave the place it
+  // lies: on a location change, an in_play item whose holder is the location just left is
+  // now held by the player. Runs AFTER inventory_updates, so a same-turn "left it on the
+  // table" is overridden. An item in an NPC's hands, used, lost, or set down in the new
+  // location is untouched. (Tolle Lege: the codex of Paul goes out to the garden with
+  // Augustine — a live run stranded it in the house and the fork contradicted the state.)
+  if (next.location !== currentState.location) {
+    for (const item of next.inventory || []) {
+      if (item?.follows_player === true && item.status === 'in_play' && item.holder === currentState.location) {
+        item.holder = 'player';
+        item.turn   = next.elapsedMinutes;
+      }
+    }
+  }
+
   // ── Resolved threads ───────────────────────────────────────────────────────
   if (Array.isArray(delta.resolved_threads)) {
     next.resolved_threads = next.resolved_threads || [];

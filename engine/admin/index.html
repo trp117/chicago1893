@@ -6135,7 +6135,7 @@ function buildRolesSection(data) {
       if (r.suggested_secret) { out.push('SUGGESTED SECRET (suggested_secret):'); out.push(indent(r.suggested_secret)); out.push(''); }
       if (r.roleInitialState?.inventory?.length) {
         out.push('STARTING INVENTORY (inventory):');
-        r.roleInitialState.inventory.forEach(i => out.push(`  • ${i}`));
+        r.roleInitialState.inventory.forEach(i => out.push(`  • ${typeof i === 'string' ? i : (i?.object_name ?? JSON.stringify(i))}`));
         out.push('');
       }
       if (r.ending_notes) {

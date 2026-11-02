@@ -55,6 +55,7 @@ const SUITE = [
   ['turn finish: streamed card reused (jsdom)', 'stream-finish.test.mjs'],
   ['silent-npc: dialogue in any quote style', 'silent-npc-quotes.test.mjs'],
   ['fork arming: reviewed vs fires_live',  'fork-arming.test.mjs'],
+  ['carried objects: codex follows player', 'codex-carry.test.mjs'],
 ];
 
 const results = [];
