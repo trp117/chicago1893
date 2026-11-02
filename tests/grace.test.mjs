@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import express from 'express';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { armReviewedForks } from './_arm-forks.mjs';   // reviewed forks read back armed (fires_live), as on prod after the backfill
 
 process.env.DEFINING_MOMENT_ENABLED = 'true';
 for (const k of ['LANGFUSE_PUBLIC_KEY', 'LANGFUSE_SECRET_KEY', 'LANGFUSE_BASE_URL']) delete process.env[k];
@@ -112,6 +113,7 @@ const store = new JsonFileStore(p('engine/data'));   // never DualWriteStore: no
 const repoNames = [['characters', 'CharacterRepository'], ['locations', 'LocationRepository'], ['clues', 'ClueRepository'], ['scenarios', 'ScenarioRepository'], ['storyArcs', 'StoryArcRepository'], ['players', 'PlayerRepository'], ['sessions', 'SessionRepository']];
 const repos = {};
 for (const [k, n] of repoNames) repos[k] = new (await import(`${ROOT}/engine/repositories/${n}.js`))[n](store);
+armReviewedForks(repos.scenarios);
 
 const JOAN_ID = 'joan_trial_rouen_1431', ROLE_ID = 'role_manchon';
 const joan = await repos.scenarios.findById(JOAN_ID);

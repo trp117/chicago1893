@@ -3589,6 +3589,7 @@ export function createAdminRouter(repos, config = {}) {
         at_elapsed_fraction: typeof result.at_elapsed_fraction === 'number' ? result.at_elapsed_fraction : 0.6,
         generated: true,
         reviewed:  false,
+        fires_live: false,   // a new draft is never armed; arming is a separate, later act
       };
       for (const k of FORK_BINDING_KEYS) {
         delete defining_moment[k];
@@ -3928,7 +3929,8 @@ export function createAdminRouter(repos, config = {}) {
     }
 
     // Engine-owned stamps, as the generator applies them. reviewed is the editor's to set, after.
-    const defining_moment = { ...posted, time_advance: 0, generated, reviewed: false };
+    // fires_live too: replaced content disarms the fork until it is reviewed and armed again.
+    const defining_moment = { ...posted, time_advance: 0, generated, reviewed: false, fires_live: false };
     if (!witnessPath && typeof defining_moment.at_elapsed_fraction !== 'number') defining_moment.at_elapsed_fraction = 0.6;
     normalizeForkBinding(defining_moment, role.id);
     delete defining_moment.timing_confirmed;   // new options need a new timing confirmation

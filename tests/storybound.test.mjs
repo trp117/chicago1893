@@ -22,6 +22,7 @@ import 'dotenv/config';
 import path from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { armReviewedForks } from './_arm-forks.mjs';   // reviewed forks read back armed (fires_live), as on prod after the backfill
 
 // The gate reads DEFINING_MOMENT_ENABLED at module load. Pin it ON for this process so the
 // fork paths are exercised; the flag-OFF half runs in a child process below.
@@ -42,7 +43,7 @@ const { isStoryBoundFork, storyBoundForkActive, composeTurnPrompt, arcBeats, sto
 
 const store = new JsonFileStore(path.join(REPO_DIR, 'engine/data'));
 const repos = {
-  scenarios: new ScenarioRepository(store),
+  scenarios: armReviewedForks(new ScenarioRepository(store)),
   locations: new LocationRepository(store),
   storyArcs: new StoryArcRepository(store),
 };
@@ -92,7 +93,7 @@ const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.
 // role_joan: bound at_scene scene_28_may since B3c (her relapse fork, live in prod).
 // role_manchon: his witness crucible, bound at_scene scene_28_may (2026-10-03).
 // role_massieu: his witness crucible, bound at_scene scene_28_may (2026-10-05).
-const EXPECTED_BOUND = ['role_joan', 'role_manchon', 'role_massieu', 'role_mccord', 'role_wills'];
+const EXPECTED_BOUND = ['role_augustine', 'role_joan', 'role_manchon', 'role_massieu', 'role_mccord', 'role_wills'];   // + Augustine: bound at_beat under_the_fig in prod v63 (2026-11-01)
 const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
@@ -264,10 +265,11 @@ const beats  = arcBeats(WG_ARC);
 head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minute');
 {
   // The pre-Part-A predicate, restated: due from total * at_elapsed_fraction on — and, since
-  // the REVIEWED GATE, only for a block with reviewed === true (fail closed: absent = never).
+  // the REVIEWED + ARMED GATE, only for a block with reviewed === true AND fires_live === true
+  // (fail closed: absent = never).
   const clockDue = (st, c) => {
     const b = st.effectiveDefiningMoment;
-    return !!b && b.reviewed === true && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
+    return !!b && b.reviewed === true && b.fires_live === true && typeof b.at_elapsed_fraction === 'number' && !!b.principal_transition?.moment
       && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * b.at_elapsed_fraction;
   };
   // A BOUND fork with no beat reached (a fresh state) is due at its fallback fraction only —
@@ -275,7 +277,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
   const fallbackDue = (st, c) => {
     const b = st.effectiveDefiningMoment;
     const frac = typeof b?.fallback_at_elapsed_fraction === 'number' ? b.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
-    return !!b && b.reviewed === true && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
+    return !!b && b.reviewed === true && b.fires_live === true && !!b.principal_transition?.moment && st.elapsedMinutes >= (c.scenario.sessionTargetMinutes || 15) * frac;
   };
   // One sweep, run twice: over the REAL stored forks, and over a FROZEN synthetic corpus whose
   // shape never changes. The real sweep's invariant (nothing moved) holds for any data, so it
@@ -308,7 +310,7 @@ head('A3 INERTNESS — every stored fork keeps its clock timing, minute by minut
 
   // FROZEN: three unbound forks at three fractions, two bound ones (at_act with an authored
   // fallback, at_beat on the default), and a role with no fork — on a 30-minute session.
-  const fork = (moment, extra) => ({ id: moment, setup: 'Frozen.', principal_transition: { type: 'decision_made', moment }, options: [{ id: 'a', text: 'A.' }, { id: 'b', text: 'B.' }], reviewed: true, ...extra });
+  const fork = (moment, extra) => ({ id: moment, setup: 'Frozen.', principal_transition: { type: 'decision_made', moment }, options: [{ id: 'a', text: 'A.' }, { id: 'b', text: 'B.' }], reviewed: true, fires_live: true, ...extra });
   const FROZEN_ARC = { id: 'syn_frozen_arc', acts: [{ act_number: 1, title: 'One', beats: [{ id: 'syn_b1' }] }, { act_number: 2, title: 'Two', beats: [{ id: 'syn_b2' }] }] };
   const FZ = {
     scenario: { id: 'syn_frozen_forks', sessionTargetMinutes: 30, storyArcIds: [FROZEN_ARC.id] },

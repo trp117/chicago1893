@@ -602,7 +602,7 @@ try {
     check('system prompt is exactly the protagonist prompt (anchored)', call.system === admin.buildDefiningMomentSystemPrompt(admin.DEFINING_MOMENT_EXEMPLAR, true));
     check('no lever in the user prompt; 8000-token ceiling as before', !/CONFIRMED LEVER/.test(call.user) && call.max_tokens === 8000);
     const dm = repos.scenarios.findPlayerRole('role_wc_protag').defining_moment;
-    check('stored block: the old keys exactly', JSON.stringify(Object.keys(dm).sort()) === JSON.stringify(['at_elapsed_fraction', 'generated', 'id', 'options', 'principal_transition', 'reviewed', 'setup', 'time_advance']) && dm.at_elapsed_fraction === 0.6, Object.keys(dm).join(','));
+    check('stored block: the old keys exactly, plus fires_live:false (a draft is never armed)', JSON.stringify(Object.keys(dm).sort()) === JSON.stringify(['at_elapsed_fraction', 'fires_live', 'generated', 'id', 'options', 'principal_transition', 'reviewed', 'setup', 'time_advance']) && dm.at_elapsed_fraction === 0.6 && dm.fires_live === false, Object.keys(dm).join(','));
     check('options: id + text only', dm.options.every(o => JSON.stringify(Object.keys(o)) === '["id","text"]'));
     check('response: the old keys exactly (no lint_warnings, no path)', JSON.stringify(Object.keys(r.body).sort()) === JSON.stringify(['classification', 'defining_moment', 'roleId']), Object.keys(r.body).join(','));
   }
@@ -861,8 +861,9 @@ try {
     check('a block with an error → 422 CRUCIBLE_LINT, the block echoed back with findings, nothing written',
       bad.status === 422 && bad.body.code === 'CRUCIBLE_LINT' && bad.body.saved === false && bad.body.defining_moment?.options?.length === 3
       && bad.body.findings.some(f => f.location === `option.${O0}.debrief`) && !roleOf('role_wc_saver').defining_moment, `${bad.status}`);
-    const good = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: { ...GEN, reviewed: true, generated: true, time_advance: 5, timing_confirmed: true } });
+    const good = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: { ...GEN, reviewed: true, generated: true, fires_live: true, time_advance: 5, timing_confirmed: true } });
     const dm = roleOf('role_wc_saver').defining_moment;
+    check('a posted fires_live:true is not trusted — saved content is unarmed (fires_live false)', dm?.fires_live === false, String(dm?.fires_live));
     check('the fixed block → saved, stamped (time_advance 0, reviewed false, generated, no timing confirmation)',
       good.status === 200 && good.body.saved === true && dm?.id === GEN.id && dm.time_advance === 0 && dm.reviewed === false && dm.generated === true && dm.timing_confirmed === undefined, `${good.status} ${good.body.error || ''}`);
     const again = await call('PUT', saveDmUrl('role_wc_saver'), { defining_moment: GEN });

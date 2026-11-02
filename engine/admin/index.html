@@ -3134,6 +3134,10 @@ function renderDefiningMomentSection(r, i, data, opts = {}) {
   }
   const dm      = r.defining_moment;
   const state   = definingMomentState(dm);
+  // Two separate decisions, stored separately: content signed off (reviewed) and armed to fire
+  // in live sessions (fires_live). The runtime fires a fork only when BOTH are true.
+  const contentReviewed = dm?.reviewed === true;
+  const armed           = contentReviewed && dm?.fires_live === true;
   const crux    = crucibleOptionCtx(r, dm);
   const leverGate = crux.witnessPath && r.witness_lever?.confirmed !== true;
   const anchored = roleIsAnchored(r);
@@ -3273,13 +3277,22 @@ function renderDefiningMomentSection(r, i, data, opts = {}) {
       </label>` : ''}
 
       ${opts.asDraft ? '' : `<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        ${state === 'authored'
-          ? `<span style="font-size:12px;color:#1d4ed8;font-weight:600">✍ Hand-authored — trusted, no review needed.</span>`
-          : `<button type="button" class="btn btn-primary mark-dm-reviewed-btn" data-role-index="${i}" data-role-id="${r.id}" ${state === 'reviewed' ? 'disabled' : ''}>
-               ${state === 'reviewed' ? '✓ Defining Moment Reviewed' : 'Mark Defining Moment Reviewed'}
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);min-width:150px">1 · Content sign-off</span>
+        ${state === 'authored' && contentReviewed
+          ? `<span style="font-size:12px;color:#1d4ed8;font-weight:600">✍ Hand-authored — ✓ reviewed.</span>`
+          : `<button type="button" class="btn btn-primary mark-dm-reviewed-btn" data-role-index="${i}" data-role-id="${r.id}" ${contentReviewed ? 'disabled' : ''}>
+               ${contentReviewed ? '✓ Defining Moment Reviewed' : 'Mark Defining Moment Reviewed'}
              </button>
-             ${state !== 'reviewed' ? '<span style="font-size:12px;color:var(--text-soft)">Read the setup and all three options against the entry paragraph before marking reviewed.</span>' : ''}`}
+             ${!contentReviewed ? `<span style="font-size:12px;color:var(--text-soft)">${state === 'authored' ? 'Hand-authored. ' : ''}Read the setup and all three options against the entry paragraph before marking reviewed. Marking reviewed does not make the fork fire.</span>` : ''}`}
         <button type="button" class="btn btn-danger btn-sm remove-dm-btn" data-role-id="${r.id}" data-role-index="${i}" data-dm-state="${state}" style="margin-left:auto">Remove defining moment</button>
+      </div>
+      <div class="dm-live-row" style="margin-top:10px;padding:11px 13px;border-radius:6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;${armed ? 'background:#fef2f2;border:1px solid #fca5a5' : 'background:#f8fafc;border:1px solid var(--border)'}">
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft);min-width:150px">2 · Live in sessions</span>
+        <label style="display:flex;gap:8px;align-items:center;cursor:${contentReviewed ? 'pointer' : 'not-allowed'}">
+          <input type="checkbox" class="dm-live-cb" data-role-index="${i}" data-role-id="${r.id}"${armed ? ' checked' : ''}${contentReviewed ? '' : ' disabled'}>
+          <span class="dm-live-label" style="font-size:12px;font-weight:600;color:${armed ? '#991b1b' : 'var(--text)'}">${armed ? '● Live — fires in sessions' : 'Live — fires in sessions'}</span>
+        </label>
+        <span class="dm-live-hint" style="font-size:12px;color:var(--text-soft)">${!contentReviewed ? 'Mark the content reviewed first — an unreviewed fork cannot be armed.' : armed ? 'Players reaching this fork are given the choice.' : 'Off: the fork is dormant — no player sees it.'}</span>
       </div>`}`;
   }
 
@@ -3297,6 +3310,7 @@ function renderDefiningMomentSection(r, i, data, opts = {}) {
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
           <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-soft)">Status</span>
           ${badge}
+          ${state === 'none' ? '' : `<span class="dm-live-chip" style="font-size:11px;padding:3px 9px;border-radius:10px;font-weight:600;${armed ? 'background:#fef2f2;color:#991b1b' : 'background:#f1f5f9;color:var(--text-soft)'}">${armed ? '● Live' : 'Not live'}</span>`}
           ${anchored ? '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f5f3ff;color:#6d28d9;font-weight:600">anchored — historical faithfulness enforced</span>' : '<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:#f1f5f9;color:var(--text-soft);font-weight:600">open outcome</span>'}
           ${archetypeBadge(forkGate.archetype)}
           ${forkGate.allowed
@@ -3536,11 +3550,50 @@ function bindDefiningMomentHandlers(formEl, data, scenarioId) {
     const rev = section.querySelector('.dm-reviewed-input');
     if (rev) rev.value = 'true';
     const badge = section.querySelector('.dm-status-badge');
-    if (badge) { badge.textContent = 'Reviewed'; badge.style.background = '#f0fdf4'; badge.style.color = '#166534'; }
+    // A hand-authored block keeps its provenance badge; only a generated one reads "Reviewed".
+    if (badge && role?.defining_moment?.generated === true) { badge.textContent = 'Reviewed'; badge.style.background = '#f0fdf4'; badge.style.color = '#166534'; }
     btn.disabled = true;
     btn.textContent = '✓ Defining Moment Reviewed';
+    // Reviewing signs the content off and does NOTHING else: the fork stays unarmed. It only
+    // makes the separate Live toggle available.
+    const liveCb = section.querySelector('.dm-live-cb');
+    if (liveCb) liveCb.disabled = false;
+    const liveHint = section.querySelector('.dm-live-hint');
+    if (liveHint) liveHint.textContent = 'Off: the fork is dormant — no player sees it.';
     if (!data.playerRoles[idx].defining_moment) data.playerRoles[idx].defining_moment = {};
     data.playerRoles[idx].defining_moment.reviewed = true;
+    handleManualSave(data, formEl);
+  });
+
+  // LIVE toggle — the deliberate arming switch (defining_moment.fires_live). Separate from
+  // review on purpose: ticking a review never arms a fork. Enabled only on reviewed content
+  // (the server forces fires_live false on an unreviewed block regardless); turning it ON asks
+  // for confirmation, turning it off does not — disarming is always safe.
+  formEl.addEventListener('change', e => {
+    const cb = e.target.closest('.dm-live-cb');
+    if (!cb) return;
+    const idx  = Number(cb.dataset.roleIndex);
+    const role = data.playerRoles[idx];
+    const dm   = role?.defining_moment;
+    if (!dm || dm.reviewed !== true) {
+      cb.checked = false;
+      toast('Mark the defining moment reviewed before arming it.', 'error');
+      return;
+    }
+    if (cb.checked && !confirm(`This fork will fire in live sessions.\n\n"${role.name || role.id}" — players who reach it will be given the choice. Arm it?`)) {
+      cb.checked = false;
+      return;
+    }
+    dm.fires_live = cb.checked;
+    const section = formEl.querySelector(`#dm-section-${idx}`);
+    const label = section?.querySelector('.dm-live-label');
+    if (label) { label.textContent = cb.checked ? '● Live — fires in sessions' : 'Live — fires in sessions'; label.style.color = cb.checked ? '#991b1b' : ''; }
+    const row = section?.querySelector('.dm-live-row');
+    if (row) { row.style.background = cb.checked ? '#fef2f2' : '#f8fafc'; row.style.border = cb.checked ? '1px solid #fca5a5' : '1px solid var(--border)'; }
+    const hint = section?.querySelector('.dm-live-hint');
+    if (hint) hint.textContent = cb.checked ? 'Players reaching this fork are given the choice.' : 'Off: the fork is dormant — no player sees it.';
+    const chip = section?.querySelector('.dm-live-chip');
+    if (chip) { chip.textContent = cb.checked ? '● Live' : 'Not live'; chip.style.background = cb.checked ? '#fef2f2' : '#f1f5f9'; chip.style.color = cb.checked ? '#991b1b' : 'var(--text-soft)'; }
     handleManualSave(data, formEl);
   });
 
@@ -6158,7 +6211,7 @@ function buildCruciblesSection(data) {
     if (hasBlock(r)) {
       const dm = r.defining_moment;
       const D = `${id}.defining_moment`;
-      out.push(`DEFINING MOMENT ${dm.id || '(no id)'} — ${dm.reviewed === true ? 'reviewed' : 'not yet reviewed'} · ${dm.generated === true ? 'generated' : 'hand-authored'}`);
+      out.push(`DEFINING MOMENT ${dm.id || '(no id)'} — ${dm.reviewed === true ? 'reviewed' : 'not yet reviewed'} · ${dm.reviewed === true && dm.fires_live === true ? 'LIVE' : 'not live'} · ${dm.generated === true ? 'generated' : 'hand-authored'}`);
       out.push('');
       field('SETUP', `${D}.setup`, dm.setup);
       dm.options.forEach((o, j) => {

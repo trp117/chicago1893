@@ -23,6 +23,7 @@ import os from 'os';
 import vm from 'vm';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { armReviewedForks } from './_arm-forks.mjs';   // reviewed forks read back armed (fires_live), as on prod after the backfill
 
 process.env.DEFINING_MOMENT_ENABLED = 'true';
 
@@ -44,7 +45,7 @@ const { validateArcScenes, sceneRefSets, preserveStoredScenes, createAdminRouter
 
 const store = new JsonFileStore(path.join(REPO_DIR, 'engine/data'));
 const repos = {
-  scenarios: new ScenarioRepository(store),
+  scenarios: armReviewedForks(new ScenarioRepository(store)),
   locations: new LocationRepository(store),
   storyArcs: new StoryArcRepository(store),
 };

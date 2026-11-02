@@ -124,10 +124,22 @@ const headPath = path.join(REPO_DIR, 'engine/server/.__head_gameRouter.test.js')
 fs.writeFileSync(headPath, execFileSync('git', ['show', 'HEAD:engine/server/gameRouter.js'], { cwd: REPO_DIR, encoding: 'utf8', maxBuffer: 64e6 }));
 try {
   const { generateEpilogueText: headGen } = await import(pathToFileURL(headPath).href);
-  for (const [name, s] of [['decision-aware (Joan-style)', summary('record_exactly')], ['no decision', { ...summary('x'), closure_state: { met: false } }]]) {
+  {
+    const s = { ...summary('x'), closure_state: { met: false } };
     const now = await run(generateEpilogueText, s, null);
     const old = await run(headGen, s, undefined);
-    check(`${name}: same calls, same prompts, same output`, same(now.calls, old.calls) && same(now.out, old.out) && now.calls.some(c => c.block === 'session'));
+    check('no decision: same calls, same prompts, same output', same(now.calls, old.calls) && same(now.out, old.out) && now.calls.some(c => c.block === 'session'));
+  }
+  {
+    // The decision arm's SYSTEM prompt is reworded on purpose (full arc, 2026-11-02 — see
+    // epilogue.test). Everything else about the call must still match HEAD: the record call,
+    // the session content, the call order, and the output.
+    const s = summary('record_exactly');
+    const now = await run(generateEpilogueText, s, null);
+    const old = await run(headGen, s, undefined);
+    const strip = calls => calls.map(c => (c.block === 'session' ? { ...c, system: '<decision arm>' } : c));
+    check('decision-aware (Joan-style): same calls, record prompt, session content and output — only the decision-arm system prompt moved',
+      same(strip(now.calls), strip(old.calls)) && same(now.out, old.out) && now.calls.some(c => c.block === 'session'));
   }
 } finally {
   fs.rmSync(headPath, { force: true });

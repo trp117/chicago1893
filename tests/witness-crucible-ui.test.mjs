@@ -466,6 +466,46 @@ try {
     f.remove();
     doc.body.appendChild(formEl);
   }
+
+  head('ARMING — "Mark Reviewed" (content) and "Live — fires in sessions" (arming) are separate');
+  {
+    // A hand-authored block, unreviewed — the Gatekeeper/Trude shape.
+    const ARM_BLOCK = { id: 'ui_arm_choice', setup: 'The door is open.', time_advance: 0, at_elapsed_fraction: 0.6,
+      principal_transition: { type: 'decision_made', moment: 'ui_arm_choice' },
+      options: [{ id: 'stay', text: 'Stay at the door and keep the line.' }, { id: 'go', text: 'Go through the door into the yard.' }, { id: 'call', text: 'Call the others to the door now.' }] };
+    // A protagonist role, so a plain three-option block passes the save lint (a witness block needs debriefs).
+    const putBlock = dm => repos.scenarios.savePlayerRole({ ...stored(), archetype: 'protagonist', witness_crucible: undefined, defining_moment: dm });
+    const beforeArm = structuredClone(stored());
+    formEl.remove();
+    putBlock(structuredClone(ARM_BLOCK));
+    let f = await freshMount();
+    const q = sel => f.querySelector(sel);
+    check('hand-authored + unreviewed: a Mark Reviewed button is offered (no longer "trusted, no review needed")', !!q('.mark-dm-reviewed-btn') && q('.mark-dm-reviewed-btn').disabled === false && !/no review needed/.test(q('#dm-section-0').textContent));
+    check('…and the Live toggle is there but DISABLED, with the reason', q('.dm-live-cb')?.disabled === true && /Mark the content reviewed first/.test(q('.dm-live-hint')?.textContent || ''));
+    check('the two controls are labelled as separate decisions', /1 · Content sign-off/.test(q('#dm-section-0').textContent) && /2 · Live in sessions/.test(q('#dm-section-0').textContent) && /Marking reviewed does not make the fork fire/.test(q('#dm-section-0').textContent));
+    f.remove();
+
+    putBlock({ ...structuredClone(ARM_BLOCK), reviewed: true });
+    f = await freshMount();
+    const cb = () => f.querySelector('.dm-live-cb');
+    check('reviewed, not armed: toggle enabled, unticked, status "Not live"', cb().disabled === false && cb().checked === false && /Not live/.test(f.querySelector('.dm-live-chip')?.textContent || ''));
+    let asked = 0;
+    win.confirm = () => { asked++; return false; };
+    cb().checked = true; cb().dispatchEvent(new win.Event('change', { bubbles: true }));
+    await settle(300);
+    check('turning Live ON asks first; declining leaves it off and stores nothing', asked === 1 && cb().checked === false && stored().defining_moment.fires_live === undefined);
+    win.confirm = () => { asked++; return true; };
+    cb().checked = true; cb().dispatchEvent(new win.Event('change', { bubbles: true }));
+    await settle(300);
+    check('confirming arms it: stored fires_live:true, reviewed untouched, the chip says Live', asked === 2 && stored().defining_moment.fires_live === true && stored().defining_moment.reviewed === true && /Live/.test(f.querySelector('.dm-live-chip')?.textContent || ''), lastToast());
+    cb().checked = false; cb().dispatchEvent(new win.Event('change', { bubbles: true }));
+    await settle(300);
+    check('turning Live OFF needs no confirm and disarms (fires_live:false, still reviewed)', asked === 2 && stored().defining_moment.fires_live === false && stored().defining_moment.reviewed === true);
+    win.confirm = () => true;
+    f.remove();
+    repos.scenarios.savePlayerRole(beforeArm);
+    doc.body.appendChild(formEl);
+  }
 } finally {
   win.close();
   await new Promise(r => server.close(r));

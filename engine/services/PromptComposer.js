@@ -1089,12 +1089,28 @@ export function definingMomentReviewed(block) {
   return block?.reviewed === true;
 }
 
-// The gate as the engine reads it: the flag on AND the playing role's fork reviewed and
-// story-bound. With the flag off no fork is ever due, so beat tracking would be work with no
-// reader; the same holds for an unreviewed fork, which is never due.
+// ARMING GATE — `reviewed` means only "a human signed the content off"; ticking it arms
+// nothing. A fork is put to a player only when it is ALSO armed: fires_live === true,
+// strictly, fail CLOSED (absent / false / non-boolean = not armed). Armed and unreviewed
+// never fires either (the role save forces fires_live false on an unreviewed block,
+// ScenarioRepository.savePlayerRole). Before this split, reviewed:false was the only way to
+// keep a reviewed fork dormant (Monica, v64), and ticking a review silently armed a fork.
+export function definingMomentArmed(block) {
+  return block?.fires_live === true;
+}
+
+// Both gates at once: content signed off AND deliberately armed. Every site that decides
+// whether a fork is in play reads this, never one half.
+export function definingMomentLive(block) {
+  return definingMomentReviewed(block) && definingMomentArmed(block);
+}
+
+// The gate as the engine reads it: the flag on AND the playing role's fork reviewed, armed
+// and story-bound. With the flag off no fork is ever due, so beat tracking would be work with
+// no reader; the same holds for an unreviewed or unarmed fork, which is never due.
 export function storyBoundForkActive(state, scenario) {
   const block = resolveDefiningMomentBlock(state, scenario);
-  return DEFINING_MOMENT_ENABLED && definingMomentReviewed(block) && isStoryBoundFork(block);
+  return DEFINING_MOMENT_ENABLED && definingMomentLive(block) && isStoryBoundFork(block);
 }
 
 // When a story-bound fork fires if its beat/act is never reached, for a block that does not
@@ -1330,7 +1346,7 @@ export function closureShouldClose(state, scenario) {
 export function definingMomentDue(state, scenario, storyArc = null) {
   const block = resolveDefiningMomentBlock(state, scenario);
   if (!DEFINING_MOMENT_ENABLED || !block) return false;
-  if (!definingMomentReviewed(block)) return false;   // REVIEWED GATE — fail closed
+  if (!definingMomentLive(block)) return false;       // REVIEWED + ARMED GATE — fail closed
   if (state?.definingMomentPresented) return false;
 
   const momentId = block.principal_transition?.moment;
@@ -1738,7 +1754,7 @@ function bindingTargetBeat(block, beats) {
 export function storyPacingNudge(state, scenario, storyArc) {
   if (typeof state?.currentSceneId === 'string') return null;
   const block = resolveDefiningMomentBlock(state, scenario);
-  if (!storyArc || !definingMomentReviewed(block) || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
+  if (!storyArc || !definingMomentLive(block) || !isStoryBoundFork(block) || state?.definingMomentPresented) return null;
   const momentId = block.principal_transition?.moment;
   if (!momentId || state?.decisions?.[momentId] != null) return null;
   if (definingMomentDue(state, scenario, storyArc) || storyBindingReached(block, state, storyArc)) return null;

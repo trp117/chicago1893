@@ -17,6 +17,7 @@ import fs from 'fs';
 import path from 'path';
 import express from 'express';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { armReviewedForks } from './_arm-forks.mjs';   // reviewed forks read back armed (fires_live), as on prod after the backfill
 
 process.env.DEFINING_MOMENT_ENABLED = 'true';
 for (const k of ['LANGFUSE_PUBLIC_KEY', 'LANGFUSE_SECRET_KEY', 'LANGFUSE_BASE_URL']) delete process.env[k];
@@ -41,7 +42,7 @@ const admin = await import(`${ROOT}/engine/admin/adminRouter.js`);
 const store = new JsonFileStore(p('engine/data'));   // never DualWriteStore: no Supabase writes
 const repos = {
   characters: new CharacterRepository(store), locations: new LocationRepository(store),
-  clues: new ClueRepository(store), scenarios: new ScenarioRepository(store),
+  clues: new ClueRepository(store), scenarios: armReviewedForks(new ScenarioRepository(store)),
   storyArcs: new StoryArcRepository(store), players: new PlayerRepository(store),
   sessions: new SessionRepository(store),
 };

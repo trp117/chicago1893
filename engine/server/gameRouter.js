@@ -19,6 +19,7 @@ import {
   getClueById,
   getArcPosition,
   scenePresentation,
+  arcBeats,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
@@ -387,6 +388,34 @@ export function extractPlayerActions(transcript) {
   return lines.slice(-SESSION_ACTIONS_MAX);
 }
 
+// What the story did AFTER the defining choice: the authored descriptions of the arc beats
+// reached from the choice on, in the order they were reached. The player's inputs alone
+// under-tell it ("Open it. Wherever it falls." is the whole record of Augustine reading Romans
+// 13 and the will resolving, 1 Nov run) — the beat is where the arc says what happened.
+// Read off the decision record's beats_before (StateManager recordDefiningDecision). [] when
+// there is no decision, no arc, no beat after it, or a decision recorded before beats_before
+// existed — and [] leaves the session prompt without the AFTER THE CHOICE section.
+const AFTER_CHOICE_MAX = 12;
+export function beatsAfterChoice(sessionState, momentId, storyArc) {
+  const rec = momentId ? sessionState?.decisions?.[momentId] : null;
+  const before = rec && typeof rec === 'object' && Number.isInteger(rec.beats_before) ? rec.beats_before : null;
+  if (before == null || !storyArc) return [];
+  const reached = Array.isArray(sessionState?.reachedBeats) ? sessionState.reachedBeats.slice(before) : [];
+  const byId = new Map(arcBeats(storyArc).map(b => [b.id, b.description]));
+  return reached.map(id => byId.get(id)).filter(d => typeof d === 'string' && d.trim()).slice(0, AFTER_CHOICE_MAX);
+}
+
+// Which of the player's inputs answered the fork: the one whose text is the chosen option's
+// text (a fork button sends the option text as the input; recordDefiningDecision matches the
+// same way). The LAST match, since the answer is the input that was recorded. -1 when none.
+export function choiceInputIndex(actions, decisionText) {
+  const want = typeof decisionText === 'string' ? decisionText.trim() : '';
+  if (!want || !Array.isArray(actions)) return -1;
+  const clip = want.length > SESSION_ACTION_CHARS ? want.slice(0, SESSION_ACTION_CHARS).trimEnd() + '…' : want;
+  for (let i = actions.length - 1; i >= 0; i--) if (actions[i]?.trim() === clip) return i;
+  return -1;
+}
+
 // Matches "turn 29", "Turn 3", "turn N" etc — must not appear in record-voice prose.
 const TURN_META_RE = /\bturn\s+\d+\b/gi;
 function scrubTurnMeta(text) {
@@ -513,7 +542,7 @@ export function recordWordBudget(layer1Fates) {
 }
 
 // Exported for tests/epilogue.test.mjs, which drives it against a scripted Anthropic.
-export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null, playerActions = []) {
+export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null, playerActions = [], afterChoice = []) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -564,11 +593,22 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
   const actions    = Array.isArray(playerActions) ? playerActions.filter(a => typeof a === 'string' && a.trim()) : [];
   const hasActions = actions.length > 0;
 
+  // FULL ARC (decision sessions only). The fork is the crucible, not the last word: the input
+  // that answered it is marked in WHAT THE PLAYER DID, and the story beats reached after it
+  // (beatsAfterChoice) ride as AFTER THE CHOICE. 1 Nov Augustine run: held back at the fork,
+  // then rose, read Romans and showed Alypius — and the block, told the choice was "the last
+  // one", framed the whole session as the holding back. Both are empty outside a decision
+  // session, so the no-decision and presence prompts are unchanged.
+  const choiceIdx  = decisionMade && hasActions ? choiceInputIndex(actions, definingState?.decision_text) : -1;
+  const after      = decisionMade && Array.isArray(afterChoice) ? afterChoice.filter(a => typeof a === 'string' && a.trim()) : [];
+  const hasAfter   = after.length > 0;
+  const CHOICE_MARK = '   ← THE DEFINING CHOICE';
+
   const sessionSystemPrompt = [
     'You are writing the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
     '',
     decisionMade
-      ? 'Convey who this person was in the room — the human experience of this session, pivoting on the defining decision they made, AND on what that decision turned out to mean given how the session ended. Name who was there with them, and let the choice carry who they became under pressure. Reflect the choice in the light of what it led to: not what they accomplished, but who they were in it and what it cost.'
+      ? 'Convey who this person was in the room — the human experience of this session as a whole: what they did across it, the defining decision at its crucible, and where they actually ended. Name who was there with them, and let the choice carry who they were under pressure. Reflect the choice in the light of what came after it and how the session ended: not what they accomplished, but who they were in it and what it cost.'
       : proximity
       ? 'Convey who this person was in proximity to the event — the quality of their presence: what they attended to, how they bore it, and what being there asked of them. Name who was there with them.'
       : 'Describe what this player did in this session: which characters they encountered, key decisions made, how the session ended for them.',
@@ -578,17 +618,17 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     '',
     'Rules:',
     hasActions
-      ? '- Draw ONLY from the SESSION SUMMARY, WHAT THE PLAYER DID, and the CLOSING PROSE provided. No other knowledge, no external sources.'
+      ? `- Draw ONLY from the SESSION SUMMARY, WHAT THE PLAYER DID,${hasAfter ? ' AFTER THE CHOICE,' : ''} and the CLOSING PROSE provided. No other knowledge, no external sources.`
       : '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
     '- Name characters ONLY from the CHARACTERS PRESENT THIS SESSION list. Never invent a name or substitute a name not on that list.',
     ...(hasActions ? [
       '- FOLLOW WHAT THE PLAYER ACTUALLY DID. WHAT THE PLAYER DID lists their own inputs this session, in order. The block must reflect that arc — whom they sought out, what they said, what they pressed on and what they let lie. Weigh it by how much of the session it took: a thread they returned to again and again is the spine of the session; a line they said once is not. Take it only from that list: where they engaged someone little or not at all, do not invent a confrontation, a conversation, or a feeling they did not show. An input records what they tried or said, not what it achieved: pressing someone for an answer is not getting one. Report what they did and said, never an outcome the CLOSING PROSE does not show. Compress: the whole arc still fits the length above.',
       ...(decisionMade ? [
-        '- THE CHOICE CLOSES THE SESSION; IT DOES NOT REWRITE IT. decision_text is what they chose at one moment, the last one. It does not describe the session before it. Hold both, in order: what they did across the session, then what they chose when it came to the point. If earlier inputs already said or did what the choice holds back, never write as if they had not — write the choice as what it withheld at that moment, after everything before it.',
+        `- FOLLOW THE WHOLE ARC — THE CHOICE IS ITS CRUCIBLE, NOT ITS LAST WORD. decision_text is what they chose at one moment${choiceIdx >= 0 ? ` (marked "← THE DEFINING CHOICE" in WHAT THE PLAYER DID; the mark is for you — never write it)` : ''}. It does not describe the session before it, and it does not settle what came after it. Hold the session in order: what they did before the choice, what they chose when it came to the point, and what they did after it — the inputs after the choice${hasAfter ? ', and AFTER THE CHOICE, which says what the story did from there' : ''}. If earlier inputs already said or did what the choice holds back, never write as if they had not. If what came after goes beyond or against the choice — they held back, then crossed — honour what they actually did: write the choice as where they stood at that moment, and tell what followed fully, not as a coda. End on where they actually ended, not on the choice.`,
       ] : []),
     ] : []),
     ...(decisionMade ? [
-      '- THE DECISION IS THE RESOLUTION. A defining decision was recorded this session (closure_state.defining_moment_state). The choice in decision_text is how this session resolved — it is the crystallizing moment, not a step toward one. Write who this person was in it and what it asked of them. Never say the session ended without resolution.',
+      '- THE DECISION IS THE CRUCIBLE. A defining decision was recorded this session (closure_state.defining_moment_state). The choice in decision_text is the crystallizing moment of this session — give it its weight, and write who this person was in it and what it asked of them. It is not necessarily how the session ended: when the session went on past it, the resolution is where they actually ended. Never say the session ended without resolution.',
       '- THE DECISION OUTRANKS closure_state. Disregard closure_state.reason, closure_state.location, and closure_state.required_locations entirely. Never frame the session as unresolved, incomplete, cut short, or as a shortfall for not reaching somewhere. Reaching a location was never the objective; the human experience was.',
       '- CLOSE CONCRETE, NOT ABSTRACT. End on a definite particular from this session — a thing held, a sound, a gesture, what someone did with their hands — at the same grain as the CLOSING PROSE. The last image must be something that definitely happened. Never close on unknowability: not "nobody could have said", not "what only you knew", not "the night absorbed it", not "no one was left to record it". That the aftermath is undocumented may be true, but it is not the ending. Never close on "the session ended before…" or "they never reached…".',
       '- GROUND IT IN THE TEXTURE OF THIS SESSION. The CLOSING PROSE carries the physical particulars — a thing in the hands, what the light was doing, the sound of the room, the weight of what was carried. Use those particulars. Do not write a close that could belong to any session.',
@@ -635,7 +675,12 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
     '',
     ...(hasActions ? [
       'WHAT THE PLAYER DID (their own inputs, in order — the record of this session):',
-      ...actions.map((a, i) => `${i + 1}. ${a}`),
+      ...actions.map((a, i) => `${i + 1}. ${a}${i === choiceIdx ? CHOICE_MARK : ''}`),
+      '',
+    ] : []),
+    ...(hasAfter ? [
+      'AFTER THE CHOICE (what the story did from the choice on, in order — events the session reached, not the player\'s words):',
+      ...after.map(a => `- ${a}`),
       '',
     ] : []),
     'CLOSING PROSE (draw physical particulars from this — do not copy its phrasing or continue its scene):',
@@ -2073,7 +2118,9 @@ Do not open with the historical context. Open inside the character's body. Let t
 
           epilogueResult = await generateEpilogueText(scenarioData.epilogue, summary, scrubTurnMeta(prose), anthropicApiKey, role?.historical_record_note || null, sessionNpcList, proximitySession,
             role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null,
-            authoredDebrief, extractPlayerActions(narrativeTranscript));
+            authoredDebrief, extractPlayerActions(narrativeTranscript),
+            beatsAfterChoice(sessionState, summary.closure_state?.defining_moment_state?.moment,
+              scenarioData?.storyArcIds?.[0] && repos.storyArcs ? repos.storyArcs.findById(scenarioData.storyArcIds[0]) : null));
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
             epilogueResult = {
               ...epilogueResult,

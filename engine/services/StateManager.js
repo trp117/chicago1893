@@ -335,7 +335,11 @@ export function recordDefiningDecision(state, scenario, { definingChoiceId, play
 
   state.decisions = {
     ...(state.decisions || {}),
-    [momentId]: { option_id: chosen.id, turn: state.turnCount ?? 0, elapsed: state.elapsedMinutes ?? 0 },
+    // beats_before: how many story beats were already reached when the choice was made, so
+    // the "Your Session" block can tell what happened AFTER it (reachedBeats.slice(beats_before)).
+    // Recorded at the start of the answer turn, so that turn's own beats count as after.
+    [momentId]: { option_id: chosen.id, turn: state.turnCount ?? 0, elapsed: state.elapsedMinutes ?? 0,
+                  beats_before: Array.isArray(state.reachedBeats) ? state.reachedBeats.length : 0 },
   };
   return chosen.id;
 }
