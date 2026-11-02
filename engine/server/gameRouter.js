@@ -28,6 +28,7 @@ import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../servic
 import { characterLabel, attachSpeakerNames, relabelHistory } from '../services/SpeakerNames.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
+import { consolidateBibliography } from '../services/Bibliography.js';
 import * as appData from '../data.js';
 import { AnchorTracker } from '../services/AnchorTracker.js';
 
@@ -443,10 +444,9 @@ function assembleBibliography(scenarioData, summary, sessionState) {
   (scenarioData.technical_facts?.facts || [])
     .filter(f => activeFacts.has(f.fact_id) && f.source)
     .forEach(f => { const s = normSource(f.source); if (s.citation && !bibMap.has(s.citation)) bibMap.set(s.citation, s); });
-  return [...bibMap.values()].sort((a, b) => {
-    if (!!a.url !== !!b.url) return a.url ? -1 : 1;
-    return a.citation.localeCompare(b.citation);
-  });
+  // Exact-deduped above; consolidateBibliography merges loci of the same work, splits compound
+  // citations it can parse, and keeps everything else verbatim (engine/services/Bibliography.js).
+  return consolidateBibliography([...bibMap.values()]);
 }
 
 // Strip {text,source} objects back to plain strings before sending to the prose-generation LLM.

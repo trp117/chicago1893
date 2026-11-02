@@ -2130,8 +2130,10 @@ function applyRedesignDialogueFormatting(containerEl) {
     const m = text.match(/^([^:]{1,40}):\s*([\s\S]+)$/);
     if (!m) return;
     const safeS = m[1].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeD = m[2].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    line.innerHTML = `<span class="redesign-dialogue-speaker">${safeS}</span><span class="redesign-dialogue-text">${safeD}</span>`;
+    const safeD = m[2].trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // The line is rebuilt from textContent, which drops the glossary spans markupGlossaryTerms put
+    // there — so the speech is marked up again here (5 of 44 Ignatius hits were lost this way).
+    line.innerHTML = `<span class="redesign-dialogue-speaker">${safeS}</span><span class="redesign-dialogue-text">${markupGlossaryTerms(safeD)}</span>`;
   });
 }
 
@@ -3544,6 +3546,39 @@ function escapeHtmlAttr(str) {
 // prose — is handled by the reviewer instead: REVIEW_PROMPTS.glossary asks for those to be
 // flagged as RECOMMEND REMOVAL candidates. Revisit if a census shows the pairs multiplying.
 //
+// THE FORMS A TERM MATCHES — bounded, so a term surfaces where it genuinely appears without
+// picking up ordinary words (the "chair" problem: "his chair" is not "the chair of rhetoric"):
+//   - the term itself, case-insensitive, whole-word (as before);
+//   - straight and curly apostrophes interchangeably ("Paul’s letters");
+//   - any run of whitespace between the words of a multi-word term (a line break mid-term);
+//   - a parenthetical term also as its base form: "chief notary (notaire)" → "chief notary";
+//   - the LAST word's plural / possessive only, and only for a last word of 4+ letters:
+//     -s, -es, consonant-y → -ies, -ex/-ix → -ices ("codices"), then an optional 's.
+// Never: stemming down, verb forms (-ed/-ing), fuzzy matching, or any single word of a
+// multi-word term on its own ("Loyola" alone, "question" alone). Measured on 352 live turns
+// (2 Nov 2026): 0 new false matches.
+function glossTermPattern(term) {
+  const APOS = "['‘’]";
+  const one = t => {
+    const words = t.trim().split(/\s+/);
+    const last  = words.pop();
+    const w = x => escapeRegex(x).replace(/['‘’]/g, APOS);
+    let lastP = w(last);
+    if (last.length >= 4 && /^[A-Za-z]+$/.test(last)) {
+      const alts = [`${w(last)}(?:s|es)?`];
+      if (/[^aeiou]y$/i.test(last)) alts.push(`${escapeRegex(last.slice(0, -1))}ies`);
+      if (/(ex|ix)$/i.test(last))   alts.push(`${escapeRegex(last.slice(0, -2))}ices`);
+      lastP = `(?:${alts.join('|')})(?:${APOS}s)?`;
+    }
+    return [...words.map(w), lastP].join('\\s+');
+  };
+  const forms = [one(term)];
+  const base = term.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+  if (base && base.toLowerCase() !== term.trim().toLowerCase()) forms.push(one(base));
+  // (?: ) not ( ): the caller numbers one capture group per term and must not see these.
+  return forms.length > 1 ? `(?:${forms.join('|')})` : forms[0];
+}
+
 // ONE alternation pass over the text — never a term-at-a-time loop.
 //
 // WHY THIS SHAPE. The previous version looped per term and spliced each <span data-def="...">
@@ -3569,11 +3604,10 @@ function markupGlossaryTerms(html) {
   if (!terms.length) return html;
 
   // First definition wins for a duplicated term, consistent with the longest-first order above.
-  const defByTerm = new Map();
-  for (const { term, definition } of terms) {
-    const key = term.toLowerCase();
-    if (!defByTerm.has(key)) defByTerm.set(key, definition || '');
-  }
+  // One capture group per DISTINCT term, so the replacer knows which term an inflected match
+  // ("codices", "Paul’s letters") belongs to without re-deriving it from the matched text.
+  const seen = new Set();
+  const uniq = terms.filter(({ term }) => { const k = term.trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
 
   // Stash the caller's tags so only text content is ever matched. \x00 is not a word character,
   // so a term sitting flush against a stashed tag (<em>Flos Sanctorum</em>) still satisfies the
@@ -3585,13 +3619,14 @@ function markupGlossaryTerms(html) {
   // got one match per render — which the sensory opening routinely consumed before the body was
   // reached. The guards still reject substring hits ("breach" inside "breached") and hyphenated
   // neighbours.
-  const re = new RegExp(`(?<![\\w\\-])(?:${terms.map(t => escapeRegex(t.term)).join('|')})(?![\\w\\-])`, 'gi');
+  const re = new RegExp(`(?<![\\w\\-])(?:${uniq.map(t => `(${glossTermPattern(t.term)})`).join('|')})(?![\\w\\-])`, 'gi');
 
   // Function replacer, never a replacement string: $&, $', $` and $1 inside a definition are
   // inert here. As a replacement string, a definition containing $' would splice the remainder
   // of the document into the page. (engine/admin/index.html carries this guard for the same reason.)
-  const marked = safe.replace(re, (match) => {
-    const def = defByTerm.get(match.toLowerCase()) || '';
+  const marked = safe.replace(re, (match, ...groups) => {
+    const i = groups.findIndex((g, k) => k < uniq.length && g !== undefined);
+    const def = i >= 0 ? (uniq[i].definition || '') : '';
     return `<span class="gloss-term" data-def="${escapeHtmlAttr(def)}">${match}</span>`;
   });
 
