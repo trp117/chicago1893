@@ -5342,7 +5342,7 @@ Return ONLY valid JSON in this exact structure:
       const startResp = await fetch(`${BASE}/game/api/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenarioId, roleId, narrativeStyle: 'immersive' }),
+        body: JSON.stringify({ scenarioId, roleId, narrativeStyle: 'focused' }),
       });
       if (!startResp.ok) throw new Error(`Start failed: ${startResp.status}`);
 

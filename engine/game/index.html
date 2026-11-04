@@ -901,6 +901,11 @@ function markWorldIntroSeen() { sessionStorage.setItem(worldIntroKey, 'true'); }
 // Rollback: change this one line back to false
 const USE_STREAMLINED_ONBOARDING = true;
 
+// NARRATIVE STYLE TOGGLE — Focused/Cinematic pills on the streamlined role screen.
+// Hidden: every player session runs 'focused'. The cinematic mode still exists in the
+// backend and system prompt. Re-enable: set this one line to true.
+const SHOW_NARRATIVE_STYLE_TOGGLE = false;
+
 // SCENARIO REDESIGN — cinematic role-selection + in-game styling
 // Rollback: set to false — instantly removes all redesign CSS via the .redesign class
 const USE_SCENARIO_REDESIGN = true;
@@ -2543,24 +2548,26 @@ function renderStreamlinedScreen1() {
   }
 
   // Style zone — centered pill buttons, outside the ruled zone
-  const styleZone = document.createElement('div');
-  styleZone.className = 'style-zone';
-  const styleOptions = document.createElement('div');
-  styleOptions.className = 'narrative-style-options';
-  for (const { value, label } of [{ value: 'focused', label: 'Focused' }, { value: 'cinematic', label: 'Cinematic' }]) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'ns-btn' + (value === 'focused' ? ' active' : '');
-    btn.dataset.style = value;
-    btn.textContent = label;
-    btn.addEventListener('click', () => {
-      styleOptions.querySelectorAll('.ns-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-    styleOptions.appendChild(btn);
+  if (SHOW_NARRATIVE_STYLE_TOGGLE) {
+    const styleZone = document.createElement('div');
+    styleZone.className = 'style-zone';
+    const styleOptions = document.createElement('div');
+    styleOptions.className = 'narrative-style-options';
+    for (const { value, label } of [{ value: 'focused', label: 'Focused' }, { value: 'cinematic', label: 'Cinematic' }]) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ns-btn' + (value === 'focused' ? ' active' : '');
+      btn.dataset.style = value;
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        styleOptions.querySelectorAll('.ns-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      styleOptions.appendChild(btn);
+    }
+    styleZone.appendChild(styleOptions);
+    roleCardsEl.insertAdjacentElement('beforebegin', styleZone);
   }
-  styleZone.appendChild(styleOptions);
-  roleCardsEl.insertAdjacentElement('beforebegin', styleZone);
 
   // Section label sits directly above the first role card
   const sectionLabel = document.createElement('p');
@@ -2583,7 +2590,9 @@ function renderStreamlinedScreen1() {
       updateTtsBarUI();
       roleOverlay.classList.add('hidden');
 
-      const selectedStyle = document.querySelector('.ns-btn.active')?.dataset.style || 'focused';
+      const selectedStyle = SHOW_NARRATIVE_STYLE_TOGGLE
+        ? (document.querySelector('.ns-btn.active')?.dataset.style || 'focused')
+        : 'focused';
       const hooks        = Array.isArray(role.character_hooks) ? role.character_hooks.filter(Boolean) : [];
       const hookIndex    = hooks.length > 0 ? Math.floor(Math.random() * hooks.length) : -1;
       const activeHook   = hookIndex >= 0 ? hooks[hookIndex] : null;
