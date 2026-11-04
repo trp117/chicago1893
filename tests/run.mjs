@@ -58,6 +58,7 @@ const SUITE = [
   ['carried objects: codex follows player', 'codex-carry.test.mjs'],
   ['glossary markup: forms + dialogue (jsdom)', 'glossary-markup.test.mjs'],
   ['primary sources: consolidation',        'bibliography.test.mjs'],
+  ['narrative style: Focused lock (jsdom)', 'narrative-style-lock.test.mjs'],
 ];
 
 const results = [];
