@@ -59,6 +59,7 @@ const SUITE = [
   ['glossary markup: forms + dialogue (jsdom)', 'glossary-markup.test.mjs'],
   ['primary sources: consolidation',        'bibliography.test.mjs'],
   ['narrative style: Focused lock (jsdom)', 'narrative-style-lock.test.mjs'],
+  ['[UNVERIFIED] tag: strip + publish gate', 'unverified-tag.test.mjs'],
 ];
 
 const results = [];

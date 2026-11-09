@@ -25,6 +25,7 @@ import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, in
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
 import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
 import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../services/NarrativeSalvage.js';
+import { stripUnverifiedDeep, stripUnverifiedFromJson, withUnverifiedStripped } from '../services/UnverifiedTag.js';
 import { characterLabel, attachSpeakerNames, relabelHistory } from '../services/SpeakerNames.js';
 import { buildSystemPrompt as buildSystemPromptFromData } from '../promptBuilder.js';
 import { SchemaValidator } from '../services/SchemaValidator.js';
@@ -203,7 +204,7 @@ function endsOnNpcQuestion(narrative, npcMoments) {
 // ── SSE helpers ────────────────────────────────────────────────────────────────
 
 function sendSse(res, obj) {
-  res.write(`data: ${JSON.stringify(obj)}\n\n`);
+  res.write(`data: ${JSON.stringify(stripUnverifiedDeep(obj))}\n\n`);
   if (typeof res.flush === 'function') res.flush();
 }
 
@@ -807,9 +808,13 @@ export function forkOptionsPayload(block) {
 
 // ── Router export ──────────────────────────────────────────────────────────────
 
-export function createGameRouter(repos, config = {}) {
+export function createGameRouter(contentRepos, config = {}) {
+  // Everything below reads through this: an [UNVERIFIED] tag is a note to the human reviewer
+  // and must not reach a response, a model prompt, session state or a transcript.
+  const repos = withUnverifiedStripped(contentRepos);
   const { anthropicApiKey, elevenLabsApiKey, elevenLabsVoiceId } = config;
   const r = Router();
+  r.use(stripUnverifiedFromJson);
 
   // ── Public scenario listing ────────────────────────────────────────────────
   r.get('/scenarios', async (_, res) => {

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { stripUnverifiedTag } from './UnverifiedTag.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { knownAsLines } from './SpeakerNames.js';
@@ -510,6 +511,7 @@ export function buildCharacterRoutes(characters, locations, playerCharacterId = 
 // ── TTS ────────────────────────────────────────────────────────────────────────
 
 export function prepareForTts(text) {
+  text = stripUnverifiedTag(text);
   return (text || '')
     .replace(/\*\*(.+?)\*\*/g, '$1')
     .replace(/\*(.+?)\*/g, '$1')

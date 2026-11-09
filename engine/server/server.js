@@ -18,6 +18,7 @@ import { PlayerRepository }     from '../repositories/PlayerRepository.js';
 import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
 import { createGameRouter }     from './gameRouter.js';
+import { stripUnverifiedFromJson } from '../services/UnverifiedTag.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
 import { checkSupabaseConnection, isSupabaseConnected, supabaseAuth, supabase as supabaseService } from '../../lib/supabase.js';
 import { SupabaseSessionStore } from '../../lib/SupabaseSessionStore.js';
@@ -110,6 +111,8 @@ const CATEGORIES = {
   'industrial':   { displayName: 'Industrial',       order: 6, blurb: 'The infrastructure of civilization, under pressure. Engineers, workers, and the crises that tested what was built to last — when technology met its limit and decisions had to be made in the dark.' },
 };
 const CATEGORY_LABELS = Object.fromEntries(Object.entries(CATEGORIES).map(([k,v]) => [k, v.displayName]));
+
+app.use(['/api/categories', '/api/stories'], stripUnverifiedFromJson);
 
 app.get('/api/categories', async (req, res) => {
   try {

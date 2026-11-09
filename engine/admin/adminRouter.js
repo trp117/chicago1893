@@ -15,6 +15,7 @@ import { resolveAnchorBinding } from '../services/ClaudeScenarioClient.js';
 import { ANCHOR_ENFORCE_FROM_DEFAULT } from '../services/StateManager.js';
 import { buildConductBoundsLines } from '../services/PromptComposer.js';
 import { lintCrucibleBlock, lintWitnessLever, lintResult, finding, formatFindings, optionLocator, wordCount, BUDGETS, LABEL_MAX_CHARS, WITNESS_LEVER_AXES } from '../services/CrucibleLint.js';
+import { findUnverifiedInBundle, unverifiedTagMessage } from '../services/UnverifiedTag.js';
 import multer from 'multer';
 import sharp from 'sharp';
 import { supabase } from '../../lib/supabase.js';
@@ -1010,7 +1011,7 @@ function validateGeneratedScenario(generated) {
 // Returns { errors: string[], warnings: string[] }
 // errors   = blocking (red) — scenario cannot be considered complete
 // warnings = non-blocking (yellow) — require human review before publication
-function validateStoredScenario(scenario, playerRoles, characters = [], locations = []) {
+function validateStoredScenario(scenario, playerRoles, characters = [], locations = [], { clues = [], storyArc = null } = {}) {
   const errors = [];
   const warnings = [];
 
@@ -1127,6 +1128,11 @@ function validateStoredScenario(scenario, playerRoles, characters = [], location
       }
     }
   });
+
+  // A generated specific nobody has checked yet. Red, not yellow: the tag marks a claim the
+  // generator itself could not source, and the fix is a human decision.
+  const unverifiedFields = findUnverifiedInBundle({ scenario, storyArc, characters, locations, clues, playerRoles });
+  if (unverifiedFields.length) errors.push(unverifiedTagMessage(unverifiedFields));
 
   // Glossary warnings (non-blocking)
   if (!scenario.glossary || scenario.glossary.length === 0) {
@@ -2954,6 +2960,23 @@ function generationMaxTokens(minutes) {
   return               48_000;
 }
 
+// Shared across the generators that write historical specifics. Rule 4 is separate because it
+// belongs only to the main scenario generator: the technical-facts and epilogue prompts already
+// require omitting what cannot be verified, and a tag there would contradict that.
+const LOAD_BEARING_SPECIFICS = `HISTORICAL ACCURACY — LOAD-BEARING SPECIFICS (read before writing any name, rank, date, unit, or number):
+
+A "load-bearing specific" is any rank, title, military or organizational unit, date (birth, death, promotion, event), weapon or equipment model, casualty figure, place-name, or hard number. These are the facts a knowledgeable reader will check, and one confident error destroys trust faster than an honest omission.
+
+For every load-bearing specific:
+1. ANCHOR TO THE SCENARIO'S DATE. State a person's rank, title, role, and unit as they were ON the scenario's date — never their later or best-known status. The most famous version of a fact is frequently wrong for the specific moment. (Robert R. McCormick is remembered as "Colonel McCormick," but at Cantigny on 28 May 1918 he was a MAJOR — promoted to lieutenant colonel only that June and colonel in September. A weapon's iconic model often postdates the scene.) When unsure of the as-of-date value, say less.
+2. PREFER GENERAL-BUT-TRUE OVER SPECIFIC-BUT-UNCERTAIN. If you are not confident of the exact rank, date, unit, or number, use the general form that is certainly true ("a battalion commander," "in the spring of 1918," "a field-artillery regiment") rather than invent a precise one. A true generality is correct; a plausible fabrication is not.
+3. DO NOT SUPPLY A NUMBER OR NAME THE RECORD DOES NOT GIVE. Omit rather than approximate.`;
+
+const LOAD_BEARING_UNVERIFIED_RULE = `4. FLAG WHAT YOU CANNOT VERIFY. If the scene needs a specific you cannot source, append " [UNVERIFIED]" so a human checks it before publication. Never present an unverified specific as settled.`;
+
+// Follows rule 4 and depends on it ("or tagged"), so it is main-generator only as well.
+const LOAD_BEARING_FICTIONAL_CHARACTERS = `FICTIONAL CHARACTERS: invented personal details (hometown, temperament, the condition of their own gear) are legitimate fiction and need no sourcing. But any claim they make about the real event or world — a troop count, a technical value, a named battle, unit, date, or place — is still a load-bearing specific and must be accurate, kept general, or tagged. Do not write "(fictional)", "composite", or any similar authoring label into the role, name, or other character fields — the character_type field records that separately, and every other field must read as in-world prose. A fictional soldier may feel what you invent; he may not state a real-world fact you cannot support.`;
+
 function buildGenerationPrompt({ description, playTimeMinutes }) {
   const s = scalingGuide(playTimeMinutes);
 
@@ -2982,6 +3005,11 @@ SCALE — adapt to the story's spine. The figures below are an upper bound for a
 - Locations: up to ${s.locs} for a story that spans a place; as few as one or two for an interior story. Aim for 2–3 NPCs per location you create.
 - Clues: up to ${s.clues}, exactly 2 marked isKeyEvidence. In an investigation these are evidence to discover; in a reckoning they are what the character comes to notice, learn, or realize — and the two isKeyEvidence clues are the two realizations the whole story turns on. Do not pad.
 - Player Roles: ${s.roles}
+
+${LOAD_BEARING_SPECIFICS}
+${LOAD_BEARING_UNVERIFIED_RULE}
+
+${LOAD_BEARING_FICTIONAL_CHARACTERS}
 
 OUTPUT RULES:
 1. Return ONLY valid JSON — no markdown, no code fences, no prose
@@ -3288,7 +3316,10 @@ export function createAdminRouter(repos, config = {}) {
     const playerRoles  = repos.scenarios.findPlayerRoles(req.params.id);
     const characters   = repos.characters.findAll().filter(c => c.scenarioIds?.includes(req.params.id));
     const locations    = repos.locations.findByScenario(req.params.id);
-    const { errors: missing, warnings } = validateStoredScenario(scenario, playerRoles, characters, locations);
+    const { errors: missing, warnings } = validateStoredScenario(scenario, playerRoles, characters, locations, {
+      clues: repos.clues.findByScenario(req.params.id),
+      storyArc: scenario.storyArcIds?.[0] ? repos.storyArcs.findById(scenario.storyArcIds[0]) : null,
+    });
     const entrySection = scenario.introduction?.sections?.find(s => s.type === 'entry');
     const roles = playerRoles.map(role => ({
       id:                role.id,
@@ -3422,7 +3453,10 @@ export function createAdminRouter(repos, config = {}) {
     const updatedRoles    = repos.scenarios.findPlayerRoles(req.params.id);
     const validationChars = repos.characters.findAll().filter(c => c.scenarioIds?.includes(scenario.id));
     const validationLocs  = repos.locations.findByScenario(scenario.id);
-    const { errors: remaining } = validateStoredScenario(scenario, updatedRoles, validationChars, validationLocs);
+    const { errors: remaining } = validateStoredScenario(scenario, updatedRoles, validationChars, validationLocs, {
+      clues: repos.clues.findByScenario(scenario.id),
+      storyArc: scenario.storyArcIds?.[0] ? repos.storyArcs.findById(scenario.storyArcIds[0]) : null,
+    });
     res.json({ success: errors.length === 0, repairs, errors, remaining, current_version: scenarioVersion });
   });
 
@@ -4788,9 +4822,11 @@ Return ONLY valid JSON in this exact structure:
       'personnel — what named characters actually did, their documented actions and fates during the event depicted',
       'other — any other technical fact a player might trigger the engine to generate incorrectly',
       '',
+      LOAD_BEARING_SPECIFICS,
+      '',
       'Rules:',
       '- Every fact must be specific and numerical where the historical record provides numbers',
-      '- Every fact must have a source reference — a named inquiry, testimony, document, or established historical record',
+      '- Every fact must have a source reference that names a specific inquiry, testimony, document, report, or published work. "The historical record", "survivor testimony", "contemporary accounts", and similar generic labels are not sources. If you cannot name the source, omit the fact.',
       '- Do not include facts that are disputed or unverifiable — omit rather than approximate',
       '- Do not include interpretive or analytical statements — facts only',
       '- Generate between 8 and 20 facts depending on the scenario\'s technical complexity',
@@ -4914,6 +4950,10 @@ Return ONLY valid JSON in this exact structure:
       '- Tone is the last paragraph of a history book — factual, outside the story, neither triumphant nor tragic. Just the record.',
       '- Include the broader historical aftermath of the event itself — what happened, what it meant, how history resolved it.',
       '- Everything stated must be verifiable. If uncertain, omit.',
+      '',
+      LOAD_BEARING_SPECIFICS,
+      '',
+      'In this epilogue, rule 1 governs how a person is described AT the event. A later rank, title, or post belongs to their post-event fate: state it only as a later, dated event ("promoted colonel in September 1918"), never as their status at the event.',
       '',
       '══ EVENT SCOPE — NAMED PEOPLE AND EVENTS ══',
       '',
@@ -5235,6 +5275,16 @@ Return ONLY valid JSON in this exact structure:
       // otherwise become unsaveable, which would make this gate something to route
       // around rather than satisfy. The transition is the moment the decision is made.
       if (scenario.status === 'published' && (existing?.status || 'draft') !== 'published') {
+        // Same transition-only rule as the glossary gate below, and for the same reason.
+        const unverifiedFields = findUnverifiedInBundle({ scenario, storyArc, characters, locations, clues, playerRoles: preparedRoles });
+        if (unverifiedFields.length) {
+          return res.status(400).json({
+            error: unverifiedTagMessage(unverifiedFields, 'Cannot publish: [UNVERIFIED] tag still present'),
+            code: 'UNVERIFIED_TAGS',
+            fields: [...new Set(unverifiedFields.map(e => e.field))],
+            tags: unverifiedFields,
+          });
+        }
         const unreviewed = (scenario.glossary || []).filter(g => g?.term?.trim() && g.approved !== true);
         if (unreviewed.length) {
           return res.status(400).json({
