@@ -2977,6 +2977,9 @@ const LOAD_BEARING_UNVERIFIED_RULE = `4. FLAG WHAT YOU CANNOT VERIFY. If the sce
 // Follows rule 4 and depends on it ("or tagged"), so it is main-generator only as well.
 const LOAD_BEARING_FICTIONAL_CHARACTERS = `FICTIONAL CHARACTERS: invented personal details (hometown, temperament, the condition of their own gear) are legitimate fiction and need no sourcing. But any claim they make about the real event or world — a troop count, a technical value, a named battle, unit, date, or place — is still a load-bearing specific and must be accurate, kept general, or tagged. Do not write "(fictional)", "composite", or any similar authoring label into the role, name, or other character fields — the character_type field records that separately, and every other field must read as in-world prose. A fictional soldier may feel what you invent; he may not state a real-world fact you cannot support.`;
 
+// Shared by the technical-facts and epilogue generators.
+const CITE_AT_WORK_LEVEL = `CITE AT THE WORK LEVEL. Name the source work — the inquiry, official report, named testimony, diary, or published book. Do NOT invent page numbers, paragraph numbers, inquiry 'Day' numbers, or other fine locators unless you are certain of them: a precise-looking but wrong locator is worse than naming the work alone. When unsure of the exact locator, cite the work without it.`;
+
 function buildGenerationPrompt({ description, playTimeMinutes }) {
   const s = scalingGuide(playTimeMinutes);
 
@@ -4827,6 +4830,7 @@ Return ONLY valid JSON in this exact structure:
       'Rules:',
       '- Every fact must be specific and numerical where the historical record provides numbers',
       '- Every fact must have a source reference that names a specific inquiry, testimony, document, report, or published work. "The historical record", "survivor testimony", "contemporary accounts", and similar generic labels are not sources. If you cannot name the source, omit the fact.',
+      `- ${CITE_AT_WORK_LEVEL}`,
       '- Do not include facts that are disputed or unverifiable — omit rather than approximate',
       '- Do not include interpretive or analytical statements — facts only',
       '- Generate between 8 and 20 facts depending on the scenario\'s technical complexity',
@@ -5029,6 +5033,7 @@ Return ONLY valid JSON in this exact structure:
       essential_beats.length
         ? `ESSENTIAL BEATS (use each beat id as thread_id in open_threads and beat_id in choice_echoes):\n${essential_beats.map(b => `- id: ${b.id}, description: ${b.description}`).join('\n')}`
         : '',
+      CITE_AT_WORK_LEVEL,
       // The scenario's own researched, cited fact table. Without this the generator has no
       // source list at all and must reach into model memory for every citation — which is
       // where invented institutional authority comes from.
