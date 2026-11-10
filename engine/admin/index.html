@@ -5661,6 +5661,7 @@ function renderPublicationReview(data) {
     { key: 'tense_attribution',  label: 'Tense and attribution',      desc: 'Every beat description is written in past tense and describes what the engine confirmed in generated text, not what the player typed.' },
     { key: 'reviewer_summary',   label: 'Reviewer summary',           desc: 'The generated beats reflect the scenario\'s actual dramatic structure and the final beat represents the correct dramatic conclusion.' },
     { key: 'manual_playthrough', label: 'Manual play-through',        desc: 'All beats are reachable on at least two different play paths through the scenario.' },
+    { key: 'rank_date_citation', label: 'Rank / date / citation pass', desc: 'Every person\'s rank, title, and unit checked against the scenario\'s date; every citation checked to the work level (no unverified page/day numbers); all reviewer VERIFY notes resolved before publish.' },
   ];
 
   const checkHtml = checkItems.map(item => {
@@ -6518,6 +6519,7 @@ function buildScenarioDocText(data, promptPrefix = '') {
       tense_attribution:  'Tense & attribution',
       reviewer_summary:   'Reviewer summary',
       manual_playthrough: 'Manual playthrough',
+      rank_date_citation: 'Rank / date / citation pass',
     };
     for (const [key, item] of Object.entries(cl)) {
       const label  = clLabels[key] || key;
