@@ -197,6 +197,9 @@ check('epilogue has block, no rule 4', /^\s*LOAD_BEARING_SPECIFICS,/m.test(epilo
 check('fictional-character rule follows rule 4 in the main generator', main.indexOf('${LOAD_BEARING_UNVERIFIED_RULE}') < main.indexOf('${LOAD_BEARING_FICTIONAL_CHARACTERS}') && main.includes('${LOAD_BEARING_FICTIONAL_CHARACTERS}'));
 check('...and only there', !facts.includes('LOAD_BEARING_FICTIONAL_CHARACTERS') && !epilogue.includes('LOAD_BEARING_FICTIONAL_CHARACTERS'));
 check('fictional-character rule forbids authoring labels', router.includes('Do not write "(fictional)", "composite", or any similar authoring label into the role, name, or other character fields'));
+const { REVIEWER_LOAD_BEARING_CHECK } = await import('../engine/services/ReviewerChecks.js');
+const adminHtml = fs.readFileSync(path.join(REPO, 'engine/admin/index.html'), 'utf8');
+check('reviewer check: admin page and server copies match', REVIEWER_LOAD_BEARING_CHECK.split('\n').every(line => adminHtml.includes(line)));
 check('McCormick parenthetical as written', router.includes('promoted to lieutenant colonel only that June and colonel in September.'));
 
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');

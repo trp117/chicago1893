@@ -1,3 +1,5 @@
+import { REVIEWER_LOAD_BEARING_CHECK } from './ReviewerChecks.js';
+
 const OPENAI_BASE_URL = 'https://api.openai.com/v1/chat/completions';
 
 async function callOpenAI(systemPrompt, userPrompt, options = {}) {
@@ -47,6 +49,8 @@ Check for:
 5. Internal contradictions — where one section conflicts with another
 6. Dramatic license that could mislead players about real history
 
+${REVIEWER_LOAD_BEARING_CHECK}
+
 Respond in the following JSON format exactly:
 
 {
@@ -64,6 +68,7 @@ Respond in the following JSON format exactly:
   ],
   "agreements_with_gemini": ["list any corrections that align with prior Gemini review"],
   "new_findings": ["list corrections not previously flagged"],
+  "verify_notes": ["each load-bearing specific you could not confirm: name it and say what to check (these are not corrections)"],
   "overall_assessment": "brief summary paragraph",
   "historical_accuracy_score": 0.0,
   "continuity_score": 0.0,

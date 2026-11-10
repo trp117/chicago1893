@@ -8008,6 +8008,17 @@ document.querySelector('.nav-link[data-view="review"]')
 // FIELD conventions are load-bearing (beat slugs not ordinals; no "behavior"
 // field; <id>.<field>, fact_id) — must match the committed resolver. Verbatim.
 // ═══════════════════════════════════════════════════════════════
+// Reviewer check for load-bearing specifics, composed per section below. Mirrored for the
+// automated reviews in engine/services/ReviewerChecks.js; a test fails if the two drift.
+const REVIEW_LB_HEAD = `LOAD-BEARING SPECIFICS — check every rank, title, unit, date, weapon/equipment model, casualty figure, place-name, and hard number:`;
+const REVIEW_LB_AS_OF = `(1) Is it correct AS OF the scenario's date, not the person's later or best-known status? A figure famous by a certain title may have held a lower rank at the time — a man remembered as "Colonel" who was a Major at the event. Flag any you cannot confirm as of that date.`;
+const REVIEW_LB_CITATION = `(2) Does each citation's named source actually support the claim, and is it cited at the work level? Flag any citation that credits a real work with something it may not say, or that carries a page/paragraph/"Day" locator you cannot verify.`;
+const REVIEW_LB_WORK_LEVEL_ONLY = `(2) Is each citation cited at the work level? Flag any citation that carries a page/paragraph/"Day" locator you cannot verify.`;
+const REVIEW_LB_VERIFY = `List each unconfirmed item as a VERIFY note (name it, say what to check). A human resolves these before the scenario is published.`;
+const REVIEW_LB_FULL = [REVIEW_LB_HEAD, REVIEW_LB_AS_OF, REVIEW_LB_CITATION, REVIEW_LB_VERIFY].join('\n');
+const REVIEW_LB_AS_OF_ONLY = [REVIEW_LB_HEAD, REVIEW_LB_AS_OF, REVIEW_LB_VERIFY].join('\n');
+const REVIEW_LB_CRUCIBLES = [REVIEW_LB_HEAD, REVIEW_LB_AS_OF, REVIEW_LB_WORK_LEVEL_ONLY, REVIEW_LB_VERIFY].join('\n');
+
 const REVIEW_PROMPTS = {
   generic: `Review this for historical accuracy and consistency. For every correction needed, use EXACTLY this format — no prose between corrections:
 
@@ -8200,6 +8211,8 @@ Check:
 - Knowledge entries for factual accuracy (what this person could actually have known).
 - Internal consistency with the roles, clues, and epilogue that reference each character.
 
+${REVIEW_LB_FULL}
+
 FIELD locator for this section: <character_id>.<field> — where field is one of: publicFace, voice, fear, description, knowledge, privateGoal, trustLogic, secrets. There is NO "behavior" field.
 
 For every correction, use EXACTLY this format — no prose between corrections:
@@ -8338,8 +8351,10 @@ DATA TO REVIEW:
 
 Check:
 - Each fact's content against its cited source and against the broader record (figures, timings, specifications).
-- Source quality: flag any fact whose citation is weak, missing, or doesn't support the claim — prefer an empty citation to an uncertain one.
+- Source quality: flag any fact whose citation is weak, missing, or doesn't support the claim; that credits a real work with something it may not say; or that is not cited at the work level or carries a page/paragraph/"Day" locator you cannot verify — prefer an empty citation to an uncertain one.
 - Consistency: a technical fact (e.g. a departure time) must not contradict the gameplay or story-arc use of the same fact.
+
+${REVIEW_LB_AS_OF_ONLY}
 
 FIELD locator for this section: <fact_id> (e.g. h_hour_cantigny_28_may_1918).
 
@@ -8374,7 +8389,7 @@ Rules:
 - Do NOT wrap CURRENT or REPLACE WITH in quotation marks. Output the raw text exactly as stored, with no surrounding quotes — the stored value has no wrapping quotes, and added quotation marks will prevent the match.
 - Quote the COMPLETE CURRENT text exactly — no ellipsis, no "...", no abbreviation, no trimming. A truncated quote cannot be located. If the span is long, quote all of it.
 - Quote CURRENT as the STORED value only — one field, no display scaffolding. Each fact is exported as a "[fact_id] (domain)" header line, then the content sentence, then a "Source: " line, then an optional "Valid: " line; those four are SEPARATE stored fields and the header, the "Source: " prefix and the "Valid: " prefix are added at display time. To correct the fact text, quote the content sentence alone. To correct a citation, quote the citation alone WITHOUT the "Source: " prefix. Never put the "[fact_id] (domain)" header line, the "Source: "/"Valid: " prefixes, or list glyphs into CURRENT.
-- Prefer an empty citation to an uncertain one — flag any fact whose source doesn't support it.
+- Prefer an empty citation to an uncertain one — flag any fact whose source doesn't support it, that credits a real work with something it may not say, or that is not cited at the work level.
 - NEW FACT adds only. Use it when a fact the scenario relies on is absent; if the fact_id already appears in the data above, the block is rejected — correct that fact with ---CORRECTION--- instead.
 - Do not invent a DOMAIN. Use one of the seven listed values exactly; anything else is rejected.
 - Internal consistency: a fact must not contradict the same figure used elsewhere in the scenario.
@@ -8396,6 +8411,9 @@ HISTORICAL FRAME — each framing claim is accurate and sourced.
 OPEN THREADS — each "not documented in surviving records" claim is genuinely true; flag any that overstate or understate what the record contains.
 
 CHOICE ECHOES — each echo is historically accurate and does not narrate invented player action as documented fact.
+
+${REVIEW_LB_FULL}
+In this section these checks are report-only: give VERIFY notes, not ---CORRECTION--- blocks. Citations here are not auto-correctable.
 
 FIELD locator for this section:
 - Character Fates: leave FIELD blank. Do NOT use the character id — fate ids are shared with the character records and will resolve to the wrong record. Use SECTION plus a verbatim CURRENT quote of the historical_record text.
@@ -8429,7 +8447,7 @@ Rules:
 - Documented vs dramatized: flag any place where invented in-scenario action is narrated in the same confident voice as documented fact.
 - Empty beats uncertain: an unsourced specific should be cut or generalized, not given an invented citation.
 - Internal consistency: any number, date, or time appearing in more than one place must reconcile.
-- Real figures are bound by the record — role and fate must match history.
+- Real figures are bound by the record — rank, role, and fate must match history as of the scenario's date.
 
 DATA TO REVIEW:
 [PASTE EPILOGUE DATA HERE]`,
@@ -8497,6 +8515,8 @@ Fact-check only what is verifiable. In priority order:
 
 The SETUP and each option's TEXT are authored FICTION: the dramatized scene, and the in-character framing of each choice. In those fields flag ONLY a falsifiable fact stated as documented — a wrong date, name or place, or an anachronism. Do NOT "correct" dramatization, invented scene detail, a character's interior state (what they feel, fear, or think), voice, or characterization — those are intentional authorial choices, not errors.
 
+${REVIEW_LB_CRUCIBLES}
+
 FIELD locator for this section — copy it exactly from the label in the data: <role_id>.defining_moment.setup; <role_id>.defining_moment.options.<option_id>.label | .text | .debrief | .outcome_disclaimer | .consequence.claim | .consequence.source; <role_id>.witness_lever.statement | .reasoning | .counter_case.assumption | .counter_case.why_wrong | .evidence.<n>.claim | .evidence.<n>.source. Options are addressed by their id, never by position.
 
 Linked fields: a consequence claim and an outcome disclaimer each appear WORD FOR WORD inside their option's debrief, and a consequence source is one of the lever's evidence sources. Report a correction to any of them exactly like any other — complete CURRENT, complete REPLACE WITH — and when correcting one changes its partner (a claim and the debrief that quotes it), give one correction for each field.
@@ -8536,6 +8556,8 @@ Apply, for each section, the checks appropriate to it:
 - period vocabulary checked term-by-term, with unsourced/invented terms flagged (especially culturally specific registers);
 - character fates checked as IN-EVENT outcome, not lifespan; documented survivors never described as dying in-event; record-silent figures left "unknown";
 - real figures bound to the documented record (rank, role, fate).
+
+${REVIEW_LB_FULL}
 
 THEN perform the cross-section consistency pass — the checks no single-section review can do:
 - Every number that appears in more than one section must reconcile: casualty figures (immediate outcome vs technical facts vs character-fate notes), times and deadlines (gameplay win/fail vs technical facts vs story arc), distances and positions.

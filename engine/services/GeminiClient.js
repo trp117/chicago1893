@@ -1,3 +1,5 @@
+import { REVIEWER_LOAD_BEARING_CHECK } from './ReviewerChecks.js';
+
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 async function callGemini(prompt, options = {}) {
@@ -94,6 +96,8 @@ export async function factCheckEpilogue(epilogueText, scenarioTitle) {
 
 Review the following historical epilogue data for factual accuracy. Be precise. If you are not certain a fact is wrong, do not flag it.
 
+${REVIEWER_LOAD_BEARING_CHECK}
+
 For each correction needed, respond in the following JSON format exactly. No prose before or after. JSON only.
 
 {
@@ -108,7 +112,8 @@ For each correction needed, respond in the following JSON format exactly. No pro
     }
   ],
   \"confirmed_accurate\": [\"list of sections that are factually sound\"],
-  \"unable_to_verify\": [\"list of claims that could not be verified\"]
+  \"unable_to_verify\": [\"list of claims that could not be verified\"],
+  \"verify_notes\": [\"each load-bearing specific you could not confirm: name it and say what to check (these are not corrections)\"]
 }
 
 Epilogue data to review:
@@ -128,6 +133,8 @@ Review the following complete scenario data for ${scenarioTitle}. Check for:
 4. Character detail consistency
 5. Internal contradictions between sections
 
+${REVIEWER_LOAD_BEARING_CHECK}
+
 Respond in the following JSON format exactly. No prose before or after. JSON only.
 
 {
@@ -142,6 +149,7 @@ Respond in the following JSON format exactly. No prose before or after. JSON onl
       \"type\": \"factual|continuity|geographic|character|contradiction\"
     }
   ],
+  \"verify_notes\": [\"each load-bearing specific you could not confirm: name it and say what to check (these are not corrections)\"],
   \"overall_assessment\": \"brief summary of scenario quality\",
   \"historical_accuracy_score\": 0.0,
   \"continuity_score\": 0.0
