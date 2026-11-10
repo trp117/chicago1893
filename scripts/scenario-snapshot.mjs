@@ -2,16 +2,26 @@
 // Scenario rollback point: snapshot a scenario's full bundle before an Apply, restore it after.
 //
 //   npm run snapshot -- <scenarioId>             [--base URL]
-//   npm run restore  -- <snapshotFile>  [--yes]  [--base URL]
+//   npm run restore  -- <snapshotFile>  [--yes]  [--force]  [--base URL]
 //
 // SNAPSHOT reads GET /admin/api/scenarios/:id/full and writes the body verbatim (plus a
-// `_snapshot` provenance key) to snapshots/<scenarioId>_<UTC>.json. Gitignored.
+// `_snapshot` provenance key carrying base_version — the live current_version at the moment
+// the snapshot was taken) to snapshots/<scenarioId>_<UTC>.json. Gitignored.
 //
 // RESTORE writes the bundle back through POST /admin/api/generate/save — the same write the
-// fact-review injector uses — guarded by baseVersion = the live current_version it just
-// diffed against, so a save landing in between is a 409, not a clobber. Without --yes it
-// prints the diff and stops. After the write it re-reads /full and reports anything that
-// still differs from the snapshot.
+// fact-review injector uses. Two version guards:
+//   1. SNAPSHOT BASE. The snapshot's base_version must equal the live current_version. If the
+//      scenario changed since the snapshot (any admin save in between), the restore REFUSES and
+//      writes nothing (exit 4): re-snapshot, re-diff, retry. Without this, an intervening save
+//      was silently reverted — the whole-bundle write carries the snapshot's copy of every
+//      entity (the Xavier draft→published revert). --force overrides it, deliberately
+//      discarding the intervening changes; that is what a true ROLLBACK past an Apply is, so a
+//      rollback needs --force. Snapshots from before base_version existed fall back to the
+//      bundle's own current_version, which /full has always included.
+//   2. WRITE TIME. baseVersion = the live current_version it just diffed against, so a save
+//      landing between the diff and the write is a 409, not a clobber. Kept under --force.
+// Without --yes it prints the diff and stops. After the write it re-reads /full and reports
+// anything that still differs from the snapshot.
 //
 // /generate/save is NOT a pure replace, and nothing in the admin API is. It overwrites the
 // scenario row and each POSTED entity whole-object, but:
@@ -47,10 +57,11 @@ const SERVER_OWNED_ROLE_KEYS = ['witness_lever', 'archetype_proposal', 'choice_r
 const die = (msg, code = 1) => { console.error(`ERROR: ${msg}`); process.exit(code); };
 
 function parseArgs(argv) {
-  const out = { _: [], yes: false, base: null };
+  const out = { _: [], yes: false, force: false, base: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--yes') out.yes = true;
+    else if (a === '--force') out.force = true;
     else if (a === '--base') out.base = argv[++i];
     else if (a.startsWith('--base=')) out.base = a.slice(7);
     else out._.push(a);
@@ -164,7 +175,7 @@ async function snapshot(id, opts) {
   const ts = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
   fs.mkdirSync(SNAP_DIR, { recursive: true });
   const file = path.join(SNAP_DIR, `${id}_${ts}.json`);
-  const body = JSON.stringify({ ...full, _snapshot: { base: api.base, taken_at: new Date().toISOString() } }, null, 2);
+  const body = JSON.stringify({ ...full, _snapshot: { base: api.base, base_version: full.current_version ?? null, taken_at: new Date().toISOString() } }, null, 2);
   fs.writeFileSync(file, body, 'utf8');
   console.log(`Wrote ${file}`);
   console.log(`  ${fs.statSync(file).size.toLocaleString()} bytes — "${full.scenario.title}" v${full.current_version}, ` +
@@ -174,21 +185,36 @@ async function snapshot(id, opts) {
 }
 
 async function restore(file, opts) {
-  if (!file) die('Usage: npm run restore -- <snapshotFile> [--yes] [--base URL]');
+  if (!file) die('Usage: npm run restore -- <snapshotFile> [--yes] [--force] [--base URL]');
   let snap;
   try { snap = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { die(`Cannot read ${file}: ${e.message}`); }
   const id = snap?.scenario?.id;
   if (!id) die(`${file} is not a scenario snapshot (no scenario.id).`);
   const meta = snap._snapshot || {};
   delete snap._snapshot;
+  // The version the snapshot was taken at. Older snapshots predate base_version; /full has
+  // always returned current_version, and an edit file built from a snapshot carries it along.
+  const baseVersion = Number.isInteger(meta.base_version) ? meta.base_version
+    : Number.isInteger(snap.current_version) ? snap.current_version : null;
 
   const api = await client(opts.base);
   if (meta.base && meta.base !== api.base) console.log(`NOTE: snapshot was taken from ${meta.base}; restoring to ${api.base}.`);
   const live = await fetchFull(api, id);
 
+  // GUARD 1 — snapshot base vs live. Checked before anything else, dry run included: a diff
+  // against a scenario that moved since the snapshot would show the intervening saves as
+  // things the restore "changes", which is exactly how they used to get reverted unnoticed.
+  if (baseVersion === null || baseVersion !== live.current_version) {
+    const why = baseVersion === null
+      ? `Scenario ${id}: snapshot records no base version, so it cannot be checked against live v${live.current_version} — re-snapshot, re-diff, and retry.`
+      : `Scenario ${id} changed since snapshot (snapshot v${baseVersion}, live v${live.current_version}) — re-snapshot, re-diff, and retry.`;
+    if (!opts.force) die(`${why} Nothing written. (--force writes anyway, discarding the intervening changes.)`, 4);
+    console.log(`FORCE: ${why.replace(/ — re-snapshot.*$/, '')} — --force given: intervening changes will be overwritten.`);
+  }
+
   const d = diffBundles(snap, live);
   const line = summarize(d);
-  console.log(`Restore ${id} (snapshot ${meta.taken_at || '?'}, live v${live.current_version}) → ${api.base}`);
+  console.log(`Restore ${id} (snapshot ${meta.taken_at || '?'} at v${baseVersion ?? '?'}, live v${live.current_version}) → ${api.base}`);
   if (!line) { console.log('No differences — live already matches the snapshot. Nothing to do.'); return; }
   console.log(`DIFF: ${line}`);
   for (const k of predictKept(snap, live, d)) console.log(`  will not roll back: ${k}`);
@@ -206,6 +232,7 @@ async function restore(file, opts) {
     });
   }
   delete payload.current_version;
+  // GUARD 2 — write time: the server 409s if a save lands between the diff above and this POST.
   payload.baseVersion = live.current_version;
 
   const r = await api.call('POST', '/generate/save', payload);
@@ -222,4 +249,4 @@ const [cmd, ...rest] = process.argv.slice(2);
 const opts = parseArgs(rest);
 if (cmd === 'snapshot') await snapshot(opts._[0], opts);
 else if (cmd === 'restore') await restore(opts._[0], opts);
-else die('Usage: scenario-snapshot.mjs snapshot <scenarioId> | restore <file> [--yes]  [--base URL]');
+else die('Usage: scenario-snapshot.mjs snapshot <scenarioId> | restore <file> [--yes] [--force]  [--base URL]');
