@@ -281,13 +281,30 @@ export async function collectAnthropicStream(fetchResponse, onChunk, { onSensory
       if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
         accumulated += evt.delta.text;
         flushNarrative();
+      } else if (evt.type === 'message_start') {
+        // Input-side usage (input_tokens, cache_creation_input_tokens, cache_read_input_tokens)
+        // arrives here; message_delta carries the output count. Merged so both survive.
+        if (evt.message?.usage) usage = { ...(usage || {}), ...evt.message.usage };
       } else if (evt.type === 'message_delta') {
         if (evt.delta?.stop_reason) stopReason = evt.delta.stop_reason;
-        if (evt.usage) usage = evt.usage;
+        if (evt.usage) usage = { ...(usage || {}), ...Object.fromEntries(Object.entries(evt.usage).filter(([, v]) => v != null)) };
       }
     }
   }
   return { text: accumulated, stopReason, usage };
+}
+
+// One line per Anthropic call on the play path: uncached input, cache write, cache read, output.
+// Returns the normalized numbers so callers can hand them to Langfuse too.
+export function logCacheUsage(label, usage, extra = '') {
+  const u = {
+    input:       usage?.input_tokens ?? null,
+    cacheWrite:  usage?.cache_creation_input_tokens ?? 0,
+    cacheRead:   usage?.cache_read_input_tokens ?? 0,
+    output:      usage?.output_tokens ?? null,
+  };
+  console.log(`[USAGE] ${label}${extra ? ' ' + extra : ''} input=${u.input} cache_write=${u.cacheWrite} cache_read=${u.cacheRead} output=${u.output}`);
+  return u;
 }
 
 async function streamRawText(fetchResponse, onChunk) {
@@ -1033,10 +1050,11 @@ Do not open with the historical context. Open inside the character's body. Let t
           messages: [{ role: 'user', content: prompt }]
         })
       });
-      const { text, stopReason: openingStopReason } = await collectAnthropicStream(
+      const { text, stopReason: openingStopReason, usage: openingUsage } = await collectAnthropicStream(
         resp,
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
       );
+      logCacheUsage('opening', openingUsage, `scenario=${scenarioId} arc=opening`);
       startTrace?.update({ output: { text: text?.slice(0, 200) } });
 
       // ── UNUSABLE OPENING ─────────────────────────────────────────────────
@@ -1363,7 +1381,8 @@ Do not open with the historical context. Open inside the character's body. Let t
         });
         const data = await resp.json();
         const text = data?.content?.[0]?.text;
-        gen?.end({ output: text, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens }, metadata: { stop_reason: data?.stop_reason } });
+        const u = logCacheUsage(`turn ${callName}`, data?.usage, `turn=${state.turnCount ?? '?'} arc=${arcPosition}`);
+        gen?.end({ output: text, usage: { input: u.input, output: u.output }, metadata: { stop_reason: data?.stop_reason, cache_creation_input_tokens: u.cacheWrite, cache_read_input_tokens: u.cacheRead } });
         return { data, text };
       };
 
@@ -1380,7 +1399,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           messages: baseMessages,
         }),
       });
-      let { text, stopReason: streamStopReason } = await collectAnthropicStream(
+      let { text, stopReason: streamStopReason, usage: streamUsage } = await collectAnthropicStream(
         streamResp,
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
         {
@@ -1388,6 +1407,8 @@ Do not open with the historical context. Open inside the character's body. Let t
           onNarrativeEnd: () => sendSse(res, { type: 'narrative_end' }),
         },
       );
+      const streamU = logCacheUsage('turn stream', streamUsage, `turn=${state.turnCount ?? '?'} arc=${arcPosition}`);
+      turnTrace?.update({ metadata: { usage: streamU } });
 
       if (!text) {
         scoreTrace(0, 'no-text-returned');
