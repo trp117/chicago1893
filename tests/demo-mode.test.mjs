@@ -109,6 +109,12 @@ try {
     }
     const c = await pget('/categories');
     check('(a) /categories is the static directory redirect, not the demo redirect to /', c.status === 301 && c.location === '/categories/', `${c.status} ${c.location}`);
+    // The admin surface is untouched in prod.
+    const login = await pget('/admin/login');
+    check('(a) /admin/login still serves the admin login page', login.status === 200 && /html/.test(login.type || ''), `${login.status}`);
+    check('(a) /admin-login.html still serves', (await pget('/admin-login.html')).status === 200);
+    const unauth = await pget('/admin/api/scenarios');
+    check('(a) /admin/api answers its own auth gate (not a demo 404)', unauth.status !== 404 && unauth.status >= 300, `${unauth.status}`);
   }
 
   // (b) the pages, byte-for-byte, no injection.
@@ -260,6 +266,14 @@ try {
     check(`${url} → 404`, (await get(url)).status === 404);
   }
   check('other static files still serve (/js/scenario-card.js)', (await get('/js/scenario-card.js')).status === 200);
+
+  // The admin surface is not reachable on the demo domain — any path, any method.
+  for (const url of ['/admin', '/admin/', '/admin/login', '/admin/reset-password', '/admin/pipeline.html', '/admin/api/scenarios', '/admin/auth/me', '/admin-login.html', '/admin-reset-password.html']) {
+    check(`GET ${url} → 404`, (await get(url)).status === 404);
+  }
+  for (const url of ['/admin/auth/login', '/admin/auth/forgot-password', '/admin/api/scenarios']) {
+    check(`POST ${url} → 404`, (await post(url, { email: 'x@example.com', password: 'x' })).status === 404);
+  }
 } catch (err) {
   console.error(`\nERROR  ${err.message}`);
   failed++;

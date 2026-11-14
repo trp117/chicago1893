@@ -30,6 +30,8 @@ export function makeIsAllowedScenario({ demoMode, demoScenarios = [] } = {}) {
 // Static files from public/ that carry the full catalogue or the Ledger 250 branding:
 // the prod homepage under its own name, its backups, and the test page.
 const BLOCKED_PUBLIC_FILE = /^\/(index[._-][^/]*\.html|test(\.html)?)$/i;
+// /admin, /admin/…, and public/admin-login.html / admin-reset-password.html.
+const ADMIN_PATH = /^\/admin(\/|$|-[^/]*\.html$)/i;
 
 // What the demo adds to the game page, injected at serve time so the file on disk — and so
 // the page prod serves — never changes:
@@ -90,11 +92,15 @@ export function injectDemoIntoGameHtml(html) {
 //   /index.html       -> redirect to /
 //   /categories[...]  -> redirect to /
 //   /test, /test.html, /index.backup*.html, /index_backup.html -> 404
+//   /admin, /admin/*, /admin-*.html (any method) -> 404
 //   /game             -> engine/game/index.html with the demo injection
 export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, cacheControl }) {
   return (req, res, next) => {
-    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     const p = req.path;
+    // The admin surface is not part of the demo: any method (the login is a POST), any depth,
+    // plus the two admin pages express.static would otherwise serve from public/.
+    if (ADMIN_PATH.test(p)) return res.status(404).send('Not found');
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     if (p === '/') {
       res.set('Cache-Control', cacheControl);
       return res.sendFile(landingPath);

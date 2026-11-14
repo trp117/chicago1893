@@ -3043,7 +3043,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   feedAppend(loadingEl);
   feedScrollTop(loadingEl);
 
-  let openingOutput, openingNextState;
+  let openingOutput, openingNextState, openingSessionId;
   try {
     // Use pre-warmed response if it matches this request and no player_addition was added
     const canUseWarm = warmStart
@@ -3097,6 +3097,7 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
         } else if (evt.type === 'done') {
           openingOutput    = evt.output;
           openingNextState = evt.nextState;
+          openingSessionId = evt.sessionId;
         } else if (evt.type === 'error') {
           // evt.error is now player-facing copy and evt.detail the technical reason. Carry the
           // detail so the console keeps it; the catch renders its own copy either way, so an
@@ -3127,6 +3128,12 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   }
 
   // Promote server state as authoritative
+  // …and the server's session id with it. /start is pre-warmed the moment a role is tapped —
+  // before startGame mints its own id — so the server's id is the one the opening, its
+  // transcript and its saved session were written under. Every later /turn, /closing-prose,
+  // /notes and /extract-facts call reads `sessionId`, so adopting it here makes the whole
+  // playthrough one session: one transcript on disk, one demo_transcripts row.
+  if (openingSessionId) sessionId = openingSessionId;
   const openingGlossary = gameState.glossary;
   gameState = { ...openingNextState, narrativeStyle: gameState.narrativeStyle };
   if (!gameState.glossary?.length && openingGlossary?.length) {
