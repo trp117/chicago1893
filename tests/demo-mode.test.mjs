@@ -95,6 +95,8 @@ try {
   const pjson = r => JSON.parse(r.body.toString());
 
   check('boot log says [DEMO] mode disabled', prod.log().includes('[DEMO] mode disabled'));
+  check('Phase 2: no demo limits/store built (no [DEMO] limits line, no [DEMO BUDGET] / [DEMO LIMIT] activity)',
+    !['[DEMO BUDGET]', '[DEMO LIMIT]', '[DEMO TRANSCRIPT]', '[DEMO] limits'].some(tag => prod.log().includes(tag)));
 
   // (a) guard not mounted: every path it would intercept reaches the normal handlers.
   {
@@ -178,6 +180,11 @@ try {
   const json = r => JSON.parse(r.body.toString());
 
   check('boot log names the whitelist', demo.log().includes(`[DEMO] mode ENABLED scenarios=${DEMO_IDS.join(',')}`));
+  check('boot log states the Phase 2 limits (defaults)', demo.log().includes('[DEMO] limits start=$90.00 hard=$98.00 starts/ip/day=2 rate=30/min global, 6/min per ip'));
+  {
+    const xf = await post('/game/api/extract-facts', { narrative: 'You saw the forged order.', existingFacts: [] });
+    check('/extract-facts is off in demo ({ newFacts: [] }, no model call)', xf.status === 200 && xf.body.toString() === '{"newFacts":[]}');
+  }
   {
     const h = json(await get('/health'));
     check('/health reports demoMode true and the four ids', h.demoMode === true && JSON.stringify(h.demoScenarios) === JSON.stringify(DEMO_IDS), JSON.stringify(h));

@@ -33,6 +33,16 @@ import { consolidateBibliography } from '../services/Bibliography.js';
 import * as appData from '../data.js';
 import { AnchorTracker } from '../services/AnchorTracker.js';
 import { makeIsAllowedScenario } from './demoMode.js';
+import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
+
+// DEMO_MODE spend metering. Every paid Claude call on the play path hands its usage block to
+// reportUsage. In prod the sink is null and reportUsage does nothing; createGameRouter points
+// it at the demo budget only when demoMode is on.
+let usageSink = null;
+function reportUsage(model, usage) {
+  if (!usageSink || !usage) return;
+  try { usageSink(model, usage); } catch (e) { console.error('[DEMO BUDGET] record failed:', e.message); }
+}
 
 // In-memory stores — non-serializable, lost on server restart (acceptable)
 const anchorTrackers       = new Map(); // sessionId -> AnchorTracker
@@ -295,6 +305,18 @@ export async function collectAnthropicStream(fetchResponse, onChunk, { onSensory
   return { text: accumulated, stopReason, usage };
 }
 
+// What a demo transcript keeps of one model response: the prose the player read and the
+// choices they were offered, speakers by roster name (never an id).
+function demoResponseSnapshot(output, characters) {
+  const named = attachSpeakerNames(output, characters);
+  return {
+    sensory_opening: named?.sensory_opening ?? null,
+    narrative:       named?.narrative ?? null,
+    npcMoments:      (named?.npcMoments || []).map(m => ({ speaker: m.speaker ?? null, text: m.text ?? '' })),
+    choices:         Array.isArray(named?.choices) ? named.choices : [],
+  };
+}
+
 // One line per Anthropic call on the play path: uncached input, cache write, cache read, output.
 // Returns the normalized numbers so callers can hand them to Langfuse too.
 export function logCacheUsage(label, usage, extra = '') {
@@ -313,6 +335,7 @@ async function streamRawText(fetchResponse, onChunk) {
   const decoder = new TextDecoder();
   let lineBuffer  = '';
   let accumulated = '';
+  let usage       = null;   // read only for DEMO_MODE metering (reportUsage); unused otherwise
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -328,9 +351,14 @@ async function streamRawText(fetchResponse, onChunk) {
       if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
         accumulated += evt.delta.text;
         onChunk(evt.delta.text);
+      } else if (evt.type === 'message_start' && evt.message?.usage) {
+        usage = { ...(usage || {}), ...evt.message.usage };
+      } else if (evt.type === 'message_delta' && evt.usage) {
+        usage = { ...(usage || {}), ...Object.fromEntries(Object.entries(evt.usage).filter(([, v]) => v != null)) };
       }
     }
   }
+  reportUsage(MODEL, usage);
   return accumulated;
 }
 
@@ -526,6 +554,7 @@ async function completeEpilogueCall({ apiKey, system, content, maxTokens, retryM
     });
     if (!resp.ok) throw new Error(`Anthropic API error (${label}): ${resp.status}`);
     const data = await resp.json();
+    reportUsage(MODEL, data.usage);
     return { text: (data.content?.[0]?.text?.trim()) || '', stop: data.stop_reason ?? 'unknown' };
   };
   let { text, stop } = await call(maxTokens);
@@ -836,6 +865,50 @@ export function createGameRouter(contentRepos, config = {}) {
   const demoMode          = config.demoMode === true;
   const isAllowedScenario = makeIsAllowedScenario({ demoMode, demoScenarios: config.demoScenarios || [] });
   const refuseScenario    = res => res.status(404).json({ error: 'Scenario not found.' });
+
+  // DEMO_MODE Phase 2 — spend cap, per-IP daily cap, rate limit, demo transcripts. Built only
+  // in demo mode; `demo` is null in prod and every use below is behind `if (demo)`.
+  const demo = demoMode ? (() => {
+    const lim   = { startCeilingCents: 9000, hardCeilingCents: 9800, dailyStartsPerIp: 2, globalPerMin: 30, ipPerMin: 6, ...(config.demoLimits || {}) };
+    const store = config.demoStore || {
+      // No store: the budget can never be read, so it fails closed and every paid call is refused.
+      readBudget: async () => { throw new Error('no demo store configured'); },
+      addBudget:  async () => { throw new Error('no demo store configured'); },
+    };
+    if (!config.demoStore) console.error('[DEMO] no demoStore configured — budget fails closed, every paid call will be refused.');
+    return {
+      store,
+      budget: createBudget({ store, startCeilingCents: lim.startCeilingCents, hardCeilingCents: lim.hardCeilingCents, refreshMs: lim.budgetRefreshMs ?? 30000 }),
+      daily:  createDailyCap({ limit: lim.dailyStartsPerIp }),
+      rate:   createRateLimiter({ globalPerMin: lim.globalPerMin, ipPerMin: lim.ipPerMin }),
+      // Transcript writes never block or break play: fire-and-forget, failures logged.
+      write(label, fn) {
+        if (!store.startTranscript) return;
+        Promise.resolve().then(fn).catch(e => console.error(`[DEMO TRANSCRIPT] ${label} failed: ${e.message}`));
+      },
+    };
+  })() : null;
+  usageSink = demo ? (model, usage) => demo.budget.record(model, usage) : null;
+
+  // The demo limit a paid request runs into, or null. Rate first (cheapest, and a surge should
+  // not even read the budget), then budget — new sessions stop at the start ceiling, in-progress
+  // calls at the hard ceiling — then the per-IP daily cap, which counts only a /start that
+  // passed everything else.
+  async function demoLimitHit(req, { starting }) {
+    const ip = req.ip || 'unknown';
+    if (!demo.rate.hit(ip)) return 'rate';
+    if (!(starting ? await demo.budget.canStart() : await demo.budget.canContinue())) return 'budget';
+    if (starting && !demo.daily.take(ip)) return 'daily';
+    return null;
+  }
+  function logDemoLimit(kind, req) {
+    console.warn(`[DEMO LIMIT] ${kind} ip=${req.ip || 'unknown'} path=${req.path}`);
+  }
+  // JSON refusal for /start and /turn, sent before the SSE stream opens. The demo client
+  // script (demoMode.js) recognises `demoLimit` and shows the copy; nothing raw reaches the page.
+  function sendDemoLimit(res, kind) {
+    return res.status(kind === 'rate' ? 429 : 403).json({ error: DEMO_LIMIT_COPY[kind], demoLimit: kind, retryable: kind === 'rate' });
+  }
   const r = Router();
   r.use(stripUnverifiedFromJson);
 
@@ -907,6 +980,18 @@ export function createGameRouter(contentRepos, config = {}) {
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
       if (!isAllowedScenario(scenarioId)) return refuseScenario(res);
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+      if (demo) {
+        const hit = await demoLimitHit(req, { starting: true });
+        if (hit) { logDemoLimit(hit, req); return sendDemoLimit(res, hit); }
+        // The daily slot is now taken. Every exit that does not deliver an opening — an
+        // unrecovered opening, a thrown error, an unknown role, a dropped connection — gives it
+        // back; only the `done` below marks it spent.
+        res.on('close', () => {
+          if (res.locals.demoOpeningDelivered) return;
+          demo.daily.refund(req.ip || 'unknown');
+          console.log(`[DEMO LIMIT] daily slot refunded ip=${req.ip || 'unknown'} (no opening delivered)`);
+        });
+      }
 
       const gameData = await getScenarioData(repos, scenarioId);
       const { scenario, playerRoles, characters, locations, clues } = gameData;
@@ -1066,6 +1151,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         chunk => sendSse(res, { type: 'chunk', text: chunk }),
       );
       logCacheUsage('opening', openingUsage, `scenario=${scenarioId} arc=opening`);
+      reportUsage(MODEL, openingUsage);
       startTrace?.update({ output: { text: text?.slice(0, 200) } });
 
       // ── UNUSABLE OPENING ─────────────────────────────────────────────────
@@ -1117,6 +1203,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           }),
         });
         const data     = await retryResp.json();
+        reportUsage(MODEL, data?.usage);
         const retryTxt = data?.content?.[0]?.text;
         gen?.end({ output: retryTxt, usage: { input: data?.usage?.input_tokens, output: data?.usage?.output_tokens }, metadata: { stop_reason: data?.stop_reason } });
         return retryTxt;
@@ -1266,8 +1353,15 @@ Do not open with the historical context. Open inside the character's body. Let t
       await writeFile(transcriptPath, transcriptHeader)
         .catch(e => console.error('[TRANSCRIPT-START ERROR]', e.message));
 
+      if (demo) res.locals.demoOpeningDelivered = true;   // DEMO_MODE: the daily slot stays spent
       sendSse(res, { type: 'done', output: attachSpeakerNames(output, characters), nextState, sessionId });
       res.end();
+      if (demo && sessionId) demo.write('start', () => demo.store.startTranscript({
+        session_id:  sessionId,
+        scenario_id: scenarioId,
+        role_id:     roleId,
+        opening:     { at: new Date().toISOString(), ...demoResponseSnapshot(output, characters), location: nextState.location ?? null },
+      }));
       return;
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
@@ -1290,6 +1384,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (!state.scenarioId)       return res.status(400).json({ error: 'state.scenarioId is required.' });
       if (!isAllowedScenario(state.scenarioId)) return refuseScenario(res);
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+      if (demo) {
+        const hit = await demoLimitHit(req, { starting: false });
+        if (hit) { logDemoLimit(hit, req); return sendDemoLimit(res, hit); }
+      }
 
       res.set({
         'Content-Type':      'text/event-stream',
@@ -1394,6 +1492,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         const data = await resp.json();
         const text = data?.content?.[0]?.text;
         const u = logCacheUsage(`turn ${callName}`, data?.usage, `turn=${state.turnCount ?? '?'} arc=${arcPosition}`);
+        reportUsage(MODEL, data?.usage);
         gen?.end({ output: text, usage: { input: u.input, output: u.output }, metadata: { stop_reason: data?.stop_reason, cache_creation_input_tokens: u.cacheWrite, cache_read_input_tokens: u.cacheRead } });
         return { data, text };
       };
@@ -1420,6 +1519,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         },
       );
       const streamU = logCacheUsage('turn stream', streamUsage, `turn=${state.turnCount ?? '?'} arc=${arcPosition}`);
+      reportUsage(MODEL, streamUsage);
       turnTrace?.update({ metadata: { usage: streamU } });
 
       if (!text) {
@@ -1858,6 +1958,30 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       sendSse(res, { type: 'done', output: attachSpeakerNames(output, characters), nextState, mockMode: false });
       res.end();
+      if (demo && sessionId) {
+        const isEnding = !!output.endState?.isEnding;
+        demo.write('turn', () => demo.store.appendTurn(sessionId, state.scenarioId, {
+          n:                  nextState.turnCount ?? null,
+          at:                 new Date().toISOString(),
+          input:              playerInput,
+          // The client sends player_action only for typed input, never for a choice button.
+          free_form:          typeof req.body.player_action === 'string',
+          defining_choice_id: req.body.definingChoiceId ?? null,
+          response:           demoResponseSnapshot(output, characters),
+          location:           nextState.location ?? null,
+          remaining_minutes:  nextState.remainingMinutes ?? null,
+          is_ending:          isEnding,
+        }));
+        if (isEnding) demo.write('outcome', () => demo.store.patchTranscript(sessionId, {
+          outcome: {
+            at:            new Date().toISOString(),
+            endState:      output.endState ?? null,
+            decisions:     nextState.decisions ?? null,
+            reachedBeats:  nextState.reachedBeats ?? null,
+            turnsPlayed:   nextState.turnCount ?? null,
+          },
+        }));
+      }
       return;
     } catch (error) {
       const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
@@ -2011,6 +2135,17 @@ Do not open with the historical context. Open inside the character's body. Let t
     // Demo: the session's own scenario (transcript header, else saved state) must be
     // whitelisted. A session whose scenario cannot be resolved is refused too.
     if (demoMode && !isAllowedScenario(scenarioId)) return refuseScenario(res);
+    // Demo limits. Answered as the SSE `error` event the client already handles here: it falls
+    // back to the authored closing (fillDocumentedOutcomeFloor) — no model call, no raw error.
+    if (demo) {
+      const hit = await demoLimitHit(req, { starting: false });
+      if (hit) {
+        logDemoLimit(hit, req);
+        res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'X-Accel-Buffering': 'no' });
+        sendSse(res, { type: 'error', error: DEMO_LIMIT_COPY[hit], demoLimit: hit });
+        return res.end();
+      }
+    }
     const scenarioData  = scenarioId ? await repos.scenarios.findById(scenarioId) : null;
     const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
     const characters    = scenarioId ? repos.characters.findAll().filter(c => (c.scenarioIds || []).includes(scenarioId)) : [];
@@ -2213,6 +2348,15 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       sendSse(res, { type: 'done', closing_prose: prose, epilogue: epilogueResult, bibliography, composite_disclosure: compositeDisclosure });
       res.end();
+      if (demo) demo.write('closing', () => demo.store.patchTranscript(sessionId, {
+        closing: {
+          at:            new Date().toISOString(),
+          prose,
+          session_block: epilogueResult?.session_block ?? null,
+          record_block:  epilogueResult?.record_block ?? null,
+        },
+        ended_at: new Date().toISOString(),
+      }));
 
       // Write closing sections to the session transcript
       if (prose) {
@@ -2284,6 +2428,10 @@ Do not open with the historical context. Open inside the character's body. Let t
   });
 
   r.post('/extract-facts', async (req, res) => {
+    // Demo: disabled. It is a best-effort, free-form Haiku call the client fires after each turn
+    // and whose failure it already ignores; an empty answer is exactly what it gets when nothing
+    // new was learned, so play is unchanged apart from the Notes list not growing.
+    if (demoMode) return res.json({ newFacts: [] });
     const { narrative = '', existingFacts = [] } = req.body || {};
     if (!narrative.trim()) return res.json({ newFacts: [] });
     try {

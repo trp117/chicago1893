@@ -26,6 +26,8 @@ import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/Prom
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
 import { makeIsAllowedScenario, demoPageGuard } from './demoMode.js';
+import { createSupabaseDemoStore } from './demoStore.js';
+import { readDemoLimitConfig } from './demoLimits.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
@@ -91,7 +93,14 @@ const gameConfig = {
   elevenLabsVoiceId:  process.env.ELEVENLABS_VOICE_ID,
   demoMode:           DEMO_MODE,
   demoScenarios:      DEMO_SCENARIOS,
+  // Phase 2: the durable spend counter + demo transcripts, and the limits. Constructed only in
+  // demo mode — with the flag off no demo table is ever touched.
+  ...(DEMO_MODE ? { demoStore: createSupabaseDemoStore(supabaseService), demoLimits: readDemoLimitConfig() } : {}),
 };
+if (DEMO_MODE) {
+  const l = gameConfig.demoLimits;
+  console.log(`[DEMO] limits start=$${(l.startCeilingCents / 100).toFixed(2)} hard=$${(l.hardCeilingCents / 100).toFixed(2)} starts/ip/day=${l.dailyStartsPerIp} rate=${l.globalPerMin}/min global, ${l.ipPerMin}/min per ip`);
+}
 
 app.use('/admin/api', requireAdminAuth, createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
 app.use('/game/api',  createGameRouter(repos, gameConfig));
