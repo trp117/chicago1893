@@ -25,6 +25,7 @@ import { SupabaseSessionStore } from '../../lib/SupabaseSessionStore.js';
 import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/PromptComposer.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
+import { makeIsAllowedScenario, demoPageGuard } from './demoMode.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
@@ -43,11 +44,27 @@ const repos = {
   sessions:   new SessionRepository(store),
 };
 
+// DEMO_MODE (engine/server/demoMode.js) — default OFF. Read here, ahead of the app, because
+// the page guard has to be mounted before express.static. Self-reported at boot, beside the
+// [CLOSURE] / [DEFINING] lines, and echoed in GET /health.
+const DEMO_MODE      = process.env.DEMO_MODE === 'true';
+const DEMO_SCENARIOS = (process.env.DEMO_SCENARIOS || '').split(',').map(s => s.trim()).filter(Boolean);
+const isAllowedScenario = makeIsAllowedScenario({ demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS });
+console.log(`[DEMO] mode ${DEMO_MODE ? 'ENABLED' : 'disabled'}${DEMO_MODE ? ` scenarios=${DEMO_SCENARIOS.join(',') || '(none)'}` : ''}`);
+if (DEMO_MODE && !DEMO_SCENARIOS.length) console.warn('[DEMO] DEMO_MODE is on but DEMO_SCENARIOS is empty — every scenario will be refused.');
+
 const app = express();
 app.set('trust proxy', 1);
 app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+// Mounted only in demo mode, so prod's middleware stack is exactly what it was.
+if (DEMO_MODE) {
+  app.use(demoPageGuard({
+    gameHtmlPath: path.join(gameDir, 'index.html'),
+    cacheControl: 'public, max-age=300, must-revalidate',
+  }));
+}
 app.use(express.static(publicDir, { maxAge: '5m' }));
 
 // Sessions persist in Supabase (public.admin_sessions) so a deploy/restart no longer signs
@@ -72,6 +89,8 @@ const gameConfig = {
   anthropicApiKey:    process.env.ANTHROPIC_API_KEY,
   elevenLabsApiKey:   process.env.ELEVENLABS_API_KEY,
   elevenLabsVoiceId:  process.env.ELEVENLABS_VOICE_ID,
+  demoMode:           DEMO_MODE,
+  demoScenarios:      DEMO_SCENARIOS,
 };
 
 app.use('/admin/api', requireAdminAuth, createAdminRouter(repos, { anthropicApiKey: process.env.ANTHROPIC_API_KEY }));
@@ -122,7 +141,7 @@ app.get('/api/categories', async (req, res) => {
     const scenarios = await repos.scenarios.findAll();
     const countBySlug = {};
     scenarios
-      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0)
+      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0 && isAllowedScenario(s.id))
       .forEach(s => {
         const slug = s.category || CATEGORY_MAP[s.id];
         if (slug) countBySlug[slug] = (countBySlug[slug] || 0) + 1;
@@ -130,7 +149,8 @@ app.get('/api/categories', async (req, res) => {
     const result = Object.entries(CATEGORIES)
       .sort(([,a],[,b]) => a.order - b.order)
       .map(([slug, c]) => ({ slug, displayName: c.displayName, blurb: c.blurb, order: c.order, count: countBySlug[slug] || 0 }));
-    res.json(result);
+    // Demo: only the categories that hold a whitelisted story. Prod keeps every category.
+    res.json(DEMO_MODE ? result.filter(c => c.count > 0) : result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -148,7 +168,7 @@ app.get('/api/stories', async (req, res) => {
     });
     const scenarios = await repos.scenarios.findAll();
     const stories = scenarios
-      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0)
+      .filter(s => s.status === 'published' && (rolesBy[s.id] || 0) > 0 && isAllowedScenario(s.id))
       .map(s => ({
         id:          s.id,
         title:       s.title,
@@ -192,6 +212,8 @@ app.get('/health', (_, res) => {
     commit,
     closureBeatsEnabled:   CLOSURE_BEATS_ENABLED,
     definingMomentEnabled: DEFINING_MOMENT_ENABLED,
+    demoMode:              DEMO_MODE,
+    demoScenarios:         DEMO_SCENARIOS,
     supabaseConnected:     isSupabaseConnected(),
     // Omitted entirely when the restore never reached its write loop, per the spec.
     ...(restoredCounts ? { restoredCounts } : {}),

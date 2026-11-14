@@ -58,6 +58,7 @@ const SUITE = [
   ['carried objects: codex follows player', 'codex-carry.test.mjs'],
   ['glossary markup: forms + dialogue (jsdom)', 'glossary-markup.test.mjs'],
   ['primary sources: consolidation',        'bibliography.test.mjs'],
+  ['DEMO_MODE: off = prod bytes; on = contained', 'demo-mode.test.mjs'],
   ['narrative style: Focused lock (jsdom)', 'narrative-style-lock.test.mjs'],
   ['restore: snapshot-base version guard',  'restore-guard.test.mjs'],
   ['[UNVERIFIED] tag: strip + publish gate', 'unverified-tag.test.mjs'],

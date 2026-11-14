@@ -32,6 +32,7 @@ import { SchemaValidator } from '../services/SchemaValidator.js';
 import { consolidateBibliography } from '../services/Bibliography.js';
 import * as appData from '../data.js';
 import { AnchorTracker } from '../services/AnchorTracker.js';
+import { makeIsAllowedScenario } from './demoMode.js';
 
 // In-memory stores — non-serializable, lost on server restart (acceptable)
 const anchorTrackers       = new Map(); // sessionId -> AnchorTracker
@@ -830,13 +831,21 @@ export function createGameRouter(contentRepos, config = {}) {
   // and must not reach a response, a model prompt, session state or a transcript.
   const repos = withUnverifiedStripped(contentRepos);
   const { anthropicApiKey, elevenLabsApiKey, elevenLabsVoiceId } = config;
+  // DEMO_MODE (demoMode.js): `true` for every id when the flag is off, so each guard below is
+  // a no-op in prod. A refused scenario answers 404 — the demo does not admit it exists.
+  const demoMode          = config.demoMode === true;
+  const isAllowedScenario = makeIsAllowedScenario({ demoMode, demoScenarios: config.demoScenarios || [] });
+  const refuseScenario    = res => res.status(404).json({ error: 'Scenario not found.' });
   const r = Router();
   r.use(stripUnverifiedFromJson);
+
+  // ── Client config ───────────────────────────────────────────────────────────
+  r.get('/config', (_, res) => res.json({ demoMode }));
 
   // ── Public scenario listing ────────────────────────────────────────────────
   r.get('/scenarios', async (_, res) => {
     const all = (await repos.scenarios.findAll())
-      .filter(s => s.status === 'published')
+      .filter(s => s.status === 'published' && isAllowedScenario(s.id))
       .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
       .map(s => ({
         id:                   s.id,
@@ -853,6 +862,7 @@ export function createGameRouter(contentRepos, config = {}) {
   r.get('/bootstrap', async (req, res) => {
     const scenarioId = req.query.scenarioId;
     if (!scenarioId) return res.status(400).json({ error: 'scenarioId is required.' });
+    if (!isAllowedScenario(scenarioId)) return refuseScenario(res);
     try {
       const { scenario, playerRoles, characters, locations, clues } = await getScenarioData(repos, scenarioId);
       console.log(`[BOOTSTRAP] scenario=${scenarioId} roles=${playerRoles.length} locs=${locations.length} clues=${clues.length}`);
@@ -895,6 +905,7 @@ export function createGameRouter(contentRepos, config = {}) {
         onboardingFlow,
       } = req.body;
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
+      if (!isAllowedScenario(scenarioId)) return refuseScenario(res);
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
       const gameData = await getScenarioData(repos, scenarioId);
@@ -1277,6 +1288,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       const { state, playerInput, history = [], sessionId } = req.body;
       if (!state || !playerInput) return res.status(400).json({ error: 'Missing state or playerInput.' });
       if (!state.scenarioId)       return res.status(400).json({ error: 'state.scenarioId is required.' });
+      if (!isAllowedScenario(state.scenarioId)) return refuseScenario(res);
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
       res.set({
@@ -1865,6 +1877,7 @@ Do not open with the historical context. Open inside the character's body. Let t
     try {
       const { state } = req.body;
       if (!state?.scenarioId) return res.status(400).json({ error: 'Missing state.scenarioId.' });
+      if (!isAllowedScenario(state.scenarioId)) return refuseScenario(res);
       const { characters, locations, clues } = await getScenarioData(repos, state.scenarioId);
 
       const discoveredClues = (state.discoveredClueIds || [])
@@ -1904,6 +1917,8 @@ Do not open with the historical context. Open inside the character's body. Let t
 
   // ── TTS ────────────────────────────────────────────────────────────────────
   r.post('/tts', async (req, res) => {
+    // Demo: audio is off entirely — refused before anything reaches ElevenLabs.
+    if (demoMode) return res.status(403).json({ error: 'Audio is disabled.' });
     const { text, sensory_opening, bridge, confirmation, trust_level, narrative_speed } = req.body;
     if (!text) return res.status(400).json({ error: 'Missing text.' });
     if (!elevenLabsApiKey) return res.status(503).json({ error: 'TTS not configured.' });
@@ -1993,6 +2008,9 @@ Do not open with the historical context. Open inside the character's body. Let t
       const sess = appData.getSession(sessionId);
       scenarioId = sess?.scenarioId || null;
     }
+    // Demo: the session's own scenario (transcript header, else saved state) must be
+    // whitelisted. A session whose scenario cannot be resolved is refused too.
+    if (demoMode && !isAllowedScenario(scenarioId)) return refuseScenario(res);
     const scenarioData  = scenarioId ? await repos.scenarios.findById(scenarioId) : null;
     const role          = roleId ? repos.scenarios.findPlayerRole(roleId) : null;
     const characters    = scenarioId ? repos.characters.findAll().filter(c => (c.scenarioIds || []).includes(scenarioId)) : [];

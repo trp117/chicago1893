@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grey Witness</title>
+<meta name="description" content="Grey Witness — step inside a decisive moment of history, as someone who was there.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Grey Witness">
+<meta property="og:title" content="Grey Witness">
+<meta property="og:description" content="Step inside a decisive moment of history, as someone who was there.">
+<meta property="og:url" content="https://greywitness.com">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Grey Witness">
+<meta name="twitter:description" content="Step inside a decisive moment of history, as someone who was there.">
+<link rel="canonical" href="https://greywitness.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Barlow+Condensed:wght@500;600&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ground:#121212;--card:#1c1c1c;--card-2:#242424;
+  --ivory:#E9E6E0;--muted:#9a968f;--accent:#B9B4AA;
+  --hairline:rgba(233,230,224,.12);
+  --pad-x:clamp(16px,5vw,64px);
+}
+body{background:var(--ground);color:var(--ivory);font-family:'Barlow',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+header{padding:clamp(40px,8vw,88px) var(--pad-x) clamp(24px,4vw,40px);max-width:1200px;width:100%;margin:0 auto}
+.brand{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(34px,6vw,60px);letter-spacing:.12em;text-transform:uppercase;line-height:1.05}
+.lede{margin-top:14px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:40ch}
+main{flex:1;padding:0 var(--pad-x) 48px;max-width:1200px;width:100%;margin:0 auto}
+.stories{display:grid;gap:2px;grid-template-columns:1fr}
+@media(min-width:620px){.stories{grid-template-columns:repeat(2,1fr)}}
+.story{display:flex;flex-direction:column;background:var(--card);color:inherit;text-decoration:none;border-left:2px solid transparent;overflow:hidden;transition:background .2s,border-color .2s}
+.story:hover,.story:focus-visible{background:var(--card-2);border-left-color:var(--accent);outline:none}
+.story-img{height:200px;background:linear-gradient(145deg,var(--card-2),var(--ground));background-size:cover;background-position:center}
+.story-body{padding:clamp(16px,2.2vw,22px);display:flex;flex-direction:column;flex:1}
+.story-era{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.story-title{font-family:'Cormorant Garamond',serif;font-size:clamp(19px,2.4vw,23px);font-weight:400;line-height:1.22;margin-bottom:10px}
+.story-hook{font-size:14px;line-height:1.6;opacity:.92;flex:1}
+.story-roles{margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.06em;color:var(--muted)}
+.status{color:var(--muted);font-style:italic;padding:24px 0}
+footer{padding:20px var(--pad-x) 32px;max-width:1200px;width:100%;margin:0 auto;border-top:1px solid var(--hairline)}
+.preview-note{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="brand">Grey Witness</h1>
+  <p class="lede">Step inside a decisive moment of history, as someone who was there.</p>
+</header>
+<main>
+  <div id="stories" class="stories" aria-live="polite"></div>
+  <p id="status" class="status">Loading stories…</p>
+</main>
+<footer>
+  <p class="preview-note">This is a preview — interactions may be reviewed to improve it.</p>
+</footer>
+<script>
+// The list comes from /api/stories, which the server filters to the demo whitelist.
+// Everything is set as text — never as HTML — so story fields cannot inject markup.
+(async () => {
+  const grid = document.getElementById('stories');
+  const status = document.getElementById('status');
+  try {
+    const resp = await fetch('/api/stories');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const stories = (await resp.json())
+      .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99) || String(a.title).localeCompare(String(b.title)));
+    if (!stories.length) { status.textContent = 'No stories are available right now.'; return; }
+    for (const s of stories) {
+      const a = document.createElement('a');
+      a.className = 'story';
+      a.href = '/game?scenarioId=' + encodeURIComponent(s.id);
+      const img = document.createElement('div');
+      img.className = 'story-img';
+      if (s.image_url) img.style.backgroundImage = 'url("' + String(s.image_url).replace(/["\\]/g, '') + '")';
+      const body = document.createElement('div');
+      body.className = 'story-body';
+      const add = (tag, cls, text) => { if (!text) return; const el = document.createElement(tag); el.className = cls; el.textContent = text; body.appendChild(el); };
+      add('p', 'story-era', s.era);
+      add('h2', 'story-title', s.title);
+      add('p', 'story-hook', s.description);
+      add('p', 'story-roles', (s.roles || []).length ? 'Play as: ' + s.roles.join(' · ') : '');
+      a.appendChild(img);
+      a.appendChild(body);
+      grid.appendChild(a);
+    }
+    status.remove();
+  } catch (e) {
+    status.textContent = 'Stories could not be loaded. Please refresh the page.';
+  }
+})();
+</script>
+</body>
+</html>
