@@ -13,6 +13,9 @@ import { fileURLToPath } from 'url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const DEMO_LANDING_PATH = path.resolve(HERE, '../demo/index.html');
+// The link-preview card (1200×630) the landing page's og:image / twitter:image point at,
+// served at GET /og-image.png — by the demo guard only, so prod has no such route.
+export const DEMO_OG_IMAGE_PATH = path.resolve(HERE, '../demo/greywitness-og.png');
 
 export function readDemoConfig(env = process.env) {
   return {
@@ -89,12 +92,13 @@ export function injectDemoIntoGameHtml(html) {
 // Page-level containment. Mounted by server.js ahead of express.static, and ONLY when the
 // flag is on. Handles the routes that would otherwise reach the catalogue or the branding:
 //   /                 -> the Grey Witness demo landing (instead of public/index.html)
+//   /og-image.png     -> the landing's link-preview image (image/png)
 //   /index.html       -> redirect to /
 //   /categories[...]  -> redirect to /
 //   /test, /test.html, /index.backup*.html, /index_backup.html -> 404
 //   /admin, /admin/*, /admin-*.html (any method) -> 404
 //   /game             -> engine/game/index.html with the demo injection
-export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, cacheControl }) {
+export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, ogImagePath = DEMO_OG_IMAGE_PATH, cacheControl }) {
   return (req, res, next) => {
     const p = req.path;
     // The admin surface is not part of the demo: any method (the login is a POST), any depth,
@@ -104,6 +108,10 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, c
     if (p === '/') {
       res.set('Cache-Control', cacheControl);
       return res.sendFile(landingPath);
+    }
+    if (p === '/og-image.png') {
+      res.set('Cache-Control', cacheControl);
+      return res.type('image/png').sendFile(ogImagePath);
     }
     if (p === '/index.html') return res.redirect(302, '/');
     if (p === '/categories' || p.startsWith('/categories/')) return res.redirect(302, '/');

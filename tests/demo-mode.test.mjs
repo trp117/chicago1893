@@ -113,6 +113,7 @@ try {
     const login = await pget('/admin/login');
     check('(a) /admin/login still serves the admin login page', login.status === 200 && /html/.test(login.type || ''), `${login.status}`);
     check('(a) /admin-login.html still serves', (await pget('/admin-login.html')).status === 200);
+    check('(a) /og-image.png does not exist in prod (404)', (await pget('/og-image.png')).status === 404);
     const unauth = await pget('/admin/api/scenarios');
     check('(a) /admin/api answers its own auth gate (not a demo 404)', unauth.status !== 404 && unauth.status >= 300, `${unauth.status}`);
   }
@@ -209,6 +210,21 @@ try {
     check('/ has the preview line', html.includes('This is a preview — interactions may be reviewed to improve it.'));
     check('/ has no Apollo hero, no categories nav', !/apollo/i.test(html) && !html.includes('/categories'));
     check('/ builds cards from /api/stories', html.includes("fetch('/api/stories')"));
+    // Link-preview card.
+    for (const tag of [
+      '<meta property="og:image" content="https://greywitness.com/og-image.png">',
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      '<meta property="og:image:alt" content="Grey Witness — interactive historical fiction">',
+      '<meta name="twitter:card" content="summary_large_image">',
+      '<meta name="twitter:image" content="https://greywitness.com/og-image.png">',
+    ]) check(`/ <head> has ${tag.slice(6, tag.indexOf(' content='))}`, head.includes(tag));
+    check('/ <head> keeps one og:type, og:title, og:description, og:url, twitter:title, twitter:description',
+      ['property="og:type"', 'property="og:title"', 'property="og:description"', 'property="og:url"', 'name="twitter:title"', 'name="twitter:description"', 'name="twitter:card"']
+        .every(a => head.split(a).length === 2));
+    const og = await get('/og-image.png');
+    check('/og-image.png → 200 image/png, the 1200×630 card byte-for-byte', og.status === 200 && og.type === 'image/png'
+      && og.body.equals(file('engine/demo/greywitness-og.png')) && og.body.readUInt32BE(16) === 1200 && og.body.readUInt32BE(20) === 630, `${og.status} ${og.type} ${og.body.length}B`);
   }
 
   // 2 — whitelist
