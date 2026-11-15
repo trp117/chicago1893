@@ -305,6 +305,39 @@ export async function collectAnthropicStream(fetchResponse, onChunk, { onSensory
   return { text: accumulated, stopReason, usage };
 }
 
+// ── Conversation-prefix caching (CONV_CACHE_ENABLED, default OFF) ──────────────────────
+// BILLING ONLY: the text the model receives is identical either way — only where the cache
+// breakpoints sit changes.
+//
+// OFF: the one system block the play path has always sent, byte-for-byte:
+//        [{ type:'text', text: <resolved system prompt>, cache_control: ephemeral }]
+// ON:  the same text split in two at the start of the "## ARC POSITION RULE" section, each
+//      half with its own breakpoint (2 of the 4 allowed):
+//        head — everything before the arc section. Fixed for the whole session (scenario
+//               context + rules), so it is written once and read on every later call;
+//        tail — the arc section onward. Carries {{ARC_POSITION}} (opening → middle → late →
+//               final) and any appended anchor-correction note, so it is rewritten when those
+//               change — but the ~6.5k-token head no longer is.
+// Falls back to the single block whenever the split would not be safe: no placeholder in the
+// raw prompt (the primary-scenario path builds its own), the head not byte-identical to the
+// raw prompt's head, or either half too short to cache (< MIN_CACHE_CHARS, ~1024 tokens).
+const MIN_CACHE_CHARS = 4500;
+export function buildSystemBlocks(rawSystemPrompt, resolvedSystemPrompt, { convCache = false } = {}) {
+  const single = [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }];
+  if (!convCache || typeof rawSystemPrompt !== 'string') return single;
+  const at = rawSystemPrompt.indexOf('{{ARC_POSITION}}');
+  if (at < 0) return single;
+  const split = rawSystemPrompt.lastIndexOf('\n## ', at) + 1;   // start of the arc section's heading line
+  if (split <= 0) return single;
+  const head = resolvedSystemPrompt.slice(0, split);
+  const tail = resolvedSystemPrompt.slice(split);
+  if (head !== rawSystemPrompt.slice(0, split) || head.length < MIN_CACHE_CHARS || tail.length < MIN_CACHE_CHARS) return single;
+  return [
+    { type: 'text', text: head, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: tail, cache_control: { type: 'ephemeral' } },
+  ];
+}
+
 // What a demo transcript keeps of one model response: the prose the player read and the
 // choices they were offered, speakers by roster name (never an id).
 function demoResponseSnapshot(output, characters) {
@@ -865,6 +898,10 @@ export function createGameRouter(contentRepos, config = {}) {
   const demoMode          = config.demoMode === true;
   const isAllowedScenario = makeIsAllowedScenario({ demoMode, demoScenarios: config.demoScenarios || [] });
   const refuseScenario    = res => res.status(404).json({ error: 'Scenario not found.' });
+  // Conversation-prefix caching (buildSystemBlocks). Env flag, default off; a test may pass it.
+  const convCache = config.convCache ?? (process.env.CONV_CACHE_ENABLED === 'true');
+  console.log(`[CONV-CACHE] ${convCache ? 'ENABLED — system prompt split at the arc section' : 'disabled'}`);
+  const systemBlocks = (raw, resolved) => buildSystemBlocks(raw, resolved, { convCache });
 
   // DEMO_MODE Phase 2 — spend cap, per-IP daily cap, rate limit, demo transcripts. Built only
   // in demo mode; `demo` is null in prod and every use below is behind `if (demo)`.
@@ -1142,7 +1179,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
           model: MODEL, max_tokens: 1600, temperature: 0.8, stream: true,
-          system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
+          system: systemBlocks(systemPrompt, resolvedSystemPrompt),
           messages: [{ role: 'user', content: prompt }]
         })
       });
@@ -1198,7 +1235,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
           body: JSON.stringify({
             model: MODEL, max_tokens: 1600, temperature: 0.8,
-            system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
+            system: systemBlocks(systemPrompt, resolvedSystemPrompt),
             messages,
           }),
         });
@@ -1485,7 +1522,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
           body: JSON.stringify({
             model: MODEL, max_tokens: toks, temperature: 0.8,
-            system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
+            system: systemBlocks(systemPrompt, resolvedSystemPrompt),
             messages
           })
         });
@@ -1506,7 +1543,7 @@ Do not open with the historical context. Open inside the character's body. Let t
         headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicApiKey, 'anthropic-version': '2023-06-01', 'anthropic-beta': 'prompt-caching-2024-07-31' },
         body: JSON.stringify({
           model: MODEL, max_tokens: maxToks, temperature: 0.8, stream: true,
-          system: [{ type: 'text', text: resolvedSystemPrompt, cache_control: { type: 'ephemeral' } }],
+          system: systemBlocks(systemPrompt, resolvedSystemPrompt),
           messages: baseMessages,
         }),
       });
