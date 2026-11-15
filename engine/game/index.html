@@ -69,6 +69,15 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 @keyframes dot-pulse { 0%,80%,100% { opacity:0.2; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
 .scene-error { color: #e07060; }
 .gloss-term { border-bottom: 1.5px dotted #b8962e; cursor: pointer; }
+/* Crisis care card — outside the story: plain sans-serif, light panel, never the scene-card voice. */
+.care-card { margin: 24px auto; max-width: 560px; padding: 22px 24px; background: #f4f1ea; color: #1f1d1a; border: 1px solid #c9c2b4; border-left: 4px solid #4a6e8a; border-radius: 8px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-style: normal; font-size: 16px; line-height: 1.6; }
+.care-card p { margin: 0 0 14px; }
+.care-card .care-return { margin-top: 6px; padding: 10px 18px; border-radius: 6px; border: 1px solid #4a6e8a; background: #4a6e8a; color: #fff; font: inherit; cursor: pointer; }
+.care-card .care-return:focus-visible { outline: 2px solid #1f1d1a; outline-offset: 2px; }
+/* Child-safety refusal — same out-of-story channel, firmer: neutral grey panel, dark border, no warmth. */
+.care-card.refusal { background: #eceae6; border-left-color: #5a1e1e; }
+.care-card.refusal p { font-weight: 600; }
+.care-card.refusal .care-return { background: #3a3632; border-color: #3a3632; }
 #gloss-tooltip { position: fixed; z-index: 9999; max-width: 300px; background: #1a1612; border: 1px solid #b8962e; border-radius: 6px; font-size: 12px; line-height: 1.55; color: #f0e8d8; box-shadow: 0 4px 16px rgba(0,0,0,0.5); display: none; }
 #gloss-tooltip-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 6px; border-bottom: 1px solid rgba(184,150,46,0.3); gap: 8px; }
 #gloss-tooltip-term { font-weight: 600; font-size: 12px; flex: 1; }
@@ -1247,6 +1256,44 @@ function renderRetryAction(label = 'Try that again', onRetry = null) {
   requestAnimationFrame(syncArrows);
 }
 
+// The out-of-character card (input-safety gate): kind 'care' (self-harm) or 'refusal' (child
+// safety, styled as a firm refusal). Deliberately NOT a scene card: its own
+// styling, no narrator or character voice, the server's fixed message set as text. Input stays
+// off until the player chooses "Return to the story", which restores the scene they were reading
+// and the same choices — no turn is consumed or advanced.
+function renderCareCard(message, storyBeforeTurn, kind = 'care') {
+  storyEl.innerHTML = '';
+  const card = document.createElement('section');
+  card.className = kind === 'refusal' ? 'care-card refusal' : 'care-card';
+  card.setAttribute('role', 'alert');
+  card.setAttribute('aria-label', 'A message from outside the story');
+  for (const para of String(message || '').split(/\n\s*\n/)) {
+    if (!para.trim()) continue;
+    const p = document.createElement('p');
+    p.textContent = para.trim();
+    card.appendChild(p);
+  }
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.className = 'care-return';
+  back.textContent = 'Return to the story';
+  back.addEventListener('click', () => {
+    storyEl.innerHTML = '';
+    for (const node of storyBeforeTurn || []) storyEl.appendChild(node);
+    choicesAreaWrapEl.classList.remove('hidden');
+    inputEl.disabled = false;
+    submitBtn.disabled = false;
+    inputEl.focus();
+  });
+  card.appendChild(back);
+  storyEl.appendChild(card);
+  storyEl.scrollTop = 0;
+  choicesAreaWrapEl.classList.add('hidden');
+  inputEl.disabled = true;
+  submitBtn.disabled = true;
+  back.focus();
+}
+
 // The player-facing copy for a failed turn. The real reason goes to the console for us, never
 // to the screen.
 function renderTurnFailure(container, detail) {
@@ -1902,6 +1949,9 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
     new Promise(resolve => storyEl.addEventListener('transitionend', resolve, { once: true })),
     new Promise(resolve => setTimeout(resolve, 350))
   ]);
+  // Kept (detached, listeners intact) so a care response can put the scene back exactly as it
+  // was — that turn never happened.
+  const storyBeforeTurn = Array.from(storyEl.childNodes);
   storyEl.innerHTML = '';
   storyEl.appendChild(scrollHintEl);
   storyEl.scrollTop = 0;
@@ -1978,6 +2028,16 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
         } else if (evt.type === 'done') {
           output    = evt.output;
           nextState = evt.nextState;
+        } else if (evt.type === 'care') {
+          // Input-safety gate (server: InputSafetyGate.js) — care or refusal. Not a story turn: nothing in
+          // gameState or conversationHistory changes, and no turn is consumed.
+          if (streamEl) streamEl.remove();
+          else dotsEl.remove();
+          entryEl.remove();
+          pendingEntryEl = null;
+          streamOptionsDots.classList.add('hidden');
+          renderCareCard(evt.message, storyBeforeTurn, evt.kind);
+          return;
         } else if (evt.type === 'error') {
           streamOptionsDots.classList.add('hidden');
           choicesAreaWrapEl.classList.remove('hidden');

@@ -33,6 +33,7 @@ import { consolidateBibliography } from '../services/Bibliography.js';
 import * as appData from '../data.js';
 import { AnchorTracker } from '../services/AnchorTracker.js';
 import { makeIsAllowedScenario } from './demoMode.js';
+import { checkInputSafety, MINOR_SELF_STATEMENT_NOTE } from '../services/InputSafetyGate.js';
 import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
 
 // DEMO_MODE spend metering. Every paid Claude call on the play path hands its usage block to
@@ -1384,6 +1385,30 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (!state.scenarioId)       return res.status(400).json({ error: 'state.scenarioId is required.' });
       if (!isAllowedScenario(state.scenarioId)) return refuseScenario(res);
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
+
+      // ── INPUT-SAFETY GATE (engine-wide, always on) ───────────────────────────
+      // Two categories only: self-harm (→ care message) and child safety (→ refusal). See
+      // services/InputSafetyGate.js. Typed input only — the client sends player_action exactly
+      // when the player typed rather than picked a choice. Runs before anything else reads or
+      // changes the turn: no scenario load, no state mutation, no prompt, no transcript, no
+      // story model call. Ahead of the demo limits too, so a person in distress is never
+      // answered with a spend or rate notice. The typed text itself is never logged or echoed.
+      let minorSelfStatement = false;
+      if (typeof req.body.player_action === 'string') {
+        const gate = await checkInputSafety(playerInput, { apiKey: anthropicApiKey, onUsage: reportUsage });
+        const { crisis, child } = gate;
+        if (crisis.stage1) console.warn(`[CRISIS] stage1 matched session=${sessionId || '-'} stage2=${crisis.stage2}${crisis.error ? ` (${crisis.error})` : ''}`);
+        if (child.stage1) console.warn(`[CHILD-SAFETY] stage1 matched session=${sessionId || '-'} stage2=${child.stage2}${child.error ? ` (${child.error})` : ''}`);
+        if (gate.action !== 'pass') {
+          res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'X-Accel-Buffering': 'no' });
+          res.flushHeaders();
+          sendSse(res, { type: 'care', kind: gate.kind, message: gate.message });
+          return res.end();
+        }
+        minorSelfStatement = gate.minorSelfStatement;
+        if (minorSelfStatement) console.warn(`[CHILD-SAFETY] under-18 self-statement, no romantic/sexual request — playing on, age kept out of character session=${sessionId || '-'}`);
+      }
+
       if (demo) {
         const hit = await demoLimitHit(req, { starting: false });
         if (hit) { logDemoLimit(hit, req); return sendDemoLimit(res, hit); }
@@ -1449,6 +1474,8 @@ Do not open with the historical context. Open inside the character's body. Let t
         resolvedSystemPrompt += `\n\n${anchorViolationNotes.get(sessionId)}`;
         anchorViolationNotes.delete(sessionId);
       }
+      // Input-safety gate: the player stated an under-18 age with no romantic/sexual request.
+      if (minorSelfStatement) resolvedSystemPrompt += `\n\n${MINOR_SELF_STATEMENT_NOTE}`;
 
       // Ensure tracker exists (survives server restarts mid-session)
       if (sessionId && !anchorTrackers.has(sessionId)) {
