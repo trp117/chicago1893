@@ -12,10 +12,64 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-export const DEMO_LANDING_PATH = path.resolve(HERE, '../demo/index.html');
-// The link-preview card (1200×630) the landing page's og:image / twitter:image point at,
-// served at GET /og-image.png — by the demo guard only, so prod has no such route.
-export const DEMO_OG_IMAGE_PATH = path.resolve(HERE, '../demo/greywitness-og.png');
+export const DEMO_DIR = path.resolve(HERE, '../demo');
+// The landing is a template: {{SITE_NAME}}, {{SITE_URL}}, {{TAGLINE}}, {{META_DESCRIPTION}}
+// are filled at serve time from the demo branding (readDemoBranding). The file on disk is
+// never served raw.
+export const DEMO_LANDING_PATH = path.join(DEMO_DIR, 'index.html');
+
+// ── Branding ────────────────────────────────────────────────────────────────
+// One codebase, several independent demos: each demo deployment names itself through env.
+// Every default is the Grey Witness value, so a deployment that sets none of these serves
+// exactly the landing it served before the branding became configurable
+// (tests/fixtures/greywitness-landing.html is that landing, frozen; demo-mode.test compares).
+export const DEMO_BRANDING_DEFAULTS = Object.freeze({
+  siteName:     'Grey Witness',
+  siteUrl:      'https://greywitness.com',
+  tagline:      'Step inside a decisive moment of history, as someone who was there.',
+  // The link-preview card (1200×630) the landing's og:image / twitter:image point at, served
+  // at GET /og-image.png by the demo guard only (prod has no such route). A file in engine/demo/.
+  ogImageFile:  'greywitness-og.png',
+});
+
+// A bare file name inside engine/demo/ — no directory part, no traversal, a .png.
+const OG_IMAGE_FILE = /^[A-Za-z0-9][A-Za-z0-9._-]*\.png$/;
+
+// Reads DEMO_SITE_NAME / DEMO_SITE_URL / DEMO_SITE_TAGLINE / DEMO_OG_IMAGE_FILE. An unset or
+// blank var takes its default. A bad image name throws: a demo that cannot name its own card
+// must not boot and quietly show another demo's.
+export function readDemoBranding(env = process.env) {
+  const pick = (k, d) => (env[k] && env[k].trim()) || d;
+  const D = DEMO_BRANDING_DEFAULTS;
+  const branding = {
+    siteName:    pick('DEMO_SITE_NAME', D.siteName),
+    siteUrl:     pick('DEMO_SITE_URL', D.siteUrl).replace(/\/+$/, ''),
+    tagline:     pick('DEMO_SITE_TAGLINE', D.tagline),
+    ogImageFile: pick('DEMO_OG_IMAGE_FILE', D.ogImageFile),
+  };
+  if (!OG_IMAGE_FILE.test(branding.ogImageFile)) {
+    throw new Error(`[DEMO] DEMO_OG_IMAGE_FILE must be a .png file name in engine/demo/ (got "${branding.ogImageFile}")`);
+  }
+  return branding;
+}
+
+export const demoOgImagePath = branding => path.join(DEMO_DIR, branding.ogImageFile);
+
+const escapeHtml = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// The landing template filled with one demo's branding. Every value is HTML-escaped (they land
+// in attributes and text). The meta description is "<name> — <tagline, first letter lowered>",
+// which for the defaults is the Grey Witness line exactly.
+export function renderDemoLanding(template, branding = DEMO_BRANDING_DEFAULTS) {
+  const t = branding.tagline;
+  const values = {
+    SITE_NAME:        branding.siteName,
+    SITE_URL:         branding.siteUrl,
+    TAGLINE:          t,
+    META_DESCRIPTION: `${branding.siteName} — ${t.charAt(0).toLowerCase()}${t.slice(1)}`,
+  };
+  return template.replace(/\{\{(SITE_NAME|SITE_URL|TAGLINE|META_DESCRIPTION)\}\}/g, (_, k) => escapeHtml(values[k]));
+}
 
 export function readDemoConfig(env = process.env) {
   return {
@@ -91,14 +145,14 @@ export function injectDemoIntoGameHtml(html) {
 
 // Page-level containment. Mounted by server.js ahead of express.static, and ONLY when the
 // flag is on. Handles the routes that would otherwise reach the catalogue or the branding:
-//   /                 -> the Grey Witness demo landing (instead of public/index.html)
-//   /og-image.png     -> the landing's link-preview image (image/png)
+//   /                 -> the demo landing, branded from env (instead of public/index.html)
+//   /og-image.png     -> the landing's link-preview image (image/png), the env-named file
 //   /index.html       -> redirect to /
 //   /categories[...]  -> redirect to /
 //   /test, /test.html, /index.backup*.html, /index_backup.html -> 404
 //   /admin, /admin/*, /admin-*.html (any method) -> 404
 //   /game             -> engine/game/index.html with the demo injection
-export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, ogImagePath = DEMO_OG_IMAGE_PATH, cacheControl }) {
+export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl }) {
   return (req, res, next) => {
     const p = req.path;
     // The admin surface is not part of the demo: any method (the login is a POST), any depth,
@@ -106,8 +160,10 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, o
     if (ADMIN_PATH.test(p)) return res.status(404).send('Not found');
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     if (p === '/') {
+      let html;
+      try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }
       res.set('Cache-Control', cacheControl);
-      return res.sendFile(landingPath);
+      return res.type('html').send(renderDemoLanding(html, branding));
     }
     if (p === '/og-image.png') {
       res.set('Cache-Control', cacheControl);

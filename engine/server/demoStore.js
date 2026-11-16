@@ -6,23 +6,40 @@
 // Only built when DEMO_MODE is on (server.js); with the flag off nothing here is constructed.
 //
 // Interface:
-//   readBudget()                         -> cents committed so far
-//   addBudget(cents)                     -> new total (atomic increment)
+//   readBudget()                         -> cents committed so far (this demo's budget row)
+//   addBudget(cents)                     -> new total (atomic increment of this demo's row)
 //   startTranscript(row)                 -> upsert the session row (scenario, role, opening)
 //   appendTurn(sessionId, scenarioId, t) -> atomically append one turn to the row's `turns`
 //   patchTranscript(sessionId, patch)    -> set outcome / closing / ended_at
 
 const nowIso = () => new Date().toISOString();
 
-export function createSupabaseDemoStore(client) {
+// Each demo deployment meters against its own demo_budget row, named by DEMO_BUDGET_ID, so two
+// demos never share a cap. The default is the row Grey Witness has always used.
+// (Transcripts stay in one shared table — scenario_id tells the demos apart.)
+export const DEFAULT_DEMO_BUDGET_ID = 'global';
+const BUDGET_ID = /^[A-Za-z0-9_-]{1,64}$/;
+export function readDemoBudgetId(env = process.env) {
+  const id = (env.DEMO_BUDGET_ID && env.DEMO_BUDGET_ID.trim()) || DEFAULT_DEMO_BUDGET_ID;
+  if (!BUDGET_ID.test(id)) throw new Error(`[DEMO] DEMO_BUDGET_ID must be 1-64 letters, digits, _ or - (got "${id}")`);
+  return id;
+}
+
+export function createSupabaseDemoStore(client, { budgetId = DEFAULT_DEMO_BUDGET_ID } = {}) {
   const must = ({ data, error }) => { if (error) throw new Error(error.message); return data; };
+  // The default row is added to with exactly the call Grey Witness has always made: p_id is
+  // passed only for another row. demo_budget_add's p_id defaults to 'global' (migration
+  // 20261116), so the two are the same statement — and Grey Witness keeps working whether or
+  // not that migration has been applied yet.
+  const addArgs = cents => budgetId === DEFAULT_DEMO_BUDGET_ID ? { p_cents: cents } : { p_cents: cents, p_id: budgetId };
   return {
+    budgetId,
     async readBudget() {
-      const row = must(await client.from('demo_budget').select('spent_cents').eq('id', 'global').maybeSingle());
+      const row = must(await client.from('demo_budget').select('spent_cents').eq('id', budgetId).maybeSingle());
       return row ? Number(row.spent_cents) : 0;
     },
     async addBudget(cents) {
-      return Number(must(await client.rpc('demo_budget_add', { p_cents: cents })));
+      return Number(must(await client.rpc('demo_budget_add', addArgs(cents))));
     },
     async startTranscript({ session_id, scenario_id, role_id, opening }) {
       must(await client.from('demo_transcripts').upsert({

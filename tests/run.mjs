@@ -60,6 +60,7 @@ const SUITE = [
   ['primary sources: consolidation',        'bibliography.test.mjs'],
   ['DEMO_MODE: off = prod bytes; on = contained', 'demo-mode.test.mjs'],
   ['DEMO_MODE: budget, caps, rate, transcripts', 'demo-limits.test.mjs'],
+  ['DEMO_MODE: per-demo branding + budget row', 'demo-branding.test.mjs'],
   ['session id: one id per playthrough (jsdom)', 'session-id.test.mjs'],
   ['input-safety gate: self-harm, child safety, sexual violence', 'crisis-intercept.test.mjs'],
   ['scripture: quoted as words, no chapter:verse', 'scripture-citation.test.mjs'],

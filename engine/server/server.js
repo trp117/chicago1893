@@ -25,8 +25,8 @@ import { SupabaseSessionStore } from '../../lib/SupabaseSessionStore.js';
 import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/PromptComposer.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
-import { makeIsAllowedScenario, demoPageGuard } from './demoMode.js';
-import { createSupabaseDemoStore } from './demoStore.js';
+import { makeIsAllowedScenario, demoPageGuard, readDemoBranding } from './demoMode.js';
+import { createSupabaseDemoStore, readDemoBudgetId } from './demoStore.js';
 import { readDemoLimitConfig } from './demoLimits.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -54,6 +54,11 @@ const DEMO_SCENARIOS = (process.env.DEMO_SCENARIOS || '').split(',').map(s => s.
 const isAllowedScenario = makeIsAllowedScenario({ demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS });
 console.log(`[DEMO] mode ${DEMO_MODE ? 'ENABLED' : 'disabled'}${DEMO_MODE ? ` scenarios=${DEMO_SCENARIOS.join(',') || '(none)'}` : ''}`);
 if (DEMO_MODE && !DEMO_SCENARIOS.length) console.warn('[DEMO] DEMO_MODE is on but DEMO_SCENARIOS is empty — every scenario will be refused.');
+// Which demo this is: its landing branding and its own spend-counter row. Read only in demo
+// mode; every default is Grey Witness's, so an unset deployment is the Grey Witness demo.
+const DEMO_BRANDING  = DEMO_MODE ? readDemoBranding() : null;
+const DEMO_BUDGET_ID = DEMO_MODE ? readDemoBudgetId() : null;
+if (DEMO_MODE) console.log(`[DEMO] site "${DEMO_BRANDING.siteName}" ${DEMO_BRANDING.siteUrl} og=${DEMO_BRANDING.ogImageFile} budget=${DEMO_BUDGET_ID}`);
 
 const app = express();
 app.set('trust proxy', 1);
@@ -64,6 +69,7 @@ app.use(express.json({ limit: '10mb' }));
 if (DEMO_MODE) {
   app.use(demoPageGuard({
     gameHtmlPath: path.join(gameDir, 'index.html'),
+    branding:     DEMO_BRANDING,
     cacheControl: 'public, max-age=300, must-revalidate',
   }));
 }
@@ -95,7 +101,7 @@ const gameConfig = {
   demoScenarios:      DEMO_SCENARIOS,
   // Phase 2: the durable spend counter + demo transcripts, and the limits. Constructed only in
   // demo mode — with the flag off no demo table is ever touched.
-  ...(DEMO_MODE ? { demoStore: createSupabaseDemoStore(supabaseService), demoLimits: readDemoLimitConfig() } : {}),
+  ...(DEMO_MODE ? { demoStore: createSupabaseDemoStore(supabaseService, { budgetId: DEMO_BUDGET_ID }), demoLimits: readDemoLimitConfig() } : {}),
 };
 if (DEMO_MODE) {
   const l = gameConfig.demoLimits;

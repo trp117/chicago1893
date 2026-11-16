@@ -15,7 +15,12 @@
 // landed: 30 routes identical. It is not repeated here — a pinned baseline would fail on every
 // later change to those routes.)
 //
-// Part B — the demo itself, with DEMO_MODE=true and the four vetted scenarios.
+// Part B — the demo itself, with DEMO_MODE=true and the four vetted scenarios, and none of the
+// per-demo env set: the landing is the frozen Grey Witness landing byte-for-byte and the budget
+// row is 'global'.
+//
+// Part C — a second demo from the same code: DEMO_SITE_* / DEMO_OG_IMAGE_FILE / DEMO_BUDGET_ID
+// name Project Limen, DEMO_SCENARIOS a different whitelist.
 //
 // No model or ElevenLabs calls: every request either fails validation, is refused, or is
 // a read. ELEVENLABS_API_KEY is blanked so /tts can never reach ElevenLabs, and Langfuse is
@@ -187,6 +192,8 @@ try {
   const json = r => JSON.parse(r.body.toString());
 
   check('boot log names the whitelist', demo.log().includes(`[DEMO] mode ENABLED scenarios=${DEMO_IDS.join(',')}`));
+  check('boot log: Grey Witness branding and budget row "global" by default',
+    demo.log().includes('[DEMO] site "Grey Witness" https://greywitness.com og=greywitness-og.png budget=global'));
   check('boot log states the Phase 2 limits (defaults)', demo.log().includes('[DEMO] limits start=$90.00 hard=$98.00 starts/ip/day=2 rate=30/min global, 6/min per ip'));
   {
     const xf = await post('/game/api/extract-facts', { narrative: 'You saw the forged order.', existingFacts: [] });
@@ -204,6 +211,7 @@ try {
     const html = r.body.toString();
     const head = html.slice(0, html.indexOf('</head>'));
     check('/ serves the demo landing (200, html)', r.status === 200 && /text\/html/.test(r.type));
+    check('/ with no per-demo env is the frozen Grey Witness landing byte-for-byte', r.body.equals(file('tests/fixtures/greywitness-landing.html')));
     check('/ <title> and og tags say Grey Witness / greywitness.com', /<title>Grey Witness<\/title>/.test(head)
       && /property="og:title" content="Grey Witness"/.test(head) && /property="og:url" content="https:\/\/greywitness\.com"/.test(head));
     check('/ carries no "Ledger 250" or "ledger250" anywhere', !/ledger\s*250/i.test(html));
@@ -289,6 +297,44 @@ try {
   }
   for (const url of ['/admin/auth/login', '/admin/auth/forgot-password', '/admin/api/scenarios']) {
     check(`POST ${url} → 404`, (await post(url, { email: 'x@example.com', password: 'x' })).status === 404);
+  }
+  for (const s of servers.splice(0)) s.stop();
+
+  // ── Part C: a second, independently branded demo ─────────────────────────
+  const LIMEN_IDS = ['ignatius_loyola_1521', 'tolle_lege_milan_386'];
+  console.log(`\nPart C — Project Limen: DEMO_SCENARIOS=${LIMEN_IDS.join(',')}, own branding, budget row "limen"`);
+  const limen = await boot('limen', ROOT, {
+    DEMO_MODE: 'true', DEMO_SCENARIOS: LIMEN_IDS.join(','),
+    DEMO_SITE_NAME: 'Project Limen', DEMO_SITE_URL: 'https://projectlimen.com',
+    DEMO_SITE_TAGLINE: 'Cross the threshold of a turning point in history.',
+    DEMO_OG_IMAGE_FILE: 'projectlimen-og.png', DEMO_BUDGET_ID: 'limen',
+  });
+  servers.push(limen);
+  {
+    const lget = url => call(limen.base, 'GET', url);
+    check('boot log: Limen branding and budget row "limen"',
+      limen.log().includes('[DEMO] site "Project Limen" https://projectlimen.com og=projectlimen-og.png budget=limen'));
+    const r = await lget('/');
+    const html = r.body.toString();
+    const head = html.slice(0, html.indexOf('</head>'));
+    check('/ names Project Limen: title, og:title, twitter:title, h1', r.status === 200 && head.includes('<title>Project Limen</title>')
+      && head.includes('<meta property="og:title" content="Project Limen">') && head.includes('<meta name="twitter:title" content="Project Limen">')
+      && html.includes('<h1 class="brand">Project Limen</h1>'));
+    check('/ tagline is visible and in og/twitter descriptions', html.includes('<p class="lede">Cross the threshold of a turning point in history.</p>')
+      && head.includes('<meta property="og:description" content="Cross the threshold of a turning point in history.">')
+      && head.includes('<meta name="twitter:description" content="Cross the threshold of a turning point in history.">'));
+    check('/ og:url, og:image, twitter:image, canonical on projectlimen.com', head.includes('<meta property="og:url" content="https://projectlimen.com">')
+      && head.includes('<meta property="og:image" content="https://projectlimen.com/og-image.png">')
+      && head.includes('<meta name="twitter:image" content="https://projectlimen.com/og-image.png">')
+      && head.includes('<link rel="canonical" href="https://projectlimen.com">'));
+    check('/ carries no Grey Witness / greywitness and no Ledger 250', !/grey ?witness/i.test(html) && !/ledger\s*250/i.test(html));
+    const og = await lget('/og-image.png');
+    check('/og-image.png → projectlimen-og.png byte-for-byte (image/png)', og.status === 200 && og.type === 'image/png'
+      && og.body.equals(file('engine/demo/projectlimen-og.png')), `${og.status} ${og.type} ${og.body.length}B`);
+    const ids = JSON.parse((await lget('/api/stories')).body.toString()).map(s => s.id).sort();
+    check("/api/stories is filtered by this demo's DEMO_SCENARIOS", JSON.stringify(ids) === JSON.stringify([...LIMEN_IDS].sort()), ids.join(','));
+    check('bootstrap: a scenario outside this whitelist is refused (404)', (await lget('/game/api/bootstrap?scenarioId=steel_curtain_cantigny')).status === 404);
+    check('/game still carries the demo injection', (await lget('/game')).body.toString().includes('id="demo-mode"'));
   }
 } catch (err) {
   console.error(`\nERROR  ${err.message}`);
