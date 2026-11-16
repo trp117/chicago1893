@@ -1387,8 +1387,8 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
       // ── INPUT-SAFETY GATE (engine-wide, always on) ───────────────────────────
-      // Two categories only: self-harm (→ care message) and child safety (→ refusal). See
-      // services/InputSafetyGate.js. Typed input only — the client sends player_action exactly
+      // Three categories only: self-harm (→ care message), child safety and sexual violence
+      // (→ refusal). See services/InputSafetyGate.js. Typed input only — the client sends player_action exactly
       // when the player typed rather than picked a choice. Runs before anything else reads or
       // changes the turn: no scenario load, no state mutation, no prompt, no transcript, no
       // story model call. Ahead of the demo limits too, so a person in distress is never
@@ -1396,9 +1396,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       let minorSelfStatement = false;
       if (typeof req.body.player_action === 'string') {
         const gate = await checkInputSafety(playerInput, { apiKey: anthropicApiKey, onUsage: reportUsage });
-        const { crisis, child } = gate;
+        const { crisis, child, sexualViolence } = gate;
         if (crisis.stage1) console.warn(`[CRISIS] stage1 matched session=${sessionId || '-'} stage2=${crisis.stage2}${crisis.error ? ` (${crisis.error})` : ''}`);
         if (child.stage1) console.warn(`[CHILD-SAFETY] stage1 matched session=${sessionId || '-'} stage2=${child.stage2}${child.error ? ` (${child.error})` : ''}`);
+        if (sexualViolence.stage1) console.warn(`[SEXUAL-VIOLENCE] stage1 matched session=${sessionId || '-'} stage2=${sexualViolence.stage2}${sexualViolence.error ? ` (${sexualViolence.error})` : ''}`);
         if (gate.action !== 'pass') {
           res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive', 'X-Accel-Buffering': 'no' });
           res.flushHeaders();
