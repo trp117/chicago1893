@@ -2977,6 +2977,10 @@ const LOAD_BEARING_UNVERIFIED_RULE = `4. FLAG WHAT YOU CANNOT VERIFY. If the sce
 // Follows rule 4 and depends on it ("or tagged"), so it is main-generator only as well.
 const LOAD_BEARING_FICTIONAL_CHARACTERS = `FICTIONAL CHARACTERS: invented personal details (hometown, temperament, the condition of their own gear) are legitimate fiction and need no sourcing. But any claim they make about the real event or world — a troop count, a technical value, a named battle, unit, date, or place — is still a load-bearing specific and must be accurate, kept general, or tagged. Do not write "(fictional)", "composite", or any similar authoring label into the role, name, or other character fields — the character_type field records that separately, and every other field must read as in-world prose. A fictional soldier may feel what you invent; he may not state a real-world fact you cannot support.`;
 
+// Main generator only — it writes in-world text (perspective, dialogue, beats, choices). The
+// epilogue's Historical Record speaks as a modern historian, where "Romans 13:13–14" is correct.
+const SCRIPTURE_CITATION_RULE = `SCRIPTURE IS QUOTED AS WORDS, NEVER AS CHAPTER AND VERSE: in every in-world field (perspective, opening narrative, dialogue, beats, choices, debriefs), no character or narration cites scripture by number. Chapter divisions date from the 13th century and verse numbers from the 16th; a period character speaks of a passage by its words or names the book in the period's way ("the Apostle", "Paul's letter to the Romans"). Never write "13:13", "Rom. 13", "chapter", or "verse" for a scripture location in those fields.`;
+
 // Shared by the technical-facts and epilogue generators.
 const CITE_AT_WORK_LEVEL = `CITE AT THE WORK LEVEL. Name the source work — the inquiry, official report, named testimony, diary, or published book. Do NOT invent page numbers, paragraph numbers, inquiry 'Day' numbers, or other fine locators unless you are certain of them: a precise-looking but wrong locator is worse than naming the work alone. When unsure of the exact locator, cite the work without it.`;
 
@@ -3013,6 +3017,8 @@ ${LOAD_BEARING_SPECIFICS}
 ${LOAD_BEARING_UNVERIFIED_RULE}
 
 ${LOAD_BEARING_FICTIONAL_CHARACTERS}
+
+${SCRIPTURE_CITATION_RULE}
 
 OUTPUT RULES:
 1. Return ONLY valid JSON — no markdown, no code fences, no prose

@@ -62,6 +62,7 @@ const SUITE = [
   ['DEMO_MODE: budget, caps, rate, transcripts', 'demo-limits.test.mjs'],
   ['session id: one id per playthrough (jsdom)', 'session-id.test.mjs'],
   ['input-safety gate: self-harm, child safety, sexual violence', 'crisis-intercept.test.mjs'],
+  ['scripture: quoted as words, no chapter:verse', 'scripture-citation.test.mjs'],
   ['narrative style: Focused lock (jsdom)', 'narrative-style-lock.test.mjs'],
   ['restore: snapshot-base version guard',  'restore-guard.test.mjs'],
   ['[UNVERIFIED] tag: strip + publish gate', 'unverified-tag.test.mjs'],

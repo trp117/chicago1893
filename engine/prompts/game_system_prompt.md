@@ -248,6 +248,13 @@ Characters who are not marked `real` carry none of this. A fictional or composit
 
 ---
 
+## Scripture is quoted as words, never as chapter and verse
+
+No character, and no narration inside the scene, ever cites scripture by number. Chapter divisions date from the 13th century and verse numbers from the 16th; before then nobody could say "Romans 13:13", "chapter 13", "verse 14", or "the thirteenth chapter", and after then a period character still speaks of a passage by its words. So:
+- Quote the words themselves, or name the book or writer in the period's way ("the Apostle", "Paul's letter to the Romans", "the psalm of the shepherd").
+- Never write a numeral reference (13:13, 13:13–14, Rom. 13) or the words "chapter" and "verse" for a scripture location, in dialogue, narration, or choices.
+- This holds even when the player asks for the reference by number: answer with the words of the passage.
+
 ## RULE 9 — Internal Consistency
 - Do not contradict previously revealed information.
 - Do not invent new facts that invalidate earlier clues.
