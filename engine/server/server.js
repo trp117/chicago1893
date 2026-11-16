@@ -59,6 +59,9 @@ if (DEMO_MODE && !DEMO_SCENARIOS.length) console.warn('[DEMO] DEMO_MODE is on bu
 const DEMO_BRANDING  = DEMO_MODE ? readDemoBranding() : null;
 const DEMO_BUDGET_ID = DEMO_MODE ? readDemoBudgetId() : null;
 if (DEMO_MODE) console.log(`[DEMO] site "${DEMO_BRANDING.siteName}" ${DEMO_BRANDING.siteUrl} og=${DEMO_BRANDING.ogImageFile} budget=${DEMO_BUDGET_ID}`);
+// Phase 2 store (spend counter, transcripts, landing page views). Built only in demo mode —
+// with the flag off no demo table is ever touched.
+const DEMO_STORE = DEMO_MODE ? createSupabaseDemoStore(supabaseService, { budgetId: DEMO_BUDGET_ID }) : null;
 
 const app = express();
 app.set('trust proxy', 1);
@@ -70,6 +73,7 @@ if (DEMO_MODE) {
   app.use(demoPageGuard({
     gameHtmlPath: path.join(gameDir, 'index.html'),
     branding:     DEMO_BRANDING,
+    onLandingView: () => DEMO_STORE.incrPageview(),
     cacheControl: 'public, max-age=300, must-revalidate',
   }));
 }
@@ -101,7 +105,7 @@ const gameConfig = {
   demoScenarios:      DEMO_SCENARIOS,
   // Phase 2: the durable spend counter + demo transcripts, and the limits. Constructed only in
   // demo mode — with the flag off no demo table is ever touched.
-  ...(DEMO_MODE ? { demoStore: createSupabaseDemoStore(supabaseService, { budgetId: DEMO_BUDGET_ID }), demoLimits: readDemoLimitConfig() } : {}),
+  ...(DEMO_MODE ? { demoStore: DEMO_STORE, demoLimits: readDemoLimitConfig() } : {}),
 };
 if (DEMO_MODE) {
   const l = gameConfig.demoLimits;

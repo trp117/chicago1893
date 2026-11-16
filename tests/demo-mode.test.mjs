@@ -77,7 +77,9 @@ async function boot(label, cwd, extraEnv) {
 async function call(base, method, url, body) {
   const resp = await fetch(base + url, {
     method, redirect: 'manual',
-    headers: body ? { 'Content-Type': 'application/json' } : {},
+    // A bot user agent, so the demo servers booted here (real Supabase) never add test hits
+    // to the live demo_pageviews tally. Counting itself is tested in demo-pageviews.test.
+    headers: { 'User-Agent': 'demo-mode-test-bot', ...(body ? { 'Content-Type': 'application/json' } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
   return {
@@ -101,7 +103,7 @@ try {
 
   check('boot log says [DEMO] mode disabled', prod.log().includes('[DEMO] mode disabled'));
   check('Phase 2: no demo limits/store built (no [DEMO] limits line, no [DEMO BUDGET] / [DEMO LIMIT] activity)',
-    !['[DEMO BUDGET]', '[DEMO LIMIT]', '[DEMO TRANSCRIPT]', '[DEMO] limits'].some(tag => prod.log().includes(tag)));
+    !['[DEMO BUDGET]', '[DEMO LIMIT]', '[DEMO TRANSCRIPT]', '[DEMO] limits', '[DEMO PAGEVIEW]', '[DEMO] site'].some(tag => prod.log().includes(tag)));
 
   // (a) guard not mounted: every path it would intercept reaches the normal handlers.
   {
@@ -298,6 +300,10 @@ try {
   for (const url of ['/admin/auth/login', '/admin/auth/forgot-password', '/admin/api/scenarios']) {
     check(`POST ${url} → 404`, (await post(url, { email: 'x@example.com', password: 'x' })).status === 404);
   }
+  // Every request above carried the bot user agent, so no page view was counted. (Had one been
+  // attempted against a database without the table, it would have logged [DEMO PAGEVIEW].)
+  await new Promise(r => setTimeout(r, 300));
+  check('test traffic (bot UA) attempted no page-view count', !demo.log().includes('[DEMO PAGEVIEW]'));
   for (const s of servers.splice(0)) s.stop();
 
   // ── Part C: a second, independently branded demo ─────────────────────────
@@ -335,6 +341,8 @@ try {
     check("/api/stories is filtered by this demo's DEMO_SCENARIOS", JSON.stringify(ids) === JSON.stringify([...LIMEN_IDS].sort()), ids.join(','));
     check('bootstrap: a scenario outside this whitelist is refused (404)', (await lget('/game/api/bootstrap?scenarioId=steel_curtain_cantigny')).status === 404);
     check('/game still carries the demo injection', (await lget('/game')).body.toString().includes('id="demo-mode"'));
+    await new Promise(r => setTimeout(r, 300));
+    check('test traffic (bot UA) attempted no page-view count', !limen.log().includes('[DEMO PAGEVIEW]'));
   }
 } catch (err) {
   console.error(`\nERROR  ${err.message}`);

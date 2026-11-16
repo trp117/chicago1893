@@ -11,6 +11,7 @@
 //   startTranscript(row)                 -> upsert the session row (scenario, role, opening)
 //   appendTurn(sessionId, scenarioId, t) -> atomically append one turn to the row's `turns`
 //   patchTranscript(sessionId, patch)    -> set outcome / closing / ended_at
+//   incrPageview()                       -> +1 landing view for this demo today (site id = budget id)
 
 const nowIso = () => new Date().toISOString();
 
@@ -41,6 +42,11 @@ export function createSupabaseDemoStore(client, { budgetId = DEFAULT_DEMO_BUDGET
     async addBudget(cents) {
       return Number(must(await client.rpc('demo_budget_add', addArgs(cents))));
     },
+    // The landing page-view tally (migration 20261117). The site id is the budget id, so each
+    // demo counts under the same name it meters under.
+    async incrPageview() {
+      must(await client.rpc('demo_pageview_incr', { p_site: budgetId }));
+    },
     async startTranscript({ session_id, scenario_id, role_id, opening }) {
       must(await client.from('demo_transcripts').upsert({
         session_id, scenario_id, role_id: role_id ?? null, opening: opening ?? null,
@@ -57,7 +63,7 @@ export function createSupabaseDemoStore(client, { budgetId = DEFAULT_DEMO_BUDGET
 }
 
 export function createMemoryDemoStore({ spentCents = 0 } = {}) {
-  const state = { spentCents, transcripts: new Map(), calls: [] };
+  const state = { spentCents, transcripts: new Map(), calls: [], pageviews: 0 };
   const row = (id, scenarioId) => {
     if (!state.transcripts.has(id)) state.transcripts.set(id, { session_id: id, scenario_id: scenarioId, role_id: null, opening: null, turns: [], outcome: null, closing: null, started_at: nowIso(), ended_at: null });
     return state.transcripts.get(id);
@@ -69,5 +75,6 @@ export function createMemoryDemoStore({ spentCents = 0 } = {}) {
     async startTranscript(r) { state.calls.push('startTranscript'); Object.assign(row(r.session_id, r.scenario_id), r); },
     async appendTurn(id, scenarioId, turn) { state.calls.push('appendTurn'); row(id, scenarioId).turns.push(turn); },
     async patchTranscript(id, patch) { state.calls.push('patchTranscript'); Object.assign(row(id, null), patch); },
+    async incrPageview() { state.calls.push('incrPageview'); state.pageviews++; },
   };
 }

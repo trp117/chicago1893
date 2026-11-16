@@ -71,6 +71,33 @@ export function renderDemoLanding(template, branding = DEMO_BRANDING_DEFAULTS) {
   return template.replace(/\{\{(SITE_NAME|SITE_URL|TAGLINE|META_DESCRIPTION)\}\}/g, (_, k) => escapeHtml(values[k]));
 }
 
+// ── Landing page views ──────────────────────────────────────────────────────
+// A per-demo daily tally (public.demo_pageviews, migration 20261117): no cookies, no third
+// parties, nothing about the visitor stored. Only a GET of the landing ("/") counts — not HEAD
+// (uptime probes), assets, /health, /api/*, /game or /og-image.png.
+//
+// Obvious bots are skipped so the tally better reflects people: any user agent containing
+// bot, crawl, spider, preview, facebookexternalhit, slackbot or redditbot (link-preview
+// fetchers and search crawlers; "bot" alone already covers most, the rest are named so the
+// list reads as what it catches). Case-insensitive. A missing user agent is not a bot here.
+export const BOT_USER_AGENT = /bot|crawl|spider|preview|facebookexternalhit|slackbot|redditbot/i;
+export const isBotUserAgent = ua => BOT_USER_AGENT.test(String(ua || ''));
+
+// Fire-and-forget: runs after the response has been handed off, on a later tick, so the count
+// can never block, delay or break the landing. Every failure (a throw, a rejection, Supabase
+// down) is swallowed; the first one per process is logged so a missing migration is visible.
+let pageviewWarned = false;
+function countLandingView(onLandingView) {
+  setImmediate(() => {
+    const warn = e => {
+      if (pageviewWarned) return;
+      pageviewWarned = true;
+      console.warn(`[DEMO PAGEVIEW] count failed (further failures not logged): ${e?.message || e}`);
+    };
+    try { Promise.resolve(onLandingView()).catch(warn); } catch (e) { warn(e); }
+  });
+}
+
 export function readDemoConfig(env = process.env) {
   return {
     demoMode:      env.DEMO_MODE === 'true',
@@ -152,7 +179,8 @@ export function injectDemoIntoGameHtml(html) {
 //   /test, /test.html, /index.backup*.html, /index_backup.html -> 404
 //   /admin, /admin/*, /admin-*.html (any method) -> 404
 //   /game             -> engine/game/index.html with the demo injection
-export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl }) {
+// onLandingView: called (fire-and-forget) once per counted landing view; omitted = no counting.
+export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null }) {
   return (req, res, next) => {
     const p = req.path;
     // The admin surface is not part of the demo: any method (the login is a POST), any depth,
@@ -163,7 +191,9 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
       let html;
       try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }
       res.set('Cache-Control', cacheControl);
-      return res.type('html').send(renderDemoLanding(html, branding));
+      res.type('html').send(renderDemoLanding(html, branding));
+      if (onLandingView && req.method === 'GET' && !isBotUserAgent(req.get('user-agent'))) countLandingView(onLandingView);
+      return;
     }
     if (p === '/og-image.png') {
       res.set('Cache-Control', cacheControl);
