@@ -14,6 +14,8 @@
 // Historical mention without a request to depict ("the rape of Lucretia", as Augustine discusses
 // it) reaches stage 2 and is the classifier's to clear.
 
+import { victimDisclosure, DISCLOSURE_CLASSIFIER_RULE } from './Disclosure.js';
+
 export const SEXUAL_VIOLENCE_CLASSIFIER_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 
@@ -52,12 +54,15 @@ const SV_AUTO = [
 
 function norm(text) { return String(text).toLowerCase().replace(/[‘’]/g, "'"); }
 
-// { stage1, autoBlock }
+// { stage1, autoBlock, disclosure }
+// A first-person victim disclosure (Disclosure.js) is never blocked outright; it goes to the
+// classifier, which passes a disclosure and still blocks a request to depict.
 export function sexualViolencePrefilter(text) {
-  if (typeof text !== 'string' || !text.trim()) return { stage1: false, autoBlock: false };
+  if (typeof text !== 'string' || !text.trim()) return { stage1: false, autoBlock: false, disclosure: false };
   const t = norm(text);
-  const autoBlock = SV_AUTO.some(re => re.test(t));
-  return { stage1: autoBlock || SV_TERMS.some(re => re.test(t)), autoBlock };
+  const disclosure = victimDisclosure(text);
+  const autoMatch  = SV_AUTO.some(re => re.test(t));
+  return { stage1: autoMatch || SV_TERMS.some(re => re.test(t)), autoBlock: autoMatch && !disclosure, disclosure };
 }
 
 // ── Stage 2 ───────────────────────────────────────────────────────────────────
@@ -65,7 +70,9 @@ const CLASSIFIER_SYSTEM = `You are a sexual-violence classifier for an interacti
 
 Decide ONE thing: does this message solicit sexual violence — rape, sexual assault, or forcing or coercing someone into a sexual act — to be carried out, depicted, or described in the story? Answer true if the player's character does it or tries to, if the player asks for it to happen to anyone, or asks for it to be described.
 
-Answer false for non-sexual violence (combat, striking, killing, torture with no sexual element), for consensual romance between adults, for a player saying that they themselves were assaulted (a disclosure, not a request), and for plain factual or historical references that do not ask for sexual violence to be depicted (for example a question about what a historical text says about a crime, or Augustine's discussion of Lucretia).
+Answer false for non-sexual violence (combat, striking, killing, torture with no sexual element), for consensual romance between adults, and for plain factual or historical references that do not ask for sexual violence to be depicted (for example a question about what a historical text says about a crime, or Augustine's discussion of Lucretia).
+
+${DISCLOSURE_CLASSIFIER_RULE}
 
 If you are unsure, answer true.
 

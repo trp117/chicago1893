@@ -10,11 +10,14 @@
 //   1. childSafetyPrefilter — regex. Any romantic/sexual term together with any minor indicator
 //      (or an under-18 self-statement) sends the text to stage 2. An EXPLICIT sexual term together
 //      with an EXPLICIT under-18 indicator (a stated age under 18, "minor", "underage", "teen"…)
-//      blocks outright, no classifier needed.
+//      blocks outright, no classifier needed — UNLESS it reads as the player's own disclosure of
+//      abuse (Disclosure.js), which always goes to the classifier instead.
 //   2. classifyChildSafety — one Haiku call (temperature 0, strict JSON {"minor_sexual": bool}).
 //      Errors, timeouts and anything but a clean boolean BLOCK (fail-closed).
 // A player who states an under-18 age with no romantic/sexual request is not blocked; the router
 // tells the story model to treat that statement as out of character (MINOR_SELF_STATEMENT_NOTE).
+
+import { victimDisclosure, DISCLOSURE_CLASSIFIER_RULE } from './Disclosure.js';
 
 export const CHILD_SAFETY_CLASSIFIER_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
@@ -82,10 +85,13 @@ export function childSafetyPrefilter(text) {
   const anyMinor      = explicitMinor || ROLE_MINOR_WORD.test(t) || NAMED_MINOR.test(t);
   const explicitSex   = EXPLICIT_SEXUAL.test(t);
   const romanticOrSex = explicitSex || ROMANTIC_OR_SEXUAL.test(t);
+  // A first-person victim disclosure is never blocked outright; the classifier decides.
+  const disclosure    = victimDisclosure(text);
   return {
     stage1: anyMinor && romanticOrSex,
-    autoBlock: explicitMinor && explicitSex,
+    autoBlock: explicitMinor && explicitSex && !disclosure,
     minorSelfStatement: selfUnder18,
+    disclosure,
   };
 }
 
@@ -97,6 +103,8 @@ Decide ONE thing: is this message soliciting or describing sexual or romantic co
 - the player says they are under 18 and makes any romantic or sexual request or advance toward anyone.
 
 Answer false for non-sexual, non-romantic references to children (asking about a son, grieving a child, a child's education or health, ordinary family affection such as a parent embracing a child), and for plain factual or historical references that do not ask for romantic or sexual content to be depicted (for example asking about Augustine's relationship with his concubine, or the historical fact of his betrothal). Romantic or sexual content between adults only is false.
+
+${DISCLOSURE_CLASSIFIER_RULE}
 
 If you are unsure, answer true.
 
