@@ -86,6 +86,10 @@ body { font-family: Georgia, serif; background: linear-gradient(180deg, #0d0d0d,
 #gloss-tooltip-close { background: none; border: none; color: #b8962e; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; opacity: 0.6; flex-shrink: 0; }
 #gloss-tooltip-close:hover { opacity: 1; }
 #gloss-tooltip-def { padding: 8px 10px 10px; }
+#gloss-tooltip-artifact { padding: 0 10px 9px; margin-top: -4px; font-size: 11px; color: #b8b4ae; }
+#gloss-tooltip-artifact[hidden] { display: none; }
+#gloss-tooltip-artifact a { color: #e8c46a; text-decoration: underline; text-underline-offset: 2px; }
+#gloss-tooltip-artifact a:hover { color: #f2d98a; }
 .bottom-bar { flex-shrink: 0; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
 .npc-line { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); color: #f6e9c8; }.choices-area-wrap { transition: opacity 250ms ease; }
 .choices-area-wrap.hidden { display: none; }
@@ -3673,6 +3677,25 @@ function glossTermPattern(term) {
   return forms.length > 1 ? `(?:${forms.join('|')})` : forms[0];
 }
 
+// ARTIFACT LINK — optional, authored per term: artifactUrl, artifactLabel, artifactSource.
+// With an http(s) artifactUrl the popover gains one line under the definition: the source, then
+// a text link (artifactLabel, else "View →") that opens the URL in a new tab. Nothing is
+// fetched or embedded. Any other scheme (javascript:, data:) is ignored, as if absent. A term
+// without artifactUrl gets no extra attributes, so its span is byte-identical to before.
+function glossArtifactUrl(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) return '';
+  try {
+    const u = new URL(raw.trim());
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+  } catch { return ''; }
+}
+function glossArtifactAttrs(entry) {
+  const url = glossArtifactUrl(entry?.artifactUrl);
+  if (!url) return '';
+  const str = v => (typeof v === 'string' ? v.trim() : '');
+  return ` data-art-url="${escapeHtmlAttr(url)}" data-art-label="${escapeHtmlAttr(str(entry.artifactLabel))}" data-art-src="${escapeHtmlAttr(str(entry.artifactSource))}"`;
+}
+
 // ONE alternation pass over the text — never a term-at-a-time loop.
 //
 // WHY THIS SHAPE. The previous version looped per term and spliced each <span data-def="...">
@@ -3721,7 +3744,7 @@ function markupGlossaryTerms(html) {
   const marked = safe.replace(re, (match, ...groups) => {
     const i = groups.findIndex((g, k) => k < uniq.length && g !== undefined);
     const def = i >= 0 ? (uniq[i].definition || '') : '';
-    return `<span class="gloss-term" data-def="${escapeHtmlAttr(def)}">${match}</span>`;
+    return `<span class="gloss-term" data-def="${escapeHtmlAttr(def)}"${glossArtifactAttrs(i >= 0 ? uniq[i] : null)}>${match}</span>`;
   });
 
   return marked.replace(/\x00(\d+)\x00/g, (_, i) => stash[+i]);
@@ -3746,8 +3769,24 @@ document.addEventListener('click', e => {
     const defEl  = document.getElementById('gloss-tooltip-def');
     if (termEl) termEl.textContent = el.textContent;
     if (defEl)  defEl.textContent  = el.dataset.def || '';
+    const artEl  = document.getElementById('gloss-tooltip-artifact');
+    const artUrl = glossArtifactUrl(el.dataset.artUrl);
+    if (artEl) {
+      artEl.replaceChildren();
+      if (artUrl) {
+        const src = (el.dataset.artSrc || '').trim();
+        if (src) artEl.append(`${src} · `);
+        const a = document.createElement('a');
+        a.href = artUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = (el.dataset.artLabel || '').trim() || 'View →';
+        artEl.append(a);
+      }
+      artEl.hidden = !artUrl;
+    }
     const rect = el.getBoundingClientRect();
-    const ttW = 300, ttH = 90;
+    const ttW = 300, ttH = artUrl ? 112 : 90;
     let left = rect.left;
     if (left + ttW > window.innerWidth - 8) left = window.innerWidth - ttW - 8;
     if (left < 8) left = 8;
@@ -3782,6 +3821,7 @@ loadGame();
     <button type="button" id="gloss-tooltip-close" aria-label="Close">✕</button>
   </div>
   <div id="gloss-tooltip-def"></div>
+  <div id="gloss-tooltip-artifact" hidden></div>
 </div>
 </body>
 </html>
