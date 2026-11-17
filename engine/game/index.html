@@ -941,6 +941,9 @@ let conversationHistory = [];
 const MAX_HISTORY_TURNS = 4;
 let locationFeed    = [];
 let feedLocationId  = null;
+let glossTurnKeys       = [];   // glossary underline cap: per displayed turn, that card's term keys (uncapped)
+let glossTurnsCommitted = 0;    // glossary underline cap: turns rendered as final = the next turn's index
+const glossTurnOfCard   = new WeakMap();   // scene card → its turn index (kept off the DOM: story markup stays byte-identical)
 // Scene sessions only: output.scene of the latest turn — the scene the narration on screen plays
 // in. The header follows it, not gameState.location (B2b-PLAYER). null for every other session.
 let currentScene    = null;
@@ -1481,6 +1484,12 @@ function renderOutput(output, meta = {}) {
     renderChoices(output.choices || [], output.definingMoment || null);
   }
   if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(sceneEl);
+  // Underline cap, on the finished card. A streamed card already carries its turn's index.
+  const glossIdx = glossTurnOfCard.has(sceneEl) ? glossTurnOfCard.get(sceneEl) : glossTurnsCommitted;
+  glossTurnOfCard.set(sceneEl, glossIdx);
+  capGlossaryUnderlines(sceneEl, glossIdx);
+  glossTurnKeys.length = glossIdx + 1;
+  glossTurnsCommitted  = glossIdx + 1;
 
   const messageId = ++currentMessageId;
   lastRenderedSpeakText      = output.narrative;
@@ -2012,11 +2021,13 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
         dotsEl.remove();
         streamEl = document.createElement('div');
         streamEl.className = 'scene-card';
+        glossTurnOfCard.set(streamEl, glossTurnsCommitted);   // this turn's index for the underline cap
         entryEl.appendChild(streamEl);
       }
       streamHtml = streamingCardHtml(streamBridge, streamSensory, streamBuffer, streamComplete);
       streamEl.innerHTML = streamHtml;
       if (USE_SCENARIO_REDESIGN) applyRedesignDialogueFormatting(streamEl);
+      capGlossaryUnderlines(streamEl, glossTurnOfCard.get(streamEl));
     };
     const sseReader  = resp.body.getReader();
     const sseDecoder = new TextDecoder();
@@ -3096,6 +3107,8 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   conversationHistory = [];
   locationFeed   = [];
   feedLocationId = null;
+  glossTurnKeys       = [];   // underline-cap tally is per session
+  glossTurnsCommitted = 0;
   currentScene   = null;
   lastRenderedBridge = null;
   pendingEntryEl = null;
@@ -3248,6 +3261,8 @@ function restartGame() {
   conversationHistory = [];
   locationFeed   = [];
   feedLocationId = null;
+  glossTurnKeys       = [];   // underline-cap tally is per session
+  glossTurnsCommitted = 0;
   currentScene   = null;
   lastRenderedBridge = null;
   pendingEntryEl = null;
@@ -3710,22 +3725,31 @@ function glossArtifactAttrs(entry) {
 // another term produced. Re-stashing each injected span would also work, but this needs no
 // bookkeeping and cannot drift.
 function markupGlossaryTerms(html) {
+  const uniq = glossaryUniqTerms();
+  if (!uniq.length) return html;
+  return markupGlossaryWith(uniq, html);
+}
+
+// The glossary's DISTINCT terms in match order. Shared by markupGlossaryTerms (which finds
+// matches) and glossTermKeyer (which names the term a match belongs to), so the two cannot drift.
+function glossaryUniqTerms() {
   const glossary = gameState?.glossary;
-  if (!glossary?.length) return html;
+  if (!glossary?.length) return [];
 
   // Longest first: alternation is leftmost-FIRST-ALTERNATIVE, not longest-match, so at a given
   // position the order here breaks ties — "Vita Christi" must precede a bare "Christi".
   const terms = [...glossary]
     .filter(g => g && typeof g.term === 'string' && g.term.trim())
     .sort((a, b) => b.term.length - a.term.length);
-  if (!terms.length) return html;
 
   // First definition wins for a duplicated term, consistent with the longest-first order above.
   // One capture group per DISTINCT term, so the replacer knows which term an inflected match
   // ("codices", "Paul’s letters") belongs to without re-deriving it from the matched text.
   const seen = new Set();
-  const uniq = terms.filter(({ term }) => { const k = term.trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  return terms.filter(({ term }) => { const k = term.trim().toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+}
 
+function markupGlossaryWith(uniq, html) {
   // Stash the caller's tags so only text content is ever matched. \x00 is not a word character,
   // so a term sitting flush against a stashed tag (<em>Flos Sanctorum</em>) still satisfies the
   // word-boundary guards below.
@@ -3748,6 +3772,73 @@ function markupGlossaryTerms(html) {
   });
 
   return marked.replace(/\x00(\d+)\x00/g, (_, i) => stash[+i]);
+}
+
+// UNDERLINE CAP — each glossary term is underlined only its first GLOSSARY_UNDERLINE_CAP
+// occurrences across the whole playthrough, counted in display order over every turn. Later
+// occurrences render as plain text: a bare <span class="gloss-capped"> with no data and no
+// popover. A term seen CAP times or fewer behaves exactly as before.
+//
+// HOW MATCHES ARE FOUND IS UNCHANGED. markupGlossaryTerms still wraps every match; this pass
+// runs afterwards on the finished card and only decides which of those spans stay underlined.
+//
+// RE-RENDER SAFE. Nothing is ever incremented across renders. glossTurnKeys[t] is the full
+// (uncapped) ordered list of term keys in turn t's card — a pure function of that card's
+// content, REPLACED (never appended) each time the card is rendered. On every render the tally
+// is rebuilt from scratch by walking turns 0..t-1, then turn t's own spans in order. Rendering
+// the same turns any number of times gives the same result; a capped span keeps its place in
+// its turn's list, so re-running the pass on an already-capped card changes nothing.
+//
+// A turn's index is fixed to its card (glossTurnOfCard): the streaming card takes the next
+// index, and the final render of that turn reuses it. A turn that fails or is withdrawn (care
+// card) never commits, so its retry renders under the same index and overwrites it.
+// Reset to empty by startGame and restartGame — the tally is per session.
+const GLOSSARY_UNDERLINE_CAP = 3;
+// State (glossTurnKeys, glossTurnsCommitted) is declared with the other session state, top of script.
+
+// Maps a matched string to the canonical key of its term, by the same patterns and order
+// markupGlossaryTerms used to match it ("codices" → "codex"); null if it no longer matches.
+// Built once per cap pass — one regex for all spans, not one per span.
+function glossTermKeyer() {
+  const uniq = glossaryUniqTerms();
+  if (!uniq.length) return () => null;
+  const re = new RegExp(`^(?:${uniq.map(t => `(${glossTermPattern(t.term)})`).join('|')})$`, 'i');
+  return text => {
+    const m = text ? re.exec(text) : null;
+    if (!m) return null;
+    const i = m.slice(1, uniq.length + 1).findIndex(g => g !== undefined);
+    return i >= 0 ? uniq[i].term.trim().toLowerCase() : null;
+  };
+}
+
+function capGlossaryUnderlines(cardEl, turnIdx) {
+  if (!cardEl || !Number.isInteger(turnIdx) || turnIdx < 0) return;
+  const spans = [...cardEl.querySelectorAll('.gloss-term, .gloss-capped')];
+  const keyOf = glossTermKeyer();
+  const keys  = spans.map(s => keyOf(s.textContent));
+  glossTurnKeys[turnIdx] = keys;
+
+  const tally = new Map();
+  for (let t = 0; t < turnIdx; t++) {
+    for (const k of glossTurnKeys[t] || []) if (k) tally.set(k, (tally.get(k) || 0) + 1);
+  }
+  spans.forEach((span, j) => {
+    const k = keys[j];
+    if (!k) return;
+    const n = (tally.get(k) || 0) + 1;
+    tally.set(k, n);
+    const underline = n <= GLOSSARY_UNDERLINE_CAP;
+    if (!underline && span.classList.contains('gloss-term')) {
+      const plain = document.createElement('span');
+      plain.className = 'gloss-capped';
+      plain.textContent = span.textContent;
+      span.replaceWith(plain);
+    } else if (underline && span.classList.contains('gloss-capped')) {
+      // Only if an earlier turn was re-rendered with fewer occurrences: rebuild the span exactly
+      // as markupGlossaryTerms makes it.
+      span.outerHTML = markupGlossaryTerms(escapeHtmlAttr(span.textContent));
+    }
+  });
 }
 
 document.addEventListener('click', e => {

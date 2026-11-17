@@ -58,6 +58,7 @@ const SUITE = [
   ['carried objects: codex follows player', 'codex-carry.test.mjs'],
   ['glossary markup: forms + dialogue (jsdom)', 'glossary-markup.test.mjs'],
   ['glossary: artifact link line (jsdom)',      'glossary-artifact-link.test.mjs'],
+  ['glossary: underline cap per session (jsdom)', 'glossary-underline-cap.test.mjs'],
   ['primary sources: consolidation',        'bibliography.test.mjs'],
   ['DEMO_MODE: off = prod bytes; on = contained', 'demo-mode.test.mjs'],
   ['DEMO_MODE: budget, caps, rate, transcripts', 'demo-limits.test.mjs'],
