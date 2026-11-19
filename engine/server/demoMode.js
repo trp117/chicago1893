@@ -196,6 +196,30 @@ try { var u = new URL(location.href); u.searchParams.set('scenarioId', window.__
   return out;
 }
 
+// /moments (DEMO_COLD_OPEN only): the landing builds each card as <a href="/game?scenarioId=…">.
+// For a scenario with a ready cold open the card goes to /?scenarioId=… instead — that
+// scenario's cold open. Rewritten in the page as the cards appear, so the landing file and its
+// own script stay as they are.
+export function injectColdOpenIntoLanding(html, readyScenarioIds) {
+  const tail = `<script id="cold-open-moments">(function () {
+  var ready = ${scriptJson(readyScenarioIds)};
+  function fix(a) {
+    try {
+      var u = new URL(a.getAttribute('href'), location.href);
+      var id = u.searchParams.get('scenarioId');
+      if (u.pathname === '/game' && id && ready.indexOf(id) !== -1) a.setAttribute('href', '/?scenarioId=' + encodeURIComponent(id));
+    } catch (e) {}
+  }
+  var grid = document.getElementById('stories');
+  if (!grid) return;
+  grid.querySelectorAll('a[href]').forEach(fix);
+  new MutationObserver(function (ms) { ms.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) { if (n.matches('a[href]')) fix(n); n.querySelectorAll && n.querySelectorAll('a[href]').forEach(fix); } }); }); }).observe(grid, { childList: true, subtree: true });
+})();</script>
+`;
+  const b = html.lastIndexOf('</body>');
+  return b === -1 ? html + tail : html.slice(0, b) + tail + html.slice(b);
+}
+
 // Page-level containment. Mounted by server.js ahead of express.static, and ONLY when the
 // flag is on. Handles the routes that would otherwise reach the catalogue or the branding:
 //   /                 -> the demo landing, branded from env (instead of public/index.html)
@@ -217,18 +241,33 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
     res.set('Cache-Control', cacheControl);
     res.type('html').send(renderDemoLanding(html, branding));
   };
+  // /moments: the card landing, with cards for scenarios that have a ready cold open pointed at
+  // that open (/?scenarioId=<id>) instead of the normal start. If the ready list cannot be read,
+  // the plain landing (every card → its normal start).
+  const sendMoments = async (req, res, next) => {
+    let html;
+    try { html = renderDemoLanding(fs.readFileSync(landingPath, 'utf8'), branding); } catch (e) { return next(e); }
+    let ready = [];
+    try { ready = await coldOpen.readyScenarios(); } catch {}
+    res.set('Cache-Control', 'no-store');
+    res.type('html').send(ready.length ? injectColdOpenIntoLanding(html, ready) : html);
+  };
   const countView = req => {
     if (onLandingView && req.method === 'GET' && !isBotUserAgent(req.get('user-agent'))) countLandingView(onLandingView);
   };
-  // The cold-open entry, or the landing. Every failure lands on the landing.
+  // The cold-open entry, or the landing. Every failure lands on the landing. ?scenarioId=<id>
+  // ("Another moment" → a card) opens that scenario's cold open when it has a ready row, and
+  // sends a scenario without one to its normal start.
   const sendEntry = async (req, res, next) => {
     let page = null;
     try {
-      const row = await coldOpen.entryRow();
-      if (row) {
+      const q = typeof req.query.scenarioId === 'string' ? req.query.scenarioId : null;
+      const pick = await coldOpen.entryFor(q);
+      if (pick?.redirect) return res.redirect(302, pick.redirect);
+      if (pick?.row) {
         const html = injectDemoIntoGameHtml(fs.readFileSync(gameHtmlPath, 'utf8'));
         page = injectColdOpenIntoGameHtml(html, {
-          scenarioId: coldOpen.config.featuredScenario, roleId: coldOpen.config.featuredRole,
+          scenarioId: pick.scenarioId, roleId: pick.roleId,
           timings: coldOpen.timings, historyUser: coldOpen.historyUser,
         }, { css: fs.readFileSync(COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(COLD_OPEN_JS_PATH, 'utf8') });
       }
@@ -248,10 +287,11 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
     if (ADMIN_PATH.test(p)) return res.status(404).send('Not found');
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     if (p === '/' && coldOpen) {
-      countView(req);
+      // A visit, not a hop from /moments to a scenario's open (that carries ?scenarioId).
+      if (!req.query.scenarioId) countView(req);
       return sendEntry(req, res, next);
     }
-    if (p === '/moments' && coldOpen) return sendLanding(req, res, next);
+    if (p === '/moments' && coldOpen) return sendMoments(req, res, next);
     if (p === '/') {
       let html;
       try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }

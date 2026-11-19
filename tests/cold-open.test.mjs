@@ -56,7 +56,7 @@ console.log('\nPart A — the game-page globals the injection hooks');
   }
   for (const fn of hooks) check(`function ${fn}() is declared at top level of the game page`, new RegExp(`^(async )?function ${fn}\\(`, 'm').test(page));
   // let/const globals the injection reads or assigns.
-  for (const v of ['gameState', 'sessionId', 'conversationHistory', 'currentRoleId', 'scenario', 'storyEl', 'choicesAreaWrapEl', 'streamOptionsDots', 'submitBtn', 'inputEl', 'formEl']) {
+  for (const v of ['gameState', 'sessionId', 'conversationHistory', 'currentRoleId', 'scenario', 'storyEl', 'choicesAreaWrapEl', 'streamOptionsDots', 'submitBtn', 'inputEl', 'formEl', 'scrollHintEl']) {
     check(`global ${v} is a top-level let/const of the game page`, new RegExp(`^(let|const) ${v}\\b`, 'm').test(page));
     check(`  …and the injection uses it by that name`, new RegExp(`\\b${v}\\b`).test(js));
   }
@@ -281,12 +281,12 @@ try {
   // C3 — the scene.
   const story = doc.getElementById('story');
   check('lean narrative on screen (both paragraphs), not the engine\'s full opening', /The ramp drops\. Red water/.test(story.textContent) && /screaming for a medic/.test(story.textContent) && !/FULL ENGINE OPENING/.test(doc.body.textContent));
-  const choiceBtns = [...doc.querySelectorAll('#choices .choice-btn')];
+  const choiceBtns = [...doc.querySelectorAll('.co-choices .choice-btn')];
   const lineEls = [...story.querySelectorAll('.scene-card .line')];
   check('a *wholly emphasised* paragraph (the call line) is tagged italic; plain narration is not', lineEls.length === 2 && !lineEls[0].classList.contains('co-em') && lineEls[1].classList.contains('co-em')
     && win.getComputedStyle(lineEls[1].querySelector('em')).fontStyle === 'italic' && win.getComputedStyle(lineEls[0].querySelector('em')).fontStyle === 'normal');
   check('the three starting choices', JSON.stringify(choiceBtns.map(b => b.textContent)) === JSON.stringify(['Crawl to the screaming man', 'Shout for the litter team', 'Check your aid bag']));
-  check('instruction line above the choices', doc.querySelector('#choices-area-wrap > .co-instruction')?.textContent === 'Your move — choose one, or write your own:');
+  check('instruction line above the choices', doc.querySelector('#story > .co-instruction')?.textContent === 'Your move — choose one, or write your own:');
   // The page's native screen-1 input ("Your move." textarea + Submit) must not be on the cold open.
   check('native screen-1 input ABSENT from the DOM (no #input-form, no #player-input, no "Your move." / Submit)',
     !doc.getElementById('input-form') && !doc.getElementById('player-input') && !doc.querySelector('textarea[placeholder="Your move."]')
@@ -294,13 +294,22 @@ try {
   check('native "↓" scroll hint not shown while the cold open is the screen', win.getComputedStyle(doc.querySelector('.scroll-hint')).display === 'none');
   const coInput = doc.querySelector('.co-input');
   check('the cold open\'s own free-text input + Send button, enabled', !!coInput && !!coInput.querySelector('textarea') && coInput.querySelector('button[type="submit"]')?.textContent === 'Send');
-  const bar = [...doc.querySelector('.bottom-bar').children];
-  check('bottom bar order: instruction + choices, then the input, then the footer', bar.indexOf(doc.getElementById('choices-area-wrap')) < bar.indexOf(coInput) && bar.indexOf(coInput) < bar.indexOf(doc.querySelector('.co-foot')));
+  // The target: ONE flowing column in the story feed, in exactly this order.
+  const order = [...story.children].filter(n => win.getComputedStyle(n).display !== 'none').map(n =>
+    n.classList.contains('co-head') ? 'header' : n.querySelector?.('.scene-card') ? 'narrative' : n.classList.contains('co-instruction') ? 'instruction'
+    : n.classList.contains('co-choices') ? 'choices' : n.classList.contains('co-input') ? 'input' : n.classList.contains('co-foot') ? 'footer' : n.className);
+  check(`scene column order: header → narrative → instruction → choices → input → footer (got ${order.join(' → ')})`,
+    JSON.stringify(order) === JSON.stringify(['header', 'narrative', 'instruction', 'choices', 'input', 'footer']));
+  check('the scene does NOT use the pinned bottom bar (hidden), no choices/input/footer in it', win.getComputedStyle(doc.querySelector('.bottom-bar')).display === 'none'
+    && !doc.querySelector('.bottom-bar .co-instruction, .bottom-bar .co-input, .bottom-bar .co-foot, .bottom-bar .co-choices'));
+  check('native game chrome hidden: title bar, location subtitle, Begin Again, Notes, ← Stories', win.getComputedStyle(doc.querySelector('header.hero')).display === 'none'
+    && ['header-title', 'header-subtitle', 'new-game-btn', 'notes-btn'].every(id => doc.getElementById(id)?.closest('header.hero')) && !!doc.querySelector('header.hero .back-link'));
   check('first-paint guard released once the scene is built (no co-pending)', !doc.documentElement.classList.contains('co-pending') && doc.documentElement.classList.contains('co-active'));
   const head = doc.querySelector('.co-head');
-  check('header row: role on the left, "The history" on the right', head.firstElementChild.classList.contains('co-role') && /Battalion Medic/.test(head.firstElementChild.textContent) && head.lastElementChild.textContent === 'The history');
-  check('header row sits above the opening in the feed', story.firstElementChild === head);
-  const foot = doc.querySelector('.bottom-bar .co-foot');
+  check('header row: role on the left, "The history" on the right, in ONE row', head.firstElementChild.classList.contains('co-role') && /Battalion Medic/.test(head.firstElementChild.textContent) && head.lastElementChild.textContent === 'The history' && head.children.length === 2);
+  check('role switcher reads as changeable: "The Battalion Medic · change role ▾"', head.firstElementChild.textContent === 'The Battalion Medic · change role ▾');
+  check('header row is the top of the view (first in the feed, page header hidden)', story.firstElementChild === head);
+  const foot = doc.querySelector('#story > .co-foot');
   check('footer: "Another moment" → /moments, "Replay the open"', foot?.querySelector('a')?.getAttribute('href') === '/moments' && foot?.querySelector('a')?.textContent === 'Another moment' && foot?.querySelector('button')?.textContent === 'Replay the open');
   check('header back link leads to /moments, not back into the entry', doc.querySelector('header.hero .back-link').getAttribute('href') === '/moments');
   check('role-selection overlay never shown', doc.getElementById('role-overlay').classList.contains('hidden'));
@@ -339,12 +348,12 @@ try {
   doc.querySelector('.co-foot button').click();
   check('"Replay the open" brings the overlay back', await until(() => !ov.hidden, 2000));
   await until(() => ov.hidden && doc.querySelector('.co-head'), 4000);
-  check('  …and lands on the same scene again, still zero model calls', !!doc.querySelector('#choices .choice-btn') && model.story.length === 0);
+  check('  …and lands on the same scene again, still zero model calls', !!doc.querySelector('.co-choices .choice-btn') && model.story.length === 0);
 
   // C7 — HANDOFF + COST: the first action.
   reply = TURN;
   const sid = win.eval('sessionId');
-  doc.querySelector('#choices .choice-btn').click();
+  doc.querySelector('.co-choices .choice-btn').click();
   check('first action: one /turn request', await until(() => log.turnDone.length === 1, 8000), `turns=${log.turnBodies.length}`);
   check('COST: the first action made EXACTLY ONE model call', model.story.length === 1 && model.classifier.length === 0, `story=${model.story.length} classifier=${model.classifier.length}`);
   const tb = log.turnBodies[0];
@@ -359,6 +368,9 @@ try {
   check('cold-open chrome gone once live (instruction, footer, own input)', !doc.querySelector('.co-instruction') && !doc.querySelector('.co-foot') && !doc.querySelector('.co-input'));
   check('once live, the page\'s native input is back in place (above the choices) and working', !!doc.getElementById('input-form') && !!doc.getElementById('player-input')
     && doc.getElementById('input-form').nextElementSibling?.id === 'stream-options-dots' && !doc.documentElement.classList.contains('co-active'));
+  check('once live, the normal chrome is back: page header + bottom bar shown, column gone, turn 1 choices in the page\'s own #choices',
+    win.getComputedStyle(doc.querySelector('header.hero')).display !== 'none' && win.getComputedStyle(doc.querySelector('.bottom-bar')).display !== 'none'
+    && !doc.querySelector('.co-choices') && [...doc.querySelectorAll('#choices .choice-btn')].map(b => b.textContent).join('|') === 'Press the wound|Drag him higher');
   const tpath = p('engine/data/transcripts', `${sid}.md`);
   check('transcript opened like /start: header, scenario line, lean opening, then the turn', await until(() => fs.existsSync(tpath) && /## Scenario: dog_green_sector/.test(fs.readFileSync(tpath, 'utf8')) && fs.readFileSync(tpath, 'utf8').includes(LEAN) && /## Entry: cold open/.test(fs.readFileSync(tpath, 'utf8')), 3000));
   check('demo transcript row: one row, opening = the lean cut as a cold open, role set, turn 1 appended', await until(() => {
@@ -482,7 +494,7 @@ try {
       child.on('exit', c => { clearTimeout(t); rej(new Error(`${label} exited ${c}:\n${out.slice(-1500)}`)); });
     });
     const base = `http://localhost:${port}`;
-    const get = async url => { const r = await realFetch(base + url, { redirect: 'manual', headers: { 'User-Agent': 'cold-open-test-bot' } }); const b = Buffer.from(await r.arrayBuffer()); return { status: r.status, cc: r.headers.get('cache-control'), body: b, text: b.toString(), sha: crypto.createHash('sha256').update(b).digest('hex') }; };
+    const get = async url => { const r = await realFetch(base + url, { redirect: 'manual', headers: { 'User-Agent': 'cold-open-test-bot' } }); const b = Buffer.from(await r.arrayBuffer()); return { status: r.status, location: r.headers.get('location'), cc: r.headers.get('cache-control'), body: b, text: b.toString(), sha: crypto.createHash('sha256').update(b).digest('hex') }; };
     return { get, log: () => out, stop: () => child.kill() };
   }
 
@@ -496,7 +508,25 @@ try {
     check('/ entry is never cached (no-store)', root.cc === 'no-store');
     check('/ entry boots with the default pacing constants', root.text.includes(JSON.stringify(CO.COLD_OPEN_TIMINGS)));
     const moments = await s1.get('/moments');
-    check('"Another moment": /moments is today\'s card landing, byte-identical to the 00b222b "/"', moments.status === 200 && moments.sha === LIMEN_LANDING_SHA);
+    const momentsScript = moments.text.match(/<script id="cold-open-moments">[\s\S]*?<\/script>\n/)?.[0] || '';
+    const momentsBase = crypto.createHash('sha256').update(moments.text.replace(momentsScript, '')).digest('hex');
+    check('"Another moment": /moments is today\'s card landing byte-for-byte, plus only the card-link script', moments.status === 200 && !!momentsScript && momentsBase === LIMEN_LANDING_SHA);
+    check('/moments knows which scenarios have a ready cold open (dog_green_sector only)', /var ready = \["dog_green_sector"\];/.test(momentsScript));
+    // The card links, as the landing's own script builds them from /api/stories.
+    {
+      const dom = new JSDOM(moments.text, { url: 'http://demo.test/moments', runScripts: 'dangerously',
+        beforeParse(w) { w.fetch = async () => new Response(JSON.stringify([{ id: 'dog_green_sector', title: 'Dog Green' }, { id: 'steel_curtain_cantigny', title: 'Cantigny' }]), { status: 200 }); } });
+      await until(() => dom.window.document.querySelectorAll('#stories a.story').length === 2, 3000);
+      const hrefs = Object.fromEntries([...dom.window.document.querySelectorAll('#stories a.story')].map(a => [a.querySelector('.story-title').textContent, a.getAttribute('href')]));
+      check(`/moments card for a baked scenario → its cold open; unbaked → normal start (${JSON.stringify(hrefs)})`, hrefs['Dog Green'] === '/?scenarioId=dog_green_sector' && hrefs['Cantigny'] === '/game?scenarioId=steel_curtain_cantigny');
+      dom.window.close();
+    }
+    const dgOpen = await s1.get('/?scenarioId=dog_green_sector');
+    check('/?scenarioId=dog_green_sector (from a card) → the Dog Green cold open (black fade → scene)', dgOpen.status === 200 && dgOpen.text.includes('window.__COLD_OPEN__ = {"scenarioId":"dog_green_sector","roleId":"role_battalion_medic"'));
+    const unbaked = await s1.get('/?scenarioId=steel_curtain_cantigny');
+    check('/?scenarioId=<no ready row> → 302 to its normal start', unbaked.status === 302 && unbaked.location === '/game?scenarioId=steel_curtain_cantigny', `${unbaked.status} ${unbaked.location}`);
+    const outside = await s1.get('/?scenarioId=apollo_13_lifeboat');
+    check('/?scenarioId=<not in this demo> → the featured cold open (no leak)', outside.status === 200 && outside.text.includes('"scenarioId":"dog_green_sector"'));
     const game = await s1.get('/game?scenarioId=dog_green_sector');
     check('/game is unchanged (demo injection only, no cold-open code)', game.text === DM.injectDemoIntoGameHtml(fs.readFileSync(p('engine/game/index.html'), 'utf8')));
     const disp1 = JSON.parse((await s1.get(`/game/api/cold-open?scenarioId=${SCENARIO_ID}&roleId=${ROLE_ID}`)).text);

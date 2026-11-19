@@ -161,9 +161,10 @@
     return form;
   }
 
-  // First live action: the cold open's own chrome goes, the page's own input comes back.
+  // First live action: the page's header, bottom bar and input come back. The column's own
+  // controls go now (no second click mid-turn); the narrative fades and is cleared by the page.
   function goLive() {
-    document.querySelectorAll('.co-instruction, .co-foot, .co-input').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('.co-instruction, .co-choices, .co-foot, .co-input').forEach(function (n) { n.remove(); });
     restoreNativeInput();
     document.documentElement.classList.remove('co-active');
   }
@@ -180,17 +181,27 @@
     });
   }
 
-  // ── Chrome: header row, instruction, footer ──────────────────────────────
+  // ── The scene column ─────────────────────────────────────────────────────
+  // While the cold open is the screen (html.co-active) the page's header and its pinned bottom
+  // bar are hidden (cold-open.css), and the scene is one flowing column in the story feed:
+  //   header row (role · change role ▾ | The history) → narrative → instruction → choices →
+  //   own input + Send → footer (Another moment · Replay the open).
+  // The page's own choices (#choices) are rendered too, by renderOutput, but sit in the hidden
+  // bottom bar; the column has its own buttons, which go through the same submitTurn. On the
+  // first action the page clears the feed itself, and the header and bottom bar come back.
   function removeChrome() {
-    document.querySelectorAll('.co-head, .co-instruction, .co-foot, .co-input').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('.co-head, .co-instruction, .co-choices, .co-foot, .co-input').forEach(function (n) { n.remove(); });
   }
+  function addToColumn(node) { storyEl.insertBefore(node, scrollHintEl); }
   function addChrome(role) {
     removeChrome();
     var head = el('div', 'co-head');
-    var roleBtn = el('button', 'co-role', getCardDisplayName(role) + ' ▾');
+    var roleBtn = el('button', 'co-role');
+    roleBtn.appendChild(el('span', 'co-role-name-label', getCardDisplayName(role)));
+    roleBtn.appendChild(el('span', 'co-role-hint', ' · change role ▾'));
     roleBtn.type = 'button';
     roleBtn.setAttribute('aria-haspopup', 'dialog');
-    roleBtn.setAttribute('aria-label', 'Role: ' + getCardDisplayName(role) + '. Choose another role');
+    roleBtn.setAttribute('aria-label', 'Role: ' + getCardDisplayName(role) + '. Change role');
     roleBtn.addEventListener('click', openRoles);
     head.appendChild(roleBtn);
     if (buildIntroPanelEl(scenario)) {
@@ -202,9 +213,19 @@
     }
     storyEl.insertBefore(head, storyEl.firstChild);
 
-    choicesAreaWrapEl.insertBefore(el('p', 'co-instruction', content.instruction), choicesAreaWrapEl.firstChild);
+    addToColumn(el('p', 'co-instruction', content.instruction));
+    var list = el('div', 'co-choices');
+    list.setAttribute('role', 'group');
+    list.setAttribute('aria-label', 'Choices');
+    (content.choices || []).forEach(function (text) {
+      var b = el('button', 'choice-btn co-choice', text);
+      b.type = 'button';
+      b.addEventListener('click', function () { submitTurn(text, { isChoice: true }); });
+      list.appendChild(b);
+    });
+    addToColumn(list);
     var own = buildColdOpenInput();
-    if (own) choicesAreaWrapEl.parentNode.insertBefore(own, choicesAreaWrapEl.nextSibling);
+    if (own) addToColumn(own);
 
     var foot = el('nav', 'co-foot');
     foot.setAttribute('aria-label', 'More');
@@ -215,7 +236,7 @@
     replay.addEventListener('click', function () { restartGame(); });
     foot.appendChild(more);
     foot.appendChild(replay);
-    document.querySelector('.bottom-bar').appendChild(foot);
+    addToColumn(foot);
   }
 
   // ── 3. The beats ─────────────────────────────────────────────────────────

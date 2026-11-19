@@ -54,7 +54,7 @@ export function readColdOpenConfig(env = process.env, { demoMode = false, demoSc
   let entryProblem = null;
   if (!featuredScenario || !featuredRole) entryProblem = 'DEMO_FEATURED_SCENARIO and DEMO_FEATURED_ROLE must both be set';
   else if (!demoScenarios.includes(featuredScenario)) entryProblem = `featured scenario "${featuredScenario}" is not in DEMO_SCENARIOS`;
-  return { enabled: true, featuredScenario, featuredRole, entryProblem, file: (env.DEMO_COLD_OPEN_FILE || '').trim() || null };
+  return { enabled: true, featuredScenario, featuredRole, entryProblem, demoScenarios: [...demoScenarios], file: (env.DEMO_COLD_OPEN_FILE || '').trim() || null };
 }
 
 // ── Row validation ──────────────────────────────────────────────────────────
@@ -173,6 +173,31 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
         lastEntry = { entry: 'landing', reason: `error: ${e?.message || e}` };
         return null;
       }
+    },
+    // What / serves for ?scenarioId=<id> ("Another moment" → a baked scenario):
+    //   no id, or the featured scenario → the featured entry ({ scenarioId, roleId, row } or null);
+    //   another whitelisted scenario with a ready row → its cold open, role = its first ready role;
+    //   a whitelisted scenario with none → { redirect: '/game?scenarioId=<id>' } (the normal start);
+    //   anything else → the featured entry. Never throws.
+    async entryFor(scenarioId) {
+      const featured = async () => { const row = await this.entryRow(); return row ? { scenarioId: config.featuredScenario, roleId: config.featuredRole, row } : null; };
+      if (!scenarioId || scenarioId === config.featuredScenario || !(config.demoScenarios || []).includes(scenarioId)) return featured();
+      try {
+        const roles = (await store.readyRoles(scenarioId)).sort();
+        if (!roles.length) return { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };
+        const row = await get(scenarioId, roles[0]);
+        return row ? { scenarioId, roleId: roles[0], row } : { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };
+      } catch {
+        return { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };
+      }
+    },
+    // Whitelisted scenarios with at least one ready row (for the /moments card links). [] on error.
+    async readyScenarios() {
+      const out = [];
+      for (const id of config.demoScenarios || []) {
+        try { if ((await store.readyRoles(id)).length) out.push(id); } catch {}
+      }
+      return out;
     },
     health() {
       return {

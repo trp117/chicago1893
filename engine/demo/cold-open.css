@@ -8,8 +8,16 @@ html.co-pending body > :not(#co-overlay) { visibility: hidden !important; }
 /* While the cold open is the screen (co-active, cleared on the first live action): no native
    scroll hint. The native input form is detached by cold-open.js, replaced by .co-input. */
 html.co-active .scroll-hint { display: none !important; }
+/* The scene is one flowing column in the story feed (cold-open.js): the page's header (title,
+   location, Begin Again, Notes, ← Stories) and its pinned bottom bar are not part of it. Both
+   return on the first live action, when co-active is cleared. */
+html.co-active header.hero, html.co-active .bottom-bar { display: none !important; }
+html.co-active .story-feed { max-width: 720px; width: 100%; margin: 0 auto; }
 
-.co-input { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 4px 16px 8px; align-items: stretch; }
+.co-choices { display: flex; flex-direction: column; gap: 8px; margin: 0 0 14px; }
+.co-choices .choice-btn { width: 100%; text-align: left; font-size: 0.95rem; line-height: 1.4; padding: 12px 14px; }
+
+.co-input { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin: 0 0 6px; align-items: stretch; }
 .co-input textarea { width: 100%; resize: none; min-height: 48px; border-radius: 12px; border: 1px solid rgba(208,176,106,0.35);
   background: var(--panel, #1b1b1b); color: var(--text, #f0eadc); padding: 12px 14px; font: inherit; font-size: 1rem; }
 .co-input textarea:focus { border-color: var(--accent, #d0b06a); outline: none; box-shadow: 0 0 0 2px rgba(208,176,106,0.12); }
@@ -31,17 +39,19 @@ html.co-active .scroll-hint { display: none !important; }
 
 .scene-card .line.co-em > em, .redesign .scene-card .line.co-em > em:only-child { font-style: italic; }
 
-.co-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 0 10px; }
+.co-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 0 12px; margin-bottom: 8px; border-bottom: 1px solid var(--border, #3a3429); }
 .co-head button, .co-foot button, .co-panel button { background: none; border: 0; border-radius: 6px; color: var(--muted, #a89f8d);
   font: inherit; font-weight: normal; cursor: pointer; padding: 6px 4px; }
 .co-head button { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 0.78rem; letter-spacing: 0.06em; }
 .co-head .co-role { color: var(--text, #f0eadc); text-align: left; }
+.co-head .co-role-hint { color: var(--muted, #a89f8d); }
+.co-head .co-history { white-space: nowrap; }
 .co-head button:hover, .co-foot button:hover, .co-foot a:hover { color: var(--accent, #d0b06a); }
 .co-head button:focus-visible, .co-foot button:focus-visible, .co-foot a:focus-visible, .co-panel button:focus-visible { outline: 2px solid var(--accent, #d0b06a); outline-offset: 2px; }
 
-.co-instruction { margin: 8px 16px 6px; font-size: 0.82rem; font-style: italic; color: var(--muted, #a89f8d); }
+.co-instruction { margin: 18px 0 10px; font-size: 0.82rem; font-style: italic; color: var(--muted, #a89f8d); }
 
-.co-foot { display: flex; justify-content: center; gap: 20px; padding: 2px 16px 10px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 0.75rem; }
+.co-foot { display: flex; justify-content: center; gap: 20px; padding: 6px 0 4px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 0.75rem; }
 .co-foot a { color: var(--muted, #a89f8d); text-decoration: underline; text-underline-offset: 3px; padding: 6px 4px; }
 .co-foot button { text-decoration: underline; text-underline-offset: 3px; }
 
