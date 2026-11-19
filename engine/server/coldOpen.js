@@ -1,0 +1,309 @@
+// DEMO_COLD_OPEN — a pre-baked, zero-model-call entry for a demo's featured scenario.
+//
+// THE CONTRACT: with DEMO_COLD_OPEN unset (or anything but 'true'), or with DEMO_MODE off,
+// nothing here is constructed and no route, header or byte of any response changes.
+// server.js builds the cold open only when readColdOpenConfig says `enabled`; the game router
+// registers its routes and its /turn pre-handler only when handed one.
+// scripts/cold-open-baseline.mjs proves the flag-off responses byte-identical to master 00b222b.
+//
+// How the entry works:
+//   - A row in public.demo_cold_opens (scenario_id, role_id, status, content) holds, per role:
+//       content.beats      two { header, line } title cards (place · date / the role)
+//       content.lean       { narrative, instruction, choices[] } — the short opening on screen
+//       content.baked      { state, output, fingerprint, baked_at } — what the real /start
+//                          produced (scripts/cold-open-bake.mjs). `state` never leaves the server.
+//   - Showing the entry reads the row and the scenario: no model call.
+//   - The player's first action is a normal /turn carrying `coldOpen: { scenarioId, roleId }`.
+//     The pre-handler swaps in the server-held baked state and seeds the model's history with
+//     the lean text the player actually read, then the ordinary turn handler runs. That turn is
+//     the first model call of the session, and it is metered as a session START.
+import crypto from 'crypto';
+import fs from 'fs';
+
+// ── Pacing ──────────────────────────────────────────────────────────────────
+// All in milliseconds. Each beat: fade in, hold, fade out; then the overlay dissolves onto the
+// scene. Under prefers-reduced-motion every fade is 0 and the holds stand.
+export const COLD_OPEN_TIMINGS = Object.freeze({
+  startDelay: 400,    // dark before the first beat
+  fadeIn:     900,
+  hold:       2600,
+  fadeOut:    700,
+  gap:        300,    // dark between the beats
+  dissolve:   1200,   // overlay → scene
+});
+
+// Rows are cached per scenario this long. An edit in Supabase is live within a minute.
+export const COLD_OPEN_CACHE_MS = 60_000;
+
+// The model's history for the first live turn: the opening exactly as the player read it.
+export const COLD_OPEN_HISTORY_USER = '[GAME_START] Render the opening scene.';
+export const coldOpenHistorySeed = leanNarrative => [
+  { role: 'user',      content: COLD_OPEN_HISTORY_USER },
+  { role: 'assistant', content: String(leanNarrative || '').trim() },
+];
+
+// ── Config ──────────────────────────────────────────────────────────────────
+// enabled: DEMO_MODE on AND DEMO_COLD_OPEN exactly 'true'. `entryProblem` is why the entry
+// cannot be offered even so (it then serves the card landing): no featured scenario/role, or
+// the featured scenario outside this demo's whitelist.
+export function readColdOpenConfig(env = process.env, { demoMode = false, demoScenarios = [] } = {}) {
+  const enabled = demoMode === true && env.DEMO_COLD_OPEN === 'true';
+  if (!enabled) return { enabled: false };
+  const featuredScenario = (env.DEMO_FEATURED_SCENARIO || '').trim();
+  const featuredRole     = (env.DEMO_FEATURED_ROLE || '').trim();
+  let entryProblem = null;
+  if (!featuredScenario || !featuredRole) entryProblem = 'DEMO_FEATURED_SCENARIO and DEMO_FEATURED_ROLE must both be set';
+  else if (!demoScenarios.includes(featuredScenario)) entryProblem = `featured scenario "${featuredScenario}" is not in DEMO_SCENARIOS`;
+  return { enabled: true, featuredScenario, featuredRole, entryProblem, file: (env.DEMO_COLD_OPEN_FILE || '').trim() || null };
+}
+
+// ── Row validation ──────────────────────────────────────────────────────────
+const str = v => typeof v === 'string' && v.trim().length > 0;
+
+// Returns null for a servable content object, else the reason it is not.
+export function coldOpenContentProblem(content, { scenarioId, roleId } = {}) {
+  if (!content || typeof content !== 'object') return 'no content';
+  const { beats, lean, baked } = content;
+  if (!Array.isArray(beats) || beats.length !== 2 || !beats.every(b => b && str(b.header) && str(b.line))) return 'beats must be two { header, line }';
+  if (!lean || !str(lean.narrative)) return 'lean.narrative missing';
+  if (!str(lean.instruction)) return 'lean.instruction missing';
+  if (!Array.isArray(lean.choices) || lean.choices.length < 1 || lean.choices.length > 4 || !lean.choices.every(str)) return 'lean.choices must be 1-4 strings';
+  if (!baked || !baked.state || typeof baked.state !== 'object') return 'baked.state missing';
+  if (scenarioId && baked.state.scenarioId !== scenarioId) return `baked.state is for scenario "${baked.state.scenarioId}"`;
+  if (roleId && baked.state.playerRoleId !== roleId) return `baked.state is for role "${baked.state.playerRoleId}"`;
+  if (!str(baked.fingerprint)) return 'baked.fingerprint missing';
+  return null;
+}
+
+// ── Store ───────────────────────────────────────────────────────────────────
+// Reads ready rows, one query per scenario, cached COLD_OPEN_CACHE_MS. A read error is logged
+// and answers "nothing ready" (the caller falls back to the card landing); it is cached only
+// briefly so a blip does not hold the entry down for a minute.
+// `fetchRows(scenarioId)` → [{ role_id, content, updated_at }] with status = 'ready'.
+export function createColdOpenStore({ fetchRows, ttlMs = COLD_OPEN_CACHE_MS, errorTtlMs = 5000, now = Date.now, log = console }) {
+  const cache = new Map();   // scenarioId -> { at, ttl, byRole: Map(roleId -> row) }
+  async function load(scenarioId) {
+    const hit = cache.get(scenarioId);
+    if (hit && now() - hit.at < hit.ttl) return hit.byRole;
+    let byRole = new Map(), ttl = ttlMs;
+    try {
+      for (const row of (await fetchRows(scenarioId)) || []) {
+        const problem = coldOpenContentProblem(row.content, { scenarioId, roleId: row.role_id });
+        if (problem) { log.warn(`[COLD-OPEN] ${scenarioId}/${row.role_id} not served: ${problem}`); continue; }
+        byRole.set(row.role_id, row);
+      }
+    } catch (e) {
+      log.warn(`[COLD-OPEN] read failed for ${scenarioId}: ${e?.message || e}`);
+      byRole = new Map();
+      ttl = errorTtlMs;
+    }
+    cache.set(scenarioId, { at: now(), ttl, byRole });
+    return byRole;
+  }
+  return {
+    async get(scenarioId, roleId) { return (await load(scenarioId)).get(roleId) || null; },
+    async readyRoles(scenarioId) { return [...(await load(scenarioId)).keys()]; },
+    clear() { cache.clear(); },
+  };
+}
+
+export function supabaseColdOpenRows(client) {
+  return async scenarioId => {
+    if (!client) throw new Error('no Supabase client');
+    const { data, error } = await client.from('demo_cold_opens')
+      .select('role_id, content, updated_at').eq('scenario_id', scenarioId).eq('status', 'ready');
+    if (error) throw new Error(error.message);
+    return data || [];
+  };
+}
+
+// DEMO_COLD_OPEN_FILE (local development and the tests only): rows from a JSON file of
+// [{ scenario_id, role_id, status, content }], re-read on every cache miss.
+export function fileColdOpenRows(file) {
+  return async scenarioId => JSON.parse(fs.readFileSync(file, 'utf8'))
+    .filter(r => r.scenario_id === scenarioId && r.status === 'ready');
+}
+
+// ── Runtime ─────────────────────────────────────────────────────────────────
+// What server.js builds when the flag is on, and hands to both the page guard and the game
+// router. `fingerprintFor(scenarioId, roleId, bakedState)` computes the CURRENT content's
+// fingerprint (gameRouter's coldOpenFingerprintFor over the live repos).
+export function createColdOpenRuntime({ config, store, fingerprintFor, timings = COLD_OPEN_TIMINGS, now = Date.now, log = console }) {
+  const stale = new Map();      // "scenario/role" -> { baked, current }
+  const checked = new Map();    // "scenario/role" -> { at, baked }
+  let lastEntry = { entry: 'landing', reason: 'not checked yet' };
+
+  async function checkFingerprint(scenarioId, roleId, row) {
+    const k = `${scenarioId}/${roleId}`;
+    const baked = row.content.baked.fingerprint;
+    const c = checked.get(k);
+    if (c && c.baked === baked && now() - c.at < COLD_OPEN_CACHE_MS) return;
+    checked.set(k, { at: now(), baked });
+    try {
+      const current = await fingerprintFor(scenarioId, roleId, row.content.baked.state);
+      if (current !== baked) {
+        if (!stale.has(k) || stale.get(k).current !== current) log.warn(`[COLD-OPEN] ${k} is STALE — the scenario changed since it was baked (baked ${baked.slice(0, 19)}…, now ${current.slice(0, 19)}…). Still served; re-bake to refresh.`);
+        stale.set(k, { baked, current });
+      } else stale.delete(k);
+    } catch (e) {
+      log.warn(`[COLD-OPEN] fingerprint check failed for ${k}: ${e?.message || e}`);
+    }
+  }
+
+  async function get(scenarioId, roleId) {
+    const row = await store.get(scenarioId, roleId);
+    if (row) await checkFingerprint(scenarioId, roleId, row);
+    return row;
+  }
+
+  return {
+    config, timings,
+    historyUser: COLD_OPEN_HISTORY_USER,
+    get,
+    readyRoles: scenarioId => store.readyRoles(scenarioId),
+    // The featured row when the entry can be offered, else null (→ the card landing). Never
+    // throws: any failure is the landing.
+    async entryRow() {
+      try {
+        if (config.entryProblem) { lastEntry = { entry: 'landing', reason: config.entryProblem }; return null; }
+        const row = await get(config.featuredScenario, config.featuredRole);
+        lastEntry = row ? { entry: 'cold-open' } : { entry: 'landing', reason: 'no ready row for the featured role' };
+        return row;
+      } catch (e) {
+        lastEntry = { entry: 'landing', reason: `error: ${e?.message || e}` };
+        return null;
+      }
+    },
+    health() {
+      return {
+        featured: config.featuredScenario && config.featuredRole ? `${config.featuredScenario}/${config.featuredRole}` : null,
+        ...lastEntry,
+        stale: [...stale.keys()],
+      };
+    },
+  };
+}
+
+// ── Fingerprint ─────────────────────────────────────────────────────────────
+// A hash of everything the baked state was produced from. Any edit to the scenario, the role,
+// its characters, locations, clues or arc changes it; the server then logs the row as stale and
+// reports it in /health, and still serves it.
+const stable = v => Array.isArray(v) ? `[${v.map(stable).join(',')}]`
+  : v && typeof v === 'object' ? `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`
+  : JSON.stringify(v ?? null);
+const byId = list => [...(list || [])].sort((a, b) => String(a?.id).localeCompare(String(b?.id)));
+export function fingerprintScenarioData({ scenario, role, characters, locations, clues, storyArc }) {
+  const body = stable({ scenario, role, characters: byId(characters), locations: byId(locations), clues: byId(clues), storyArc: storyArc ?? null });
+  return 'sha256:' + crypto.createHash('sha256').update(body).digest('hex');
+}
+
+// ── Names on screen ─────────────────────────────────────────────────────────
+// Does `text` name this character? Full name, any alias, or the surname (last word, 4+ letters).
+export function namesCharacter(text, character) {
+  const t = String(text || '').toLowerCase();
+  if (!t || !character) return false;
+  const names = [character.name, character.display_name, character.short_name, ...(character.aliases || [])].filter(str);
+  const last = String(character.name || '').trim().split(/\s+/).pop();
+  if (last && last.length >= 4) names.push(last);
+  return names.some(n => new RegExp(`(^|[^a-z])${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^a-z])`).test(t));
+}
+
+// ── The first live turn's state ─────────────────────────────────────────────
+// The baked state, refreshed where the scenario's CURRENT review state must win (the glossary
+// approval gate and the reviewed technical facts — the same rules /start applies), and with
+// every NPC the lean cut never names taken back out of introducedNpcs, so the engine introduces
+// them properly instead of using a name the player has not seen. They stay in presentNpcs:
+// they are still physically there.
+export function buildColdOpenState(content, { scenario, characters = [] }) {
+  const state = structuredClone(content.baked.state);
+  state.narrativeStyle = 'focused';
+
+  const glossStatus = scenario.status || 'published';
+  const glossAll = (scenario.glossary || []).filter(g => g.term?.trim() && g.definition?.trim());
+  state.glossary = glossStatus === 'draft' ? glossAll : glossAll.filter(g => g.approved === true);
+
+  state.technicalFacts = scenario.technical_facts?.reviewed === true
+    ? (scenario.technical_facts.facts || []).map(f => ({
+        ...f, status: 'current', source_character: 'scenario_record', pre_seeded: true, turn_stated: 0, session_minutes_stated: 0,
+      }))
+    : [];
+
+  const lean = content.lean.narrative;
+  const unseen = [];
+  if (Array.isArray(state.introducedNpcs)) {
+    state.introducedNpcs = state.introducedNpcs.filter(id => {
+      const c = characters.find(ch => ch.id === id);
+      if (!c || namesCharacter(lean, c)) return true;
+      unseen.push(id);
+      return false;
+    });
+  }
+  return { state, unseen };
+}
+
+// ── Authoring lint (bake script and boot log) ──────────────────────────────
+// Things in the baked state the lean cut does not show the player. Warnings, not errors: the
+// author decides. NPC introductions are handled automatically (buildColdOpenState).
+export function lintColdOpen(content, { characters = [], clues = [] } = {}) {
+  const out = [];
+  const lean = content?.lean?.narrative || '';
+  const st = content?.baked?.state || {};
+  const name = id => characters.find(c => c.id === id)?.name || id;
+  for (const id of st.introducedNpcs || []) {
+    const c = characters.find(ch => ch.id === id);
+    if (c && !namesCharacter(lean, c)) out.push(`NPC ${name(id)} was introduced by the full opening but is not named in the lean cut — will be re-introduced on the first turn`);
+  }
+  for (const id of st.presentNpcs || []) {
+    const c = characters.find(ch => ch.id === id);
+    if (c && !namesCharacter(lean, c)) out.push(`NPC ${name(id)} is present in the scene but not named in the lean cut`);
+  }
+  for (const id of st.discoveredClueIds || []) {
+    const cl = clues.find(c => c.id === id);
+    out.push(`clue ${cl?.title || cl?.name || id} was discovered by the full opening — check the lean cut shows it`);
+  }
+  for (const b of st.reachedBeats || []) out.push(`story beat ${typeof b === 'string' ? b : b?.id || JSON.stringify(b)} was reached by the full opening — check the lean cut shows it`);
+  const choices = content?.lean?.choices || [];
+  if (choices.length !== 3) out.push(`${choices.length} starting choices (the design calls for 3)`);
+  for (const ch of choices) {
+    for (const c of characters) if (namesCharacter(ch, c) && !namesCharacter(lean, c)) out.push(`choice "${ch}" names ${c.name}, who is not named in the lean cut`);
+  }
+  return out;
+}
+
+// ── Transcript header ───────────────────────────────────────────────────────
+// The same shape /start writes, so closing-prose and the reviewers read a cold-open session
+// exactly like any other. The opening recorded is the lean cut — what the player read.
+export function coldOpenTranscriptHeader({ scenario, scenarioId, role, roleId, sessionId, narrative, date = new Date() }) {
+  let introText = '';
+  for (const section of scenario.introduction?.sections || []) {
+    const text = section.type === 'entry'
+      ? (section.character_entries?.[roleId] || section.text || '')
+      : (section.text || '');
+    if (text) introText += text + '\n\n';
+  }
+  return [
+    `# ${scenario.title || scenarioId}`,
+    `## Scenario: ${scenarioId}`,
+    `## Character: ${role.name}`,
+    `## Session: ${sessionId}`,
+    `## Date: ${date.toISOString()}`,
+    `## Play Time: ${scenario.sessionTargetMinutes || '?'} minutes`,
+    `## Entry: cold open (pre-baked opening)`,
+    ``,
+    `---`,
+    ``,
+    `## Character Brief`,
+    ``,
+    role.briefing || '',
+    ``,
+    `---`,
+    ``,
+    introText.trimEnd()
+      ? `## Introduction\n\n${introText.trimEnd()}\n\n---\n\n## Session\n\n`
+      : `## Session\n\n`,
+    narrative || '',
+    ``,
+    `---`,
+    ``,
+  ].join('\n');
+}

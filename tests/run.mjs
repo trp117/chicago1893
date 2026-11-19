@@ -64,6 +64,7 @@ const SUITE = [
   ['DEMO_MODE: budget, caps, rate, transcripts', 'demo-limits.test.mjs'],
   ['DEMO_MODE: per-demo branding + budget row', 'demo-branding.test.mjs'],
   ['DEMO_MODE: landing page-view tally', 'demo-pageviews.test.mjs'],
+  ['DEMO_COLD_OPEN: zero-call entry + first-turn handoff', 'cold-open.test.mjs'],
   ['session id: one id per playthrough (jsdom)', 'session-id.test.mjs'],
   ['input-safety gate: self-harm, child safety, sexual violence', 'crisis-intercept.test.mjs'],
   ['scripture: quoted as words, no chapter:verse', 'scripture-citation.test.mjs'],
