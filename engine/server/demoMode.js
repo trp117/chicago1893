@@ -170,6 +170,32 @@ export function injectDemoIntoGameHtml(html) {
   return at === -1 ? DEMO_GAME_INJECTION + html : html.slice(0, at) + DEMO_GAME_INJECTION + html.slice(at);
 }
 
+// ── DEMO_COLD_OPEN entry page ───────────────────────────────────────────────
+// The cold-open entry is the game page (unchanged on disk) + the demo injection + this: a
+// stylesheet and a boot config in <head> (after the demo injection, before every page script),
+// and the cold-open script just before </body>, after the page script has defined the globals
+// it hooks. Both files live in engine/demo/ and are read at serve time, like the landing.
+export const COLD_OPEN_CSS_PATH = path.join(DEMO_DIR, 'cold-open.css');
+export const COLD_OPEN_JS_PATH  = path.join(DEMO_DIR, 'cold-open.js');
+// JSON that is safe inside a <script> element.
+const SCRIPT_UNSAFE = new RegExp('[<' + String.fromCharCode(0x2028, 0x2029) + ']', 'g');
+const scriptJson = v => JSON.stringify(v).replace(SCRIPT_UNSAFE, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+
+export function injectColdOpenIntoGameHtml(html, { scenarioId, roleId, timings, historyUser }, { css, js }) {
+  const boot = { scenarioId, roleId, timings, historyUser };
+  const head = `<style id="cold-open-css">${css}</style>
+<script id="cold-open-boot">window.__COLD_OPEN__ = ${scriptJson(boot)};
+document.documentElement.classList.add('co-boot');
+try { var u = new URL(location.href); u.searchParams.set('scenarioId', window.__COLD_OPEN__.scenarioId); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) {}</script>
+`;
+  const tail = `<script id="cold-open-js">${js}</script>\n`;
+  const h = html.indexOf('</head>');
+  let out = h === -1 ? head + html : html.slice(0, h) + head + html.slice(h);
+  const b = out.lastIndexOf('</body>');
+  out = b === -1 ? out + tail : out.slice(0, b) + tail + out.slice(b);
+  return out;
+}
+
 // Page-level containment. Mounted by server.js ahead of express.static, and ONLY when the
 // flag is on. Handles the routes that would otherwise reach the catalogue or the branding:
 //   /                 -> the demo landing, branded from env (instead of public/index.html)
@@ -180,13 +206,52 @@ export function injectDemoIntoGameHtml(html) {
 //   /admin, /admin/*, /admin-*.html (any method) -> 404
 //   /game             -> engine/game/index.html with the demo injection
 // onLandingView: called (fire-and-forget) once per counted landing view; omitted = no counting.
-export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null }) {
+//
+// coldOpen (DEMO_COLD_OPEN only; omitted otherwise, and then nothing below changes): the
+// runtime from coldOpen.js. With it, / is the cold-open entry when the featured role has a
+// ready row — and the card landing on any failure — and /moments is the card landing.
+export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null, coldOpen = null }) {
+  const sendLanding = (req, res, next) => {
+    let html;
+    try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }
+    res.set('Cache-Control', cacheControl);
+    res.type('html').send(renderDemoLanding(html, branding));
+  };
+  const countView = req => {
+    if (onLandingView && req.method === 'GET' && !isBotUserAgent(req.get('user-agent'))) countLandingView(onLandingView);
+  };
+  // The cold-open entry, or the landing. Every failure lands on the landing.
+  const sendEntry = async (req, res, next) => {
+    let page = null;
+    try {
+      const row = await coldOpen.entryRow();
+      if (row) {
+        const html = injectDemoIntoGameHtml(fs.readFileSync(gameHtmlPath, 'utf8'));
+        page = injectColdOpenIntoGameHtml(html, {
+          scenarioId: coldOpen.config.featuredScenario, roleId: coldOpen.config.featuredRole,
+          timings: coldOpen.timings, historyUser: coldOpen.historyUser,
+        }, { css: fs.readFileSync(COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(COLD_OPEN_JS_PATH, 'utf8') });
+      }
+    } catch (e) {
+      console.warn(`[COLD-OPEN] entry failed, serving the landing: ${e?.message || e}`);
+      page = null;
+    }
+    if (!page) return sendLanding(req, res, next);
+    // Never cached: whether / is the entry or the landing follows the row, which can change.
+    res.set('Cache-Control', 'no-store');
+    res.type('html').send(page);
+  };
   return (req, res, next) => {
     const p = req.path;
     // The admin surface is not part of the demo: any method (the login is a POST), any depth,
     // plus the two admin pages express.static would otherwise serve from public/.
     if (ADMIN_PATH.test(p)) return res.status(404).send('Not found');
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+    if (p === '/' && coldOpen) {
+      countView(req);
+      return sendEntry(req, res, next);
+    }
+    if (p === '/moments' && coldOpen) return sendLanding(req, res, next);
     if (p === '/') {
       let html;
       try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }

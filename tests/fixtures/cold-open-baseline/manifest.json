@@ -1,0 +1,588 @@
+{
+  "commit": "00b222bde3ec172e9354a5fb6159d394825d33d1",
+  "capturedAt": "2026-11-19T06:25:08.650Z",
+  "shapes": {
+    "prod": {
+      "GET /": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /index.html": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /game": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "37db8c78d722847c137a46002b149af9b69d98e75e915f9ff6b2cc089f374ed9",
+        "bytes": 189860
+      },
+      "GET /game?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "37db8c78d722847c137a46002b149af9b69d98e75e915f9ff6b2cc089f374ed9",
+        "bytes": 189860
+      },
+      "GET /moments": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "50b453cb16eb9f53193bf1274471b58910ac46c99482804131d7f2cd815b8901",
+        "bytes": 146
+      },
+      "GET /og-image.png": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a90a95a724f690ec24cdc64b6c160a3d0291fa62d577ab7e2238389b1164a121",
+        "bytes": 151
+      },
+      "GET /test": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "d4926a254cef210fc9f0dbafa87c2eff986800f2bb1a7b61b1f08c7d40fb43fc",
+        "bytes": 10681
+      },
+      "GET /categories": {
+        "status": 301,
+        "type": "text/html; charset=UTF-8",
+        "location": "/categories/",
+        "cacheControl": null,
+        "sha256": "4b091809961256d2d7f5123d96f3033aad3f671658e3514d8def8254fb9eb3fa",
+        "bytes": 160
+      },
+      "GET /admin/login": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=0",
+        "sha256": "454113e1910ffde093b1f811abe0d98da27de3045146ee0ac9dea9f5839e77a4",
+        "bytes": 7766
+      },
+      "GET /js/scenario-card.js": {
+        "status": 200,
+        "type": "application/javascript; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "a9b52ab7499dd06c9004cd4423da859f46c066511324756f421579f9a6d64895",
+        "bytes": 2756
+      },
+      "GET /api/stories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "6dd5a814956c645421872da20b3816aab869e57c1ff1079690479249d461c586",
+        "bytes": 11136
+      },
+      "GET /api/categories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "af940e6d1c8ad83c1312b7236248b955581b698a996d02c2f53a19072b72e63c",
+        "bytes": 1748
+      },
+      "GET /game/api/config": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "8430fee786b96ee91da21d77d77972825cd7d32045ce3077ee6a69384f651268",
+        "bytes": 18
+      },
+      "GET /game/api/scenarios": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "aab6241f7346c5b706cb3d73674240ced2f8e674fb7acc42fdece459dee61f47",
+        "bytes": 8161
+      },
+      "GET /game/api/bootstrap?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "6fff3cedf459722d2e8c7b0d7c77678ad4b92037027ef62e759cc7e8b81d4b6a",
+        "bytes": 106128
+      },
+      "GET /game/api/bootstrap?scenarioId=tolle_lege_milan_386": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "620cfd1c0d9aa96969a4a009e0017e62398fe6a0ec6e0b215b81d0d28e5a1ae5",
+        "bytes": 75989
+      },
+      "GET /game/api/cold-open?scenarioId=dog_green_sector&roleId=battalion_medic": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "bc58b4ae1c97a68f0f75d998eb90196de52269fa7f58d0038da41b84d1b8ce71",
+        "bytes": 157
+      },
+      "GET /game/api/cold-open/turn": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a3cb688f71778aaabffabe924d60f6e6899b1ef59f9ec1282cdc022c4d2c75c3",
+        "bytes": 162
+      },
+      "POST /game/api/cold-open/turn {}": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "60a355e143139a79fab8d723414b697a11c3f16ea53c26fd88bee67126526a88",
+        "bytes": 163
+      },
+      "POST /game/api/start {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "cd41004fb19ee4128e42c9f342abbea00d142448812840ca5c58f7142043a788",
+        "bytes": 47
+      },
+      "POST /game/api/turn {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "POST /game/api/turn {\"coldOpen\":{\"scenarioId\":\"dog_green_sector\",\"roleId\":\"battalion_medic\"}}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "GET /health": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": "no-store",
+        "sha256": "ca907fab5bda2fa5388f2ce7acad87398904847cb3a79cf6dc929160139fe7fc",
+        "bytes": 230
+      }
+    },
+    "gw": {
+      "GET /": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "6ea1a02f60035118ce044da52fbfb85261dec061512e50ea8eedf049324cb800",
+        "bytes": 6073
+      },
+      "GET /?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "6ea1a02f60035118ce044da52fbfb85261dec061512e50ea8eedf049324cb800",
+        "bytes": 6073
+      },
+      "GET /index.html": {
+        "status": 302,
+        "type": "text/plain; charset=utf-8",
+        "location": "/",
+        "cacheControl": null,
+        "sha256": "4a420424a2c575891b5947fe46615eb7968fc4e8d212361d6a631dc01407558b",
+        "bytes": 23
+      },
+      "GET /game": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /game?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /moments": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "50b453cb16eb9f53193bf1274471b58910ac46c99482804131d7f2cd815b8901",
+        "bytes": 146
+      },
+      "GET /og-image.png": {
+        "status": 200,
+        "type": "image/png",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "00d879bbd7419b76404489eb169abd6e7e3b4eeb6f7ebe1627ec174d4e17b4f3",
+        "bytes": 808966
+      },
+      "GET /test": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "e3ebaa16dd9d9b9fc107c42183fb6cf9d22927e1af03dbbdfa0ccc38e4e4ac31",
+        "bytes": 9
+      },
+      "GET /categories": {
+        "status": 302,
+        "type": "text/plain; charset=utf-8",
+        "location": "/",
+        "cacheControl": null,
+        "sha256": "4a420424a2c575891b5947fe46615eb7968fc4e8d212361d6a631dc01407558b",
+        "bytes": 23
+      },
+      "GET /admin/login": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "e3ebaa16dd9d9b9fc107c42183fb6cf9d22927e1af03dbbdfa0ccc38e4e4ac31",
+        "bytes": 9
+      },
+      "GET /js/scenario-card.js": {
+        "status": 200,
+        "type": "application/javascript; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "a9b52ab7499dd06c9004cd4423da859f46c066511324756f421579f9a6d64895",
+        "bytes": 2756
+      },
+      "GET /api/stories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "f338540b7787a457f9272b781f44ea7877ad66a7c9fd8bebd3396b1ac70c8c7d",
+        "bytes": 1430
+      },
+      "GET /api/categories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "bf8fdc649c078c48fc14e0b568063196fa6287c07a46980dd080b473917d5324",
+        "bytes": 214
+      },
+      "GET /game/api/config": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "1788adda867cbaf2cfed2840fa269e7208384f38b7f5f6d36a7458ede30a661a",
+        "bytes": 17
+      },
+      "GET /game/api/scenarios": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "9397990349d9ae40afb482ed4ed521080bcdc660d9a31072f4c9c1c217e428b6",
+        "bytes": 1099
+      },
+      "GET /game/api/bootstrap?scenarioId=dog_green_sector": {
+        "status": 404,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "83ddd9496f2d783d4d4410ea7647b9b61df8a70261b8ac7d8359ec1e3a41511d",
+        "bytes": 31
+      },
+      "GET /game/api/bootstrap?scenarioId=tolle_lege_milan_386": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "620cfd1c0d9aa96969a4a009e0017e62398fe6a0ec6e0b215b81d0d28e5a1ae5",
+        "bytes": 75989
+      },
+      "GET /game/api/cold-open?scenarioId=dog_green_sector&roleId=battalion_medic": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "bc58b4ae1c97a68f0f75d998eb90196de52269fa7f58d0038da41b84d1b8ce71",
+        "bytes": 157
+      },
+      "GET /game/api/cold-open/turn": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a3cb688f71778aaabffabe924d60f6e6899b1ef59f9ec1282cdc022c4d2c75c3",
+        "bytes": 162
+      },
+      "POST /game/api/cold-open/turn {}": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "60a355e143139a79fab8d723414b697a11c3f16ea53c26fd88bee67126526a88",
+        "bytes": 163
+      },
+      "POST /game/api/start {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "cd41004fb19ee4128e42c9f342abbea00d142448812840ca5c58f7142043a788",
+        "bytes": 47
+      },
+      "POST /game/api/turn {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "POST /game/api/turn {\"coldOpen\":{\"scenarioId\":\"dog_green_sector\",\"roleId\":\"battalion_medic\"}}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "GET /health": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": "no-store",
+        "sha256": "fcb9cb37059747383657a0e0997a9c82dd2739a7f37564310480d63840813a91",
+        "bytes": 274
+      }
+    },
+    "limen": {
+      "GET /": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "595354c10c107e8147e07039ae5b7aa26503bd36f5eb6084a72287fdfb2b7c3a",
+        "bytes": 6016
+      },
+      "GET /?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "595354c10c107e8147e07039ae5b7aa26503bd36f5eb6084a72287fdfb2b7c3a",
+        "bytes": 6016
+      },
+      "GET /index.html": {
+        "status": 302,
+        "type": "text/plain; charset=utf-8",
+        "location": "/",
+        "cacheControl": null,
+        "sha256": "4a420424a2c575891b5947fe46615eb7968fc4e8d212361d6a631dc01407558b",
+        "bytes": 23
+      },
+      "GET /game": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /game?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /moments": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "50b453cb16eb9f53193bf1274471b58910ac46c99482804131d7f2cd815b8901",
+        "bytes": 146
+      },
+      "GET /og-image.png": {
+        "status": 200,
+        "type": "image/png",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "79c97b7a24f506356584a55b99a11ec6c9670f8c4e270ea1f56b63cb1e6cfed6",
+        "bytes": 806333
+      },
+      "GET /test": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "e3ebaa16dd9d9b9fc107c42183fb6cf9d22927e1af03dbbdfa0ccc38e4e4ac31",
+        "bytes": 9
+      },
+      "GET /categories": {
+        "status": 302,
+        "type": "text/plain; charset=utf-8",
+        "location": "/",
+        "cacheControl": null,
+        "sha256": "4a420424a2c575891b5947fe46615eb7968fc4e8d212361d6a631dc01407558b",
+        "bytes": 23
+      },
+      "GET /admin/login": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "e3ebaa16dd9d9b9fc107c42183fb6cf9d22927e1af03dbbdfa0ccc38e4e4ac31",
+        "bytes": 9
+      },
+      "GET /js/scenario-card.js": {
+        "status": 200,
+        "type": "application/javascript; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "a9b52ab7499dd06c9004cd4423da859f46c066511324756f421579f9a6d64895",
+        "bytes": 2756
+      },
+      "GET /api/stories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "63fe0deb8691e034bc86247135bfcb81beba9a92280a54f69e4c9a4cea7351dd",
+        "bytes": 1562
+      },
+      "GET /api/categories": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "cd8bf4290646fe4fa40fb22821638cb0dc1600556d7e43443a3367ad2579a489",
+        "bytes": 230
+      },
+      "GET /game/api/config": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "1788adda867cbaf2cfed2840fa269e7208384f38b7f5f6d36a7458ede30a661a",
+        "bytes": 17
+      },
+      "GET /game/api/scenarios": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "44be8eee88af7e1ab7bbe7e457990ec35a675b913a3668bef0a7db8898be1ee7",
+        "bytes": 1146
+      },
+      "GET /game/api/bootstrap?scenarioId=dog_green_sector": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "6fff3cedf459722d2e8c7b0d7c77678ad4b92037027ef62e759cc7e8b81d4b6a",
+        "bytes": 106128
+      },
+      "GET /game/api/bootstrap?scenarioId=tolle_lege_milan_386": {
+        "status": 404,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "83ddd9496f2d783d4d4410ea7647b9b61df8a70261b8ac7d8359ec1e3a41511d",
+        "bytes": 31
+      },
+      "GET /game/api/cold-open?scenarioId=dog_green_sector&roleId=battalion_medic": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "bc58b4ae1c97a68f0f75d998eb90196de52269fa7f58d0038da41b84d1b8ce71",
+        "bytes": 157
+      },
+      "GET /game/api/cold-open/turn": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a3cb688f71778aaabffabe924d60f6e6899b1ef59f9ec1282cdc022c4d2c75c3",
+        "bytes": 162
+      },
+      "POST /game/api/cold-open/turn {}": {
+        "status": 404,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "60a355e143139a79fab8d723414b697a11c3f16ea53c26fd88bee67126526a88",
+        "bytes": 163
+      },
+      "POST /game/api/start {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "cd41004fb19ee4128e42c9f342abbea00d142448812840ca5c58f7142043a788",
+        "bytes": 47
+      },
+      "POST /game/api/turn {}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "POST /game/api/turn {\"coldOpen\":{\"scenarioId\":\"dog_green_sector\",\"roleId\":\"battalion_medic\"}}": {
+        "status": 400,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "a12173e7fee263516537953801c8086ae738fac03355c865dbbcce67a73f0df9",
+        "bytes": 41
+      },
+      "GET /health": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": "no-store",
+        "sha256": "a95d919a15c5f2fb6986bed3a9b1dd1c2d351278a1f0c579ecd17471191dd8d1",
+        "bytes": 272
+      }
+    }
+  }
+}

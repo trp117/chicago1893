@@ -17,7 +17,7 @@ import { StoryArcRepository }   from '../repositories/StoryArcRepository.js';
 import { PlayerRepository }     from '../repositories/PlayerRepository.js';
 import { SessionRepository }    from '../repositories/SessionRepository.js';
 import { createAdminRouter }    from '../admin/adminRouter.js';
-import { createGameRouter }     from './gameRouter.js';
+import { createGameRouter, coldOpenFingerprintFor } from './gameRouter.js';
 import { stripUnverifiedFromJson } from '../services/UnverifiedTag.js';
 import { SchemaValidator }      from '../services/SchemaValidator.js';
 import { checkSupabaseConnection, isSupabaseConnected, supabaseAuth, supabase as supabaseService } from '../../lib/supabase.js';
@@ -28,6 +28,7 @@ import { requireAdminAuth } from '../../lib/adminAuth.js';
 import { makeIsAllowedScenario, demoPageGuard, readDemoBranding } from './demoMode.js';
 import { createSupabaseDemoStore, readDemoBudgetId } from './demoStore.js';
 import { readDemoLimitConfig } from './demoLimits.js';
+import { readColdOpenConfig, createColdOpenStore, createColdOpenRuntime, supabaseColdOpenRows, fileColdOpenRows } from './coldOpen.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
@@ -62,6 +63,18 @@ if (DEMO_MODE) console.log(`[DEMO] site "${DEMO_BRANDING.siteName}" ${DEMO_BRAND
 // Phase 2 store (spend counter, transcripts, landing page views). Built only in demo mode —
 // with the flag off no demo table is ever touched.
 const DEMO_STORE = DEMO_MODE ? createSupabaseDemoStore(supabaseService, { budgetId: DEMO_BUDGET_ID }) : null;
+// DEMO_COLD_OPEN (coldOpen.js) — default OFF, and inert without DEMO_MODE. Built only when on:
+// otherwise nothing is constructed, no route is added and no boot line is printed.
+const COLD_OPEN_CONFIG = readColdOpenConfig(process.env, { demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS });
+const COLD_OPEN = COLD_OPEN_CONFIG.enabled ? createColdOpenRuntime({
+  config: COLD_OPEN_CONFIG,
+  store:  createColdOpenStore({ fetchRows: COLD_OPEN_CONFIG.file ? fileColdOpenRows(COLD_OPEN_CONFIG.file) : supabaseColdOpenRows(supabaseService) }),
+  fingerprintFor: (scenarioId, roleId, state) => coldOpenFingerprintFor(repos, scenarioId, roleId, state),
+}) : null;
+if (COLD_OPEN) {
+  console.log(`[COLD-OPEN] enabled featured=${COLD_OPEN_CONFIG.featuredScenario || '(none)'}/${COLD_OPEN_CONFIG.featuredRole || '(none)'} source=${COLD_OPEN_CONFIG.file ? 'file' : 'supabase'}`);
+  if (COLD_OPEN_CONFIG.entryProblem) console.warn(`[COLD-OPEN] entry unavailable, / serves the card landing: ${COLD_OPEN_CONFIG.entryProblem}`);
+}
 
 const app = express();
 app.set('trust proxy', 1);
@@ -75,6 +88,7 @@ if (DEMO_MODE) {
     branding:     DEMO_BRANDING,
     onLandingView: () => DEMO_STORE.incrPageview(),
     cacheControl: 'public, max-age=300, must-revalidate',
+    ...(COLD_OPEN ? { coldOpen: COLD_OPEN } : {}),
   }));
 }
 app.use(express.static(publicDir, { maxAge: '5m' }));
@@ -106,6 +120,7 @@ const gameConfig = {
   // Phase 2: the durable spend counter + demo transcripts, and the limits. Constructed only in
   // demo mode — with the flag off no demo table is ever touched.
   ...(DEMO_MODE ? { demoStore: DEMO_STORE, demoLimits: readDemoLimitConfig() } : {}),
+  ...(COLD_OPEN ? { coldOpen: COLD_OPEN } : {}),
 };
 if (DEMO_MODE) {
   const l = gameConfig.demoLimits;
@@ -236,6 +251,8 @@ app.get('/health', (_, res) => {
     supabaseConnected:     isSupabaseConnected(),
     // Omitted entirely when the restore never reached its write loop, per the spec.
     ...(restoredCounts ? { restoredCounts } : {}),
+    // DEMO_COLD_OPEN only: which entry / serves, and any stale rows. Absent otherwise.
+    ...(COLD_OPEN ? { coldOpen: COLD_OPEN.health() } : {}),
     uptime: process.uptime(),
   });
 });
@@ -423,6 +440,9 @@ function startServer() {
 (async () => {
   await restoreFromSupabase();
   new SchemaValidator(repos).report().catch(e => console.error('[SCHEMA]', e.message));
+  // DEMO_COLD_OPEN only: check the featured row once content is restored, so a stale bake
+  // shows in the boot log and /health before the first visitor.
+  if (COLD_OPEN) COLD_OPEN.entryRow().then(row => console.log(`[COLD-OPEN] / serves ${row ? 'the cold open' : 'the card landing'}${row ? '' : ` (${COLD_OPEN.health().reason})`}`));
   startServer();
 })().catch(err => {
   console.error('[STARTUP] Fatal init error:', err.message);

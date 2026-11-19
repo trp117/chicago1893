@@ -35,6 +35,7 @@ import { AnchorTracker } from '../services/AnchorTracker.js';
 import { makeIsAllowedScenario } from './demoMode.js';
 import { checkInputSafety, MINOR_SELF_STATEMENT_NOTE } from '../services/InputSafetyGate.js';
 import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
+import { fingerprintScenarioData, buildColdOpenState, coldOpenHistorySeed, coldOpenTranscriptHeader } from './coldOpen.js';
 
 // DEMO_MODE spend metering. Every paid Claude call on the play path hands its usage block to
 // reportUsage. In prod the sink is null and reportUsage does nothing; createGameRouter points
@@ -104,6 +105,16 @@ async function getScenarioData(repos, scenarioId, { state = null } = {}) {
   const storyArc    = state ? loadStoryArc(repos, scenario, state) : null;
   if (storyArc) data.storyArc = storyArc;
   return data;
+}
+
+// DEMO_COLD_OPEN: the fingerprint of the content a baked opening was produced from — read the
+// same way the router reads it (through the [UNVERIFIED] strip), arc resolved from the baked
+// state. Used by server.js (stale check) and scripts/cold-open-bake.mjs (stamping a bake).
+export async function coldOpenFingerprintFor(contentRepos, scenarioId, roleId, bakedState) {
+  const data = await getScenarioData(withUnverifiedStripped(contentRepos), scenarioId, { state: bakedState });
+  const role = data.playerRoles.find(r => r.id === roleId);
+  if (!role) throw new Error(`Role "${roleId}" not found in "${scenarioId}".`);
+  return fingerprintScenarioData({ ...data, role });
 }
 
 // ── JSON extraction ────────────────────────────────────────────────────────────
@@ -913,6 +924,90 @@ export function createGameRouter(contentRepos, config = {}) {
   const r = Router();
   r.use(stripUnverifiedFromJson);
 
+  // ── DEMO_COLD_OPEN (coldOpen.js) ────────────────────────────────────────────
+  // Present only when server.js built the cold open (DEMO_MODE on AND DEMO_COLD_OPEN=true).
+  // Otherwise neither route below exists and /turn is registered with no pre-handler.
+  const coldOpen = demo && config.coldOpen ? config.coldOpen : null;
+  let coldOpenFirstTurn = null;
+  if (coldOpen) {
+    // The entry's display content. No model call: a cached row read and nothing else. The baked
+    // state is not sent — only what the page shows, plus where the opening plays (its header).
+    r.get('/cold-open', async (req, res) => {
+      const { scenarioId, roleId } = req.query;
+      const notFound = () => res.status(404).json({ error: 'Not found.' });
+      if (typeof scenarioId !== 'string' || typeof roleId !== 'string' || !isAllowedScenario(scenarioId)) return notFound();
+      try {
+        const row = await coldOpen.get(scenarioId, roleId);
+        if (!row) return notFound();
+        const { beats, lean, baked } = row.content;
+        res.set('Cache-Control', 'no-store').json({
+          scenarioId, roleId,
+          beats:       beats.map(b => ({ header: b.header, line: b.line })),
+          narrative:   lean.narrative,
+          instruction: lean.instruction,
+          choices:     lean.choices,
+          location:    baked.state.location ?? null,
+          scene:       baked.output?.scene ?? null,
+          readyRoles:  await coldOpen.readyRoles(scenarioId),
+        });
+      } catch (e) {
+        console.warn(`[COLD-OPEN] display read failed: ${e?.message || e}`);
+        notFound();
+      }
+    });
+
+    // The first live action of a cold-open session: an ordinary /turn request carrying
+    // `coldOpen: { scenarioId, roleId }`. Whatever state and history the client sent are
+    // replaced by the server-held baked state and the lean-cut history seed, the transcript is
+    // opened the way /start opens it, and the turn is metered as a session START (budget start
+    // ceiling + per-IP daily cap, refunded if no turn is delivered). Then the turn handler runs.
+    coldOpenFirstTurn = async (req, res, next) => {
+      const co = req.body?.coldOpen;
+      if (!co) return next();
+      try {
+        const { playerInput, sessionId } = req.body;
+        const { scenarioId, roleId } = co;
+        if (typeof playerInput !== 'string' || !playerInput.trim() || typeof sessionId !== 'string' || !sessionId.trim()) {
+          return res.status(400).json({ error: 'Missing playerInput or sessionId.' });
+        }
+        if (typeof scenarioId !== 'string' || !isAllowedScenario(scenarioId)) return refuseScenario(res);
+        const row = await coldOpen.get(scenarioId, roleId);
+        if (!row) return res.status(404).json({ error: 'This opening is not available.' });
+        const { scenario, playerRoles, characters } = await getScenarioData(repos, scenarioId);
+        const role = playerRoles.find(x => x.id === roleId);
+        if (!role) return res.status(404).json({ error: 'This opening is not available.' });
+
+        const { state, unseen } = buildColdOpenState(row.content, { scenario, characters });
+        req.body.state   = state;
+        req.body.history = coldOpenHistorySeed(row.content.lean.narrative);
+        res.locals.coldOpenStart = true;
+        console.log(`[COLD-OPEN] first action scenario=${scenarioId} role=${roleId} session=${sessionId}${unseen.length ? ` reintroduce=${unseen.join(',')}` : ''}`);
+
+        await writeFile(join(TRANSCRIPTS_DIR, `${sessionId}.md`), coldOpenTranscriptHeader({
+          scenario, scenarioId, role, roleId, sessionId, narrative: row.content.lean.narrative,
+        })).catch(e => console.error('[COLD-OPEN TRANSCRIPT ERROR]', e.message));
+
+        res.on('close', () => {
+          if (res.locals.turnDelivered) {
+            demo.write('start', () => demo.store.startTranscript({
+              session_id:  sessionId,
+              scenario_id: scenarioId,
+              role_id:     roleId,
+              opening:     { at: new Date().toISOString(), entry: 'cold_open', ...demoResponseSnapshot({ narrative: row.content.lean.narrative, choices: row.content.lean.choices }, characters), location: state.location ?? null },
+            }));
+          } else if (res.locals.coldOpenSlotTaken) {
+            demo.daily.refund(req.ip || 'unknown');
+            console.log(`[DEMO LIMIT] daily slot refunded ip=${req.ip || 'unknown'} (cold-open first turn not delivered)`);
+          }
+        });
+        return next();
+      } catch (e) {
+        console.error(`[COLD-OPEN] first action failed: ${e?.message || e}`);
+        if (!res.headersSent) res.status(500).json({ error: 'This opening could not be continued — please try again.' });
+      }
+    };
+  }
+
   // ── Client config ───────────────────────────────────────────────────────────
   r.get('/config', (_, res) => res.json({ demoMode }));
 
@@ -1378,7 +1473,9 @@ Do not open with the historical context. Open inside the character's body. Let t
   });
 
   // ── Turn ───────────────────────────────────────────────────────────────────
-  r.post('/turn', async (req, res) => {
+  // coldOpenFirstTurn is null unless the cold open is on, so in prod and in a demo without it
+  // this registers exactly the one handler it always did.
+  r.post('/turn', ...(coldOpenFirstTurn ? [coldOpenFirstTurn] : []), async (req, res) => {
     try {
       const { state, playerInput, history = [], sessionId } = req.body;
       if (!state || !playerInput) return res.status(400).json({ error: 'Missing state or playerInput.' });
@@ -1412,8 +1509,12 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       if (demo) {
-        const hit = await demoLimitHit(req, { starting: false });
+        // A cold-open first action (coldOpenFirstTurn set coldOpenStart) is the session's start:
+        // it meets the start ceiling and takes the daily slot. Every other turn: unchanged.
+        const starting = res.locals.coldOpenStart === true;
+        const hit = await demoLimitHit(req, { starting });
         if (hit) { logDemoLimit(hit, req); return sendDemoLimit(res, hit); }
+        if (starting) res.locals.coldOpenSlotTaken = true;
       }
 
       res.set({
@@ -1985,6 +2086,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       turnTrace?.update({ output: { narrative: output.narrative?.slice(0, 300), location: output.location, isEnding: output.endState?.isEnding ?? false } });
       scoreTrace(traceTags.length ? 0 : 1, traceTags.length ? traceTags.join(', ') : undefined);
 
+      res.locals.turnDelivered = true;   // read only by coldOpenFirstTurn (cold-open demos)
       sendSse(res, { type: 'done', output: attachSpeakerNames(output, characters), nextState, mockMode: false });
       res.end();
       if (demo && sessionId) {
