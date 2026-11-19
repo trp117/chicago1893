@@ -56,6 +56,32 @@ function readDisplay(v) {
 }
 const display = readDisplay(opt('display'));
 
+// ── --from-row: write a row already baked (a dry run's --out file) ──────────
+// No /start, no model call: the row written is exactly the row that was reviewed. Validated and
+// linted again, status taken from --status (default draft). Needs --write to touch Supabase.
+async function upsertRow(row) {
+  const { createClient } = await import('@supabase/supabase-js');
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  // updated_at stamped on every write (the column default only covers the first insert).
+  const { error: e } = await sb.from('demo_cold_opens').upsert({ ...row, updated_at: new Date().toISOString() }, { onConflict: 'scenario_id,role_id' });
+  if (e) throw new Error(`upsert failed: ${e.message}`);
+  const { data, error: e2 } = await sb.from('demo_cold_opens').select('scenario_id, role_id, status, updated_at').eq('scenario_id', row.scenario_id).eq('role_id', row.role_id).single();
+  if (e2) throw new Error(`read-back failed: ${e2.message}`);
+  console.log(`UPSERTED into demo_cold_opens — read back: ${JSON.stringify(data)}`);
+}
+if (opt('from-row')) {
+  const rows = JSON.parse(fs.readFileSync(opt('from-row'), 'utf8'));
+  const row = (Array.isArray(rows) ? rows : [rows]).find(r => r.scenario_id === scenarioId && r.role_id === roleId);
+  if (!row) { console.error(`no ${scenarioId}/${roleId} row in ${opt('from-row')}`); process.exit(2); }
+  row.status = status;
+  const problem = coldOpenContentProblem(row.content, { scenarioId, roleId });
+  if (problem) { console.error(`row would not be served: ${problem}`); process.exit(1); }
+  console.log(`from-row: ${scenarioId}/${roleId} baked ${row.content.baked.baked_at}, fingerprint ${row.content.baked.fingerprint.slice(0, 23)}…, status ${status} — no model call`);
+  if (flag('write')) await upsertRow(row);
+  else console.log('DRY RUN — nothing written to Supabase. Re-run with --write to upsert.');
+  process.exit(0);
+}
+
 // ── Boot a local server (prod mode, content restored from Supabase) ─────────
 const freePort = () => new Promise((resolve, reject) => {
   const s = net.createServer();
@@ -152,12 +178,7 @@ try {
   console.log(`\nrow written to ${outFile} (status ${row.status})`);
 
   if (flag('write')) {
-    const { createClient } = await import('@supabase/supabase-js');
-    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-    // updated_at stamped on every write (the column default only covers the first insert).
-    const { error: e } = await sb.from('demo_cold_opens').upsert({ ...row, updated_at: new Date().toISOString() }, { onConflict: 'scenario_id,role_id' });
-    if (e) throw new Error(`upsert failed: ${e.message}`);
-    console.log(`UPSERTED into demo_cold_opens (${scenarioId}/${roleId}, ${row.status}). Live within 60s on any demo with DEMO_COLD_OPEN=true.`);
+    await upsertRow(row);
   } else {
     console.log('DRY RUN — nothing written to Supabase. Re-run with --write to upsert.');
   }
