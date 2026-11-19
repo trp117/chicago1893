@@ -64,26 +64,38 @@ html.rl.rl-wide header.hero #redesign-location-sub,
 html.rl.rl-wide header.hero #new-game-btn { display: none !important; }
 html.rl.rl-wide header.hero h1 { font-size: 1.05rem; margin: 0; }
 
+/* The rail's ground: a feathered scrim over the image on the rail's side only (column edge →
+   viewport edge). Transparent at the column, darkening quickly to where the rail text sits, then
+   gently deeper toward the right; the photo still shows through at the far margin. No edge, no
+   border, no card. Lighter than the column's reading surface (0.86): the rail is secondary. */
+html.rl.rl-wide .rl-rail::before {
+  content: ''; position: fixed; top: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none;
+  width: max(220px, calc(50vw - 360px));
+  background: linear-gradient(to right,
+    rgba(6, 6, 5, 0) 0%, rgba(6, 6, 5, 0.5) 10%, rgba(6, 6, 5, 0.62) 38%, rgba(6, 6, 5, 0.7) 100%);
+}
+html.rl.rl-wide .rl-rail { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55); }
+
 /* Recessive: muted, small, one thin divider, no boxes. */
 .rl-rail .rl-block { margin: 0; }
 .rl-rail .rl-block + .rl-block { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(58, 52, 41, 0.7); }
-.rl-rail .rl-label { margin: 0 0 8px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #857b6a; }
+.rl-rail .rl-label { margin: 0 0 8px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a39883; }
 .rl-rail .rl-line { margin: 0 0 4px; font-size: 0.82rem; line-height: 1.4; }
 .rl-rail .rl-role { color: var(--text, #f0eadc); font-family: Georgia, serif; font-size: 0.95rem; }
 .rl-rail button { background: none; border: 0; border-radius: 4px; padding: 0; margin: 0; font: inherit; font-weight: normal; color: inherit; cursor: pointer; text-align: left; }
 .rl-rail button:hover { color: var(--accent, #d0b06a); }
 .rl-rail button:focus-visible { outline: 2px solid var(--accent, #d0b06a); outline-offset: 2px; }
-.rl-rail .rl-change { color: #857b6a; font-size: 0.78rem; }
+.rl-rail .rl-change { color: #a39883; font-size: 0.78rem; }
 .rl-rail .rl-history { margin-top: 6px; font-size: 0.78rem; text-decoration: underline; text-underline-offset: 3px; }
 .rl-rail .rl-cast { list-style: none; margin: 0; padding: 0; }
 .rl-rail .rl-cast li { margin: 0 0 8px; }
 .rl-rail .rl-cast li.rl-gone { opacity: 0.45; }
 .rl-rail .rl-npc { display: block; width: 100%; }
 .rl-rail .rl-npc-name { display: block; color: var(--text, #f0eadc); font-size: 0.85rem; }
-.rl-rail .rl-npc-tag { display: block; font-size: 0.74rem; color: #857b6a; }
+.rl-rail .rl-npc-tag { display: block; font-size: 0.74rem; color: #a39883; }
 .rl-rail .rl-npc-more { margin: 6px 0 2px; font-size: 0.78rem; line-height: 1.5; color: var(--muted, #c1b9a6); }
-.rl-rail .rl-more { font-size: 0.74rem; color: #857b6a; text-decoration: underline; text-underline-offset: 3px; }
-.rl-rail .rl-empty { font-size: 0.78rem; color: #857b6a; font-style: italic; }
+.rl-rail .rl-more { font-size: 0.74rem; color: #a39883; text-decoration: underline; text-underline-offset: 3px; }
+.rl-rail .rl-empty { font-size: 0.78rem; color: #a39883; font-style: italic; }
 
 /* ── The history panel (rail link) ────────────────────────────────────────────────────── */
 .rl-panel { position: fixed; inset: 0; z-index: 9100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, 0.72); }

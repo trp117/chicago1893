@@ -70,6 +70,17 @@ console.log('\nPart A — gating, injection, contract');
   const MAPPED = ['scrollTop', 'scrollHeight', 'clientHeight', 'getBoundingClientRect'];
   check(`#story scroll APIs the page uses (${[...used].join(', ')}) are all mapped by the shim`, [...used].every(u => MAPPED.includes(u)));
   check('…and its scroll listener is fed by the column\'s scroll events', /storyEl\.addEventListener\('scroll'/.test(PAGE) && /dispatchEvent\(new Event\('scroll'\)\)/.test(js));
+  // The rail's scrim: on the rail's side only, feathered (transparent at the column edge), lighter
+  // than the column's reading surface, and never a card (no border, no radius, no box shadow).
+  {
+    const m = RL_FILES.css.match(/html\.rl\.rl-wide \.rl-rail::before \{([\s\S]*?)\n\}/);
+    const rule = m?.[1] || '';
+    const alphas = [...rule.matchAll(/rgba\(6, 6, 5, ([\d.]+)\)/g)].map(a => Number(a[1]));
+    const surface = Number(RL_FILES.css.match(/html\.rl \.main-column \{[\s\S]*?background: rgba\(14, 13, 11, ([\d.]+)\)/)?.[1]);
+    check('rail scrim: fixed to the rail side, feathered from transparent, deepening rightward', /position: fixed/.test(rule) && /right: 0/.test(rule) && /calc\(50vw - 360px\)/.test(rule) && alphas[0] === 0 && alphas.every((a, i) => i === 0 || a >= alphas[i - 1]));
+    check(`rail scrim: subtler than the column surface (max ${Math.max(...alphas)} < ${surface})`, Math.max(...alphas) < surface);
+    check('rail scrim: not a card (no border, radius or box-shadow)', !/border|radius|box-shadow/.test(rule));
+  }
   for (const sel of ['class="app-shell"', 'class="main-column"', 'class="story-feed"', 'class="bottom-bar"', 'id="choices-area-wrap"', 'id="input-form"', 'class="hero"']) {
     check(`the page still has ${sel}`, PAGE.includes(sel));
   }
