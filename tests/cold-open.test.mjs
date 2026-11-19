@@ -206,7 +206,7 @@ try {
   };
   const bakedMedic = await bake(ROLE_ID), bakedCox = await bake(OTHER_ROLE);
   check('bake: one real /start per role (2 story calls)', model.story.length === 2);
-  const LEAN = 'The ramp drops. Red water to the knees.\n\nSomeone up the beach is screaming for a medic.';
+  const LEAN = 'The ramp drops. Red water to the knees.\n\n*Someone up the beach is screaming for a medic.*';
   const row = async (roleId, baked, extra = {}) => ({
     scenario_id: SCENARIO_ID, role_id: roleId, status: 'ready',
     content: {
@@ -282,6 +282,9 @@ try {
   const story = doc.getElementById('story');
   check('lean narrative on screen (both paragraphs), not the engine\'s full opening', /The ramp drops\. Red water/.test(story.textContent) && /screaming for a medic/.test(story.textContent) && !/FULL ENGINE OPENING/.test(doc.body.textContent));
   const choiceBtns = [...doc.querySelectorAll('#choices .choice-btn')];
+  const lineEls = [...story.querySelectorAll('.scene-card .line')];
+  check('a *wholly emphasised* paragraph (the call line) is tagged italic; plain narration is not', lineEls.length === 2 && !lineEls[0].classList.contains('co-em') && lineEls[1].classList.contains('co-em')
+    && win.getComputedStyle(lineEls[1].querySelector('em')).fontStyle === 'italic' && win.getComputedStyle(lineEls[0].querySelector('em')).fontStyle === 'normal');
   check('the three starting choices', JSON.stringify(choiceBtns.map(b => b.textContent)) === JSON.stringify(['Crawl to the screaming man', 'Shout for the litter team', 'Check your aid bag']));
   check('instruction line above the choices', doc.querySelector('#choices-area-wrap > .co-instruction')?.textContent === 'Your move — choose one, or write your own:');
   check('free-text input + send button enabled', !doc.getElementById('player-input').disabled && !doc.querySelector('#input-form button[type="submit"]').disabled);

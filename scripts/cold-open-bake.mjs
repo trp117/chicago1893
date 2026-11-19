@@ -41,7 +41,20 @@ const imp = rel => import(pathToFileURL(path.join(ROOT, rel)).href);
 const { coldOpenContentProblem, lintColdOpen } = await imp('engine/server/coldOpen.js');
 const { coldOpenFingerprintFor } = await imp('engine/server/gameRouter.js');
 
-const display = opt('display') ? JSON.parse(fs.readFileSync(opt('display'), 'utf8')) : null;
+// --display is inline JSON (starts with "{") or a path to a JSON file. lean.narrative may be a
+// string or an array of paragraphs (joined with a blank line). A paragraph given as
+// { text, italic: true } is stored wrapped in *asterisks* — the engine's emphasis mark, which the
+// cold-open page renders italic (the call line).
+function readDisplay(v) {
+  if (!v) return null;
+  const d = JSON.parse(v.trim().startsWith('{') ? v : fs.readFileSync(v, 'utf8'));
+  const n = d?.lean?.narrative;
+  if (Array.isArray(n)) {
+    d.lean.narrative = n.map(p => typeof p === 'string' ? p.trim() : (p.italic ? `*${String(p.text).trim()}*` : String(p.text).trim())).join('\n\n');
+  }
+  return d;
+}
+const display = readDisplay(opt('display'));
 
 // ── Boot a local server (prod mode, content restored from Supabase) ─────────
 const freePort = () => new Promise((resolve, reject) => {
@@ -141,6 +154,7 @@ try {
   if (flag('write')) {
     const { createClient } = await import('@supabase/supabase-js');
     const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    // updated_at stamped on every write (the column default only covers the first insert).
     const { error: e } = await sb.from('demo_cold_opens').upsert({ ...row, updated_at: new Date().toISOString() }, { onConflict: 'scenario_id,role_id' });
     if (e) throw new Error(`upsert failed: ${e.message}`);
     console.log(`UPSERTED into demo_cold_opens (${scenarioId}/${roleId}, ${row.status}). Live within 60s on any demo with DEMO_COLD_OPEN=true.`);

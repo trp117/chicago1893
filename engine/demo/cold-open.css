@@ -14,6 +14,8 @@ html.co-boot #role-overlay { display: none !important; }
 #co-overlay .co-skip { position: absolute; left: 0; right: 0; bottom: max(20px, env(safe-area-inset-bottom));
   text-align: center; font-family: system-ui, sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; color: #857b6a; }
 
+.scene-card .line.co-em > em, .redesign .scene-card .line.co-em > em:only-child { font-style: italic; }
+
 .co-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 0 10px; }
 .co-head button, .co-foot button, .co-panel button { background: none; border: 0; border-radius: 6px; color: var(--muted, #a89f8d);
   font: inherit; font-weight: normal; cursor: pointer; padding: 6px 4px; }

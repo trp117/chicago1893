@@ -104,6 +104,7 @@
     var opening = { narrative: content.narrative, choices: content.choices };
     if (content.scene) opening.scene = content.scene;
     renderOutput(opening, { skipTts: true });
+    markEmphasisLines();
     updateCandleIndicator(gameState.remainingMinutes, scenario.sessionTargetMinutes || 15);
     addChrome(role);
     streamOptionsDots.classList.add('hidden');
@@ -113,6 +114,18 @@
     submitBtn.disabled = false;
     inputEl.disabled = false;
     storyEl.scrollTop = 0;
+  }
+
+  // A paragraph authored wholly in *asterisks* (the engine's own emphasis mark) is meant to read
+  // italic — the call line. markupNarrative makes it a lone <em>, which the redesign CSS sets
+  // upright like plain narration, so such lines are tagged and kept italic (cold-open.css).
+  function markEmphasisLines() {
+    var paras = String(content.narrative).split('\n').filter(function (l) { return l.trim(); });
+    var cards = storyEl.querySelectorAll('.scene-card');
+    var lines = cards.length ? cards[cards.length - 1].querySelectorAll('.line') : [];
+    paras.forEach(function (para, i) {
+      if (lines[i] && /^\s*\*[^*]+\*\s*$/.test(para)) lines[i].classList.add('co-em');
+    });
   }
 
   // ── Chrome: header row, instruction, footer ──────────────────────────────
