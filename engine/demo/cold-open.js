@@ -17,6 +17,9 @@
 (function () {
   'use strict';
   var CO = window.__COLD_OPEN__;
+  // DEMO_READING_LAYOUT on (html.rl, set in <head> by readingLayout.js): the scene uses the
+  // page's own controls inside the reading column. Off: the standalone column below, unchanged.
+  var READING_LAYOUT = document.documentElement.classList.contains('rl');
   if (!CO) return;
 
   var COLD_OPEN_HOOKS = ['renderStreamlinedScreen1', 'restartGame', 'submitTurn', 'renderOutput', 'renderChoices',
@@ -107,8 +110,11 @@
     markEmphasisLines();
     updateCandleIndicator(gameState.remainingMinutes, scenario.sessionTargetMinutes || 15);
     addChrome(role);
-    detachNativeInput();
+    // Reading layout: the page's own input stays — it is the column's input at the cold open
+    // and in every turn after it.
+    if (!READING_LAYOUT) detachNativeInput();
     document.documentElement.classList.add('co-active');
+    if (READING_LAYOUT && window.__readingLayout) window.__readingLayout.update();   // the rail's "change role"
     streamOptionsDots.classList.add('hidden');
     choicesAreaWrapEl.classList.remove('hidden');
     choicesAreaWrapEl.style.transition = '';
@@ -213,6 +219,16 @@
     }
     storyEl.insertBefore(head, storyEl.firstChild);
 
+    if (READING_LAYOUT) {
+      // The reading layout's column IS the page's own layout (narrative, then the bottom bar
+      // flowing after it): the page's #choices already hold this opening's choices (renderOutput)
+      // and its #input-form is the input. Only the instruction (above the choices) and the footer
+      // (last) are added — and removed on the first action — so live turns do not reflow.
+      choicesAreaWrapEl.insertBefore(el('p', 'co-instruction', content.instruction), choicesAreaWrapEl.firstChild);
+      document.querySelector('.bottom-bar').appendChild(buildFooter());
+      return;
+    }
+
     addToColumn(el('p', 'co-instruction', content.instruction));
     var list = el('div', 'co-choices');
     list.setAttribute('role', 'group');
@@ -226,7 +242,9 @@
     addToColumn(list);
     var own = buildColdOpenInput();
     if (own) addToColumn(own);
-
+    addToColumn(buildFooter());
+  }
+  function buildFooter() {
     var foot = el('nav', 'co-foot');
     foot.setAttribute('aria-label', 'More');
     var more = el('a', null, 'Another moment');
@@ -236,7 +254,7 @@
     replay.addEventListener('click', function () { restartGame(); });
     foot.appendChild(more);
     foot.appendChild(replay);
-    addToColumn(foot);
+    return foot;
   }
 
   // ── 3. The beats ─────────────────────────────────────────────────────────

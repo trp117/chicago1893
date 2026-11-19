@@ -34,7 +34,7 @@ const ENV_FILE = path.join(ROOT, '.env');
 if (fs.existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 
 // Every cold-open env var, so a shape can say "none of these" explicitly.
-const COLD_OPEN_VARS = ['DEMO_COLD_OPEN', 'DEMO_FEATURED_SCENARIO', 'DEMO_FEATURED_ROLE'];
+const COLD_OPEN_VARS = ['DEMO_COLD_OPEN', 'DEMO_FEATURED_SCENARIO', 'DEMO_FEATURED_ROLE', 'DEMO_READING_LAYOUT', 'DEMO_COLD_OPEN_FILE'];
 const unsetAll = Object.fromEntries(COLD_OPEN_VARS.map(k => [k, undefined]));
 
 const LIMEN = {
@@ -50,10 +50,12 @@ export const SHAPES = {
 };
 // compare only: the same shapes with cold-open env present that must still be inert.
 const INERT_VARIANTS = {
-  prod:  [{ DEMO_COLD_OPEN: 'true', DEMO_FEATURED_SCENARIO: 'dog_green_sector', DEMO_FEATURED_ROLE: 'battalion_medic' }],
-  gw:    [{ DEMO_COLD_OPEN: 'false' }],
+  prod:  [{ DEMO_COLD_OPEN: 'true', DEMO_FEATURED_SCENARIO: 'dog_green_sector', DEMO_FEATURED_ROLE: 'battalion_medic' },
+          { DEMO_READING_LAYOUT: 'true' }],
+  gw:    [{ DEMO_COLD_OPEN: 'false' }, { DEMO_READING_LAYOUT: 'false' }],
   limen: [{ DEMO_FEATURED_SCENARIO: 'dog_green_sector', DEMO_FEATURED_ROLE: 'battalion_medic' },
-          { DEMO_COLD_OPEN: 'false', DEMO_FEATURED_SCENARIO: 'dog_green_sector', DEMO_FEATURED_ROLE: 'battalion_medic' }],
+          { DEMO_COLD_OPEN: 'false', DEMO_FEATURED_SCENARIO: 'dog_green_sector', DEMO_FEATURED_ROLE: 'battalion_medic' },
+          { DEMO_READING_LAYOUT: 'false' }],
 };
 
 export const ROUTES = [

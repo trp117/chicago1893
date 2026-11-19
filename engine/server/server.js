@@ -29,6 +29,7 @@ import { makeIsAllowedScenario, demoPageGuard, readDemoBranding } from './demoMo
 import { createSupabaseDemoStore, readDemoBudgetId } from './demoStore.js';
 import { readDemoLimitConfig } from './demoLimits.js';
 import { readColdOpenConfig, createColdOpenStore, createColdOpenRuntime, supabaseColdOpenRows, fileColdOpenRows } from './coldOpen.js';
+import { readReadingLayoutConfig } from './readingLayout.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
@@ -71,6 +72,9 @@ const COLD_OPEN = COLD_OPEN_CONFIG.enabled ? createColdOpenRuntime({
   store:  createColdOpenStore({ fetchRows: COLD_OPEN_CONFIG.file ? fileColdOpenRows(COLD_OPEN_CONFIG.file) : supabaseColdOpenRows(supabaseService) }),
   fingerprintFor: (scenarioId, roleId, state) => coldOpenFingerprintFor(repos, scenarioId, roleId, state),
 }) : null;
+// DEMO_READING_LAYOUT (readingLayout.js) — default OFF, inert without DEMO_MODE. Layout only.
+const READING_LAYOUT = readReadingLayoutConfig(process.env, { demoMode: DEMO_MODE }).enabled;
+if (READING_LAYOUT) console.log('[READING-LAYOUT] enabled — /game and the cold open use the reading column + cast rail');
 if (COLD_OPEN) {
   console.log(`[COLD-OPEN] enabled featured=${COLD_OPEN_CONFIG.featuredScenario || '(none)'}/${COLD_OPEN_CONFIG.featuredRole || '(none)'} source=${COLD_OPEN_CONFIG.file ? 'file' : 'supabase'}`);
   if (COLD_OPEN_CONFIG.entryProblem) console.warn(`[COLD-OPEN] entry unavailable, / serves the card landing: ${COLD_OPEN_CONFIG.entryProblem}`);
@@ -89,6 +93,7 @@ if (DEMO_MODE) {
     onLandingView: () => DEMO_STORE.incrPageview(),
     cacheControl: 'public, max-age=300, must-revalidate',
     ...(COLD_OPEN ? { coldOpen: COLD_OPEN } : {}),
+    ...(READING_LAYOUT ? { readingLayout: true } : {}),
   }));
 }
 app.use(express.static(publicDir, { maxAge: '5m' }));
@@ -253,6 +258,8 @@ app.get('/health', (_, res) => {
     ...(restoredCounts ? { restoredCounts } : {}),
     // DEMO_COLD_OPEN only: which entry / serves, and any stale rows. Absent otherwise.
     ...(COLD_OPEN ? { coldOpen: COLD_OPEN.health() } : {}),
+    // DEMO_READING_LAYOUT only. Absent otherwise.
+    ...(READING_LAYOUT ? { readingLayout: true } : {}),
     uptime: process.uptime(),
   });
 });

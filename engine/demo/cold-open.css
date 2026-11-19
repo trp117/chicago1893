@@ -11,8 +11,8 @@ html.co-active .scroll-hint { display: none !important; }
 /* The scene is one flowing column in the story feed (cold-open.js): the page's header (title,
    location, Begin Again, Notes, ← Stories) and its pinned bottom bar are not part of it. Both
    return on the first live action, when co-active is cleared. */
-html.co-active header.hero, html.co-active .bottom-bar { display: none !important; }
-html.co-active .story-feed { max-width: 720px; width: 100%; margin: 0 auto; }
+html.co-active:not(.rl) header.hero, html.co-active:not(.rl) .bottom-bar { display: none !important; }
+html.co-active:not(.rl) .story-feed { max-width: 720px; width: 100%; margin: 0 auto; }
 
 .co-choices { display: flex; flex-direction: column; gap: 8px; margin: 0 0 14px; }
 .co-choices .choice-btn { width: 100%; text-align: left; font-size: 0.95rem; line-height: 1.4; padding: 12px 14px; }

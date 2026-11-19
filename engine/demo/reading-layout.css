@@ -1,0 +1,101 @@
+/* DEMO_READING_LAYOUT — injected into /game and the cold-open page at serve time (demoMode.js),
+   only when the flag is on. Every rule is under html.rl (set in <head> before first paint).
+   html.rl-wide (container ≥ 900px, kept current by reading-layout.js) adds the cast rail.
+   Keyed on classes rather than @media so the two modes are one switch, set in one place. */
+
+/* ── Atmosphere: the scenario's image, full-bleed, behind everything ───────────────────── */
+html.rl body { background: #0b0a09; }
+html.rl body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(5, 5, 4, var(--rl-veil, 0.55)), rgba(5, 5, 4, calc(var(--rl-veil, 0.55) + 0.2))),
+    var(--rl-image, linear-gradient(180deg, #0d0d0d, #161616));
+  background-size: cover; background-position: var(--rl-image-pos, center); background-repeat: no-repeat;
+}
+html.rl .app-shell { position: relative; z-index: 1; background: transparent; grid-template-columns: minmax(0, 1fr); }
+
+/* ── The reading column: capped measure, one scroller, nothing pinned ──────────────────── */
+html.rl .main-column {
+  width: 100%; max-width: 720px; margin: 0 auto; height: 100vh; height: 100dvh;
+  overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;
+  background: rgba(14, 13, 11, 0.86);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.45);
+  scrollbar-width: thin; scrollbar-color: var(--border, #3a3429) transparent;
+}
+html.rl .story-feed { flex: none; overflow: visible; min-height: 0; max-width: none; padding: 24px 28px 8px; }
+html.rl .bottom-bar { flex: none; border-top: 0; background: transparent; padding-bottom: 28px; }
+html.rl header.hero { position: sticky; top: 0; z-index: 5; flex: none; background: rgba(14, 13, 11, 0.96); }
+html.rl .scroll-hint { display: none !important; }
+
+/* Choices: stacked in the column, full width, the same at the cold open and in every turn. */
+html.rl .choices-wrap { display: block; }
+html.rl .choices-arrow { display: none !important; }
+html.rl .choices { display: flex !important; flex-direction: column; flex-wrap: nowrap; overflow: visible; gap: 8px; padding: 4px 28px 10px; scroll-snap-type: none; }
+html.rl .choice-btn {
+  flex: none; width: 100%; text-align: left; white-space: normal;
+  padding: 12px 14px; font-size: 0.95rem; line-height: 1.4; border-radius: 10px;
+  border: 1px solid var(--border, #3a3429); background: rgba(40, 35, 24, 0.55); color: var(--text, #f0eadc);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+html.rl .choice-btn:hover { border-color: var(--accent, #d0b06a); color: var(--text, #f0eadc); }
+html.rl .input-row { padding: 6px 28px 10px; }
+
+/* Narrow: one full-width column, 16px gutters, no rail; orientation stays in the top bar. */
+html.rl:not(.rl-wide) .main-column { max-width: none; box-shadow: none; }
+html.rl:not(.rl-wide) .story-feed { padding: 14px 16px 8px; }
+html.rl:not(.rl-wide) .choices { padding: 4px 16px 10px; }
+html.rl:not(.rl-wide) .input-row { padding: 6px 16px 10px; }
+html.rl .rl-rail { display: none; }
+
+/* ── Wide: column + cast rail ─────────────────────────────────────────────────────────── */
+html.rl.rl-wide .app-shell { grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(220px, 1fr); }
+html.rl.rl-wide .main-column { grid-column: 2; grid-row: 1; }
+html.rl.rl-wide .rl-rail {
+  display: block; grid-column: 3; grid-row: 1; align-self: start;
+  max-width: 260px; padding: 28px 24px 0 28px; height: 100vh; height: 100dvh; overflow-y: auto;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: var(--muted, #c1b9a6);
+}
+/* The top bar slims to the location: role / date move to the rail. */
+html.rl.rl-wide header.hero { min-height: 0; padding: 12px 28px; }
+html.rl.rl-wide header.hero .back-link,
+html.rl.rl-wide header.hero #header-subtitle,
+html.rl.rl-wide header.hero #redesign-location-sub,
+html.rl.rl-wide header.hero #new-game-btn { display: none !important; }
+html.rl.rl-wide header.hero h1 { font-size: 1.05rem; margin: 0; }
+
+/* Recessive: muted, small, one thin divider, no boxes. */
+.rl-rail .rl-block { margin: 0; }
+.rl-rail .rl-block + .rl-block { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(58, 52, 41, 0.7); }
+.rl-rail .rl-label { margin: 0 0 8px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #857b6a; }
+.rl-rail .rl-line { margin: 0 0 4px; font-size: 0.82rem; line-height: 1.4; }
+.rl-rail .rl-role { color: var(--text, #f0eadc); font-family: Georgia, serif; font-size: 0.95rem; }
+.rl-rail button { background: none; border: 0; border-radius: 4px; padding: 0; margin: 0; font: inherit; font-weight: normal; color: inherit; cursor: pointer; text-align: left; }
+.rl-rail button:hover { color: var(--accent, #d0b06a); }
+.rl-rail button:focus-visible { outline: 2px solid var(--accent, #d0b06a); outline-offset: 2px; }
+.rl-rail .rl-change { color: #857b6a; font-size: 0.78rem; }
+.rl-rail .rl-history { margin-top: 6px; font-size: 0.78rem; text-decoration: underline; text-underline-offset: 3px; }
+.rl-rail .rl-cast { list-style: none; margin: 0; padding: 0; }
+.rl-rail .rl-cast li { margin: 0 0 8px; }
+.rl-rail .rl-cast li.rl-gone { opacity: 0.45; }
+.rl-rail .rl-npc { display: block; width: 100%; }
+.rl-rail .rl-npc-name { display: block; color: var(--text, #f0eadc); font-size: 0.85rem; }
+.rl-rail .rl-npc-tag { display: block; font-size: 0.74rem; color: #857b6a; }
+.rl-rail .rl-npc-more { margin: 6px 0 2px; font-size: 0.78rem; line-height: 1.5; color: var(--muted, #c1b9a6); }
+.rl-rail .rl-more { font-size: 0.74rem; color: #857b6a; text-decoration: underline; text-underline-offset: 3px; }
+.rl-rail .rl-empty { font-size: 0.78rem; color: #857b6a; font-style: italic; }
+
+/* ── The history panel (rail link) ────────────────────────────────────────────────────── */
+.rl-panel { position: fixed; inset: 0; z-index: 9100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, 0.72); }
+.rl-panel-sheet { width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto; padding: 18px 16px 22px; background: #171512; border: 1px solid var(--border, #3a3429); border-radius: 14px; color: var(--text, #f0eadc); }
+.rl-panel-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.rl-panel-title { margin: 0; font-family: system-ui, sans-serif; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted, #c1b9a6); }
+.rl-panel .rl-close { background: none; border: 0; color: var(--muted, #c1b9a6); font-size: 1.1rem; font-weight: normal; padding: 6px 8px; cursor: pointer; }
+.rl-panel .intro-panel-text { font-size: 0.95rem; line-height: 1.6; margin: 0 0 14px; }
+
+/* ── With the cold open (cold-open.js uses the native controls under html.rl) ──────────── */
+/* Wide: the rail carries role and history, so the cold open's own header row steps aside. */
+html.rl.rl-wide.co-active .co-head { display: none; }
+html.rl .co-instruction { margin: 10px 28px 6px; }
+html.rl:not(.rl-wide) .co-instruction { margin: 10px 16px 6px; }
+html.rl .bottom-bar > .co-foot { order: 5; padding: 6px 28px 4px; }

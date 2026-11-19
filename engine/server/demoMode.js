@@ -10,6 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { injectReadingLayoutIntoGameHtml, readingLayoutFiles } from './readingLayout.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const DEMO_DIR = path.resolve(HERE, '../demo');
@@ -231,10 +232,14 @@ export function injectColdOpenIntoLanding(html, readyScenarioIds) {
 //   /game             -> engine/game/index.html with the demo injection
 // onLandingView: called (fire-and-forget) once per counted landing view; omitted = no counting.
 //
+// readingLayout (DEMO_READING_LAYOUT only; false otherwise, and then nothing below changes):
+// /game and the cold-open page also carry the reading layout (readingLayout.js).
+//
 // coldOpen (DEMO_COLD_OPEN only; omitted otherwise, and then nothing below changes): the
 // runtime from coldOpen.js. With it, / is the cold-open entry when the featured role has a
 // ready row — and the card landing on any failure — and /moments is the card landing.
-export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null, coldOpen = null }) {
+export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null, coldOpen = null, readingLayout = false }) {
+  const withLayout = html => readingLayout ? injectReadingLayoutIntoGameHtml(html, readingLayoutFiles()) : html;
   const sendLanding = (req, res, next) => {
     let html;
     try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }
@@ -266,10 +271,10 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
       if (pick?.redirect) return res.redirect(302, pick.redirect);
       if (pick?.row) {
         const html = injectDemoIntoGameHtml(fs.readFileSync(gameHtmlPath, 'utf8'));
-        page = injectColdOpenIntoGameHtml(html, {
+        page = withLayout(injectColdOpenIntoGameHtml(html, {
           scenarioId: pick.scenarioId, roleId: pick.roleId,
           timings: coldOpen.timings, historyUser: coldOpen.historyUser,
-        }, { css: fs.readFileSync(COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(COLD_OPEN_JS_PATH, 'utf8') });
+        }, { css: fs.readFileSync(COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(COLD_OPEN_JS_PATH, 'utf8') }));
       }
     } catch (e) {
       console.warn(`[COLD-OPEN] entry failed, serving the landing: ${e?.message || e}`);
@@ -311,7 +316,10 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
       let html;
       try { html = fs.readFileSync(gameHtmlPath, 'utf8'); } catch (e) { return next(e); }
       res.set('Cache-Control', cacheControl);
-      return res.type('html').send(injectDemoIntoGameHtml(html));
+      if (!readingLayout) return res.type('html').send(injectDemoIntoGameHtml(html));
+      let page;
+      try { page = withLayout(injectDemoIntoGameHtml(html)); } catch (e) { return next(e); }
+      return res.type('html').send(page);
     }
     return next();
   };
