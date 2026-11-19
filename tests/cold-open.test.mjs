@@ -56,7 +56,7 @@ console.log('\nPart A — the game-page globals the injection hooks');
   }
   for (const fn of hooks) check(`function ${fn}() is declared at top level of the game page`, new RegExp(`^(async )?function ${fn}\\(`, 'm').test(page));
   // let/const globals the injection reads or assigns.
-  for (const v of ['gameState', 'sessionId', 'conversationHistory', 'currentRoleId', 'scenario', 'storyEl', 'choicesAreaWrapEl', 'streamOptionsDots', 'submitBtn', 'inputEl']) {
+  for (const v of ['gameState', 'sessionId', 'conversationHistory', 'currentRoleId', 'scenario', 'storyEl', 'choicesAreaWrapEl', 'streamOptionsDots', 'submitBtn', 'inputEl', 'formEl']) {
     check(`global ${v} is a top-level let/const of the game page`, new RegExp(`^(let|const) ${v}\\b`, 'm').test(page));
     check(`  …and the injection uses it by that name`, new RegExp(`\\b${v}\\b`).test(js));
   }
@@ -235,13 +235,13 @@ try {
     { scenarioId: SCENARIO_ID, roleId: ROLE_ID, timings, historyUser: CO.COLD_OPEN_HISTORY_USER },
     { css: fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(DM.COLD_OPEN_JS_PATH, 'utf8') });
 
-  async function openPage({ timings = FAST, reducedMotion = false } = {}) {
+  async function openPage({ timings = FAST, reducedMotion = false, base = BASE } = {}) {
     const log = { urls: [], turnBodies: [], turnDone: [] };
     const dom = new JSDOM(pageHtml(timings), {
-      url: `${BASE}/`, runScripts: 'dangerously', pretendToBeVisual: true,
+      url: `${base}/`, runScripts: 'dangerously', pretendToBeVisual: true,
       beforeParse(win) {
         win.fetch = async (u, o) => {
-          const href = new URL(u, BASE).href;
+          const href = new URL(u, base).href;
           log.urls.push(new URL(href).pathname);
           if (href.includes('/game/api/turn')) log.turnBodies.push(JSON.parse(o.body));
           const resp = await realFetch(href, o);
@@ -287,7 +287,16 @@ try {
     && win.getComputedStyle(lineEls[1].querySelector('em')).fontStyle === 'italic' && win.getComputedStyle(lineEls[0].querySelector('em')).fontStyle === 'normal');
   check('the three starting choices', JSON.stringify(choiceBtns.map(b => b.textContent)) === JSON.stringify(['Crawl to the screaming man', 'Shout for the litter team', 'Check your aid bag']));
   check('instruction line above the choices', doc.querySelector('#choices-area-wrap > .co-instruction')?.textContent === 'Your move — choose one, or write your own:');
-  check('free-text input + send button enabled', !doc.getElementById('player-input').disabled && !doc.querySelector('#input-form button[type="submit"]').disabled);
+  // The page's native screen-1 input ("Your move." textarea + Submit) must not be on the cold open.
+  check('native screen-1 input ABSENT from the DOM (no #input-form, no #player-input, no "Your move." / Submit)',
+    !doc.getElementById('input-form') && !doc.getElementById('player-input') && !doc.querySelector('textarea[placeholder="Your move."]')
+    && ![...doc.querySelectorAll('button')].some(b => b.textContent.trim() === 'Submit' && b.isConnected));
+  check('native "↓" scroll hint not shown while the cold open is the screen', win.getComputedStyle(doc.querySelector('.scroll-hint')).display === 'none');
+  const coInput = doc.querySelector('.co-input');
+  check('the cold open\'s own free-text input + Send button, enabled', !!coInput && !!coInput.querySelector('textarea') && coInput.querySelector('button[type="submit"]')?.textContent === 'Send');
+  const bar = [...doc.querySelector('.bottom-bar').children];
+  check('bottom bar order: instruction + choices, then the input, then the footer', bar.indexOf(doc.getElementById('choices-area-wrap')) < bar.indexOf(coInput) && bar.indexOf(coInput) < bar.indexOf(doc.querySelector('.co-foot')));
+  check('first-paint guard released once the scene is built (no co-pending)', !doc.documentElement.classList.contains('co-pending') && doc.documentElement.classList.contains('co-active'));
   const head = doc.querySelector('.co-head');
   check('header row: role on the left, "The history" on the right', head.firstElementChild.classList.contains('co-role') && /Battalion Medic/.test(head.firstElementChild.textContent) && head.lastElementChild.textContent === 'The history');
   check('header row sits above the opening in the feed', story.firstElementChild === head);
@@ -347,7 +356,9 @@ try {
   check(`turn ran on the server-held BAKED state (turnCount ${bakedTurnCount} → ${bakedTurnCount + 1}, client state had none)`, done1.nextState.turnCount === bakedTurnCount + 1 && done1.nextState.scenarioId === SCENARIO_ID && done1.nextState.playerRoleId === ROLE_ID);
   check('baked engine state carried through (npc_states present)', !!done1.nextState.npc_states && !('__coldOpen' in done1.nextState));
   check('the story continues on screen; the page adopted the live state', /crawl through the surf/.test(story.textContent) && await until(() => win.eval('gameState.__coldOpen') === undefined, 2000));
-  check('cold-open chrome gone once live (instruction, footer)', !doc.querySelector('.co-instruction') && !doc.querySelector('.co-foot'));
+  check('cold-open chrome gone once live (instruction, footer, own input)', !doc.querySelector('.co-instruction') && !doc.querySelector('.co-foot') && !doc.querySelector('.co-input'));
+  check('once live, the page\'s native input is back in place (above the choices) and working', !!doc.getElementById('input-form') && !!doc.getElementById('player-input')
+    && doc.getElementById('input-form').nextElementSibling?.id === 'stream-options-dots' && !doc.documentElement.classList.contains('co-active'));
   const tpath = p('engine/data/transcripts', `${sid}.md`);
   check('transcript opened like /start: header, scenario line, lean opening, then the turn', await until(() => fs.existsSync(tpath) && /## Scenario: dog_green_sector/.test(fs.readFileSync(tpath, 'utf8')) && fs.readFileSync(tpath, 'utf8').includes(LEAN) && /## Entry: cold open/.test(fs.readFileSync(tpath, 'utf8')), 3000));
   check('demo transcript row: one row, opening = the lean cut as a cold open, role set, turn 1 appended', await until(() => {
@@ -402,6 +413,36 @@ try {
   sk.doc.getElementById('co-overlay').click();
   check('tap anywhere skips the beats straight to the scene', await until(() => sk.doc.getElementById('co-overlay').hidden, 1500));
   sk.win.close();
+
+  // C12b — first paint: only the overlay can be painted before the scene exists.
+  {
+    const html = pageHtml(FAST);
+    const css = fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8');
+    check('first paint: the co-pending class is set in <head>, before <body> is parsed', html.indexOf("classList.add('co-boot', 'co-pending', 'co-active')") > -1 && html.indexOf("classList.add('co-boot', 'co-pending', 'co-active')") < html.indexOf('<body'));
+    check('first paint: the cold-open stylesheet (with the co-pending blackout) is in <head>', html.indexOf('id="cold-open-css"') < html.indexOf('</head>') && /html\.co-pending body > :not\(#co-overlay\) \{ visibility: hidden !important; \}/.test(css));
+    // Before the page script's loadGame resolves, nothing but the overlay is visible.
+    const early = new JSDOM(html, { url: `${BASE}/`, runScripts: 'dangerously', pretendToBeVisual: true,
+      beforeParse(w) { w.fetch = () => new Promise(() => {}); w.scrollTo = () => {}; w.speechSynthesis ??= { getVoices: () => [], cancel() {}, speak() {} }; w.console.error = () => {}; } });
+    const ed = early.window.document;
+    const vis = n => early.window.getComputedStyle(n).visibility;
+    check('before the scene is built: page header hidden, overlay showing, html still co-pending', ed.documentElement.classList.contains('co-pending') && vis(ed.querySelector('header.hero')) === 'hidden' && vis(ed.getElementById('input-form')) === 'hidden' && !ed.getElementById('co-overlay').hidden && vis(ed.getElementById('co-overlay')) !== 'hidden');
+    early.window.close();
+  }
+
+  // C12c — a typed first action through the cold open's own input (fresh router: own daily cap).
+  {
+    const typedBase = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { ...routerCfg, demoStore: createMemoryDemoStore() })));
+    const tp = await openPage({ base: typedBase });
+    await until(() => tp.doc.getElementById('co-overlay').hidden, 3000);
+    const n0 = model.story.length;
+    reply = TURN;
+    tp.doc.getElementById('co-player-input').value = 'I keep low and crawl toward the voice.';
+    tp.doc.querySelector('.co-input').requestSubmit();
+    check('typed first action through the cold open\'s input: one tagged /turn, sent as player_action', await until(() => tp.log.turnDone.length === 1, 8000)
+      && tp.log.turnBodies[0].coldOpen?.roleId === ROLE_ID && tp.log.turnBodies[0].player_action === 'I keep low and crawl toward the voice.' && model.story.length === n0 + 1);
+    check('  …then the native input is back and the cold-open input gone', !!tp.doc.getElementById('input-form') && !tp.doc.querySelector('.co-input'));
+    tp.win.close();
+  }
 
   // C13 — flag off at the router: no route, /turn ignores a coldOpen tag.
   const offBase = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { ...routerCfg, coldOpen: undefined, demoStore: createMemoryDemoStore() })));

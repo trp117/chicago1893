@@ -1,6 +1,21 @@
 /* DEMO_COLD_OPEN entry — injected into the game page at serve time (demoMode.js), only when
    the flag is on. The game page is dark-only; these rules use its own tokens. */
 html.co-boot #role-overlay { display: none !important; }
+/* From first paint until the scene is built under the overlay (co-pending, set in <head> and
+   cleared by cold-open.js), only the overlay is visible: no flash of the game page's header. */
+html.co-pending, html.co-pending body { background: #050504 !important; }
+html.co-pending body > :not(#co-overlay) { visibility: hidden !important; }
+/* While the cold open is the screen (co-active, cleared on the first live action): no native
+   scroll hint. The native input form is detached by cold-open.js, replaced by .co-input. */
+html.co-active .scroll-hint { display: none !important; }
+
+.co-input { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 4px 16px 8px; align-items: stretch; }
+.co-input textarea { width: 100%; resize: none; min-height: 48px; border-radius: 12px; border: 1px solid rgba(208,176,106,0.35);
+  background: var(--panel, #1b1b1b); color: var(--text, #f0eadc); padding: 12px 14px; font: inherit; font-size: 1rem; }
+.co-input textarea:focus { border-color: var(--accent, #d0b06a); outline: none; box-shadow: 0 0 0 2px rgba(208,176,106,0.12); }
+.co-input button { min-width: 72px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--accent, #d0b06a);
+  background: var(--accent, #d0b06a); color: #1a150c; font-weight: bold; cursor: pointer; }
+.co-input button:focus-visible { outline: 2px solid var(--text, #f0eadc); outline-offset: 2px; }
 
 #co-overlay { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center;
   padding: 24px 16px; background: #050504; color: #ECE3D2; cursor: pointer; opacity: 1; }

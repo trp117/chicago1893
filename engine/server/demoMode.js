@@ -185,7 +185,7 @@ export function injectColdOpenIntoGameHtml(html, { scenarioId, roleId, timings, 
   const boot = { scenarioId, roleId, timings, historyUser };
   const head = `<style id="cold-open-css">${css}</style>
 <script id="cold-open-boot">window.__COLD_OPEN__ = ${scriptJson(boot)};
-document.documentElement.classList.add('co-boot');
+document.documentElement.classList.add('co-boot', 'co-pending', 'co-active');
 try { var u = new URL(location.href); u.searchParams.set('scenarioId', window.__COLD_OPEN__.scenarioId); history.replaceState(history.state, '', u.pathname + u.search + u.hash); } catch (e) {}</script>
 `;
   const tail = `<script id="cold-open-js">${js}</script>\n`;

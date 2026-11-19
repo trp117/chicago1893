@@ -107,6 +107,8 @@
     markEmphasisLines();
     updateCandleIndicator(gameState.remainingMinutes, scenario.sessionTargetMinutes || 15);
     addChrome(role);
+    detachNativeInput();
+    document.documentElement.classList.add('co-active');
     streamOptionsDots.classList.add('hidden');
     choicesAreaWrapEl.classList.remove('hidden');
     choicesAreaWrapEl.style.transition = '';
@@ -114,6 +116,56 @@
     submitBtn.disabled = false;
     inputEl.disabled = false;
     storyEl.scrollTop = 0;
+    // The scene is built under the overlay: the page may now be painted (the overlay covers it).
+    document.documentElement.classList.remove('co-pending');
+  }
+
+  // ── The input: the cold open's own, below the choices ───────────────────
+  // The page's native input form sits ABOVE the choices in the bottom bar; on the cold open it
+  // would land between the narrative and the instruction line. It is taken out of the DOM while
+  // the cold open is the screen (the page's formEl/inputEl constants keep the element and its
+  // listeners) and put back, in place, on the first live action.
+  var nativeSlot = null;
+  function detachNativeInput() {
+    if (nativeSlot || !formEl.isConnected) return;
+    nativeSlot = document.createComment('cold-open: native input');
+    formEl.replaceWith(nativeSlot);
+  }
+  function restoreNativeInput() {
+    if (!nativeSlot) return;
+    nativeSlot.replaceWith(formEl);
+    nativeSlot = null;
+  }
+  function buildColdOpenInput() {
+    if (scenario.allow_free_input === false) return null;
+    var form = el('form', 'co-input');
+    var ta = el('textarea');
+    ta.id = 'co-player-input';
+    ta.rows = 2;
+    ta.placeholder = 'Or write your own…';
+    ta.setAttribute('aria-label', 'Write your own move');
+    var send = el('button', null, 'Send');
+    send.type = 'submit';
+    form.appendChild(ta);
+    form.appendChild(send);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var text = ta.value.trim();
+      if (!text) return;
+      ta.value = '';
+      submitTurn(text);   // typed: the page sends it as player_action, as with its own input
+    });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
+    });
+    return form;
+  }
+
+  // First live action: the cold open's own chrome goes, the page's own input comes back.
+  function goLive() {
+    document.querySelectorAll('.co-instruction, .co-foot, .co-input').forEach(function (n) { n.remove(); });
+    restoreNativeInput();
+    document.documentElement.classList.remove('co-active');
   }
 
   // A paragraph authored wholly in *asterisks* (the engine's own emphasis mark) is meant to read
@@ -130,7 +182,7 @@
 
   // ── Chrome: header row, instruction, footer ──────────────────────────────
   function removeChrome() {
-    document.querySelectorAll('.co-head, .co-instruction, .co-foot').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('.co-head, .co-instruction, .co-foot, .co-input').forEach(function (n) { n.remove(); });
   }
   function addChrome(role) {
     removeChrome();
@@ -151,6 +203,8 @@
     storyEl.insertBefore(head, storyEl.firstChild);
 
     choicesAreaWrapEl.insertBefore(el('p', 'co-instruction', content.instruction), choicesAreaWrapEl.firstChild);
+    var own = buildColdOpenInput();
+    if (own) choicesAreaWrapEl.parentNode.insertBefore(own, choicesAreaWrapEl.nextSibling);
 
     var foot = el('nav', 'co-foot');
     foot.setAttribute('aria-label', 'More');
@@ -295,7 +349,7 @@
         var body = JSON.parse(init.body);
         body.coldOpen = { scenarioId: scenario.id, roleId: roleId };
         init = Object.assign({}, init, { body: JSON.stringify(body) });
-        document.querySelectorAll('.co-instruction, .co-foot').forEach(function (n) { n.remove(); });
+        goLive();
       } catch (e) {}
     }
     return pageFetch.call(window, input, init);
