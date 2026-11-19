@@ -97,13 +97,29 @@ export async function boot(label, extraEnv, cwd = ROOT) {
 }
 
 async function record(base, [method, url, body]) {
-  const resp = await fetch(base + url, {
-    method, redirect: 'manual',
-    headers: { 'User-Agent': 'cold-open-baseline-bot', ...(body ? { 'Content-Type': 'application/json' } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  // Retried: a live host waking up can miss fetch's 10s connect timeout.
+  let resp;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      resp = await fetch(base + url, {
+        method, redirect: 'manual',
+        headers: { 'User-Agent': 'cold-open-baseline-bot', ...(body ? { 'Content-Type': 'application/json' } : {}) },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      break;
+    } catch (e) { if (attempt >= 4) throw e; await new Promise(r => setTimeout(r, 2000 * attempt)); }
+  }
   let buf = Buffer.from(await resp.arrayBuffer());
-  if (url === '/health') { const j = JSON.parse(buf.toString()); delete j.uptime; buf = Buffer.from(JSON.stringify(j)); }
+  let commit = null;
+  if (url === '/health') {
+    const j = JSON.parse(buf.toString());
+    delete j.uptime;
+    // Railway stamps the deployed SHA; a local boot says 'unknown'. Reported, never compared.
+    commit = j.commit ?? null;
+    j.commit = 'unknown';
+    buf = Buffer.from(JSON.stringify(j));
+  }
+  if (commit && commit !== 'unknown') record.lastCommit = commit;
   return {
     entry: {
       status: resp.status,
@@ -170,7 +186,55 @@ if (mode === 'capture') {
   }
   console.log(failed ? `\n${failed} of ${checked} route checks differ.` : `\nAll ${checked} route checks byte-identical to ${manifest.commit.slice(0, 7)}.`);
   process.exit(failed ? 1 : 0);
+} else if (mode === 'capture-live') {
+  // The deployed services' own before-picture: --prod/--gw/--limen <url> --manifest <file>.
+  // A live host is not comparable to a local boot byte-for-byte (a Windows checkout serves CRLF,
+  // Railway serves git's LF; each service has its own branding env), so a live proof compares
+  // the services against themselves before and after a deploy.
+  const argOf = name => { const i = process.argv.indexOf(`--${name}`); return i === -1 ? null : process.argv[i + 1]; };
+  const out = argOf('manifest');
+  if (!out) { console.error('capture-live needs --manifest <file>'); process.exit(2); }
+  const live = { commit: null, capturedAt: new Date().toISOString(), live: true, shapes: {}, deployed: {} };
+  for (const shape of Object.keys(SHAPES)) {
+    const base = argOf(shape)?.replace(/\/+$/, '');
+    if (!base) continue;
+    record.lastCommit = null;
+    live.shapes[shape] = {};
+    for (const r of ROUTES) live.shapes[shape][key(r)] = (await record(base, r)).entry;
+    live.deployed[shape] = { base, commit: record.lastCommit };
+    console.log(`captured ${shape} ${base} (deployed ${record.lastCommit?.slice(0, 7) ?? '?'})`);
+  }
+  live.commit = Object.values(live.deployed)[0]?.commit || 'unknown';
+  fs.writeFileSync(out, JSON.stringify(live, null, 2) + '\n');
+  console.log(`wrote ${out}`);
+} else if (mode === 'compare-live') {
+  // The deployed services, as they run: --prod <url> --gw <url> --limen <url>, against
+  // --manifest <file> (default: the local-boot manifest). Read-only GETs and validation-failing
+  // POSTs only (no paid call); bot user agent (no page-view count).
+  const mi = process.argv.indexOf('--manifest');
+  const manifest = JSON.parse(fs.readFileSync(mi === -1 ? MANIFEST : process.argv[mi + 1], 'utf8'));
+  const urlOf = name => { const i = process.argv.indexOf(`--${name}`); return i === -1 ? null : process.argv[i + 1].replace(/\/+$/, ''); };
+  console.log(`baseline ${manifest.commit.slice(0, 7)} captured ${manifest.capturedAt}`);
+  let failed = 0, checked = 0;
+  for (const shape of Object.keys(SHAPES)) {
+    const base = urlOf(shape);
+    if (!base) { console.log(`  SKIP  ${shape}: no --${shape} url`); continue; }
+    record.lastCommit = null;
+    let bad = 0;
+    for (const r of ROUTES) {
+      const k = key(r), want = manifest.shapes[shape][k];
+      const { entry } = await record(base, r);
+      checked++;
+      if (!['status', 'type', 'location', 'cacheControl', 'sha256'].every(f => entry[f] === want[f])) {
+        bad++; failed++;
+        console.log(`  FAIL  ${shape} ${base}  ${k}\n        want ${JSON.stringify(want)}\n        got  ${JSON.stringify(entry)}`);
+      }
+    }
+    console.log(`  ${bad ? 'FAIL' : 'PASS'}  ${shape} ${base} (deployed ${record.lastCommit ? record.lastCommit.slice(0, 7) : '?'}): ${ROUTES.length - bad}/${ROUTES.length} routes byte-identical`);
+  }
+  console.log(failed ? `\n${failed} of ${checked} route checks differ.` : `\nAll ${checked} route checks byte-identical to ${manifest.commit.slice(0, 7)}.`);
+  process.exit(failed ? 1 : 0);
 } else {
-  console.error('usage: node scripts/cold-open-baseline.mjs capture|compare');
+  console.error('usage: node scripts/cold-open-baseline.mjs capture|compare|compare-live --prod <url> --gw <url> --limen <url>');
   process.exit(2);
 }
