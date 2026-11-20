@@ -10,7 +10,10 @@
 //   2. When the page has loaded the scenario (loadGame → renderStreamlinedScreen1, hooked
 //      here), reads the opening from /game/api/cold-open — a row read, never a model call —
 //      and sets the scene up underneath: lean narrative, instruction, choices, input.
-//   3. Plays the two beats, then dissolves onto the scene. Tap / Enter / Escape skips.
+//   3. Plays the two title screens (the row's `intro`), then dissolves onto the scene.
+//      Screen 1: the story's name, place · date, then the wide line (narration, italic).
+//      Screen 2: "You are a/an {role}, {unit}", then the character line (quoted).
+//      Tap / Enter / Escape skips.
 //   4. The first choice or typed action goes through the page's own submitTurn. The /turn
 //      request is tagged `coldOpen` here; the server swaps in the baked state. That is the
 //      first model call of the session.
@@ -51,14 +54,30 @@
   overlay.id = 'co-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-label', 'Opening');
-  var beatEls = [0, 1].map(function () {
-    var b = el('div', 'co-beat');
-    b.appendChild(el('p', 'co-beat-header'));
-    b.appendChild(el('p', 'co-beat-line'));
-    overlay.appendChild(b);
-    return b;
-  });
-  overlay.appendChild(el('p', 'co-skip', 'Tap to skip'));
+  // Screen 1 (wide shot): title block (name, place · date), then the wide line.
+  var s1 = el('div', 'co-screen co-s1');
+  var titleBlock = el('div', 'co-title');
+  var nameEl = el('p', 'co-name');
+  nameEl.setAttribute('role', 'heading');
+  nameEl.setAttribute('aria-level', '1');
+  var datelineEl = el('p', 'co-dateline');
+  titleBlock.appendChild(nameEl);
+  titleBlock.appendChild(datelineEl);
+  var wideEl = el('p', 'co-wide');
+  s1.appendChild(titleBlock);
+  s1.appendChild(wideEl);
+  // Screen 2 (character): "You are a/an {role}, {unit}", then the character line.
+  var s2 = el('div', 'co-screen co-s2');
+  var youEl = el('p', 'co-you');
+  var charEl = el('p', 'co-character');
+  s2.appendChild(youEl);
+  s2.appendChild(charEl);
+  var skipEl = el('p', 'co-skip', 'Tap to skip');
+  overlay.appendChild(s1);
+  overlay.appendChild(s2);
+  overlay.appendChild(skipEl);
+  // Every element that fades on its own, in the order they appear.
+  var stagedEls = [titleBlock, wideEl, youEl, charEl, skipEl];
   document.body.appendChild(overlay);
 
   // Back link (“← Stories”) leads to the card grid, not back into this entry.
@@ -80,7 +99,7 @@
         var role = (scenario.playerRoleOptions || []).find(function (r) { return r.id === roleId; });
         if (!role) throw new Error('role ' + roleId + ' not in this scenario');
         setUpScene(role);
-        playBeats();
+        playIntro();
       });
   }
 
@@ -257,7 +276,7 @@
     return foot;
   }
 
-  // ── 3. The beats ─────────────────────────────────────────────────────────
+  // ── 3. The title screens ─────────────────────────────────────────────────
   var timers = [];
   var finishing = null;
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
@@ -270,41 +289,67 @@
     overlay.hidden = false;
     overlay.style.transition = 'none';
     overlay.style.opacity = '1';
-    beatEls.forEach(function (b) { b.style.transition = 'none'; b.style.opacity = '0'; });
+    [s1, s2].concat(stagedEls).forEach(function (n) { n.style.transition = 'none'; n.style.opacity = '0'; });
+    s1.style.opacity = '1';
+    s2.style.opacity = '1';
   }
 
   function quoted(line) {
     var s = String(line || '').trim();
     return /^["“‘']/.test(s) ? s : '“' + s + '”';
   }
+  // The wide line is narration: shown without quotation marks, even if the row has them.
+  function unquoted(line) {
+    return String(line || '').trim().replace(/^["“‘']+|["”’']+$/g, '').trim();
+  }
+  // "a" or "an" by the role's first letter.
+  function article(noun) { return /^[aeiou]/i.test(String(noun || '').trim()) ? 'an' : 'a'; }
 
-  function playBeats() {
+  function fillIntro(intro) {
+    nameEl.textContent = intro.name;
+    datelineEl.textContent = intro.place + ' · ' + intro.date;
+    wideEl.textContent = unquoted(intro.wide);
+    youEl.textContent = '';
+    youEl.appendChild(document.createTextNode('You are ' + article(intro.role) + ' '));
+    youEl.appendChild(el('span', 'co-you-role', intro.role));
+    if (intro.unit) youEl.appendChild(el('span', 'co-you-unit', ', ' + intro.unit));
+    charEl.textContent = quoted(intro.character);
+  }
+
+  function playIntro() {
     showOverlayBlank();
-    (content.beats || []).slice(0, 2).forEach(function (beat, i) {
-      beatEls[i].querySelector('.co-beat-header').textContent = beat.header;
-      beatEls[i].querySelector('.co-beat-line').textContent = quoted(beat.line);
-    });
-    var t = T.startDelay || 0;
-    beatEls.forEach(function (b) {
-      at(t, function () { setOpacity(b, '1', fade(T.fadeIn)); });
-      t += fade(T.fadeIn) + (T.hold || 0);
-      at(t, function () { setOpacity(b, '0', fade(T.fadeOut)); });
-      t += fade(T.fadeOut) + (T.gap || 0);
-    });
-    at(t, dissolve);
+    var intro = content.intro || {};
+    fillIntro(intro);
+    var f = fade(T.fade);
+    at(T.skipHint || 0, function () { setOpacity(skipEl, '1', f); });
+    if (reduced) {
+      // Reduced motion: screen 1 whole and at once, then the scene. No staged fades.
+      setOpacity(titleBlock, '1', 0);
+      setOpacity(wideEl, '1', 0);
+      at(T.s1out || 0, dissolve);
+      return;
+    }
+    at(T.titleIn || 0, function () { setOpacity(titleBlock, '1', f); });
+    at(T.quoteIn || 0, function () { setOpacity(wideEl, '1', f); });
+    at(T.s1out || 0, function () { setOpacity(s1, '0', f); });
+    at(T.s2in || 0, function () { setOpacity(youEl, '1', f); });
+    at(T.charIn || 0, function () { setOpacity(charEl, '1', f); });
+    at(T.s2out || 0, function () { setOpacity(s2, '0', f); });
+    at(T.reveal || 0, dissolve);
   }
 
   function dissolve() {
     if (finishing) return;
     clearTimers();
     finishing = true;
-    beatEls.forEach(function (b) { setOpacity(b, '0', fade(T.fadeOut) / 2); });
-    setOpacity(overlay, '0', fade(T.dissolve));
-    at(fade(T.dissolve), function () { overlay.hidden = true; });
+    var d = fade(T.dissolve);
+    [s1, s2, skipEl].forEach(function (n) { setOpacity(n, '0', d / 2); });
+    setOpacity(overlay, '0', d);
+    at(d, function () { overlay.hidden = true; });
   }
 
   // Skip: any tap on the overlay, or Enter / Space / Escape while it is up. Before the content
-  // has arrived a skip just waits for it (playBeats is then cut short by the same flag).
+  // has arrived a skip just waits for it.
   overlay.addEventListener('click', function () { if (content) dissolve(); });
   document.addEventListener('keydown', function (e) {
     if (overlay.hidden || !content) return;

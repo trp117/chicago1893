@@ -307,13 +307,13 @@ try {
   const baked = await post(bakeBase, '/game/api/start', { scenarioId: SCENARIO_ID, roleId: ROLE_ID, narrativeStyle: 'focused', onboardingFlow: 'streamlined' });
   const LEAN = 'The ramp drops. Red water to the knees.\n\n*Someone up the beach is screaming for a medic.*';
   const row = { scenario_id: SCENARIO_ID, role_id: ROLE_ID, status: 'ready', content: {
-    beats: [{ header: 'Omaha Beach · 6 June 1944', line: 'The ramp drops.' }, { header: 'The Battalion Medic', line: 'Every man costs another.' }],
+    intro: { name: 'Dog Green: The Longest Morning', place: 'Omaha Beach', date: 'June 6, 1944', wide: 'The first wave has come apart in the surf.', role: 'Battalion Medic', unit: '116th Infantry', character: 'You have more wounded than you have hands.' },
     lean: { narrative: LEAN, instruction: 'Your move — choose one, or write your own:', choices: ['Crawl to the screaming man', 'Shout for the litter team', 'Check your aid bag'] },
     baked: { state: baked.nextState, output: baked.output, fingerprint: await coldOpenFingerprintFor(repos, SCENARIO_ID, ROLE_ID, baked.nextState), baked_at: new Date().toISOString() } } };
   const cfg = CO.readColdOpenConfig({ DEMO_COLD_OPEN: 'true', DEMO_FEATURED_SCENARIO: SCENARIO_ID, DEMO_FEATURED_ROLE: ROLE_ID }, { demoMode: true, demoScenarios: [SCENARIO_ID] });
   const runtime = CO.createColdOpenRuntime({ config: cfg, store: CO.createColdOpenStore({ fetchRows: async () => [row] }), fingerprintFor: (s, r, st) => coldOpenFingerprintFor(repos, s, r, st) });
   const COBASE = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { ...routerCfg, demoStore: createMemoryDemoStore(), coldOpen: runtime })));
-  const FAST = { startDelay: 10, fadeIn: 10, hold: 30, fadeOut: 10, gap: 10, dissolve: 10 };
+  const FAST = { titleIn: 5, quoteIn: 15, s1out: 30, s2in: 40, charIn: 50, s2out: 60, reveal: 70, skipHint: 5, fade: 10, dissolve: 10 };
   const coHtml = RL.injectReadingLayoutIntoGameHtml(DM.injectColdOpenIntoGameHtml(DM.injectDemoIntoGameHtml(PAGE),
     { scenarioId: SCENARIO_ID, roleId: ROLE_ID, timings: FAST, historyUser: CO.COLD_OPEN_HISTORY_USER },
     { css: fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(DM.COLD_OPEN_JS_PATH, 'utf8') }), RL_FILES);
@@ -334,6 +334,15 @@ try {
   check('…which opens the cold open\'s role switcher', !!kd.querySelector('.co-panel .co-roles'));
   kd.querySelector('.co-panel .co-close').click();
   check('rail at the cold open: "In the scene" names no one the lean cut has not introduced', !!kd.querySelector('.rl-empty'));
+  {
+    const coCss = fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8');
+    check('accent token: the layout reads in the demo gold #d6a64c — rail headers, dateline, links (no steel blue)', /html\.rl \{ --demo-accent: #d6a64c; \}/.test(RL_FILES.css)
+      && /\.rl-label \{[^}]*color: var\(--demo-accent\)/.test(RL_FILES.css) && /\.rl-when \{ color: var\(--demo-accent\)/.test(RL_FILES.css)
+      && /\.rl-rail button:hover \{ color: var\(--demo-accent\)/.test(RL_FILES.css) && !/8198ab/i.test(RL_FILES.css + coCss));
+    check('the intro renders inside the reading column (overlay takes the layout grid; screens in the column cell)', /html\.rl\.rl-wide #co-overlay \{ grid-template-columns: minmax\(0, 1fr\) minmax\(0, 720px\) minmax\(220px, 1fr\); \}/.test(coCss)
+      && /html\.rl\.rl-wide #co-overlay::before, html\.rl\.rl-wide #co-overlay > \* \{ grid-column: 2; \}/.test(coCss) && cs(K.win, '#co-overlay').getPropertyValue('display') === 'none');
+    check('the intro\'s title screens were in the column page (screen 1 + screen 2 + skip)', !!kd.querySelector('#co-overlay .co-s1 .co-name') && !!kd.querySelector('#co-overlay .co-s2 .co-you-role') && kd.querySelector('#co-overlay .co-you').textContent === 'You are a Battalion Medic, 116th Infantry');
+  }
   const coSk = skeleton(K.win);
   reply = TURN;
   kd.querySelector('#choices .choice-btn').click();

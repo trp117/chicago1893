@@ -35,7 +35,7 @@ import { AnchorTracker } from '../services/AnchorTracker.js';
 import { makeIsAllowedScenario } from './demoMode.js';
 import { checkInputSafety, MINOR_SELF_STATEMENT_NOTE } from '../services/InputSafetyGate.js';
 import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
-import { fingerprintScenarioData, buildColdOpenState, coldOpenHistorySeed, coldOpenTranscriptHeader } from './coldOpen.js';
+import { fingerprintScenarioData, buildColdOpenState, coldOpenHistorySeed, coldOpenTranscriptHeader, coldOpenIntroDisplay } from './coldOpen.js';
 
 // DEMO_MODE spend metering. Every paid Claude call on the play path hands its usage block to
 // reportUsage. In prod the sink is null and reportUsage does nothing; createGameRouter points
@@ -939,10 +939,10 @@ export function createGameRouter(contentRepos, config = {}) {
       try {
         const row = await coldOpen.get(scenarioId, roleId);
         if (!row) return notFound();
-        const { beats, lean, baked } = row.content;
+        const { intro, lean, baked } = row.content;
         res.set('Cache-Control', 'no-store').json({
           scenarioId, roleId,
-          beats:       beats.map(b => ({ header: b.header, line: b.line })),
+          intro:       coldOpenIntroDisplay(intro),
           narrative:   lean.narrative,
           instruction: lean.instruction,
           choices:     lean.choices,

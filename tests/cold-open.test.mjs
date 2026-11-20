@@ -11,7 +11,7 @@
 //          COST: loading the entry (page + bootstrap + cold-open) makes 0 model calls; the first
 //          action makes exactly 1. HANDOFF: that turn runs on the server-held baked state with the
 //          lean-cut history, is metered as a start (daily slot, refunded on failure), opens the
-//          transcript; later turns are ordinary. UI: beats, dissolve, scene, choices, input,
+//          transcript; later turns are ordinary. UI: the two title screens (intro), dissolve, scene, choices, input,
 //          role switcher, the history, Another moment, Replay, reduced motion.
 // Part D — server boots (DEMO_COLD_OPEN_FILE): / is the entry, /moments is today's landing
 //          byte-for-byte, /game is unchanged, /health reports staleness; every fail-safe
@@ -80,12 +80,16 @@ console.log('\nPart B — coldOpen.js');
   check('featured role unset → entryProblem (landing)', !!CO.readColdOpenConfig({ ...on, DEMO_FEATURED_ROLE: '' }, { demoMode: true, demoScenarios: ['dog_green_sector'] }).entryProblem);
 
   const good = {
-    beats: [{ header: 'A · B', line: 'x' }, { header: 'R', line: 'y' }],
+    intro: { name: 'N', place: 'P', date: 'D', wide: 'w', role: 'R', unit: 'U', character: 'c' },
     lean: { narrative: 'n', instruction: 'i', choices: ['a', 'b', 'c'] },
     baked: { state: { scenarioId: 's', playerRoleId: 'r' }, fingerprint: 'sha256:x' },
   };
   check('a complete row is servable', CO.coldOpenContentProblem(good, { scenarioId: 's', roleId: 'r' }) === null);
-  check('one beat → not servable', !!CO.coldOpenContentProblem({ ...good, beats: [good.beats[0]] }));
+  check('old two-beat row (no intro) → not servable', !!CO.coldOpenContentProblem({ beats: [{ header: 'A', line: 'x' }, { header: 'R', line: 'y' }], lean: good.lean, baked: good.baked }));
+  check('intro missing a required field (wide) → not servable', /intro\.wide/.test(CO.coldOpenContentProblem({ ...good, intro: { ...good.intro, wide: '' } }) || ''));
+  const { unit, ...noUnit } = good.intro;
+  check('intro.unit is optional', CO.coldOpenContentProblem({ ...good, intro: noUnit }, { scenarioId: 's', roleId: 'r' }) === null);
+  check('intro display: trimmed, empty unit left out', JSON.stringify(CO.coldOpenIntroDisplay({ ...noUnit, name: ' N ', unit: '  ' })) === JSON.stringify({ name: 'N', place: 'P', date: 'D', wide: 'w', role: 'R', character: 'c' }));
   check('no choices → not servable', !!CO.coldOpenContentProblem({ ...good, lean: { ...good.lean, choices: [] } }));
   check('baked state of another role → not servable', !!CO.coldOpenContentProblem(good, { scenarioId: 's', roleId: 'other' }));
   check('no fingerprint → not servable', !!CO.coldOpenContentProblem({ ...good, baked: { state: good.baked.state } }));
@@ -210,7 +214,9 @@ try {
   const row = async (roleId, baked, extra = {}) => ({
     scenario_id: SCENARIO_ID, role_id: roleId, status: 'ready',
     content: {
-      beats: [{ header: 'Omaha Beach · 6 June 1944', line: 'The ramp drops at 06:36.' }, { header: roleId === ROLE_ID ? 'The Battalion Medic' : 'The Coxswain', line: 'Every man you reach costs you another.' }],
+      intro: roleId === ROLE_ID
+        ? { name: 'Dog Green: The Longest Morning', place: 'Omaha Beach', date: 'June 6, 1944', wide: '“The first wave has come apart in the surf.”', role: 'Battalion Medic', unit: '116th Infantry', character: 'You have more wounded than you have hands.' }
+        : { name: 'Dog Green: The Longest Morning', place: 'Omaha Beach', date: 'June 6, 1944', wide: 'The ramp drops at 06:36.', role: 'Assault Boat Coxswain', character: 'Every man you land costs you another.' },
       lean: { narrative: LEAN, instruction: 'Your move — choose one, or write your own:', choices: ['Crawl to the screaming man', 'Shout for the litter team', 'Check your aid bag'] },
       baked: { state: baked.nextState, output: baked.output, fingerprint: await coldOpenFingerprintFor(repos, SCENARIO_ID, roleId, baked.nextState), baked_at: new Date().toISOString(), source: '/start' },
       ...extra,
@@ -230,7 +236,7 @@ try {
   const BASE = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, routerCfg)));
 
   // The entry page, as the guard builds it — with fast pacing so the test does not wait seconds.
-  const FAST = { startDelay: 20, fadeIn: 20, hold: 60, fadeOut: 20, gap: 10, dissolve: 20 };
+  const FAST = { titleIn: 10, quoteIn: 300, s1out: 600, s2in: 700, charIn: 950, s2out: 1200, reveal: 1300, skipHint: 150, fade: 20, dissolve: 20 };
   const pageHtml = timings => DM.injectColdOpenIntoGameHtml(DM.injectDemoIntoGameHtml(fs.readFileSync(p('engine/game/index.html'), 'utf8')),
     { scenarioId: SCENARIO_ID, roleId: ROLE_ID, timings, historyUser: CO.COLD_OPEN_HISTORY_USER },
     { css: fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8'), js: fs.readFileSync(DM.COLD_OPEN_JS_PATH, 'utf8') });
@@ -268,14 +274,25 @@ try {
   check('COST: entry load made ZERO model calls', model.story.length === 0 && model.classifier.length === 0, `story=${model.story.length} classifier=${model.classifier.length}`);
   check('the URL carries the featured scenario for the page script', new win.URL(win.location.href).searchParams.get('scenarioId') === SCENARIO_ID);
 
-  // C2 — beats → dissolve.
+  // C2 — the two title screens → dissolve.
   const ov = doc.getElementById('co-overlay');
-  const beats = [...ov.querySelectorAll('.co-beat')];
-  check('beat 1: header (place · date) above the quoted hook line', beats[0].querySelector('.co-beat-header').textContent === 'Omaha Beach · 6 June 1944' && beats[0].querySelector('.co-beat-line').textContent === '“The ramp drops at 06:36.”');
-  check('beat 2: header (the role) above the quoted stakes line', beats[1].querySelector('.co-beat-header').textContent === 'The Battalion Medic' && beats[1].querySelector('.co-beat-line').textContent === '“Every man you reach costs you another.”');
-  check('overlay up at load, with a skip hint', !ov.hidden && /Tap to skip/.test(ov.textContent));
-  check('beats fade (transition on opacity, not instant)', await until(() => /opacity 20ms/.test(beats[0].style.transition) && beats[0].style.opacity === '1', 2000));
-  check('beat 2 shows after beat 1', await until(() => beats[1].style.opacity === '1', 2000));
+  const q = sel => ov.querySelector(sel);
+  const coCss = fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8');
+  check('screen 1: the story name (large), then place · date beneath it', q('.co-s1 .co-title .co-name').textContent === 'Dog Green: The Longest Morning'
+    && q('.co-s1 .co-title .co-dateline').textContent === 'Omaha Beach · June 6, 1944' && q('.co-title').firstElementChild === q('.co-name'));
+  check('screen 1: the wide line below the title, NO quotation marks (even if the row has them), italic', q('.co-s1 .co-wide').textContent === 'The first wave has come apart in the surf.'
+    && q('.co-title').nextElementSibling === q('.co-wide') && win.getComputedStyle(q('.co-wide')).fontStyle === 'italic');
+  check('screen 2: "You are a Battalion Medic, 116th Infantry" — role noun and unit in their own spans', q('.co-s2 .co-you').textContent === 'You are a Battalion Medic, 116th Infantry'
+    && q('.co-you .co-you-role').textContent === 'Battalion Medic' && q('.co-you .co-you-unit').textContent === ', 116th Infantry');
+  check('screen 2: the character line below it, WITH quotation marks', q('.co-s2 .co-character').textContent === '“You have more wounded than you have hands.”' && q('.co-you').nextElementSibling === q('.co-character'));
+  check('accent: place · date and the role noun read in the demo gold #d6a64c', /--demo-accent: #d6a64c/.test(coCss)
+    && /\.co-dateline \{[^}]*color: var\(--demo-accent/.test(coCss) && /\.co-you-role \{ color: var\(--demo-accent/.test(coCss) && /\.co-you-unit \{ color: #a89f8d/.test(coCss));
+  check('overlay up at load; skip hint present', !ov.hidden && q('.co-skip').textContent === 'Tap to skip');
+  check('title block fades in first (opacity transition), before the wide line', await until(() => q('.co-title').style.opacity === '1', 2000) && /opacity 20ms/.test(q('.co-title').style.transition) && q('.co-wide').style.opacity !== '1');
+  check('then the wide line', await until(() => q('.co-wide').style.opacity === '1', 2000));
+  check('skip hint fades in', await until(() => q('.co-skip').style.opacity === '1', 2000));
+  check('screen 1 fades out before screen 2 comes in', await until(() => q('.co-s1').style.opacity === '0', 2000) && q('.co-you').style.opacity !== '1');
+  check('screen 2: "You are …", then the character line', await until(() => q('.co-you').style.opacity === '1', 2000) && q('.co-character').style.opacity !== '1' && await until(() => q('.co-character').style.opacity === '1', 2000));
   check('overlay dissolves away onto the scene', await until(() => ov.hidden, 3000));
 
   // C3 — the scene.
@@ -335,7 +352,7 @@ try {
   log.urls.length = 0;
   coxBtn.click();
   check('choosing a role with its own cold open re-opens the entry from that role', await until(() => /Coxswain/.test(doc.querySelector('.co-head .co-role')?.textContent || ''), 4000) && log.urls.includes('/game/api/cold-open'));
-  check('  …the beats replay for it', !ov.hidden || beats[1].querySelector('.co-beat-header').textContent === 'The Coxswain');
+  check('  …the intro replays for it: "You are an Assault Boat Coxswain" (an, no unit)', ov.querySelector('.co-you').textContent === 'You are an Assault Boat Coxswain' && !ov.querySelector('.co-you-unit'));
   check('  …and it made no model call', model.story.length === 0);
   await until(() => ov.hidden, 3000);
   // Back to the medic for the handoff.
@@ -415,15 +432,17 @@ try {
 
   // C11 — reduced motion: no fades.
   const rm = await openPage({ reducedMotion: true });
-  const rmBeat = rm.doc.querySelector('#co-overlay .co-beat');
-  check('prefers-reduced-motion: beats cut in with no fade (0ms transitions)', await until(() => rmBeat.style.opacity === '1', 2000) && /opacity 0ms/.test(rmBeat.style.transition));
-  check('  …and the overlay still clears to the scene', await until(() => rm.doc.getElementById('co-overlay').hidden, 3000));
+  const rq = sel => rm.doc.querySelector('#co-overlay ' + sel);
+  check('prefers-reduced-motion: screen 1 whole at once, no fade (0ms transitions)', await until(() => rq('.co-title').style.opacity === '1' && rq('.co-wide').style.opacity === '1', 2000)
+    && /opacity 0ms/.test(rq('.co-title').style.transition) && /opacity 0ms/.test(rq('.co-wide').style.transition));
+  check('  …and the overlay clears to the scene', await until(() => rm.doc.getElementById('co-overlay').hidden, 3000));
+  check('  …without staging screen 2', rq('.co-you').style.opacity !== '1' && rq('.co-character').style.opacity !== '1');
   rm.win.close();
 
   // C12 — tap to skip.
-  const sk = await openPage({ timings: { startDelay: 50, fadeIn: 50, hold: 20000, fadeOut: 50, gap: 50, dissolve: 20 } });
+  const sk = await openPage({ timings: { ...CO.COLD_OPEN_TIMINGS, dissolve: 20 } });
   sk.doc.getElementById('co-overlay').click();
-  check('tap anywhere skips the beats straight to the scene', await until(() => sk.doc.getElementById('co-overlay').hidden, 1500));
+  check('tap anywhere skips the intro straight to the scene', await until(() => sk.doc.getElementById('co-overlay').hidden, 1500));
   sk.win.close();
 
   // C12b — first paint: only the overlay can be painted before the scene exists.

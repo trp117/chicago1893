@@ -1,6 +1,8 @@
 /* DEMO_COLD_OPEN entry — injected into the game page at serve time (demoMode.js), only when
    the flag is on. The game page is dark-only; these rules use its own tokens. */
 html.co-boot #role-overlay { display: none !important; }
+/* The demo accent: the gold the title screens, and the reading layout's rail, read in. */
+html.co-boot { --demo-accent: #d6a64c; }
 /* From first paint until the scene is built under the overlay (co-pending, set in <head> and
    cleared by cold-open.js), only the overlay is visible: no flash of the game page's header. */
 html.co-pending, html.co-pending body { background: #050504 !important; }
@@ -18,22 +20,60 @@ html.co-active:not(.rl) .story-feed { max-width: 720px; width: 100%; margin: 0 a
 .co-choices .choice-btn { width: 100%; text-align: left; font-size: 0.95rem; line-height: 1.4; padding: 12px 14px; }
 
 .co-input { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin: 0 0 6px; align-items: stretch; }
-.co-input textarea { width: 100%; resize: none; min-height: 48px; border-radius: 12px; border: 1px solid rgba(208,176,106,0.35);
+.co-input textarea { width: 100%; resize: none; min-height: 48px; border-radius: 12px; border: 1px solid rgba(214,166,76,0.35);
   background: var(--panel, #1b1b1b); color: var(--text, #f0eadc); padding: 12px 14px; font: inherit; font-size: 1rem; }
-.co-input textarea:focus { border-color: var(--accent, #d0b06a); outline: none; box-shadow: 0 0 0 2px rgba(208,176,106,0.12); }
-.co-input button { min-width: 72px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--accent, #d0b06a);
-  background: var(--accent, #d0b06a); color: #1a150c; font-weight: bold; cursor: pointer; }
+.co-input textarea:focus { border-color: var(--demo-accent, #d6a64c); outline: none; box-shadow: 0 0 0 2px rgba(214,166,76,0.12); }
+.co-input button { min-width: 72px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--demo-accent, #d6a64c);
+  background: var(--demo-accent, #d6a64c); color: #1a150c; font-weight: bold; cursor: pointer; }
 .co-input button:focus-visible { outline: 2px solid var(--text, #f0eadc); outline-offset: 2px; }
 
 #co-overlay { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center;
   padding: 24px 16px; background: #050504; color: #ECE3D2; cursor: pointer; opacity: 1; }
 #co-overlay[hidden] { display: none; }
-#co-overlay .co-beat { position: absolute; left: 16px; right: 16px; top: 50%; transform: translateY(-50%);
-  margin: 0 auto; max-width: 34rem; text-align: center; opacity: 0; }
-#co-overlay .co-beat-header { margin: 0 0 18px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: #a89f8d; }
-#co-overlay .co-beat-line { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
-  font-size: clamp(1.35rem, 5.2vw, 2.1rem); line-height: 1.4; color: #ECE3D2; }
+/* The two title screens, stacked in the same place (cold-open.js fades them in turn). */
+#co-overlay .co-screen { position: absolute; left: 16px; right: 16px; top: 50%; transform: translateY(-50%);
+  margin: 0 auto; max-width: 34rem; text-align: center; }
+#co-overlay .co-title, #co-overlay .co-wide, #co-overlay .co-you, #co-overlay .co-character, #co-overlay .co-skip { opacity: 0; }
+/* Screen 1: the story's name (large), place · date beneath (small, uppercase, accent), then the
+   wide line — narration, italic, no quotation marks. */
+#co-overlay .co-title { margin: 0 0 30px; }
+#co-overlay .co-name { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-weight: normal;
+  font-size: clamp(1.9rem, 7.4vw, 3rem); line-height: 1.15; color: #ECE3D2; }
+#co-overlay .co-dateline { margin: 14px 0 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--demo-accent, #d6a64c); }
+#co-overlay .co-wide { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+  font-size: clamp(1.1rem, 4.2vw, 1.45rem); line-height: 1.5; color: #d9cfbd; }
+/* Screen 2: "You are a/an {role}, {unit}" — the role in accent, the unit muted — then the
+   character line, quoted. */
+#co-overlay .co-you { margin: 0 0 24px; font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.35rem, 5.2vw, 2rem); line-height: 1.3; color: #ECE3D2; }
+#co-overlay .co-you-role { color: var(--demo-accent, #d6a64c); }
+#co-overlay .co-you-unit { color: #a89f8d; }
+#co-overlay .co-character { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+  font-size: clamp(1.1rem, 4.2vw, 1.45rem); line-height: 1.5; color: #d9cfbd; }
+/* Inside the reading layout: the screens sit in the reading column, over the scenario's image,
+   exactly where the scene appears when the overlay dissolves (no jump at the reveal). The
+   overlay takes the layout's own grid (the reading layout's .app-shell), the column's surface is
+   its ::before, and the screens and the skip hint share the column's cell. */
+html.rl #co-overlay {
+  display: grid; grid-template-columns: minmax(0, 1fr); padding: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 5, 4, var(--rl-veil, 0.55)), rgba(5, 5, 4, calc(var(--rl-veil, 0.55) + 0.2))),
+    var(--rl-image, linear-gradient(180deg, #0d0d0d, #161616)) #050504;
+  background-size: cover; background-position: var(--rl-image-pos, center); background-repeat: no-repeat;
+}
+html.rl #co-overlay[hidden] { display: none; }
+html.rl.rl-wide #co-overlay { grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(220px, 1fr); }
+html.rl #co-overlay::before { content: ''; grid-column: 1; grid-row: 1; background: rgba(14, 13, 11, 0.86); }
+html.rl #co-overlay > * { grid-column: 1; grid-row: 1; }
+html.rl.rl-wide #co-overlay::before, html.rl.rl-wide #co-overlay > * { grid-column: 2; }
+html.rl.rl-wide #co-overlay::before { box-shadow: 0 0 60px rgba(0, 0, 0, 0.45); }
+html.rl #co-overlay .co-screen { position: relative; top: auto; left: auto; right: auto; transform: none;
+  align-self: center; width: 100%; max-width: none; margin: 0; padding: 0 16px; box-sizing: border-box; }
+html.rl.rl-wide #co-overlay .co-screen { padding: 0 28px; }
+html.rl #co-overlay .co-screen > * { max-width: 34rem; margin-left: auto; margin-right: auto; }
+html.rl #co-overlay .co-skip { position: relative; left: auto; right: auto; bottom: auto; align-self: end;
+  padding-bottom: max(20px, env(safe-area-inset-bottom)); }
 #co-overlay .co-skip { position: absolute; left: 0; right: 0; bottom: max(20px, env(safe-area-inset-bottom));
   text-align: center; font-family: system-ui, sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; color: #857b6a; }
 
@@ -46,8 +86,8 @@ html.co-active:not(.rl) .story-feed { max-width: 720px; width: 100%; margin: 0 a
 .co-head .co-role { color: var(--text, #f0eadc); text-align: left; }
 .co-head .co-role-hint { color: var(--muted, #a89f8d); }
 .co-head .co-history { white-space: nowrap; }
-.co-head button:hover, .co-foot button:hover, .co-foot a:hover { color: var(--accent, #d0b06a); }
-.co-head button:focus-visible, .co-foot button:focus-visible, .co-foot a:focus-visible, .co-panel button:focus-visible { outline: 2px solid var(--accent, #d0b06a); outline-offset: 2px; }
+.co-head button:hover, .co-foot button:hover, .co-foot a:hover { color: var(--demo-accent, #d6a64c); }
+.co-head button:focus-visible, .co-foot button:focus-visible, .co-foot a:focus-visible, .co-panel button:focus-visible { outline: 2px solid var(--demo-accent, #d6a64c); outline-offset: 2px; }
 
 .co-instruction { margin: 18px 0 10px; font-size: 0.82rem; font-style: italic; color: var(--muted, #a89f8d); }
 
@@ -61,16 +101,16 @@ html.co-active:not(.rl) .story-feed { max-width: 720px; width: 100%; margin: 0 a
   background: #171512; border: 1px solid var(--border, #3a342a); border-radius: 14px 14px 0 0; color: var(--text, #f0eadc); }
 @media (min-width: 640px) { .co-panel { align-items: center; } .co-panel-sheet { border-radius: 14px; } }
 .co-panel-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.co-panel-title { margin: 0; font-family: system-ui, sans-serif; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted, #a89f8d); }
+.co-panel-title { margin: 0; font-family: system-ui, sans-serif; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--demo-accent, #d6a64c); }
 .co-panel .co-close { font-size: 1.1rem; line-height: 1; padding: 6px 8px; }
 .co-panel .intro-panel-text { font-size: 0.95rem; line-height: 1.6; margin: 0 0 14px; }
 
 .co-roles { list-style: none; margin: 0; padding: 0; }
 .co-roles li + li { margin-top: 8px; }
 .co-roles button { display: block; width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--border, #3a342a); border-radius: 10px; color: var(--text, #f0eadc); }
-.co-roles button:hover { border-color: var(--accent, #d0b06a); }
-.co-roles button[aria-current="true"] { border-color: var(--accent, #d0b06a); border-left-width: 3px; }
+.co-roles button:hover { border-color: var(--demo-accent, #d6a64c); }
+.co-roles button[aria-current="true"] { border-color: var(--demo-accent, #d6a64c); border-left-width: 3px; }
 .co-role-name { display: block; font-family: Georgia, serif; font-size: 1rem; }
-.co-role-tag { margin-left: 8px; font-family: system-ui, sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, #d0b06a); }
+.co-role-tag { margin-left: 8px; font-family: system-ui, sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--demo-accent, #d6a64c); }
 .co-role-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 4px;
   font-family: system-ui, sans-serif; font-size: 0.8rem; line-height: 1.4; color: var(--muted, #a89f8d); }

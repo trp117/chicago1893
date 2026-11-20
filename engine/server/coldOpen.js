@@ -8,7 +8,8 @@
 //
 // How the entry works:
 //   - A row in public.demo_cold_opens (scenario_id, role_id, status, content) holds, per role:
-//       content.beats      two { header, line } title cards (place · date / the role)
+//       content.intro      the two title screens: { name, place, date, wide, role, unit?,
+//                          character } — screen 1 the story and place, screen 2 "You are a/an …"
 //       content.lean       { narrative, instruction, choices[] } — the short opening on screen
 //       content.baked      { state, output, fingerprint, baked_at } — what the real /start
 //                          produced (scripts/cold-open-bake.mjs). `state` never leaves the server.
@@ -21,15 +22,22 @@ import crypto from 'crypto';
 import fs from 'fs';
 
 // ── Pacing ──────────────────────────────────────────────────────────────────
-// All in milliseconds. Each beat: fade in, hold, fade out; then the overlay dissolves onto the
-// scene. Under prefers-reduced-motion every fade is 0 and the holds stand.
+// All in milliseconds from the start of the intro. Screen 1 (wide shot): the title block at
+// titleIn, the wide line at quoteIn, out at s1out. Screen 2 (character): "You are a/an …" at
+// s2in, the character line at charIn, out at s2out. The overlay dissolves onto the scene at
+// reveal. The skip hint shows at skipHint. Each fade lasts `fade` ms, the dissolve `dissolve`.
+// Under prefers-reduced-motion: screen 1 at once, no staged fades, the scene at s1out.
 export const COLD_OPEN_TIMINGS = Object.freeze({
-  startDelay: 400,    // dark before the first beat
-  fadeIn:     900,
-  hold:       2600,
-  fadeOut:    700,
-  gap:        300,    // dark between the beats
-  dissolve:   1200,   // overlay → scene
+  titleIn:   450,
+  quoteIn:   2800,
+  s1out:     7800,
+  s2in:      8700,
+  charIn:    10000,
+  s2out:     12800,
+  reveal:    13500,
+  skipHint:  1600,
+  fade:      700,
+  dissolve:  700,
 });
 
 // Rows are cached per scenario this long. An edit in Supabase is live within a minute.
@@ -60,11 +68,29 @@ export function readColdOpenConfig(env = process.env, { demoMode = false, demoSc
 // ── Row validation ──────────────────────────────────────────────────────────
 const str = v => typeof v === 'string' && v.trim().length > 0;
 
+// The title screens. `unit` is optional (screen 2 then reads "You are a/an {role}").
+export const COLD_OPEN_INTRO_FIELDS = Object.freeze(['name', 'place', 'date', 'wide', 'role', 'character']);
+export function coldOpenIntroProblem(intro) {
+  if (!intro || typeof intro !== 'object' || Array.isArray(intro)) return 'intro missing';
+  const missing = COLD_OPEN_INTRO_FIELDS.filter(k => !str(intro[k]));
+  if (missing.length) return `intro.${missing.join(', intro.')} missing`;
+  if (intro.unit !== undefined && intro.unit !== null && typeof intro.unit !== 'string') return 'intro.unit must be a string';
+  return null;
+}
+// What the page is sent: the intro's own fields, trimmed; an empty unit is left out.
+export function coldOpenIntroDisplay(intro) {
+  const out = {};
+  for (const k of COLD_OPEN_INTRO_FIELDS) out[k] = String(intro[k]).trim();
+  if (str(intro.unit)) out.unit = intro.unit.trim();
+  return out;
+}
+
 // Returns null for a servable content object, else the reason it is not.
 export function coldOpenContentProblem(content, { scenarioId, roleId } = {}) {
   if (!content || typeof content !== 'object') return 'no content';
-  const { beats, lean, baked } = content;
-  if (!Array.isArray(beats) || beats.length !== 2 || !beats.every(b => b && str(b.header) && str(b.line))) return 'beats must be two { header, line }';
+  const { intro, lean, baked } = content;
+  const introProblem = coldOpenIntroProblem(intro);
+  if (introProblem) return introProblem;
   if (!lean || !str(lean.narrative)) return 'lean.narrative missing';
   if (!str(lean.instruction)) return 'lean.instruction missing';
   if (!Array.isArray(lean.choices) || lean.choices.length < 1 || lean.choices.length > 4 || !lean.choices.every(str)) return 'lean.choices must be 1-4 strings';

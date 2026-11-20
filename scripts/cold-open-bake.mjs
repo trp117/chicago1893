@@ -5,7 +5,7 @@
 //   node scripts/cold-open-bake.mjs --scenario dog_green_sector --role role_battalion_medic \
 //        [--display display.json] [--out row.json] [--status draft|ready] [--write]
 //
-// --display  JSON { beats: [{header,line},{header,line}], lean: { narrative, instruction, choices[] } }
+// --display  JSON { intro: { name, place, date, wide, role, unit?, character }, lean: { narrative, instruction, choices[] } }
 //            Without it the row carries the engine's own full opening and choices as a draft.
 // --out      write the row as a one-element JSON array (the shape DEMO_COLD_OPEN_FILE reads).
 //            Default: <scratch>/cold-open-<scenario>-<role>.json
@@ -149,7 +149,7 @@ try {
 
   const out = done.output;
   const content = {
-    beats: display?.beats ?? [{ header: 'PLACE · DATE', line: 'HOOK LINE' }, { header: role.name, line: 'STAKES LINE' }],
+    intro: display?.intro ?? { name: boot?.scenario?.title || scenarioId, place: 'PLACE', date: 'DATE', wide: 'WIDE LINE', role: role.name, character: 'CHARACTER LINE' },
     lean: display?.lean ?? { narrative: out.narrative, instruction: 'Your move — choose one, or write your own:', choices: out.choices },
     baked: {
       state: done.nextState,
@@ -171,7 +171,7 @@ try {
   console.log(`  reachedBeats=${JSON.stringify(done.nextState.reachedBeats ?? [])} clues=${JSON.stringify(done.nextState.discoveredClueIds ?? [])} scene=${done.nextState.currentSceneId ?? '-'}`);
   console.log(`  fingerprint ${fingerprint}`);
   console.log(lint.length ? `\nlint (${lint.length}):\n${lint.map(l => '  ! ' + l).join('\n')}` : '\nlint: clean');
-  if (!display) console.log('\nNo --display given: lean text = the engine\'s full opening, beats are placeholders, status forced to draft.');
+  if (!display) console.log('\nNo --display given: lean text = the engine\'s full opening, intro lines are placeholders, status forced to draft.');
 
   const outFile = opt('out') || path.join(os.tmpdir(), `cold-open-${scenarioId}-${roleId}.json`);
   fs.writeFileSync(outFile, JSON.stringify([row], null, 2) + '\n');

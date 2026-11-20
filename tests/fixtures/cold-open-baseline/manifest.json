@@ -1,6 +1,6 @@
 {
-  "commit": "00b222bde3ec172e9354a5fb6159d394825d33d1",
-  "capturedAt": "2026-11-19T06:25:08.650Z",
+  "commit": "55938a0717752b3300e49301ead1e0599bab4fb9",
+  "capturedAt": "2026-11-20T07:00:18.495Z",
   "shapes": {
     "prod": {
       "GET /": {
