@@ -64,7 +64,7 @@ html.rl #co-overlay {
 }
 html.rl #co-overlay[hidden] { display: none; }
 html.rl.rl-wide #co-overlay { grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(220px, 1fr); }
-html.rl #co-overlay::before { content: ''; grid-column: 1; grid-row: 1; background: rgba(14, 13, 11, 0.86); }
+html.rl #co-overlay::before { content: ''; grid-column: 1; grid-row: 1; background: rgba(14, 13, 11, 0.8); }
 html.rl #co-overlay > * { grid-column: 1; grid-row: 1; }
 html.rl.rl-wide #co-overlay::before, html.rl.rl-wide #co-overlay > * { grid-column: 2; }
 html.rl.rl-wide #co-overlay::before { box-shadow: 0 0 60px rgba(0, 0, 0, 0.45); }
