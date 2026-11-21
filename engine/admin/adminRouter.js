@@ -74,13 +74,17 @@ async function processSource(buffer) {
     .toBuffer();
 }
 
-async function storageUpload(filename, buffer) {
+// Uploads overwrite the same object name (<id>_wide.jpg, …), which storage serves with
+// max-age=3600 — so the URL a scenario stores carries ?v=<upload time>. A new upload is a new
+// URL, and no browser or CDN copy of the previous image can be served in its place. Storage
+// ignores the query; the object name (what download/remove use) is unchanged.
+async function storageUpload(filename, buffer, version = Date.now()) {
   const { error } = await supabase.storage
     .from(STORAGE_BUCKET)
     .upload(filename, buffer, { contentType: 'image/jpeg', upsert: true });
   if (error) throw error;
   const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
-  return data.publicUrl;
+  return `${data.publicUrl}?v=${version}`;
 }
 
 const _dir = dirname(fileURLToPath(import.meta.url));
@@ -6255,10 +6259,11 @@ Return only the scene description. No preamble, no closing remarks.`,
         processShort(req.file.buffer, cropAnchor),
         processSource(req.file.buffer),
       ]);
+      const v = Date.now();   // one upload time for the set
       const [wideUrl, shortUrl, sourceUrl] = await Promise.all([
-        storageUpload(`${id}_wide.jpg`,   wideBuffer),
-        storageUpload(`${id}_short.jpg`,  shortBuffer),
-        storageUpload(`${id}_source.jpg`, sourceBuffer),
+        storageUpload(`${id}_wide.jpg`,   wideBuffer, v),
+        storageUpload(`${id}_short.jpg`,  shortBuffer, v),
+        storageUpload(`${id}_source.jpg`, sourceBuffer, v),
       ]);
       const updated = {
         ...scenario,
@@ -6316,9 +6321,10 @@ Return only the scene description. No preamble, no closing remarks.`,
         processWide(sourceBuffer, brightness),
         processShort(sourceBuffer, cropAnchor, brightness),
       ]);
+      const v = Date.now();   // one upload time for the set
       const [wideUrl, shortUrl] = await Promise.all([
-        storageUpload(`${id}_wide.jpg`, wideBuffer),
-        storageUpload(`${id}_short.jpg`, shortBuffer),
+        storageUpload(`${id}_wide.jpg`, wideBuffer, v),
+        storageUpload(`${id}_short.jpg`, shortBuffer, v),
       ]);
       const updated = {
         ...scenario,

@@ -6979,12 +6979,13 @@ function renderPreview(data, autoSaved = false) {
       artStatusEl.textContent = msg;
       artStatusEl.style.color = type === 'error' ? 'var(--danger,#dc2626)' : type === 'success' ? 'var(--success,#16a34a)' : 'var(--text-soft)';
     }
+    // Stored image URLs may already carry ?v=<upload time>: join the preview's own bust with & then.
+    function artBust(u) { return u + (String(u).includes('?') ? '&' : '?') + 't=' + Date.now(); }
     function setArtPreviews(wide, short, source) {
-      const ts = '?t=' + Date.now();
-      if (wideImg)  wideImg.src  = wide  + ts;
-      if (shortImg) shortImg.src = short + ts;
+      if (wideImg)  wideImg.src  = artBust(wide);
+      if (shortImg) shortImg.src = artBust(short);
       if (sourceImg && sourceLink && source) {
-        sourceImg.src  = source + ts;
+        sourceImg.src  = artBust(source);
         sourceLink.href = source;
       }
     }
@@ -7083,7 +7084,7 @@ function renderPreview(data, autoSaved = false) {
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
           _syncImageToEditor(artScenarioId, result.image, result.current_version);
-          if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
+          if (shortImg) { shortImg.src = artBust(result.short); shortImg.style.opacity = '1'; }
           setArtStatus('Crop updated.', 'success');
         } catch (err) {
           if (shortImg) shortImg.style.opacity = '1';
@@ -7115,8 +7116,8 @@ function renderPreview(data, autoSaved = false) {
           const result = await resp.json();
           if (result.error) throw new Error(result.detail || result.error);
           _syncImageToEditor(artScenarioId, result.image, result.current_version);
-          if (wideImg)  { wideImg.src  = result.wide  + '?t=' + Date.now(); wideImg.style.opacity  = '1'; }
-          if (shortImg) { shortImg.src = result.short + '?t=' + Date.now(); shortImg.style.opacity = '1'; }
+          if (wideImg)  { wideImg.src  = artBust(result.wide); wideImg.style.opacity  = '1'; }
+          if (shortImg) { shortImg.src = artBust(result.short); shortImg.style.opacity = '1'; }
           setArtStatus('Brightness updated.', 'success');
         } catch (err) {
           if (wideImg)  wideImg.style.opacity  = '1';
