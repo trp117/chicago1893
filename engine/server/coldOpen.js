@@ -30,11 +30,11 @@ import fs from 'fs';
 export const COLD_OPEN_TIMINGS = Object.freeze({
   titleIn:   450,
   quoteIn:   2800,
-  s1out:     7800,
-  s2in:      8700,
-  charIn:    10000,
-  s2out:     12800,
-  reveal:    13500,
+  s1out:     9100,    // wide line held 6.3s (was 5.0s)
+  s2in:      10000,
+  charIn:    11300,
+  s2out:     16700,   // character line held 5.4s (was 2.8s)
+  reveal:    17400,
   skipHint:  1600,
   fade:      700,
   dissolve:  700,
