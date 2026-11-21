@@ -161,10 +161,14 @@ const servers = [], children = [];
 const listen = async app => { const s = app.listen(0); await new Promise(r => s.once('listening', r)); servers.push(s); return `http://127.0.0.1:${s.address().port}`; };
 const post = async (base, url, body) => { const r = await realFetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const t = await r.text(); return t.split('\n').filter(l => l.startsWith('data: ')).map(l => { try { return JSON.parse(l.slice(6)); } catch { return null; } }).find(e => e?.type === 'done'); };
 
-async function openPage(html, base, { wide = true, path: pagePath = "/" } = {}) {
+// pinRandom: Math.random = () => 0 before any page script runs. The direct start picks its hook
+// when the entry RENDERS (the entry shows the briefing-with-hook, and Begin sends that same
+// briefing), so a pin set later, just before Begin, comes too late to make the pick deterministic.
+async function openPage(html, base, { wide = true, path: pagePath = "/", pinRandom = false } = {}) {
   const log = { urls: [], turnBodies: [], turnDone: 0, notesOpened: false, starts: [] };
   const dom = new JSDOM(html, { url: `${base}${pagePath}`, runScripts: 'dangerously', pretendToBeVisual: true,
     beforeParse(w) {
+      if (pinRandom) w.Math.random = () => 0;
       w.fetch = async (u, o) => {
         const href = new URL(u, base).href;
         log.urls.push(new URL(href).pathname);
@@ -432,7 +436,9 @@ try {
     await tick(300);
     const L1urls = L1.log.urls.slice();
     L1.win.close();
-    const E = await openPage(dsNav, SLOT, { path: `/game?scenarioId=${SCENARIO_ID}` });   // the reload
+    // The reload. Math.random pinned from the start, like the native flow above: the entry picks
+    // its hook as it renders, so the /start parity check below compares hook 0 with hook 0.
+    const E = await openPage(dsNav, SLOT, { path: `/game?scenarioId=${SCENARIO_ID}`, pinRandom: true });
     const { win: ew, doc: ed } = E;
     await until(() => ed.querySelector('.ds-entry'), 6000);
     await tick(300);
