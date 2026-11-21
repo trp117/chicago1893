@@ -61,6 +61,14 @@ const INERT_VARIANTS = {
 export const ROUTES = [
   ['GET', '/'], ['GET', '/?scenarioId=dog_green_sector'], ['GET', '/index.html'],
   ['GET', '/game'], ['GET', '/game?scenarioId=dog_green_sector'],
+  // The entry paths the reading layout's direct start covers (card grid, "Another moment",
+  // role switcher): a non-baked scenario's /game, /game with &roleId=, and / with &roleId=.
+  ['GET', '/game?scenarioId=steel_curtain_cantigny'],
+  ['GET', '/game?scenarioId=dog_green_sector&roleId=role_coxswain'],
+  ['GET', '/?scenarioId=steel_curtain_cantigny'],
+  ['GET', '/?scenarioId=dog_green_sector&roleId=role_coxswain'],
+  ['GET', '/?scenarioId=dog_green_sector&roleId=role_battalion_medic'],
+  ['GET', '/game/api/bootstrap?scenarioId=steel_curtain_cantigny'],
   ['GET', '/moments'], ['GET', '/og-image.png'], ['GET', '/test'], ['GET', '/categories'],
   ['GET', '/admin/login'], ['GET', '/js/scenario-card.js'],
   ['GET', '/api/stories'], ['GET', '/api/categories'],

@@ -14,7 +14,14 @@
 // Part C — with the cold open: the scene uses the page's own choices + input inside the column;
 //          the structure is identical before and after the first action (no reflow); exactly one
 //          model call; the rail's "change role" exists only at the cold open.
-// Part D — server boots: /game and / carry the layout exactly when the flag is on; /health.
+// Part D — server boots: /game and / carry the layout exactly when the flag is on; /health; the
+//          card grid (/moments) sends a non-baked card to /game, which serves the direct start;
+//          / with &roleId= routes a role to its cold open or to the direct start.
+// Part E — the direct start (/game with the layout): no native overlay ever shown; Screen 2's
+//          character entry in the column with Begin, parity with the native flow (entry texts,
+//          /start body); SLOT TIMING — load and reload spend 0 daily slots, each Begin exactly 1;
+//          restart re-enters the same role in the layout; ?roleId=; the role panel; the cold
+//          open's switcher (layout on: &roleId=; layout off: unchanged).
 //
 // The flag-OFF byte-identity proof is scripts/cold-open-baseline.mjs (local + live).
 import 'dotenv/config';
@@ -45,6 +52,13 @@ const DM = await import(`${ROOT}/engine/server/demoMode.js`);
 const CO = await import(`${ROOT}/engine/server/coldOpen.js`);
 const PAGE = fs.readFileSync(p('engine/game/index.html'), 'utf8');
 const RL_FILES = RL.readingLayoutFiles();
+const DS_FILES = RL.directStartFiles();
+// /game as the server serves it with the layout on (DS = direct start; coldOpen = DEMO_COLD_OPEN).
+const servedGame = (page, { coldOpen = false, dsJs = DS_FILES.js } = {}) =>
+  RL.injectReadingLayoutIntoGameHtml(RL.injectDirectStartIntoGameHtml(DM.injectDemoIntoGameHtml(page), { coldOpen }, { css: DS_FILES.css, js: dsJs }), RL_FILES);
+// Test harness only: a script run with `location` shadowed, so a navigation it makes is recorded
+// (jsdom cannot navigate). The script text inside is the file, unchanged.
+const withNav = js => `(function (location) {\n${js}\n}).call(window, window.__nav);`;
 
 // ── Part A ───────────────────────────────────────────────────────────────────
 console.log('\nPart A — gating, injection, contract');
@@ -85,6 +99,17 @@ console.log('\nPart A — gating, injection, contract');
     check(`column surface lightened (${surface}) and the intro's column surface matches it (${introSurface}): no brightness change at the reveal`, surface <= 0.8 && introSurface === surface);
     check(`rail scrim: subtler than the column surface (max ${Math.max(...alphas)} < ${surface})`, Math.max(...alphas) < surface);
     check('rail scrim: not a card (no border, radius or box-shadow)', !/border|radius|box-shadow/.test(rule));
+  }
+  {
+    const out2 = RL.injectDirectStartIntoGameHtml(PAGE, { coldOpen: true }, DS_FILES);
+    check('direct start: css + boot in <head> before the page script; script after the page script', out2.indexOf('id="direct-start-boot"') < out2.indexOf('<script>') && out2.indexOf('id="direct-start-js"') > out2.lastIndexOf('loadGame();'));
+    check('direct start: boot carries only the per-deployment coldOpen flag', out2.includes('window.__DIRECT_START__ = {"coldOpen":true};') && RL.injectDirectStartIntoGameHtml(PAGE, {}, DS_FILES).includes('window.__DIRECT_START__ = {"coldOpen":false};'));
+    check('direct start: nothing else in the page changes', out2.replace(/<style id="direct-start-css">[\s\S]*?<\/script>\n/, '').replace(/<script id="direct-start-js">[\s\S]*?<\/script>\n/, '') === PAGE);
+    const dsHooks = JSON.parse(DS_FILES.js.match(/DS_HOOKS = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
+    for (const fn of dsHooks) check(`direct start: function ${fn}() is declared at top level of the game page`, new RegExp(`^(async )?function ${fn}\\(`, 'm').test(PAGE));
+    for (const v of ['gameState', 'scenario', 'currentRoleId', 'storyEl']) check(`direct start: global ${v} is a top-level let/const of the game page`, new RegExp(`^(let|const) ${v}\\b`, 'm').test(PAGE));
+    check('the page calls renderStreamlinedScreen1 from loadGame AND restartGame (both re-enter through the hook)', (PAGE.match(/^\s+renderStreamlinedScreen1\(\);/gm) || []).length >= 2);
+    check('direct start never sends /start itself (Begin calls the page\'s startGame; no warm start)', !/\/start|fetch\(|warmStart/.test(DS_FILES.js.replace(/^\s*\/\/.*$/gm, '')));
   }
   for (const sel of ['class="app-shell"', 'class="main-column"', 'class="story-feed"', 'class="bottom-bar"', 'id="choices-area-wrap"', 'id="input-form"', 'class="hero"']) {
     check(`the page still has ${sel}`, PAGE.includes(sel));
@@ -137,19 +162,27 @@ const listen = async app => { const s = app.listen(0); await new Promise(r => s.
 const post = async (base, url, body) => { const r = await realFetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const t = await r.text(); return t.split('\n').filter(l => l.startsWith('data: ')).map(l => { try { return JSON.parse(l.slice(6)); } catch { return null; } }).find(e => e?.type === 'done'); };
 
 async function openPage(html, base, { wide = true, path: pagePath = "/" } = {}) {
-  const log = { urls: [], turnBodies: [], turnDone: 0, notesOpened: false };
+  const log = { urls: [], turnBodies: [], turnDone: 0, notesOpened: false, starts: [] };
   const dom = new JSDOM(html, { url: `${base}${pagePath}`, runScripts: 'dangerously', pretendToBeVisual: true,
     beforeParse(w) {
       w.fetch = async (u, o) => {
         const href = new URL(u, base).href;
         log.urls.push(new URL(href).pathname);
         if (href.includes('/game/api/turn')) log.turnBodies.push(JSON.parse(o.body));
+        // A /start is recorded when it is SENT (status/json filled in when it answers).
+        const entry = href.includes('/game/api/start') ? { body: JSON.parse(o.body), status: null, json: null } : null;
+        if (entry) log.starts.push(entry);
         const r = await realFetch(href, o);
+        if (entry) {
+          entry.status = r.status;
+          if (r.status !== 200) r.clone().json().then(j => { entry.json = j; }, () => {});
+        }
         if (href.includes('/game/api/turn')) r.clone().text().then(t => { if (t.includes('"type":"done"')) log.turnDone++; });
         return r;
       };
       w.matchMedia = q => ({ matches: /min-width: 900px/.test(q) ? wide : false, media: q, addEventListener() {}, removeEventListener() {} });
       w.scrollTo = () => {}; w.HTMLElement.prototype.scrollIntoView = () => {};
+      w.__nav = { href: null, replaced: null, search: new URL(`${base}${pagePath}`).search, replace(u) { this.replaced = u; } };
       w.speechSynthesis ??= { getVoices: () => [], cancel() {}, speak() {} };
       w.console.error = () => {};
     } });
@@ -181,12 +214,13 @@ try {
   console.log('\nPart B — /game with the reading layout (direct / card-grid entry)');
   const routerCfg = { anthropicApiKey: 'rl-test', demoMode: true, demoScenarios: [SCENARIO_ID], demoStore: createMemoryDemoStore(), demoLimits: { dailyStartsPerIp: 50, globalPerMin: 1000, ipPerMin: 1000 } };
   const BASE = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, routerCfg)));
-  const gameHtml = RL.injectReadingLayoutIntoGameHtml(DM.injectDemoIntoGameHtml(PAGE), RL_FILES);
+  const gameHtml = servedGame(PAGE);
   const B = await openPage(gameHtml, BASE, { path: `/game?scenarioId=${SCENARIO_ID}` });
   const { win, doc } = B;
   await until(() => win.eval('typeof scenario !== "undefined" && !!scenario'), 6000);
   model.story = 0;
-  check('page load (bootstrap, role screen) made ZERO model calls', model.story === 0 && !B.log.urls.some(u => /turn|start/.test(u)), B.log.urls.join(','));
+  await until(() => doc.querySelector('.ds-entry'), 4000);
+  check('page load (bootstrap, character entry) made ZERO model calls', model.story === 0 && !B.log.urls.some(u => /turn|start/.test(u)), B.log.urls.join(','));
   reply = OPENING;
   await win.startGame(ROLE_ID, 'focused', {});
   await until(() => doc.querySelector('#choices .choice-btn'), 6000);
@@ -209,7 +243,7 @@ try {
   check('cast rail shown, exactly two blocks: "You are", "In the scene"', !!rail && cs(win, rail).getPropertyValue('display') === 'block' && JSON.stringify(labels) === '["You are","In the scene"]');
   check('"You are": the role, where (location), when, and The history', rail.querySelector('.rl-role').textContent === 'The Battalion Medic' && !!rail.querySelector('.rl-where')?.textContent
     && rail.querySelector('.rl-when').textContent === `Minute 0 of ${(await repos.scenarios.findById(SCENARIO_ID)).sessionTargetMinutes}` && rail.querySelector('.rl-history')?.textContent === 'The history');
-  check('no "change role" outside the cold open', !rail.querySelector('.rl-change'));
+  check('no "change role" once the session has started (outside the cold open / pre-Begin entry)', !rail.querySelector('.rl-change'));
   rail.querySelector('.rl-history').click();
   const intro = (await repos.scenarios.findById(SCENARIO_ID)).introduction?.sections?.find(s => s.type === 'world')?.text;
   check('The history opens the scenario\'s real introduction', !!doc.querySelector('.rl-panel') && !!intro && doc.querySelector('.rl-panel').textContent.includes(intro));
@@ -295,7 +329,8 @@ try {
 
   // Narrow: one full-width column, no rail, orientation in the top bar.
   const N = await openPage(gameHtml, BASE, { wide: false, path: `/game?scenarioId=${SCENARIO_ID}` });
-  await until(() => N.win.eval('typeof scenario !== "undefined" && !!scenario'), 6000);
+  await until(() => N.doc.querySelector('.ds-entry'), 6000);
+  check('narrow, before Begin: no rail, so the entry carries an inline "Change role"', cs(N.win, '.rl-rail').getPropertyValue('display') === 'none' && cs(N.win, '.ds-entry .ds-change').getPropertyValue('display') !== 'none');
   reply = OPENING;
   await N.win.startGame(ROLE_ID, 'focused', {});
   await until(() => N.doc.querySelector('#choices .choice-btn'), 6000);
@@ -360,6 +395,146 @@ try {
   check('Notes never opened by itself (cold open → handoff → turn 1)', !K.log.notesOpened);
   K.win.close();
 
+  // ── Part E ─────────────────────────────────────────────────────────────────
+  console.log('\nPart E — the direct start (/game, reading layout): entry, parity, slot timing, restart, role switch');
+  {
+    const FIRST = (await (await realFetch(`${BASE}/game/api/bootstrap?scenarioId=${SCENARIO_ID}`)).json()).scenario.playerRoleOptions;
+    const SECOND = FIRST[1];
+    const dsNav = servedGame(PAGE, { dsJs: withNav(DS_FILES.js) });
+    const dsNavCold = servedGame(PAGE, { coldOpen: true, dsJs: withNav(DS_FILES.js) });
+
+    // ── Parity source: the NATIVE flow (flag off, no layout), Math.random pinned. Screen 1 → tap the
+    // first role card (its warm /start is the native /start body); Screen 2's title + paragraphs.
+    const nativeBase = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { anthropicApiKey: 'rl-test' })));
+    const NV = await openPage(DM.injectDemoIntoGameHtml(PAGE), nativeBase, { path: `/game?scenarioId=${SCENARIO_ID}` });
+    await until(() => NV.doc.querySelector('#role-overlay .role-card'), 6000);
+    check('native (flag off): the page\'s own entry is the role overlay (Screen 1) — the old format the layout must replace', !NV.doc.getElementById('role-overlay').classList.contains('hidden'));
+    NV.win.Math.random = () => 0;
+    // The native card unlocks audio (new Audio().play()) first; jsdom has no media playback.
+    NV.win.Audio = function () { return { src: '', play: () => Promise.resolve(), pause() {}, duration: NaN }; };
+    reply = OPENING;
+    NV.doc.querySelector('#role-overlay .role-card').click();
+    await until(() => NV.doc.querySelectorAll('#intro-sections p').length > 0 && NV.log.starts.length === 1, 6000);
+    const nativeTitle = NV.doc.getElementById('intro-title').textContent;
+    const nativeParas = [...NV.doc.querySelectorAll('#intro-sections p')].map(p => p.textContent);
+    const nativeStart = NV.log.starts[0]?.body;
+    // Let the native warm /start finish (its model call) before anything below counts calls.
+    await until(() => NV.log.starts[0]?.status != null, 20000);
+    await tick(500);
+    NV.win.close();
+
+    // ── Load + reload: zero /start, zero slots. Router with a daily cap of 2.
+    const slotCfg = { anthropicApiKey: 'rl-test', demoMode: true, demoScenarios: [SCENARIO_ID], demoStore: createMemoryDemoStore(), demoLimits: { dailyStartsPerIp: 2, globalPerMin: 1000, ipPerMin: 1000 } };
+    const SLOT = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, slotCfg)));
+    model.story = 0;
+    const L1 = await openPage(dsNav, SLOT, { path: `/game?scenarioId=${SCENARIO_ID}` });
+    await until(() => L1.doc.querySelector('.ds-entry'), 6000);
+    await tick(300);
+    const L1urls = L1.log.urls.slice();
+    L1.win.close();
+    const E = await openPage(dsNav, SLOT, { path: `/game?scenarioId=${SCENARIO_ID}` });   // the reload
+    const { win: ew, doc: ed } = E;
+    await until(() => ed.querySelector('.ds-entry'), 6000);
+    await tick(300);
+    check('SLOT: page load sent NO /start and made no model call', L1urls.length && !L1urls.some(u => /\/start|\/turn/.test(u)), L1urls.join(','));
+    check('SLOT: reload sent NO /start and made no model call', !E.log.urls.some(u => /\/start|\/turn/.test(u)) && model.story === 0, E.log.urls.join(','));
+
+    // ── The entry, in the layout.
+    const root = ed.documentElement;
+    check('entry: html.rl + html.ds-pre; NEITHER native overlay is shown (#role-overlay, #intro-overlay hidden)', root.classList.contains('rl') && root.classList.contains('ds-pre')
+      && ed.getElementById('role-overlay').classList.contains('hidden') && cs(ew, '#role-overlay').getPropertyValue('display') === 'none'
+      && ed.getElementById('intro-overlay').classList.contains('hidden') && cs(ew, '#intro-overlay').getPropertyValue('display') === 'none');
+    const entry = ed.querySelector('.ds-entry');
+    check('entry: in the reading column (#story inside .main-column)', entry?.parentElement?.id === 'story' && !!entry.closest('.main-column') && cs(ew, '.main-column').getPropertyValue('max-width') === '720px');
+    check(`entry: defaults to the FIRST role in playerRoleOptions (${FIRST[0].id})`, ew.eval('currentRoleId') === FIRST[0].id);
+    check('PARITY: the entry\'s heading = native Screen 2\'s title', ed.querySelector('.ds-role')?.textContent === nativeTitle && !!nativeTitle, `${ed.querySelector('.ds-role')?.textContent} | ${nativeTitle}`);
+    const dsParas = [...ed.querySelectorAll('.ds-entry .ds-p')].map(p => p.textContent);
+    check(`PARITY: the entry's paragraphs = native Screen 2's (${nativeParas.length}: bridge → context → entry)`, nativeParas.length > 0 && JSON.stringify(dsParas) === JSON.stringify(nativeParas), `\n        ds     ${JSON.stringify(dsParas)}\n        native ${JSON.stringify(nativeParas)}`);
+    check('entry: Begin in the column; choices + input hidden until Begin', ed.querySelector('.ds-entry .ds-begin')?.textContent === 'Begin' && cs(ew, '.bottom-bar').getPropertyValue('display') === 'none');
+    const rail = ed.querySelector('.rl-rail');
+    check('rail before Begin: "You are" the first role, "· change role ▾"', rail.querySelector('.rl-role')?.textContent === ew.eval('getCardDisplayName')(FIRST[0]) && rail.querySelector('.rl-change')?.textContent === ' · change role ▾');
+    check('wide: the inline "Change role" steps aside (the rail carries it)', cs(ew, '.ds-entry .ds-change').getPropertyValue('display') === 'none');
+
+    // ── The role panel (rail): roles listed, current marked; another role → that role's entry.
+    rail.querySelector('.rl-change').click();
+    const panelRoles = [...ed.querySelectorAll('.ds-panel .ds-roles button')];
+    check('role panel: every role, in playerRoleOptions order, the current one marked', JSON.stringify(panelRoles.map(b => b.getAttribute('data-role'))) === JSON.stringify(FIRST.map(r => r.id))
+      && panelRoles[0].getAttribute('aria-current') === 'true' && panelRoles[0].querySelector('.ds-role-tag')?.textContent === 'Current' && !!ed.querySelector('.ds-panel.rl-panel .rl-panel-sheet'));
+    panelRoles[0].click();
+    check('role panel: picking the current role just closes it', !ed.querySelector('.ds-panel') && ew.__nav.href === null);
+    rail.querySelector('.rl-change').click();
+    ed.querySelector(`.ds-panel .ds-roles button[data-role="${SECOND.id}"]`).click();
+    check('PATH role switcher (direct start, no cold open): another role → /game?scenarioId=…&roleId=…', ew.__nav.href === `/game?scenarioId=${SCENARIO_ID}&roleId=${SECOND.id}`, ew.__nav.href);
+    ew.__nav.href = null;
+    ed.querySelector('.ds-panel .rl-close')?.click();
+
+    // ── Begin: exactly one /start, the native body; the opening streams into the column.
+    ew.Math.random = () => 0;
+    reply = OPENING;
+    model.story = 0;
+    ed.querySelector('.ds-entry .ds-begin').click();
+    await until(() => ed.querySelector('#choices .choice-btn') && E.log.starts.length === 1, 8000);
+    await tick(150);
+    check('SLOT: Begin sent exactly ONE /start (200) and one model call', E.log.starts.length === 1 && E.log.starts[0].status === 200 && model.story === 1, `starts=${E.log.starts.length} story=${model.story}`);
+    const pick = b => b && ({ roleId: b.roleId, narrativeStyle: b.narrativeStyle, character_context: b.character_context, player_addition: b.player_addition, active_hook: b.active_hook, onboardingFlow: b.onboardingFlow });
+    check('PARITY: the /start body = the native flow\'s (role, style, character_context, active_hook, player_addition, onboardingFlow)', !!nativeStart && JSON.stringify(pick(E.log.starts[0].body)) === JSON.stringify(pick(nativeStart)),
+      `\n        ds     ${JSON.stringify(pick(E.log.starts[0].body))}\n        native ${JSON.stringify(pick(nativeStart))}`);
+    check('after Begin: the opening is in the column; entry controls, html.ds-pre and "change role" gone; bar shown', /FULL OPENING/.test(ed.getElementById('story').textContent) && !ed.querySelector('.ds-begin')
+      && !root.classList.contains('ds-pre') && !rail.querySelector('.rl-change') && cs(ew, '.bottom-bar').getPropertyValue('display') !== 'none');
+    check('after Begin: still no native overlay', ed.getElementById('role-overlay').classList.contains('hidden') && ed.getElementById('intro-overlay').classList.contains('hidden'));
+
+    // ── PATH restart ("Begin Again" → confirm → restartGame): the same role, in the layout.
+    ed.getElementById('restart-confirm-yes').click();
+    await until(() => ed.querySelector('.ds-entry .ds-begin'), 4000);
+    check('PATH restart: re-enters the entry in the layout, same role, no overlay, no /start', root.classList.contains('ds-pre') && ew.eval('currentRoleId') === FIRST[0].id
+      && ed.getElementById('role-overlay').classList.contains('hidden') && ed.getElementById('intro-overlay').classList.contains('hidden') && E.log.starts.length === 1);
+    ed.querySelector('.ds-entry .ds-begin').click();
+    await until(() => E.log.starts.length === 2 && ed.querySelector('#choices .choice-btn'), 8000);
+    check('SLOT: the second Begin (after restart) plays — slot 2 of 2', E.log.starts[1]?.status === 200);
+    ed.getElementById('restart-confirm-yes').click();
+    await until(() => ed.querySelector('.ds-entry .ds-begin'), 4000);
+    ed.querySelector('.ds-entry .ds-begin').click();
+    await until(() => E.log.starts.length === 3 && E.log.starts[2].json, 6000);
+    check('SLOT: a third Begin → 403 daily — so load + reload spent 0 and each Begin exactly 1', E.log.starts[2].status === 403 && E.log.starts[2].json?.demoLimit === 'daily', JSON.stringify(E.log.starts[2]));
+    check('Notes never opened by itself (direct start)', !E.log.notesOpened);
+    ew.close();
+
+    // ── ?roleId=: a known role is used; an unknown one falls back to the first.
+    const RQ = await openPage(dsNav, BASE, { path: `/game?scenarioId=${SCENARIO_ID}&roleId=${SECOND.id}` });
+    await until(() => RQ.doc.querySelector('.ds-entry'), 6000);
+    check('?roleId=<second role> → the entry for that role', RQ.win.eval('currentRoleId') === SECOND.id && RQ.doc.querySelector('.ds-role')?.textContent === RQ.win.eval('buildCharacterHeader')(SECOND));
+    RQ.win.close();
+    const RU = await openPage(dsNav, BASE, { path: `/game?scenarioId=${SCENARIO_ID}&roleId=no_such_role` });
+    await until(() => RU.doc.querySelector('.ds-entry'), 6000);
+    check('?roleId=<unknown> → the first role', RU.win.eval('currentRoleId') === FIRST[0].id);
+    RU.win.close();
+
+    // ── With DEMO_COLD_OPEN on, the panel routes through / (which picks cold open vs direct start).
+    const DC = await openPage(dsNavCold, BASE, { path: `/game?scenarioId=${SCENARIO_ID}` });
+    await until(() => DC.doc.querySelector('.ds-entry'), 6000);
+    DC.doc.querySelector('.rl-rail .rl-change').click();
+    DC.doc.querySelector(`.ds-panel .ds-roles button[data-role="${SECOND.id}"]`).click();
+    check('PATH role switcher (direct start, cold open on): another role → /?scenarioId=…&roleId=…', DC.win.__nav.href === `/?scenarioId=${SCENARIO_ID}&roleId=${SECOND.id}`, DC.win.__nav.href);
+    DC.win.close();
+
+    // ── The cold open's own switcher: a role with no ready row.
+    const coJs = withNav(fs.readFileSync(DM.COLD_OPEN_JS_PATH, 'utf8'));
+    const coPage = (layout, js) => {
+      const h = DM.injectColdOpenIntoGameHtml(DM.injectDemoIntoGameHtml(PAGE), { scenarioId: SCENARIO_ID, roleId: ROLE_ID, timings: FAST, historyUser: CO.COLD_OPEN_HISTORY_USER },
+        { css: fs.readFileSync(DM.COLD_OPEN_CSS_PATH, 'utf8'), js });
+      return layout ? RL.injectReadingLayoutIntoGameHtml(h, RL_FILES) : h;
+    };
+    for (const [layout, want] of [[true, `/game?scenarioId=${SCENARIO_ID}&roleId=${SECOND.id}`], [false, `/game?scenarioId=${SCENARIO_ID}`]]) {
+      const K2 = await openPage(coPage(layout, coJs), COBASE);
+      await until(() => K2.doc.querySelector('.co-head') && K2.doc.getElementById('co-overlay').hidden, 8000);
+      check(`cold open (${layout ? 'layout on' : 'layout off'}): no direct start on the cold-open page`, !K2.doc.querySelector('.ds-entry') && !K2.doc.getElementById('direct-start-js') && !K2.doc.documentElement.classList.contains('ds-pre'));
+      K2.doc.querySelector('.co-head .co-role').click();
+      K2.doc.querySelectorAll('.co-panel .co-roles button')[[...K2.doc.querySelectorAll('.co-panel .co-roles button')].findIndex(b => b.textContent.startsWith(K2.win.eval('getCardDisplayName')(SECOND)))].click();
+      check(`PATH role switcher (cold open, ${layout ? 'layout ON' : 'layout OFF'}): a role with no ready row → ${want}`, K2.win.__nav.href === want, K2.win.__nav.href);
+      K2.win.close();
+    }
+  }
+
   // ── Part D ─────────────────────────────────────────────────────────────────
   console.log('\nPart D — server boots');
   const freePort = () => new Promise((res, rej) => { const s = net.createServer(); s.listen(0, () => { const { port } = s.address(); s.close(() => res(port)); }); s.on('error', rej); });
@@ -378,8 +553,8 @@ try {
       child.stdout.on('data', on); child.stderr.on('data', on);
       child.on('exit', c => { clearTimeout(t); rej(new Error(`${label} exited ${c}:\n${out.slice(-1500)}`)); });
     });
-    const get = async url => { const r = await realFetch(`http://localhost:${port}${url}`, { redirect: 'manual', headers: { 'User-Agent': 'reading-layout-test-bot' } }); return { status: r.status, text: await r.text() }; };
-    return { get, log: () => out, stop: () => child.kill() };
+    const get = async url => { const r = await realFetch(`http://localhost:${port}${url}`, { redirect: 'manual', headers: { 'User-Agent': 'reading-layout-test-bot' } }); return { status: r.status, location: r.headers.get('location'), text: await r.text() }; };
+    return { get, base: `http://localhost:${port}`, log: () => out, stop: () => child.kill() };
   }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rl-test-'));
   const rowsFile = path.join(tmp, 'rows.json');
@@ -387,7 +562,33 @@ try {
   const s1 = await bootServer('rl + cold open', { DEMO_READING_LAYOUT: 'true', DEMO_COLD_OPEN: 'true', DEMO_FEATURED_SCENARIO: SCENARIO_ID, DEMO_FEATURED_ROLE: ROLE_ID, DEMO_COLD_OPEN_FILE: rowsFile });
   {
     const g = await s1.get('/game?scenarioId=steel_curtain_cantigny');
-    check('/game = game page + demo injection + reading layout, exactly', g.status === 200 && g.text === RL.injectReadingLayoutIntoGameHtml(DM.injectDemoIntoGameHtml(PAGE), RL_FILES));
+    check('/game = game page + demo injection + direct start (coldOpen: true) + reading layout, exactly', g.status === 200 && g.text === servedGame(PAGE, { coldOpen: true }));
+    const gr = await s1.get('/game?scenarioId=steel_curtain_cantigny&roleId=role_forward_infantryman');
+    check('/game?…&roleId= is the same page (the role is read in the page; /game stays cacheable)', gr.status === 200 && gr.text === g.text);
+    // PATH 1 — the card grid, end to end: /moments builds its cards from /api/stories; the baked
+    // scenario's card goes to its cold open, the non-baked one to /game (the direct start).
+    {
+      const m = await s1.get('/moments');
+      const base1 = s1.base;
+      const mdom = new JSDOM(m.text, { url: `${base1}/moments`, runScripts: 'dangerously', beforeParse(w) { w.fetch = (u, o) => realFetch(new URL(u, base1).href, o); } });
+      await until(() => mdom.window.document.querySelectorAll('#stories a.story').length >= 2, 8000);
+      const hrefs = Object.fromEntries([...mdom.window.document.querySelectorAll('#stories a.story')].map(a => [new URL(a.href).searchParams.get('scenarioId'), a.getAttribute('href')]));
+      mdom.window.close();
+      check('PATH card grid: Dog Green (baked) → its cold open; Cantigny (not baked) → /game (the direct start)', hrefs.dog_green_sector === '/?scenarioId=dog_green_sector' && hrefs.steel_curtain_cantigny === '/game?scenarioId=steel_curtain_cantigny', JSON.stringify(hrefs));
+      const followed = await s1.get(hrefs.steel_curtain_cantigny);
+      check('…and that card\'s page is the direct start in the reading layout', followed.text === g.text && followed.text.includes('id="direct-start-js"') && followed.text.includes('id="reading-layout-js"'));
+    }
+    check('PATH "Another moment": /moments is the card grid (→ the card-grid path above)', (await s1.get('/moments')).status === 200);
+    const nb = await s1.get('/?scenarioId=steel_curtain_cantigny');
+    check('/ for a non-baked scenario still redirects to /game?scenarioId=… (unchanged)', nb.status === 302 && nb.location === '/game?scenarioId=steel_curtain_cantigny', JSON.stringify(nb.location));
+    const toDirect = await s1.get('/?scenarioId=dog_green_sector&roleId=role_coxswain');
+    check('PATH role switcher: / + a role with no ready row → /game?scenarioId=…&roleId=… (the direct start in that role)', toDirect.status === 302 && toDirect.location === '/game?scenarioId=dog_green_sector&roleId=role_coxswain', JSON.stringify(toDirect.location));
+    const toCold = await s1.get(`/?scenarioId=dog_green_sector&roleId=${ROLE_ID}`);
+    check('PATH role switcher: / + a ready role → that role\'s cold open (served, not redirected)', toCold.status === 200 && toCold.text.includes(`"roleId":"${ROLE_ID}"`) && toCold.text.includes('id="cold-open-js"'));
+    const cantRole = await s1.get('/?scenarioId=steel_curtain_cantigny&roleId=role_unknown_x');
+    check('/ + a role on a non-baked scenario → the direct start with that role id (the page falls back to the first role if unknown)', cantRole.status === 302 && cantRole.location === '/game?scenarioId=steel_curtain_cantigny&roleId=role_unknown_x');
+    const off = await s1.get('/?scenarioId=not_whitelisted&roleId=x');
+    check('/ + roleId on a scenario outside the whitelist → the featured entry, as before (no redirect)', off.status === 200 && off.text.includes(`"roleId":"${ROLE_ID}"`));
     const r = await s1.get('/');
     const expected = RL.injectReadingLayoutIntoGameHtml(DM.injectColdOpenIntoGameHtml(DM.injectDemoIntoGameHtml(PAGE),
       { scenarioId: SCENARIO_ID, roleId: ROLE_ID, timings: CO.COLD_OPEN_TIMINGS, historyUser: CO.COLD_OPEN_HISTORY_USER },
@@ -403,7 +604,9 @@ try {
     const g = await s2.get('/game');
     const r = await s2.get('/');
     const h = JSON.parse((await s2.get('/health')).text);
-    check('flag off: /game has no layout (demo injection only)', g.text === DM.injectDemoIntoGameHtml(PAGE));
+    check('flag off: /game has no layout and no direct start (demo injection only)', g.text === DM.injectDemoIntoGameHtml(PAGE) && !g.text.includes('direct-start'));
+    const gq = await s2.get('/game?scenarioId=dog_green_sector&roleId=role_coxswain');
+    check('flag off: /game?…&roleId= is the same plain demo page', gq.text === DM.injectDemoIntoGameHtml(PAGE));
     check('flag off: the cold-open page has no layout', !r.text.includes('reading-layout') && r.text.includes('id="cold-open-js"'));
     check('flag off: /health has no readingLayout key, no boot line', !('readingLayout' in h) && !/READING-LAYOUT/.test(s2.log()));
   }

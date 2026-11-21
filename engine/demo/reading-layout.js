@@ -184,13 +184,17 @@
     var role = (scenario.playerRoleOptions || []).find(function (r) { return r.id === gameState.playerRoleId; });
     var roleLine = el('p', 'rl-line');
     roleLine.appendChild(el('span', 'rl-role', role && typeof getCardDisplayName === 'function' ? getCardDisplayName(role) : (gameState.playerRoleName || '')));
-    // Changing role belongs to the cold open only (it re-opens the scene); never mid-session.
+    // Changing role belongs to the entry only — the cold open (it re-opens the scene) or the
+    // direct start before Begin (direct-start.js) — never mid-session.
     var coRole = root.classList.contains('co-active') ? document.querySelector('.co-head .co-role') : null;
-    if (coRole) {
+    var ds = window.__directStart;
+    var changeRole = coRole ? function () { coRole.click(); }
+      : (ds && ds.canChangeRole() ? ds.openRoles : null);
+    if (changeRole) {
       var ch = el('button', 'rl-change', ' · change role ▾');
       ch.type = 'button';
       ch.setAttribute('aria-haspopup', 'dialog');
-      ch.addEventListener('click', function () { coRole.click(); });
+      ch.addEventListener('click', changeRole);
       roleLine.appendChild(ch);
     }
     you.appendChild(roleLine);

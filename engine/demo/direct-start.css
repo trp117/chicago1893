@@ -1,0 +1,36 @@
+/* DEMO_READING_LAYOUT direct start — injected into /game with direct-start.js, only when the
+   reading layout is on. The character entry and Begin live in the reading column; the native
+   #role-overlay / #intro-overlay are never shown. Every rule is under html.rl. */
+
+/* Before Begin: no choices, no input — the entry's Begin is the only action. */
+html.rl.ds-pre .bottom-bar { display: none; }
+html.rl.ds-pre #role-overlay, html.rl.ds-pre #intro-overlay { display: none !important; }
+
+html.rl .ds-entry { padding: 8px 0 12px; }
+html.rl .ds-entry .ds-role { margin: 0 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size: 1.3rem; font-weight: normal; line-height: 1.35; color: var(--text, #f0eadc); }
+html.rl .ds-entry .ds-p { margin: 0 0 14px; font-family: Georgia, 'Times New Roman', serif; font-size: 1.02rem; line-height: 1.7; color: var(--text, #f0eadc); }
+html.rl .ds-entry .ds-bridge { font-style: italic; color: var(--muted, #c1b9a6); }
+html.rl .ds-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 18px; }
+html.rl .ds-begin {
+  padding: 12px 26px; border-radius: 10px; border: 1px solid var(--demo-accent); background: rgba(214, 166, 76, 0.12);
+  color: var(--text, #f0eadc); font-family: Georgia, 'Times New Roman', serif; font-size: 1rem; cursor: pointer;
+}
+html.rl .ds-begin:hover { background: rgba(214, 166, 76, 0.22); }
+html.rl .ds-begin:focus-visible, html.rl .ds-change:focus-visible { outline: 2px solid var(--demo-accent); outline-offset: 2px; }
+html.rl .ds-begin:disabled { opacity: 0.6; cursor: default; }
+/* Inline "Change role": for narrow screens, where there is no rail. Wide: the rail carries it. */
+html.rl .ds-change { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 0.85rem; color: #a39883; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+html.rl .ds-change:hover { color: var(--demo-accent); }
+html.rl.rl-wide .ds-change { display: none; }
+
+/* The role panel (the layout's panel: .rl-panel / .rl-panel-sheet). */
+.ds-panel .ds-roles { list-style: none; margin: 0; padding: 0; }
+.ds-panel .ds-roles li + li { margin-top: 8px; }
+.ds-panel .ds-roles button {
+  display: block; width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--border, #3a3429); background: rgba(40, 35, 24, 0.55); color: var(--text, #f0eadc); font: inherit;
+}
+.ds-panel .ds-roles button:hover, .ds-panel .ds-roles button[aria-current="true"] { border-color: var(--demo-accent); }
+.ds-panel .ds-role-name { display: block; font-family: Georgia, 'Times New Roman', serif; font-size: 1rem; }
+.ds-panel .ds-role-tag { margin-left: 8px; font-family: system-ui, sans-serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--demo-accent); }
+.ds-panel .ds-role-desc { display: block; margin-top: 4px; font-size: 0.82rem; line-height: 1.45; color: var(--muted, #c1b9a6); }

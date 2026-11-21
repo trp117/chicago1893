@@ -1,6 +1,6 @@
 {
-  "commit": "55938a0717752b3300e49301ead1e0599bab4fb9",
-  "capturedAt": "2026-11-20T07:00:18.495Z",
+  "commit": "ff7806c1025a073c4b000c0ac29b295fbbf88d4c",
+  "capturedAt": "2026-11-21T05:51:26.429Z",
   "shapes": {
     "prod": {
       "GET /": {
@@ -42,6 +42,54 @@
         "cacheControl": "public, max-age=300, must-revalidate",
         "sha256": "37db8c78d722847c137a46002b149af9b69d98e75e915f9ff6b2cc089f374ed9",
         "bytes": 189860
+      },
+      "GET /game?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "37db8c78d722847c137a46002b149af9b69d98e75e915f9ff6b2cc089f374ed9",
+        "bytes": 189860
+      },
+      "GET /game?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "37db8c78d722847c137a46002b149af9b69d98e75e915f9ff6b2cc089f374ed9",
+        "bytes": 189860
+      },
+      "GET /?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_battalion_medic": {
+        "status": 200,
+        "type": "text/html; charset=UTF-8",
+        "location": null,
+        "cacheControl": "public, max-age=300",
+        "sha256": "9f4d0d3c9f65a1fa44268e87bd4a12d78aada2ddc8825ec6f07c65402c22f78b",
+        "bytes": 52960
+      },
+      "GET /game/api/bootstrap?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "20544b47b0b547abae02a29caa28535b527b377d9b3176aeeab9b1918d758726",
+        "bytes": 119383
       },
       "GET /moments": {
         "status": 404,
@@ -237,6 +285,54 @@
         "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
         "bytes": 191932
       },
+      "GET /game?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /game?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "6ea1a02f60035118ce044da52fbfb85261dec061512e50ea8eedf049324cb800",
+        "bytes": 6073
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "6ea1a02f60035118ce044da52fbfb85261dec061512e50ea8eedf049324cb800",
+        "bytes": 6073
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_battalion_medic": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "6ea1a02f60035118ce044da52fbfb85261dec061512e50ea8eedf049324cb800",
+        "bytes": 6073
+      },
+      "GET /game/api/bootstrap?scenarioId=steel_curtain_cantigny": {
+        "status": 404,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "83ddd9496f2d783d4d4410ea7647b9b61df8a70261b8ac7d8359ec1e3a41511d",
+        "bytes": 31
+      },
       "GET /moments": {
         "status": 404,
         "type": "text/html; charset=utf-8",
@@ -430,6 +526,54 @@
         "cacheControl": "public, max-age=300, must-revalidate",
         "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
         "bytes": 191932
+      },
+      "GET /game?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /game?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "9526ef6ef0df805dd1fe2d9313aab45842ad1ea9e7159bd9bf6f42d07ddcb4d4",
+        "bytes": 191932
+      },
+      "GET /?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "595354c10c107e8147e07039ae5b7aa26503bd36f5eb6084a72287fdfb2b7c3a",
+        "bytes": 6016
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_coxswain": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "595354c10c107e8147e07039ae5b7aa26503bd36f5eb6084a72287fdfb2b7c3a",
+        "bytes": 6016
+      },
+      "GET /?scenarioId=dog_green_sector&roleId=role_battalion_medic": {
+        "status": 200,
+        "type": "text/html; charset=utf-8",
+        "location": null,
+        "cacheControl": "public, max-age=300, must-revalidate",
+        "sha256": "595354c10c107e8147e07039ae5b7aa26503bd36f5eb6084a72287fdfb2b7c3a",
+        "bytes": 6016
+      },
+      "GET /game/api/bootstrap?scenarioId=steel_curtain_cantigny": {
+        "status": 200,
+        "type": "application/json; charset=utf-8",
+        "location": null,
+        "cacheControl": null,
+        "sha256": "20544b47b0b547abae02a29caa28535b527b377d9b3176aeeab9b1918d758726",
+        "bytes": 119383
       },
       "GET /moments": {
         "status": 404,

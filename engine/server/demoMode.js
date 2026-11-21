@@ -10,7 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { injectReadingLayoutIntoGameHtml, readingLayoutFiles } from './readingLayout.js';
+import { injectReadingLayoutIntoGameHtml, readingLayoutFiles, injectDirectStartIntoGameHtml, directStartFiles } from './readingLayout.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const DEMO_DIR = path.resolve(HERE, '../demo');
@@ -233,7 +233,8 @@ export function injectColdOpenIntoLanding(html, readyScenarioIds) {
 // onLandingView: called (fire-and-forget) once per counted landing view; omitted = no counting.
 //
 // readingLayout (DEMO_READING_LAYOUT only; false otherwise, and then nothing below changes):
-// /game and the cold-open page also carry the reading layout (readingLayout.js).
+// /game and the cold-open page also carry the reading layout (readingLayout.js), and /game's
+// own entry is the direct start (direct-start.js) instead of the native role/character overlays.
 //
 // coldOpen (DEMO_COLD_OPEN only; omitted otherwise, and then nothing below changes): the
 // runtime from coldOpen.js. With it, / is the cold-open entry when the featured role has a
@@ -267,7 +268,8 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
     let page = null;
     try {
       const q = typeof req.query.scenarioId === 'string' ? req.query.scenarioId : null;
-      const pick = await coldOpen.entryFor(q);
+      const r = typeof req.query.roleId === 'string' ? req.query.roleId : null;
+      const pick = await coldOpen.entryFor(q, r);
       if (pick?.redirect) return res.redirect(302, pick.redirect);
       if (pick?.row) {
         const html = injectDemoIntoGameHtml(fs.readFileSync(gameHtmlPath, 'utf8'));
@@ -318,7 +320,7 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
       res.set('Cache-Control', cacheControl);
       if (!readingLayout) return res.type('html').send(injectDemoIntoGameHtml(html));
       let page;
-      try { page = withLayout(injectDemoIntoGameHtml(html)); } catch (e) { return next(e); }
+      try { page = withLayout(injectDirectStartIntoGameHtml(injectDemoIntoGameHtml(html), { coldOpen: !!coldOpen }, directStartFiles())); } catch (e) { return next(e); }
       return res.type('html').send(page);
     }
     return next();

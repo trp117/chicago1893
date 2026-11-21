@@ -42,3 +42,28 @@ try { if (window.matchMedia('(min-width: ${READING_LAYOUT_RAIL_MIN_PX}px)').matc
 export function readingLayoutFiles() {
   return { css: fs.readFileSync(READING_LAYOUT_CSS_PATH, 'utf8'), js: fs.readFileSync(READING_LAYOUT_JS_PATH, 'utf8') };
 }
+
+// ── Direct start (/game only, never the cold-open page) ─────────────────────────────────────
+// With the layout on, /game's own entry (the native role screen + character screen overlays) is
+// replaced by direct-start.js: the character entry and Begin in the column, /start on Begin
+// only. A separate file because, unlike the layout, it drives the page's /start. The boot config
+// is per deployment, never per request (/game stays cacheable): coldOpen = whether / routes a
+// role to its cold open (DEMO_COLD_OPEN on) — the role panel's link target.
+export const DIRECT_START_CSS_PATH = path.join(DEMO_DIR, 'direct-start.css');
+export const DIRECT_START_JS_PATH  = path.join(DEMO_DIR, 'direct-start.js');
+
+export function injectDirectStartIntoGameHtml(html, { coldOpen = false } = {}, { css, js }) {
+  const head = `<style id="direct-start-css">${css}</style>
+<script id="direct-start-boot">window.__DIRECT_START__ = ${JSON.stringify({ coldOpen: coldOpen === true })};</script>
+`;
+  const tail = `<script id="direct-start-js">${js}</script>\n`;
+  const h = html.indexOf('</head>');
+  let out = h === -1 ? head + html : html.slice(0, h) + head + html.slice(h);
+  const b = out.lastIndexOf('</body>');
+  out = b === -1 ? out + tail : out.slice(0, b) + tail + out.slice(b);
+  return out;
+}
+
+export function directStartFiles() {
+  return { css: fs.readFileSync(DIRECT_START_CSS_PATH, 'utf8'), js: fs.readFileSync(DIRECT_START_JS_PATH, 'utf8') };
+}

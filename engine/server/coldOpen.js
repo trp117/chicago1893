@@ -205,9 +205,23 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
     //   another whitelisted scenario with a ready row → its cold open, role = its first ready role;
     //   a whitelisted scenario with none → { redirect: '/game?scenarioId=<id>' } (the normal start);
     //   anything else → the featured entry. Never throws.
-    async entryFor(scenarioId) {
+    // With &roleId=<role> (a role switcher) on a whitelisted scenario, featured or not: that
+    // role's cold open when it has a ready row, else { redirect: '/game?scenarioId=<id>&roleId=<role>' }
+    // (the direct start, which falls back to the first role if the id is not one of the scenario's).
+    async entryFor(scenarioId, roleId = null) {
       const featured = async () => { const row = await this.entryRow(); return row ? { scenarioId: config.featuredScenario, roleId: config.featuredRole, row } : null; };
-      if (!scenarioId || scenarioId === config.featuredScenario || !(config.demoScenarios || []).includes(scenarioId)) return featured();
+      const listed = !!scenarioId && (config.demoScenarios || []).includes(scenarioId);
+      if (listed && typeof roleId === 'string' && roleId) {
+        const direct = { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}&roleId=${encodeURIComponent(roleId)}` };
+        try {
+          if (!(await store.readyRoles(scenarioId)).includes(roleId)) return direct;
+          const row = await get(scenarioId, roleId);
+          return row ? { scenarioId, roleId, row } : direct;
+        } catch {
+          return direct;
+        }
+      }
+      if (!scenarioId || scenarioId === config.featuredScenario || !listed) return featured();
       try {
         const roles = (await store.readyRoles(scenarioId)).sort();
         if (!roles.length) return { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };

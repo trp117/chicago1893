@@ -402,9 +402,10 @@
       if (r.description) b.appendChild(el('span', 'co-role-desc', r.description));
       b.addEventListener('click', function () {
         if (r.id === roleId) return closePanel();
-        // A role with its own cold open re-opens here; any other goes to the normal start.
+        // A role with its own cold open re-opens here; any other goes to the normal start —
+        // with the reading layout, the direct start in that role (layout off: unchanged).
         if (ready.indexOf(r.id) !== -1) { roleId = r.id; closePanel(); restartGame(); }
-        else location.href = '/game?scenarioId=' + enc(scenario.id);
+        else location.href = '/game?scenarioId=' + enc(scenario.id) + (READING_LAYOUT ? '&roleId=' + enc(r.id) : '');
       });
       li.appendChild(b);
       list.appendChild(li);
