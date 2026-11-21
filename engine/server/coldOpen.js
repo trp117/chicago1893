@@ -253,12 +253,48 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
 // A hash of everything the baked state was produced from. Any edit to the scenario, the role,
 // its characters, locations, clues or arc changes it; the server then logs the row as stale and
 // reports it in /health, and still serves it.
+//
+// Hash-everything-EXCEPT: a field added later is hashed by default, so new content can never
+// drift unseen. Excluded are only fields no game prompt, baked state or first-turn seeding reads
+// (checked against engine/services, engine/server, engine/game, engine/demo — admin excluded):
+//   every record (scenario, role, character, location, clue, arc): updatedAt, createdAt —
+//     metadata; any scenario save re-stamps every child.
+//   scenario: image (url/shortUrl/sourceUrl incl. ?v=, brightness, cropAnchor, generation_prompt)
+//     — a presentation asset read live by the page, never baked or sent to the model;
+//     review_checklist, beats_status — admin/editorial;
+//     displayOrder, order, featured, hidden, category — catalog/landing only.
+//   role, characters: fact_checked; role: entry_paragraph_flags — admin/editorial.
+// Excluding a field that DOES reach the opening would hide real drift: add one here only after
+// checking nothing outside the admin reads it.
+const FP_EXCLUDE_ALL = ['updatedAt', 'createdAt'];
+const FP_EXCLUDE = {
+  scenario:   [...FP_EXCLUDE_ALL, 'image', 'review_checklist', 'beats_status', 'displayOrder', 'order', 'featured', 'hidden', 'category'],
+  role:       [...FP_EXCLUDE_ALL, 'fact_checked', 'entry_paragraph_flags'],
+  characters: [...FP_EXCLUDE_ALL, 'fact_checked'],
+  locations:  FP_EXCLUDE_ALL,
+  clues:      FP_EXCLUDE_ALL,
+  storyArc:   FP_EXCLUDE_ALL,
+};
+const omit = (o, keys) => {
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return o ?? null;
+  const out = { ...o };
+  for (const k of keys) delete out[k];
+  return out;
+};
 const stable = v => Array.isArray(v) ? `[${v.map(stable).join(',')}]`
   : v && typeof v === 'object' ? `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`
   : JSON.stringify(v ?? null);
 const byId = list => [...(list || [])].sort((a, b) => String(a?.id).localeCompare(String(b?.id)));
+const omitEach = (list, keys) => byId(list).map(o => omit(o, keys));
 export function fingerprintScenarioData({ scenario, role, characters, locations, clues, storyArc }) {
-  const body = stable({ scenario, role, characters: byId(characters), locations: byId(locations), clues: byId(clues), storyArc: storyArc ?? null });
+  const body = stable({
+    scenario:   omit(scenario, FP_EXCLUDE.scenario),
+    role:       omit(role, FP_EXCLUDE.role),
+    characters: omitEach(characters, FP_EXCLUDE.characters),
+    locations:  omitEach(locations, FP_EXCLUDE.locations),
+    clues:      omitEach(clues, FP_EXCLUDE.clues),
+    storyArc:   omit(storyArc, FP_EXCLUDE.storyArc),
+  });
   return 'sha256:' + crypto.createHash('sha256').update(body).digest('hex');
 }
 
