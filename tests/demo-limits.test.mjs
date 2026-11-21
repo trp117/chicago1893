@@ -34,6 +34,7 @@ const { SessionRepository }   = await import(`${ROOT}/engine/repositories/Sessio
 const { createMemoryDemoStore } = await import(`${ROOT}/engine/server/demoStore.js`);
 const { costCents, DEMO_LIMIT_COPY, createBudget } = await import(`${ROOT}/engine/server/demoLimits.js`);
 const { injectDemoIntoGameHtml } = await import(`${ROOT}/engine/server/demoMode.js`);
+const { createDemoPreview, PREVIEW_COOKIE } = await import(`${ROOT}/engine/server/demoPreview.js`);
 
 let failed = 0;
 const check = (name, ok, detail = '') => {
@@ -99,9 +100,10 @@ const snapshot = dir => { try { return new Set(fs.readdirSync(p(dir))); } catch 
 const before = { 'engine/data/sessions': snapshot('engine/data/sessions'), 'engine/data/transcripts': snapshot('engine/data/transcripts'), 'data/sessions': snapshot('data/sessions') };
 
 const servers = [];
-async function mount(config) {
+async function mount(config, pre = null) {
   const app = express();
   app.set('trust proxy', 1);    // as server.js — req.ip from X-Forwarded-For
+  if (pre) app.use(pre);
   app.use(express.json({ limit: '10mb' }));
   app.use('/game/api', createGameRouter(repos, { anthropicApiKey: 'demo-limits-test-key', ...config }));
   const server = app.listen(0);
@@ -109,9 +111,9 @@ async function mount(config) {
   servers.push(server);
   return `http://127.0.0.1:${server.address().port}/game/api`;
 }
-async function req(base, method, route, body, ip = '203.0.113.1') {
+async function req(base, method, route, body, ip = '203.0.113.1', headers = {}) {
   const resp = await realFetch(base + route, {
-    method, headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: body ? JSON.stringify(body) : undefined,
+    method, headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip, ...headers }, body: body ? JSON.stringify(body) : undefined,
   });
   const raw = await resp.text();
   const events = raw.split('\n').filter(l => l.startsWith('data: ')).map(l => { try { return JSON.parse(l.slice(6)); } catch { return null; } }).filter(Boolean);
@@ -236,6 +238,53 @@ try {
     const ok = await start(base, ip);
     check('…so the IP still has its one slot: the next /start plays', ok.status === 200 && !!ok.done, `${ok.status}`);
     check('…and once an opening is delivered the slot is spent: the next /start → 403 daily', (await start(base, ip)).json?.demoLimit === 'daily');
+  }
+
+  // ── DEMO_PREVIEW_KEY tester bypass ─────────────────────────────────────────
+  section('flag ON — DEMO_PREVIEW_KEY bypasses the daily cap only');
+  {
+    const KEY = 'k'.repeat(10) + 'test-preview-key-0123456789';
+    const quiet = { log() {}, warn() {} };
+    check('off without DEMO_MODE', createDemoPreview({ demoMode: false, key: KEY, log: quiet }) === null);
+    check('off with no key', createDemoPreview({ demoMode: true, key: undefined, log: quiet }) === null);
+    check('off with a short key', createDemoPreview({ demoMode: true, key: 'short', log: quiet }) === null);
+
+    const pv = createDemoPreview({ demoMode: true, key: KEY, log: quiet });
+    const base = await mount({ ...DEMO, demoStore: createMemoryDemoStore(), demoLimits: { ...BIG, dailyStartsPerIp: 1, ipPerMin: 3 }, demoHasBypass: pv.hasBypass }, pv.middleware);
+    const root = base.slice(0, -'/game/api'.length);
+
+    const good = await realFetch(`${root}/game?scenarioId=x&preview_key=${encodeURIComponent(KEY)}`, { redirect: 'manual' });
+    const setCookie = good.headers.get('set-cookie') || '';
+    const cookie = setCookie.split(';')[0];
+    check('right key → 302 to the same URL without the key, HttpOnly cookie set', good.status === 302 && good.headers.get('location') === '/game?scenarioId=x'
+      && cookie.startsWith(PREVIEW_COOKIE + '=') && /HttpOnly/i.test(setCookie) && !setCookie.includes(KEY), `${good.status} ${good.headers.get('location')} ${setCookie}`);
+    const bad = await realFetch(`${root}/game?scenarioId=x&preview_key=wrong`, { redirect: 'manual' });
+    check('wrong key → same redirect, no cookie', bad.status === 302 && bad.headers.get('location') === '/game?scenarioId=x' && !bad.headers.get('set-cookie'));
+
+    const ip = '203.0.113.70';
+    const pub1 = await start(base, ip);
+    const pub2 = await start(base, ip);
+    check('without the cookie the public cap holds (1st plays, 2nd → daily)', pub1.status === 200 && pub2.json?.demoLimit === 'daily');
+    const sendStart = (hdr, from = '203.0.113.71') => (reply = OPENING, req(base, 'POST', '/start', { scenarioId: SCENARIO_ID, roleId: ROLE_ID, narrativeStyle: 'focused' }, from, hdr));
+    const t1 = await sendStart({ Cookie: cookie });
+    const t2 = await sendStart({ Cookie: cookie });
+    check('with the cookie: repeated /start from one IP all play', t1.status === 200 && !!t1.done && t2.status === 200 && !!t2.done, `${t1.status},${t2.status}`);
+    const forged = await sendStart({ Cookie: `${PREVIEW_COOKIE}=forged` }, '203.0.113.74');
+    check('a forged cookie gets no bypass', forged.status === 200);   // first public slot for this IP…
+    check('…and the next one hits the public cap', (await sendStart({ Cookie: `${PREVIEW_COOKIE}=forged` }, '203.0.113.74')).json?.demoLimit === 'daily');
+
+    // A bypassed /start that fails must not refund (pop) the IP's real public slot.
+    const ip2 = '203.0.113.72';
+    check('public slot taken for ip2', (await start(base, ip2)).status === 200);
+    const failedBypass = await (reply = OPENING, req(base, 'POST', '/start', { scenarioId: SCENARIO_ID, roleId: 'no_such_role', narrativeStyle: 'focused' }, ip2, { Cookie: cookie }));
+    await tick();
+    check('bypassed /start that fails (404) …', failedBypass.status === 404);
+    check('…does not refund ip2\'s public slot: a cookieless /start is still capped', (await start(base, ip2)).json?.demoLimit === 'daily');
+
+    const ip3 = '203.0.113.73';
+    const burst = [];
+    for (let i = 0; i < 4; i++) burst.push(await (reply = OPENING, req(base, 'POST', '/start', { scenarioId: SCENARIO_ID, roleId: ROLE_ID, narrativeStyle: 'focused' }, ip3, { Cookie: cookie })));
+    check('the cookie does not bypass the rate limit (4th in a minute → 429)', burst[3].status === 429 && burst[3].json?.demoLimit === 'rate', burst.map(b => b.status).join(','));
   }
 
   // ── Rate limit ─────────────────────────────────────────────────────────────

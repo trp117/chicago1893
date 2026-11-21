@@ -901,6 +901,7 @@ export function createGameRouter(contentRepos, config = {}) {
     };
   })() : null;
   usageSink = demo ? (model, usage) => demo.budget.record(model, usage) : null;
+  const demoHasBypass = typeof config.demoHasBypass === 'function' ? config.demoHasBypass : () => false;
 
   // The demo limit a paid request runs into, or null. Rate first (cheapest, and a surge should
   // not even read the budget), then budget — new sessions stop at the start ceiling, in-progress
@@ -910,8 +911,19 @@ export function createGameRouter(contentRepos, config = {}) {
     const ip = req.ip || 'unknown';
     if (!demo.rate.hit(ip)) return 'rate';
     if (!(starting ? await demo.budget.canStart() : await demo.budget.canContinue())) return 'budget';
-    if (starting && !demo.daily.take(ip)) return 'daily';
+    if (starting) {
+      // DEMO_PREVIEW_KEY tester cookie (demoPreview.js): the daily cap only — rate and budget
+      // above still apply. No slot is taken, so refundDaily below gives nothing back.
+      if (demoHasBypass(req)) { req.demoDailyBypassed = true; console.log(`[DEMO PREVIEW] daily cap bypassed ip=${ip} path=${req.path}`); }
+      else if (!demo.daily.take(ip)) return 'daily';
+    }
     return null;
+  }
+  // Give back the daily slot a /start (or cold-open first turn) took — never one it did not take.
+  function refundDaily(req, why) {
+    if (req.demoDailyBypassed) return;
+    demo.daily.refund(req.ip || 'unknown');
+    console.log(`[DEMO LIMIT] daily slot refunded ip=${req.ip || 'unknown'} (${why})`);
   }
   function logDemoLimit(kind, req) {
     console.warn(`[DEMO LIMIT] ${kind} ip=${req.ip || 'unknown'} path=${req.path}`);
@@ -996,8 +1008,7 @@ export function createGameRouter(contentRepos, config = {}) {
               opening:     { at: new Date().toISOString(), entry: 'cold_open', ...demoResponseSnapshot({ narrative: row.content.lean.narrative, choices: row.content.lean.choices }, characters), location: state.location ?? null },
             }));
           } else if (res.locals.coldOpenSlotTaken) {
-            demo.daily.refund(req.ip || 'unknown');
-            console.log(`[DEMO LIMIT] daily slot refunded ip=${req.ip || 'unknown'} (cold-open first turn not delivered)`);
+            refundDaily(req, 'cold-open first turn not delivered');
           }
         });
         return next();
@@ -1084,8 +1095,7 @@ export function createGameRouter(contentRepos, config = {}) {
         // back; only the `done` below marks it spent.
         res.on('close', () => {
           if (res.locals.demoOpeningDelivered) return;
-          demo.daily.refund(req.ip || 'unknown');
-          console.log(`[DEMO LIMIT] daily slot refunded ip=${req.ip || 'unknown'} (no opening delivered)`);
+          refundDaily(req, 'no opening delivered');
         });
       }
 

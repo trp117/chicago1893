@@ -30,6 +30,7 @@ import { createSupabaseDemoStore, readDemoBudgetId } from './demoStore.js';
 import { readDemoLimitConfig } from './demoLimits.js';
 import { readColdOpenConfig, createColdOpenStore, createColdOpenRuntime, supabaseColdOpenRows, fileColdOpenRows } from './coldOpen.js';
 import { readReadingLayoutConfig } from './readingLayout.js';
+import { createDemoPreview } from './demoPreview.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir   = path.resolve(__dirname, '../data');
@@ -85,6 +86,10 @@ app.set('trust proxy', 1);
 app.use(compression());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+// DEMO_PREVIEW_KEY (demoPreview.js) — a private tester bypass of the daily cap only. Null
+// (nothing mounted) unless DEMO_MODE is on and the key is set.
+const DEMO_PREVIEW = createDemoPreview({ demoMode: DEMO_MODE, key: process.env.DEMO_PREVIEW_KEY, secureCookie: process.env.NODE_ENV === 'production' });
+if (DEMO_PREVIEW) { console.log('[DEMO] preview-key daily-cap bypass ENABLED'); app.use(DEMO_PREVIEW.middleware); }
 // Mounted only in demo mode, so prod's middleware stack is exactly what it was.
 if (DEMO_MODE) {
   app.use(demoPageGuard({
@@ -126,6 +131,7 @@ const gameConfig = {
   // demo mode — with the flag off no demo table is ever touched.
   ...(DEMO_MODE ? { demoStore: DEMO_STORE, demoLimits: readDemoLimitConfig() } : {}),
   ...(COLD_OPEN ? { coldOpen: COLD_OPEN } : {}),
+  ...(DEMO_PREVIEW ? { demoHasBypass: DEMO_PREVIEW.hasBypass } : {}),
 };
 if (DEMO_MODE) {
   const l = gameConfig.demoLimits;
