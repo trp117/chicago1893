@@ -241,12 +241,6 @@ export function injectColdOpenIntoLanding(html, readyScenarioIds) {
 // ready row — and the card landing on any failure — and /moments is the card landing.
 export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, branding = DEMO_BRANDING_DEFAULTS, ogImagePath = demoOgImagePath(branding), cacheControl, onLandingView = null, coldOpen = null, readingLayout = false }) {
   const withLayout = html => readingLayout ? injectReadingLayoutIntoGameHtml(html, readingLayoutFiles()) : html;
-  const sendLanding = (req, res, next) => {
-    let html;
-    try { html = fs.readFileSync(landingPath, 'utf8'); } catch (e) { return next(e); }
-    res.set('Cache-Control', cacheControl);
-    res.type('html').send(renderDemoLanding(html, branding));
-  };
   // /moments: the card landing, with cards for scenarios that have a ready cold open pointed at
   // that open (/?scenarioId=<id>) instead of the normal start. If the ready list cannot be read,
   // the plain landing (every card → its normal start).
@@ -282,7 +276,9 @@ export function demoPageGuard({ gameHtmlPath, landingPath = DEMO_LANDING_PATH, b
       console.warn(`[COLD-OPEN] entry failed, serving the landing: ${e?.message || e}`);
       page = null;
     }
-    if (!page) return sendLanding(req, res, next);
+    // No featured entry (DEMO_FEATURED_SCENARIO/ROLE empty, no ready row, any failure): the
+    // /moments grid, so each card with a ready row plays its cold open (the museum flow).
+    if (!page) return sendMoments(req, res, next);
     // Never cached: whether / is the entry or the landing follows the row, which can change.
     res.set('Cache-Control', 'no-store');
     res.type('html').send(page);
