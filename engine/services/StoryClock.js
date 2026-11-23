@@ -186,13 +186,47 @@ export function buildStoryClockDirective(clock, { now, prev = null, pinned = fal
   return lines.join('\n');
 }
 
+// ── Act pacing (Part 3) ─────────────────────────────────────────────────────────────────
+// The act the CLOCK puts the story in (expectedAct, from the arc's minuteRange), and the push to
+// get the scene there — so a clock at 06:45 is not narrating a dugout still in the prep. storyAct
+// is the act of the furthest beat reached (null when no beat has been reported). roster false =
+// the prompt carries no beat roster (no story-bound fork, no scenes): this block then lists the
+// act's beat ids itself and asks for them to be reported, so the next turn knows where the story is.
+export function buildActPacingDirective(arc, { elapsed, now, storyAct = null, roster = false } = {}) {
+  const act = expectedAct(arc, elapsed);
+  if (!act) return '';
+  const label = `ACT ${act.actNumber}${act.name ? ` — ${act.name}` : ''}`;
+  const first = Math.min(...arc.acts.map(a => a.actNumber).filter(Number.isFinite));
+  const lines = [`⚑ ACT PACING: At ${formatStoryTime(now)} the story belongs in ${label}.`];
+  if (storyAct != null && storyAct < act.actNumber) {
+    lines.push(`The story is still in Act ${storyAct}. Move the scene into ${label} THIS turn: bridge with the time that has passed — the clock has moved on; say in a line what changed while it did — and play this act's situation. Do not play out the skipped beats one by one.`);
+  } else if (storyAct == null && act.actNumber > first) {
+    lines.push(`If the scene is still in an earlier act's situation, move it into ${label} THIS turn: bridge with the time that has passed and play this act's situation. Do not linger in earlier business.`);
+  } else {
+    lines.push('Keep the scene in this act\'s situation. Do not linger in an earlier act\'s business, and do not run ahead into a later act\'s.');
+  }
+  if (!roster) {
+    const beats = (Array.isArray(act.beats) ? act.beats : []).filter(b => typeof b?.id === 'string' && b.id.trim());
+    if (beats.length) {
+      lines.push(`${label} beats — when one HAPPENS, report it with stateChanges: { beats_reached: ["<id>"] } in that turn, id exactly as listed; never one that has not happened:`);
+      for (const b of beats) lines.push(`  - ${b.id} — ${String(b.description || '').trim().slice(0, 160)}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 // Everything one turn needs from the clock. now = the reading at the turn's session minute;
 // prev = state.storyClockLast, the time the previous turn was narrated at. The caller records
 // now on state (storyClockLast) so the NEXT turn reads this turn as its span's start.
-export function storyClockTurn(arc, state, { now: nowOverride = null, pinned = false } = {}) {
+export function storyClockTurn(arc, state, { now: nowOverride = null, pinned = false, storyAct = null, roster = false } = {}) {
   const clock = readStoryClock(arc);
   if (!clock) return null;
-  const now  = nowOverride ?? storyMinutesAt(clock, state?.elapsedMinutes ?? 0);
+  const elapsed = state?.elapsedMinutes ?? 0;
+  const now  = nowOverride ?? storyMinutesAt(clock, elapsed);
   const prev = typeof state?.storyClockLast === 'number' && Number.isFinite(state.storyClockLast) ? state.storyClockLast : null;
-  return { arc, clock, now, prev, pinned, timeLabel: formatStoryTime(now), directive: buildStoryClockDirective(clock, { now, prev, pinned }) };
+  const directive = [
+    buildStoryClockDirective(clock, { now, prev, pinned }),
+    buildActPacingDirective(arc, { elapsed, now, storyAct, roster }),
+  ].filter(Boolean).join('\n\n');
+  return { arc, clock, now, prev, pinned, timeLabel: formatStoryTime(now), directive };
 }

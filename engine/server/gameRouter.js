@@ -20,6 +20,7 @@ import {
   getArcPosition,
   scenePresentation,
   arcBeats,
+  storyPosition,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime } from '../services/StoryClock.js';
@@ -1234,7 +1235,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       // STORY CLOCK: the opening is narrated at the clock's first reading. Nothing for other sessions.
       const openingClockArc = loadClockArc(repos, scenario);
-      const openingClock    = openingClockArc ? storyClockTurn(openingClockArc, initialState) : null;
+      const openingClock    = openingClockArc ? storyClockTurn(openingClockArc, initialState, { roster: !!gameData.storyArc }) : null;
       if (openingClock) gameData.storyClock = openingClock;
 
       const prompt = composeTurnPrompt(initialState, openingInput, gameData);
@@ -1405,6 +1406,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Story-bound fork only (gameData.storyArc is attached for no other session): the
       // opening can already reach the arc's first beat.
       let openingBeats = [];
+      if (!gameData.storyArc && openingClock) openingBeats = recordReachedBeats(nextState, output, openingClock.arc);
       if (gameData.storyArc) {
         openingBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (openingBeats.length) console.log('[STORY-BOUND] beats reached: ' + openingBeats.join(', '));
@@ -1591,7 +1593,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       // The time this turn is narrated at is read off the arc's map at the session minute, and
       // reaches the model as the authoritative ⚑ STORY CLOCK. No key is added for any other session.
       const clockArc = loadClockArc(repos, scenario);
-      const clockNow = clockArc ? storyClockTurn(clockArc, state) : null;
+      // Part 3 reads where the story actually is (the furthest beat reached) and whether the prompt
+      // already carries a beat roster (a story-bound fork or scenes put gameData.storyArc there).
+      const clockNow = clockArc
+        ? storyClockTurn(clockArc, state, { storyAct: storyPosition(state, clockArc)?.actNumber ?? null, roster: !!gameData.storyArc })
+        : null;
       if (clockNow) {
         gameData.storyClock = clockNow;
         // The time this turn is narrated at becomes the NEXT turn's span start (Part 2). Set
@@ -1974,6 +1980,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (gameData.storyArc) {
         newBeats = recordReachedBeats(nextState, output, gameData.storyArc);
         if (newBeats.length) console.log('[STORY-BOUND] beats reached: ' + newBeats.join(', '));
+      } else if (clockNow) {
+        // STORY CLOCK, no story-bound fork or scenes: the act-pacing block asked for beats, so the
+        // next turn's pacing can tell where the story is. State only; nothing else reads them here.
+        newBeats = recordReachedBeats(nextState, output, clockNow.arc);
+        if (newBeats.length) console.log('[STORY-CLOCK] beats reached: ' + newBeats.join(', '));
       }
       // Scene scenarios only: move the scene on — one step on the current scene's own ending
       // beat, or straight to the fork's scene on the turn the fork is put (B3d). State and

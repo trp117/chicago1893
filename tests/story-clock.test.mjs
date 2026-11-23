@@ -206,6 +206,29 @@ console.log('\n5b. Time canon over the SPAN since the last turn (Part 2)');
   check('…and the prompt carries it, with storyClockLast kept out of the state JSON', p2.includes('H-Hour: the 28th Infantry goes over the top (6:45 a.m.)') && !('storyClockLast' in stateJson(p2)));
 }
 
+console.log('\n5c. Act pacing (Part 3)');
+{
+  const pace = (e, o = {}) => SC.buildActPacingDirective(ARC, { elapsed: e, now: SC.storyMinutesAt(clock, e), ...o });
+  const behind = pace(18, { storyAct: 2 });
+  check('clock in Act 3, story in Act 2 → "still in Act 2. Move the scene into ACT 3 — H-Hour THIS turn"',
+    behind.startsWith('⚑ ACT PACING: At 6:46 a.m. the story belongs in ACT 3 — H-Hour.') && behind.includes('The story is still in Act 2. Move the scene into ACT 3 — H-Hour THIS turn'));
+  check('story on schedule → keep it there, no push', pace(18, { storyAct: 3 }).includes('Keep the scene in this act\'s situation') && !pace(18, { storyAct: 3 }).includes('THIS turn'));
+  check('position unknown past Act 1 → the conditional push', pace(18).includes('If the scene is still in an earlier act\'s situation, move it into ACT 3 — H-Hour THIS turn'));
+  check('position unknown in Act 1 → no push', !pace(3).includes('THIS turn'));
+  check('story AHEAD of the clock → no push backwards', pace(10, { storyAct: 3 }).includes('Keep the scene in this act\'s situation'));
+  check('no roster in the prompt → the act\'s beat ids, with the report instruction', pace(18).includes('ACT 3 — H-Hour beats — when one HAPPENS, report it with stateChanges: { beats_reached: ["<id>"] }') && pace(18).includes('  - 0645_am_the — 06:45 AM: the whistle.'));
+  check('  …only the expected act\'s beats (no Act 4 beat at minute 18)', !pace(18).includes('0710_am_the'));
+  check('roster already in the prompt → no beat list repeated', !pace(18, { roster: true }).includes('beats_reached'));
+  check('acts without minuteRange → no pacing block', SC.buildActPacingDirective({ acts: [{ actNumber: 1 }] }, { elapsed: 5, now: 300 }) === '');
+  const turn = SC.storyClockTurn(ARC, at(18, { storyClockLast: T('06:19') }), { storyAct: 2, roster: true });
+  check('storyClockTurn: the clock block, then the pacing block', turn.directive.startsWith('⚑ STORY CLOCK: It is now 6:46 a.m.') && turn.directive.includes('\n\n⚑ ACT PACING: At 6:46 a.m.'));
+  // Beats recorded against the clock arc (the router does this when no story arc is loaded).
+  const st = at(18, {});
+  SM.recordReachedBeats(st, { stateChanges: { beats_reached: ['0520_am_a', 'not_a_beat'] } }, ARC);
+  check('beats reported on a clock turn are recorded against the clock arc (unknown ids dropped)', JSON.stringify(st.reachedBeats) === '["0520_am_a"]');
+  check('  …and the next turn\'s pacing reads Act 2 from them', PC.storyPosition(st, ARC)?.actNumber === 2);
+}
+
 console.log('\n6. Flag-off byte-identity: every stored role vs the committed (HEAD) PromptComposer');
 const headPath = p('engine/services/.__head_PromptComposer.storyclock.test.js');
 fs.writeFileSync(headPath, execFileSync('git', ['show', 'HEAD:engine/services/PromptComposer.js'], { cwd: REPO_DIR, encoding: 'utf8', maxBuffer: 64e6 }));
