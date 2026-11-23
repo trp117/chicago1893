@@ -284,6 +284,26 @@ console.log('\n5d. Fork pin (06:46) + hold, with fallback 0.60');
   check('the pinned turn\'s directive says to hold the scene at the decision', late.includes('This is the moment the decision is put to the player — hold the scene at it.'));
 }
 
+console.log('\n5e. Admin saves keep story_clock');
+{
+  const AR = await quiet(async () => import(`${ROOT}/engine/admin/adminRouter.js`));
+  const stored = { id: 'arc1', acts: [], story_clock: { anchors: [[0, '04:45'], [30, '07:30']] } };
+  const repos = { storyArcs: { findById: id => (id === 'arc1' ? stored : null) } };
+  const absent = AR.preserveStoredStoryClock(repos, { id: 'arc1', acts: [{ actNumber: 1 }] });
+  check('a save WITHOUT story_clock (stale tab, hand POST) keeps the stored block', JSON.stringify(absent.story_clock) === JSON.stringify(stored.story_clock));
+  check('  …as a copy, not the stored object', absent.story_clock !== stored.story_clock);
+  check('an explicit null clears it (key removed)', !('story_clock' in AR.preserveStoredStoryClock(repos, { id: 'arc1', story_clock: null })));
+  const posted = { anchors: [[0, '05:00'], [30, '07:00']] };
+  check('a posted block wins', AR.preserveStoredStoryClock(repos, { id: 'arc1', story_clock: posted }).story_clock === posted);
+  check('an arc that never had one stays without', !('story_clock' in AR.preserveStoredStoryClock(repos, { id: 'arc_new' })));
+  // Both editors start from the loaded arc, so root keys they do not render survive a save.
+  const ui = fs.readFileSync(p('engine/admin/index.html'), 'utf8');
+  check('entity editor: extractFormData starts from { ...existingItem }', /function extractFormData\(cfg, formEl, existingItem\) \{\s*const data = existingItem \? \{ \.\.\.existingItem \} : \{\};/.test(ui));
+  check('scenario editor: collectEdits writes into the loaded bundle (setDeep on data)', /function collectEdits\(containerEl, data\) \{[\s\S]{0,1500}setDeep\(data, path, val\);/.test(ui));
+  const router = fs.readFileSync(p('engine/admin/adminRouter.js'), 'utf8');
+  check('both arc write paths run the guard (PUT /story-arcs/:id and /generate/save)', router.split('preserveStoredStoryClock(repos, preserveStoredScenes(repos, { ...req.body').length === 2 && router.split('      preserveStoredStoryClock(repos, storyArc);').length === 2);
+}
+
 console.log('\n6. Flag-off byte-identity: every stored role vs the committed (HEAD) PromptComposer');
 const headPath = p('engine/services/.__head_PromptComposer.storyclock.test.js');
 fs.writeFileSync(headPath, execFileSync('git', ['show', 'HEAD:engine/services/PromptComposer.js'], { cwd: REPO_DIR, encoding: 'utf8', maxBuffer: 64e6 }));

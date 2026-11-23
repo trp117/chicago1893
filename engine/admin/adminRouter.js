@@ -695,6 +695,23 @@ function validateArcScenes(arc, { locationIds, roleIds = null }) {
 // stays key-absent, the husk stripped rather than stored, as the anchor guard strips its own.
 // Acts are matched by actNumber (an act reorder must not move scenes onto the wrong act),
 // falling back to position only for acts that carry no actNumber.
+// STORY CLOCK (engine/services/StoryClock.js) — arc.story_clock is authored data no editor
+// renders. Both editors spread the loaded arc, so a normal save keeps it; this guards the rest
+// (a tab loaded before the key existed, a hand-rolled POST, any future editor that rebuilds the
+// arc): an ABSENT story_clock keeps the stored one, and an explicit null removes it. Same rule
+// as preserveStoredScenes' absent-vs-[] for scenes, and the same class of risk as the
+// defining_moment wipe. Mutates and returns the arc.
+export function preserveStoredStoryClock(repos, arc) {
+  if (!arc?.id || !arc || typeof arc !== 'object') return arc;
+  if (!('story_clock' in arc)) {
+    const stored = repos.storyArcs.findById(arc.id);
+    if (stored && stored.story_clock != null) arc.story_clock = JSON.parse(JSON.stringify(stored.story_clock));
+  } else if (arc.story_clock === null) {
+    delete arc.story_clock;
+  }
+  return arc;
+}
+
 function preserveStoredScenes(repos, arc) {
   if (!arc?.id || !Array.isArray(arc.acts)) return arc;
   const stored     = repos.storyArcs.findById(arc.id);
@@ -4314,7 +4331,7 @@ export function createAdminRouter(repos, config = {}) {
     const stored = repos.storyArcs.findById(req.params.id);
     if (!stored) return notFound(res);
     // Guard FIRST, then validate what will actually be written — restored scenes included.
-    const arc = preserveStoredScenes(repos, { ...req.body, id: req.params.id });
+    const arc = preserveStoredStoryClock(repos, preserveStoredScenes(repos, { ...req.body, id: req.params.id }));
     const sceneErrors = validateArcScenes(arc, sceneRefSets(repos, arc.scenarioId || stored.scenarioId));
     if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
     res.json(repos.storyArcs.save(arc));
@@ -5263,6 +5280,7 @@ Return ONLY valid JSON in this exact structure:
     // the arc after, so a rejection further down would leave a half-saved bundle.
     if (storyArc?.id) {
       preserveStoredScenes(repos, storyArc);   // a stale tab's absent scenes are restored, not erased
+      preserveStoredStoryClock(repos, storyArc);   // …and an absent story_clock likewise (null clears it)
       const sceneErrors = validateArcScenes(storyArc, sceneRefSets(repos, storyArc.scenarioId || scenario.id, locations, playerRoles));
       if (sceneErrors.length) return res.status(400).json(scenesRejection(sceneErrors));
     }
