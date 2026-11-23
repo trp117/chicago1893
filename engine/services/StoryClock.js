@@ -162,7 +162,8 @@ const when = e => (e.at != null ? formatStoryTime(e.at) : `${formatStoryTime(e.f
 export function buildStoryClockDirective(clock, { now, prev = null, pinned = false } = {}) {
   const N = formatStoryTime(now);
   const lines = [
-    `⚑ STORY CLOCK: It is now ${N}. This time is AUTHORITATIVE — the engine keeps it, you do not. Narrate this turn at ${N}. Never state, imply or count toward any other current time; a watch, stopwatch or schedule checked this turn reads ${N}.${pinned ? ' This is the moment the decision is put to the player — hold the scene at it.' : ''}`,
+    // N already ends "a.m."/"p.m.", which closes its sentence — no second full stop.
+    `⚑ STORY CLOCK: It is now ${N} This time is AUTHORITATIVE — the engine keeps it, you do not. Narrate this turn at ${N} Never state, imply or count toward any other current time; a watch, stopwatch or schedule checked this turn reads ${N}${pinned ? ' This is the moment the decision is put to the player — hold the scene at it.' : ''}`,
   ];
   if (!clock.canon.length) return lines.join('\n');
   const span = canonSpan(clock, prev, now);

@@ -282,6 +282,7 @@ console.log('\n5d. Fork pin (06:46) + hold, with fallback 0.60');
   check('  …and the header moves forward to it (6:38 → 6:46), never back', mono([...r3.shown, r3.after]), [...r3.shown, r3.after].join(' '));
   const late = SC.buildStoryClockDirective(SC.readStoryClock(PIN), { now: T('06:46'), prev: T('06:38'), pinned: true });
   check('the pinned turn\'s directive says to hold the scene at the decision', late.includes('This is the moment the decision is put to the player — hold the scene at it.'));
+  check('the clock line reads cleanly: "It is now 6:46 a.m. This time…", no doubled full stop', late.startsWith('⚑ STORY CLOCK: It is now 6:46 a.m. This time is AUTHORITATIVE') && !late.includes('a.m..'));
 }
 
 console.log('\n5e. Admin saves keep story_clock');
