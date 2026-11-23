@@ -131,17 +131,68 @@ export function expectedAct(arc, elapsed) {
   return hit || (e < acts[0].minuteRange[0] ? acts[0] : acts[acts.length - 1]);
 }
 
-// Part 1 — "⚑ STORY CLOCK": the authoritative time this turn is narrated at.
-export function buildStoryClockDirective(clock, { now } = {}) {
-  const N = formatStoryTime(now);
-  return `⚑ STORY CLOCK: It is now ${N}. This time is AUTHORITATIVE — the engine keeps it, you do not. Narrate this turn at ${N}. Never state, imply or count toward any other current time; a watch, stopwatch or schedule checked this turn reads ${N}.`;
+// ── Canon, read over the span since the last turn (Part 2) ─────────────────────────────────
+// prev = the story time the previous turn was narrated at (null on a session's first turn, or a
+// cold open's), now = this turn's. A turn covers 8–20 story minutes in the fast stretches, so a
+// canon event usually falls BETWEEN two readings: the span, not the instant, says what has just
+// happened. Without it the model, told "it is 06:46", treats the turn as the first moment after
+// the last one it narrated (06:38) and plays H-Hour as still to come.
+export function canonSpan(clock, prev, now) {
+  const out = { justHappened: [], underWay: [], past: [], ahead: [] };
+  for (const e of clock.canon) {
+    if (e.at != null) {
+      if (e.at > now) out.ahead.push(e);
+      else if (prev != null && e.at > prev) out.justHappened.push(e);
+      else out.past.push(e);
+    } else if (now < e.from) out.ahead.push(e);
+    else if (now < e.to) {
+      if (prev != null && e.from > prev) out.justHappened.push(e);   // opened inside the span: news, and still running
+      out.underWay.push(e);
+    } else if (prev != null && e.to > prev) out.justHappened.push({ ...e, ended: true });
+    else out.past.push(e);
+  }
+  const key = e => (e.at ?? e.from);
+  for (const k of Object.keys(out)) out[k].sort((a, b) => key(a) - key(b));
+  return out;
 }
 
-// Everything one turn needs from the clock: the reading at this turn's session minute, the label
-// for timeOfNight, and the directive. `arc` must be a clock arc (loadClockArc).
-export function storyClockTurn(arc, state) {
+const when = e => (e.at != null ? formatStoryTime(e.at) : `${formatStoryTime(e.from)}–${formatStoryTime(e.to)}`);
+
+// "⚑ STORY CLOCK" (Part 1) + the time canon over the span (Part 2), as one block.
+export function buildStoryClockDirective(clock, { now, prev = null, pinned = false } = {}) {
+  const N = formatStoryTime(now);
+  const lines = [
+    `⚑ STORY CLOCK: It is now ${N}. This time is AUTHORITATIVE — the engine keeps it, you do not. Narrate this turn at ${N}. Never state, imply or count toward any other current time; a watch, stopwatch or schedule checked this turn reads ${N}.${pinned ? ' This is the moment the decision is put to the player — hold the scene at it.' : ''}`,
+  ];
+  if (!clock.canon.length) return lines.join('\n');
+  const span = canonSpan(clock, prev, now);
+  if (prev != null && prev < now && span.justHappened.length) {
+    lines.push(`SINCE THE LAST TURN (${formatStoryTime(prev)} → ${N}) these have HAPPENED — narrate them as having happened, never as still to come:`);
+    for (const e of span.justHappened) lines.push(`  - ${e.text} (${when(e)}${e.ended ? ', now over' : ''})`);
+  }
+  if (span.underWay.length) {
+    lines.push('UNDER WAY NOW:');
+    for (const e of span.underWay) lines.push(`  - ${e.text} (${when(e)})`);
+  }
+  if (span.ahead.length) {
+    lines.push('AHEAD — has NOT happened; do not narrate it as happening or as having happened:');
+    for (const e of span.ahead) {
+      const mins = Math.round((e.at ?? e.from) - now);
+      lines.push(`  - ${e.text} (${when(e)}${mins > 0 ? `, in about ${mins} min` : ''})`);
+    }
+  }
+  lines.push('TIME CANON — fixed times; never contradict them:');
+  for (const e of [...clock.canon].sort((a, b) => (a.at ?? a.from) - (b.at ?? b.from))) lines.push(`  - ${when(e)}: ${e.text}`);
+  return lines.join('\n');
+}
+
+// Everything one turn needs from the clock. now = the reading at the turn's session minute;
+// prev = state.storyClockLast, the time the previous turn was narrated at. The caller records
+// now on state (storyClockLast) so the NEXT turn reads this turn as its span's start.
+export function storyClockTurn(arc, state, { now: nowOverride = null, pinned = false } = {}) {
   const clock = readStoryClock(arc);
   if (!clock) return null;
-  const now = storyMinutesAt(clock, state?.elapsedMinutes ?? 0);
-  return { arc, clock, now, timeLabel: formatStoryTime(now), directive: buildStoryClockDirective(clock, { now }) };
+  const now  = nowOverride ?? storyMinutesAt(clock, state?.elapsedMinutes ?? 0);
+  const prev = typeof state?.storyClockLast === 'number' && Number.isFinite(state.storyClockLast) ? state.storyClockLast : null;
+  return { arc, clock, now, prev, pinned, timeLabel: formatStoryTime(now), directive: buildStoryClockDirective(clock, { now, prev, pinned }) };
 }

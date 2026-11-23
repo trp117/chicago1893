@@ -1398,7 +1398,10 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const nextState = mergeState(seededInitial, output, scenario, clues, '', locations);
-      if (openingClock) nextState.storyClock = formatStoryTime(storyMinutesAt(openingClock.clock, nextState.elapsedMinutes));
+      if (openingClock) {
+        nextState.storyClock     = formatStoryTime(storyMinutesAt(openingClock.clock, nextState.elapsedMinutes));
+        nextState.storyClockLast = openingClock.now;   // the first turn's span starts at the opening
+      }
       // Story-bound fork only (gameData.storyArc is attached for no other session): the
       // opening can already reach the arc's first beat.
       let openingBeats = [];
@@ -1591,6 +1594,9 @@ Do not open with the historical context. Open inside the character's body. Let t
       const clockNow = clockArc ? storyClockTurn(clockArc, state) : null;
       if (clockNow) {
         gameData.storyClock = clockNow;
+        // The time this turn is narrated at becomes the NEXT turn's span start (Part 2). Set
+        // after storyClockTurn read the previous one; mergeState carries it onto nextState.
+        state.storyClockLast = clockNow.now;
         console.log(`[STORY-CLOCK] turn at ${clockNow.timeLabel} (session minute ${state.elapsedMinutes})`);
       }
 

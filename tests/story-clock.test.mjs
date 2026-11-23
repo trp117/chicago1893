@@ -145,6 +145,67 @@ console.log('\n5. The display (reading layout)');
   check('unpatched clock() ignores a stamp (flag-off pages never read it)', clockFn(raw)({ elapsedMinutes: 18, storyClock: '6:46 a.m.' }) === '5:03 a.m.');
 }
 
+console.log('\n5b. Time canon over the SPAN since the last turn (Part 2)');
+{
+  const CANON = {
+    ...ARC,
+    story_clock: {
+      ...ARC.story_clock,
+      canon: [
+        { id: 'prep',   from: '04:45', to: '06:45', text: 'The preparatory bombardment' },
+        { id: 'lift_1', at: '06:43', text: 'Lift 1 of the rolling barrage' },
+        { id: 'h_hour', at: '06:45', text: 'H-Hour: the 28th Infantry goes over the top' },
+        { id: 'lift_3', at: '06:47', text: 'Lift 3, the transition lift' },
+        { id: 'lifts',  from: '06:43', to: '06:55', text: 'The rolling-barrage lifts, 100 m every 2 min' },
+      ],
+    },
+  };
+  const ck = SC.readStoryClock(CANON);
+  check('canon reads (3 instants, 2 ranges)', ck.canon.length === 5);
+
+  // The case in the brief: previous turn at 06:38, this one at 06:46.
+  const sp = SC.canonSpan(ck, T('06:38'), T('06:46'));
+  const ids = list => list.map(e => e.id).join(',');
+  check('06:38 → 06:46: lift 1, H-Hour and the lifts window have just happened; the prep has just ended',
+    ids(sp.justHappened) === 'lift_1,lifts,h_hour,prep' || ids(sp.justHappened).split(',').sort().join() === 'h_hour,lift_1,lifts,prep', ids(sp.justHappened));
+  check('  …the lifts are under way, lift 3 is ahead', ids(sp.underWay) === 'lifts' && ids(sp.ahead) === 'lift_3');
+  const d = SC.buildStoryClockDirective(ck, { now: T('06:46'), prev: T('06:38') });
+  check('directive: "Since the last turn (6:38 a.m. → 6:46 a.m.)" … narrate as having happened',
+    d.includes('SINCE THE LAST TURN (6:38 a.m. → 6:46 a.m.) these have HAPPENED — narrate them as having happened, never as still to come:'));
+  const sinceBlock = d.slice(d.indexOf('SINCE THE LAST TURN'), d.indexOf('UNDER WAY NOW'));
+  check('  …listing H-Hour and lift 1 there', sinceBlock.includes('H-Hour: the 28th Infantry goes over the top (6:45 a.m.)') && sinceBlock.includes('Lift 1 of the rolling barrage (6:43 a.m.)'));
+  check('  …the prep as over', sinceBlock.includes('The preparatory bombardment (4:45 a.m.–6:45 a.m., now over)'));
+  const aheadBlock = d.slice(d.indexOf('AHEAD'), d.indexOf('TIME CANON'));
+  check('  …and lift 3 as NEXT: "Lift 3, the transition lift (6:47 a.m., in about 1 min)"', aheadBlock.includes('Lift 3, the transition lift (6:47 a.m., in about 1 min)'));
+  check('  …H-Hour is NOT in the ahead list', !aheadBlock.includes('H-Hour'));
+
+  // Before H-Hour: nothing of the assault may be narrated.
+  const pre = SC.buildStoryClockDirective(ck, { now: T('06:38'), prev: T('06:19') });
+  const preAhead = pre.slice(pre.indexOf('AHEAD'), pre.indexOf('TIME CANON'));
+  check('06:19 → 06:38: H-Hour ahead "in about 7 min", every lift ahead, prep under way, nothing just happened',
+    preAhead.includes('H-Hour: the 28th Infantry goes over the top (6:45 a.m., in about 7 min)') && preAhead.includes('Lift 1') && preAhead.includes('Lift 3')
+      && pre.includes('UNDER WAY NOW:\n  - The preparatory bombardment') && !pre.includes('SINCE THE LAST TURN'));
+  check('the full time canon is always listed', pre.includes('TIME CANON — fixed times; never contradict them:') && pre.includes('  - 6:45 a.m.: H-Hour'));
+  check('first turn (no previous time) → no span line', !SC.buildStoryClockDirective(ck, { now: T('04:54'), prev: null }).includes('SINCE THE LAST TURN'));
+  check('a held clock (prev = now) → no span line', !SC.buildStoryClockDirective(ck, { now: T('06:46'), prev: T('06:46') }).includes('SINCE THE LAST TURN'));
+  check('no canon → the clock line alone', SC.buildStoryClockDirective(clock, { now: T('06:46'), prev: T('06:38') }).split('\n').length === 1);
+
+  // The chain the router runs: each turn reads state.storyClockLast, then records its own time.
+  let st = at(0, { storyClockLast: T('04:45') });   // the opening recorded 04:45
+  const lines = [];
+  for (const adv of [2, 3, 3, 3, 3, 4]) {
+    st = quiet(() => SM.mergeState(st, { timeAdvance: adv, stateChanges: {} }, scenario, [], '', locations, { maxAdvance: 4 }));
+    const turn = SC.storyClockTurn(CANON, st);
+    lines.push(turn);
+    st.storyClockLast = turn.now;   // what the router does
+  }
+  const last = lines[lines.length - 1];
+  check('router chain: the turn at 6:46 a.m. reads its span from the turn before (6:19 a.m.)',
+    last.timeLabel === '6:46 a.m.' && SC.formatStoryTime(last.prev) === '6:19 a.m.' && last.directive.includes('SINCE THE LAST TURN (6:19 a.m. → 6:46 a.m.)'), `${last.timeLabel} prev=${last.prev}`);
+  const p2 = quiet(() => PC.composeTurnPrompt({ ...st, storyClockLast: last.prev }, 'I wait.', { ...gd, storyClock: last }));
+  check('…and the prompt carries it, with storyClockLast kept out of the state JSON', p2.includes('H-Hour: the 28th Infantry goes over the top (6:45 a.m.)') && !('storyClockLast' in stateJson(p2)));
+}
+
 console.log('\n6. Flag-off byte-identity: every stored role vs the committed (HEAD) PromptComposer');
 const headPath = p('engine/services/.__head_PromptComposer.storyclock.test.js');
 fs.writeFileSync(headPath, execFileSync('git', ['show', 'HEAD:engine/services/PromptComposer.js'], { cwd: REPO_DIR, encoding: 'utf8', maxBuffer: 64e6 }));
