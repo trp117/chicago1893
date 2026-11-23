@@ -315,9 +315,22 @@ export function namesCharacter(text, character) {
 // every NPC the lean cut never names taken back out of introducedNpcs, so the engine introduces
 // them properly instead of using a name the player has not seen. They stay in presentNpcs:
 // they are still physically there.
-export function buildColdOpenState(content, { scenario, characters = [] }) {
+//
+// ROLE-SCOPED FIELDS are re-resolved from the LIVE role (when one is passed), by the same rule
+// as StateManager.buildInitialState: role beats scenario. A bake freezes them at bake time, so
+// a fork (or closure) authored after the bake never reached a cold-open session — the 2026-11-23
+// Cantigny artillery run played its whole clock with effectiveDefiningMoment null. Only these
+// four fields; the opening's narrative, intro, lean cut and location are not touched.
+export function buildColdOpenState(content, { scenario, characters = [], role = null }) {
   const state = structuredClone(content.baked.state);
   state.narrativeStyle = 'focused';
+
+  if (role) {
+    state.effectiveClosure              = role.closure ?? scenario.closure ?? null;
+    state.effectiveClosureSource        = role.closure ? 'role' : (scenario.closure ? 'scenario' : 'none');
+    state.effectiveDefiningMoment       = role.defining_moment ?? scenario.defining_moment ?? null;
+    state.effectiveDefiningMomentSource = role.defining_moment ? 'role' : (scenario.defining_moment ? 'scenario' : 'none');
+  }
 
   const glossStatus = scenario.status || 'published';
   const glossAll = (scenario.glossary || []).filter(g => g.term?.trim() && g.definition?.trim());
@@ -340,6 +353,20 @@ export function buildColdOpenState(content, { scenario, characters = [] }) {
     });
   }
   return { state, unseen };
+}
+
+// STORY TRACKING on a cold-open start — what /start's opening sets up when the session plays
+// with an arc (the story-bound fork's arc, or a scene arc). storyArc is loadStoryArc on the
+// REFRESHED state, so a fork added after the bake now brings its arc. reachedBeats starts
+// empty: the baked opening kept no stateChanges, so its beats cannot be replayed, and an
+// at_act/at_beat binding is reached by the live turns that follow (gameRouter's
+// recordReachedBeats). Scene state is NOT initialised here: a scene arc is loaded whether or
+// not there is a fork, so the bake already ran initSceneState, and running it again could move
+// the location away from the opening the player was shown. Returns true when it seeded.
+export function seedColdOpenStoryTracking(state, storyArc) {
+  if (!storyArc || Array.isArray(state.reachedBeats)) return false;
+  state.reachedBeats = [];
+  return true;
 }
 
 // ── Authoring lint (bake script and boot log) ──────────────────────────────

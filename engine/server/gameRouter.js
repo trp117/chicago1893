@@ -35,7 +35,7 @@ import { AnchorTracker } from '../services/AnchorTracker.js';
 import { makeIsAllowedScenario } from './demoMode.js';
 import { checkInputSafety, MINOR_SELF_STATEMENT_NOTE } from '../services/InputSafetyGate.js';
 import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
-import { fingerprintScenarioData, buildColdOpenState, coldOpenHistorySeed, coldOpenTranscriptHeader, coldOpenIntroDisplay } from './coldOpen.js';
+import { fingerprintScenarioData, buildColdOpenState, seedColdOpenStoryTracking, coldOpenHistorySeed, coldOpenTranscriptHeader, coldOpenIntroDisplay } from './coldOpen.js';
 
 // DEMO_MODE spend metering. Every paid Claude call on the play path hands its usage block to
 // reportUsage. In prod the sink is null and reportUsage does nothing; createGameRouter points
@@ -989,7 +989,9 @@ export function createGameRouter(contentRepos, config = {}) {
         const role = playerRoles.find(x => x.id === roleId);
         if (!role) return res.status(404).json({ error: 'This opening is not available.' });
 
-        const { state, unseen } = buildColdOpenState(row.content, { scenario, characters });
+        const { state, unseen } = buildColdOpenState(row.content, { scenario, characters, role });
+        if (seedColdOpenStoryTracking(state, loadStoryArc(repos, scenario, state))) console.log(`[COLD-OPEN] story tracking seeded scenario=${scenarioId} role=${roleId}`);
+        console.log(`[COLD-OPEN] role fields from live role: defining_moment=${state.effectiveDefiningMomentSource}${state.effectiveDefiningMoment?.id ? ` (${state.effectiveDefiningMoment.id})` : ''} closure=${state.effectiveClosureSource}`);
         req.body.state   = state;
         req.body.history = coldOpenHistorySeed(row.content.lean.narrative);
         res.locals.coldOpenStart = true;
