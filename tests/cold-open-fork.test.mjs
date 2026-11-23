@@ -44,7 +44,7 @@ const role     = { id: 'role_artillery_commander', defining_moment: FORK };
 const arc = {
   id: 'steel_curtain_cantigny_main_arc',
   acts: [
-    { actNumber: 1, beats: [{ id: '0445_am_the' }, { id: 'the_artillery_commander' }, { id: 'the_signaler_exits' }] },
+    { actNumber: 1, beats: [{ id: '0445_am_the' }, { id: 'the_artillery_commander_prep' }, { id: 'the_signaler_exits' }] },
     { actNumber: 2, beats: [{ id: '0520_am_a' }, { id: 'a_runner_from' }] },
     { actNumber: 3, beats: [{ id: '0638_am_a' }, { id: '0645_am_the' }, { id: 'the_artillery_commander' }] },
     { actNumber: 4, beats: [{ id: '0710_am_the' }] },
@@ -134,14 +134,27 @@ console.log('\nThe opening the player sees is untouched');
   check('only role-scoped fields (+ the existing glossary/facts/style refresh, + reachedBeats) differ from the bake', changed.every(k => allowed.includes(k)), `changed: ${changed.join(', ')}`);
 }
 
-console.log('\nKnown content hazard (logged, not fixed here)');
+console.log('\nAct-1 / Act-3 beat ids are distinct (2026-11-23 rename)');
 {
-  // the_artillery_commander is a beat id in BOTH act 1 and act 3; storyPosition takes the last
-  // arc beat whose id is reached, so the act-1 beat already counts as act 3.
+  // Until the rename, the_artillery_commander was a beat id in BOTH act 1 and act 3, and
+  // storyPosition takes the LAST arc beat whose id is reached — so the act-1 beat counted as
+  // act 3 and fired the fork in act 1. Act 1's is now the_artillery_commander_prep.
+  const ids = PC.arcBeats(arc).map(b => b.id);
+  check('every beat id in the arc is unique', new Set(ids).size === ids.length, ids.join(', '));
   const s1 = at(state, 4, { reachedBeats: [] });
-  SM.recordReachedBeats(s1, { stateChanges: { beats_reached: ['the_artillery_commander'] } }, arc);
-  const pos = PC.storyPosition(s1, arc);
-  console.log(`  INFO  reporting act-1 "the_artillery_commander" puts story position in act ${pos?.actNumber} → due=${PC.definingMomentDue(s1, scenario, arc)}`);
+  SM.recordReachedBeats(s1, { stateChanges: { beats_reached: ['the_artillery_commander_prep'] } }, arc);
+  check('act-1 beat reported at minute 4 → story position is act 1', PC.storyPosition(s1, arc)?.actNumber === 1);
+  check('  …and the fork is NOT due', PC.definingMomentDue(s1, scenario, arc) === false);
+  check('  …still not due at minute 19 with only act-1/2 beats', PC.definingMomentDue(at(state, 19, { reachedBeats: ['the_artillery_commander_prep', 'a_runner_from'] }), scenario, arc) === false);
+  check('  …due at the 0.65 fallback (minute 19.5) if act 3 is never reported', PC.definingMomentDue(at(state, 19.5, { reachedBeats: ['the_artillery_commander_prep'] }), scenario, arc) === true);
+  const s3 = at(state, 14, { reachedBeats: ['the_artillery_commander_prep'] });
+  SM.recordReachedBeats(s3, { stateChanges: { beats_reached: ['the_artillery_commander'] } }, arc);
+  check('act-3 the_artillery_commander reported at minute 14 → act 3, due by the BINDING', PC.storyPosition(s3, arc)?.actNumber === 3
+    && PC.definingMomentDue(s3, scenario, arc) === true && PC.forkTimingStatus(s3, scenario, arc).via === 'binding');
+  // The old shape, kept as a guard on why the rename matters.
+  const dup = { ...arc, acts: arc.acts.map(a => a.actNumber === 1 ? { ...a, beats: a.beats.map(b => b.id === 'the_artillery_commander_prep' ? { id: 'the_artillery_commander' } : b) } : a) };
+  const sd = at(state, 4, { reachedBeats: ['the_artillery_commander'] });
+  check('(pre-rename duplicate shape DID count act 3 from the act-1 report — the bug the rename fixes)', PC.storyPosition(sd, dup)?.actNumber === 3 && PC.definingMomentDue(sd, scenario, dup) === true);
 }
 
 console.log(failed ? `\n${failed} FAILED` : '\nAll passed');

@@ -93,7 +93,7 @@ const stateFor  = (role) => quiet(() => buildInitialState(WG.scenario, role, WG.
 // role_joan: bound at_scene scene_28_may since B3c (her relapse fork, live in prod).
 // role_manchon: his witness crucible, bound at_scene scene_28_may (2026-10-03).
 // role_massieu: his witness crucible, bound at_scene scene_28_may (2026-10-05).
-const EXPECTED_BOUND = ['role_augustine', 'role_joan', 'role_manchon', 'role_massieu', 'role_mccord', 'role_wills'];   // + Augustine: bound at_beat under_the_fig in prod v63 (2026-11-01)
+const EXPECTED_BOUND = ['role_artillery_commander', 'role_augustine', 'role_joan', 'role_manchon', 'role_massieu', 'role_mccord', 'role_wills'];   // + Augustine: bound at_beat under_the_fig in prod v63 (2026-11-01); + artillery commander: at_act 3, fallback 0.65, Cantigny v79 (2026-11-23)
 const isBoundRole    = r => isStoryBoundFork(r.defining_moment);
 
 head('THE GATE — isStoryBoundFork');
