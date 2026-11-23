@@ -66,6 +66,7 @@ const SUITE = [
   ['DEMO_MODE: landing page-view tally', 'demo-pageviews.test.mjs'],
   ['DEMO_COLD_OPEN: zero-call entry + first-turn handoff', 'cold-open.test.mjs'],
   ['DEMO_COLD_OPEN: live role fields + fork on a baked start', 'cold-open-fork.test.mjs'],
+  ['STORY CLOCK: arc-tracking time, canon, pacing', 'story-clock.test.mjs'],
   ['DEMO_READING_LAYOUT: column + cast rail, no reflow', 'reading-layout.test.mjs'],
   ['session id: one id per playthrough (jsdom)', 'session-id.test.mjs'],
   ['input-safety gate: self-harm, child safety, sexual violence', 'crisis-intercept.test.mjs'],

@@ -1850,7 +1850,7 @@ export function buildStoryPositionDirective(state, scenario, storyArc) {
   return lines.join('\n');
 }
 
-export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues, playerRoles = [], storyArc = null }) {
+export function composeTurnPrompt(state, playerInput, { scenario, characters, locations, clues, playerRoles = [], storyArc = null, storyClock = null }) {
   const location      = getLocationById(state.location, locations);
   const relevantChars = getRelevantCharacters(state, location, characters, locations);
   const charRoutes    = buildCharacterRoutes(characters, locations, state.playerCharacterId);
@@ -1887,11 +1887,16 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     graceActive, graceUsed,
     // presentNpcs is rendered by name in buildPresenceBlock; raw ids in the state block add nothing.
     presentNpcs,
+    // STORY CLOCK bookkeeping (StoryClock.js) — the display label and the last narrated time.
+    // The narrator is told the time by the ⚑ STORY CLOCK directive; absent on every other session.
+    storyClock: _storyClockLabel, storyClockLast,
     ...stateRest
   } = state;
+  // A clock session (gameData.storyClock, built by the router only when STORY_CLOCK_ENABLED and
+  // the arc carries story_clock) replaces the 1:1 start+elapsed time with the clock's reading.
   const promptState = {
     ...stateRest,
-    timeOfNight: timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes, scenario.sessionStartTime || null),
+    timeOfNight: storyClock?.timeLabel ?? timeToPeriodString(remainingMinutes, scenario.sessionTargetMinutes, scenario.sessionStartTime || null),
   };
 
   return turnTemplate
@@ -1913,6 +1918,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{NARRATIVE_STYLE}}',        state.narrativeStyle || 'focused')
     .replace('{{SENSORY_OPENING_CHECK}}',  buildSensoryOpeningCheck(scenario.sensory_opening))
     .replace('{{CLOSURE_FLAG_DIRECTIVE}}', [
+      storyClock?.directive,
       buildClosureFlagDirective(state, scenario),
       buildStoryPositionDirective(state, scenario, storyArc),
       sceneFramingDirective(state, scenario, storyArc, locations),

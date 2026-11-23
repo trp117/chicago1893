@@ -10,6 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { STORY_CLOCK_ENABLED } from '../services/StoryClock.js';
 
 const DEMO_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../demo');
 export const READING_LAYOUT_CSS_PATH = path.join(DEMO_DIR, 'reading-layout.css');
@@ -39,8 +40,23 @@ try { if (window.matchMedia('(min-width: ${READING_LAYOUT_RAIL_MIN_PX}px)').matc
   return out;
 }
 
-export function readingLayoutFiles() {
-  return { css: fs.readFileSync(READING_LAYOUT_CSS_PATH, 'utf8'), js: fs.readFileSync(READING_LAYOUT_JS_PATH, 'utf8') };
+export function readingLayoutFiles({ storyClock = STORY_CLOCK_ENABLED } = {}) {
+  const js = fs.readFileSync(READING_LAYOUT_JS_PATH, 'utf8');
+  return { css: fs.readFileSync(READING_LAYOUT_CSS_PATH, 'utf8'), js: storyClock ? withStoryClockDisplay(js) : js };
+}
+
+// STORY CLOCK display (StoryClock.js): with STORY_CLOCK_ENABLED the header's clock() prefers the
+// time the server stamped on state (gameState.storyClock — set only for a clock session) over
+// sessionStartTime + elapsed. Patched at serve time, like everything else here, so the file — and
+// with the flag off, every served byte — is unchanged. A missing anchor leaves the script as is.
+export const STORY_CLOCK_DISPLAY_ANCHOR = 'function clock() {';
+export function withStoryClockDisplay(js) {
+  if (js.split(STORY_CLOCK_DISPLAY_ANCHOR).length !== 2) {
+    console.warn('[STORY-CLOCK] reading-layout.js clock() anchor not found exactly once — header keeps the 1:1 clock');
+    return js;
+  }
+  return js.replace(STORY_CLOCK_DISPLAY_ANCHOR,
+    `${STORY_CLOCK_DISPLAY_ANCHOR}\n    if (typeof gameState !== 'undefined' && gameState && typeof gameState.storyClock === 'string' && gameState.storyClock) return gameState.storyClock;`);
 }
 
 // ── Direct start (/game only, never the cold-open page) ─────────────────────────────────────

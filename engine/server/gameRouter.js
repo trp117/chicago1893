@@ -22,6 +22,7 @@ import {
   arcBeats,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
+import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime } from '../services/StoryClock.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
 import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
 import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../services/NarrativeSalvage.js';
@@ -1231,6 +1232,11 @@ Do not open with the historical context. Open inside the character's body. Let t
         worldContextBlock,
       ].join('\n');
 
+      // STORY CLOCK: the opening is narrated at the clock's first reading. Nothing for other sessions.
+      const openingClockArc = loadClockArc(repos, scenario);
+      const openingClock    = openingClockArc ? storyClockTurn(openingClockArc, initialState) : null;
+      if (openingClock) gameData.storyClock = openingClock;
+
       const prompt = composeTurnPrompt(initialState, openingInput, gameData);
 
       console.log(`[START] scenario=${scenarioId} role=${roleId}`);
@@ -1392,6 +1398,7 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const nextState = mergeState(seededInitial, output, scenario, clues, '', locations);
+      if (openingClock) nextState.storyClock = formatStoryTime(storyMinutesAt(openingClock.clock, nextState.elapsedMinutes));
       // Story-bound fork only (gameData.storyArc is attached for no other session): the
       // opening can already reach the arc's first beat.
       let openingBeats = [];
@@ -1575,6 +1582,16 @@ Do not open with the historical context. Open inside the character's body. Let t
           + " start=" + startLoc
           + (intended ? " intended=" + intended : "")
           + " drift=" + (state.location !== (intended ?? startLoc)));
+      }
+
+      // STORY CLOCK (StoryClock.js) — only when STORY_CLOCK_ENABLED and the arc carries story_clock.
+      // The time this turn is narrated at is read off the arc's map at the session minute, and
+      // reaches the model as the authoritative ⚑ STORY CLOCK. No key is added for any other session.
+      const clockArc = loadClockArc(repos, scenario);
+      const clockNow = clockArc ? storyClockTurn(clockArc, state) : null;
+      if (clockNow) {
+        gameData.storyClock = clockNow;
+        console.log(`[STORY-CLOCK] turn at ${clockNow.timeLabel} (session minute ${state.elapsedMinutes})`);
       }
 
       // Save current state so promptBuilder can read session context
@@ -1938,7 +1955,11 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const prevAct = state.act || 1;
-      let nextState = mergeState(state, output, scenario, clues, playerInput, locations);
+      let nextState = clockNow
+        ? mergeState(state, output, scenario, clues, playerInput, locations, { maxAdvance: clockNow.clock.maxAdvance })
+        : mergeState(state, output, scenario, clues, playerInput, locations);
+      // The time the player's header shows after this turn: where the clock now stands.
+      if (clockNow) nextState.storyClock = formatStoryTime(storyMinutesAt(clockNow.clock, nextState.elapsedMinutes));
 
       // Story-bound fork only: record the beats this turn reached. Read by the NEXT turn's
       // definingMomentDue, so a fork bound to a beat is put to the player on the turn after

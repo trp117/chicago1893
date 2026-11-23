@@ -375,7 +375,9 @@ export function recordReachedBeats(state, modelOutput, storyArc) {
   return added;
 }
 
-export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '', locations = []) {
+// clock (STORY CLOCK sessions only, StoryClock.js): { maxAdvance } caps this turn's SESSION-minute
+// advance — never story time, which is read off the arc's map. Omitted for every other session.
+export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '', locations = [], clock = null) {
   const next  = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
 
@@ -386,9 +388,11 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
   // `||` used to reject into the default, would slip through as 0 or NaN and corrupt
   // elapsedMinutes. Take the first candidate that is genuinely a finite number; 3
   // stays the final backstop.
-  const advance       = [modelOutput.timeAdvance, scenario.systems?.timePerTurnDefault, 3]
+  const rawAdvance    = [modelOutput.timeAdvance, scenario.systems?.timePerTurnDefault, 3]
     .map(v => (typeof v === 'number' ? v : (typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN)))
     .find(Number.isFinite) ?? 3;
+  const advance = typeof clock?.maxAdvance === 'number' && rawAdvance > clock.maxAdvance ? clock.maxAdvance : rawAdvance;
+  if (advance !== rawAdvance) console.log(`[STORY-CLOCK] turn advance ${rawAdvance} → ${advance} session min (cap)`);
   const sessionTarget = currentState.extensionUsed
     ? (scenario.sessionTargetMinutes || 15) + 5
     : (scenario.sessionTargetMinutes || 15);
