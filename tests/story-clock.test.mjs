@@ -229,6 +229,61 @@ console.log('\n5c. Act pacing (Part 3)');
   check('  …and the next turn\'s pacing reads Act 2 from them', PC.storyPosition(st, ARC)?.actNumber === 2);
 }
 
+console.log('\n5d. Fork pin (06:46) + hold, with fallback 0.60');
+{
+  const PIN = { ...ARC, story_clock: { ...ARC.story_clock, fork_pins: { mccormick_lift_three_choice: '06:46' } } };
+  const ck = SC.readStoryClock(PIN);
+  const FORK = {
+    id: 'mccormick_lift_three_choice', at_act: 3, reviewed: true, fires_live: true, time_advance: 0, fallback_at_elapsed_fraction: 0.6,
+    principal_transition: { type: 'decision_made', moment: 'mccormick_lift_three_choice' },
+    options: [{ id: 'fire_lift_three', text: 'Fire.' }, { id: 'request_emergency_suspension', text: 'Suspend.' }, { id: 'hold_guns_at_the_wire', text: 'Hold.' }],
+  };
+  check('fork_pins reads; the pin is 06:46 for the moment id', SC.forkPinMinutes(ck, FORK) === T('06:46'));
+  check('no pin for another moment', SC.forkPinMinutes(ck, { principal_transition: { moment: 'other' } }) === null);
+  check('hold minute = max(pin minute 18, fallback 0.60 × 30 = 18) = 18', near(SC.forkHoldMinute(ck, FORK, 18), 18));
+  check('hold respects a later due minute (fallback 0.65 → 19.5)', near(SC.forkHoldMinute(ck, FORK, 19.5), 19.5));
+  const hold = (e, adv, holdAt) => quiet(() => SM.mergeState(at(e), { timeAdvance: adv, stateChanges: {} }, scenario, [], '', locations, { maxAdvance: 4, holdAt })).elapsedMinutes;
+  check('mergeState holds: 16 + 4 with holdAt 18 → 18', hold(16, 4, 18) === 18);
+  check('  …an advance that stops short is untouched (14 + 3 → 17)', hold(14, 3, 18) === 17);
+  check('  …already past the hold → only the cap applies (19 + 9 → 23)', hold(19, 9, 18) === 23);
+  check('  …no holdAt → only the cap', hold(16, 4, null) === 20);
+
+  // Replay the router's sequence: due-check → pin jump → compose at the pin → merge with hold.
+  const sc = { ...scenario, sessionTargetMinutes: 30 };
+  const run = (advances, { bindAtTurn = null } = {}) => {
+    let st = at(0, { effectiveDefiningMoment: FORK, effectiveDefiningMomentSource: 'role', decisions: {}, definingMomentPresented: false, reachedBeats: [], storyClockLast: T('04:45') });
+    const shown = [];
+    for (let i = 0; i < advances.length; i++) {
+      const due = PC.definingMomentDue(st, sc, PIN);
+      let now = SC.storyMinutesAt(ck, st.elapsedMinutes), pinned = false, holdAt = null;
+      if (due) {
+        const pin = SC.forkPinMinutes(ck, FORK);
+        if (now <= pin) { const pa = SC.sessionMinuteAt(ck, pin); if (st.elapsedMinutes < pa) { st.elapsedMinutes = pa; st.remainingMinutes = 30 - pa; } now = pin; pinned = true; }
+      } else {
+        holdAt = SC.forkHoldMinute(ck, FORK, 30 * FORK.fallback_at_elapsed_fraction);
+      }
+      st.storyClockLast = now;
+      const out = { timeAdvance: due ? 0 : advances[i], stateChanges: bindAtTurn === i ? { beats_reached: ['0638_am_a'] } : {} };
+      st = quiet(() => SM.mergeState(st, out, sc, [], '', locations, { maxAdvance: 4, holdAt }));
+      SM.recordReachedBeats(st, out, PIN);
+      if (due) { st.definingMomentPresented = true; return { forkAt: SC.formatStoryTime(now), pinned, turn: i + 1, shown, after: SC.formatStoryTime(SC.storyMinutesAt(ck, st.elapsedMinutes)) }; }
+      shown.push(SC.formatStoryTime(SC.storyMinutesAt(ck, st.elapsedMinutes)));
+    }
+    return { forkAt: null, shown };
+  };
+  const mono = shown => shown.every((t, i) => i === 0 || SC.parseHHMM(t.replace(/ [ap]\.m\./, '').padStart(5, '0')) >= SC.parseHHMM(shown[i - 1].replace(/ [ap]\.m\./, '').padStart(5, '0')));
+  const r1 = run([2, 3, 3, 3, 3, 5, 9, 2, 2, 2, 2, 2]);
+  check(`968a1f03's advances: the fork is put at 6:46 a.m. (pinned), not 7:23 — turn ${r1.turn}`, r1.forkAt === '6:46 a.m.' && r1.pinned, JSON.stringify(r1));
+  check('  …the header never runs backwards, and reads 6:46 a.m. after the fork turn', mono([...r1.shown, r1.after]) && r1.after === '6:46 a.m.', [...r1.shown, r1.after].join(' '));
+  const r2 = run(Array(15).fill(2));
+  check(`steady 2-minute turns: the fork is put at 6:46 a.m. (turn ${r2.turn})`, r2.forkAt === '6:46 a.m.' && r2.pinned, JSON.stringify(r2));
+  const r3 = run([4, 4, 4, 4, 2, 2, 2], { bindAtTurn: 3 });
+  check(`act-3 beat reported at minute 16 (binding): the fork jumps forward to 6:46 a.m. next turn (turn ${r3.turn})`, r3.forkAt === '6:46 a.m.' && r3.pinned && r3.turn === 5, JSON.stringify(r3));
+  check('  …and the header moves forward to it (6:38 → 6:46), never back', mono([...r3.shown, r3.after]), [...r3.shown, r3.after].join(' '));
+  const late = SC.buildStoryClockDirective(SC.readStoryClock(PIN), { now: T('06:46'), prev: T('06:38'), pinned: true });
+  check('the pinned turn\'s directive says to hold the scene at the decision', late.includes('This is the moment the decision is put to the player — hold the scene at it.'));
+}
+
 console.log('\n6. Flag-off byte-identity: every stored role vs the committed (HEAD) PromptComposer');
 const headPath = p('engine/services/.__head_PromptComposer.storyclock.test.js');
 fs.writeFileSync(headPath, execFileSync('git', ['show', 'HEAD:engine/services/PromptComposer.js'], { cwd: REPO_DIR, encoding: 'utf8', maxBuffer: 64e6 }));

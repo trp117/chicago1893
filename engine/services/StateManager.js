@@ -376,7 +376,8 @@ export function recordReachedBeats(state, modelOutput, storyArc) {
 }
 
 // clock (STORY CLOCK sessions only, StoryClock.js): { maxAdvance } caps this turn's SESSION-minute
-// advance — never story time, which is read off the arc's map. Omitted for every other session.
+// advance — never story time, which is read off the arc's map; { holdAt } stops the session at a
+// pending pinned fork's hold minute (StoryClock.forkHoldMinute). Omitted for every other session.
 export function mergeState(currentState, modelOutput, scenario, clues, playerInput = '', locations = [], clock = null) {
   const next  = structuredClone(currentState);
   const delta = modelOutput.stateChanges || {};
@@ -391,8 +392,10 @@ export function mergeState(currentState, modelOutput, scenario, clues, playerInp
   const rawAdvance    = [modelOutput.timeAdvance, scenario.systems?.timePerTurnDefault, 3]
     .map(v => (typeof v === 'number' ? v : (typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN)))
     .find(Number.isFinite) ?? 3;
-  const advance = typeof clock?.maxAdvance === 'number' && rawAdvance > clock.maxAdvance ? clock.maxAdvance : rawAdvance;
-  if (advance !== rawAdvance) console.log(`[STORY-CLOCK] turn advance ${rawAdvance} → ${advance} session min (cap)`);
+  const capped  = typeof clock?.maxAdvance === 'number' && rawAdvance > clock.maxAdvance ? clock.maxAdvance : rawAdvance;
+  const fromNow = currentState.elapsedMinutes ?? 0;
+  const advance = typeof clock?.holdAt === 'number' && fromNow < clock.holdAt && fromNow + capped > clock.holdAt ? clock.holdAt - fromNow : capped;
+  if (advance !== rawAdvance) console.log(`[STORY-CLOCK] turn advance ${rawAdvance} → ${advance} session min (${advance < capped ? `held at fork, minute ${clock.holdAt}` : 'cap'})`);
   const sessionTarget = currentState.extensionUsed
     ? (scenario.sessionTargetMinutes || 15) + 5
     : (scenario.sessionTargetMinutes || 15);

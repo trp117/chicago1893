@@ -21,9 +21,13 @@ import {
   scenePresentation,
   arcBeats,
   storyPosition,
+  definingMomentLive,
+  isStoryBoundFork,
+  DEFINING_MOMENT_ENABLED,
+  FORK_FALLBACK_FRACTION_DEFAULT,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
-import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime } from '../services/StoryClock.js';
+import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime, readStoryClock, forkPinMinutes, forkHoldMinute, sessionMinuteAt } from '../services/StoryClock.js';
 import { forkDiagTurnLine, forkDiagSummaryLines, stripForkDiagnostics, forkDiagActive, DIAG_PREFIX } from '../services/ForkDiagnostics.js';
 import { grantGrace, closeGraceTurn, graceDiagLine } from '../services/SessionTermination.js';
 import { looksLikeJsonReply, salvageNarrative, unnestNarrative } from '../services/NarrativeSalvage.js';
@@ -107,6 +111,22 @@ async function getScenarioData(repos, scenarioId, { state = null } = {}) {
   const storyArc    = state ? loadStoryArc(repos, scenario, state) : null;
   if (storyArc) data.storyArc = storyArc;
   return data;
+}
+
+// STORY CLOCK fork hold: the session minute a PENDING fork comes due on its own — a story-bound
+// fork's fallback, an unbound fork's at_elapsed_fraction — or NaN when no live fork is pending
+// (flag off, unreviewed/unarmed, already put, already answered). Read only on clock sessions.
+function pendingForkDueMinute(state, scenario) {
+  const block = resolveDefiningMomentBlock(state, scenario);
+  if (!DEFINING_MOMENT_ENABLED || !block || !definingMomentLive(block) || state?.definingMomentPresented) return NaN;
+  const momentId = block.principal_transition?.moment;
+  if (!momentId || state?.decisions?.[momentId] != null) return NaN;
+  const total = scenario?.sessionTargetMinutes || 15;
+  if (isStoryBoundFork(block)) {
+    const fb = typeof block.fallback_at_elapsed_fraction === 'number' && Number.isFinite(block.fallback_at_elapsed_fraction) ? block.fallback_at_elapsed_fraction : FORK_FALLBACK_FRACTION_DEFAULT;
+    return total * fb;
+  }
+  return typeof block.at_elapsed_fraction === 'number' ? total * block.at_elapsed_fraction : NaN;
 }
 
 // DEMO_COLD_OPEN: the fingerprint of the content a baked opening was produced from — read the
@@ -1593,10 +1613,34 @@ Do not open with the historical context. Open inside the character's body. Let t
       // The time this turn is narrated at is read off the arc's map at the session minute, and
       // reaches the model as the authoritative ⚑ STORY CLOCK. No key is added for any other session.
       const clockArc = loadClockArc(repos, scenario);
+      // FORK PIN (story_clock.fork_pins): the turn that puts the fork is narrated at the pin. If the
+      // session is short of the pin's minute (an early binding), it moves forward to it; never back.
+      let clockPin = null, clockHoldAt = null;
+      if (clockArc) {
+        const clk = readStoryClock(clockArc);
+        if (forkDue) {
+          const pin = forkPinMinutes(clk, definingBlock);
+          if (pin != null && storyMinutesAt(clk, state.elapsedMinutes ?? 0) <= pin) {
+            const pinAt = sessionMinuteAt(clk, pin);
+            if ((state.elapsedMinutes ?? 0) < pinAt) {
+              const target = (scenario.sessionTargetMinutes || 15) + (state.extensionUsed ? 5 : 0);
+              console.log(`[STORY-CLOCK] fork pin: session minute ${state.elapsedMinutes} → ${pinAt}`);
+              state.elapsedMinutes   = pinAt;
+              state.remainingMinutes = Math.max(0, target - pinAt);
+            }
+            clockPin = pin;
+          } else if (pin != null) {
+            console.warn(`[STORY-CLOCK] fork pin ${formatStoryTime(pin)} is behind the clock — fork narrated at the clock's time`);
+          }
+        } else {
+          // HOLD: while a pinned fork is pending, no turn carries the session past it (mergeState).
+          clockHoldAt = forkHoldMinute(clk, resolveDefiningMomentBlock(state, scenario), pendingForkDueMinute(state, scenario));
+        }
+      }
       // Part 3 reads where the story actually is (the furthest beat reached) and whether the prompt
       // already carries a beat roster (a story-bound fork or scenes put gameData.storyArc there).
       const clockNow = clockArc
-        ? storyClockTurn(clockArc, state, { storyAct: storyPosition(state, clockArc)?.actNumber ?? null, roster: !!gameData.storyArc })
+        ? storyClockTurn(clockArc, state, { storyAct: storyPosition(state, clockArc)?.actNumber ?? null, roster: !!gameData.storyArc, now: clockPin, pinned: clockPin != null })
         : null;
       if (clockNow) {
         gameData.storyClock = clockNow;
@@ -1968,7 +2012,7 @@ Do not open with the historical context. Open inside the character's body. Let t
 
       const prevAct = state.act || 1;
       let nextState = clockNow
-        ? mergeState(state, output, scenario, clues, playerInput, locations, { maxAdvance: clockNow.clock.maxAdvance })
+        ? mergeState(state, output, scenario, clues, playerInput, locations, { maxAdvance: clockNow.clock.maxAdvance, holdAt: clockHoldAt })
         : mergeState(state, output, scenario, clues, playerInput, locations);
       // The time the player's header shows after this turn: where the clock now stands.
       if (clockNow) nextState.storyClock = formatStoryTime(storyMinutesAt(clockNow.clock, nextState.elapsedMinutes));

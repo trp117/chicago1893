@@ -230,3 +230,25 @@ export function storyClockTurn(arc, state, { now: nowOverride = null, pinned = f
   ].filter(Boolean).join('\n\n');
   return { arc, clock, now, prev, pinned, timeLabel: formatStoryTime(now), directive };
 }
+
+// ── Fork pin ──────────────────────────────────────────────────────────────────────────────
+// story_clock.fork_pins["<moment id>"] = "HH:MM": the defining moment is narrated at that time.
+// Two halves, both engine-owned:
+//   HOLD — while the fork is pending, a turn may not carry the session past holdAt =
+//          max(the pin's session minute, the minute the fork comes due). So the fork cannot be
+//          overshot by a long turn, and it is always due by the time the clock reaches the pin.
+//   JUMP — on the turn the fork is put, the session moves forward to the pin if it is short of
+//          it (an early binding), and that turn is narrated at the pin. Never backwards.
+export function forkPinMinutes(clock, block) {
+  const id = block?.principal_transition?.moment ?? block?.id;
+  return id != null && clock?.forkPins && Object.prototype.hasOwnProperty.call(clock.forkPins, id) ? clock.forkPins[id] : null;
+}
+
+// The session minute a pending pinned fork holds the clock at, or null. dueMinute is when the
+// fork comes due on its own (a bound fork's fallback, an unbound fork's at_elapsed_fraction).
+export function forkHoldMinute(clock, block, dueMinute) {
+  const pin = forkPinMinutes(clock, block);
+  if (pin == null) return null;
+  const pinAt = sessionMinuteAt(clock, pin);
+  return Number.isFinite(dueMinute) ? Math.max(pinAt, dueMinute) : pinAt;
+}
