@@ -339,7 +339,12 @@ export function recordDefiningDecision(state, scenario, { definingChoiceId, play
     // the "Your Session" block can tell what happened AFTER it (reachedBeats.slice(beats_before)).
     // Recorded at the start of the answer turn, so that turn's own beats count as after.
     [momentId]: { option_id: chosen.id, turn: state.turnCount ?? 0, elapsed: state.elapsedMinutes ?? 0,
-                  beats_before: Array.isArray(state.reachedBeats) ? state.reachedBeats.length : 0 },
+                  beats_before: Array.isArray(state.reachedBeats) ? state.reachedBeats.length : 0,
+                  // The branch-flag values frozen when the fork was put (gameRouter → state.forkFlags),
+                  // so the debrief reads the fact the player saw narrated, whatever the flag does
+                  // later. Only a fork that reads flags has them; every other record is unchanged.
+                  ...(state.forkFlags && typeof state.forkFlags === 'object' && Object.keys(state.forkFlags).length
+                    ? { flags: { ...state.forkFlags } } : {}) },
   };
   return chosen.id;
 }

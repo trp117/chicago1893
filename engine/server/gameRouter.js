@@ -14,6 +14,8 @@ import {
   definingMomentDue,
   resolveDefiningMomentBlock,
   authoredForkDebrief,
+  forkDebriefWithRecap,
+  forkBranchSnapshot,
   closureShouldClose,
   prepareForTts,
   getClueById,
@@ -624,7 +626,62 @@ export function recordWordBudget(layer1Fates) {
 }
 
 // Exported for tests/epilogue.test.mjs, which drives it against a scripted Anthropic.
-export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null, playerActions = [], afterChoice = []) {
+// The LEAD-UP RECAP (two-block "Your Session", opt-in per fork via debrief_with_recap): the
+// player's own account of what they did up to and around the defining choice, written to sit
+// ABOVE the authored debrief, which owns the outcome. So it never judges the choice and never
+// tells what it led to — and it is never handed the debrief text, the closing prose (which shows
+// how the night ended) or AFTER THE CHOICE. Inputs after the choice are cut at the choice when it
+// can be found. Exported for tests.
+export function buildLeadUpRecapPrompt(sessionSummary, sessionNpcList = [], playerActions = []) {
+  const definingState = sessionSummary?.closure_state?.defining_moment_state || null;
+  const all        = Array.isArray(playerActions) ? playerActions.filter(a => typeof a === 'string' && a.trim()) : [];
+  const choiceIdx  = choiceInputIndex(all, definingState?.decision_text);
+  const actions    = choiceIdx >= 0 ? all.slice(0, choiceIdx + 1) : all;
+  const hasActions = actions.length > 0;
+  const system = [
+    'You are writing the player\'s own recap that opens the "Your Session" block for a completed Living History game session. Return ONLY plain prose — no JSON, no markdown fences, no preamble.',
+    '',
+    'On the same screen, directly after your recap, an authored passage tells what the defining choice led to. Your part is only the lead-up: what this person did across the session, up to and around the choice they made.',
+    '',
+    'Length: 40–70 words.',
+    'Voice: second person, past tense. Not documentary. Not historian\'s record.',
+    '',
+    'Rules:',
+    hasActions
+      ? '- Draw ONLY from the SESSION SUMMARY and WHAT THE PLAYER DID. No other knowledge, no external sources.'
+      : '- Draw ONLY from the SESSION SUMMARY provided. No other knowledge, no external sources.',
+    '- Name characters ONLY from the CHARACTERS PRESENT THIS SESSION list. Never invent a name or substitute a name not on that list.',
+    ...(hasActions ? [
+      '- FOLLOW WHAT THE PLAYER ACTUALLY DID. WHAT THE PLAYER DID lists their own inputs, in order. Reflect that arc — whom they sought out, what they said, what they pressed on and what they let lie — weighted by how much of the session it took. Do not invent a conversation, a confrontation or a feeling they did not show. An input records what they tried or said, not what it achieved: pressing for something is not getting it.',
+    ] : []),
+    `- END AT THE CHOICE. The defining choice is decision_text in closure_state.defining_moment_state${choiceIdx >= 0 ? ' (marked "← THE DEFINING CHOICE" in WHAT THE PLAYER DID; the mark is for you — never write it)' : ''}. Bring the recap up to the moment it was put to them and say what they chose — paraphrase it, never quote it verbatim. Stop there.`,
+    '- NEVER JUDGE IT. No approval, blame, verdict or weighing of the choice or of anything they did — not "rightly", not "bravely", not "too late", not "the right call". Say what they did and leave it.',
+    '- NEVER TELL THE OUTCOME. Do not say what the choice led to, whether it worked, what happened after it, or how the event ended. The passage that follows owns all of that.',
+    '- The options they did not take appear only as internal ids in available_options — never name, translate, or paraphrase those.',
+    '- Never import the documented historical ending of the real event.',
+    '- Do not attribute the player\'s choices or actions to real historical people as documented fact.',
+    '- Do not reference turn numbers, session identifiers, or game-internal metadata.',
+  ].join('\n');
+  // No ids (the Pedro leak), and nothing that states how the night ended.
+  const { interacted_characters: _ids, outcome: _o, anchored_outcome: _a, ...summaryForRecap } = sessionSummary || {};
+  const content = [
+    'SESSION SUMMARY:',
+    JSON.stringify(summaryForRecap, null, 2),
+    '',
+    sessionNpcList.length > 0
+      ? 'CHARACTERS PRESENT THIS SESSION (name characters only from this list — never invent a name):\n' +
+        sessionNpcList.map(c => `- ${c.name}${c.role ? ` (${c.role})` : ''}`).join('\n')
+      : 'CHARACTERS PRESENT THIS SESSION: none recorded.',
+    ...(hasActions ? [
+      '',
+      'WHAT THE PLAYER DID (their own inputs, in order, up to the choice):',
+      ...actions.map((a, i) => `${i + 1}. ${a}${i === choiceIdx ? '   ← THE DEFINING CHOICE' : ''}`),
+    ] : []),
+  ].join('\n');
+  return { system, content };
+}
+
+export async function generateEpilogueText(epilogueData, sessionSummary, closingProse, anthropicApiKey, playerHistoricalNote, sessionNpcList = [], proximitySession = false, playedRole = null, authoredSessionBlock = null, playerActions = [], afterChoice = [], { recapWithDebrief = false } = {}) {
   // Apply strict verification filter: when on, fates not yet human-verified are withheld from the LLM.
   const fatesForLLM = STRICT_FATE_VERIFICATION
     ? (epilogueData?.character_fates || []).filter(f => f.verified === true)
@@ -775,10 +832,31 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
   // session without one (no fork, no decision, no debrief on the chosen option) passes null
   // and makes the same call with the same prompt as before.
   // 60–100 words is ~130 tokens; 200 left almost no headroom. 400, retried at 800, then trimmed.
-  const session_block = authoredSessionBlock || await completeEpilogueCall({
-    apiKey: anthropicApiKey, system: sessionSystemPrompt, content: sessionUserContent,
-    maxTokens: 400, retryMaxTokens: 800, label: 'session block',
-  });
+  //
+  // TWO BLOCKS (recapWithDebrief — the fork's debrief_with_recap, and only with an authored
+  // debrief): the lead-up recap call is made instead, and the result carries the recap as
+  // session_block and the authored text, verbatim, as session_debrief. If the recap call fails
+  // the debrief alone is the block — exactly the one-block result — so the player always gets it.
+  let session_block, session_debrief = null;
+  if (authoredSessionBlock && recapWithDebrief === true) {
+    let recap = '';
+    try {
+      const p = buildLeadUpRecapPrompt(sessionSummary, sessionNpcList, playerActions);
+      recap = await completeEpilogueCall({
+        apiKey: anthropicApiKey, system: p.system, content: p.content,
+        maxTokens: 300, retryMaxTokens: 600, label: 'session recap',
+      });
+    } catch (e) {
+      console.warn('[EPILOGUE] session recap failed — shipping the authored debrief alone:', e.message);
+    }
+    if (recap && recap.trim()) { session_block = recap.trim(); session_debrief = authoredSessionBlock; }
+    else session_block = authoredSessionBlock;
+  } else {
+    session_block = authoredSessionBlock || await completeEpilogueCall({
+      apiKey: anthropicApiKey, system: sessionSystemPrompt, content: sessionUserContent,
+      maxTokens: 400, retryMaxTokens: 800, label: 'session block',
+    });
+  }
   if (!session_block) throw new Error('No session block text returned');
 
   // ── Call 2: record block ─────────────────────────────────────────────────────
@@ -874,7 +952,7 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
       .map(f => f.primary_source)
   )];
 
-  return { session_block, record_block, label: 'Historical Record', sources, style_hint: 'historian' };
+  return { session_block, ...(session_debrief ? { session_debrief } : {}), record_block, label: 'Historical Record', sources, style_hint: 'historian' };
 }
 
 // The fork's options as handed to the client: ids and text from the block, never the model.
@@ -2094,7 +2172,14 @@ Do not open with the historical context. Open inside the character's body. Let t
         // Latch it: the fork has now been asked, and must not be asked again even if the
         // player answers with something that records no decision.
         nextState.definingMomentPresented = true;
-        console.log("[DEFINING] fork presented - " + options.length + " options, timeAdvance=" + output.timeAdvance);
+        // Freeze the flags this fork reads (branch flag, debrief-variant flags) at the values the
+        // fork turn was composed from — the same snapshot buildDefiningMomentInstruction narrated.
+        // Read off `state`, not nextState: a flag the model sets on this very turn did not shape
+        // the narration. null (nothing written) for a fork that reads no flag.
+        const frozenFlags = forkBranchSnapshot(state, definingBlock);
+        if (frozenFlags) nextState.forkFlags = frozenFlags;
+        console.log("[DEFINING] fork presented - " + options.length + " options, timeAdvance=" + output.timeAdvance
+          + (frozenFlags ? " flags=" + JSON.stringify(frozenFlags) : ""));
       }
 
       // Termination at the target (SessionTermination.js): a turn that reached the target with the
@@ -2513,9 +2598,13 @@ Do not open with the historical context. Open inside the character's body. Let t
           const proximitySession = !forkBlock;
           // The chosen option's authored debrief, when it has one — used verbatim as "Your
           // Session" (null for every fork without one, and for every session with no decision).
-          const authoredDebrief = authoredForkDebrief(forkBlock, summary.closure_state?.defining_moment_state);
+          // Variant debriefs (options[].debrief_variants) are picked on the flag values frozen when
+          // the fork was put, hence sessionState. debrief_with_recap adds the player's own recap
+          // ahead of it (two blocks) — opt-in per fork.
+          const authoredDebrief   = authoredForkDebrief(forkBlock, summary.closure_state?.defining_moment_state, sessionState);
+          const recapWithDebrief  = !!authoredDebrief && forkDebriefWithRecap(forkBlock);
           console.log('[EPILOGUE-CLOSE] epilogue arm —',
-            authoredDebrief ? `decision-aware (authored debrief, option ${summary.closure_state.defining_moment_state.decision})`
+            authoredDebrief ? `decision-aware (authored debrief${recapWithDebrief ? ' + recap' : ''}, option ${summary.closure_state.defining_moment_state.decision}${sessionState?.decisions?.[summary.closure_state.defining_moment_state.moment]?.flags ? ', flags ' + JSON.stringify(sessionState.decisions[summary.closure_state.defining_moment_state.moment].flags) : ''})`
               : summary.closure_state?.defining_moment_state?.met === true ? 'decision-aware'
               : proximitySession ? 'proximity/presence'
               : 'fork-present-not-fired (unchanged)');
@@ -2524,12 +2613,16 @@ Do not open with the historical context. Open inside the character's body. Let t
             role ? { id: role.id, name: role.name, character_type: role.character_type || null, represents: role.represents || null } : null,
             authoredDebrief, extractPlayerActions(narrativeTranscript),
             beatsAfterChoice(sessionState, summary.closure_state?.defining_moment_state?.moment,
-              scenarioData?.storyArcIds?.[0] && repos.storyArcs ? repos.storyArcs.findById(scenarioData.storyArcIds[0]) : null));
+              scenarioData?.storyArcIds?.[0] && repos.storyArcs ? repos.storyArcs.findById(scenarioData.storyArcIds[0]) : null),
+            { recapWithDebrief });
           if ((epilogueResult?.session_block || epilogueResult?.record_block) && characters.length) {
+            // The session block is authored — and shipped untouched, it was written with names,
+            // not ids — only when the debrief IS the block. With a recap, the block is the
+            // model's recap and is cleaned; session_debrief is never touched.
+            const sessionAuthored = !!authoredDebrief && !epilogueResult.session_debrief;
             epilogueResult = {
               ...epilogueResult,
-              // An authored debrief is shipped untouched — it was written with names, not ids.
-              session_block: authoredDebrief ? epilogueResult.session_block : fixCharacterIdLeaks(epilogueResult.session_block || '', characters),
+              session_block: sessionAuthored ? epilogueResult.session_block : fixCharacterIdLeaks(epilogueResult.session_block || '', characters),
               record_block:  fixCharacterIdLeaks(epilogueResult.record_block  || '', characters),
             };
           }
@@ -2578,6 +2671,7 @@ Do not open with the historical context. Open inside the character's body. Let t
           at:            new Date().toISOString(),
           prose,
           session_block: epilogueResult?.session_block ?? null,
+          ...(epilogueResult?.session_debrief ? { session_debrief: epilogueResult.session_debrief } : {}),
           record_block:  epilogueResult?.record_block ?? null,
         },
         ended_at: new Date().toISOString(),
@@ -2594,6 +2688,8 @@ Do not open with the historical context. Open inside the character's body. Let t
           if (aftermath) lines.push('', '## Historical Aftermath', '', aftermath);
           if (epilogueResult?.session_block) {
             lines.push('', '---', '', '## Your Session', '', epilogueResult.session_block);
+            // Two-block fork: the authored debrief follows the recap as its capstone.
+            if (epilogueResult.session_debrief) lines.push('', epilogueResult.session_debrief);
           }
           if (epilogueResult?.record_block) {
             lines.push('', '---', '', '## Historical Record', '', epilogueResult.record_block);

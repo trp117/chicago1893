@@ -112,12 +112,78 @@ const summary  = decision => ({ interacted_characters: ['guillaume_manchon'], re
 const played = { id: 'role_manchon', name: 'Guillaume Manchon', character_type: 'real' };
 const run = async (fn, s, authored) => { calls.length = 0; const out = await fn(epilogue, s, 'Closing prose.', 'k', null, [], false, played, authored); return { out, calls: [...calls] }; };
 
-head('authored debrief → verbatim, no session call, record call unchanged');
+head('ONE block (debrief_with_recap off — the saints): authored debrief verbatim, no session call');
 const A = await run(generateEpilogueText, summary('record_exactly'), FIDELITY);
 check('session_block is the authored text, byte for byte', A.out.session_block === FIDELITY);
 check('no session-block model call made', A.calls.filter(c => c.block === 'session').length === 0);
+check('no session_debrief key on a one-block result', !('session_debrief' in A.out));
 check('record block still generated', A.calls.filter(c => c.block === 'record').length === 1 && A.out.record_block === 'Model record text.');
 check('debrief text never reaches the record prompt', !A.calls.some(c => c.content.includes('You kept it true')));
+{
+  const off = { ...summary('record_exactly') };
+  calls.length = 0;
+  const out = await generateEpilogueText(epilogue, off, 'Closing prose.', 'k', null, [], false, played, FIDELITY, ['I watch.'], [], { recapWithDebrief: false });
+  check('recapWithDebrief:false explicitly → the same one-block result', out.session_block === FIDELITY && !('session_debrief' in out) && !calls.some(c => c.block === 'session'));
+}
+
+head('TWO blocks (debrief_with_recap on — Cantigny): recap first, authored debrief as capstone');
+{
+  const ACTIONS = ['I read the needle.', 'I send Wakely to the fault.', 'x', 'I check the stopwatch.'];
+  const s = summary('record_exactly');   // decision_text 'x' — the 3rd input is the choice
+  calls.length = 0;
+  const out = await generateEpilogueText(epilogue, { ...s, anchored_outcome: { id: 'a', description: 'ANCHORED-OUTCOME-TEXT' } },
+    'CLOSING-PROSE-TEXT', 'k', null, [{ name: 'Wakely', role: 'linesman' }], false, played, FIDELITY, ACTIONS, ['AFTER-BEAT-TEXT'], { recapWithDebrief: true });
+  const sess = calls.filter(c => c.block === 'session');
+  check('one recap call is made', sess.length === 1);
+  check('session_block is the model recap', out.session_block === 'Model session text.');
+  check('session_debrief is the authored debrief, byte for byte', out.session_debrief === FIDELITY);
+  check('record block unchanged', out.record_block === 'Model record text.' && calls.filter(c => c.block === 'record').length === 1);
+  const sys = sess[0]?.system || '', content = sess[0]?.content || '';
+  check('lead-up prompt: 40–70 words, ends at the choice, never judges, never tells the outcome',
+    sys.includes('Length: 40–70 words.') && sys.includes('END AT THE CHOICE') && sys.includes('NEVER JUDGE IT') && sys.includes('NEVER TELL THE OUTCOME'));
+  check('the debrief text is NOT passed to the recap', !content.includes('You kept it true') && !sys.includes('You kept it true'));
+  check('nor the closing prose, AFTER THE CHOICE, or the anchored outcome', !content.includes('CLOSING-PROSE-TEXT') && !content.includes('AFTER-BEAT-TEXT') && !content.includes('ANCHORED-OUTCOME-TEXT'));
+  check('no character ids in the recap prompt', !content.includes('guillaume_manchon'));
+  check('inputs cut at the choice (marked); later inputs not sent',
+    content.includes('3. x   ← THE DEFINING CHOICE') && content.includes('I send Wakely to the fault.') && !content.includes('I check the stopwatch.'));
+}
+{
+  // Recap call fails → the authored debrief alone, i.e. exactly the one-block result.
+  const saved = globalThis.fetch;
+  globalThis.fetch = async (url, opts) => {
+    const body = JSON.parse(opts.body);
+    if (body.system.includes('"Your Session"')) return { ok: false, status: 500, json: async () => ({ error: { message: 'boom' } }), text: async () => 'boom' };
+    return saved(url, opts);
+  };
+  let out = null;
+  try { out = await generateEpilogueText(epilogue, summary('record_exactly'), 'Closing prose.', 'k', null, [], false, played, FIDELITY, [], [], { recapWithDebrief: true }); }
+  catch (e) { out = { error: e.message }; }
+  globalThis.fetch = saved;
+  check('recap call fails → session_block is the authored debrief, no session_debrief', out?.session_block === FIDELITY && !('session_debrief' in out), JSON.stringify(out));
+}
+{
+  calls.length = 0;
+  const out = await generateEpilogueText(epilogue, { ...summary('x'), closure_state: { met: false } }, 'Closing prose.', 'k', null, [], false, played, null, [], [], { recapWithDebrief: true });
+  check('recapWithDebrief with no authored debrief → the ordinary model session block', out.session_block === 'Model session text.' && !('session_debrief' in out)
+    && calls.some(c => c.block === 'session' && c.system.includes('Describe what this player did')));
+}
+
+head('client + transcripts carry session_debrief after the recap');
+{
+  const dom = new JSDOM(html);
+  const deb = dom.window.document.getElementById('closing-epilogue-session-debrief');
+  check('closing screen: a debrief element sits after the recap text inside "Your Session"',
+    !!deb && deb.previousElementSibling?.id === 'closing-epilogue-session-text' && deb.parentElement?.id === 'closing-epilogue-session');
+  check('done handler fills it from evt.epilogue.session_debrief',
+    /const debriefText = evt\.epilogue\?\.session_debrief \|\| '';/.test(html) && /epSessionDebriefEl\.textContent = debriefText;/.test(html));
+  check('narration speaks it after the recap', /speakAtLeast\(epSessionTextEl\.textContent\);\s*\n\s*if \(epSessionDebriefEl\?\.textContent\) await speakAtLeast\(epSessionDebriefEl\.textContent\);/.test(html));
+  check('empty debrief element is hidden (one-block sessions look as before)', html.includes('.closing-epilogue-debrief:empty { display: none; }'));
+  const router = fs.readFileSync(path.join(REPO_DIR, 'engine/server/gameRouter.js'), 'utf8');
+  check('session transcript: debrief follows the recap under ## Your Session', router.includes("if (epilogueResult.session_debrief) lines.push('', epilogueResult.session_debrief);"));
+  check('demo transcript stores session_debrief', router.includes('session_debrief: epilogueResult.session_debrief'));
+  const exp = fs.readFileSync(path.join(REPO_DIR, 'scripts/export-demo-transcripts.mjs'), 'utf8');
+  check('demo export prints it after the recap', exp.includes("if (r.closing.session_debrief) lines.push(r.closing.session_debrief, '');"));
+}
 
 head('no debrief → session prompt identical to the committed (HEAD) code');
 const headPath = path.join(REPO_DIR, 'engine/server/.__head_gameRouter.test.js');

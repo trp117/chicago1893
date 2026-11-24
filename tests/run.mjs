@@ -38,6 +38,7 @@ const SUITE = [
   ['B2b-PLAYER: scene header + bridge (jsdom)', 'scene-player.test.mjs'],
   ['TTS: narration speed on every request',  'tts-speed.test.mjs'],
   ['fork options: authored debrief + label',  'fork-debrief.test.mjs'],
+  ['fork branch flag + debrief variants',     'fork-branch-flag.test.mjs'],
   ['Manchon witness crucible (Stage 2)',     'manchon-crucible.test.mjs'],
   ['decision hold: a chosen path sticks',     'decision-hold.test.mjs'],
   ['soft target + grace margin',              'grace.test.mjs'],

@@ -66,6 +66,7 @@ for (const r of rows) {
     lines.push('### Closing', '');
     if (r.closing.prose)         lines.push(quote(r.closing.prose), '');
     if (r.closing.session_block) lines.push('**Your Session**', '', r.closing.session_block, '');
+    if (r.closing.session_debrief) lines.push(r.closing.session_debrief, '');
     if (r.closing.record_block)  lines.push('**Historical Record**', '', r.closing.record_block, '');
   }
 }

@@ -394,6 +394,33 @@ function preserveStoredDefiningMoment(repos, role) {
   return role;
 }
 
+// FORK KEYS NO EDITOR RENDERS — branch_flag and debrief_with_recap on the block, and
+// debrief_variants on each option (PromptComposer: forkBranchFlag, forkDebriefWithRecap,
+// authoredForkDebrief). preserveStoredDefiningMoment above only acts when the client sends NO
+// block; a client that sends a real one is honored whole, so a tab loaded before these keys were
+// written posts the block without them and the save drops them. Same class as the story_clock
+// guard (preserveStoredStoryClock): for the SAME block (same id), an ABSENT key keeps the stored
+// value and an explicit null removes it. Options are matched by id. A different block id is a
+// replacement and is honored as sent. Mutates and returns the role.
+const DM_UNRENDERED_BLOCK_KEYS = ['branch_flag', 'debrief_with_recap'];
+export function preserveStoredForkExtensions(repos, role) {
+  const dm = role?.defining_moment;
+  if (!hasRealDefiningMoment(dm)) return role;
+  const stored = repos.scenarios.findPlayerRole(role.id)?.defining_moment;
+  if (!hasRealDefiningMoment(stored) || stored.id !== dm.id) return role;
+  const copy = v => JSON.parse(JSON.stringify(v));
+  const keep = (target, source, k) => {
+    if (!(k in target)) { if (source && source[k] !== undefined) target[k] = copy(source[k]); }
+    else if (target[k] === null) delete target[k];
+  };
+  for (const k of DM_UNRENDERED_BLOCK_KEYS) keep(dm, stored, k);
+  for (const o of Array.isArray(dm.options) ? dm.options : []) {
+    if (!o || typeof o !== 'object') continue;
+    keep(o, stored.options.find(s => s?.id === o.id), 'debrief_variants');
+  }
+  return role;
+}
+
 // ── Role archetype ────────────────────────────────────────────────────────────
 // ARCHETYPE — what KIND of role this is, stored durably on the role itself. It is the
 // property the artifact generators will gate on (a fork for a role that cannot carry one,
@@ -851,6 +878,7 @@ function preserveStoredRoleBlocks(repos, role) {
   };
   preserveStoredEndingNotes(shim, role);
   preserveStoredDefiningMoment(shim, role);
+  preserveStoredForkExtensions(shim, role);   // after it: a restored block already has its keys
   preserveStoredArchetype(shim, role);
   preserveStoredArchetypeProposal(shim, role);
   preserveStoredAnchoredLocation(shim, role);
@@ -891,7 +919,7 @@ export function checkDefiningMoment(role, block, { lever = role?.witness_lever ?
 // content changed, or one being marked reviewed (approval is a decision point, as publishing is
 // for the glossary gate). A stored block that predates a tightened rule is grandfathered until
 // someone touches it, so tightening a rule never freezes an unrelated save.
-const DM_CHECKED_KEYS = ['id', 'setup', 'options', 'principal_transition'];
+const DM_CHECKED_KEYS = ['id', 'setup', 'options', 'principal_transition', 'branch_flag', 'debrief_with_recap'];
 function definingMomentTouched(next, stored) {
   if (!hasRealDefiningMoment(stored)) return true;
   const pick = b => JSON.stringify(DM_CHECKED_KEYS.map(k => b?.[k] ?? null));
@@ -2101,6 +2129,22 @@ function definingMomentStructureFindings(block) {
       for (const k of ['label', 'debrief']) {
         if (o && o[k] !== undefined && typeof o[k] !== 'string') add(loc(i, k), `option ${i + 1}: "${k}" must be text.`);
       }
+      // debrief_variants (optional): [{ when: { flag, equals: boolean }, debrief }], read by
+      // authoredForkDebrief, with the plain debrief as the fallback it falls back to.
+      if (o && o.debrief_variants !== undefined) {
+        if (!Array.isArray(o.debrief_variants)) add(loc(i, 'debrief_variants'), `option ${i + 1}: "debrief_variants" must be a list.`);
+        else {
+          if (o.debrief_variants.length && !(typeof o.debrief === 'string' && o.debrief.trim())) {
+            add(loc(i, 'debrief_variants'), `option ${i + 1}: "debrief_variants" needs a plain "debrief" as the fallback.`);
+          }
+          o.debrief_variants.forEach((v, j) => {
+            if (!v || typeof v.when?.flag !== 'string' || !v.when.flag.trim() || typeof v.when.equals !== 'boolean') {
+              add(loc(i, `debrief_variants.${j}.when`), `option ${i + 1}, variant ${j + 1}: "when" must be { "flag": "<name>", "equals": true|false }.`);
+            }
+            if (!v || typeof v.debrief !== 'string' || !v.debrief.trim()) add(loc(i, `debrief_variants.${j}.debrief`), `option ${i + 1}, variant ${j + 1}: "debrief" is empty.`);
+          });
+        }
+      }
     });
     const ids = block.options.map(o => o?.id);
     if (new Set(ids).size !== ids.length) add('options', 'option ids must be unique.');
@@ -2114,6 +2158,17 @@ function definingMomentStructureFindings(block) {
   }
   if (block.at_elapsed_fraction != null && typeof block.at_elapsed_fraction !== 'number') {
     add('block.at_elapsed_fraction', `"at_elapsed_fraction" must be a number (got ${JSON.stringify(block.at_elapsed_fraction)}).`);
+  }
+  // branch_flag (optional): the flag the fork turn branches on (PromptComposer.forkBranchFlag).
+  if (block.branch_flag !== undefined) {
+    const b = block.branch_flag;
+    if (!b || typeof b !== 'object' || Array.isArray(b)) add('block.branch_flag', '"branch_flag" must be { flag, set_when, narrate_if_true, narrate_if_false }.');
+    else for (const k of ['flag', 'set_when', 'narrate_if_true', 'narrate_if_false']) {
+      if (typeof b[k] !== 'string' || !b[k].trim()) add('block.branch_flag', `"branch_flag.${k}" is empty.`);
+    }
+  }
+  if (block.debrief_with_recap !== undefined && typeof block.debrief_with_recap !== 'boolean') {
+    add('block.debrief_with_recap', `"debrief_with_recap" must be true or false (got ${JSON.stringify(block.debrief_with_recap)}).`);
   }
   return out;
 }

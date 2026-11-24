@@ -177,15 +177,22 @@ export function lintCrucibleBlock(block, { path = 'protagonist', generated = tru
     if (blame.length)  add(prose, 'blame', location, `blame phrasing (${blame.join(', ')}).`);
   };
   banned('setup', block?.setup);
+  // Every debrief the player can be shown: the plain one and each flag-keyed variant
+  // (options[].debrief_variants) — the same prose rules and budget apply to all of them.
+  const variantDebriefs = (o, i) => (Array.isArray(o?.debrief_variants) ? o.debrief_variants : [])
+    .map((v, j) => [loc(i, `debrief_variants.${j}.debrief`), v?.debrief]);
+  const allDebriefs = (o, i) => [[loc(i, 'debrief'), o?.debrief], ...variantDebriefs(o, i)];
   options.forEach((o, i) => {
-    if (!str(o?.debrief)) return;
-    banned(loc(i, 'debrief'), o.debrief);
-    const claim = hits(OUTCOME_CLAIM_PATTERNS, o.debrief);
-    if (claim.length) add(prose, 'outcome_claim', loc(i, 'debrief'), `claims the outcome was changed (${claim.join(', ')}).`);
+    for (const [at, d] of allDebriefs(o, i)) {
+      if (!str(d)) continue;
+      banned(at, d);
+      const claim = hits(OUTCOME_CLAIM_PATTERNS, d);
+      if (claim.length) add(prose, 'outcome_claim', at, `claims the outcome was changed (${claim.join(', ')}).`);
+    }
   });
   // Authoring vocabulary and source hedges, everywhere the player reads.
   const fields = [['setup', block?.setup], ...options.flatMap((o, i) =>
-    [[loc(i, 'text'), o?.text], [loc(i, 'label'), o?.label], [loc(i, 'debrief'), o?.debrief]])];
+    [[loc(i, 'text'), o?.text], [loc(i, 'label'), o?.label], ...allDebriefs(o, i)])];
   const quoted = found => found.map(t => `"${t}"`).join(', ');
   for (const [at, text] of fields) {
     if (!str(text)) continue;
@@ -232,7 +239,7 @@ export function lintCrucibleBlock(block, { path = 'protagonist', generated = tru
   if (witness) within('setup', wordCount(block?.setup), budget.setup);
   options.forEach((o, i) => {
     if (witness) within(loc(i, 'text'), wordCount(o?.text), budget.option_text);
-    if (str(o?.debrief)) within(loc(i, 'debrief'), wordCount(o.debrief), budget.debrief);
+    for (const [at, d] of allDebriefs(o, i)) if (str(d)) within(at, wordCount(d), budget.debrief);
   });
   return lintResult(findings);
 }

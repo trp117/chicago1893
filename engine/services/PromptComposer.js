@@ -1297,11 +1297,89 @@ export function evaluateDefiningMoment(state, scenario) {
 //
 // Deliberately NOT exposed through evaluateDefiningMoment: that object is JSON'd whole into
 // the epilogue prompts, and the record block must not receive a page of session prose.
-export function authoredForkDebrief(block, definingState) {
+//
+// DEBRIEF VARIANTS (options[].debrief_variants, optional). An option may carry debriefs keyed
+// on a flag — [{ when: { flag, equals }, debrief }] — tried in order; the first whose flag
+// matches wins, and the plain `debrief` is the fallback. The flag is read through
+// forkFlagValue: the value FROZEN when the fork was put (so the debrief reads the same fact the
+// player saw narrated), else the live flag. Without `state` no variant can be judged and the
+// plain debrief is returned. An option with no variants returns exactly what it always did.
+export function authoredForkDebrief(block, definingState, state = null) {
   if (definingState?.met !== true || !Array.isArray(block?.options)) return null;
   const chosen = block.options.find(o => o?.id === definingState.decision);
+  if (state && Array.isArray(chosen?.debrief_variants)) {
+    for (const v of chosen.debrief_variants) {
+      const flag = typeof v?.when?.flag === 'string' ? v.when.flag.trim() : '';
+      const text = typeof v?.debrief === 'string' ? v.debrief.trim() : '';
+      if (!flag || typeof v.when.equals !== 'boolean' || !text) continue;
+      if (forkFlagValue(state, block, flag) === v.when.equals) return text;
+    }
+  }
   const text   = typeof chosen?.debrief === 'string' ? chosen.debrief.trim() : '';
   return text || null;
+}
+
+// ── FORK BRANCH FLAG ──────────────────────────────────────────────────────────
+// A fork whose setup depends on something the player did or did not bring about (Cantigny:
+// whether Hartney's correction reached the dugout) names that fact as a FLAG on the block:
+//
+//   branch_flag: { flag, set_when, narrate_if_true, narrate_if_false }
+//
+//   set_when          what has to actually happen on the page for the flag to go true; before
+//                     the fork, every turn carries a directive to emit it (buildForkBranchFlagDirective)
+//   narrate_if_*      the branch the fork turn narrates; the ENGINE picks it from the flag, so
+//                     the model never judges for itself which world the player is in
+//
+// The flag's value is FROZEN when the fork is put (forkBranchSnapshot → state.forkFlags) and
+// copied onto the decision record (StateManager.recordDefiningDecision), so the debrief
+// variant chosen at the end reads the same value the fork turn narrated — a later flag change
+// cannot move it. A block without branch_flag and without debrief_variants freezes nothing.
+export function forkBranchFlag(block) {
+  const b = block?.branch_flag;
+  const s = v => (typeof v === 'string' ? v.trim() : '');
+  if (!b || typeof b !== 'object' || !s(b.flag)) return null;
+  return { flag: s(b.flag), set_when: s(b.set_when), narrate_if_true: s(b.narrate_if_true), narrate_if_false: s(b.narrate_if_false) };
+}
+
+// Every flag the block reads at the end of the session: its branch flag and each variant's
+// `when.flag`. These — and only these — are frozen when the fork is put.
+export function forkFrozenFlagNames(block) {
+  const names = new Set();
+  const branch = forkBranchFlag(block);
+  if (branch) names.add(branch.flag);
+  for (const o of Array.isArray(block?.options) ? block.options : []) {
+    for (const v of Array.isArray(o?.debrief_variants) ? o.debrief_variants : []) {
+      if (typeof v?.when?.flag === 'string' && v.when.flag.trim()) names.add(v.when.flag.trim());
+    }
+  }
+  return [...names];
+}
+
+// The frozen values, read off the state the fork turn is composed from: { flag: boolean }.
+// null when the block reads no flag. The ONE reader both the fork turn's narration
+// (buildDefiningMomentInstruction) and the freeze (gameRouter) go through, so they agree.
+export function forkBranchSnapshot(state, block) {
+  const names = forkFrozenFlagNames(block);
+  if (!names.length) return null;
+  return Object.fromEntries(names.map(n => [n, state?.flags?.[n] === true]));
+}
+
+// A flag's value for the debrief: frozen on the decision record, else frozen at presentation
+// (a fork put but not yet answered), else live.
+export function forkFlagValue(state, block, flag) {
+  const moment = block?.principal_transition?.moment;
+  const rec    = moment ? state?.decisions?.[moment] : null;
+  const frozen = rec && typeof rec === 'object' && rec.flags && typeof rec.flags === 'object' ? rec.flags
+               : state?.forkFlags && typeof state.forkFlags === 'object' ? state.forkFlags : null;
+  if (frozen && Object.prototype.hasOwnProperty.call(frozen, flag)) return frozen[flag] === true;
+  return state?.flags?.[flag] === true;
+}
+
+// TWO-BLOCK "YOUR SESSION" (opt-in per fork): debrief_with_recap: true puts the player's own
+// model-written lead-up recap first and the authored debrief after it as the capstone. Off —
+// absent or anything but true — the authored debrief alone is the block, as before.
+export function forkDebriefWithRecap(block) {
+  return block?.debrief_with_recap === true;
 }
 
 // Whether a met closure transition should DRIVE/PERMIT the close *right now*:
@@ -1472,10 +1550,18 @@ export function buildDefiningMomentInstruction(state, scenario, storyArc = null)
   if (!definingMomentDue(state, scenario, storyArc)) return '';
   const block = resolveDefiningMomentBlock(state, scenario);
   const setup = typeof block?.setup === 'string' ? block.setup.trim() : '';
+  // Branch flag: the engine, not the model, says which world this turn is in — read from the
+  // same snapshot gameRouter freezes onto state when it puts the fork.
+  const branch     = forkBranchFlag(block);
+  const branchVal  = branch ? forkBranchSnapshot(state, block)?.[branch.flag] === true : null;
+  const branchText = branch ? (branchVal ? branch.narrate_if_true : branch.narrate_if_false) : '';
   return [
     '⚑ DEFINING MOMENT (THIS TURN): Bring the scene to the choice this character has been carrying, and stop at it.',
     setup
       ? `The authored shape of this moment — narrate INTO it. Do not reproduce it verbatim, do not contradict it, do not add a resolution it does not have:\n${setup}`
+      : '',
+    branchText
+      ? `WHAT HAS HAPPENED (engine state, settled — this overrides any "if … / if not …" in the shape above; narrate this branch and no other):\n${branchText}`
       : '',
     'Escalate what is already in the room to its peak: what the fire, the people present, and the passing time are each doing to make this unavoidable NOW. The last line of your narrative must leave the decision standing open — end at the threshold, mid-pressure.',
     'You MUST NOT resolve it. Do not narrate the player character choosing, moving on the choice, speaking the decision, or having already decided. Do not describe what follows from any option. Do not have an NPC decide for them. The choice belongs to the player.',
@@ -1531,6 +1617,25 @@ export function buildClosureFlagDirective(state, scenario) {
     ? `When ${principal.flag_trigger}, `
     : 'When the moment this arc resolves on is reached, ';
   return `⚑ CLOSURE FLAG: ${when}you MUST emit stateChanges: { flags: { "${principal.flag}": true } } in that turn's response. Set it the instant it becomes true and never unset it.`;
+}
+
+// Standing per-turn directive that DRIVES a fork's branch flag (forkBranchFlag) BEFORE the fork:
+// the turn the authored set_when actually happens, the model emits the flag. Sibling of
+// buildClosureFlagDirective. '' unless the flag is on, the fork is live, it carries a branch_flag
+// with a set_when, and the fork is still ahead (not due, not put, not answered) with the flag not
+// yet true — once the fork is due the value is frozen and nothing after it can matter. Every
+// block without branch_flag composes a byte-identical prompt.
+export function buildForkBranchFlagDirective(state, scenario, storyArc = null) {
+  if (!DEFINING_MOMENT_ENABLED) return '';
+  const block  = resolveDefiningMomentBlock(state, scenario);
+  const branch = forkBranchFlag(block);
+  if (!branch?.set_when || !definingMomentLive(block)) return '';
+  if (state?.definingMomentPresented) return '';
+  const momentId = block.principal_transition?.moment;
+  if (momentId && state?.decisions?.[momentId] != null) return '';
+  if (state?.flags?.[branch.flag] === true) return '';
+  if (definingMomentDue(state, scenario, storyArc)) return '';
+  return `⚑ STORY FLAG: The turn ${branch.set_when}, you MUST emit stateChanges: { flags: { "${branch.flag}": true } } in that turn's response. Only when it actually happens on the page in that turn — not when it is attempted, sent for, hoped for or still under way. Set it once and never unset it.`;
 }
 
 // The story arc's beats flattened into story order, each carrying the act it sits in. Only
@@ -1890,6 +1995,9 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     // STORY CLOCK bookkeeping (StoryClock.js) — the display label and the last narrated time.
     // The narrator is told the time by the ⚑ STORY CLOCK directive; absent on every other session.
     storyClock: _storyClockLabel, storyClockLast,
+    // forkFlags: the branch-flag values frozen when the fork was put — bookkeeping for the
+    // debrief; the fork turn is told its branch by buildDefiningMomentInstruction.
+    forkFlags: _forkFlags,
     ...stateRest
   } = state;
   // A clock session (gameData.storyClock, built by the router only when STORY_CLOCK_ENABLED and
@@ -1920,6 +2028,7 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
     .replace('{{CLOSURE_FLAG_DIRECTIVE}}', [
       storyClock?.directive,
       buildClosureFlagDirective(state, scenario),
+      buildForkBranchFlagDirective(state, scenario, storyArc),
       buildStoryPositionDirective(state, scenario, storyArc),
       sceneFramingDirective(state, scenario, storyArc, locations),
     ].filter(Boolean).join('\n\n'))

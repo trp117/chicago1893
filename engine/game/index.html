@@ -168,6 +168,7 @@ li { margin-bottom: 8px; }
 .closing-epilogue-block { display: none; }
 .closing-epilogue-block.visible { display: block; }
 .closing-epilogue-block.visible + .closing-epilogue-block.visible { margin-top: 1.4em; }
+.closing-epilogue-debrief:empty { display: none; }
 .closing-epilogue-loading { display: none; text-align: center; margin-top: 2.4em; }
 .closing-epilogue-loading.visible { display: flex; align-items: center; justify-content: center; gap: 0.5em; overflow: hidden; transition: opacity 0.6s ease, height 0.4s ease 0.6s, margin-top 0.4s ease 0.6s; }
 /* Cross-fade out as the epilogue fades in, then collapse so the epilogue slides into its place. */
@@ -878,6 +879,7 @@ li { margin-bottom: 8px; }
       <div id="closing-epilogue-session" class="closing-epilogue-block">
         <div class="closing-epilogue-label">Your Session</div>
         <div id="closing-epilogue-session-text" class="closing-epilogue-text"></div>
+        <div id="closing-epilogue-session-debrief" class="closing-epilogue-text closing-epilogue-debrief"></div>
       </div>
       <div id="closing-epilogue-record" class="closing-epilogue-block">
         <div class="closing-epilogue-label">Historical Record</div>
@@ -1650,6 +1652,8 @@ function showClosingScreen(endState, sessionId) {
   const epilogueEl    = document.getElementById('closing-epilogue');
   const epSessionEl     = document.getElementById('closing-epilogue-session');
   const epSessionTextEl = document.getElementById('closing-epilogue-session-text');
+  // Two-block fork (debrief_with_recap): the authored debrief, after the player's recap.
+  const epSessionDebriefEl = document.getElementById('closing-epilogue-session-debrief');
   const epRecordEl      = document.getElementById('closing-epilogue-record');
   const epRecordTextEl  = document.getElementById('closing-epilogue-record-text');
   const reflEl        = document.getElementById('closing-reflection');
@@ -1763,6 +1767,7 @@ function showClosingScreen(endState, sessionId) {
       if (hasEpilogue) {
         revealEpilogue();
         if (epSessionTextEl?.textContent) await speakAtLeast(epSessionTextEl.textContent);
+        if (epSessionDebriefEl?.textContent) await speakAtLeast(epSessionDebriefEl.textContent);
         if (epRecordTextEl?.textContent)  await speakAtLeast(epRecordTextEl.textContent);
       }
       if (hasReflection && reflEl) {
@@ -1848,11 +1853,13 @@ function showClosingScreen(endState, sessionId) {
             let hasBibliography  = false;
             let hasCompositeNote = false;
             const sessionText = evt.epilogue?.session_block || '';
+            const debriefText = evt.epilogue?.session_debrief || '';
             const recordText  = evt.epilogue?.record_block  || '';
             if (sessionText || recordText) {
               hasEpilogue = true;
               if (sessionText && epSessionEl && epSessionTextEl) {
                 epSessionTextEl.textContent = sessionText;
+                if (epSessionDebriefEl) epSessionDebriefEl.textContent = debriefText;
                 epSessionEl.classList.add('visible');
               }
               if (recordText && epRecordEl && epRecordTextEl) {
