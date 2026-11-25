@@ -636,19 +636,28 @@ export function recordWordBudget(layer1Fates) {
 // can be found. Exported for tests.
 // RECAP LENGTH. The prompt asks for about 60–110 words; the CEILING is enforced after the call
 // (enforceRecapCeiling) — the prompt alone let a 112-word recap through against a 70-word target.
-export const RECAP_WORDS_MIN = 60, RECAP_WORDS_TARGET = 110, RECAP_WORDS_CEILING = 130;
+export const RECAP_WORDS_MIN = 60, RECAP_WORDS_TARGET = 110, RECAP_WORDS_CEILING = 150;
 export const countWords = t => (String(t ?? '').trim().match(/\S+/g) || []).length;
-// Cut at the last sentence end that keeps the text within `max` words. A text with no sentence end
-// inside the limit is cut at the word limit and closed with an ellipsis. Text already within it
-// is returned unchanged.
+// Bring the recap within `max` words by dropping its EARLIEST sentences. The recap ENDS AT THE
+// CHOICE, so the final sentence is the one that must survive — a tail cut (the first version of
+// this) removed exactly the choice. Paragraph breaks are kept. If the last sentence alone is still
+// over, its opening words go and it starts with an ellipsis. Text already within it is unchanged.
+const SENTENCE = /[^.!?]+(?:[.!?]+["'”’)\]]*|$)\s*/g;
 export function trimToSentenceCeiling(text, max = RECAP_WORDS_CEILING) {
   const t = String(text ?? '').trim();
   if (countWords(t) <= max) return t;
-  const words = t.split(/\s+/).slice(0, max);
-  for (let i = words.length - 1; i >= 0; i--) {
-    if (/[.!?]["'”’)]*$/.test(words[i])) return words.slice(0, i + 1).join(' ');
+  const paras = t.split(/\n\s*\n/).map(p => (p.match(SENTENCE) || []).map(s => s.trim()).filter(Boolean)).filter(p => p.length);
+  const total = () => paras.reduce((n, p) => n + p.reduce((m, s) => m + countWords(s), 0), 0);
+  const count = () => paras.reduce((n, p) => n + p.length, 0);
+  while (total() > max && count() > 1) {
+    paras[0].shift();
+    if (!paras[0].length) paras.shift();
   }
-  return words.join(' ').replace(/[,;:—–-]+$/, '') + '…';
+  if (total() > max) {
+    const words = paras[0][0].split(/\s+/);
+    paras[0][0] = '…' + words.slice(words.length - max).join(' ');
+  }
+  return paras.map(p => p.join(' ')).join('\n\n');
 }
 // Over the ceiling: ONE rewrite asked for (retry(words) → text or null), taken only if it is shorter;
 // whatever is still over is trimmed at a sentence. Never throws — a failed retry falls to the trim.

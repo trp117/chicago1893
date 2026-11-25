@@ -117,19 +117,27 @@ head('5. recap ceiling');
   const sent = n => Array.from({ length: n }, (_, i) => `Word${i}`).join(' ');
   const short = sent(9) + '.';
   check('countWords', GR.countWords('  a b\nc ') === 3);
-  check('≤130 unchanged, no retry', await GR.enforceRecapCeiling(short, async () => { throw new Error('must not retry'); }) === short);
-  const long = Array.from({ length: 15 }, () => sent(10) + '.').join(' ');   // 150 words, 10-word sentences
+  check('≤150 unchanged, no retry', await GR.enforceRecapCeiling(sent(150), async () => { throw new Error('must not retry'); }) === sent(150));
+  // 17 ten-word sentences = 170 words; the last one names the choice.
+  const CHOICE = 'Then you held the guns at the wire and gave no order.';
+  const body = Array.from({ length: 16 }, (_, i) => `S${i} ` + sent(9) + '.');
+  const long = [...body, CHOICE.replace('.', ' now.')].join(' ');
+  const choiceLast = long.split(/(?<=\.)\s/).pop();
   let asked = null;
-  const viaRetry = await GR.enforceRecapCeiling(long, async w => { asked = w; return Array.from({ length: 10 }, () => sent(10) + '.').join(' '); });
-  check('over: retry asked with the count', asked === 150);
-  check('over: shorter retry taken', GR.countWords(viaRetry) === 100);
+  const viaRetry = await GR.enforceRecapCeiling(long, async w => { asked = w; return body.slice(0, 9).join(' ') + ' ' + choiceLast; });
+  check('over: retry asked with the count', asked === GR.countWords(long), String(asked));
+  check('over: shorter retry taken', GR.countWords(viaRetry) === 103, String(GR.countWords(viaRetry)));
   const trimmed = await GR.enforceRecapCeiling(long, async () => null);
-  check('retry failed: trimmed at a sentence ≤130', GR.countWords(trimmed) === 130 && trimmed.endsWith('.'));
+  check('retry failed: ≤150 and the FINAL sentence (the choice) survives', GR.countWords(trimmed) <= 150 && trimmed.endsWith(choiceLast), String(GR.countWords(trimmed)));
+  check('retry failed: the EARLIEST sentences are the ones dropped', !trimmed.startsWith('S0 ') && trimmed.includes('S15 '));
   const longer = await GR.enforceRecapCeiling(long, async () => long + ' ' + long);
-  check('retry longer: ignored, original trimmed', GR.countWords(longer) === 130);
+  check('retry longer: ignored, original trimmed from the front', GR.countWords(longer) <= 150 && longer.endsWith(choiceLast));
+  const paras = await GR.enforceRecapCeiling(body.slice(0, 10).join(' ') + '\n\n' + body.slice(10).join(' ') + ' ' + choiceLast, async () => null);
+  check('paragraph break kept when the second paragraph survives', paras.includes('\n\n') ? paras.split('\n\n')[1].endsWith(choiceLast) : paras.endsWith(choiceLast));
   const runOn = sent(200);
-  check('no sentence end: cut at 130 + ellipsis', (await GR.enforceRecapCeiling(runOn, async () => null)).endsWith('…'));
-  check('RECAP constants', GR.RECAP_WORDS_MIN === 60 && GR.RECAP_WORDS_TARGET === 110 && GR.RECAP_WORDS_CEILING === 130);
+  const ro = await GR.enforceRecapCeiling(runOn, async () => null);
+  check('no sentence end: keeps the LAST 150 words, opens with an ellipsis', ro.startsWith('…') && ro.endsWith('Word199') && GR.countWords(ro) === 150);
+  check('RECAP constants', GR.RECAP_WORDS_MIN === 60 && GR.RECAP_WORDS_TARGET === 110 && GR.RECAP_WORDS_CEILING === 150);
 }
 
 head('6. admin keep-list');
