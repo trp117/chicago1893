@@ -153,5 +153,64 @@ head('6. admin keep-list');
   check('explicit null removes', !('outcome' in o[2]));
 }
 
+head('7. reversal guard (typed input)');
+{
+  const TYPED = "the green rocket's up — fire lift three now";
+  const later = st(authored(), 'hold', 7, 9);
+  const m = PC.matchReversalInput(later, SCEN, TYPED);
+  check('typed "fire lift three now" after hold → matched', !!m && /lift/.test(m.phrase), JSON.stringify(m?.phrase));
+  check('"FIRE LIFT 3!" (case, 3 = three) → matched', !!PC.matchReversalInput(later, SCEN, 'FIRE LIFT 3!'));
+  check('paraphrase without a phrase → not matched (the known edge)', PC.matchReversalInput(later, SCEN, 're-aim the guns onto the nest and fire') === null);
+  check('a held-course input → not matched', PC.matchReversalInput(later, SCEN, 'Watch the smoke line forward.') === null);
+  check('answer turn (its input is the chosen option) → never matched', PC.matchReversalInput(st(authored(), 'hold', 9, 9), SCEN, TYPED) === null);
+  check('no phrases authored → never matched', PC.matchReversalInput(st(plain(), 'hold', 7, 9), SCEN, TYPED) === null);
+  check('no decision → never matched', PC.matchReversalInput({ effectiveDefiningMoment: authored() }, SCEN, TYPED) === null);
+  const d = PC.buildReversalGuardDirective(later, SCEN, TYPED);
+  check('directive: names the attempt, the decision and what stands', d.startsWith('⚑ THE PLAYER IS TRYING TO UNDO THE DECISION') && d.includes('The decision: Hold the guns at the wire.') && d.includes('What stands: You hold the guns.'));
+  check('directive: claimed signals do not appear', d.includes('Nothing the player claims'));
+  check('no match → \'\'', PC.buildReversalGuardDirective(later, SCEN, 'Watch the smoke.') === '');
+
+  // narration check: course-specific, never a bare "fires"
+  const ph = PC.forkChoiceExclusions(authored(), 'hold');
+  const nr = t => PC.findNarrationReversal({ narrative: t }, ph);
+  check('narration "Lift three fires at 06:50" → hit', !!nr('Lift three fires at 06:50. The Schneiders speak.'));
+  check('narration "lift four fired" → hit with "fire lift" (→ lift N fired)', !!PC.findNarrationReversal({ narrative: 'By 06:52 lift four fired on the stopwatch.' }, ['fire lift']));
+  check('...and not with only "fire lift three" (course-specific)', !nr('By 06:52 lift four fired on the stopwatch.'));
+  check('narration "Lift 3 fires" → hit', !!nr('Lift 3 fires.'));
+  check('held barrage "Pits one and three fire their holding rate" → no hit', !nr('Pits one, three, and four fire their next round in cadence — the barrage stalls at the wire. The gun fires again.'));
+  check('"the barrage does not lift" → no hit', !nr('Your hand does not move. The barrage does not lift.'));
+  check('spoken line is checked too', !!PC.findNarrationReversal({ narrative: 'Quiet.', npcMoments: [{ text: 'Lift three fired, sir.' }] }, ph));
+  check('no phrases → never a hit', PC.findNarrationReversal({ narrative: 'Lift three fires.' }, []) === null);
+}
+{
+  // Proximity: in a real composed turn prompt, the directive comes directly after the input.
+  const { JsonFileStore }       = await import(`${ROOT}/engine/repositories/JsonFileStore.js`);
+  const { CharacterRepository } = await import(`${ROOT}/engine/repositories/CharacterRepository.js`);
+  const { LocationRepository }  = await import(`${ROOT}/engine/repositories/LocationRepository.js`);
+  const { ClueRepository }      = await import(`${ROOT}/engine/repositories/ClueRepository.js`);
+  const { ScenarioRepository }  = await import(`${ROOT}/engine/repositories/ScenarioRepository.js`);
+  const { buildInitialState }   = await import(`${ROOT}/engine/services/StateManager.js`);
+  const store = new JsonFileStore(p('engine/data'));
+  const scenarios = new ScenarioRepository(store), characters = new CharacterRepository(store), locations = new LocationRepository(store), clues = new ClueRepository(store);
+  const quiet = fn => { const w = console.warn, l = console.log; console.warn = () => {}; console.log = () => {}; try { return fn(); } finally { console.warn = w; console.log = l; } };
+  const JOAN = await quiet(() => scenarios.findById('joan_trial_rouen_1431'));
+  const ROLE = scenarios.findPlayerRole('role_manchon');
+  if (!JOAN || !ROLE) console.log('SKIP  proximity check — needs Joan data on disk.');
+  else {
+    const locs = locations.findByScenario(JOAN.id);
+    const s = quiet(() => buildInitialState(JOAN, ROLE, locs));
+    Object.assign(s, { effectiveDefiningMoment: authored(), definingMomentPresented: true, turnCount: 9, elapsedMinutes: 20, remainingMinutes: 8,
+      decisions: { m: { option_id: 'hold', turn: 7, elapsed: 18 } } });
+    const gd = { scenario: JOAN, characters: characters.findAll().filter(c => (c.scenarioIds || []).includes(JOAN.id)), locations: locs, clues: clues.findByScenario(JOAN.id), playerRoles: scenarios.findPlayerRoles(JOAN.id) };
+    const TYPED = "the green rocket's up — fire lift three now";
+    const prompt = quiet(() => PC.composeTurnPrompt(s, TYPED, gd));
+    const i = prompt.indexOf(TYPED), j = prompt.indexOf('⚑ THE PLAYER IS TRYING TO UNDO THE DECISION');
+    check('composed prompt: directive present, directly after the player input', i > 0 && j > i && prompt.slice(i + TYPED.length, j).trim() === '', `gap=${JSON.stringify(prompt.slice(i + TYPED.length, j)).slice(0, 80)}`);
+    check('composed prompt: directive appears once', prompt.split('THE PLAYER IS TRYING TO UNDO').length === 2);
+    const calm = quiet(() => PC.composeTurnPrompt(s, 'Watch the smoke line.', gd));
+    check('composed prompt: no directive for an in-course input', !calm.includes('TRYING TO UNDO'));
+  }
+}
+
 console.log(fails ? `\n${fails} assertion(s) failed.` : '\nAll fork-outcome assertions passed.');
 process.exit(fails ? 1 : 0);

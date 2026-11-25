@@ -29,6 +29,8 @@ import {
   FORK_FALLBACK_FRACTION_DEFAULT,
   decidedChoiceExclusions,
   filterExcludedChoices,
+  matchReversalInput,
+  findNarrationReversal,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime, readStoryClock, forkPinMinutes, forkHoldMinute, sessionMinuteAt } from '../services/StoryClock.js';
@@ -1795,6 +1797,12 @@ Do not open with the historical context. Open inside the character's body. Let t
       }
 
       const prompt = composeTurnPrompt(state, playerInput, gameData);
+      // REVERSAL GUARD (PromptComposer.matchReversalInput): the input asks for a course the player did
+      // NOT choose. The prompt already carries the targeted directive beside the input; here the
+      // turn's prose is held back from the stream and checked before it is shown (below), so a
+      // reversal is never streamed and then swapped out. null on every other turn — streamed as before.
+      const reversalGuard = matchReversalInput(state, scenario, playerInput);
+      if (reversalGuard) console.warn(`[DECISION-HOLD] typed reversal attempt ~ "${reversalGuard.phrase}" — guard directive in prompt, stream held for check`);
       // Scene sessions only: what the player is shown of the scene this turn plays in — from the
       // state the prompt was just composed from, bridge included exactly when the prompt had it.
       const turnScene = gameData.storyArc ? scenePresentation(state, scenario, gameData.storyArc, locations) : null;
@@ -1851,9 +1859,9 @@ Do not open with the historical context. Open inside the character's body. Let t
       });
       let { text, stopReason: streamStopReason, usage: streamUsage } = await collectAnthropicStream(
         streamResp,
-        chunk => sendSse(res, { type: 'chunk', text: chunk }),
+        chunk => { if (!reversalGuard) sendSse(res, { type: 'chunk', text: chunk }); },
         {
-          onSensoryChunk: chunk => sendSse(res, { type: 'chunk', field: 'sensory_opening', text: chunk }),
+          onSensoryChunk: chunk => { if (!reversalGuard) sendSse(res, { type: 'chunk', field: 'sensory_opening', text: chunk }); },
           onNarrativeEnd: () => sendSse(res, { type: 'narrative_end' }),
         },
       );
@@ -2077,6 +2085,36 @@ Do not open with the historical context. Open inside the character's body. Let t
       // Fix raw character ID leaks (e.g. "char_jim_lovell:" → "Jim Lovell:")
       if (output.narrative) {
         output.narrative = fixCharacterIdLeaks(output.narrative, characters);
+      }
+
+      // REVERSAL GUARD — output check. Only on a turn whose input asked for a not-chosen course: if
+      // the prose narrates that course anyway (the same phrases, plus their statement forms — "lift
+      // three fires"; never a bare "fires"), ONE corrective retry. The retry is taken whole (it has
+      // not been streamed) only if it is clean; otherwise the original ships and the miss is logged.
+      if (reversalGuard) {
+        const hit = findNarrationReversal(output, reversalGuard.phrases);
+        if (hit) {
+          traceTags.push('reversal-narrated');
+          console.warn(`[DECISION-HOLD] narration reversed the decision ("${hit.text}" ~ "${hit.phrase}") — corrective retry`);
+          let retryText = null;
+          try {
+            ({ text: retryText } = await callModel([
+              ...baseMessages,
+              { role: 'assistant', content: text || '' },
+              { role: 'user', content: `Your narration carried out a course the player did NOT choose ("${hit.text}"). The decision already made stands and cannot be reversed this session. Rewrite this turn as a single valid JSON object following the output contract: the player's attempt meets the held decision — the order is not carried out, nothing they claimed appears unless it was already on the page, and nothing from the course not taken happens. Choices must not lead toward it either.` },
+            ], null, 'retry-reversal'));
+          } catch { retryText = null; }
+          let cand = null;
+          if (retryText) { try { cand = extractJson(retryText); } catch { cand = null; } }
+          if (cand && typeof cand.narrative === 'string' && cand.narrative.trim() && !findNarrationReversal(cand, reversalGuard.phrases)) {
+            cand.narrative = fixCharacterIdLeaks(cand.narrative, characters);
+            output = cand; text = retryText;
+            console.log('[DECISION-HOLD] corrective retry held the decision');
+          } else {
+            traceTags.push('reversal-unrecovered');
+            console.warn('[DECISION-HOLD] corrective retry did not hold the decision — shipping the original');
+          }
+        }
       }
 
 

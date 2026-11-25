@@ -1656,6 +1656,71 @@ export function decidedChoiceExclusions(state, scenario) {
   return forkChoiceExclusions(resolveDefiningMomentBlock(state, scenario), dm.decision);
 }
 
+// ── REVERSAL GUARD (typed input) ─────────────────────────────────────────────────────────────
+// The choice filter only shapes BUTTONS. A player can still TYPE the course they did not choose
+// ("the green rocket's up — fire lift three now"), and a standing rule in the decision-hold block
+// lost that contest about half the time: the player's command sits right beside the narration
+// request. So when the input itself asks for a not-chosen course — matched against the same
+// excludes_in_choices phrases as the filter — a targeted directive is placed RIGHT AFTER the
+// player's input in the prompt, and gameRouter checks that turn's narration for the reversal
+// (findNarrationReversal) and retries once. Opt-in exactly as the filter: no phrases → never fires.
+// Never on the answer turn: its input IS the chosen option.
+export function matchReversalInput(state, scenario, playerInput) {
+  if (typeof playerInput !== 'string' || !playerInput.trim()) return null;
+  const phrases = decidedChoiceExclusions(state, scenario);
+  if (!phrases.length) return null;
+  const dm = evaluateDefiningMoment(state, scenario);
+  if (isDecisionAnswerTurn(state, dm.moment)) return null;
+  const hit = filterExcludedChoices([playerInput], phrases).dropped[0];
+  return hit ? { phrase: hit.phrase, phrases } : null;
+}
+export function buildReversalGuardDirective(state, scenario, playerInput) {
+  const m = matchReversalInput(state, scenario, playerInput);
+  if (!m) return '';
+  const dm      = evaluateDefiningMoment(state, scenario);
+  const block   = resolveDefiningMomentBlock(state, scenario);
+  const outcome = forkOptionOutcome((block?.options || []).find(o => o?.id === dm.decision));
+  return [
+    `⚑ THE PLAYER IS TRYING TO UNDO THE DECISION: this input asks for a course the player did NOT choose ("${m.phrase}"). The decision already made stands and cannot be reversed this session.`,
+    `The decision: ${dm.decision_text}`,
+    ...(outcome ? [`What stands: ${outcome}`] : []),
+    'Narrate the attempt meeting the decision: the order is not carried out — not partly, not late, not in secret. Nothing the player claims (a signal, a rocket, a runner, a restored line) appears unless it is already on the page. Nothing that follows from the course not taken happens. Show the character\'s attempt and the world holding.',
+  ].join('\n');
+}
+// Narration-side patterns for the same phrases: the phrase itself, plus its verb-object inversion,
+// since an imperative ("fire lift three") is narrated as a statement ("lift three fires", "lift
+// four fired"): object, at most one word, then the verb's -s / -ed form. Course-specific by
+// construction — a bare "fires" never matches, so a held barrage firing at the wire is not a hit.
+function verbForms(v) {
+  return v.endsWith('e') ? [v + 's', v + 'd'] : [v + 's', v + 'ed'];
+}
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export function narrationReversalPatterns(phrases) {
+  const out = [];
+  for (const p of phrases || []) {
+    const n = normalizeChoiceText(p).trim();
+    if (!n) continue;
+    out.push({ phrase: p, re: new RegExp(' ' + escRe(n) + ' ') });
+    const t = n.split(' ');
+    if (t.length >= 2) {
+      const obj = t.slice(1).join(' ');
+      out.push({ phrase: p, re: new RegExp(' ' + escRe(obj) + ' (?:[a-z]+ )?(?:' + verbForms(t[0]).map(escRe).join('|') + ') ') });
+    }
+  }
+  return out;
+}
+// { phrase, text } for the first reversal found in the turn's prose (narrative + spoken lines), else null.
+export function findNarrationReversal(output, phrases) {
+  const prose = [output?.sensory_opening, output?.narrative, ...(output?.npcMoments || []).map(m => m?.text)]
+    .filter(s => typeof s === 'string').join(' ');
+  const norm = normalizeChoiceText(prose);
+  for (const { phrase, re } of narrationReversalPatterns(phrases)) {
+    const m = norm.match(re);
+    if (m) return { phrase, text: m[0].trim() };
+  }
+  return null;
+}
+
 export function buildDecisionHoldDirective(state, scenario) {
   const dm   = evaluateDefiningMoment(state, scenario);
   const text = dm.met && typeof dm.decision_text === 'string' ? dm.decision_text.trim() : '';
@@ -2130,5 +2195,6 @@ export function composeTurnPrompt(state, playerInput, { scenario, characters, lo
       buildDecisionHoldDirective(state, scenario),
     ].filter(Boolean).join('\n\n'))
     .replace('{{CLOSING_INSTRUCTION}}',    buildClosingInstruction(state, scenario, storyArc))
-    .replace('{{PLAYER_INPUT}}',           resolvedInput);
+    // The reversal guard sits RIGHT AFTER the input it answers ('' on every other turn).
+    .replace('{{PLAYER_INPUT}}',           () => [resolvedInput, buildReversalGuardDirective(state, scenario, playerInput)].filter(Boolean).join('\n\n'));
 }
