@@ -395,14 +395,15 @@ function preserveStoredDefiningMoment(repos, role) {
 }
 
 // FORK KEYS NO EDITOR RENDERS — branch_flag and debrief_with_recap on the block, and
-// debrief_variants on each option (PromptComposer: forkBranchFlag, forkDebriefWithRecap,
-// authoredForkDebrief). preserveStoredDefiningMoment above only acts when the client sends NO
+// debrief_variants, outcome and excludes_in_choices on each option (PromptComposer: forkBranchFlag,
+// forkDebriefWithRecap, authoredForkDebrief, forkOptionOutcome, forkChoiceExclusions). preserveStoredDefiningMoment above only acts when the client sends NO
 // block; a client that sends a real one is honored whole, so a tab loaded before these keys were
 // written posts the block without them and the save drops them. Same class as the story_clock
 // guard (preserveStoredStoryClock): for the SAME block (same id), an ABSENT key keeps the stored
 // value and an explicit null removes it. Options are matched by id. A different block id is a
 // replacement and is honored as sent. Mutates and returns the role.
 const DM_UNRENDERED_BLOCK_KEYS = ['branch_flag', 'debrief_with_recap'];
+const DM_UNRENDERED_OPTION_KEYS = ['debrief_variants', 'outcome', 'excludes_in_choices'];
 export function preserveStoredForkExtensions(repos, role) {
   const dm = role?.defining_moment;
   if (!hasRealDefiningMoment(dm)) return role;
@@ -416,7 +417,8 @@ export function preserveStoredForkExtensions(repos, role) {
   for (const k of DM_UNRENDERED_BLOCK_KEYS) keep(dm, stored, k);
   for (const o of Array.isArray(dm.options) ? dm.options : []) {
     if (!o || typeof o !== 'object') continue;
-    keep(o, stored.options.find(s => s?.id === o.id), 'debrief_variants');
+    const so = stored.options.find(s => s?.id === o.id);
+    for (const k of DM_UNRENDERED_OPTION_KEYS) keep(o, so, k);
   }
   return role;
 }
@@ -2128,6 +2130,16 @@ function definingMomentStructureFindings(block) {
       // lintCrucibleBlock's job (CrucibleLint.js), per path.
       for (const k of ['label', 'debrief']) {
         if (o && o[k] !== undefined && typeof o[k] !== 'string') add(loc(i, k), `option ${i + 1}: "${k}" must be text.`);
+      }
+      // outcome (optional): what the answer turn MUST narrate (buildDecisionHoldDirective).
+      if (o && o.outcome !== undefined && (typeof o.outcome !== 'string' || !o.outcome.trim())) {
+        add(loc(i, 'outcome'), `option ${i + 1}: "outcome" must be non-empty text.`);
+      }
+      // excludes_in_choices (optional): phrases that mark a choice as leading toward THIS option,
+      // dropped from the choices offered after any OTHER option is chosen (filterExcludedChoices).
+      if (o && o.excludes_in_choices !== undefined
+          && (!Array.isArray(o.excludes_in_choices) || o.excludes_in_choices.some(p => typeof p !== 'string' || !p.trim()))) {
+        add(loc(i, 'excludes_in_choices'), `option ${i + 1}: "excludes_in_choices" must be a list of non-empty phrases.`);
       }
       // debrief_variants (optional): [{ when: { flag, equals: boolean }, debrief }], read by
       // authoredForkDebrief, with the plain debrief as the fallback it falls back to.

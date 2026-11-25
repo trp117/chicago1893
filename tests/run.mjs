@@ -41,6 +41,7 @@ const SUITE = [
   ['fork branch flag + debrief variants',     'fork-branch-flag.test.mjs'],
   ['Manchon witness crucible (Stage 2)',     'manchon-crucible.test.mjs'],
   ['decision hold: a chosen path sticks',     'decision-hold.test.mjs'],
+  ['fork outcome: authored consequence + choice filter + recap ceiling', 'fork-outcome.test.mjs'],
   ['soft target + grace margin',              'grace.test.mjs'],
   ['Massieu witness crucible',                'massieu-crucible.test.mjs'],
   ['narrative salvage: no JSON on screen',     'narrative-salvage.test.mjs'],

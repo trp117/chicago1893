@@ -27,6 +27,8 @@ import {
   isStoryBoundFork,
   DEFINING_MOMENT_ENABLED,
   FORK_FALLBACK_FRACTION_DEFAULT,
+  decidedChoiceExclusions,
+  filterExcludedChoices,
 } from '../services/PromptComposer.js';
 import { mergeState, buildInitialState, recordDefiningDecision, loadStoryArc, initSceneState, advanceScene, recordReachedBeats, holdSceneLocation } from '../services/StateManager.js';
 import { loadClockArc, storyClockTurn, storyMinutesAt, formatStoryTime, readStoryClock, forkPinMinutes, forkHoldMinute, sessionMinuteAt } from '../services/StoryClock.js';
@@ -632,6 +634,36 @@ export function recordWordBudget(layer1Fates) {
 // tells what it led to — and it is never handed the debrief text, the closing prose (which shows
 // how the night ended) or AFTER THE CHOICE. Inputs after the choice are cut at the choice when it
 // can be found. Exported for tests.
+// RECAP LENGTH. The prompt asks for about 60–110 words; the CEILING is enforced after the call
+// (enforceRecapCeiling) — the prompt alone let a 112-word recap through against a 70-word target.
+export const RECAP_WORDS_MIN = 60, RECAP_WORDS_TARGET = 110, RECAP_WORDS_CEILING = 130;
+export const countWords = t => (String(t ?? '').trim().match(/\S+/g) || []).length;
+// Cut at the last sentence end that keeps the text within `max` words. A text with no sentence end
+// inside the limit is cut at the word limit and closed with an ellipsis. Text already within it
+// is returned unchanged.
+export function trimToSentenceCeiling(text, max = RECAP_WORDS_CEILING) {
+  const t = String(text ?? '').trim();
+  if (countWords(t) <= max) return t;
+  const words = t.split(/\s+/).slice(0, max);
+  for (let i = words.length - 1; i >= 0; i--) {
+    if (/[.!?]["'”’)]*$/.test(words[i])) return words.slice(0, i + 1).join(' ');
+  }
+  return words.join(' ').replace(/[,;:—–-]+$/, '') + '…';
+}
+// Over the ceiling: ONE rewrite asked for (retry(words) → text or null), taken only if it is shorter;
+// whatever is still over is trimmed at a sentence. Never throws — a failed retry falls to the trim.
+export async function enforceRecapCeiling(recap, retry) {
+  let t = String(recap ?? '').trim();
+  if (countWords(t) <= RECAP_WORDS_CEILING) return t;
+  const before = countWords(t);
+  let again = null;
+  try { again = await retry(before); } catch { again = null; }
+  if (typeof again === 'string' && again.trim() && countWords(again) < before) t = again.trim();
+  const out = trimToSentenceCeiling(t);
+  console.warn(`[EPILOGUE] recap over ${RECAP_WORDS_CEILING} words (${before}) — retry ${again ? countWords(again) : 'failed'}, shipped ${countWords(out)}`);
+  return out;
+}
+
 export function buildLeadUpRecapPrompt(sessionSummary, sessionNpcList = [], playerActions = []) {
   const definingState = sessionSummary?.closure_state?.defining_moment_state || null;
   const all        = Array.isArray(playerActions) ? playerActions.filter(a => typeof a === 'string' && a.trim()) : [];
@@ -643,7 +675,7 @@ export function buildLeadUpRecapPrompt(sessionSummary, sessionNpcList = [], play
     '',
     'On the same screen, directly after your recap, an authored passage tells what the defining choice led to. Your part is only the lead-up: what this person did across the session, up to and around the choice they made.',
     '',
-    'Length: 40–70 words.',
+    `Length: about ${RECAP_WORDS_MIN}–${RECAP_WORDS_TARGET} words, never more than ${RECAP_WORDS_CEILING}.`,
     'Voice: second person, past tense. Not documentary. Not historian\'s record.',
     '',
     'Rules:',
@@ -846,6 +878,11 @@ export async function generateEpilogueText(epilogueData, sessionSummary, closing
         apiKey: anthropicApiKey, system: p.system, content: p.content,
         maxTokens: 300, retryMaxTokens: 600, label: 'session recap',
       });
+      recap = await enforceRecapCeiling(recap, words => completeEpilogueCall({
+        apiKey: anthropicApiKey, system: p.system,
+        content: `${p.content}\n\nYOUR PREVIOUS RECAP (${words} words — too long; the limit is ${RECAP_WORDS_CEILING}):\n${recap}\n\nRewrite it in ${RECAP_WORDS_TARGET} words or fewer. Same rules. Return only the recap.`,
+        maxTokens: 300, retryMaxTokens: 600, label: 'session recap (shorten)',
+      }));
     } catch (e) {
       console.warn('[EPILOGUE] session recap failed — shipping the authored debrief alone:', e.message);
     }
@@ -2064,6 +2101,49 @@ Do not open with the historical context. Open inside the character's body. Let t
         }
       }
 
+      // EXCLUDED CHOICES (options[].excludes_in_choices, opt-in — PromptComposer.filterExcludedChoices).
+      // After a decision, a choice leading toward a course the player did NOT pick is dropped. If
+      // fewer than two survive, ONE corrective retry asks for replacement choices; only the retry's
+      // CHOICES are taken (filtered again), never its narrative or stateChanges — the narrative was
+      // already streamed and must stay the one the player read. If the retry does not yield two
+      // clean choices, the filtered original ships. Before mergeState, like detection point 2.
+      // Empty phrase list (every fork without the field, every undecided session) — untouched.
+      const excludedPhrases = (!forkDue && !output.endState?.isEnding) ? decidedChoiceExclusions(state, scenario) : [];
+      if (excludedPhrases.length && Array.isArray(output.choices)) {
+        const first = filterExcludedChoices(output.choices, excludedPhrases);
+        if (first.dropped.length) {
+          traceTags.push('excluded-choice');
+          console.warn('[DECISION-HOLD] dropped ' + first.dropped.length + ' choice(s) leading to a course not chosen: '
+            + first.dropped.map(d => JSON.stringify(d.choice) + ' ~ "' + d.phrase + '"').join(', '));
+          let kept = first.kept;
+          if (kept.filter(c => typeof c === 'string' && c.trim()).length < 2) {
+            let retryText = null;
+            try {
+              ({ text: retryText } = await callModel([
+                ...baseMessages,
+                { role: 'assistant', content: text || '' },
+                { role: 'user', content: 'Your "choices" offered a course the player did NOT choose: '
+                  + first.dropped.map(d => JSON.stringify(d.choice)).join('; ')
+                  + '. The player\'s decision is made and acted on. Return the SAME response as a single valid JSON object — same narrative — with a "choices" array of 2-4 short next steps that carry out the course the player chose or face what follows from it. No choice may contain a course they did not choose in any part of it: not as a second step, a fallback, a conditional or a preparation.' },
+              ], null, 'retry-excluded-choice'));
+            } catch { retryText = null; }
+            let cand = null;
+            if (retryText) { try { cand = extractJson(retryText); } catch { cand = null; } }
+            const again = cand && Array.isArray(cand.choices) ? filterExcludedChoices(cand.choices, excludedPhrases) : null;
+            const usable = again ? again.kept.filter(c => typeof c === 'string' && c.trim()) : [];
+            if (usable.length >= 2) {
+              kept = usable;
+              console.log('[DECISION-HOLD] corrective retry gave ' + usable.length + ' clean choice(s)'
+                + (again.dropped.length ? ' (' + again.dropped.length + ' more dropped)' : ''));
+            } else {
+              traceTags.push('excluded-choice-unrecovered');
+              console.warn('[DECISION-HOLD] corrective retry did not yield 2 clean choices — shipping ' + kept.length + ' filtered choice(s)');
+            }
+          }
+          output.choices = kept;
+        }
+      }
+
       // Anchor violation check — runs after all retries, before streaming done
       if (sessionId && anchorTrackers.has(sessionId) && output.narrative) {
         const violations = anchorTrackers.get(sessionId).check(output.narrative);
@@ -2673,6 +2753,14 @@ Do not open with the historical context. Open inside the character's body. Let t
           session_block: epilogueResult?.session_block ?? null,
           ...(epilogueResult?.session_debrief ? { session_debrief: epilogueResult.session_debrief } : {}),
           record_block:  epilogueResult?.record_block ?? null,
+          // The fork record, saved on EVERY close — a time-expiry close never has an isEnding turn,
+          // so the turn route's `outcome` patch never runs and the decision was lost. Inside
+          // `closing`, never the top-level `outcome` column, so it cannot clobber an isEnding
+          // outcome. decisions carries each answer with its frozen flags; fork_presented +
+          // fork_flags tell "put but unanswered" (flags frozen, no decision) from "never put".
+          decisions:      sessionState?.decisions ?? null,
+          fork_presented: !!sessionState?.definingMomentPresented,
+          fork_flags:     sessionState?.forkFlags ?? null,
         },
         ended_at: new Date().toISOString(),
       }));

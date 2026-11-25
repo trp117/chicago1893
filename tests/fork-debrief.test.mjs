@@ -139,8 +139,8 @@ head('TWO blocks (debrief_with_recap on — Cantigny): recap first, authored deb
   check('session_debrief is the authored debrief, byte for byte', out.session_debrief === FIDELITY);
   check('record block unchanged', out.record_block === 'Model record text.' && calls.filter(c => c.block === 'record').length === 1);
   const sys = sess[0]?.system || '', content = sess[0]?.content || '';
-  check('lead-up prompt: 40–70 words, ends at the choice, never judges, never tells the outcome',
-    sys.includes('Length: 40–70 words.') && sys.includes('END AT THE CHOICE') && sys.includes('NEVER JUDGE IT') && sys.includes('NEVER TELL THE OUTCOME'));
+  check('lead-up prompt: about 60–110 words, ceiling 130, ends at the choice, never judges, never tells the outcome',
+    sys.includes('Length: about 60–110 words, never more than 130.') && sys.includes('END AT THE CHOICE') && sys.includes('NEVER JUDGE IT') && sys.includes('NEVER TELL THE OUTCOME'));
   check('the debrief text is NOT passed to the recap', !content.includes('You kept it true') && !sys.includes('You kept it true'));
   check('nor the closing prose, AFTER THE CHOICE, or the anchored outcome', !content.includes('CLOSING-PROSE-TEXT') && !content.includes('AFTER-BEAT-TEXT') && !content.includes('ANCHORED-OUTCOME-TEXT'));
   check('no character ids in the recap prompt', !content.includes('guillaume_manchon'));

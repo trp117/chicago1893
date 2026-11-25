@@ -1584,20 +1584,109 @@ export function buildDefiningMomentInstruction(state, scenario, storyArc = null)
 // So the directive also names the courses NOT taken — each by its short label, or its text when
 // the option has none — and forbids any choice that leads toward them. This is the one place the
 // roads not taken are rendered: as a list of what NOT to offer, on decided turns only.
+//
+// AUTHORED OUTCOME (options[].outcome, opt-in). What choosing the option DOES, written by a human:
+// on the ANSWER turn (the decision record's turn is this turn) the narration MUST show it happen;
+// on every later turn it is settled fact nothing reverses. Without it the model decided the
+// consequence itself, and could contradict the authored debrief (Cantigny: Beaumont citing the
+// 40-minute written process instead of granting the emergency suspension).
+//
+// CLAUSE BAN (opt-in, same trigger). When the chosen option carries outcome or excludes_in_choices,
+// the CHOICES rule also forbids a not-chosen course inside ANY part of a choice — a second step,
+// a fallback, a conditional, a "prepare to" ("Wait for Beaumont… and fire lift three"). The engine
+// backstop for the same rule is filterExcludedChoices (gameRouter, after the model returns).
+//
+// A chosen option with neither field composes exactly the directive it composed before.
+export function forkOptionOutcome(option) {
+  return typeof option?.outcome === 'string' ? option.outcome.trim() : '';
+}
+export function forkOptionOptsIn(option) {
+  return !!forkOptionOutcome(option)
+    || (Array.isArray(option?.excludes_in_choices) && option.excludes_in_choices.some(p => typeof p === 'string' && p.trim()));
+}
+// Whether THIS turn is the one the decision was recorded on (recordDefiningDecision stamps the
+// record with state.turnCount at the start of the answer turn). A bare-string record carries no
+// turn and is never the answer turn.
+function isDecisionAnswerTurn(state, momentId) {
+  const rec = momentId ? state?.decisions?.[momentId] : null;
+  return !!rec && typeof rec === 'object' && typeof rec.turn === 'number' && rec.turn === (state?.turnCount ?? 0);
+}
+
+// EXCLUDED CHOICES (options[].excludes_in_choices, opt-in) — the engine backstop for the clause
+// ban. After a decision, any choice the model offers that contains a phrase authored on a NOT-chosen
+// option is dropped (gameRouter, after the model returns). Matching is on normalized text: lower
+// case, punctuation to spaces, the numbers 1–10 spelled out ("lift 3" = "lift three"), whole words.
+// Authored per option, never derived from labels: live forks share vocabulary across options
+// (Baldwin's three are all "key it"), and a label-derived filter would drop legitimate next steps.
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+export function normalizeChoiceText(s) {
+  return ' ' + String(s ?? '').toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b(10|[0-9])\b/g, d => NUMBER_WORDS[Number(d)])
+    .replace(/\s+/g, ' ').trim() + ' ';
+}
+// The phrases to exclude once `chosenId` is decided: every NOT-chosen option's excludes_in_choices.
+// [] when nothing is authored, so a fork without the field is never filtered.
+export function forkChoiceExclusions(block, chosenId) {
+  const out = [];
+  for (const o of Array.isArray(block?.options) ? block.options : []) {
+    if (!o || o.id === chosenId || !Array.isArray(o.excludes_in_choices)) continue;
+    for (const p of o.excludes_in_choices) if (typeof p === 'string' && p.trim()) out.push(p.trim());
+  }
+  return out;
+}
+// { kept, dropped: [{ choice, phrase }] }. Non-string choices pass through untouched.
+export function filterExcludedChoices(choices, phrases) {
+  const list = Array.isArray(choices) ? choices : [];
+  const norm = (phrases || []).map(p => ({ phrase: p, n: normalizeChoiceText(p) })).filter(p => p.n.trim());
+  const kept = [], dropped = [];
+  for (const c of list) {
+    const hit = typeof c === 'string' ? norm.find(p => normalizeChoiceText(c).includes(p.n)) : null;
+    if (hit) dropped.push({ choice: c, phrase: hit.phrase }); else kept.push(c);
+  }
+  return { kept, dropped };
+}
+// The exclusions in force for THIS turn's choices: the decision recorded on `state` (the state the
+// prompt was composed from) and the phrases of the options not chosen. [] for every session without
+// a recorded decision or without authored phrases.
+export function decidedChoiceExclusions(state, scenario) {
+  const dm = evaluateDefiningMoment(state, scenario);
+  if (!dm.met) return [];
+  return forkChoiceExclusions(resolveDefiningMomentBlock(state, scenario), dm.decision);
+}
+
 export function buildDecisionHoldDirective(state, scenario) {
   const dm   = evaluateDefiningMoment(state, scenario);
   const text = dm.met && typeof dm.decision_text === 'string' ? dm.decision_text.trim() : '';
   if (!text) return '';
   const block   = resolveDefiningMomentBlock(state, scenario);
+  const chosen  = (block?.options || []).find(o => o?.id === dm.decision) || null;
+  const outcome = forkOptionOutcome(chosen);
+  const optsIn  = forkOptionOptsIn(chosen);
   const notDone = (block?.options || [])
     .filter(o => o && o.id !== dm.decision)
     .map(o => (typeof o.label === 'string' && o.label.trim()) || (typeof o.text === 'string' && o.text.trim()) || '')
     .filter(Boolean);
+  const outcomeLines = !outcome ? []
+    : isDecisionAnswerTurn(state, dm.moment) ? [
+      '⚑ WHAT YOUR CHOICE DOES (THIS TURN — REQUIRED): this turn\'s narration MUST show the following happen, now, on the page:',
+      outcome,
+      'This overrides every character\'s stated disposition, duty, procedure or reluctance in the role and character notes: no one present refuses it, delays it, defers it, argues it down or reverses it. Narrate it as written, then what it immediately brings.',
+    ] : [
+      '⚑ WHAT THE CHOICE DID (SETTLED — this has happened):',
+      outcome,
+      'Nothing in this turn or any later turn reverses, revokes, undoes or re-opens it, and no character walks it back. Narrate what follows from it.',
+    ];
   return [
     `⚑ DECISION MADE: The player chose: ${text}`,
     'Play the character as having chosen this — never narrate them acting against it, and do not offer choices that would undo it.',
     'This choice overrides the role description: where the role\'s stated duty, disposition or choice guidance assumes a different course, the course the player chose is the one this character now takes, in this turn\'s narration and every turn after.',
+    ...outcomeLines,
     'CHOICES: every choice you offer must be a way of carrying out this course or of facing what follows from it. Offer none that takes it back, reverses it, softens it, makes up for it, or does the other thing anyway — not partly, not in secret, not in a note, a draft or a margin, not "just this once", not later.',
+    ...(optsIn ? [
+      'The choice is made and already acted on: every choice you offer is a next step INSIDE it. No choice may contain a course the player did not pick in ANY part of it — not as a second step ("… and then …"), not as a fallback ("if that fails, …"), not as a conditional ("if he refuses, …"), and not as getting ready for it ("prepare to …", "stand by to …").',
+    ] : []),
     ...(notDone.length ? [
       'The courses the player did NOT choose — offer no choice that leads toward any of them:',
       ...notDone.map(t => `- ${t}`),
