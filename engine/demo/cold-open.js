@@ -221,14 +221,23 @@
   function addChrome(role) {
     removeChrome();
     var head = el('div', 'co-head');
-    var roleBtn = el('button', 'co-role');
-    roleBtn.appendChild(el('span', 'co-role-name-label', getCardDisplayName(role)));
-    roleBtn.appendChild(el('span', 'co-role-hint', ' · change role ▾'));
-    roleBtn.type = 'button';
-    roleBtn.setAttribute('aria-haspopup', 'dialog');
-    roleBtn.setAttribute('aria-label', 'Role: ' + getCardDisplayName(role) + '. Change role');
-    roleBtn.addEventListener('click', openRoles);
-    head.appendChild(roleBtn);
+    // One role on offer (DEMO_VISIBLE_ROLES, or a one-role scenario): the role's name, no
+    // switcher — as direct-start.js does. Not a .co-role, so the reading rail (which
+    // proxies "change role" to .co-head .co-role) offers none either.
+    if ((scenario.playerRoleOptions || []).length > 1) {
+      var roleBtn = el('button', 'co-role');
+      roleBtn.appendChild(el('span', 'co-role-name-label', getCardDisplayName(role)));
+      roleBtn.appendChild(el('span', 'co-role-hint', ' · change role ▾'));
+      roleBtn.type = 'button';
+      roleBtn.setAttribute('aria-haspopup', 'dialog');
+      roleBtn.setAttribute('aria-label', 'Role: ' + getCardDisplayName(role) + '. Change role');
+      roleBtn.addEventListener('click', openRoles);
+      head.appendChild(roleBtn);
+    } else {
+      var roleOnly = el('span', 'co-role-static');
+      roleOnly.appendChild(el('span', 'co-role-name-label', getCardDisplayName(role)));
+      head.appendChild(roleOnly);
+    }
     if (buildIntroPanelEl(scenario)) {
       var histBtn = el('button', 'co-history', 'The history');
       histBtn.type = 'button';

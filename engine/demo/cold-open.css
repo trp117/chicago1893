@@ -85,6 +85,7 @@ html.rl #co-overlay .co-skip { position: relative; left: auto; right: auto; bott
 .co-head button { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 0.78rem; letter-spacing: 0.06em; }
 .co-head .co-role { color: var(--text, #f0eadc); text-align: left; }
 .co-head .co-role-hint { color: var(--muted, #a89f8d); }
+.co-head .co-role-static { color: var(--text, #f0eadc); font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 0.78rem; letter-spacing: 0.06em; padding: 6px 4px; }
 .co-head .co-history { white-space: nowrap; }
 .co-head button:hover, .co-foot button:hover, .co-foot a:hover { color: var(--demo-accent, #d6a64c); }
 .co-head button:focus-visible, .co-foot button:focus-visible, .co-foot a:focus-visible, .co-panel button:focus-visible { outline: 2px solid var(--demo-accent, #d6a64c); outline-offset: 2px; }

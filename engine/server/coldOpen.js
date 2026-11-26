@@ -20,6 +20,7 @@
 //     the first model call of the session, and it is metered as a session START.
 import crypto from 'crypto';
 import fs from 'fs';
+import { makeIsVisibleRole } from './demoMode.js';
 
 // ── Pacing ──────────────────────────────────────────────────────────────────
 // All in milliseconds from the start of the intro. Screen 1 (wide shot): the title block at
@@ -53,8 +54,9 @@ export const coldOpenHistorySeed = leanNarrative => [
 // ── Config ──────────────────────────────────────────────────────────────────
 // enabled: DEMO_MODE on AND DEMO_COLD_OPEN exactly 'true'. `entryProblem` is why the entry
 // cannot be offered even so (it then serves the card landing): no featured scenario/role, or
-// the featured scenario outside this demo's whitelist.
-export function readColdOpenConfig(env = process.env, { demoMode = false, demoScenarios = [] } = {}) {
+// the featured scenario outside this demo's whitelist, or the featured role hidden by
+// DEMO_VISIBLE_ROLES (`visibleRoles`, demoMode.js readDemoVisibleRoles; {} = every role).
+export function readColdOpenConfig(env = process.env, { demoMode = false, demoScenarios = [], visibleRoles = {} } = {}) {
   const enabled = demoMode === true && env.DEMO_COLD_OPEN === 'true';
   if (!enabled) return { enabled: false };
   const featuredScenario = (env.DEMO_FEATURED_SCENARIO || '').trim();
@@ -62,7 +64,8 @@ export function readColdOpenConfig(env = process.env, { demoMode = false, demoSc
   let entryProblem = null;
   if (!featuredScenario || !featuredRole) entryProblem = 'DEMO_FEATURED_SCENARIO and DEMO_FEATURED_ROLE must both be set';
   else if (!demoScenarios.includes(featuredScenario)) entryProblem = `featured scenario "${featuredScenario}" is not in DEMO_SCENARIOS`;
-  return { enabled: true, featuredScenario, featuredRole, entryProblem, demoScenarios: [...demoScenarios], file: (env.DEMO_COLD_OPEN_FILE || '').trim() || null };
+  else if (!makeIsVisibleRole({ demoMode: true, visibleRoles })(featuredScenario, featuredRole)) entryProblem = `featured role "${featuredRole}" is not in DEMO_VISIBLE_ROLES`;
+  return { enabled: true, featuredScenario, featuredRole, entryProblem, demoScenarios: [...demoScenarios], visibleRoles: { ...visibleRoles }, file: (env.DEMO_COLD_OPEN_FILE || '').trim() || null };
 }
 
 // ── Row validation ──────────────────────────────────────────────────────────
@@ -158,6 +161,10 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
   const stale = new Map();      // "scenario/role" -> { baked, current }
   const checked = new Map();    // "scenario/role" -> { at, baked }
   let lastEntry = { entry: 'landing', reason: 'not checked yet' };
+  // DEMO_VISIBLE_ROLES: a hidden role's ready row is never offered — not in the switcher's ready
+  // list, not as a scenario's default open, not by ?roleId=. No list = every ready row, as before.
+  const isVisibleRole = makeIsVisibleRole({ demoMode: true, visibleRoles: config.visibleRoles || {} });
+  const visibleReadyRoles = async scenarioId => (await store.readyRoles(scenarioId)).filter(r => isVisibleRole(scenarioId, r));
 
   async function checkFingerprint(scenarioId, roleId, row) {
     const k = `${scenarioId}/${roleId}`;
@@ -186,7 +193,8 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
     config, timings,
     historyUser: COLD_OPEN_HISTORY_USER,
     get,
-    readyRoles: scenarioId => store.readyRoles(scenarioId),
+    readyRoles: scenarioId => visibleReadyRoles(scenarioId),
+    isVisibleRole,
     // The featured row when the entry can be offered, else null (→ the card landing). Never
     // throws: any failure is the landing.
     async entryRow() {
@@ -208,13 +216,16 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
     // With &roleId=<role> (a role switcher) on a whitelisted scenario, featured or not: that
     // role's cold open when it has a ready row, else { redirect: '/game?scenarioId=<id>&roleId=<role>' }
     // (the direct start, which falls back to the first role if the id is not one of the scenario's).
+    // A role hidden by DEMO_VISIBLE_ROLES is treated as no role given: the featured scenario →
+    // the featured entry; another scenario → its first visible ready role, or its normal start.
     async entryFor(scenarioId, roleId = null) {
       const featured = async () => { const row = await this.entryRow(); return row ? { scenarioId: config.featuredScenario, roleId: config.featuredRole, row } : null; };
       const listed = !!scenarioId && (config.demoScenarios || []).includes(scenarioId);
+      if (listed && typeof roleId === 'string' && roleId && !isVisibleRole(scenarioId, roleId)) roleId = null;
       if (listed && typeof roleId === 'string' && roleId) {
         const direct = { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}&roleId=${encodeURIComponent(roleId)}` };
         try {
-          if (!(await store.readyRoles(scenarioId)).includes(roleId)) return direct;
+          if (!(await visibleReadyRoles(scenarioId)).includes(roleId)) return direct;
           const row = await get(scenarioId, roleId);
           return row ? { scenarioId, roleId, row } : direct;
         } catch {
@@ -223,7 +234,7 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
       }
       if (!scenarioId || scenarioId === config.featuredScenario || !listed) return featured();
       try {
-        const roles = (await store.readyRoles(scenarioId)).sort();
+        const roles = (await visibleReadyRoles(scenarioId)).sort();
         if (!roles.length) return { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };
         const row = await get(scenarioId, roles[0]);
         return row ? { scenarioId, roleId: roles[0], row } : { redirect: `/game?scenarioId=${encodeURIComponent(scenarioId)}` };
@@ -235,7 +246,7 @@ export function createColdOpenRuntime({ config, store, fingerprintFor, timings =
     async readyScenarios() {
       const out = [];
       for (const id of config.demoScenarios || []) {
-        try { if ((await store.readyRoles(id)).length) out.push(id); } catch {}
+        try { if ((await visibleReadyRoles(id)).length) out.push(id); } catch {}
       }
       return out;
     },

@@ -25,7 +25,7 @@ import { SupabaseSessionStore } from '../../lib/SupabaseSessionStore.js';
 import { CLOSURE_BEATS_ENABLED, DEFINING_MOMENT_ENABLED } from '../services/PromptComposer.js';
 import { getScenarioVersions, restoreScenarioVersion } from '../../lib/scenarioStore.js';
 import { requireAdminAuth } from '../../lib/adminAuth.js';
-import { makeIsAllowedScenario, demoPageGuard, readDemoBranding } from './demoMode.js';
+import { makeIsAllowedScenario, demoPageGuard, readDemoBranding, readDemoVisibleRoles } from './demoMode.js';
 import { createSupabaseDemoStore, readDemoBudgetId } from './demoStore.js';
 import { readDemoLimitConfig } from './demoLimits.js';
 import { readColdOpenConfig, createColdOpenStore, createColdOpenRuntime, supabaseColdOpenRows, fileColdOpenRows } from './coldOpen.js';
@@ -57,6 +57,10 @@ const DEMO_SCENARIOS = (process.env.DEMO_SCENARIOS || '').split(',').map(s => s.
 const isAllowedScenario = makeIsAllowedScenario({ demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS });
 console.log(`[DEMO] mode ${DEMO_MODE ? 'ENABLED' : 'disabled'}${DEMO_MODE ? ` scenarios=${DEMO_SCENARIOS.join(',') || '(none)'}` : ''}`);
 if (DEMO_MODE && !DEMO_SCENARIOS.length) console.warn('[DEMO] DEMO_MODE is on but DEMO_SCENARIOS is empty — every scenario will be refused.');
+// DEMO_VISIBLE_ROLES (demoMode.js) — read only in demo mode; unset or empty = every role.
+const DEMO_VISIBLE_ROLES = DEMO_MODE ? readDemoVisibleRoles(process.env) : {};
+const HAS_VISIBLE_ROLES  = Object.keys(DEMO_VISIBLE_ROLES).length > 0;
+if (HAS_VISIBLE_ROLES) console.log(`[DEMO] visible roles ${Object.entries(DEMO_VISIBLE_ROLES).map(([s, rs]) => rs.map(r => `${s}/${r}`).join(',')).join(',')} (scenarios not listed: every role)`);
 // Which demo this is: its landing branding and its own spend-counter row. Read only in demo
 // mode; every default is Grey Witness's, so an unset deployment is the Grey Witness demo.
 const DEMO_BRANDING  = DEMO_MODE ? readDemoBranding() : null;
@@ -67,7 +71,7 @@ if (DEMO_MODE) console.log(`[DEMO] site "${DEMO_BRANDING.siteName}" ${DEMO_BRAND
 const DEMO_STORE = DEMO_MODE ? createSupabaseDemoStore(supabaseService, { budgetId: DEMO_BUDGET_ID }) : null;
 // DEMO_COLD_OPEN (coldOpen.js) — default OFF, and inert without DEMO_MODE. Built only when on:
 // otherwise nothing is constructed, no route is added and no boot line is printed.
-const COLD_OPEN_CONFIG = readColdOpenConfig(process.env, { demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS });
+const COLD_OPEN_CONFIG = readColdOpenConfig(process.env, { demoMode: DEMO_MODE, demoScenarios: DEMO_SCENARIOS, visibleRoles: DEMO_VISIBLE_ROLES });
 const COLD_OPEN = COLD_OPEN_CONFIG.enabled ? createColdOpenRuntime({
   config: COLD_OPEN_CONFIG,
   store:  createColdOpenStore({ fetchRows: COLD_OPEN_CONFIG.file ? fileColdOpenRows(COLD_OPEN_CONFIG.file) : supabaseColdOpenRows(supabaseService) }),
@@ -131,6 +135,7 @@ const gameConfig = {
   // demo mode — with the flag off no demo table is ever touched.
   ...(DEMO_MODE ? { demoStore: DEMO_STORE, demoLimits: readDemoLimitConfig() } : {}),
   ...(COLD_OPEN ? { coldOpen: COLD_OPEN } : {}),
+  ...(HAS_VISIBLE_ROLES ? { demoVisibleRoles: DEMO_VISIBLE_ROLES } : {}),
   ...(DEMO_PREVIEW ? { demoHasBypass: DEMO_PREVIEW.hasBypass } : {}),
 };
 if (DEMO_MODE) {
@@ -266,6 +271,8 @@ app.get('/health', (_, res) => {
     ...(COLD_OPEN ? { coldOpen: COLD_OPEN.health() } : {}),
     // DEMO_READING_LAYOUT only. Absent otherwise.
     ...(READING_LAYOUT ? { readingLayout: true } : {}),
+    // DEMO_VISIBLE_ROLES only. Absent otherwise.
+    ...(HAS_VISIBLE_ROLES ? { visibleRoles: DEMO_VISIBLE_ROLES } : {}),
     uptime: process.uptime(),
   });
 });

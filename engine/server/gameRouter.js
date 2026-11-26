@@ -44,7 +44,7 @@ import { SchemaValidator } from '../services/SchemaValidator.js';
 import { consolidateBibliography } from '../services/Bibliography.js';
 import * as appData from '../data.js';
 import { AnchorTracker } from '../services/AnchorTracker.js';
-import { makeIsAllowedScenario } from './demoMode.js';
+import { makeIsAllowedScenario, makeIsVisibleRole } from './demoMode.js';
 import { checkInputSafety, MINOR_SELF_STATEMENT_NOTE } from '../services/InputSafetyGate.js';
 import { createBudget, createDailyCap, createRateLimiter, DEMO_LIMIT_COPY } from './demoLimits.js';
 import { fingerprintScenarioData, buildColdOpenState, seedColdOpenStoryTracking, coldOpenHistorySeed, coldOpenTranscriptHeader, coldOpenIntroDisplay } from './coldOpen.js';
@@ -1025,6 +1025,10 @@ export function createGameRouter(contentRepos, config = {}) {
   const demoMode          = config.demoMode === true;
   const isAllowedScenario = makeIsAllowedScenario({ demoMode, demoScenarios: config.demoScenarios || [] });
   const refuseScenario    = res => res.status(404).json({ error: 'Scenario not found.' });
+  // DEMO_VISIBLE_ROLES (demoMode.js): `true` for every role when the flag is off or no list was
+  // given. A hidden role is left out of bootstrap's role list (every picker and switcher reads it)
+  // and answered like an unknown role wherever one is named: /start, /turn, the cold open.
+  const isVisibleRole     = makeIsVisibleRole({ demoMode, visibleRoles: config.demoVisibleRoles || {} });
 
   // DEMO_MODE Phase 2 — spend cap, per-IP daily cap, rate limit, demo transcripts. Built only
   // in demo mode; `demo` is null in prod and every use below is behind `if (demo)`.
@@ -1095,7 +1099,7 @@ export function createGameRouter(contentRepos, config = {}) {
     r.get('/cold-open', async (req, res) => {
       const { scenarioId, roleId } = req.query;
       const notFound = () => res.status(404).json({ error: 'Not found.' });
-      if (typeof scenarioId !== 'string' || typeof roleId !== 'string' || !isAllowedScenario(scenarioId)) return notFound();
+      if (typeof scenarioId !== 'string' || typeof roleId !== 'string' || !isAllowedScenario(scenarioId) || !isVisibleRole(scenarioId, roleId)) return notFound();
       try {
         const row = await coldOpen.get(scenarioId, roleId);
         if (!row) return notFound();
@@ -1131,6 +1135,7 @@ export function createGameRouter(contentRepos, config = {}) {
           return res.status(400).json({ error: 'Missing playerInput or sessionId.' });
         }
         if (typeof scenarioId !== 'string' || !isAllowedScenario(scenarioId)) return refuseScenario(res);
+        if (!isVisibleRole(scenarioId, roleId)) return res.status(404).json({ error: 'This opening is not available.' });
         const row = await coldOpen.get(scenarioId, roleId);
         if (!row) return res.status(404).json({ error: 'This opening is not available.' });
         const { scenario, playerRoles, characters } = await getScenarioData(repos, scenarioId);
@@ -1197,7 +1202,7 @@ export function createGameRouter(contentRepos, config = {}) {
       const { scenario, playerRoles, characters, locations, clues } = await getScenarioData(repos, scenarioId);
       console.log(`[BOOTSTRAP] scenario=${scenarioId} roles=${playerRoles.length} locs=${locations.length} clues=${clues.length}`);
 
-      const playerRoleOptions = playerRoles.map(r => ({
+      const playerRoleOptions = playerRoles.filter(r => isVisibleRole(scenarioId, r.id)).map(r => ({
         id:               r.id,
         name:             r.name,
         real_name:        r.real_name || null,
@@ -1236,6 +1241,8 @@ export function createGameRouter(contentRepos, config = {}) {
       } = req.body;
       if (!scenarioId || !roleId) return res.status(400).json({ error: 'scenarioId and roleId are required.' });
       if (!isAllowedScenario(scenarioId)) return refuseScenario(res);
+      // Before the daily slot is taken: a hidden role is an unknown role (the same 404).
+      if (!isVisibleRole(scenarioId, roleId)) return res.status(404).json({ error: `Role "${roleId}" not found.` });
       if (!anthropicApiKey)       return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
       if (demo) {
         const hit = await demoLimitHit(req, { starting: true });
@@ -1651,6 +1658,8 @@ Do not open with the historical context. Open inside the character's body. Let t
       if (!state || !playerInput) return res.status(400).json({ error: 'Missing state or playerInput.' });
       if (!state.scenarioId)       return res.status(400).json({ error: 'state.scenarioId is required.' });
       if (!isAllowedScenario(state.scenarioId)) return refuseScenario(res);
+      // The client holds the state: a hand-made one naming a hidden role is refused like /start.
+      if (!isVisibleRole(state.scenarioId, state.playerRoleId)) return res.status(404).json({ error: 'Role not found.' });
       if (!anthropicApiKey)        return res.status(503).json({ error: 'ANTHROPIC_API_KEY is not configured.' });
 
       // ── INPUT-SAFETY GATE (engine-wide, always on) ───────────────────────────

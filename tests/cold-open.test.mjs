@@ -79,6 +79,41 @@ console.log('\nPart B — coldOpen.js');
   check('featured scenario outside DEMO_SCENARIOS → entryProblem (landing)', /not in DEMO_SCENARIOS/.test(CO.readColdOpenConfig(on, { demoMode: true, demoScenarios: ['steel_curtain_cantigny'] }).entryProblem || ''));
   check('featured role unset → entryProblem (landing)', !!CO.readColdOpenConfig({ ...on, DEMO_FEATURED_ROLE: '' }, { demoMode: true, demoScenarios: ['dog_green_sector'] }).entryProblem);
 
+  // DEMO_VISIBLE_ROLES — parse, predicate, featured-role check.
+  const quietLog = { warn() {} };
+  check('visible roles: unset / empty → {}', JSON.stringify(DM.readDemoVisibleRoles({})) === '{}' && JSON.stringify(DM.readDemoVisibleRoles({ DEMO_VISIBLE_ROLES: ' , ' })) === '{}');
+  const vr = DM.readDemoVisibleRoles({ DEMO_VISIBLE_ROLES: ' steel_curtain_cantigny/role_artillery_commander, dog_green_sector/role_battalion_medic,dog_green_sector/role_coxswain, nonsense, a/b/c, /x, y/ ,dog_green_sector/role_coxswain' }, { log: quietLog });
+  check('visible roles: "scenario/role" pairs grouped per scenario; malformed and duplicate entries dropped', JSON.stringify(vr) === JSON.stringify({ steel_curtain_cantigny: ['role_artillery_commander'], dog_green_sector: ['role_battalion_medic', 'role_coxswain'] }));
+  const vis = DM.makeIsVisibleRole({ demoMode: true, visibleRoles: vr });
+  check('visible roles: a listed scenario shows only its listed roles', vis('steel_curtain_cantigny', 'role_artillery_commander') && !vis('steel_curtain_cantigny', 'role_forward_infantryman') && !vis('steel_curtain_cantigny', 'role_indigenous_signaler'));
+  check('visible roles: a scenario the list does not name shows every role', vis('tolle_lege_milan_386', 'anything'));
+  check('visible roles: DEMO_MODE off → every role, list or not', DM.makeIsVisibleRole({ demoMode: false, visibleRoles: vr })('steel_curtain_cantigny', 'role_forward_infantryman'));
+  check('visible roles: no list → every role', DM.makeIsVisibleRole({ demoMode: true })('steel_curtain_cantigny', 'role_forward_infantryman') && DM.makeIsVisibleRole({ demoMode: true, visibleRoles: {} })('x', 'y'));
+  check('visible roles: an inherited key ("constructor") is not a listing', DM.makeIsVisibleRole({ demoMode: true, visibleRoles: {} })('constructor', 'r'));
+  check('featured role hidden by DEMO_VISIBLE_ROLES → entryProblem (landing)', /not in DEMO_VISIBLE_ROLES/.test(CO.readColdOpenConfig(on, { demoMode: true, demoScenarios: ['dog_green_sector'], visibleRoles: { dog_green_sector: ['role_coxswain'] } }).entryProblem || ''));
+  check('featured role listed → no entry problem', !CO.readColdOpenConfig(on, { demoMode: true, demoScenarios: ['dog_green_sector'], visibleRoles: { dog_green_sector: ['role_battalion_medic'] } }).entryProblem);
+
+  // The runtime: ready rows of hidden roles are never offered.
+  {
+    const fakeRow = { content: { baked: { fingerprint: 'sha256:x', state: {} } } };
+    const fakeStore = { get: async () => fakeRow, readyRoles: async sid => sid === 'dog_green_sector' ? ['role_battalion_medic', 'role_coxswain'] : sid === 'other_s' ? ['role_b', 'role_a'] : [] };
+    const mk = visibleRoles => CO.createColdOpenRuntime({
+      config: CO.readColdOpenConfig(on, { demoMode: true, demoScenarios: ['dog_green_sector', 'other_s', 'bare_s'], visibleRoles }),
+      store: fakeStore, fingerprintFor: async () => 'sha256:x', log: quietLog,
+    });
+    const off = mk({}), only = mk({ dog_green_sector: ['role_battalion_medic'], other_s: ['role_b'] });
+    check('runtime, no list: readyRoles unchanged', JSON.stringify(await off.readyRoles('dog_green_sector')) === '["role_battalion_medic","role_coxswain"]');
+    check('runtime, list: readyRoles drops the hidden role', JSON.stringify(await only.readyRoles('dog_green_sector')) === '["role_battalion_medic"]');
+    check('runtime, no list: ?roleId=<other ready role> opens that role', (await off.entryFor('dog_green_sector', 'role_coxswain'))?.roleId === 'role_coxswain');
+    check('runtime, list: ?roleId=<hidden role> on the featured scenario → the featured entry', (await only.entryFor('dog_green_sector', 'role_coxswain'))?.roleId === 'role_battalion_medic');
+    check('runtime, list: ?roleId=<hidden role> never becomes a direct-start redirect', !(await only.entryFor('dog_green_sector', 'role_coxswain'))?.redirect);
+    check('runtime, list: another scenario\'s default open skips its hidden ready role', (await off.entryFor('other_s'))?.roleId === 'role_a' && (await only.entryFor('other_s'))?.roleId === 'role_b');
+    check('runtime, list: a hidden ?roleId= on another scenario → that scenario\'s first visible role', (await only.entryFor('other_s', 'role_a'))?.roleId === 'role_b');
+    check('runtime: a scenario with no ready row still goes to its normal start', (await only.entryFor('bare_s', 'r'))?.redirect === '/game?scenarioId=bare_s&roleId=r');
+    const onlyHidden = mk({ other_s: ['role_z'] });
+    check('runtime, list: a scenario whose only ready rows are hidden → its normal start, and off /moments\' ready list', (await onlyHidden.entryFor('other_s'))?.redirect === '/game?scenarioId=other_s' && !(await onlyHidden.readyScenarios()).includes('other_s'));
+  }
+
   const good = {
     intro: { name: 'N', place: 'P', date: 'D', wide: 'w', role: 'R', unit: 'U', character: 'c' },
     lean: { narrative: 'n', instruction: 'i', choices: ['a', 'b', 'c'] },
@@ -482,6 +517,46 @@ try {
   reply = TURN;
   const offTurn = await post(offBase, '/game/api/turn', { playerInput: 'x', sessionId: crypto.randomUUID(), state: clientState, coldOpen: { scenarioId: SCENARIO_ID, roleId: ROLE_ID } });
   check('router without the cold open: a coldOpen tag is ignored (client state used, 41 → 42)', offTurn.done?.nextState.turnCount === 42);
+
+  // C14 — DEMO_VISIBLE_ROLES: the coxswain hidden, the medic the only role on offer.
+  {
+    const visibleRoles = { [SCENARIO_ID]: [ROLE_ID] };
+    const vCfg = CO.readColdOpenConfig({ DEMO_COLD_OPEN: 'true', DEMO_FEATURED_SCENARIO: SCENARIO_ID, DEMO_FEATURED_ROLE: ROLE_ID }, { demoMode: true, demoScenarios: [SCENARIO_ID], visibleRoles });
+    const vRuntime = CO.createColdOpenRuntime({
+      config: vCfg,
+      store: CO.createColdOpenStore({ fetchRows: async sid => rows.filter(r => r.scenario_id === sid && r.status === 'ready') }),
+      fingerprintFor: (s, r, st) => coldOpenFingerprintFor(repos, s, r, st),
+    });
+    const vStore = createMemoryDemoStore();
+    const vBase = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { ...routerCfg, coldOpen: vRuntime, demoStore: vStore, demoVisibleRoles: visibleRoles })));
+    const bootRoles = async base => ((await (await realFetch(`${base}/game/api/bootstrap?scenarioId=${SCENARIO_ID}`)).json()).scenario?.playerRoleOptions || []).map(r => r.id);
+    const allRoles = repos.scenarios.findPlayerRoles(SCENARIO_ID).map(r => r.id);
+    check('visible roles: bootstrap lists only the visible role', JSON.stringify(await bootRoles(vBase)) === JSON.stringify([ROLE_ID]));
+    check('visible roles: without the list, bootstrap lists every role (unchanged)', JSON.stringify(await bootRoles(BASE)) === JSON.stringify(allRoles) && allRoles.length > 1);
+    const prodBase = await listen(express().use(express.json({ limit: '10mb' })).use('/game/api', createGameRouter(repos, { anthropicApiKey: 'cold-open-test-key', demoVisibleRoles: visibleRoles })));
+    check('visible roles: ignored with DEMO_MODE off (prod router lists every role)', JSON.stringify(await bootRoles(prodBase)) === JSON.stringify(allRoles));
+
+    const n0 = model.story.length;
+    const hiddenStart = await post(vBase, '/game/api/start', { scenarioId: SCENARIO_ID, roleId: OTHER_ROLE, narrativeStyle: 'focused' });
+    check('visible roles: /start with a hidden role → 404, no model call', hiddenStart.status === 404 && model.story.length === n0);
+    check('visible roles: …refused before the demo limits run (no budget read, no transcript)', !vStore.state.calls.includes('readBudget') && !vStore.state.calls.includes('startTranscript'), vStore.state.calls.join(','));
+    const forged = await post(vBase, '/game/api/turn', { playerInput: 'x', sessionId: crypto.randomUUID(), state: { ...done1.nextState, playerRoleId: OTHER_ROLE } });
+    check('visible roles: /turn on a hand-made state naming a hidden role → 404, no model call', forged.status === 404 && model.story.length === n0);
+    check('visible roles: GET /cold-open for the hidden role → 404', (await realFetch(`${vBase}/game/api/cold-open?scenarioId=${SCENARIO_ID}&roleId=${OTHER_ROLE}`)).status === 404);
+    const vis = await (await realFetch(`${vBase}/game/api/cold-open?scenarioId=${SCENARIO_ID}&roleId=${ROLE_ID}`)).json();
+    check('visible roles: the visible role\'s cold open is served, readyRoles lists only it', vis.roleId === ROLE_ID && JSON.stringify(vis.readyRoles) === JSON.stringify([ROLE_ID]));
+    const hiddenFirst = await post(vBase, '/game/api/turn', { playerInput: 'x', sessionId: crypto.randomUUID(), state: {}, coldOpen: { scenarioId: SCENARIO_ID, roleId: OTHER_ROLE } });
+    check('visible roles: a cold-open first turn tagged with the hidden role → 404, no model call', hiddenFirst.status === 404 && model.story.length === n0);
+    check('visible roles: ?roleId=<hidden> at / → the featured entry', (await vRuntime.entryFor(SCENARIO_ID, OTHER_ROLE))?.roleId === ROLE_ID);
+
+    // The page: one role on offer → no switcher in the header (and so none on the rail).
+    const vp = await openPage({ base: vBase });
+    await until(() => vp.doc.getElementById('co-overlay').hidden, 3000);
+    const vHead = vp.doc.querySelector('.co-head');
+    check('visible roles: header shows the role name with no switcher', !vHead.querySelector('.co-role') && /Battalion Medic/.test(vHead.querySelector('.co-role-static')?.textContent || '') && !/change role/.test(vHead.textContent));
+    check('visible roles: "The history" still in the header', /The history/.test(vHead.textContent));
+    vp.win.close();
+  }
 
   // ── Part D: server boots ───────────────────────────────────────────────────
   console.log('\nPart D — server boots: /, /moments, /health, fail-safes');

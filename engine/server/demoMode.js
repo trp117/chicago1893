@@ -112,6 +112,36 @@ export function makeIsAllowedScenario({ demoMode, demoScenarios = [] } = {}) {
   return id => !demoMode || demoScenarios.includes(id);
 }
 
+// DEMO_VISIBLE_ROLES — which roles a demo offers, as "scenario/role,scenario/role".
+// Per scenario: a scenario named here shows ONLY its listed roles (the bootstrap role list every
+// role picker and switcher reads, and the server's /start, /turn and cold-open checks); a scenario
+// not named shows all its roles. Unset or empty, or DEMO_MODE off: every role, as before. The
+// admin never reads it. Returns { [scenarioId]: [roleId, …] } — {} when unset. A malformed entry
+// (no "/") is reported and skipped.
+export function readDemoVisibleRoles(env = process.env, { log = console } = {}) {
+  const out = {};
+  for (const raw of (env.DEMO_VISIBLE_ROLES || '').split(',')) {
+    const entry = raw.trim();
+    if (!entry) continue;
+    const slash = entry.indexOf('/');
+    const scenarioId = slash > 0 ? entry.slice(0, slash).trim() : '';
+    const roleId     = slash > 0 ? entry.slice(slash + 1).trim() : '';
+    if (!scenarioId || !roleId || roleId.includes('/')) { log.warn(`[DEMO] DEMO_VISIBLE_ROLES entry "${entry}" ignored — expected scenario_id/role_id`); continue; }
+    (out[scenarioId] ||= []).includes(roleId) || out[scenarioId].push(roleId);
+  }
+  return out;
+}
+
+// (scenarioId, roleId) → may the demo offer this role? True for everything when the flag is off
+// or nothing is listed, and for every role of a scenario the whitelist does not name.
+export function makeIsVisibleRole({ demoMode, visibleRoles = {} } = {}) {
+  return (scenarioId, roleId) => {
+    if (!demoMode) return true;
+    const listed = Object.hasOwn(visibleRoles, scenarioId) ? visibleRoles[scenarioId] : null;
+    return !listed || listed.includes(roleId);
+  };
+}
+
 // Static files from public/ that carry the full catalogue or the Ledger 250 branding:
 // the prod homepage under its own name, its backups, and the test page.
 const BLOCKED_PUBLIC_FILE = /^\/(index[._-][^/]*\.html|test(\.html)?)$/i;
