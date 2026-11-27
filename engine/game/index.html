@@ -1971,7 +1971,8 @@ async function submitTurn(playerInput, { isChoice = false, definingChoiceId = nu
   inputEl.value = '';
   scrollHintEl.classList.remove('visible');
   choicesAreaWrapEl.classList.add('hidden');
-  streamOptionsDots.classList.remove('hidden');
+  // One loader per turn: the feed's thinking-dots. The bottom-bar #stream-options-dots stays
+  // hidden (it duplicated them); the restore paths below still add 'hidden', a no-op now.
   submitBtn.disabled = true;
 
   // Fade out current narrative, fetch in parallel so network isn't blocked by animation
@@ -3129,10 +3130,10 @@ async function startGame(roleId, narrativeStyle, briefingContext = {}) {
   renderSidebar();
   updateLocationDisplay(gameState.location);
 
-  // Hide choices area and show streaming dots while opening generates
+  // Hide the choices area while the opening generates. The feed's thinking-dots (below) are the
+  // only loader; #stream-options-dots stays hidden.
   scrollHintEl.classList.remove('visible');
   choicesAreaWrapEl.classList.add('hidden');
-  streamOptionsDots.classList.remove('hidden');
   submitBtn.disabled = true;
 
   // Show thinking dots while waiting for first chunk
