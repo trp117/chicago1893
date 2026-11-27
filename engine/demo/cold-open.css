@@ -33,7 +33,17 @@ html.co-active:not(.rl) .story-feed { max-width: 720px; width: 100%; margin: 0 a
 /* The two title screens, stacked in the same place (cold-open.js fades them in turn). */
 #co-overlay .co-screen { position: absolute; left: 16px; right: 16px; top: 50%; transform: translateY(-50%);
   margin: 0 auto; max-width: 34rem; text-align: center; }
-#co-overlay .co-title, #co-overlay .co-wide, #co-overlay .co-you, #co-overlay .co-character, #co-overlay .co-skip { opacity: 0; }
+#co-overlay .co-title, #co-overlay .co-wide, #co-overlay .co-you, #co-overlay .co-character, #co-overlay .co-dots, #co-overlay .co-skip { opacity: 0; }
+/* The three-dot hold pulse under each screen's text. The group's opacity is staged by the
+   script with its screen's last line; the dots pulse inside it. Colour = the wide/character
+   line's ink (the overlay has no --ink token). */
+#co-overlay .co-dots { display: flex; gap: 11px; justify-content: center; margin-top: 40px; }
+#co-overlay .co-dots span { width: 8px; height: 8px; border-radius: 50%; background: #d9cfbd; opacity: .28;
+  animation: coDot 1.4s ease-in-out infinite; }
+#co-overlay .co-dots span:nth-child(2) { animation-delay: .2s; }
+#co-overlay .co-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes coDot { 0%, 100% { opacity: .24; transform: translateY(0); } 42% { opacity: .9; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { #co-overlay .co-dots span { animation: none; opacity: .5; } }
 /* Screen 1: the story's name (large), place · date beneath (small, uppercase, accent), then the
    wide line — narration, italic, no quotation marks. */
 #co-overlay .co-title { margin: 0 0 30px; }

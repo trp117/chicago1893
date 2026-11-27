@@ -64,20 +64,33 @@
   titleBlock.appendChild(nameEl);
   titleBlock.appendChild(datelineEl);
   var wideEl = el('p', 'co-wide');
+  // A three-dot pulse under each screen's text, so the timed hold reads as intentional. Pure
+  // CSS animation (cold-open.css .co-dots); it fades in with the screen's last line and out with
+  // the screen.
+  function dotsEl() {
+    var d = el('div', 'co-dots');
+    d.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 3; i++) d.appendChild(el('span'));
+    return d;
+  }
+  var dots1 = dotsEl();
   s1.appendChild(titleBlock);
   s1.appendChild(wideEl);
+  s1.appendChild(dots1);
   // Screen 2 (character): "You are a/an {role}, {unit}", then the character line.
   var s2 = el('div', 'co-screen co-s2');
   var youEl = el('p', 'co-you');
   var charEl = el('p', 'co-character');
   s2.appendChild(youEl);
+  var dots2 = dotsEl();
   s2.appendChild(charEl);
+  s2.appendChild(dots2);
   var skipEl = el('p', 'co-skip', 'Tap to skip');
   overlay.appendChild(s1);
   overlay.appendChild(s2);
   overlay.appendChild(skipEl);
   // Every element that fades on its own, in the order they appear.
-  var stagedEls = [titleBlock, wideEl, youEl, charEl, skipEl];
+  var stagedEls = [titleBlock, wideEl, dots1, youEl, charEl, dots2, skipEl];
   document.body.appendChild(overlay);
 
   // Back link (“← Stories”) leads to the card grid, not back into this entry.
@@ -335,14 +348,15 @@
       // Reduced motion: screen 1 whole and at once, then the scene. No staged fades.
       setOpacity(titleBlock, '1', 0);
       setOpacity(wideEl, '1', 0);
+      setOpacity(dots1, '1', 0);
       at(T.s1out || 0, dissolve);
       return;
     }
     at(T.titleIn || 0, function () { setOpacity(titleBlock, '1', f); });
-    at(T.quoteIn || 0, function () { setOpacity(wideEl, '1', f); });
+    at(T.quoteIn || 0, function () { setOpacity(wideEl, '1', f); setOpacity(dots1, '1', f); });
     at(T.s1out || 0, function () { setOpacity(s1, '0', f); });
     at(T.s2in || 0, function () { setOpacity(youEl, '1', f); });
-    at(T.charIn || 0, function () { setOpacity(charEl, '1', f); });
+    at(T.charIn || 0, function () { setOpacity(charEl, '1', f); setOpacity(dots2, '1', f); });
     at(T.s2out || 0, function () { setOpacity(s2, '0', f); });
     at(T.reveal || 0, dissolve);
   }
